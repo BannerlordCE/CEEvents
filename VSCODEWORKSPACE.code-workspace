@@ -1,0 +1,26 @@
+{
+	"folders": [
+		{
+			"path": "..\\ModuleData"
+		},
+		{
+			"path": "..\\ModuleLogs"
+		},
+		{
+			"path": "..\\ModuleLoader"
+		},
+		{
+			"path": "..\\GUI\\Brushes"
+		},
+		{
+			"path": ".."
+		},
+		{
+			"path": "..\\..\\zCEDefaults"
+		},
+		{
+			"path": "..\\..\\zCEAnimations"
+		}
+	],
+	"settings": {}
+}
