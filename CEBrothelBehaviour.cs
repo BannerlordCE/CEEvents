@@ -453,7 +453,7 @@ namespace CaptivityEvents.Brothel
         {
 
             // Owner Dialogue Confident Prostitute
-            campaignGameStarter.AddDialogLine("prostitute_requirements_owner", "start", "cprostitute_owner_00", "{=CEBROTHEL1049}Hello {?PLAYER.GENDER}milady{?}my lord{\\?}, I am currently working very hard.[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(() => ConversationWithProstituteIsOwner() && ConversationWithConfidentProstitute()), null, 100, null);
+            campaignGameStarter.AddDialogLine("prostitute_requirements_owner", "start", "cprostitute_owner_00", "{=CEBROTHEL1008}Hello {?PLAYER.GENDER}milady{?}my lord{\\?}, I am currently working very hard.[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(() => ConversationWithProstituteIsOwner() && ConversationWithConfidentProstitute()), null, 100, null);
 
             campaignGameStarter.AddPlayerLine("cprostitute_owner_00_yes", "cprostitute_owner_00", "prostitute_service_yes_response", "{=CEBROTHEL1007}I will like to have some fun.", null, null, 100, null, null);
 
@@ -472,142 +472,142 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddDialogLine("tprostitute_owner_00_break_r", "tprostitute_owner_00_break_response", "close_window", "{=CEBROTHEL1005}Thank you {?PLAYER.GENDER}milady{?}my lord{\\?}.", null, null, 100, null);
 
             // Requirements not met
-            campaignGameStarter.AddDialogLine("prostitute_requirements_not_met", "start", "close_window", "{=CEBROTHEL1049}Sorry {?PLAYER.GENDER}milady{?}my lord{\\?}, I am currently very busy.", new ConversationSentence.OnConditionDelegate(ConversationWithProstituteNotMetRequirements), null, 100, null);
+            campaignGameStarter.AddDialogLine("prostitute_requirements_not_met", "start", "close_window", "{=CEBROTHEL1009}Sorry {?PLAYER.GENDER}milady{?}my lord{\\?}, I am currently very busy.", new ConversationSentence.OnConditionDelegate(ConversationWithProstituteNotMetRequirements), null, 100, null);
 
-            campaignGameStarter.AddDialogLine("customer_requirements_not_met", "start", "customer_00", "{=CEBROTHEL1050}What do you want? Cannot you see that I am trying to enjoy the whores here? [ib:normal][rb:unsure]", new ConversationSentence.OnConditionDelegate(() => { return ConversationWithCustomerNotMetRequirements() && ConversationWithConfidentCustomer(); }), null, 100, null);
+            campaignGameStarter.AddDialogLine("customer_requirements_not_met", "start", "customer_00", "{=CEBROTHEL1010}What do you want? Cannot you see that I am trying to enjoy the whores here? [ib:normal][rb:unsure]", new ConversationSentence.OnConditionDelegate(() => { return ConversationWithCustomerNotMetRequirements() && ConversationWithConfidentCustomer(); }), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("customer_00_nevermind", "customer_00", "prostitute_service_no_response", "{=CEBROTHEL2124}Uh, nevermind.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("customer_00_nevermind", "customer_00", "prostitute_service_no_response", "{=CEBROTHEL1011}Uh, nevermind.", null, null, 100, null, null);
 
             // Tried Customer 01
-            campaignGameStarter.AddDialogLine("tcustomer_00_start", "start", "tcustomer_00", "{=CEBROTHEL1051}Yes? [ib:normal][rb:unsure]", new ConversationSentence.OnConditionDelegate(ConversationWithTiredCustomer), null, 100, null);
+            campaignGameStarter.AddDialogLine("tcustomer_00_start", "start", "tcustomer_00", "{=CEBROTHEL1012}Yes? [ib:normal][rb:unsure]", new ConversationSentence.OnConditionDelegate(ConversationWithTiredCustomer), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("tcustomer_00_service", "tcustomer_00", "tcustomer_00_talk_service", "{=CEBROTHEL1041}Would you like my services for {AMOUNT} denars?", new ConversationSentence.OnConditionDelegate(() => { return PriceWithProstitute() && !ConversationWithCustomerNotMetRequirements(); }), null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("tcustomer_00_service", "tcustomer_00", "tcustomer_00_talk_service", "{=CEBROTHEL1013}Would you like my services for {AMOUNT} denars?", new ConversationSentence.OnConditionDelegate(() => { return PriceWithProstitute() && !ConversationWithCustomerNotMetRequirements(); }), null, 100, null, null);
 
-            campaignGameStarter.AddPlayerLine("tcustomer_00_nevermind", "tcustomer_00", "close_window", "{=CEBROTHEL2124}Uh, nevermind.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("tcustomer_00_nevermind", "tcustomer_00", "close_window", "{=CEBROTHEL1011}Uh, nevermind.", null, null, 100, null, null);
 
             campaignGameStarter.AddDialogLine("tcustomer_00_service_r", "tcustomer_00_talk_service", "close_window", "{=!}{RESPONSE_STRING}", new ConversationSentence.OnConditionDelegate(ConversationWithCustomerRandomResponse), null, 100, null);
 
             // Confident Customer 00
-            campaignGameStarter.AddDialogLine("ccustomer_00_start", "start", "ccustomer_00", "{=CEBROTHEL1052}Well hello there you {?PLAYER.GENDER}fine whore{?}stud{\\?}, would you like {AMOUNT} denars for your services? [ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(() => { return RandomizeConversation(2) && PriceWithProstitute() && ConversationWithConfidentCustomer(); }), null, 100, null);
+            campaignGameStarter.AddDialogLine("ccustomer_00_start", "start", "ccustomer_00", "{=CEBROTHEL1014}Well hello there you {?PLAYER.GENDER}fine whore{?}stud{\\?}, would you like {AMOUNT} denars for your services? [ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(() => { return RandomizeConversation(2) && PriceWithProstitute() && ConversationWithConfidentCustomer(); }), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("ccustomer_00_service", "ccustomer_00", "close_window", "{=CEBROTHEL2001}Yes, my lord I can do that.", null, new ConversationSentence.OnConsequenceDelegate(ConversationCustomerConsequenceSex), 100, null, null);
+            campaignGameStarter.AddPlayerLine("ccustomer_00_service", "ccustomer_00", "close_window", "{=CEBROTHEL1015}Yes, my lord I can do that.", null, new ConversationSentence.OnConsequenceDelegate(ConversationCustomerConsequenceSex), 100, null, null);
 
-            campaignGameStarter.AddPlayerLine("ccustomer_00_rage", "ccustomer_00", "ccustomer_00_rage_reply", "{=CEBROTHEL1030}Excuse me, I don't work here!", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("ccustomer_00_rage", "ccustomer_00", "ccustomer_00_rage_reply", "{=CEBROTHEL1016}Excuse me, I don't work here!", null, null, 100, null, null);
 
             campaignGameStarter.AddDialogLine("ccustomer_00_rage_reply_r", "ccustomer_00_rage_reply", "close_window", "{=!}{RESPONSE_STRING}", new ConversationSentence.OnConditionDelegate(ConversationWithCustomerRandomResponse), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("ccustomer_00_nevermind", "ccustomer_00", "close_window", "{=CEBROTHEL5045}Sorry sir, I have to leave.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("ccustomer_00_nevermind", "ccustomer_00", "close_window", "{=CEBROTHEL1017}Sorry sir, I have to leave.", null, null, 100, null, null);
 
 
 
             // Confident Prostitute Extra Replies
-            campaignGameStarter.AddPlayerLine("prostitute_service_yes", "prostitute_service", "prostitute_service_yes_response", "{=CEBROTHEL2003}That's a fair price I'd say.", null, null, 100, new ConversationSentence.OnClickableConditionDelegate(ConversationHasEnoughForService), null);
-            campaignGameStarter.AddPlayerLine("prostitute_service_no", "prostitute_service", "prostitute_service_no_response", "{=CEBROTHEL2005}That's too much, no thanks.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("prostitute_service_yes", "prostitute_service", "prostitute_service_yes_response", "{=CEBROTHEL1018}That's a fair price I'd say.", null, null, 100, new ConversationSentence.OnClickableConditionDelegate(ConversationHasEnoughForService), null);
+            campaignGameStarter.AddPlayerLine("prostitute_service_no", "prostitute_service", "prostitute_service_no_response", "{=CEBROTHEL1019}That's too much, no thanks.", null, null, 100, null, null);
 
-            campaignGameStarter.AddDialogLine("prostitute_service_yes_response_id", "prostitute_service_yes_response", "close_window", "{=CEBROTHEL2004}Follow me sweetie. [ib:normal][rb:positive]", null, new ConversationSentence.OnConsequenceDelegate(ConversationProstituteConsequenceSex), 100, null);
+            campaignGameStarter.AddDialogLine("prostitute_service_yes_response_id", "prostitute_service_yes_response", "close_window", "{=CEBROTHEL1020}Follow me sweetie. [ib:normal][rb:positive]", null, new ConversationSentence.OnConsequenceDelegate(ConversationProstituteConsequenceSex), 100, null);
 
-            campaignGameStarter.AddDialogLine("prostitute_service_no_response_id", "prostitute_service_no_response", "close_window", "{=CEBROTHEL2006}Stop wasting my time then.[ib:aggressive][rb:unsure]", null, null, 100, null);
+            campaignGameStarter.AddDialogLine("prostitute_service_no_response_id", "prostitute_service_no_response", "close_window", "{=CEBROTHEL1021}Stop wasting my time then.[ib:aggressive][rb:unsure]", null, null, 100, null);
 
             // Dialogue with Confidient Prostitute 00
-            campaignGameStarter.AddDialogLine("cprostitute_talk_00", "start", "cprostitute_talk_00_response", "{=CEBROTHEL2000}Hey {?PLAYER.GENDER}beautiful{?}handsome{\\?} want to have some fun? [ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(() => { return RandomizeConversation(3) && ConversationWithConfidentProstitute(); }), null, 100, null);
+            campaignGameStarter.AddDialogLine("cprostitute_talk_00", "start", "cprostitute_talk_00_response", "{=CEBROTHEL1022}Hey {?PLAYER.GENDER}beautiful{?}handsome{\\?} want to have some fun? [ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(() => { return RandomizeConversation(3) && ConversationWithConfidentProstitute(); }), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("cprostitute_talk_00_service_r", "cprostitute_talk_00_response", "cprostitute_talk_00_service", "{=CEBROTHEL2001}Yeah, I could go for a bit of refreshment.", null, null, 100, null, null);
-            campaignGameStarter.AddPlayerLine("cprostitute_talk_00_nevermind_r", "cprostitute_talk_00_response", "prostitute_service_no_response", "{=CEBROTHEL2005}No, I am fine.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("cprostitute_talk_00_service_r", "cprostitute_talk_00_response", "cprostitute_talk_00_service", "{=CEBROTHEL1023}Yeah, I could go for a bit of refreshment.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("cprostitute_talk_00_nevermind_r", "cprostitute_talk_00_response", "prostitute_service_no_response", "{=CEBROTHEL1024}No, I am fine.", null, null, 100, null, null);
 
-            campaignGameStarter.AddDialogLine("cprostitute_talk_00_service_ar", "cprostitute_talk_00_service", "prostitute_service", "{=CEBROTHEL2002}Sounds good, that'll be {AMOUNT} denars. [ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(PriceWithProstitute), null, 100, null);
+            campaignGameStarter.AddDialogLine("cprostitute_talk_00_service_ar", "cprostitute_talk_00_service", "prostitute_service", "{=CEBROTHEL1025}Sounds good, that'll be {AMOUNT} denars. [ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(PriceWithProstitute), null, 100, null);
 
             // Dialogue with Confidient Prostitute 01
-            campaignGameStarter.AddDialogLine("cprostitute_talk_01", "start", "cprostitute_talk_01_response", "{=CEBROTHEL2007}Hey {?PLAYER.GENDER}cutie{?}handsome{\\?} you look like you need some companionship.[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(() => { return RandomizeConversation(3) && ConversationWithConfidentProstitute(); }), null, 100, null);
+            campaignGameStarter.AddDialogLine("cprostitute_talk_01", "start", "cprostitute_talk_01_response", "{=CEBROTHEL1026}Hey {?PLAYER.GENDER}cutie{?}handsome{\\?} you look like you need some companionship.[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(() => { return RandomizeConversation(3) && ConversationWithConfidentProstitute(); }), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("cprostitute_talk_01_service_r", "cprostitute_talk_01_response", "cprostitute_talk_01_service", "{=CEBROTHEL2008}I have been awfully lonely...", null, null, 100, null, null);
-            campaignGameStarter.AddPlayerLine("cprostitute_talk_01_nevermind_r", "cprostitute_talk_01_response", "prostitute_service_no_response", "{=CEBROTHEL2009}No thanks.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("cprostitute_talk_01_service_r", "cprostitute_talk_01_response", "cprostitute_talk_01_service", "{=CEBROTHEL1027}I have been awfully lonely...", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("cprostitute_talk_01_nevermind_r", "cprostitute_talk_01_response", "prostitute_service_no_response", "{=CEBROTHEL1028}No thanks.", null, null, 100, null, null);
 
-            campaignGameStarter.AddDialogLine("cprostitute_talk_01_service_ar", "cprostitute_talk_01_service", "prostitute_service", "{=CEBROTHEL2010}I'm sorry to hear that, let's change that tonight for {AMOUNT} denars. [ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(PriceWithProstitute), null, 100, null);
+            campaignGameStarter.AddDialogLine("cprostitute_talk_01_service_ar", "cprostitute_talk_01_service", "prostitute_service", "{=CEBROTHEL1029}I'm sorry to hear that, let's change that tonight for {AMOUNT} denars. [ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(PriceWithProstitute), null, 100, null);
 
             // Dialogue with Confidient Prostitute 02
-            campaignGameStarter.AddDialogLine("cprostitute_talk_02", "start", "cprostitute_talk_02_response", "{=CEBROTHEL2162}Is there something I can help you with this evening?[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(ConversationWithConfidentProstitute), null, 100, null);
+            campaignGameStarter.AddDialogLine("cprostitute_talk_02", "start", "cprostitute_talk_02_response", "{=CEBROTHEL1030}Is there something I can help you with this evening?[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(ConversationWithConfidentProstitute), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("cprostitute_talk_02_service_r", "cprostitute_talk_02_response", "cprostitute_talk_02_service", "{=CEBROTHEL2163}Yeah, I think you can help me with the problem I'm having.", null, null, 100, null, null);
-            campaignGameStarter.AddPlayerLine("cprostitute_talk_02_nevermind_r", "cprostitute_talk_02_response", "cprostitute_service_02_no_response", "{=CEBROTHEL2164}Maybe later.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("cprostitute_talk_02_service_r", "cprostitute_talk_02_response", "cprostitute_talk_02_service", "{=CEBROTHEL1031}Yeah, I think you can help me with the problem I'm having.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("cprostitute_talk_02_nevermind_r", "cprostitute_talk_02_response", "cprostitute_service_02_no_response", "{=CEBROTHEL1032}Maybe later.", null, null, 100, null, null);
 
-            campaignGameStarter.AddDialogLine("cprostitute_talk_02_service_ar", "cprostitute_talk_02_service", "cprostitute_service_02", "{=CEBROTHEL2165}Perfect, my \"treatment\" costs {AMOUNT} denars for a full dose.[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(PriceWithProstitute), null, 100, null);
+            campaignGameStarter.AddDialogLine("cprostitute_talk_02_service_ar", "cprostitute_talk_02_service", "cprostitute_service_02", "{=CEBROTHEL1033}Perfect, my \"treatment\" costs {AMOUNT} denars for a full dose.[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(PriceWithProstitute), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("cprostitute_service_02_yes", "cprostitute_service_02", "cprostitute_service_02_yes_response", "{=CEBROTHEL2166}Sounds like my kind of cure.", null, null, 100, new ConversationSentence.OnClickableConditionDelegate(ConversationHasEnoughForService), null);
-            campaignGameStarter.AddPlayerLine("cprostitute_service_02_no", "cprostitute_service_02", "cprostitute_service_02_no_response", "{=CEBROTHEL2167}You know, my condition isn't that bad.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("cprostitute_service_02_yes", "cprostitute_service_02", "cprostitute_service_02_yes_response", "{=CEBROTHEL1034}Sounds like my kind of cure.", null, null, 100, new ConversationSentence.OnClickableConditionDelegate(ConversationHasEnoughForService), null);
+            campaignGameStarter.AddPlayerLine("cprostitute_service_02_no", "cprostitute_service_02", "cprostitute_service_02_no_response", "{=CEBROTHEL1035}You know, my condition isn't that bad.", null, null, 100, null, null);
 
-            campaignGameStarter.AddDialogLine("cprostitute_service_02_yes_response_id", "cprostitute_service_02_yes_response", "close_window", "{=CEBROTHEL2136}Let's go to the doctor's office so you can be treated.[ib:confident][rb:very_positive]", null, new ConversationSentence.OnConsequenceDelegate(ConversationProstituteConsequenceSex), 100, null);
+            campaignGameStarter.AddDialogLine("cprostitute_service_02_yes_response_id", "cprostitute_service_02_yes_response", "close_window", "{=CEBROTHEL1036}Let's go to the doctor's office so you can be treated.[ib:confident][rb:very_positive]", null, new ConversationSentence.OnConsequenceDelegate(ConversationProstituteConsequenceSex), 100, null);
 
-            campaignGameStarter.AddDialogLine("cprostitute_service_02_no_response_id", "cprostitute_service_02_no_response", "close_window", "{=CEBROTHEL2169}See ya around.[ib:confident][rb:very_positive]", null, null, 100, null);
+            campaignGameStarter.AddDialogLine("cprostitute_service_02_no_response_id", "cprostitute_service_02_no_response", "close_window", "{=CEBROTHEL1037}See ya around.[ib:confident][rb:very_positive]", null, null, 100, null);
 
             // Dialogue with Tired Prostitute 00
-            campaignGameStarter.AddDialogLine("tprostitute_talk_00", "start", "tprostitute_talk_response_00", "{=CEBROTHEL2122}What do you want?[ib:closed][rb:unsure]", new ConversationSentence.OnConditionDelegate(() => { return RandomizeConversation(2) && ConversationWithTiredProstitute(); }), null, 100, null);
+            campaignGameStarter.AddDialogLine("tprostitute_talk_00", "start", "tprostitute_talk_response_00", "{=CEBROTHEL1038}What do you want?[ib:closed][rb:unsure]", new ConversationSentence.OnConditionDelegate(() => { return RandomizeConversation(2) && ConversationWithTiredProstitute(); }), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("tprostitute_service_00", "tprostitute_talk_response_00", "tprostitute_service_accept_00", "{=CEBROTHEL2123}I'd like your services for the evening.", null, null, 100, null, null);
-            campaignGameStarter.AddPlayerLine("tprostitute_nevermind_00", "tprostitute_talk_response_00", "prostitute_service_no_response", "{=CEBROTHEL2124}Uh, nevermind.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("tprostitute_service_00", "tprostitute_talk_response_00", "tprostitute_service_accept_00", "{=CEBROTHEL1039}I'd like your services for the evening.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("tprostitute_nevermind_00", "tprostitute_talk_response_00", "prostitute_service_no_response", "{=CEBROTHEL1011}Uh, nevermind.", null, null, 100, null, null);
 
-            campaignGameStarter.AddDialogLine("tprostitute_service_accept_00_r", "tprostitute_service_accept_00", "tprostitute_service_00", "{=CEBROTHEL2125}Fine, but it's going to be {AMOUNT} denars up front.[ib:closed][rb:unsure]", new ConversationSentence.OnConditionDelegate(PriceWithProstitute), null, 100, null);
+            campaignGameStarter.AddDialogLine("tprostitute_service_accept_00_r", "tprostitute_service_accept_00", "tprostitute_service_00", "{=CEBROTHEL1040}Fine, but it's going to be {AMOUNT} denars up front.[ib:closed][rb:unsure]", new ConversationSentence.OnConditionDelegate(PriceWithProstitute), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("tprostitute_service_00_yes", "tprostitute_service_00", "tprostitute_service_00_yes_response", "{=CEBROTHEL2126}Very well.", null, null, 100, new ConversationSentence.OnClickableConditionDelegate(ConversationHasEnoughForService), null);
-            campaignGameStarter.AddPlayerLine("tprostitute_service_00_no", "tprostitute_service_00", "prostitute_service_no_response", "{=CEBROTHEL2127}That's a bit too much.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("tprostitute_service_00_yes", "tprostitute_service_00", "tprostitute_service_00_yes_response", "{=CEBROTHEL1041}Very well.", null, null, 100, new ConversationSentence.OnClickableConditionDelegate(ConversationHasEnoughForService), null);
+            campaignGameStarter.AddPlayerLine("tprostitute_service_00_no", "tprostitute_service_00", "prostitute_service_no_response", "{=CEBROTHEL1042}That's a bit too much.", null, null, 100, null, null);
 
-            campaignGameStarter.AddDialogLine("tprostitute_service_00_yes_response_id", "tprostitute_service_00_yes_response", "close_window", "{=CEBROTHEL2128}Right this way...[ib:closed][rb:unsure]", null, new ConversationSentence.OnConsequenceDelegate(ConversationProstituteConsequenceSex), 100, null);
+            campaignGameStarter.AddDialogLine("tprostitute_service_00_yes_response_id", "tprostitute_service_00_yes_response", "close_window", "{=CEBROTHEL1043}Right this way...[ib:closed][rb:unsure]", null, new ConversationSentence.OnConsequenceDelegate(ConversationProstituteConsequenceSex), 100, null);
 
-            campaignGameStarter.AddDialogLine("tprostitute_service_00_no_response_id", "tprostitute_service_00_no_response", "close_window", "{=CEBROTHEL2129}Thank goodness...[ib:closed][rb:unsure]", null, null, 100, null);
+            campaignGameStarter.AddDialogLine("tprostitute_service_00_no_response_id", "tprostitute_service_00_no_response", "close_window", "{=CEBROTHEL1044}Thank goodness...[ib:closed][rb:unsure]", null, null, 100, null);
 
             //  Dialogue with Tired Prostitute 01
-            campaignGameStarter.AddDialogLine("tprostitute_talk_01", "start", "tprostitute_talk_response_01", "{=CEBROTHEL2130}Is there something you want?[ib:closed][rb:unsure]", new ConversationSentence.OnConditionDelegate(ConversationWithTiredProstitute), null, 100, null);
+            campaignGameStarter.AddDialogLine("tprostitute_talk_01", "start", "tprostitute_talk_response_01", "{=CEBROTHEL1045}Is there something you want?[ib:closed][rb:unsure]", new ConversationSentence.OnConditionDelegate(ConversationWithTiredProstitute), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("tprostitute_service_01", "tprostitute_talk_response_01", "tprostitute_service_accept_01", "{=CEBROTHEL2131}How much for your time?", null, null, 100, null, null);
-            campaignGameStarter.AddPlayerLine("tprostitute_nevermind_01", "tprostitute_talk_response_01", "tprostitute_service_01_no_response", "{=CEBROTHEL2132}Not as this moment.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("tprostitute_service_01", "tprostitute_talk_response_01", "tprostitute_service_accept_01", "{=CEBROTHEL1046}How much for your time?", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("tprostitute_nevermind_01", "tprostitute_talk_response_01", "tprostitute_service_01_no_response", "{=CEBROTHEL1047}Not as this moment.", null, null, 100, null, null);
 
-            campaignGameStarter.AddDialogLine("tprostitute_service_accept_01_r", "tprostitute_service_accept_01", "tprostitute_service_01", "{=CEBROTHEL2133}Ok well... {AMOUNT} denars sounds about right.[ib:closed][rb:unsure]", new ConversationSentence.OnConditionDelegate(PriceWithProstitute), null, 100, null);
+            campaignGameStarter.AddDialogLine("tprostitute_service_accept_01_r", "tprostitute_service_accept_01", "tprostitute_service_01", "{=CEBROTHEL1048}Ok well... {AMOUNT} denars sounds about right.[ib:closed][rb:unsure]", new ConversationSentence.OnConditionDelegate(PriceWithProstitute), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("tprostitute_service_01_yes", "tprostitute_service_01", "tprostitute_service_01_yes_response", "{=CEBROTHEL2134}Alright, here you go.", null, null, 100, new ConversationSentence.OnClickableConditionDelegate(ConversationHasEnoughForService), null);
-            campaignGameStarter.AddPlayerLine("tprostitute_service_01_no", "tprostitute_service_01", "tprostitute_service_01_no_response", "{=CEBROTHEL2135}Nevermind.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("tprostitute_service_01_yes", "tprostitute_service_01", "tprostitute_service_01_yes_response", "{=CEBROTHEL1049}Alright, here you go.", null, null, 100, new ConversationSentence.OnClickableConditionDelegate(ConversationHasEnoughForService), null);
+            campaignGameStarter.AddPlayerLine("tprostitute_service_01_no", "tprostitute_service_01", "tprostitute_service_01_no_response", "{=CEBROTHEL1050}Nevermind.", null, null, 100, null, null);
 
-            campaignGameStarter.AddDialogLine("tprostitute_service_01_yes_response_id", "tprostitute_service_01_yes_response", "close_window", "{=CEBROTHEL2136}Follow me to the back.[ib:closed][rb:unsure]", null, new ConversationSentence.OnConsequenceDelegate(ConversationProstituteConsequenceSex), 100, null);
+            campaignGameStarter.AddDialogLine("tprostitute_service_01_yes_response_id", "tprostitute_service_01_yes_response", "close_window", "{=CEBROTHEL1051}Follow me to the back.[ib:closed][rb:unsure]", null, new ConversationSentence.OnConsequenceDelegate(ConversationProstituteConsequenceSex), 100, null);
 
-            campaignGameStarter.AddDialogLine("tprostitute_service_01_no_response_id", "tprostitute_service_01_no_response", "close_window", "{=CEBROTHEL2137}Ugh...[ib:closed][rb:unsure]", null, null, 100, null);
+            campaignGameStarter.AddDialogLine("tprostitute_service_01_no_response_id", "tprostitute_service_01_no_response", "close_window", "{=CEBROTHEL1052}Ugh...[ib:closed][rb:unsure]", null, null, 100, null);
 
             // Dialogue With Owner 00
-            campaignGameStarter.AddDialogLine("ce_owner_talk_00", "start", "ce_owner_response_00", "{=CEBROTHEL2082}Oh, a valued customer, how can I help you today?[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(ConversationWithBrothelOwnerBeforeSelling), null, 100, null);
+            campaignGameStarter.AddDialogLine("ce_owner_talk_00", "start", "ce_owner_response_00", "{=CEBROTHEL1053}Oh, a valued customer, how can I help you today?[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(ConversationWithBrothelOwnerBeforeSelling), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("ce_op_response_01", "ce_owner_response_00", "ce_owner_buy_00", "{=CEBROTHEL3095}I would like to buy your establishment.", null, null, 100, null);
+            campaignGameStarter.AddPlayerLine("ce_op_response_01", "ce_owner_response_00", "ce_owner_buy_00", "{=CEBROTHEL1054}I would like to buy your establishment.", null, null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("ce_op_response_04", "ce_owner_response_00", "ce_owner_exit_00", "{=CEBROTHEL2084}I don't need anything at the moment.", null, null, 100, null);
+            campaignGameStarter.AddPlayerLine("ce_op_response_04", "ce_owner_response_00", "ce_owner_exit_00", "{=CEBROTHEL1055}I don't need anything at the moment.", null, null, 100, null);
 
-            campaignGameStarter.AddDialogLine("ce_owner_buy_00_r", "ce_owner_buy_00", "ce_owner_buy_response", "{=CEBROTHEL3096}I am selling this establishment for {AMOUNT} denars.", new ConversationSentence.OnConditionDelegate(PriceWithBrothel), null, 100, null);
+            campaignGameStarter.AddDialogLine("ce_owner_buy_00_r", "ce_owner_buy_00", "ce_owner_buy_response", "{=CEBROTHEL1056}I am selling this establishment for {AMOUNT} denars.", new ConversationSentence.OnConditionDelegate(PriceWithBrothel), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("ce_owner_buy_yes", "ce_owner_buy_response", "ce_owner_business_complete", "{=CEBROTHEL2134}Alright, here you go.", null,
+            campaignGameStarter.AddPlayerLine("ce_owner_buy_yes", "ce_owner_buy_response", "ce_owner_business_complete", "{=CEBROTHEL1049}Alright, here you go.", null,
                 new ConversationSentence.OnConsequenceDelegate(ConversationBoughtBrothel), 100, new ConversationSentence.OnClickableConditionDelegate(ConversationHasEnoughMoneyForBrothel), null);
-            campaignGameStarter.AddPlayerLine("ce_owner_buy_no", "ce_owner_buy_response", "ce_owner_exit_00", "{=CEBROTHEL2135}Nevermind.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("ce_owner_buy_no", "ce_owner_buy_response", "ce_owner_exit_00", "{=CEBROTHEL1050}Nevermind.", null, null, 100, null, null);
 
-            campaignGameStarter.AddDialogLine("ce_owner_business_complete_response", "ce_owner_business_complete", "close_window", "{=CEBROTHEL3097}A pleasure doing business. [ib:confident][rb:very_positive]", null, null, 100, null);
+            campaignGameStarter.AddDialogLine("ce_owner_business_complete_response", "ce_owner_business_complete", "close_window", "{=CEBROTHEL1057}A pleasure doing business. [ib:confident][rb:very_positive]", null, null, 100, null);
 
-            campaignGameStarter.AddDialogLine("ce_owner_exit_response", "ce_owner_exit_00", "close_window", "{=CEBROTHEL2092}Very well, I'll be here if you need anything. [ib:confident][rb:very_positive]", null, null, 100, null);
+            campaignGameStarter.AddDialogLine("ce_owner_exit_response", "ce_owner_exit_00", "close_window", "{=CEBROTHEL1058}Very well, I'll be here if you need anything. [ib:confident][rb:very_positive]", null, null, 100, null);
 
             // Dialogue With Brothel Owner 01
-            campaignGameStarter.AddDialogLine("ce_owner_talk_01", "start", "close_window", "{=CEBROTHEL3103}Let me prepare the establishment, it will be ready for you soon.", new ConversationSentence.OnConditionDelegate(ConversationWithBrothelOwnerAfterSelling), null, 100, null);
+            campaignGameStarter.AddDialogLine("ce_owner_talk_01", "start", "close_window", "{=CEBROTHEL1059}Let me prepare the establishment, it will be ready for you soon.", new ConversationSentence.OnConditionDelegate(ConversationWithBrothelOwnerAfterSelling), null, 100, null);
 
             // Dialogue With Assistant 00
-            campaignGameStarter.AddDialogLine("ce_assistant_talk_00", "start", "ce_assistant_response_00", "{=CEBROTHEL3099}Hello boss, how can I help you today?[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(ConversationWithBrothelAssistantBeforeSelling), null, 100, null);
+            campaignGameStarter.AddDialogLine("ce_assistant_talk_00", "start", "ce_assistant_response_00", "{=CEBROTHEL1060}Hello boss, how can I help you today?[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(ConversationWithBrothelAssistantBeforeSelling), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("ce_ap_response_01", "ce_assistant_response_00", "ce_assistant_sell_00", "{=CEBROTHEL3100}I would like to sell our establishment.", null, null, 100, null);
+            campaignGameStarter.AddPlayerLine("ce_ap_response_01", "ce_assistant_response_00", "ce_assistant_sell_00", "{=CEBROTHEL1061}I would like to sell our establishment.", null, null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("ce_ap_response_04", "ce_assistant_response_00", "ce_assistant_exit_00", "{=CEBROTHEL2084}I don't need anything at the moment.", null, null, 100, null);
+            campaignGameStarter.AddPlayerLine("ce_ap_response_04", "ce_assistant_response_00", "ce_assistant_exit_00", "{=CEBROTHEL1055}I don't need anything at the moment.", null, null, 100, null);
 
-            campaignGameStarter.AddDialogLine("ce_assistant_sell_00_r", "ce_assistant_sell_00", "ce_assistant_sell_response", "{=CEBROTHEL3098}We can sell this establishment for {AMOUNT} denars.", new ConversationSentence.OnConditionDelegate(PriceWithBrothel), null, 100, null);
+            campaignGameStarter.AddDialogLine("ce_assistant_sell_00_r", "ce_assistant_sell_00", "ce_assistant_sell_response", "{=CEBROTHEL1062}We can sell this establishment for {AMOUNT} denars.", new ConversationSentence.OnConditionDelegate(PriceWithBrothel), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("ce_assistant_sell_yes", "ce_assistant_sell_response", "ce_assistant_business_complete", "{=CEBROTHEL2003}That's a fair price I'd say.", null,
+            campaignGameStarter.AddPlayerLine("ce_assistant_sell_yes", "ce_assistant_sell_response", "ce_assistant_business_complete", "{=CEBROTHEL1018}That's a fair price I'd say.", null,
                 new ConversationSentence.OnConsequenceDelegate(ConversationSoldBrothel), 100, null, null);
-            campaignGameStarter.AddPlayerLine("ce_assistant_sell_no", "ce_assistant_sell_response", "ce_assistant_exit_00", "{=CEBROTHEL2135}Nevermind.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("ce_assistant_sell_no", "ce_assistant_sell_response", "ce_assistant_exit_00", "{=CEBROTHEL1050}Nevermind.", null, null, 100, null, null);
 
-            campaignGameStarter.AddDialogLine("ce_assistant_business_complete_r", "ce_assistant_business_complete", "close_window", "{=CEBROTHEL3101}It's been a pleasure working for you! [ib:confident][rb:very_positive]", null, null, 100, null);
+            campaignGameStarter.AddDialogLine("ce_assistant_business_complete_r", "ce_assistant_business_complete", "close_window", "{=CEBROTHEL1063}It's been a pleasure working for you! [ib:confident][rb:very_positive]", null, null, 100, null);
 
-            campaignGameStarter.AddDialogLine("ce_assistant_exit_00_r", "ce_assistant_exit_00", "close_window", "{=CEBROTHEL2092}Very well, I'll be here if you need anything. [ib:confident][rb:very_positive]", null, null, 100, null);
+            campaignGameStarter.AddDialogLine("ce_assistant_exit_00_r", "ce_assistant_exit_00", "close_window", "{=CEBROTHEL1058}Very well, I'll be here if you need anything. [ib:confident][rb:very_positive]", null, null, 100, null);
 
             // Dialogue With Assistance 01
-            campaignGameStarter.AddDialogLine("ce_assistant_talk_01", "start", "close_window", "{=CEBROTHEL3102}The new owner will arrive here shortly, I will just clean up things for now.", new ConversationSentence.OnConditionDelegate(ConversationWithBrothelAssistantAfterSelling), null, 100, null);
+            campaignGameStarter.AddDialogLine("ce_assistant_talk_01", "start", "close_window", "{=CEBROTHEL1064}The new owner will arrive here shortly, I will just clean up things for now.", new ConversationSentence.OnConditionDelegate(ConversationWithBrothelAssistantAfterSelling), null, 100, null);
         }
 
 
@@ -753,9 +753,9 @@ namespace CaptivityEvents.Brothel
         // Customer Conditions
         private static readonly string[] customerStrings = { "customer_confident", "customer_tired" };
 
-        private static readonly string[] responses = { "{=CEBROTHEL2005}That's too much, no thanks.", "{=CEBROTHEL2134}Alright, here you go." };
+        private static readonly string[] responses = { "{=CEBROTHEL1019}That's too much, no thanks.", "{=CEBROTHEL1049}Alright, here you go." };
 
-        private static readonly string[] rageResponses = { "{=CEBROTHEL6403}Well perhaps you should, you sure look like a {?PLAYER.GENDER}whore{?}prostitute{\\?}!", "{=CEBROTHEL4324}My apologies, {?PLAYER.GENDER}milady{?}my lord{\\?}" };
+        private static readonly string[] rageResponses = { "{=CEBROTHEL1065}Well perhaps you should, you sure look like a {?PLAYER.GENDER}whore{?}prostitute{\\?}!", "{=CEBROTHEL1066}My apologies, {?PLAYER.GENDER}milady{?}my lord{\\?}!" };
 
         private bool ConversationWithCustomerNotMetRequirements()
         {

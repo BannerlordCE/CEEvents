@@ -19,7 +19,7 @@ namespace CaptivityEvents.Brothel
             tooltipVM.Mode = 1;
             tooltipVM.AddProperty("", new TextObject("{=CEEVENTS1099}Brothel").ToString(), 0, TooltipProperty.TooltipPropertyFlags.Title);
             tooltipVM.AddProperty(new TextObject("{=qRqnrtdX}Owner", null).ToString(), brothel.Owner.Name.ToString(), 0, TooltipProperty.TooltipPropertyFlags.None);
-            tooltipVM.AddProperty(new TextObject("Captives To Be Added", null).ToString(), brothel.Owner.Name.ToString(), 0, TooltipProperty.TooltipPropertyFlags.None);
+            tooltipVM.AddProperty(new TextObject("{=CEBROTHEL0994}Notable Prostitutes", null).ToString(), brothel.Owner.Name.ToString(), 0, TooltipProperty.TooltipPropertyFlags.None);
             tooltipVM.AddProperty(string.Empty, string.Empty, 0, TooltipProperty.TooltipPropertyFlags.None);
         }
     }

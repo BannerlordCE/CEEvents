@@ -18,8 +18,12 @@ namespace CaptivityEvents.Custom
         public static string testLog = "FC";
 
         private static readonly List<CEEvent> allEvents = new List<CEEvent>();
+        private static readonly List<CECustom> allFlags = new List<CECustom>();
 
-        private static readonly List<CEEventFlags> allFlags = new List<CEEventFlags>();
+        public static List<CECustom> GetFlags()
+        {
+            return allFlags;
+        }
 
         public static List<CEEvent> GetAllVerifiedXSEFSEvents(List<string> modules)
         {
@@ -39,8 +43,15 @@ namespace CaptivityEvents.Custom
                                 continue;
                             }
 
-                            if (Path.GetFileNameWithoutExtension(text) == "CEModuleFlags")
+                            if (Path.GetFileNameWithoutExtension(text).StartsWith("CEModuleFlags"))
                             {
+                                ForceLogToFile("Custom Flags Found: " + text);
+                                if (XMLFileCompliesWithFlagXSD(text))
+                                {
+                                    allFlags.AddRange(collection: DeserializeXMLFileToFlags(text));
+                                    ForceLogToFile("Custom Flags  Added: " + text);
+                                }
+                                ForceLogToFile("Custom Flags  Added: " + allFlags.Count().ToString());
                                 continue;
                             }
 
@@ -67,14 +78,15 @@ namespace CaptivityEvents.Custom
                 string[] files = Directory.GetFiles(fullPath, "*.xml", SearchOption.AllDirectories);
                 foreach (string text in files)
                 {
-                    if (Path.GetFileNameWithoutExtension(text) == "CEModuleFlags")
+                    if (Path.GetFileNameWithoutExtension(text).StartsWith("CEModuleFlags"))
                     {
                         ForceLogToFile("Custom Flags Found: " + text);
                         if (XMLFileCompliesWithFlagXSD(text))
                         {
-                            allEvents.AddRange(collection: DeserializeXMLFileToObject(text));
+                            allFlags.AddRange(collection: DeserializeXMLFileToFlags(text));
                             ForceLogToFile("Custom Flags  Added: " + text);
                         }
+                        ForceLogToFile("Custom Flags  Added: " + allFlags.Count().ToString());
                         continue;
                     }
 
@@ -95,6 +107,7 @@ namespace CaptivityEvents.Custom
             }
         }
 
+        // Flags
         private static bool XMLFileCompliesWithFlagXSD(string file)
         {
             string fullPath = (BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CEFlagsModal.xsd");
@@ -124,25 +137,24 @@ namespace CaptivityEvents.Custom
             }
             else
             {
-                LogXMLIssueToFile(msg, file);
+                LogXMLFlagIssueToFile(msg, file);
                 result = false;
             }
             return result;
         }
 
-
-        public static List<CEFlags> DeserializeXMLFileToFlags(string XmlFilename)
+        public static List<CECustom> DeserializeXMLFileToFlags(string XmlFilename)
         {
-            List<CEFlags> list = new List<CEFlags>();
+            List<CECustom> list = new List<CECustom>();
             try
             {
                 if (string.IsNullOrEmpty(XmlFilename))
                 {
                     return null;
                 }
-                StreamReader textReader = new StreamReader(XmlFilename)CEFlags;
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(CEFlags));
-                CEFlags xsefsevents = (CEFlags)xmlSerializer.Deserialize(textReader);
+                StreamReader textReader = new StreamReader(XmlFilename);
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(CECustom));
+                CECustom xsefsevents = (CECustom)xmlSerializer.Deserialize(textReader);
                 list.Add(xsefsevents);
             }
             catch (Exception innerException)
@@ -155,6 +167,22 @@ namespace CaptivityEvents.Custom
             return list;
         }
 
+        [DebuggerStepThroughAttribute]
+        private static void LogXMLFlagIssueToFile(string msg, string xmlFile = "")
+        {
+            string fullPath = (BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedFlagXML.txt");
+            FileInfo file = new FileInfo(fullPath);
+            file.Directory.Create();
+            if (lines == 0)
+            {
+                File.WriteAllText((BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedFlagXML.txt"), "");
+            }
+            string contents = xmlFile + " does not comply to CEFlagsModal format described in CEFlagsModal.xsd " + msg + Environment.NewLine;
+            File.AppendAllText(fullPath, contents);
+            lines++;
+        }
+
+        // Standard Events
         private static bool XMLFileCompliesWithStandardXSD(string file)
         {
             string fullPath = (BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CEEventsModal.xsd");
@@ -231,6 +259,8 @@ namespace CaptivityEvents.Custom
             File.AppendAllText(fullPath, contents);
             lines++;
         }
+
+
 
         [DebuggerStepThroughAttribute]
         public static void LogToFile(string msg)

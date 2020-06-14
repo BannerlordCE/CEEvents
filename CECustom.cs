@@ -9,12 +9,12 @@ namespace CaptivityEvents
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = null, IsNullable = false)]
     [Serializable]
-    public class CEFlags
+    public class CECustom
     {
         [XmlElement("CEModuleName")]
-        public string Name { get; set; }
+        public string CEModuleName { get; set; }
 
-        [XmlElement("CEFlag")]
-        public List<string> Flags { get; set; }
+        [XmlArrayItem("CEFlag")]
+        public List<string> CEFlags { get; set; }
     }
 }

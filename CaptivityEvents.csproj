@@ -43,7 +43,7 @@
     <Compile Include="CEConsole.cs" />
     <Compile Include="CEDefaultPregnancyModel.cs" />
     <Compile Include="CEEventChecker.cs" />
-    <Compile Include="CEEventFlags.cs" />
+    <Compile Include="CECustom.cs" />
     <Compile Include="CEEventManager.cs" />
     <Compile Include="CEEventMapNotification.cs" />
     <Compile Include="CECaptorMapNotification.cs" />

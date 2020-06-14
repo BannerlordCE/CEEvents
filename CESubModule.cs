@@ -31,6 +31,7 @@ namespace CaptivityEvents
         private bool _isLoadedInGame = false;
 
         public static List<CEEvent> CEEvents = new List<CEEvent>();
+        public static List<CECustom> CEFlags = new List<CECustom>();
 
         public static List<CEEvent> CEEventList = new List<CEEvent>();
         public static List<CEEvent> CEWaitingList = new List<CEEvent>();
@@ -203,6 +204,7 @@ namespace CaptivityEvents
 
             // Load Events
             CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
+            CEFlags = CECustomHandler.GetFlags();
 
             // Load Images
             string fullPath = (BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/");
@@ -374,6 +376,14 @@ namespace CaptivityEvents
                 if (listedEvent.Name.IsStringNoneOrEmpty())
                 {
                     continue;
+                }
+
+                if (listedEvent.MultipleListOfCustomFlags != null && listedEvent.MultipleListOfCustomFlags.Count > 0)
+                {
+                    if (!CEFlags.Exists(match => match.CEFlags.Any(x => listedEvent.MultipleListOfCustomFlags.Contains(x))))
+                    {
+                        continue;
+                    }
                 }
 
                 if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEEvents.FindAll(matchEvent => { return matchEvent.Name == listedEvent.Name; }).Count > 1)
