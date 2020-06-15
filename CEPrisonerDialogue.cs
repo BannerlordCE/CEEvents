@@ -26,7 +26,10 @@ namespace CaptivityEvents
             campaignGameStarter.AddPlayerLine("PrisonerPrisonerInParty", "prisoner_recruit_start_player", "PrisonerPrisonerInPartyResponse", "{=CEEVENTS1108}Time to have some fun.", null, new ConversationSentence.OnConsequenceDelegate(ConversationCEEventInPartyOnConsequence), 100, null, null);
             campaignGameStarter.AddDialogLine("PrisonerPrisonerInPartyResponseChat", "PrisonerPrisonerInPartyResponse", "close_window", "{=!}{RESPONSE_STRING}", new ConversationSentence.OnConditionDelegate(ConversationCEEventResponseInPartyOnCondition), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("CEPrisonerInCell_01", "CEPrisonerInCell", "PrisonerPrisonerInPartyResponse", "{=CEEVENTS1052}You are coming with me.", null, new ConversationSentence.OnConsequenceDelegate(ConversationCEEventInCellOnConsequence), 100, null, null);
+            campaignGameStarter.AddPlayerLine("CEPrisonerInCell_01", "CEPrisonerInCell", "CEPrisonerInCell_01_response", "{=CEEVENTS1052}You are coming with me.", null, null, 100, null, null);
+
+            campaignGameStarter.AddDialogLine("CEPrisonerInCell_01_r", "CEPrisonerInCell_01_response", "close_window", "{=!}{RESPONSE_STRING}", new ConversationSentence.OnConditionDelegate(ConversationCEEventResponseInPartyOnCondition), new ConversationSentence.OnConsequenceDelegate(ConversationCEEventInCellOnConsequence), 100, null);
+
             campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "close_window", "{=CEEVENTS1051}Nevermind.", null, null, 100, null, null);
         }
 
@@ -77,24 +80,24 @@ namespace CaptivityEvents
             {
                 if (captive.HeroObject.GetSkillValue(CESkills.Slavery) > 250)
                 {
-                    MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1073}Finally![ib:confident][rb:very_positive]", false);
+                    MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1053}Yes you came {?PLAYER.GENDER}mistress{?}master{\\?}! [ib:confident][rb:very_positive]", false);
                 }
                 else if (captive.HeroObject.GetSkillValue(CESkills.Slavery) > 100)
                 {
-                    MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1071}Yes {?PLAYER.GENDER}mistress{?}master{\\?} [ib:confident2][rb:positive]", false);
+                    MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1054}Yes {?PLAYER.GENDER}mistress{?}master{\\?} [ib:weary][rb:positive]", false);
                 }
                 else if (captive.HeroObject.GetSkillValue(CESkills.Slavery) > 50)
                 {
-                    MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1070}Alright.[ib:weary][rb:unsure]", false);
+                    MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1055}Yes? [ib:weary][rb:unsure]", false);
                 }
                 else
                 {
-                    MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1072}What?! [ib:aggressive][rb:very_negative]", false);
+                    MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1072}I am not your slave! [ib:aggressive][rb:very_negative]", false);
                 }
             }
             else
             {
-                MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1109}Wait what?[ib:nervous][rb:very_negative]", false);
+                MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1057}What do you want? [ib:nervous][rb:very_negative]", false);
             }
 
             return (Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.PartyBelongedToAsPrisoner != null && Hero.OneToOneConversationHero.PartyBelongedToAsPrisoner.IsMobile && Hero.OneToOneConversationHero.HeroState == Hero.CharacterStates.Prisoner);

@@ -413,6 +413,18 @@ namespace CaptivityEvents.Models
                 CEEventLoader.VictimSlaveryModifier(0, Hero.MainHero, true, true);
                 return "menu_captivity_end_by_ally_party_saved";
             }
+
+            if (PlayerCaptivity.CaptorParty.IsSettlement && PlayerCaptivity.CaptorParty.MapFaction == Hero.MainHero.Clan)
+            {
+                int prostituteSkillFlag = Hero.MainHero.GetSkillValue(CESkills.IsProstitute);
+                if (prostituteSkillFlag == 0)
+                {
+                    CECampaignBehavior.extraVariables.Owner = null;
+                    CEEventLoader.VictimSlaveryModifier(0, Hero.MainHero, true, true);
+                    return "menu_captivity_end_by_ally_party_saved";
+                }
+            }
+
             if (!CESettings.Instance.SlaveryToggle && !FactionManager.IsAtWarAgainstFaction(PlayerCaptivity.CaptorParty.MapFaction, MobileParty.MainParty.MapFaction) && (PlayerCaptivity.CaptorParty.MapFaction == MobileParty.MainParty.MapFaction || (!Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingModerate(PlayerCaptivity.CaptorParty.MapFaction) && !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingSevere(PlayerCaptivity.CaptorParty.MapFaction))))
             {
                 return "menu_captivity_end_no_more_enemies";

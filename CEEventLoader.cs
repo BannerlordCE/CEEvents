@@ -94,12 +94,33 @@ namespace CaptivityEvents.Events
                 try
                 {
                     string BackgroundName = listedEvent.BackgroundName;
-                    if (BackgroundName != null && BackgroundName != "")
+                    if (!BackgroundName.IsStringNoneOrEmpty())
                     {
+                        CESubModule.animationPlayEvent = false;
                         CESubModule.LoadTexture(BackgroundName);
+                    }
+                    else if (listedEvent.BackgroundAnimation != null && listedEvent.BackgroundAnimation.Count > 0)
+                    {
+                        CESubModule.animationImageList = listedEvent.BackgroundAnimation;
+                        CESubModule.animationIndex = 0;
+                        CESubModule.animationPlayEvent = true;
+                        float speed = 0.03f;
+                        try
+                        {
+                            if (!listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty())
+                            {
+                                speed = GetFloatFromXML(listedEvent.BackgroundAnimationSpeed);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            CECustomHandler.LogToFile("Failed to load BackgroundAnimationSpeed for " + listedEvent.Name + " : Exception: " + e.ToString());
+                        }
+                        CESubModule.animationSpeed = speed;
                     }
                     else
                     {
+                        CESubModule.animationPlayEvent = false;
                         CESubModule.LoadTexture("default_random");
                     }
                 }
@@ -1189,9 +1210,33 @@ namespace CaptivityEvents.Events
                       try
                       {
                           string BackgroundName = listedEvent.BackgroundName;
-                          if (BackgroundName != null && BackgroundName != "")
+                          if (!BackgroundName.IsStringNoneOrEmpty())
                           {
+                              CESubModule.animationPlayEvent = false;
                               CESubModule.LoadTexture(BackgroundName);
+                          }
+                          else if (listedEvent.BackgroundAnimation != null && listedEvent.BackgroundAnimation.Count > 0)
+                          {
+                              CESubModule.animationImageList = listedEvent.BackgroundAnimation;
+                              CESubModule.animationIndex = 0;
+                              CESubModule.animationPlayEvent = true;
+                              float speed = 0.03f;
+                              try
+                              {
+                                  if (!listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty())
+                                  {
+                                      speed = GetFloatFromXML(listedEvent.BackgroundAnimationSpeed);
+                                  }
+                              }
+                              catch (Exception e)
+                              {
+                                  CECustomHandler.ForceLogToFile("Failed to load BackgroundAnimationSpeed for " + listedEvent.Name + " : Exception: " + e.ToString());
+                              }
+                              CESubModule.animationSpeed = speed;
+                          }
+                          else
+                          {
+                              CESubModule.animationPlayEvent = false;
                           }
                       }
                       catch (Exception)
@@ -1324,10 +1369,10 @@ namespace CaptivityEvents.Events
                         string BackgroundName = listedEvent.BackgroundName;
                         if (!BackgroundName.IsStringNoneOrEmpty())
                         {
+                            CESubModule.animationPlayEvent = false;
                             CESubModule.LoadTexture(BackgroundName);
                         }
-
-                        if (listedEvent.BackgroundAnimation != null && listedEvent.BackgroundAnimation.Count > 0)
+                        else if (listedEvent.BackgroundAnimation != null && listedEvent.BackgroundAnimation.Count > 0)
                         {
                             CESubModule.animationImageList = listedEvent.BackgroundAnimation;
                             CESubModule.animationIndex = 0;
@@ -1342,7 +1387,7 @@ namespace CaptivityEvents.Events
                             }
                             catch (Exception e)
                             {
-                                CECustomHandler.LogToFile("Failed to load BackgroundAnimationSpeed for " + listedEvent.Name + " : Exception: " + e.ToString());
+                                CECustomHandler.ForceLogToFile("Failed to load BackgroundAnimationSpeed for " + listedEvent.Name + " : Exception: " + e.ToString());
                             }
                             CESubModule.animationSpeed = speed;
                         }
@@ -1353,7 +1398,7 @@ namespace CaptivityEvents.Events
                     }
                     catch (Exception)
                     {
-                        CECustomHandler.LogToFile("Failed to load background for " + listedEvent.Name);
+                        CECustomHandler.ForceLogToFile("Failed to load background for " + listedEvent.Name);
                     }
 
                     if (PlayerCaptivity.IsCaptive)
@@ -2971,18 +3016,39 @@ namespace CaptivityEvents.Events
                 try
                 {
                     string BackgroundName = listedEvent.BackgroundName;
-                    if (BackgroundName != null && BackgroundName != "")
+                    if (!BackgroundName.IsStringNoneOrEmpty())
                     {
+                        CESubModule.animationPlayEvent = false;
                         CESubModule.LoadTexture(BackgroundName);
+                    }
+                    else if (listedEvent.BackgroundAnimation != null && listedEvent.BackgroundAnimation.Count > 0)
+                    {
+                        CESubModule.animationImageList = listedEvent.BackgroundAnimation;
+                        CESubModule.animationIndex = 0;
+                        CESubModule.animationPlayEvent = true;
+                        float speed = 0.03f;
+                        try
+                        {
+                            if (!listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty())
+                            {
+                                speed = GetFloatFromXML(listedEvent.BackgroundAnimationSpeed);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            CECustomHandler.ForceLogToFile("Failed to load BackgroundAnimationSpeed for " + listedEvent.Name + " : Exception: " + e.ToString());
+                        }
+                        CESubModule.animationSpeed = speed;
                     }
                     else
                     {
+                        CESubModule.animationPlayEvent = false;
                         CESubModule.LoadTexture("captor_default");
                     }
                 }
                 catch (Exception)
                 {
-                    CECustomHandler.LogToFile("Background failed to load on " + listedEvent.Name);
+                    CECustomHandler.ForceLogToFile("Background failed to load on " + listedEvent.Name);
                 }
             }, GameOverlays.MenuOverlayType.None, GameMenu.MenuFlags.none, null);
 
@@ -4236,43 +4302,50 @@ namespace CaptivityEvents.Events
 
             if (_captorParty.IsSettlement && _captorParty.Settlement.IsTown)
             {
-                if (Hero.MainHero.IsAlive)
+                try
                 {
-                    if (Hero.MainHero.IsWounded)
+                    if (Hero.MainHero.IsAlive)
                     {
-                        Hero.MainHero.HitPoints = 20;
+                        if (Hero.MainHero.IsWounded)
+                        {
+                            Hero.MainHero.HitPoints = 20;
+                        }
+                        if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.IsMobile)
+                        {
+                            PlayerCaptivity.CaptorParty.MobileParty.SetDoNotAttackMainParty(12);
+                        }
+                        PlayerEncounter.ProtectPlayerSide(1f);
+                        MobileParty.MainParty.IsDisorganized = false;
+                        PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, 1, true);
                     }
-                    if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.IsMobile)
-                    {
-                        PlayerCaptivity.CaptorParty.MobileParty.SetDoNotAttackMainParty(12);
-                    }
-                    PlayerEncounter.ProtectPlayerSide(1f);
-                    MobileParty.MainParty.IsDisorganized = false;
-                    PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, 1, true);
-                }
 
-                if (Campaign.Current.CurrentMenuContext != null)
+                    if (Campaign.Current.CurrentMenuContext != null)
+                    {
+                        GameMenu.SwitchToMenu("town");
+                    }
+                    if (Hero.MainHero.IsAlive)
+                    {
+                        Hero.MainHero.ChangeState(Hero.CharacterStates.Active);
+                        Hero.MainHero.DaysLeftToRespawn = 0;
+                    }
+                    if (_captorParty.IsActive)
+                    {
+                        _captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                    }
+                    if (Hero.MainHero.IsAlive)
+                    {
+                        MobileParty.MainParty.IsActive = true;
+                        PartyBase.MainParty.SetAsCameraFollowParty();
+                        MobileParty.MainParty.SetMoveModeHold();
+                        SkillLevelingManager.OnMainHeroReleasedFromCaptivity(PlayerCaptivity.CaptivityStartTime.ElapsedHoursUntilNow);
+                        PartyBase.MainParty.UpdateVisibilityAndInspected(true);
+                    }
+                    PlayerCaptivity.CaptorParty = null;
+                } 
+                catch (Exception e)
                 {
-                    GameMenu.SwitchToMenu("town");
+                    PlayerCaptivity.EndCaptivity();
                 }
-                if (Hero.MainHero.IsAlive)
-                {
-                    Hero.MainHero.ChangeState(Hero.CharacterStates.Active);
-                    Hero.MainHero.DaysLeftToRespawn = 0;
-                }
-                if (_captorParty.IsActive)
-                {
-                    _captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
-                }
-                if (Hero.MainHero.IsAlive)
-                {
-                    MobileParty.MainParty.IsActive = true;
-                    PartyBase.MainParty.SetAsCameraFollowParty();
-                    MobileParty.MainParty.SetMoveModeHold();
-                    SkillLevelingManager.OnMainHeroReleasedFromCaptivity(PlayerCaptivity.CaptivityStartTime.ElapsedHoursUntilNow);
-                    PartyBase.MainParty.UpdateVisibilityAndInspected(true);
-                }
-                PlayerCaptivity.CaptorParty = null;
             }
             else
             {
@@ -5151,10 +5224,10 @@ namespace CaptivityEvents.Events
                 {
                     CharacterObject m = CharacterObject.Templates.Where((characterObject) => { return characterObject.IsFemale == false; }).GetRandomElement();
                     Hero randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.BornSettlement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
-                    Hero spouse = targetHero.Spouse;
-                    targetHero.Spouse = randomSoldier;
+                    CEHelper.spouseOne = randomSoldier;
+                    CEHelper.spouseTwo = targetHero;
                     MakePregnantAction.Apply(targetHero);
-                    targetHero.Spouse = spouse;
+                    CEHelper.spouseOne = CEHelper.spouseTwo = null;
                     TextObject textObject4 = new TextObject("{PLAYER_HERO} forced impregnated by {PLAYER_SPOUSE}.", null);
                     textObject4.SetTextVariable("PLAYER_HERO", targetHero.Name);
                     textObject4.SetTextVariable("PLAYER_SPOUSE", randomSoldier.Name);
@@ -5220,16 +5293,12 @@ namespace CaptivityEvents.Events
                         textObject3.SetTextVariable("SPOUSE", targetHero.Name);
                         InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
 
-                        Hero spouse = targetHero.Spouse;
-                        Hero randomSoldierSpouse = randomSoldier.Spouse;
-                        targetHero.Spouse = randomSoldier;
-                        randomSoldier.Spouse = targetHero;
-                        MakePregnantAction.Apply(randomSoldier);
+                        CEHelper.spouseOne = randomSoldier;
+                        CEHelper.spouseTwo = targetHero;
+                        MakePregnantAction.Apply(targetHero);
+                        CEHelper.spouseOne = CEHelper.spouseTwo = null;
 
                         //RelationsModifier(randomSoldier, 50, targetHero);
-
-                        targetHero.Spouse = spouse;
-                        randomSoldier.Spouse = randomSoldierSpouse;
 
                         return;
                     }
@@ -5297,16 +5366,12 @@ namespace CaptivityEvents.Events
                         textObject3.SetTextVariable("SPOUSE", randomSoldier.Name);
                         InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
 
-                        Hero spouse = targetHero.Spouse;
-                        Hero randomSoldierSpouse = randomSoldier.Spouse;
-                        targetHero.Spouse = randomSoldier;
-                        randomSoldier.Spouse = targetHero;
+                        CEHelper.spouseOne = randomSoldier;
+                        CEHelper.spouseTwo = targetHero;
                         MakePregnantAction.Apply(targetHero);
+                        CEHelper.spouseOne = CEHelper.spouseTwo = null;
 
                         //RelationsModifier(randomSoldier, 50, targetHero);
-
-                        targetHero.Spouse = spouse;
-                        randomSoldier.Spouse = randomSoldierSpouse;
 
                         return;
                     }
@@ -5315,10 +5380,10 @@ namespace CaptivityEvents.Events
                 {
                     CharacterObject m = CharacterObject.Templates.Where((characterObject) => { return characterObject.IsFemale == false; }).GetRandomElement();
                     Hero randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.BornSettlement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
-                    Hero spouse = targetHero.Spouse;
-                    targetHero.Spouse = randomSoldier;
+                    CEHelper.spouseOne = randomSoldier;
+                    CEHelper.spouseTwo = targetHero;
                     MakePregnantAction.Apply(targetHero);
-                    targetHero.Spouse = spouse;
+                    CEHelper.spouseOne = CEHelper.spouseTwo = null;
                     TextObject textObject4 = new TextObject("{PLAYER_HERO} forced impregnated by {PLAYER_SPOUSE}.", null);
                     textObject4.SetTextVariable("PLAYER_HERO", targetHero.Name);
                     textObject4.SetTextVariable("PLAYER_SPOUSE", randomSoldier.Name);
@@ -5387,16 +5452,12 @@ namespace CaptivityEvents.Events
                         textObject3.SetTextVariable("SPOUSE", targetHero.Name);
                         InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
 
-                        Hero spouse = targetHero.Spouse;
-                        Hero randomSoldierSpouse = randomSoldier.Spouse;
-                        targetHero.Spouse = randomSoldier;
-                        randomSoldier.Spouse = targetHero;
-                        MakePregnantAction.Apply(randomSoldier);
+                        CEHelper.spouseOne = randomSoldier;
+                        CEHelper.spouseTwo = targetHero;
+                        MakePregnantAction.Apply(targetHero);
+                        CEHelper.spouseOne = CEHelper.spouseTwo = null;
 
                         //RelationsModifier(randomSoldier, 50, targetHero);
-
-                        targetHero.Spouse = spouse;
-                        randomSoldier.Spouse = randomSoldierSpouse;
 
                         return;
                     }

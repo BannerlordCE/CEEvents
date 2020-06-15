@@ -2,6 +2,7 @@
 using CaptivityEvents.CampaignBehaviours;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
+using CaptivityEvents.Helper;
 using CaptivityEvents.Models;
 using HarmonyLib;
 using System;
@@ -389,6 +390,34 @@ namespace CaptivityEvents
                 if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEEvents.FindAll(matchEvent => { return matchEvent.Name == listedEvent.Name; }).Count > 1)
                 {
                     continue;
+                }
+
+                if (!CEHelper.brothelFlagFemale)
+                {
+                    if (
+                   listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) &&
+                   listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) &&
+                   listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) &&
+                   listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) &&
+                   listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale)
+                   )
+                    {
+                        CEHelper.brothelFlagFemale = true;
+                    }
+                }
+
+                if (!CEHelper.brothelFlagMale)
+                {
+                    if (
+                    listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) &&
+                    listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) &&
+                    listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) &&
+                    listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) &&
+                    listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale)
+                    )
+                    {
+                        CEHelper.brothelFlagMale = true;
+                    }
                 }
 
                 if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))

@@ -13,5 +13,8 @@ namespace CaptivityEvents.Helper
 
         public static Hero spouseTwo = null;
 
+        public static bool brothelFlagFemale = false;
+
+        public static bool brothelFlagMale = false;
     }
 }

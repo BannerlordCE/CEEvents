@@ -35,11 +35,11 @@ namespace CaptivityEvents.Brothel
             string hint2 = CEBrothelClanFinanceItemVM.GetBrothelRunningHintText(isCurrentlyActive, costToStart);
             if (isCurrentlyActive)
             {
-                base.ActionList.Add(new StringItemWithEnabledAndHintVM(new Action<object>(ExecuteToggleBrothel), new TextObject("{=CEBROTHEL0995}Stop operations", null).ToString(), true, null, hint2));
+                base.ActionList.Add(new StringItemWithEnabledAndHintVM(new Action<object>(ExecuteToggleBrothel), new TextObject("{=CEBROTHEL0995}Stop Operations", null).ToString(), true, null, hint2));
             }
             else
             {
-                base.ActionList.Add(new StringItemWithEnabledAndHintVM(new Action<object>(ExecuteToggleBrothel), new TextObject("{=CEBROTHEL0996}Start operations", null).ToString(), (Hero.MainHero.Gold >= costToStart), null, hint2));
+                base.ActionList.Add(new StringItemWithEnabledAndHintVM(new Action<object>(ExecuteToggleBrothel), new TextObject("{=CEBROTHEL0996}Start Operations", null).ToString(), (Hero.MainHero.Gold >= costToStart), null, hint2));
             }
         }
 

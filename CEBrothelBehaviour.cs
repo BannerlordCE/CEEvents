@@ -1,5 +1,6 @@
 ﻿using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
+using CaptivityEvents.Helper;
 using CaptivityEvents.Models;
 using Helpers;
 using System;
@@ -194,6 +195,14 @@ namespace CaptivityEvents.Brothel
         public static bool ProstitutionMenuJoinOnCondition(MenuCallbackArgs args)
         {
             args.optionLeaveType = GameMenuOption.LeaveType.Continue;
+            if (!CEHelper.brothelFlagFemale && Hero.MainHero.IsFemale || !CEHelper.brothelFlagMale && !Hero.MainHero.IsFemale)
+            {
+                return false;
+            }
+            if (Campaign.Current.IsMainHeroDisguised)
+            {
+                return false;
+            }
             return true;
         }
         public static void ProstitutionMenuJoinOnConsequence(MenuCallbackArgs args)
@@ -453,7 +462,7 @@ namespace CaptivityEvents.Brothel
         {
 
             // Owner Dialogue Confident Prostitute
-            campaignGameStarter.AddDialogLine("prostitute_requirements_owner", "start", "cprostitute_owner_00", "{=CEBROTHEL1008}Hello {?PLAYER.GENDER}milady{?}my lord{\\?}, I am currently working very hard.[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(() => ConversationWithProstituteIsOwner() && ConversationWithConfidentProstitute()), null, 100, null);
+            campaignGameStarter.AddDialogLine("prostitute_requirements_owner", "start", "cprostitute_owner_00", "{=CEBROTHEL1008}Do you need something {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(() => ConversationWithProstituteIsOwner() && ConversationWithConfidentProstitute()), null, 100, null);
 
             campaignGameStarter.AddPlayerLine("cprostitute_owner_00_yes", "cprostitute_owner_00", "prostitute_service_yes_response", "{=CEBROTHEL1007}I will like to have some fun.", null, null, 100, null, null);
 
@@ -572,7 +581,7 @@ namespace CaptivityEvents.Brothel
             // Dialogue With Owner 00
             campaignGameStarter.AddDialogLine("ce_owner_talk_00", "start", "ce_owner_response_00", "{=CEBROTHEL1053}Oh, a valued customer, how can I help you today?[ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(ConversationWithBrothelOwnerBeforeSelling), null, 100, null);
 
-            campaignGameStarter.AddPlayerLine("ce_op_response_01", "ce_owner_response_00", "ce_owner_buy_00", "{=CEBROTHEL1054}I would like to buy your establishment.", null, null, 100, null);
+            campaignGameStarter.AddPlayerLine("ce_op_response_01", "ce_owner_response_00", "ce_owner_buy_00", "{=CEBROTHEL1054}I would like to buy your establishment.", new ConversationSentence.OnConditionDelegate(ConversationWithBrothelOwnerShowBuy), null, 100, null);
 
             campaignGameStarter.AddPlayerLine("ce_op_response_04", "ce_owner_response_00", "ce_owner_exit_00", "{=CEBROTHEL1055}I don't need anything at the moment.", null, null, 100, null);
 
@@ -633,6 +642,10 @@ namespace CaptivityEvents.Brothel
         {
             return CharacterObject.OneToOneConversationCharacter.StringId == "brothel_owner" && !_hasSoldEstablishment;
         }
+        private bool ConversationWithBrothelOwnerShowBuy()
+        {
+            return CharacterObject.OneToOneConversationCharacter.StringId == "brothel_owner" && !Campaign.Current.IsMainHeroDisguised;
+        }
 
         private void ConversationBoughtBrothel()
         {
@@ -677,7 +690,7 @@ namespace CaptivityEvents.Brothel
 
         private bool ConversationWithProstituteNotMetRequirements()
         {
-            return CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("prostitute") && (Hero.MainHero.IsFemale);
+            return CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("prostitute") && Campaign.Current.IsMainHeroDisguised;
         }
 
         private bool ConversationWithConfidentProstitute()
@@ -759,7 +772,7 @@ namespace CaptivityEvents.Brothel
 
         private bool ConversationWithCustomerNotMetRequirements()
         {
-            return CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("customer") && !(Hero.MainHero.IsFemale);
+            return CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("customer") && (!(Hero.MainHero.IsFemale) || Campaign.Current.IsMainHeroDisguised);
         }
 
         private bool ConversationWithConfidentCustomer()
@@ -776,6 +789,14 @@ namespace CaptivityEvents.Brothel
             try
             {
                 GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, prostitutionCost, false);
+                SkillObject ProstitueFlag = CESkills.IsProstitute;
+                Hero.MainHero.SetSkillValue(ProstitueFlag, 1);
+                SkillObject ProstitutionSkill = CESkills.Prostitution;
+
+                if (Hero.MainHero.GetSkillValue(ProstitutionSkill) < 100)
+                {
+                    Hero.MainHero.SetSkillValue(ProstitutionSkill, 100);
+                }
                 CEEventLoader.VictimProstitutionModifier(MBRandom.RandomInt(1, 10), Hero.MainHero, false, true, true);
                 switch (Settlement.CurrentSettlement.Culture.GetCultureCode())
                 {
@@ -894,7 +915,16 @@ namespace CaptivityEvents.Brothel
         }
         public void WeeklyTick()
         {
+            SkillObject ProstitutionSkill = CESkills.Prostitution;
             _hasBoughtTunToParty = false;
+            if (Hero.MainHero.GetSkillValue(ProstitutionSkill) > 500)
+            {
+                CEEventLoader.VictimProstitutionModifier(MBRandom.RandomInt(-300, -200), Hero.MainHero, false, false, false);
+            }
+            else if (Hero.MainHero.GetSkillValue(ProstitutionSkill) > 100)
+            {
+                CEEventLoader.VictimProstitutionModifier(MBRandom.RandomInt(-40, -10), Hero.MainHero, false, false, false);
+            }
         }
 
         public override void RegisterEvents()
