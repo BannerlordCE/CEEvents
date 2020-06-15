@@ -20,6 +20,20 @@ namespace CaptivityEvents
             {
                 LogToggle = true,
             });
+            basePresets.Add("Hard Mode", () => new CESettings()
+            {
+                StolenGear = true,
+                StolenGearChance = 30f,
+                BetterOutFitChance = 10,
+                RenownMin = -300f,
+
+            });
+            basePresets.Add("Easy Mode", () => new CESettings()
+            {
+                StolenGear = false,
+                RenownMin = 0f,
+
+            });
             return basePresets;
         }
 
@@ -211,10 +225,6 @@ namespace CaptivityEvents
         [SettingPropertyFloatingInteger("{=CESETTINGS1084}Renown Min", -1000f, 1000f, "0", Order = 1, RequireRestart = false, HintText = "{=CESETTINGS1085}Renown can only drop to this point.")]
         [SettingPropertyGroup("{=CESETTINGS0095}Other")]
         public float RenownMin { get; set; } = -150f;
-
-        [SettingPropertyBool("{=CESETTINGS1086}Disable HeroModification via Harmony (Compatability)", Order = 2, RequireRestart = true, HintText = "{=CESETTINGS1087}Disables Harmony for compatability with mods who modify hero spouse states (causes ex spouses to appear)")]
-        [SettingPropertyGroup("{=CESETTINGS0095}Other")]
-        public bool CompatibilitySpouse { get; set; } = false;
 
         [SettingPropertyBool("{=CESETTINGS1088}Logging Toggle (Slows Down The Game)", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1089}Log the events (Debug Mode)")]
         [SettingPropertyGroup("{=CESETTINGS0095}Other")]

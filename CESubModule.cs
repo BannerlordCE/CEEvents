@@ -361,7 +361,6 @@ namespace CaptivityEvents
                     CECustomHandler.ForceLogToFile("Mod " + id + " uses Harmony version " + version);
                 }
 
-                CECustomHandler.ForceLogToFile((!CESettings.Instance.CompatibilitySpouse) ? "Patching Hero Class: No Conflicts Detected : Enabled." : "CompatibilitySpouse: Disabled.");
                 CECustomHandler.ForceLogToFile((CESettings.Instance.EventCaptorNotifications) ? "Patching Map Notifications: No Conflicts Detected : Enabled." : "EventCaptorNotifications: Disabled.");
 
                 harmony.PatchAll();
