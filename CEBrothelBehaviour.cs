@@ -487,15 +487,6 @@ namespace CaptivityEvents.Brothel
 
             campaignGameStarter.AddPlayerLine("customer_00_nevermind", "customer_00", "prostitute_service_no_response", "{=CEBROTHEL1011}Uh, nevermind.", null, null, 100, null, null);
 
-            // Tried Customer 01
-            campaignGameStarter.AddDialogLine("tcustomer_00_start", "start", "tcustomer_00", "{=CEBROTHEL1012}Yes? [ib:normal][rb:unsure]", new ConversationSentence.OnConditionDelegate(ConversationWithTiredCustomer), null, 100, null);
-
-            campaignGameStarter.AddPlayerLine("tcustomer_00_service", "tcustomer_00", "tcustomer_00_talk_service", "{=CEBROTHEL1013}Would you like my services for {AMOUNT} denars?", new ConversationSentence.OnConditionDelegate(() => { return PriceWithProstitute() && !ConversationWithCustomerNotMetRequirements(); }), null, 100, null, null);
-
-            campaignGameStarter.AddPlayerLine("tcustomer_00_nevermind", "tcustomer_00", "close_window", "{=CEBROTHEL1011}Uh, nevermind.", null, null, 100, null, null);
-
-            campaignGameStarter.AddDialogLine("tcustomer_00_service_r", "tcustomer_00_talk_service", "close_window", "{=!}{RESPONSE_STRING}", new ConversationSentence.OnConditionDelegate(ConversationWithCustomerRandomResponse), null, 100, null);
-
             // Confident Customer 00
             campaignGameStarter.AddDialogLine("ccustomer_00_start", "start", "ccustomer_00", "{=CEBROTHEL1014}Well hello there you {?PLAYER.GENDER}fine whore{?}stud{\\?}, would you like {AMOUNT} denars for your services? [ib:confident][rb:very_positive]", new ConversationSentence.OnConditionDelegate(() => { return RandomizeConversation(2) && PriceWithProstitute() && ConversationWithConfidentCustomer(); }), null, 100, null);
 
@@ -503,9 +494,18 @@ namespace CaptivityEvents.Brothel
 
             campaignGameStarter.AddPlayerLine("ccustomer_00_rage", "ccustomer_00", "ccustomer_00_rage_reply", "{=CEBROTHEL1016}Excuse me, I don't work here!", null, null, 100, null, null);
 
-            campaignGameStarter.AddDialogLine("ccustomer_00_rage_reply_r", "ccustomer_00_rage_reply", "close_window", "{=!}{RESPONSE_STRING}", new ConversationSentence.OnConditionDelegate(ConversationWithCustomerRandomResponse), null, 100, null);
+            campaignGameStarter.AddDialogLine("ccustomer_00_rage_reply_r", "ccustomer_00_rage_reply", "close_window", "{=!}{RESPONSE_STRING}", new ConversationSentence.OnConditionDelegate(ConversationWithCustomerRandomResponseRage), null, 100, null);
 
             campaignGameStarter.AddPlayerLine("ccustomer_00_nevermind", "ccustomer_00", "close_window", "{=CEBROTHEL1017}Sorry sir, I have to leave.", null, null, 100, null, null);
+
+            // Tried Customer 01
+            campaignGameStarter.AddDialogLine("tcustomer_00_start", "start", "tcustomer_00", "{=CEBROTHEL1012}Yes? [ib:normal][rb:unsure]", new ConversationSentence.OnConditionDelegate(() => ConversationWithTiredCustomer() || ConversationWithConfidentCustomer()), null, 100, null);
+
+            campaignGameStarter.AddPlayerLine("tcustomer_00_service", "tcustomer_00", "tcustomer_00_talk_service", "{=CEBROTHEL1013}Would you like my services for {AMOUNT} denars?", new ConversationSentence.OnConditionDelegate(() => { return PriceWithProstitute() && !ConversationWithCustomerNotMetRequirements(); }), null, 100, null, null);
+
+            campaignGameStarter.AddPlayerLine("tcustomer_00_nevermind", "tcustomer_00", "close_window", "{=CEBROTHEL1011}Uh, nevermind.", null, null, 100, null, null);
+
+            campaignGameStarter.AddDialogLine("tcustomer_00_service_r", "tcustomer_00_talk_service", "close_window", "{=!}{RESPONSE_STRING}", new ConversationSentence.OnConditionDelegate(ConversationWithCustomerRandomResponse), null, 100, null);
 
 
 
@@ -867,7 +867,6 @@ namespace CaptivityEvents.Brothel
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {
             AddDialogs(campaignGameStarter);
-            TooltipVM.AddTooltipType(typeof(CEBrothel), new Action<TooltipVM, object[]>(CEBrothelToolTip.WorkshopTypeTooltipAction));
         }
 
         private void OnSettlementLeft(MobileParty party, Settlement settlement)

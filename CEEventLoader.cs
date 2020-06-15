@@ -4081,7 +4081,10 @@ namespace CaptivityEvents.Events
                         // Strip
                         if (op.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StripHero))
                         {
-                            InventoryManager.OpenScreenAsInventoryOf(Hero.MainHero.PartyBelongedTo.Party.MobileParty, captiveHero.CharacterObject);
+                            if (CECampaignBehavior.extraVariables.menuToSwitchBackTo == null)
+                            {
+                                InventoryManager.OpenScreenAsInventoryOf(Hero.MainHero.PartyBelongedTo.Party.MobileParty, captiveHero.CharacterObject);
+                            }
                         }
                         if (op.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip))
                         {

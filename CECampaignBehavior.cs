@@ -380,6 +380,7 @@ namespace CaptivityEvents.CampaignBehaviours
                             stillbornCount++;
                         }
                     }
+
                     if (mother == Hero.MainHero || mother == Hero.MainHero.Spouse)
                     {
                         TextObject textObject;
@@ -401,32 +402,42 @@ namespace CaptivityEvents.CampaignBehaviours
                         }
                         else if (stillbornCount == 1 && aliveOffsprings.Count == 1)
                         {
-                            TextObject textObject2 = new TextObject("{=YOub8FqT}{CHILD.NAME} and a stillborn baby", null);
-                            StringHelpers.SetCharacterProperties("CHILD", aliveOffsprings[0].CharacterObject, null, textObject2, false);
-                            textObject.SetTextVariable("DELIVERED_CHILDREN", textObject2);
+                            textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=CEEVENTS1168}one healthy and one stillborn baby", null));
                         }
                         else if (stillbornCount == 0 && aliveOffsprings.Count == 1)
                         {
-                            TextObject textObject2 = new TextObject("{=U2UZoZL7}{CHILD.NAME}", null);
-                            StringHelpers.SetCharacterProperties("CHILD", aliveOffsprings[0].CharacterObject, null, textObject2, false);
-                            textObject.SetTextVariable("DELIVERED_CHILDREN", textObject2);
+                            textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=CEEVENTS1169}a healthy baby", null));
                         }
                         else if (stillbornCount == 0 && aliveOffsprings.Count == 2)
                         {
-                            TextObject textObject2 = new TextObject("{=wwPjjtHS}{CHILD1.NAME} and {CHILD2.NAME}", null);
-                            StringHelpers.SetCharacterProperties("CHILD1", aliveOffsprings[0].CharacterObject, null, textObject2, false);
-                            StringHelpers.SetCharacterProperties("CHILD2", aliveOffsprings[1].CharacterObject, null, textObject2, false);
-                            textObject.SetTextVariable("DELIVERED_CHILDREN", textObject2);
+                            textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=CEEVENTS1170}two healthy babies", null));
                         }
                         StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, null, textObject, false);
                         InformationManager.AddQuickInformation(textObject, 0, null, "");
                     }
-                    ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(pregnancy.Mother, aliveOffsprings, stillbornCount);
+
+                    if (mother.IsHumanPlayerCharacter || mother.Spouse == Hero.MainHero)
+                    {
+                        for (int i = 0; i < stillbornCount; i++)
+                        {
+                            ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(mother, null);
+                            LogEntry.AddLogEntry(childbirthLogEntry);
+                            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText()));
+                        }
+                        foreach (Hero newbornHero in aliveOffsprings)
+                        {
+                            ChildbirthLogEntry childbirthLogEntry2 = new ChildbirthLogEntry(mother, newbornHero);
+                            LogEntry.AddLogEntry(childbirthLogEntry2);
+                            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText()));
+                        }
+                    }
+
+                    /*ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(pregnancy.Mother, aliveOffsprings, stillbornCount);
                     LogEntry.AddLogEntry(childbirthLogEntry);
                     if (mother == Hero.MainHero || pregnancy.Father == Hero.MainHero)
                     {
                         Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(aliveOffsprings, childbirthLogEntry.GetEncyclopediaText()));
-                    }
+                    }*/
 
                     mother.IsPregnant = false;
                     pregnancy.AlreadyOccured = true;

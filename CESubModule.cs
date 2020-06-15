@@ -540,10 +540,11 @@ namespace CaptivityEvents
 
             if (!_isLoadedInGame)
             {
+                TooltipVM.AddTooltipType(typeof(CEBrothel), new Action<TooltipVM, object[]>(CEBrothelToolTip.WorkshopTypeTooltipAction));
                 LoadBrothelSounds();
-                AddCustomEvents(campaignStarter);
                 _isLoadedInGame = true;
             }
+            AddCustomEvents(campaignStarter);
         }
 
         protected void ReplaceModel<TBaseType, TChildType>(IGameStarter gameStarter) where TBaseType : GameModel where TChildType : GameModel
@@ -676,35 +677,38 @@ namespace CaptivityEvents
                         switch (dungeonState)
                         {
                             case DungeonState.StartWalking:
-                                try
+                                if (CharacterObject.OneToOneConversationCharacter == null)
                                 {
-
-                                    MissionCameraFadeView behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
-
-                                    Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
-
-                                    TaleWorlds.Engine.WorldPosition worldPosition = new TaleWorlds.Engine.WorldPosition(Mission.Current.Scene, UIntPtr.Zero, gameEntity.GlobalPosition, false);
-
-                                    if (agentTalkingTo.CanBeAssignedForScriptedMovement())
+                                    try
                                     {
-                                        agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun, "");
-                                        CESubModule.dungeonFadeOut = 2f;
+
+                                        MissionCameraFadeView behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
+
+                                        Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
+
+                                        TaleWorlds.Engine.WorldPosition worldPosition = new TaleWorlds.Engine.WorldPosition(Mission.Current.Scene, UIntPtr.Zero, gameEntity.GlobalPosition, false);
+
+                                        if (agentTalkingTo.CanBeAssignedForScriptedMovement())
+                                        {
+                                            agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun, "");
+                                            CESubModule.dungeonFadeOut = 2f;
+                                        }
+                                        else
+                                        {
+                                            agentTalkingTo.DisableScriptedMovement();
+                                            agentTalkingTo.HandleStopUsingAction();
+                                            agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun, "");
+                                            CESubModule.dungeonFadeOut = 2f;
+                                        }
+                                        behaviour.BeginFadeOut(dungeonFadeOut);
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        agentTalkingTo.DisableScriptedMovement();
-                                        agentTalkingTo.HandleStopUsingAction();
-                                        agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun, "");
-                                        CESubModule.dungeonFadeOut = 2f;
+                                        CECustomHandler.ForceLogToFile("Failed MissionCameraFadeView.");
                                     }
-                                    behaviour.BeginFadeOut(dungeonFadeOut);
+                                    brothelTimerOne = missionStateDungeon.CurrentMission.Time + dungeonFadeOut;
+                                    dungeonState = DungeonState.FadeIn;
                                 }
-                                catch (Exception)
-                                {
-                                    CECustomHandler.ForceLogToFile("Failed MissionCameraFadeView.");
-                                }
-                                brothelTimerOne = missionStateDungeon.CurrentMission.Time + dungeonFadeOut;
-                                dungeonState = DungeonState.FadeIn;
                                 break;
                             case DungeonState.FadeIn:
                                 if (brothelTimerOne < missionStateDungeon.CurrentMission.Time)
