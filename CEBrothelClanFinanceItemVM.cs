@@ -31,8 +31,6 @@ namespace CaptivityEvents.Brothel
             WorkshopType workshopType = WorkshopType.Find("pottery_shop");
             this.WorkshopTypeId = workshopType.StringId;
             base.ImageName = ((component != null) ? component.WaitMeshName : "");
-            //GameTexts.SetVariable("SHOPNAME", _brothel.Settlement.Name);
-            //GameTexts.SetVariable("SHOPTYPE", new TextObject("{=CEEVENTS1099}Brothel"));
         }
 
         public override void RefreshValues()
@@ -42,31 +40,17 @@ namespace CaptivityEvents.Brothel
             base.Location = this._brothel.Settlement.Name.ToString();
             base.Income = (int)(Math.Max(0, this._brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
             base.IncomeValueText = base.DetermineIncomeText(base.Income);
+            this.InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
+            this.OutputsText = "";
             base.ActionList.Clear();
             base.ItemProperties.Clear();
             this.PopulateActionList();
             this.PopulateStatsList();
         }
 
-        public string WorkshopTypeId
-        {
-            get
-            {
-                return this._workshopTypeId;
-            }
-            set
-            {
-                if (value != this._workshopTypeId)
-                {
-                    this._workshopTypeId = value;
-                    base.OnPropertyChanged("WorkshopTypeId");
-                }
-            }
-        }
-
         protected override void PopulateActionList()
         {
-            int sellingCost = _brothel.Capital * 3;
+            int sellingCost = _brothel.Capital;
             string hint = CEBrothelClanFinanceItemVM.GetBrothelSellHintText(sellingCost);
             base.ActionList.Add(new StringItemWithEnabledAndHintVM(new Action<object>(ExecuteSellBrothel), new TextObject("{=PHkC8Gia}Sell", null).ToString(), true, null, hint));
 
@@ -85,15 +69,18 @@ namespace CaptivityEvents.Brothel
 
         protected override void PopulateStatsList()
         {
-            base.ItemProperties.Add(new ClanSelectableItemPropertyVM(_brothel.IsRunning ? new TextObject("{=nMcvafHY}Active", null).ToString() : new TextObject("{=bnrRzeiF}Not Active", null).ToString(), "", null));
-            base.ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=Ra17aK4e}Capital:", null).ToString(), _brothel.Capital.ToString(), null));
-            base.ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CaRbMaZY}Daily Wage:", null).ToString(), _brothel.Expense.ToString(), null));
+            base.ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0988}State", null).ToString(), _brothel.IsRunning ? new TextObject("{=CEBROTHEL0992}Normal", null).ToString() : new TextObject("{=CEBROTHEL0991}Not Active", null).ToString(), null));
+            base.ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0990}Capital", null).ToString(), _brothel.Capital.ToString(), null));
+            base.ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0989}Expenses", null).ToString(), _brothel.Expense.ToString(), null));
             if (this._brothel.NotRunnedDays > 0)
             {
                 TextObject textObject = new TextObject("{=*}{DAYS} days ago", null);
                 textObject.SetTextVariable("DAYS", this._brothel.NotRunnedDays);
                 base.ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=*}Last Run", null).ToString(), textObject.ToString(), null));
             }
+
+            this.InputProducts = GameTexts.FindText("str_CE_brothel_description", _brothel.IsRunning ? null : "inactive").ToString();
+            this.OutputProducts = "";
         }
 
         private void ExecuteBeginWorkshopHint()
@@ -149,8 +136,8 @@ namespace CaptivityEvents.Brothel
         {
             if (_brothel != null)
             {
+                GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, _brothel.Capital, false);
                 CEBrothelBehaviour.BrothelInteraction(_brothel.Settlement, false);
-                GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, _brothel.Capital * 3, false);
 
                 Action onRefresh = _onRefresh;
                 if (onRefresh == null)
@@ -161,9 +148,98 @@ namespace CaptivityEvents.Brothel
             }
         }
 
+
+        public string WorkshopTypeId
+        {
+            get
+            {
+                return this._workshopTypeId;
+            }
+            set
+            {
+                if (value != this._workshopTypeId)
+                {
+                    this._workshopTypeId = value;
+                    base.OnPropertyChanged("WorkshopTypeId");
+                }
+            }
+        }
+
+        public string InputsText
+        {
+            get
+            {
+                return this._inputsText;
+            }
+            set
+            {
+                if (value != this._inputsText)
+                {
+                    this._inputsText = value;
+                    base.OnPropertyChanged("InputsText");
+                }
+            }
+        }
+
+        public string OutputsText
+        {
+            get
+            {
+                return this._outputsText;
+            }
+            set
+            {
+                if (value != this._outputsText)
+                {
+                    this._outputsText = value;
+                    base.OnPropertyChanged("OutputsText");
+                }
+            }
+        }
+
+        public string InputProducts
+        {
+            get
+            {
+                return this._inputProducts;
+            }
+            set
+            {
+                if (value != this._inputProducts)
+                {
+                    this._inputProducts = value;
+                    base.OnPropertyChanged("InputProducts");
+                }
+            }
+        }
+
+        public string OutputProducts
+        {
+            get
+            {
+                return this._outputProducts;
+            }
+            set
+            {
+                if (value != this._outputProducts)
+                {
+                    this._outputProducts = value;
+                    base.OnPropertyChanged("OutputProducts");
+                }
+            }
+        }
+
         private readonly CEBrothel _brothel;
 
         private string _workshopTypeId;
+
+        private string _inputsText;
+
+        private string _outputsText;
+
+        private string _inputProducts;
+
+        private string _outputProducts;
 
     }
 }

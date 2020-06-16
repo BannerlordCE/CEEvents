@@ -12,12 +12,17 @@ namespace CaptivityEvents.Brothel
         public CEBrothel(Settlement settlement)
         {
             Settlement = settlement;
+            Expense = 200;
+            InitialCapital = 5000;
+            Capital = 5000;
         }
 
         public void ChangeGold(int amount)
         {
             Capital = MBMath.ClampInt(Capital + amount, 1, 10000);
         }
+
+        public int ProfitMade => Math.Max(Capital - InitialCapital, 0);
 
         [SaveableField(1)]
         public Settlement Settlement;
@@ -41,12 +46,11 @@ namespace CaptivityEvents.Brothel
         public int Capital = 5000;
 
         [SaveableField(9)]
-        public int InitialCapital = 5000;
-
-        [SaveableField(10)]
         public int Expense = 200;
 
-        public int ProfitMade => Math.Max(Capital - InitialCapital, 0);
+        [SaveableField(10)]
+        public int InitialCapital = 5000;
+
 
     }
 }

@@ -628,19 +628,19 @@ namespace CaptivityEvents.Brothel
         // Owner Conditions
         private bool ConversationWithBrothelAssistantAfterSelling()
         {
-            return CharacterObject.OneToOneConversationCharacter.StringId == "brothel_assistant" && _hasSoldEstablishment;
+            return CharacterObject.OneToOneConversationCharacter.StringId == "brothel_assistant" && !DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
         }
         private bool ConversationWithBrothelOwnerAfterSelling()
         {
-            return CharacterObject.OneToOneConversationCharacter.StringId == "brothel_owner" && _hasSoldEstablishment;
+            return CharacterObject.OneToOneConversationCharacter.StringId == "brothel_owner" && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
         }
         private bool ConversationWithBrothelAssistantBeforeSelling()
         {
-            return CharacterObject.OneToOneConversationCharacter.StringId == "brothel_assistant" && !_hasSoldEstablishment;
+            return CharacterObject.OneToOneConversationCharacter.StringId == "brothel_assistant" && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
         }
         private bool ConversationWithBrothelOwnerBeforeSelling()
         {
-            return CharacterObject.OneToOneConversationCharacter.StringId == "brothel_owner" && !_hasSoldEstablishment;
+            return CharacterObject.OneToOneConversationCharacter.StringId == "brothel_owner" && !DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
         }
         private bool ConversationWithBrothelOwnerShowBuy()
         {
@@ -651,13 +651,11 @@ namespace CaptivityEvents.Brothel
         {
             GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, brothelCost, false);
             BrothelInteraction(Settlement.CurrentSettlement, true);
-            _hasSoldEstablishment = true;
         }
         private void ConversationSoldBrothel()
         {
             GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, brothelCost, false);
             BrothelInteraction(Settlement.CurrentSettlement, false);
-            _hasSoldEstablishment = true;
         }
         private bool ConversationHasEnoughMoneyForBrothel(out TextObject text)
         {
@@ -671,7 +669,21 @@ namespace CaptivityEvents.Brothel
         }
         private bool PriceWithBrothel()
         {
-            MBTextManager.SetTextVariable("AMOUNT", new TextObject(brothelCost.ToString(), null), false);
+            try
+            {
+                if (CharacterObject.OneToOneConversationCharacter.StringId == "brothel_assistant")
+                {
+                    MBTextManager.SetTextVariable("AMOUNT", new TextObject(GetPlayerBrothel(Settlement.CurrentSettlement).Capital.ToString(), null), false);
+                }
+                else
+                {
+                    MBTextManager.SetTextVariable("AMOUNT", new TextObject(brothelCost.ToString(), null), false);
+                }
+            } catch (Exception)
+            {
+
+            }
+
             return true;
         }
 
@@ -875,41 +887,46 @@ namespace CaptivityEvents.Brothel
             {
                 brothel.RemoveAllCharacters();
                 _isBrothelInitialized = false;
-                _hasSoldEstablishment = false;
             }
         }
 
         public void DailyTick()
         {
             _orderedDrinkThisDayInSettlement = null;
-            foreach (CEBrothel brothel in CEBrothelBehaviour.GetPlayerBrothels())
+            try
             {
-                Town town = brothel.Settlement.Town;
-                if (!town.IsRebeling)
+                foreach (CEBrothel brothel in CEBrothelBehaviour.GetPlayerBrothels())
                 {
-                    if (brothel.IsRunning)
+                    Town town = brothel.Settlement.Town;
+                    if (!town.IsRebeling)
                     {
-                        brothel.ChangeGold(MBRandom.RandomInt(50, 400));
-                        brothel.ChangeGold(brothel.Expense);
-                        if (brothel.Capital < 0 && Hero.MainHero.Gold < Math.Abs(brothel.Capital))
+                        if (brothel.IsRunning)
                         {
-                            if (brothel.Settlement.OwnerClan == Clan.PlayerClan)
+                            brothel.ChangeGold(MBRandom.RandomInt(50, 400));
+                            if (brothel.Capital < 0 && Hero.MainHero.Gold < Math.Abs(brothel.Capital))
                             {
-                                TextObject textObject3 = new TextObject("{CEBROTHEL0998}The brothel of {SETTLEMENT} has gone bankrupted, and is no longer active.");
-                                textObject3.SetTextVariable("SETTLEMENT", brothel.Settlement.Name);
-                                InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
-                                brothel.IsRunning = false;
+                                if (brothel.Settlement.OwnerClan == Clan.PlayerClan)
+                                {
+                                    TextObject textObject3 = new TextObject("{CEBROTHEL0998}The brothel of {SETTLEMENT} has gone bankrupted, and is no longer active.");
+                                    textObject3.SetTextVariable("SETTLEMENT", brothel.Settlement.Name);
+                                    InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
+                                    brothel.IsRunning = false;
+                                }
+                                else
+                                {
+                                    TextObject textObject3 = new TextObject("{CEBROTHEL0999}The brothel of {SETTLEMENT} has gone bankrupted, and has been requisitioned.");
+                                    textObject3.SetTextVariable("SETTLEMENT", brothel.Settlement.Name);
+                                    InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
+                                    BrothelInteraction(brothel.Settlement, false);
+                                }
                             }
-                            else
-                            {
-                                TextObject textObject3 = new TextObject("{CEBROTHEL0999}The brothel of {SETTLEMENT} has gone bankrupted, and has been requisitioned.");
-                                textObject3.SetTextVariable("SETTLEMENT", brothel.Settlement.Name);
-                                InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
-                            }
-
                         }
                     }
                 }
+            }
+            catch (Exception)
+            {
+
             }
         }
         public void WeeklyTick()
@@ -935,6 +952,11 @@ namespace CaptivityEvents.Brothel
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, new Action<CampaignGameStarter>(OnSessionLaunched));
             CampaignEvents.OnSettlementLeftEvent.AddNonSerializedListener(this, new Action<MobileParty, Settlement>(OnSettlementLeft));
             CampaignEvents.LocationCharactersAreReadyToSpawnEvent.AddNonSerializedListener(this, new Action<Dictionary<string, int>>(LocationCharactersAreReadyToSpawn));
+        }
+        
+        public static CEBrothel GetPlayerBrothel(Settlement settlement)
+        {
+            return _brothelList.FirstOrDefault(brothelData => { return brothelData.Settlement.StringId == settlement.StringId && brothelData.Owner == Hero.MainHero; });
         }
 
         public static List<CEBrothel> GetPlayerBrothels()
@@ -979,7 +1001,7 @@ namespace CaptivityEvents.Brothel
             {
                 if (ContainsBrothelData(settlement))
                 {
-                    _brothelList.Where(brothel => { return brothel.Settlement.StringId == settlement.StringId; }).Select(brothel => { brothel.Owner = flagToPurchase ? Hero.MainHero : null; return brothel; }).ToList();
+                    _brothelList.Where(brothel => { return brothel.Settlement.StringId == settlement.StringId; }).Select(brothel => { brothel.Owner = flagToPurchase ? Hero.MainHero : null; brothel.Capital = brothel.InitialCapital; return brothel; }).ToList();
                 }
             }
             catch (Exception)
@@ -1064,8 +1086,6 @@ namespace CaptivityEvents.Brothel
         private Settlement _orderedDrinkThisDayInSettlement;
 
         private bool _orderedDrinkThisVisit;
-
-        private bool _hasSoldEstablishment;
 
         private bool _hasMetWithRansomBroker;
 
