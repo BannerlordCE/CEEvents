@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -37,11 +38,15 @@ namespace CaptivityEvents.Brothel
         public TextObject Name = new TextObject("{=CEEVENTS1099}Brothel");
 
         [SaveableField(8)]
-        public int Capital = 200;
+        public int Capital = 5000;
 
         [SaveableField(9)]
+        public int InitialCapital = 5000;
+
+        [SaveableField(10)]
         public int Expense = 200;
 
+        public int ProfitMade => Math.Max(Capital - InitialCapital, 0);
 
     }
 }

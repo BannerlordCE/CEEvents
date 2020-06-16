@@ -10,7 +10,7 @@ namespace CaptivityEvents.Brothel
 {
     static class CEBrothelToolTip
     {
-        public static void WorkshopTypeTooltipAction(this TooltipVM tooltipVM, object[] args)
+        public static void BrothelTypeTooltipAction(this TooltipVM tooltipVM, object[] args)
         {
             UpdateTooltip(tooltipVM, args[0] as CEBrothel);
         }
@@ -19,8 +19,7 @@ namespace CaptivityEvents.Brothel
             tooltipVM.Mode = 1;
             tooltipVM.AddProperty("", new TextObject("{=CEEVENTS1099}Brothel").ToString(), 0, TooltipProperty.TooltipPropertyFlags.Title);
             tooltipVM.AddProperty(new TextObject("{=qRqnrtdX}Owner", null).ToString(), brothel.Owner.Name.ToString(), 0, TooltipProperty.TooltipPropertyFlags.None);
-            tooltipVM.AddProperty(new TextObject("{=CEBROTHEL0994}Notable Prostitutes", null).ToString(), brothel.Owner.Name.ToString(), 0, TooltipProperty.TooltipPropertyFlags.None);
-            tooltipVM.AddProperty(string.Empty, string.Empty, 0, TooltipProperty.TooltipPropertyFlags.None);
+            tooltipVM.AddProperty(new TextObject("{=CEBROTHEL0994}Notable Prostitutes", null).ToString(), "None", 0, TooltipProperty.TooltipPropertyFlags.None);
         }
     }
 }

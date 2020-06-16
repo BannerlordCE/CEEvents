@@ -31,7 +31,7 @@ namespace CaptivityEvents.Patches
 				{
 					if (brothel.IsRunning)
 					{
-						int num3 = (int)((float)Math.Max(0, brothel.Capital) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
+						int num3 = (int)((float)Math.Max(0, brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
 						num += num3;
 						if (applyWithdrawals && num3 > 0)
 						{

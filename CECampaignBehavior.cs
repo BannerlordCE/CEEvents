@@ -418,28 +418,30 @@ namespace CaptivityEvents.CampaignBehaviours
                         InformationManager.AddQuickInformation(textObject, 0, null, "");
                     }
 
-                    //if (mother.IsHumanPlayerCharacter || pregnancy.Father == Hero.MainHero)
-                    //{
-                    //    for (int i = 0; i < stillbornCount; i++)
-                    //    {
-                    //        ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(mother, null);
-                    //        LogEntry.AddLogEntry(childbirthLogEntry);
-                    //        Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText()));
-                    //    }
-                    //    foreach (Hero newbornHero in aliveOffsprings)
-                    //    {
-                    //        ChildbirthLogEntry childbirthLogEntry2 = new ChildbirthLogEntry(mother, newbornHero);
-                    //        LogEntry.AddLogEntry(childbirthLogEntry2);
-                    //        Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText()));
-                    //    }
-                    //}
-
-                    ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(pregnancy.Mother, aliveOffsprings, stillbornCount);
-                    LogEntry.AddLogEntry(childbirthLogEntry);
-                    if (mother == Hero.MainHero || pregnancy.Father == Hero.MainHero)
+                    // 1.4.2 version
+                    if (mother.IsHumanPlayerCharacter || pregnancy.Father == Hero.MainHero)
                     {
-                        Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(aliveOffsprings, childbirthLogEntry.GetEncyclopediaText()));
+                        for (int i = 0; i < stillbornCount; i++)
+                        {
+                            ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(mother, null);
+                            LogEntry.AddLogEntry(childbirthLogEntry);
+                            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText()));
+                        }
+                        foreach (Hero newbornHero in aliveOffsprings)
+                        {
+                            ChildbirthLogEntry childbirthLogEntry2 = new ChildbirthLogEntry(mother, newbornHero);
+                            LogEntry.AddLogEntry(childbirthLogEntry2);
+                            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText()));
+                        }
                     }
+
+                    // 1.4.1 Version
+                    //ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(pregnancy.Mother, aliveOffsprings, stillbornCount);
+                    //LogEntry.AddLogEntry(childbirthLogEntry);
+                    //if (mother == Hero.MainHero || pregnancy.Father == Hero.MainHero)
+                    //{
+                    //    Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(aliveOffsprings, childbirthLogEntry.GetEncyclopediaText()));
+                    //}
 
                     mother.IsPregnant = false;
                     pregnancy.AlreadyOccured = true;

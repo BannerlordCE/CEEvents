@@ -539,7 +539,7 @@ namespace CaptivityEvents
 
             if (!_isLoadedInGame)
             {
-                TooltipVM.AddTooltipType(typeof(CEBrothel), new Action<TooltipVM, object[]>(CEBrothelToolTip.WorkshopTypeTooltipAction));
+                TooltipVM.AddTooltipType(typeof(CEBrothel), new Action<TooltipVM, object[]>(CEBrothelToolTip.BrothelTypeTooltipAction));
                 LoadBrothelSounds();
                 _isLoadedInGame = true;
             }
