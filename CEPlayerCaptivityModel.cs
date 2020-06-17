@@ -1,4 +1,4 @@
-﻿using CaptivityEvents.CampaignBehaviours;
+﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Issues;
@@ -403,13 +403,13 @@ namespace CaptivityEvents.Models
         {
             if (PlayerCaptivity.CaptorParty.IsMobile && !PlayerCaptivity.CaptorParty.MobileParty.IsActive)
             {
-                CECampaignBehavior.extraVariables.Owner = null;
+                CECampaignBehavior.ExtraProps.Owner = null;
                 CEEventLoader.VictimSlaveryModifier(0, Hero.MainHero, true, true);
                 return "menu_captivity_end_by_party_removed";
             }
             if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MapFaction == Hero.MainHero.Clan)
             {
-                CECampaignBehavior.extraVariables.Owner = null;
+                CECampaignBehavior.ExtraProps.Owner = null;
                 CEEventLoader.VictimSlaveryModifier(0, Hero.MainHero, true, true);
                 return "menu_captivity_end_by_ally_party_saved";
             }
@@ -419,7 +419,7 @@ namespace CaptivityEvents.Models
                 int prostituteSkillFlag = Hero.MainHero.GetSkillValue(CESkills.IsProstitute);
                 if (prostituteSkillFlag == 0)
                 {
-                    CECampaignBehavior.extraVariables.Owner = null;
+                    CECampaignBehavior.ExtraProps.Owner = null;
                     CEEventLoader.VictimSlaveryModifier(0, Hero.MainHero, true, true);
                     return "menu_captivity_end_by_ally_party_saved";
                 }
@@ -453,7 +453,7 @@ namespace CaptivityEvents.Models
                     {
                         if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MapEvent != null)
                         {
-                            CECampaignBehavior.extraVariables.Owner = null;
+                            CECampaignBehavior.ExtraProps.Owner = null;
                             CEEventLoader.VictimSlaveryModifier(0, Hero.MainHero, true, true);
                             return "menu_escape_captivity_during_battle";
                         }

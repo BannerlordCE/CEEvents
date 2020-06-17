@@ -2,7 +2,7 @@
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Barterables;
 
-namespace CaptivityEvents.CampaignBehaviours
+namespace CaptivityEvents.CampaignBehaviors
 {
     public class CESetPrisonerFreeBarterBehavior : CampaignBehaviorBase
     {

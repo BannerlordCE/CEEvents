@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TaleWorlds.CampaignSystem;
+﻿using TaleWorlds.CampaignSystem;
 
 namespace CaptivityEvents.Helper
 {
@@ -16,5 +11,15 @@ namespace CaptivityEvents.Helper
         public static bool brothelFlagFemale = false;
 
         public static bool brothelFlagMale = false;
+
+
+        public static bool notificationCaptorExists = false;
+
+        public static bool notificationCaptorCheck = false;
+
+        public static bool notificationEventExists = false;
+
+        public static bool notificationEventCheck = false;
+
     }
 }

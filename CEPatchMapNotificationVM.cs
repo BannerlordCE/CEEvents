@@ -1,4 +1,4 @@
-﻿using CaptivityEvents.CampaignBehaviours;
+﻿using CaptivityEvents.Helper;
 using CaptivityEvents.Notifications;
 using HarmonyLib;
 using System;
@@ -28,7 +28,7 @@ namespace CaptivityEvents.Patches
                 CECaptorMapNotification captorMapNotification = data as CECaptorMapNotification;
                 __result = new CECaptorMapNotificationItemVM(captorMapNotification.CaptorEvent, data, null, new Action<MapNotificationItemBaseVM>((MapNotificationItemBaseVM item) =>
                 {
-                    CECampaignBehavior.extraVariables.notificationCaptorExists = false;
+                    CEHelper.notificationCaptorExists = false;
                     CESubModule.LoadCampaignNotificationTexture("default");
 
                     object[] parameters = new object[1];
@@ -41,7 +41,7 @@ namespace CaptivityEvents.Patches
                 CEEventMapNotification eventMapNotification = data as CEEventMapNotification;
                 __result = new CEEventMapNotificationItemVM(eventMapNotification.RandomEvent, data, null, new Action<MapNotificationItemBaseVM>((MapNotificationItemBaseVM item) =>
                 {
-                    CECampaignBehavior.extraVariables.notificationEventExists = false;
+                    CEHelper.notificationEventExists = false;
                     CESubModule.LoadCampaignNotificationTexture("default", 1);
 
                     object[] parameters = new object[1];

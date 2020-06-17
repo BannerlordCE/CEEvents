@@ -1,13 +1,9 @@
 ﻿using CaptivityEvents.Brothel;
 using HarmonyLib;
 using System;
-using System.Linq;
 using System.Reflection;
-using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories;
-using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance;
-using TaleWorlds.Library;
 
 namespace CaptivityEvents.Patches
 {
@@ -26,15 +22,15 @@ namespace CaptivityEvents.Patches
         [HarmonyPostfix]
         public static void RefreshList(ClanIncomeVM __instance)
         {
-            foreach (CEBrothel brothel in CEBrothelBehaviour.GetPlayerBrothels())
+            foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
             {
                 __instance.Incomes.Add(new CEBrothelClanFinanceItemVM(brothel, new Action<ClanFinanceIncomeItemBaseVM>((ClanFinanceIncomeItemBaseVM brothelIncome) =>
                 {
-                    OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome } );
+                    OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome });
                 }), new Action(__instance.OnRefresh)));
             }
             __instance.RefreshTotalIncome();
-            OnIncomeSelection.Invoke(__instance, new object[] { GetDefaultIncome.Invoke(__instance, null) } );
+            OnIncomeSelection.Invoke(__instance, new object[] { GetDefaultIncome.Invoke(__instance, null) });
             __instance.RefreshValues();
         }
     }

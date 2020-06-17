@@ -1,7 +1,7 @@
 ﻿using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
-using CaptivityEvents.Notifications;
 using CaptivityEvents.Helper;
+using CaptivityEvents.Notifications;
 using Helpers;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
 
-namespace CaptivityEvents.CampaignBehaviours
+namespace CaptivityEvents.CampaignBehaviors
 {
     internal class CECampaignBehavior : CampaignBehaviorBase
     {
@@ -40,14 +40,13 @@ namespace CaptivityEvents.CampaignBehaviours
 
         private void LaunchCaptorEvent()
         {
-            if (!extraVariables.notificationCaptorExists)
+            if (!CEHelper.notificationCaptorExists)
             {
-                extraVariables.notificationCaptorExists = true;
-
                 CharacterObject Captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
                 CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(Captive);
                 if (returnedEvent != null)
                 {
+                    CEHelper.notificationCaptorExists = true;
                     try
                     {
                         if (!returnedEvent.NotificationName.IsStringNoneOrEmpty())
@@ -77,12 +76,12 @@ namespace CaptivityEvents.CampaignBehaviours
 
         private void LaunchRandomEvent()
         {
-            if (!extraVariables.notificationEventExists)
+            if (!CEHelper.notificationEventExists)
             {
-                extraVariables.notificationEventExists = true;
                 CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
                 if (returnedEvent != null)
                 {
+                    CEHelper.notificationEventExists = true;
                     try
                     {
                         if (!returnedEvent.NotificationName.IsStringNoneOrEmpty())
@@ -125,15 +124,15 @@ namespace CaptivityEvents.CampaignBehaviours
                         {
                             if (CESettings.Instance.EventCaptorNotifications)
                             {
-                                if (CESettings.Instance.EventRandomEnabled && (!extraVariables.notificationEventExists || !extraVariables.notificationCaptorExists))
+                                if (CESettings.Instance.EventRandomEnabled && (!CEHelper.notificationEventExists || !CEHelper.notificationCaptorExists))
                                 {
                                     int randomNumber = MBRandom.RandomInt(100);
 
-                                    if (!extraVariables.notificationEventExists && (randomNumber < CESettings.Instance.EventRandomFireChance))
+                                    if (!CEHelper.notificationEventExists && (randomNumber < CESettings.Instance.EventRandomFireChance))
                                     {
                                         LaunchRandomEvent();
                                     }
-                                    else if (!extraVariables.notificationCaptorExists && randomNumber > CESettings.Instance.EventRandomFireChance)
+                                    else if (!CEHelper.notificationCaptorExists && randomNumber > CESettings.Instance.EventRandomFireChance)
                                     {
                                         LaunchCaptorEvent();
                                     }
@@ -184,8 +183,8 @@ namespace CaptivityEvents.CampaignBehaviours
                                         }
                                         else
                                         {
-                                            extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                                            extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                                            _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
+                                            _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                                         }
 
                                         GameMenu.SwitchToMenu(returnedEvent.Name);
@@ -213,8 +212,8 @@ namespace CaptivityEvents.CampaignBehaviours
                                         }
                                         else
                                         {
-                                            extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                                            extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                                            _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
+                                            _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                                         }
 
                                         GameMenu.SwitchToMenu(returnedEvent.Name);
@@ -419,29 +418,29 @@ namespace CaptivityEvents.CampaignBehaviours
                     }
 
                     // 1.4.2 version
-                    if (mother.IsHumanPlayerCharacter || pregnancy.Father == Hero.MainHero)
-                    {
-                        for (int i = 0; i < stillbornCount; i++)
-                        {
-                            ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(mother, null);
-                            LogEntry.AddLogEntry(childbirthLogEntry);
-                            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText()));
-                        }
-                        foreach (Hero newbornHero in aliveOffsprings)
-                        {
-                            ChildbirthLogEntry childbirthLogEntry2 = new ChildbirthLogEntry(mother, newbornHero);
-                            LogEntry.AddLogEntry(childbirthLogEntry2);
-                            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText()));
-                        }
-                    }
+                    //if (mother.IsHumanPlayerCharacter || pregnancy.Father == Hero.MainHero)
+                    //{
+                    //    for (int i = 0; i < stillbornCount; i++)
+                    //    {
+                    //        ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(mother, null);
+                    //        LogEntry.AddLogEntry(childbirthLogEntry);
+                    //        Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText()));
+                    //    }
+                    //    foreach (Hero newbornHero in aliveOffsprings)
+                    //    {
+                    //        ChildbirthLogEntry childbirthLogEntry2 = new ChildbirthLogEntry(mother, newbornHero);
+                    //        LogEntry.AddLogEntry(childbirthLogEntry2);
+                    //        Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText()));
+                    //    }
+                    //}
 
                     // 1.4.1 Version
-                    //ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(pregnancy.Mother, aliveOffsprings, stillbornCount);
-                    //LogEntry.AddLogEntry(childbirthLogEntry);
-                    //if (mother == Hero.MainHero || pregnancy.Father == Hero.MainHero)
-                    //{
-                    //    Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(aliveOffsprings, childbirthLogEntry.GetEncyclopediaText()));
-                    //}
+                    ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(pregnancy.Mother, aliveOffsprings, stillbornCount);
+                    LogEntry.AddLogEntry(childbirthLogEntry);
+                    if (mother == Hero.MainHero || pregnancy.Father == Hero.MainHero)
+                    {
+                        Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(aliveOffsprings, childbirthLogEntry.GetEncyclopediaText()));
+                    }
 
                     mother.IsPregnant = false;
                     pregnancy.AlreadyOccured = true;
@@ -500,8 +499,9 @@ namespace CaptivityEvents.CampaignBehaviours
 
             if (_hoursPassed > CESettings.Instance.EventOccuranceCaptor)
             {
-                extraVariables.notificationEventCheck = true;
-                extraVariables.notificationCaptorCheck = true;
+
+                CEHelper.notificationEventCheck = true;
+                CEHelper.notificationCaptorCheck = true;
                 _hoursPassed = 0;
                 return true;
             }
@@ -535,7 +535,7 @@ namespace CaptivityEvents.CampaignBehaviours
                 _heroPregnancies = new List<Pregnancy>();
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -564,7 +564,7 @@ namespace CaptivityEvents.CampaignBehaviours
         {
             dataStore.SyncData("_CEheroPregnancies", ref _heroPregnancies);
             dataStore.SyncData("_CEreturnEquipment", ref _returnEquipment);
-            dataStore.SyncData("_CEextraVariables", ref extraVariables);
+            dataStore.SyncData("_CEextraVariables", ref _extraVariables);
         }
 
         private int _hoursPassed = 0;
@@ -573,7 +573,10 @@ namespace CaptivityEvents.CampaignBehaviours
 
         private static List<ReturnEquipment> _returnEquipment = new List<ReturnEquipment>();
 
-        public static ExtraVariables extraVariables = new ExtraVariables();
+
+        public static ExtraVariables ExtraProps => _extraVariables;
+
+        private static ExtraVariables _extraVariables = new ExtraVariables();
 
         internal class Pregnancy
         {
@@ -631,27 +634,26 @@ namespace CaptivityEvents.CampaignBehaviours
             {
             }
 
+            public void ResetVariables()
+            {
+                Owner = null;
+                menuToSwitchBackTo = null;
+                currentBackgroundMeshNameToSwitchBackTo = null;
+
+                CEHelper.notificationCaptorCheck = false;
+                CEHelper.notificationEventCheck = false;
+                CEHelper.notificationCaptorExists = false;
+                CEHelper.notificationEventExists = false;
+            }
+
             [SaveableField(1)]
             public Hero Owner = null;
 
             [SaveableField(2)]
-            public bool notificationCaptorExists = false;
-
-            [SaveableField(3)]
-            public bool notificationCaptorCheck = false;
-
-            [SaveableField(4)]
-            public bool notificationEventExists = false;
-
-            [SaveableField(5)]
-            public bool notificationEventCheck = false;
-
-            [SaveableField(6)]
             public string menuToSwitchBackTo = null;
 
-            [SaveableField(7)]
+            [SaveableField(3)]
             public string currentBackgroundMeshNameToSwitchBackTo = null;
-
         }
     }
 }

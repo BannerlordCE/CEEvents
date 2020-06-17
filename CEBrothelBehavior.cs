@@ -12,7 +12,6 @@ using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.Overlay;
 using TaleWorlds.CampaignSystem.SandBox;
 using TaleWorlds.Core;
-using TaleWorlds.Core.ViewModelCollection;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
@@ -20,7 +19,7 @@ using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Brothel
 {
-    internal class CEBrothelBehaviour : CampaignBehaviorBase
+    internal class CEBrothelBehavior : CampaignBehaviorBase
     {
         private static readonly Location brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanIfSettlementAccessModelLetsPlayer", "CanAlways", "CanAlways", "CanIfGrownUpMaleOrHero", new string[] { "empire_house_c_tavern_a", "", "", "" }, null);
 
@@ -150,7 +149,7 @@ namespace CaptivityEvents.Brothel
                     break;
 
                 case CultureCode.Battania:
-                    brothel.SetSceneName(0, "battania_tavern_interior_a");
+                    brothel.SetSceneName(0, "battania_tavern_interior_b");
                     break;
 
                 case CultureCode.Khuzait:
@@ -249,7 +248,7 @@ namespace CaptivityEvents.Brothel
             Settlement settlement = PlayerEncounter.LocationEncounter.Settlement;
             if (CampaignMission.Current.Location == brothel && !_isBrothelInitialized)
             {
-                LocationComplex.Current.AddPassage(settlement.LocationComplex.GetLocationWithId("center"), brothel);
+                //LocationComplex.Current.AddPassage(settlement.LocationComplex.GetLocationWithId("center"), brothel);
                 AddPeopleToTownTavern(settlement, unusedUsablePointCount);
                 _isBrothelInitialized = true;
             }
@@ -429,6 +428,8 @@ namespace CaptivityEvents.Brothel
 
             brothel.AddLocationCharacters(new CreateLocationCharacterDelegate(CreateTavernkeeper), settlement.Culture, LocationCharacter.CharacterRelations.Neutral, 1);
 
+            brothel.AddLocationCharacters(new CreateLocationCharacterDelegate(CreateTavernWench), settlement.Culture, LocationCharacter.CharacterRelations.Neutral, 1);
+
             brothel.AddLocationCharacters(new CreateLocationCharacterDelegate(CreateMusician), settlement.Culture, LocationCharacter.CharacterRelations.Neutral, 1);
             brothel.AddLocationCharacters(new CreateLocationCharacterDelegate(CreateRansomBroker), settlement.Culture, LocationCharacter.CharacterRelations.Neutral, 1);
 
@@ -438,14 +439,10 @@ namespace CaptivityEvents.Brothel
                 brothel.AddLocationCharacters(new CreateLocationCharacterDelegate(CreateDancer), settlement.Culture, LocationCharacter.CharacterRelations.Neutral, dancers);
             }
 
+
             if (num > 0)
             {
-                int num5 = (int)(num * 0.05f);
-                if (num5 > 0)
-                {
-                    brothel.AddLocationCharacters(new CreateLocationCharacterDelegate(CreateTavernWench), settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num5);
-                }
-                int num2 = (int)(num * 0.1f);
+                int num2 = (int)(num * 0.2f);
                 if (num2 > 0)
                 {
                     brothel.AddLocationCharacters(new CreateLocationCharacterDelegate(CreateTownsManForTavern), settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num2);
@@ -679,7 +676,8 @@ namespace CaptivityEvents.Brothel
                 {
                     MBTextManager.SetTextVariable("AMOUNT", new TextObject(brothelCost.ToString(), null), false);
                 }
-            } catch (Exception)
+            }
+            catch (Exception)
             {
 
             }
@@ -756,13 +754,13 @@ namespace CaptivityEvents.Brothel
                         break;
 
                     case CultureCode.Battania:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
+                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_wodden_straw_a");
                         break;
                     case CultureCode.Khuzait:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_b");
+                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_f");
                         break;
                     default:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
+                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
                         break;
                 }
 
@@ -801,10 +799,7 @@ namespace CaptivityEvents.Brothel
             try
             {
                 GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, prostitutionCost, false);
-                SkillObject ProstitueFlag = CESkills.IsProstitute;
-                Hero.MainHero.SetSkillValue(ProstitueFlag, 1);
                 SkillObject ProstitutionSkill = CESkills.Prostitution;
-
                 if (Hero.MainHero.GetSkillValue(ProstitutionSkill) < 100)
                 {
                     Hero.MainHero.SetSkillValue(ProstitutionSkill, 100);
@@ -895,7 +890,7 @@ namespace CaptivityEvents.Brothel
             _orderedDrinkThisDayInSettlement = null;
             try
             {
-                foreach (CEBrothel brothel in CEBrothelBehaviour.GetPlayerBrothels())
+                foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
                 {
                     Town town = brothel.Settlement.Town;
                     if (!town.IsRebeling)
@@ -953,7 +948,7 @@ namespace CaptivityEvents.Brothel
             CampaignEvents.OnSettlementLeftEvent.AddNonSerializedListener(this, new Action<MobileParty, Settlement>(OnSettlementLeft));
             CampaignEvents.LocationCharactersAreReadyToSpawnEvent.AddNonSerializedListener(this, new Action<Dictionary<string, int>>(LocationCharactersAreReadyToSpawn));
         }
-        
+
         public static CEBrothel GetPlayerBrothel(Settlement settlement)
         {
             return _brothelList.FirstOrDefault(brothelData => { return brothelData.Settlement.StringId == settlement.StringId && brothelData.Owner == Hero.MainHero; });
@@ -1073,6 +1068,11 @@ namespace CaptivityEvents.Brothel
             dataStore.SyncData<bool>("_hasMetWithRansomBroker", ref _hasMetWithRansomBroker);
             dataStore.SyncData<bool>("_hasBoughtTunToParty", ref _hasBoughtTunToParty);
             dataStore.SyncData<List<CEBrothel>>("_CEbrothelList", ref _brothelList);
+        }
+
+        public static void CleanList()
+        {
+            _brothelList = new List<CEBrothel>();
         }
 
         private static List<CEBrothel> _brothelList = new List<CEBrothel>();

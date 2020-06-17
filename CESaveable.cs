@@ -1,5 +1,5 @@
 ﻿using CaptivityEvents.Brothel;
-using CaptivityEvents.CampaignBehaviours;
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Issues;
 using CaptivityEvents.Notifications;
 using System.Collections.Generic;
@@ -20,9 +20,11 @@ namespace CaptivityEvents
             base.AddClassDefinition(typeof(CECampaignBehavior.Pregnancy), 3);
             base.AddClassDefinition(typeof(CESkills), 4);
             base.AddClassDefinition(typeof(CECaptorMapNotification), 5);
+            // REMOVE VM ONCE SAVEDATA CRASHES IN BETA REFER TO TALEWORLD'S SAVE DEFINER ISSUE
             base.AddClassDefinition(typeof(CECaptorMapNotificationItemVM), 6);
             base.AddClassDefinition(typeof(CECampaignBehavior.ReturnEquipment), 7);
             base.AddClassDefinition(typeof(CEEventMapNotification), 8);
+            // REMOVE VM ONCE SAVEDATA CRASHES IN BETA REFER TO TALEWORLD'S SAVE DEFINER ISSUE
             base.AddClassDefinition(typeof(CEEventMapNotificationItemVM), 9);
             base.AddClassDefinition(typeof(CECampaignBehavior.ExtraVariables), 10);
             base.AddClassDefinition(typeof(CEBrothel), 11);

@@ -337,7 +337,7 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("CustomFlag")]
         public List<string> MultipleListOfCustomFlags { get; set; }
-        
+
 
         [XmlArrayItem("RestrictedListOfFlags", IsNullable = false)]
         public RestrictedListOfFlags[] MultipleRestrictedListOfFlags { get; set; }

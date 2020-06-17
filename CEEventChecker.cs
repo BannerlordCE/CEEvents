@@ -1,4 +1,4 @@
-﻿using CaptivityEvents.CampaignBehaviours;
+﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using System;
 using System.Linq;
@@ -757,11 +757,11 @@ namespace CaptivityEvents.Events
 
             if (isOwnedFlag || isNotOwnedFlag)
             {
-                if (isOwnedFlag && CECampaignBehavior.extraVariables.Owner == null)
+                if (isOwnedFlag && CECampaignBehavior.ExtraProps.Owner == null)
                 {
                     return "Skipping event " + listEvent.Name + " it does not match the conditions. isOwnedFlag.";
                 }
-                else if (isNotOwnedFlag && CECampaignBehavior.extraVariables.Owner != null)
+                else if (isNotOwnedFlag && CECampaignBehavior.ExtraProps.Owner != null)
                 {
                     return "Skipping event " + listEvent.Name + " it does not match the conditions. isNotOwnedFlag.";
                 }

@@ -1,5 +1,5 @@
 ﻿using CaptivityEvents.Brothel;
-using CaptivityEvents.CampaignBehaviours;
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
@@ -517,7 +517,7 @@ namespace CaptivityEvents
             campaignStarter.AddBehavior(new CECampaignBehavior());
             if (CESettings.Instance.ProstitutionControl)
             {
-                campaignStarter.AddBehavior(new CEBrothelBehaviour());
+                campaignStarter.AddBehavior(new CEBrothelBehavior());
             }
             if (CESettings.Instance.PrisonerEscapeBehavior)
             {
@@ -537,13 +537,14 @@ namespace CaptivityEvents
                 CEPrisonerDialogue.AddPrisonerLines(campaignStarter);
             }
 
+            AddCustomEvents(campaignStarter);
+
             if (!_isLoadedInGame)
             {
                 TooltipVM.AddTooltipType(typeof(CEBrothel), new Action<TooltipVM, object[]>(CEBrothelToolTip.BrothelTypeTooltipAction));
                 LoadBrothelSounds();
                 _isLoadedInGame = true;
             }
-            AddCustomEvents(campaignStarter);
         }
 
         protected void ReplaceModel<TBaseType, TChildType>(IGameStarter gameStarter) where TBaseType : GameModel where TChildType : GameModel
@@ -635,11 +636,13 @@ namespace CaptivityEvents
             catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("Failed to load " + listedEvent.Name + " exception: " + e.Message.ToString() + " stacktrace: " + e.StackTrace.ToString());
-
-                TextObject textObject = new TextObject("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
-                textObject.SetTextVariable("NAME", listedEvent.Name);
-                textObject.SetTextVariable("ERROR", e.Message);
-                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
+                if (!_isLoadedInGame)
+                {
+                    TextObject textObject = new TextObject("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
+                    textObject.SetTextVariable("NAME", listedEvent.Name);
+                    textObject.SetTextVariable("ERROR", e.Message);
+                    InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
+                }
             }
         }
 
@@ -739,8 +742,8 @@ namespace CaptivityEvents
                             }
                             else
                             {
-                                CECampaignBehavior.extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                                CECampaignBehavior.extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
+                                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                             }
 
                             CEEvent triggeredEvent = captiveToPlay.IsFemale ? CESubModule.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu") : CESubModule.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
@@ -778,8 +781,8 @@ namespace CaptivityEvents
                             }
                             else
                             {
-                                CECampaignBehavior.extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                                CECampaignBehavior.extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
+                                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                             }
 
                             CEEvent triggeredEvent = captiveToPlay.IsFemale ? CESubModule.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu") : CESubModule.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");

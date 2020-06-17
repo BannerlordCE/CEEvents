@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TaleWorlds.Core.ViewModelCollection;
+﻿using TaleWorlds.Core.ViewModelCollection;
 using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Brothel
 {
-    static class CEBrothelToolTip
+    internal static class CEBrothelToolTip
     {
         public static void BrothelTypeTooltipAction(this TooltipVM tooltipVM, object[] args)
         {

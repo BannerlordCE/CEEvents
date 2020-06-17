@@ -1,4 +1,4 @@
-﻿using CaptivityEvents.CampaignBehaviours;
+﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
 using HarmonyLib;
@@ -1082,7 +1082,7 @@ namespace CaptivityEvents.Events
                             {
                                 Settlement settlement = PartyBase.MainParty.MobileParty.CurrentSettlement;
                                 Hero notable = settlement.Notables.Where(findFirstNotable => { return !findFirstNotable.IsFemale; }).GetRandomElement();
-                                CECampaignBehavior.extraVariables.Owner = notable;
+                                CECampaignBehavior.ExtraProps.Owner = notable;
                                 CECaptivityChange(args, settlement.Party);
                             }
                             catch (Exception)
@@ -1262,9 +1262,9 @@ namespace CaptivityEvents.Events
 
                           text.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale ? 1 : 0);
 
-                          if (CECampaignBehavior.extraVariables.Owner != null)
+                          if (CECampaignBehavior.ExtraProps.Owner != null)
                           {
-                              text.SetTextVariable("OWNER_NAME", CECampaignBehavior.extraVariables.Owner.Name);
+                              text.SetTextVariable("OWNER_NAME", CECampaignBehavior.ExtraProps.Owner.Name);
                           }
                           if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement != null)
                           {
@@ -1419,9 +1419,9 @@ namespace CaptivityEvents.Events
 
                         text.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale ? 1 : 0);
 
-                        if (CECampaignBehavior.extraVariables.Owner != null)
+                        if (CECampaignBehavior.ExtraProps.Owner != null)
                         {
-                            text.SetTextVariable("OWNER_NAME", CECampaignBehavior.extraVariables.Owner.Name);
+                            text.SetTextVariable("OWNER_NAME", CECampaignBehavior.ExtraProps.Owner.Name);
                         }
 
                         if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement != null)
@@ -2711,12 +2711,12 @@ namespace CaptivityEvents.Events
                             MobileParty party = null;
                             if (PlayerCaptivity.CaptorParty.IsSettlement)
                             {
-                                CECampaignBehavior.extraVariables.Owner = null;
+                                CECampaignBehavior.ExtraProps.Owner = null;
                                 party = PlayerCaptivity.CaptorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; });
                             }
                             else
                             {
-                                CECampaignBehavior.extraVariables.Owner = null;
+                                CECampaignBehavior.ExtraProps.Owner = null;
                                 party = PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; });
                             }
 
@@ -2744,7 +2744,7 @@ namespace CaptivityEvents.Events
                             {
                                 party = PlayerCaptivity.CaptorParty;
                             }
-                            CECampaignBehavior.extraVariables.Owner = null;
+                            CECampaignBehavior.ExtraProps.Owner = null;
                             CECaptivityChange(args, party);
                         }
                         catch (Exception)
@@ -2770,7 +2770,7 @@ namespace CaptivityEvents.Events
                             if (party != null)
                             {
                                 CECaptivityChange(args, party.Party);
-                                CECampaignBehavior.extraVariables.Owner = party.LeaderHero;
+                                CECampaignBehavior.ExtraProps.Owner = party.LeaderHero;
                             }
                         }
                         catch (Exception)
@@ -2796,7 +2796,7 @@ namespace CaptivityEvents.Events
                             }
 
                             notable = settlement.Notables.Where(findFirstNotable => { return !findFirstNotable.IsFemale; }).GetRandomElement();
-                            CECampaignBehavior.extraVariables.Owner = notable;
+                            CECampaignBehavior.ExtraProps.Owner = notable;
                             CECaptivityChange(args, settlement.Party);
                         }
                         catch (Exception)
@@ -4079,13 +4079,6 @@ namespace CaptivityEvents.Events
                         }
 
                         // Strip
-                        if (op.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StripHero))
-                        {
-                            if (CECampaignBehavior.extraVariables.menuToSwitchBackTo == null)
-                            {
-                                InventoryManager.OpenScreenAsInventoryOf(Hero.MainHero.PartyBelongedTo.Party.MobileParty, captiveHero.CharacterObject);
-                            }
-                        }
                         if (op.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip))
                         {
                             CEStripVictim(captiveHero);
@@ -4138,7 +4131,15 @@ namespace CaptivityEvents.Events
                         CEKillPrisoners(args);
                     }
 
-                    if (op.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners))
+                    if (op.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StripHero) && captiveHero != null)
+                    {
+                        if (CESettings.Instance.EventCaptorGearCaptives)
+                        {
+                            CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
+                        }
+                        InventoryManager.OpenScreenAsInventoryOf(Hero.MainHero.PartyBelongedTo.Party.MobileParty, captiveHero.CharacterObject);
+                    }
+                    else if (op.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners))
                     {
                         CEPrisonerRebel(args);
                     }
@@ -4301,7 +4302,7 @@ namespace CaptivityEvents.Events
         {
             CESubModule.LoadTexture("default");
             PartyBase _captorParty = PlayerCaptivity.CaptorParty;
-            CECampaignBehavior.extraVariables.Owner = null;
+            CECampaignBehavior.ExtraProps.Owner = null;
 
             if (_captorParty.IsSettlement && _captorParty.Settlement.IsTown)
             {
@@ -4344,8 +4345,8 @@ namespace CaptivityEvents.Events
                         PartyBase.MainParty.UpdateVisibilityAndInspected(true);
                     }
                     PlayerCaptivity.CaptorParty = null;
-                } 
-                catch (Exception e)
+                }
+                catch (Exception)
                 {
                     PlayerCaptivity.EndCaptivity();
                 }
@@ -4358,7 +4359,7 @@ namespace CaptivityEvents.Events
 
         private static void CECaptivityEscape(MenuCallbackArgs args)
         {
-            CECampaignBehavior.extraVariables.Owner = null;
+            CECampaignBehavior.ExtraProps.Owner = null;
             bool wasInSettlement = PlayerCaptivity.CaptorParty.IsSettlement;
             Settlement currentSettlement = PlayerCaptivity.CaptorParty.Settlement;
             TextObject textObject = GameTexts.FindText("str_CE_escape_success", (wasInSettlement) ? "settlement" : null);
@@ -4389,14 +4390,14 @@ namespace CaptivityEvents.Events
         // Captor Specific Functions
         private static void CECaptorContinue(MenuCallbackArgs args)
         {
-            if (CECampaignBehavior.extraVariables.menuToSwitchBackTo != null)
+            if (CECampaignBehavior.ExtraProps.menuToSwitchBackTo != null)
             {
-                GameMenu.SwitchToMenu(CECampaignBehavior.extraVariables.menuToSwitchBackTo);
-                CECampaignBehavior.extraVariables.menuToSwitchBackTo = null;
-                if (CECampaignBehavior.extraVariables.currentBackgroundMeshNameToSwitchBackTo != null)
+                GameMenu.SwitchToMenu(CECampaignBehavior.ExtraProps.menuToSwitchBackTo);
+                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
+                if (CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo != null)
                 {
-                    args.MenuContext.SetBackgroundMeshName(CECampaignBehavior.extraVariables.currentBackgroundMeshNameToSwitchBackTo);
-                    CECampaignBehavior.extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
+                    args.MenuContext.SetBackgroundMeshName(CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo);
+                    CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
                 }
             }
             else
@@ -5324,9 +5325,9 @@ namespace CaptivityEvents.Events
                         {
                             randomSoldier = captorHero;
                         }
-                        else if (lord && CECampaignBehavior.extraVariables.Owner != null)
+                        else if (lord && CECampaignBehavior.ExtraProps.Owner != null)
                         {
-                            randomSoldier = CECampaignBehavior.extraVariables.Owner;
+                            randomSoldier = CECampaignBehavior.ExtraProps.Owner;
                         }
                         else if (lord && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty != null && targetHero.PartyBelongedToAsPrisoner.MobileParty.LeaderHero != null && !targetHero.PartyBelongedToAsPrisoner.MobileParty.LeaderHero.IsFemale)
                         {

@@ -3,7 +3,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
 
-namespace CaptivityEvents.CampaignBehaviours
+namespace CaptivityEvents.CampaignBehaviors
 {
     public class CEPrisonerEscapeCampaignBehavior : CampaignBehaviorBase
     {

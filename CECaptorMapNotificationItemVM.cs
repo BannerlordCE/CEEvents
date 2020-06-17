@@ -1,6 +1,7 @@
-﻿using CaptivityEvents.CampaignBehaviours;
+﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
+using CaptivityEvents.Helper;
 using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -13,7 +14,7 @@ namespace CaptivityEvents.Notifications
 {
     internal class CECaptorMapNotificationItemVM : MapNotificationItemBaseVM
     {
-        private CEEvent _captorEvent;
+        private readonly CEEvent _captorEvent;
 
         public CECaptorMapNotificationItemVM(CEEvent captorEvent, InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
         {
@@ -28,29 +29,30 @@ namespace CaptivityEvents.Notifications
         public override void ManualRefreshRelevantStatus()
         {
             base.ManualRefreshRelevantStatus();
-            if (MobileParty.MainParty.Party.PrisonRoster.Count == 0 || PlayerCaptivity.IsCaptive || !CECampaignBehavior.extraVariables.notificationCaptorExists)
+            if (MobileParty.MainParty.Party.PrisonRoster.Count == 0 || PlayerCaptivity.IsCaptive || !CEHelper.notificationCaptorExists)
             {
-                CECampaignBehavior.extraVariables.notificationCaptorExists = false;
+                CEHelper.notificationCaptorExists = false;
                 base.ExecuteRemove();
             }
-            else if (CECampaignBehavior.extraVariables.notificationCaptorExists)
+            else if (CEHelper.notificationCaptorExists)
             {
                 if (!MobileParty.MainParty.Party.PrisonRoster.Contains(_captorEvent.Captive) || CEEventChecker.FlagsDoMatchEventConditions(_captorEvent, _captorEvent.Captive, PartyBase.MainParty) != null)
                 {
-                    CECampaignBehavior.extraVariables.notificationCaptorCheck = false;
-                    CECampaignBehavior.extraVariables.notificationCaptorExists = false;
+                    CEHelper.notificationCaptorCheck = false;
+                    CEHelper.notificationCaptorExists = false;
                     base.ExecuteRemove();
                 }
                 else
                 {
-                    CECampaignBehavior.extraVariables.notificationCaptorCheck = false;
+                    CEHelper.notificationCaptorCheck = false;
                 }
             }
         }
 
         private void OnCaptorNotificationInspect()
         {
-            CECampaignBehavior.extraVariables.notificationCaptorExists = false;
+
+            CEHelper.notificationCaptorExists = false;
             base.ExecuteRemove();
             if (MobileParty.MainParty.Party.PrisonRoster.Count > 0 && MobileParty.MainParty.Party.PrisonRoster.Contains(_captorEvent.Captive))
             {
@@ -67,8 +69,11 @@ namespace CaptivityEvents.Notifications
                         }
                         else
                         {
-                            CECampaignBehavior.extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                            CECampaignBehavior.extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                            if (CECampaignBehavior.ExtraProps != null)
+                            {
+                                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
+                                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                            }
                         }
 
                         GameMenu.SwitchToMenu(_captorEvent.Name);

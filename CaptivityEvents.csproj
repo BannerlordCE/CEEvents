@@ -37,7 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CEBrothel.cs" />
-    <Compile Include="CEBrothelBehaviour.cs" />
+    <Compile Include="CEBrothelBehavior.cs" />
     <Compile Include="CEBrothelToolTip.cs" />
     <Compile Include="CEBrothelClanFinanceItemVM.cs" />
     <Compile Include="CEConsole.cs" />

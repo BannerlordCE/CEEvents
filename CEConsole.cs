@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.CampaignBehaviours;
+﻿using CaptivityEvents.Brothel;
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using System;
@@ -254,6 +255,11 @@ namespace CaptivityEvents.Helper
                                     {
                                         GameMenu.ActivateGameMenu("prisoner_wait");
                                     }
+                                    else
+                                    {
+                                        CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapStateCaptive.GameMenuId;
+                                        CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapStateCaptive.MenuContext.CurrentBackgroundMeshName;
+                                    }
 
                                     GameMenu.SwitchToMenu(result);
                                     return "Successfully launched event.";
@@ -411,10 +417,6 @@ namespace CaptivityEvents.Helper
             try
             {
                 Thread.Sleep(500);
-                if (!CampaignCheats.CheckCheatUsage(ref CampaignCheats.ErrorType))
-                {
-                    return CampaignCheats.ErrorType;
-                }
                 if (CampaignCheats.CheckHelp(strings))
                 {
                     return "Format is \"captivity.current_status [SEARCH_HERO]\".";
@@ -456,10 +458,6 @@ namespace CaptivityEvents.Helper
             try
             {
                 Thread.Sleep(500);
-                if (!CampaignCheats.CheckCheatUsage(ref CampaignCheats.ErrorType))
-                {
-                    return CampaignCheats.ErrorType;
-                }
                 if (CampaignCheats.CheckHelp(strings))
                 {
                     return "Format is \"captivity.reset_status [SEARCH_HERO]\".";
@@ -493,6 +491,7 @@ namespace CaptivityEvents.Helper
                     CEEventLoader.VictimProstitutionModifier(0, hero, false, false, false);
                     CEEventLoader.VictimSlaveryModifier(0, hero, true, true, false);
                     CEEventLoader.VictimSlaveryModifier(0, hero, false, false, false);
+                    CECampaignBehavior.ExtraProps.ResetVariables();
                     return "Successfully reset status";
                 }
                 catch (Exception)
@@ -512,10 +511,6 @@ namespace CaptivityEvents.Helper
             try
             {
                 Thread.Sleep(500);
-                if (!CampaignCheats.CheckCheatUsage(ref CampaignCheats.ErrorType))
-                {
-                    return CampaignCheats.ErrorType;
-                }
                 if (CampaignCheats.CheckHelp(strings))
                 {
                     return "Format is \"captivity.clear_pregnancies \".";
@@ -532,6 +527,36 @@ namespace CaptivityEvents.Helper
                 {
                     bool successful = CECampaignBehavior.ClearPregnancyList();
                     return successful ? "Successfully cleared pregnancies of Captivity Events" : "Failed to Clear";
+                }
+                catch (Exception)
+                {
+                    return "Failed";
+                }
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e.ToString();
+            }
+        }
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("clean_save", "captivity")]
+        public static string CleanSave(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+                if (CampaignCheats.CheckHelp(strings))
+                {
+                    return "Format is \"captivity.clean_save \".";
+                }
+
+                try
+                {
+                    bool successful = CECampaignBehavior.ClearPregnancyList();
+                    CEBrothelBehavior.CleanList();
+                    ResetStatus(new List<string>());
+
+                    return successful ? "Successfully cleaned save of captivity events data. Save the game now." : "Failed to Clean";
                 }
                 catch (Exception)
                 {

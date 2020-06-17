@@ -1,6 +1,7 @@
-﻿using CaptivityEvents.CampaignBehaviours;
+﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
+using CaptivityEvents.Helper;
 using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -28,29 +29,29 @@ namespace CaptivityEvents.Notifications
         public override void ManualRefreshRelevantStatus()
         {
             base.ManualRefreshRelevantStatus();
-            if (PlayerCaptivity.IsCaptive || !CECampaignBehavior.extraVariables.notificationEventExists)
+            if (PlayerCaptivity.IsCaptive || !CEHelper.notificationEventExists)
             {
-                CECampaignBehavior.extraVariables.notificationEventExists = false;
+                CEHelper.notificationEventExists = false;
                 base.ExecuteRemove();
             }
-            else if (CECampaignBehavior.extraVariables.notificationEventCheck)
+            else if (CECampaignBehavior.ExtraProps != null && CEHelper.notificationEventCheck)
             {
                 if (CEEventChecker.FlagsDoMatchEventConditions(_randomEvent, CharacterObject.PlayerCharacter) != null)
                 {
-                    CECampaignBehavior.extraVariables.notificationEventCheck = false;
-                    CECampaignBehavior.extraVariables.notificationEventExists = false;
+                    CEHelper.notificationEventCheck = false;
+                    CEHelper.notificationEventExists = false;
                     base.ExecuteRemove();
                 }
                 else
                 {
-                    CECampaignBehavior.extraVariables.notificationEventCheck = false;
+                    CEHelper.notificationEventCheck = false;
                 }
             }
         }
 
         private void OnRandomNotificationInspect()
         {
-            CECampaignBehavior.extraVariables.notificationEventExists = false;
+            CEHelper.notificationEventExists = false;
             base.ExecuteRemove();
             string result = CEEventChecker.FlagsDoMatchEventConditions(_randomEvent, CharacterObject.PlayerCharacter);
             if (result == null)
@@ -64,8 +65,11 @@ namespace CaptivityEvents.Notifications
                     }
                     else
                     {
-                        CECampaignBehavior.extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                        CECampaignBehavior.extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                        if (CECampaignBehavior.ExtraProps != null)
+                        {
+                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
+                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                        }
                     }
 
                     GameMenu.SwitchToMenu(_randomEvent.Name);
