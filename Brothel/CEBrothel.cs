@@ -43,14 +43,12 @@ namespace CaptivityEvents.Brothel
         public TextObject Name = new TextObject("{=CEEVENTS1099}Brothel");
 
         [SaveableField(8)]
-        public int Capital = 5000;
+        public int Capital = 5000; //Warning: field value ignored during initialization
 
         [SaveableField(9)]
         public int Expense = 200;
 
         [SaveableField(10)]
         public int InitialCapital = 5000;
-
-
     }
 }

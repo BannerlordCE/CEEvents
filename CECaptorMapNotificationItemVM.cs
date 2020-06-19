@@ -1,8 +1,8 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿using System;
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
-using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
@@ -18,76 +18,82 @@ namespace CaptivityEvents.Notifications
 
         public CECaptorMapNotificationItemVM(CEEvent captorEvent, InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
         {
-            base.NotificationIdentifier = CESettings.Instance.EventCaptorCustomTextureNotifications ? "cecaptor" : "death";
+            NotificationIdentifier = CESettings.Instance != null && CESettings.Instance.EventCaptorCustomTextureNotifications
+                ? "cecaptor"
+                : "death";
             _captorEvent = captorEvent;
-            _onInspect = delegate ()
-            {
-                OnCaptorNotificationInspect();
-            };
+
+            _onInspect = delegate
+                         {
+                             OnCaptorNotificationInspect();
+                         };
         }
 
         public override void ManualRefreshRelevantStatus()
         {
             base.ManualRefreshRelevantStatus();
-            if (MobileParty.MainParty.Party.PrisonRoster.Count == 0 || PlayerCaptivity.IsCaptive || !CEHelper.notificationCaptorExists)
+
+            if (MobileParty.MainParty.Party.PrisonRoster.Count == 0 || PlayerCaptivity.IsCaptive || !CEContext.notificationCaptorExists)
             {
-                CEHelper.notificationCaptorExists = false;
-                base.ExecuteRemove();
+                CEContext.notificationCaptorExists = false;
+                ExecuteRemove();
             }
-            else if (CEHelper.notificationCaptorExists)
+
+            if (!CEContext.notificationCaptorExists) return;
+
+
+            if (!MobileParty.MainParty.Party.PrisonRoster.Contains(_captorEvent.Captive) || CEEventChecker.FlagsDoMatchEventConditions(_captorEvent, _captorEvent.Captive, PartyBase.MainParty) != null)
             {
-                if (!MobileParty.MainParty.Party.PrisonRoster.Contains(_captorEvent.Captive) || CEEventChecker.FlagsDoMatchEventConditions(_captorEvent, _captorEvent.Captive, PartyBase.MainParty) != null)
-                {
-                    CEHelper.notificationCaptorCheck = false;
-                    CEHelper.notificationCaptorExists = false;
-                    base.ExecuteRemove();
-                }
-                else
-                {
-                    CEHelper.notificationCaptorCheck = false;
-                }
+                CEContext.notificationCaptorCheck = false;
+                CEContext.notificationCaptorExists = false;
+                ExecuteRemove();
+            }
+            else
+            {
+                CEContext.notificationCaptorCheck = false;
             }
         }
 
         private void OnCaptorNotificationInspect()
         {
+            CEContext.notificationCaptorExists = false;
+            ExecuteRemove();
 
-            CEHelper.notificationCaptorExists = false;
-            base.ExecuteRemove();
             if (MobileParty.MainParty.Party.PrisonRoster.Count > 0 && MobileParty.MainParty.Party.PrisonRoster.Contains(_captorEvent.Captive))
             {
                 // Declare Variables
-                string returnString = CEEventChecker.FlagsDoMatchEventConditions(_captorEvent, _captorEvent.Captive, PartyBase.MainParty);
-                if (returnString == null)
-                {
-                    if (Game.Current.GameStateManager.ActiveState is MapState mapState)
-                    {
-                        Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-                        if (!mapState.AtMenu)
-                        {
-                            GameMenu.ActivateGameMenu("prisoner_wait");
-                        }
-                        else
-                        {
-                            if (CECampaignBehavior.ExtraProps != null)
-                            {
-                                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
-                                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                            }
-                        }
+                var returnString = CEEventChecker.FlagsDoMatchEventConditions(_captorEvent, _captorEvent.Captive, PartyBase.MainParty);
 
-                        GameMenu.SwitchToMenu(_captorEvent.Name);
+                if (string.IsNullOrEmpty(returnString))
+                {
+                    if (!(Game.Current.GameStateManager.ActiveState is MapState mapState)) return;
+
+                    Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+
+                    if (!mapState.AtMenu)
+                    {
+                        GameMenu.ActivateGameMenu("prisoner_wait");
                     }
+                    else
+                    {
+                        if (CECampaignBehavior.ExtraProps != null)
+                        {
+                            CECampaignBehavior.ExtraProps.MenuToSwitchBackTo = mapState.GameMenuId;
+                            CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                        }
+                    }
+
+                    GameMenu.SwitchToMenu(_captorEvent.Name);
                 }
                 else
                 {
-                    TextObject textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.", null);
+                    var textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
                 }
             }
             else
             {
-                TextObject textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.", null);
+                var textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
             }
         }

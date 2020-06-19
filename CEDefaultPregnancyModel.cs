@@ -17,33 +17,39 @@ namespace CaptivityEvents.Models
 
         public override float DeliveringTwinsProbability => 0.03f;
 
-        private bool IsHeroAgeSuitableForPregnancy(Hero hero)
+        private static bool IsHeroAgeSuitableForPregnancy(Hero hero)
         {
             return hero.Age >= 18f && hero.Age <= 45f;
         }
 
         public override float GetDailyChanceOfPregnancyForHero(Hero hero)
         {
-            float num = 0f;
+            var num = 0f;
+
             if (hero.Spouse != null && hero.IsFertile && IsHeroAgeSuitableForPregnancy(hero))
             {
-                ExplainedNumber explainedNumber = new ExplainedNumber(1f, null);
+                var explainedNumber = new ExplainedNumber(1f);
                 PerkHelper.AddPerkBonusForCharacter(DefaultPerks.Medicine.PerfectHealth, hero.Clan.Leader.CharacterObject, ref explainedNumber);
                 num = (6.5f - (hero.Age - 18f) * 0.23f) * 0.02f * explainedNumber.ResultNumber;
             }
-            if (hero.Children.Count == 0)
+
+            switch (hero.Children.Count)
             {
-                num *= 3f;
+                case 0:
+                    num *= 3f;
+
+                    break;
+                case 1:
+                    num *= 2f;
+
+                    break;
             }
-            else if (hero.Children.Count == 1)
-            {
-                num *= 2f;
-            }
+
             return num;
         }
 
-        private const int MinPregnancyAge = 18;
+        //private const int MinPregnancyAge = 18;
 
-        private const int MaxPregnancyAge = 45;
+        //private const int MaxPregnancyAge = 45;
     }
 }

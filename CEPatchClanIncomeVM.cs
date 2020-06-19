@@ -16,13 +16,13 @@ namespace CaptivityEvents.Patches
         [HarmonyPrepare]
         private static bool ShouldPatch()
         {
-            return CESettings.Instance.ProstitutionControl;
+            return CESettings.Instance != null && CESettings.Instance.ProstitutionControl;
         }
 
         [HarmonyPostfix]
         public static void RefreshList(ClanIncomeVM __instance)
         {
-            foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
+            foreach (var brothel in CEBrothelBehavior.GetPlayerBrothels())
             {
                 __instance.Incomes.Add(new CEBrothelClanFinanceItemVM(brothel, new Action<ClanFinanceIncomeItemBaseVM>((ClanFinanceIncomeItemBaseVM brothelIncome) =>
                 {

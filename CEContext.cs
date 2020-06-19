@@ -2,7 +2,7 @@
 
 namespace CaptivityEvents.Helper
 {
-    public class CEHelper
+    public static class CEContext
     {
         public static Hero spouseOne = null;
 
@@ -20,6 +20,5 @@ namespace CaptivityEvents.Helper
         public static bool notificationEventExists = false;
 
         public static bool notificationEventCheck = false;
-
     }
 }

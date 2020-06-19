@@ -1,8 +1,7 @@
-﻿using CaptivityEvents.Helper;
+﻿using System.Reflection;
+using CaptivityEvents.Helper;
 using CaptivityEvents.Notifications;
 using HarmonyLib;
-using System;
-using System.Reflection;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.Core;
 
@@ -11,43 +10,48 @@ namespace CaptivityEvents.Patches
     [HarmonyPatch(typeof(MapNotificationVM), "DetermineNotificationType")]
     internal class CEMapNotificationVMPatch
     {
-        public static MethodInfo RemoveNotificationItem = AccessTools.Method(typeof(MapNotificationVM), "RemoveNotificationItem");
+        private static readonly MethodInfo RemoveNotificationItem = AccessTools.Method(typeof(MapNotificationVM), "RemoveNotificationItem");
 
         [HarmonyPrepare]
         private static bool ShouldPatch()
         {
-            return CESettings.Instance.EventCaptorNotifications;
+            return CESettings.Instance != null && CESettings.Instance.EventCaptorNotifications;
         }
 
         [HarmonyPostfix]
         private static void DetermineNotificationType(MapNotificationVM __instance, ref MapNotificationItemBaseVM __result, InformationData data)
         {
-            Type type = data.GetType();
-            if (type.Equals(typeof(CECaptorMapNotification)))
-            {
-                CECaptorMapNotification captorMapNotification = data as CECaptorMapNotification;
-                __result = new CECaptorMapNotificationItemVM(captorMapNotification.CaptorEvent, data, null, new Action<MapNotificationItemBaseVM>((MapNotificationItemBaseVM item) =>
-                {
-                    CEHelper.notificationCaptorExists = false;
-                    CESubModule.LoadCampaignNotificationTexture("default");
+            var type = data.GetType();
 
-                    object[] parameters = new object[1];
-                    parameters[0] = item;
-                    RemoveNotificationItem.Invoke(__instance, parameters);
-                }));
-            }
-            else if (type.Equals(typeof(CEEventMapNotification)))
-            {
-                CEEventMapNotification eventMapNotification = data as CEEventMapNotification;
-                __result = new CEEventMapNotificationItemVM(eventMapNotification.RandomEvent, data, null, new Action<MapNotificationItemBaseVM>((MapNotificationItemBaseVM item) =>
-                {
-                    CEHelper.notificationEventExists = false;
-                    CESubModule.LoadCampaignNotificationTexture("default", 1);
+            if (type != typeof(CECaptorMapNotification)) return;
 
-                    object[] parameters = new object[1];
-                    parameters[0] = item;
-                    RemoveNotificationItem.Invoke(__instance, parameters);
-                }));
+            switch (data)
+            {
+                case CECaptorMapNotification captorMapNotification:
+                    __result = new CECaptorMapNotificationItemVM(captorMapNotification.CaptorEvent, data, null, item =>
+                                                                                                                {
+                                                                                                                    CEContext.notificationCaptorExists = false;
+                                                                                                                    CESubModule.LoadCampaignNotificationTexture("default");
+
+                                                                                                                    var parameters = new object[1];
+                                                                                                                    parameters[0] = item;
+                                                                                                                    RemoveNotificationItem.Invoke(__instance, parameters);
+                                                                                                                });
+
+                    break;
+
+                case CEEventMapNotification eventMapNotification:
+                    __result = new CEEventMapNotificationItemVM(eventMapNotification.RandomEvent, data, null, item =>
+                                                                                                              {
+                                                                                                                  CEContext.notificationEventExists = false;
+                                                                                                                  CESubModule.LoadCampaignNotificationTexture("default", 1);
+
+                                                                                                                  var parameters = new object[1];
+                                                                                                                  parameters[0] = item;
+                                                                                                                  RemoveNotificationItem.Invoke(__instance, parameters);
+                                                                                                              });
+
+                    break;
             }
         }
     }
