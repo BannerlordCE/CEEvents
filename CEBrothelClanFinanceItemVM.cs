@@ -13,30 +13,20 @@ namespace CaptivityEvents.Brothel
         public CEBrothelClanFinanceItemVM(CEBrothel brothel, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh) : base(onSelection, onRefresh)
         {
             _brothel = brothel;
-            // 1.4.1 
-            //base.IncomeTypeAsEnum = IncomeTypes.None;
-            //GameTexts.SetVariable("SHOPNAME", _brothel.Settlement.Name);
-            //GameTexts.SetVariable("SHOPTYPE", new TextObject("{=CEEVENTS1099}Brothel"));
-            //PopulateActionList();
-            //PopulateStatsList();
-            //base.Name = GameTexts.FindText("str_clan_finance_shop", null).ToString();
-            //base.Income = (int)(Math.Max(0, brothel.Capital) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
-            //base.Visual = ((CharacterObject.PlayerCharacter != null) ? new ImageIdentifierVM(CharacterCode.CreateFrom(CharacterObject.PlayerCharacter)) : new ImageIdentifierVM(ImageIdentifierType.Null));
-            //base.IncomeValueText = base.DetermineIncomeText(base.Income);
 
             // 1.4.2
             base.IncomeTypeAsEnum = IncomeTypes.None;
             SettlementComponent component = _brothel.Settlement.GetComponent<SettlementComponent>();
             WorkshopType workshopType = WorkshopType.Find("pottery_shop");
             WorkshopTypeId = workshopType.StringId;
-            //base.ImageName = ((component != null) ? component.WaitMeshName : "");
+            base.ImageName = ((component != null) ? component.WaitMeshName : "");
         }
 
         public override void RefreshValues()
         {
             base.RefreshValues();
             base.Name = _brothel.Name.ToString();
-            //base.Location = _brothel.Settlement.Name.ToString();
+            base.Location = _brothel.Settlement.Name.ToString();
             base.Income = (int)(Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
             base.IncomeValueText = base.DetermineIncomeText(base.Income);
             InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
