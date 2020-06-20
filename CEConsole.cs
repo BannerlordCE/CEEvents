@@ -16,8 +16,16 @@ namespace CaptivityEvents.Helper
 {
     internal class CEConsole
     {
+        internal CEBrothelBehavior BrothelBehavior { get; set; }
+
+
+        public CEConsole(CEBrothelBehavior brothelBehavior)
+        {
+            BrothelBehavior = brothelBehavior;
+        }
+
         [CommandLineFunctionality.CommandLineArgumentFunction("force_fire_event", "captivity")]
-        public static string ForceFireEvent(List<string> strings)
+        public string ForceFireEvent(List<string> strings)
         {
             try
             {
@@ -162,7 +170,7 @@ namespace CaptivityEvents.Helper
         }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("fire_event", "captivity")]
-        public static string FireEvent(List<string> strings)
+        public string FireEvent(List<string> strings)
         {
             try
             {
@@ -317,7 +325,7 @@ namespace CaptivityEvents.Helper
         }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("list_events", "captivity")]
-        public static string ListEvents(List<string> strings)
+        public string ListEvents(List<string> strings)
         {
             try
             {
@@ -348,7 +356,6 @@ namespace CaptivityEvents.Helper
                     }
 
                 return text;
-
             }
             catch (Exception e)
             {
@@ -357,7 +364,7 @@ namespace CaptivityEvents.Helper
         }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("current_status", "captivity")]
-        public static string CurrentStatus(List<string> strings)
+        public string CurrentStatus(List<string> strings)
         {
             try
             {
@@ -384,7 +391,7 @@ namespace CaptivityEvents.Helper
         }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("reset_status", "captivity")]
-        public static string ResetStatus(List<string> strings)
+        public string ResetStatus(List<string> strings)
         {
             try
             {
@@ -424,7 +431,7 @@ namespace CaptivityEvents.Helper
         }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("clear_pregnancies", "captivity")]
-        public static string ClearPregnancies(List<string> strings)
+        public string ClearPregnancies(List<string> strings)
         {
             try
             {
@@ -456,7 +463,7 @@ namespace CaptivityEvents.Helper
         }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("clean_save", "captivity")]
-        public static string CleanSave(List<string> strings)
+        public string CleanSave(List<string> strings)
         {
             try
             {
@@ -467,7 +474,7 @@ namespace CaptivityEvents.Helper
                 try
                 {
                     var successful = CECampaignBehavior.ClearPregnancyList();
-                    CEBrothelBehavior.CleanList();
+                    BrothelBehavior.Session.CleanList();
                     ResetStatus(new List<string>());
 
                     return successful
@@ -486,7 +493,7 @@ namespace CaptivityEvents.Helper
         }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("play_sound", "captivity")]
-        public static string PlaySound(List<string> strings)
+        public string PlaySound(List<string> strings)
         {
             try
             {

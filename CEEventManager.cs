@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CaptivityEvents.Custom;
+using CaptivityEvents.Enums;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -11,12 +12,6 @@ namespace CaptivityEvents.Events
 {
     internal class CEEventManager
     {
-        // Flags and Conditions
-        private static void PrintDebugInGameTextMessage(string v)
-        {
-            var textObject = new TextObject(v);
-            InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
-        }
 
         public static string FireSpecificEvent(string specificEvent, bool force = false)
         {
@@ -298,5 +293,14 @@ namespace CaptivityEvents.Events
 
             return null;
         }
+
+        // Flags and Conditions
+        private static void PrintDebugInGameTextMessage(string v)
+        {
+            var textObject = new TextObject(v);
+            InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
+        }
+
+        
     }
 }

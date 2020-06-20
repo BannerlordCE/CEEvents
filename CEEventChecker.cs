@@ -2,6 +2,7 @@
 using System.Linq;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
+using CaptivityEvents.Enums;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -170,7 +171,7 @@ namespace CaptivityEvents.Events
             var restrictedList = listEvent.MultipleRestrictedListOfFlags;
 
             // Settings checking
-            if (!CESettings.Instance.SexualContent && listEvent.SexualContent) return "Skipping event " + listEvent.Name + " SexualContent events disabled.";
+            if (CESettings.Instance != null && (!CESettings.Instance.SexualContent && listEvent.SexualContent)) return "Skipping event " + listEvent.Name + " SexualContent events disabled.";
 
             if (!CESettings.Instance.NonSexualContent && !listEvent.SexualContent) return "Skipping event " + listEvent.Name + " NonSexualContent events disabled.";
 
@@ -194,7 +195,7 @@ namespace CaptivityEvents.Events
                 captorParty = PartyBase.MainParty;
             }
 
-            var CEFlag = true;
+            var ceFlag = true;
 
             // Gender Checks
             if (!captive.IsFemale && restrictedList.Contains(RestrictedListOfFlags.HeroGenderIsFemale)) return "Skipping event " + listEvent.Name + " it does not match the conditions. HeroGenderIsFemale.";
@@ -455,7 +456,7 @@ namespace CaptivityEvents.Events
                     {
                         if (!listEvent.ReqHeroPartyHaveItem.IsStringNoneOrEmpty())
                         {
-                            var foundItem = ItemObject.All.FirstOrDefault(item => { return item.StringId == listEvent.ReqHeroPartyHaveItem; });
+                            var foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == listEvent.ReqHeroPartyHaveItem);
 
                             if (foundItem == null)
                             {
@@ -930,7 +931,7 @@ namespace CaptivityEvents.Events
 
             if (hasCityFlag || hasDungeonFlag || hasVillageFlag || hasHideoutFlag || hasTravellingFlag || hasCastleFlag || hasPartyInTownFlag || visitedByCaravanFlag || duringSiegeFlag || duringRaidFlag)
             {
-                CEFlag = false;
+                ceFlag = false;
 
                 if (captorParty != null && captorParty.IsSettlement)
                 {
@@ -939,7 +940,7 @@ namespace CaptivityEvents.Events
                         if (visitedByCaravanFlag)
                             try
                             {
-                                CEFlag = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
+                                ceFlag = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
                             }
                             catch (Exception)
                             {
@@ -948,36 +949,36 @@ namespace CaptivityEvents.Events
                         else if (visitedByLordFlag)
                             try
                             {
-                                CEFlag = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
+                                ceFlag = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
                             }
                             catch (Exception)
                             {
                                 CECustomHandler.LogToFile("Failed to get Lord Party");
                             }
-                        else CEFlag = true;
+                        else ceFlag = true;
                     }
 
-                    if (hasVillageFlag && captorParty.Settlement.IsVillage) CEFlag = true;
+                    if (hasVillageFlag && captorParty.Settlement.IsVillage) ceFlag = true;
 
-                    if (hasHideoutFlag && captorParty.Settlement.IsHideout()) CEFlag = true;
+                    if (hasHideoutFlag && captorParty.Settlement.IsHideout()) ceFlag = true;
 
                     if (hasCastleFlag && captorParty.Settlement.IsCastle)
                     {
                         if (visitedByLordFlag)
                             try
                             {
-                                CEFlag = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty) != null;
+                                ceFlag = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty) != null;
                             }
                             catch (Exception)
                             {
                                 CECustomHandler.LogToFile("Failed to get Lord Party");
                             }
-                        else CEFlag = true;
+                        else ceFlag = true;
                     }
 
-                    if (duringSiegeFlag != captorParty.Settlement.IsUnderSiege) CEFlag = false;
+                    if (duringSiegeFlag != captorParty.Settlement.IsUnderSiege) ceFlag = false;
 
-                    if (duringRaidFlag != captorParty.Settlement.IsUnderRaid) CEFlag = false;
+                    if (duringRaidFlag != captorParty.Settlement.IsUnderRaid) ceFlag = false;
                 }
                 else if (captorParty != null && captorParty.IsMobile && captorParty.MobileParty.CurrentSettlement != null)
                 {
@@ -986,7 +987,7 @@ namespace CaptivityEvents.Events
                         if (visitedByCaravanFlag)
                             try
                             {
-                                CEFlag = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
+                                ceFlag = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
                             }
                             catch (Exception)
                             {
@@ -995,63 +996,63 @@ namespace CaptivityEvents.Events
                         else if (visitedByLordFlag)
                             try
                             {
-                                CEFlag = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
+                                ceFlag = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
                             }
                             catch (Exception)
                             {
                                 CECustomHandler.LogToFile("Failed to get Lord Party");
                             }
-                        else CEFlag = true;
+                        else ceFlag = true;
                     }
 
-                    if (hasVillageFlag && captorParty.MobileParty.CurrentSettlement.IsVillage) CEFlag = true;
+                    if (hasVillageFlag && captorParty.MobileParty.CurrentSettlement.IsVillage) ceFlag = true;
 
                     if (hasCastleFlag && captorParty.MobileParty.CurrentSettlement.IsCastle)
                     {
                         if (visitedByLordFlag)
                             try
                             {
-                                CEFlag = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
+                                ceFlag = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
                             }
                             catch (Exception)
                             {
                                 CECustomHandler.LogToFile("Failed to get Lord Party");
                             }
-                        else CEFlag = true;
+                        else ceFlag = true;
                     }
 
-                    if (hasHideoutFlag && captorParty.MobileParty.CurrentSettlement.IsHideout()) CEFlag = true;
+                    if (hasHideoutFlag && captorParty.MobileParty.CurrentSettlement.IsHideout()) ceFlag = true;
 
-                    if (duringSiegeFlag != captorParty.MobileParty.CurrentSettlement.IsUnderSiege) CEFlag = false;
+                    if (duringSiegeFlag != captorParty.MobileParty.CurrentSettlement.IsUnderSiege) ceFlag = false;
 
-                    if (duringRaidFlag != captorParty.MobileParty.CurrentSettlement.IsUnderRaid) CEFlag = false;
+                    if (duringRaidFlag != captorParty.MobileParty.CurrentSettlement.IsUnderRaid) ceFlag = false;
                 }
                 else if (hasTravellingFlag)
                 {
                     if (captorParty.IsMobile)
                     {
-                        CEFlag = true;
+                        ceFlag = true;
 
-                        if (duringSiegeFlag != (captorParty.MobileParty.BesiegerCamp != null)) CEFlag = false;
+                        if (duringSiegeFlag != (captorParty.MobileParty.BesiegerCamp != null)) ceFlag = false;
 
                         var raidingEvent = captorParty.MapEvent != null && captorParty.MapEvent.IsRaid && captorParty.MapFaction.IsAtWarWith(captorParty.MapEvent.MapEventSettlement.MapFaction) && captorParty.MapEvent.DefenderSide.TroopCount == 0;
 
-                        if (duringRaidFlag != raidingEvent) CEFlag = false;
+                        if (duringRaidFlag != raidingEvent) ceFlag = false;
                     }
                 }
             }
 
-            if (!CEFlag) return "Skipping event " + listEvent.Name + " it does not match the location conditions.";
+            if (!ceFlag) return "Skipping event " + listEvent.Name + " it does not match the location conditions.";
 
             // Time Checks
             var hasNightFlag = restrictedList.Contains(RestrictedListOfFlags.TimeNight);
             var hasDayFlag = restrictedList.Contains(RestrictedListOfFlags.TimeDay);
 
-            if (hasNightFlag || hasDayFlag) CEFlag = false
+            if (hasNightFlag || hasDayFlag) ceFlag = false
                                                      || hasNightFlag && Campaign.Current.IsNight 
                                                      || hasDayFlag && Campaign.Current.IsDay;
 
-            if (!CEFlag) return "Skipping event " + listEvent.Name + " it does not match the time conditions.";
+            if (!ceFlag) return "Skipping event " + listEvent.Name + " it does not match the time conditions.";
 
             // Seasons Checks
             var hasWinterFlag = restrictedList.Contains(RestrictedListOfFlags.SeasonWinter);
@@ -1059,7 +1060,7 @@ namespace CaptivityEvents.Events
             var hasSpringFlag = restrictedList.Contains(RestrictedListOfFlags.SeasonSummer);
             var hasFallFlag = restrictedList.Contains(RestrictedListOfFlags.SeasonFall);
 
-            if (hasWinterFlag || hasSummerFlag) CEFlag = hasSummerFlag && CampaignTime.Now.GetSeasonOfYear == 1 
+            if (hasWinterFlag || hasSummerFlag) ceFlag = hasSummerFlag && CampaignTime.Now.GetSeasonOfYear == 1 
                                                          || hasFallFlag && CampaignTime.Now.GetSeasonOfYear == 2 
                                                          || hasWinterFlag && CampaignTime.Now.GetSeasonOfYear == 3 
                                                          || hasSpringFlag && (CampaignTime.Now.GetSeasonOfYear == 4 
@@ -1067,7 +1068,7 @@ namespace CaptivityEvents.Events
 
 
 
-            if (!CEFlag) return "Skipping event " + listEvent.Name + " it does not match the seasons conditions.";
+            if (!ceFlag) return "Skipping event " + listEvent.Name + " it does not match the seasons conditions.";
 
             listEvent.Captive = captive;
 

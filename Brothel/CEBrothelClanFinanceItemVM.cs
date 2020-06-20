@@ -10,33 +10,94 @@ namespace CaptivityEvents.Brothel
 {
     internal class CEBrothelClanFinanceItemVM : ClanFinanceIncomeItemBaseVM
     {
+        internal CEBrothelOwnerConditions Owner { get; set; }
+
         public CEBrothelClanFinanceItemVM(CEBrothel brothel, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh) : base(onSelection, onRefresh)
         {
             _brothel = brothel;
-            // 1.4.1 
-            //base.IncomeTypeAsEnum = IncomeTypes.None;
-            //GameTexts.SetVariable("SHOPNAME", _brothel.Settlement.Name);
-            //GameTexts.SetVariable("SHOPTYPE", new TextObject("{=CEEVENTS1099}Brothel"));
-            //PopulateActionList();
-            //PopulateStatsList();
-            //base.Name = GameTexts.FindText("str_clan_finance_shop", null).ToString();
-            //base.Income = (int)(Math.Max(0, brothel.Capital) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
-            //base.Visual = ((CharacterObject.PlayerCharacter != null) ? new ImageIdentifierVM(CharacterCode.CreateFrom(CharacterObject.PlayerCharacter)) : new ImageIdentifierVM(ImageIdentifierType.Null));
-            //base.IncomeValueText = base.DetermineIncomeText(base.Income);
 
             // 1.4.2
             IncomeTypeAsEnum = IncomeTypes.None;
             var component = _brothel.Settlement.GetComponent<SettlementComponent>();
             var workshopType = WorkshopType.Find("pottery_shop");
             WorkshopTypeId = workshopType.StringId;
-            //base.ImageName = ((component != null) ? component.WaitMeshName : "");
+
+            ImageName = component != null
+                ? component.WaitMeshName
+                : "";
         }
+
+
+
+        public string WorkshopTypeId
+        {
+            get => _workshopTypeId;
+            set
+            {
+                if (value == _workshopTypeId) return;
+                _workshopTypeId = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string InputsText
+        {
+            get => _inputsText;
+            set
+            {
+                if (value == _inputsText) return;
+                _inputsText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string OutputsText
+        {
+            get => _outputsText;
+            set
+            {
+                if (value == _outputsText) return;
+                _outputsText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string InputProducts
+        {
+            get => _inputProducts;
+            set
+            {
+                if (value == _inputProducts) return;
+                _inputProducts = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string OutputProducts
+        {
+            get => _outputProducts;
+            set
+            {
+                if (value == _outputProducts) return;
+                _outputProducts = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private readonly CEBrothel _brothel;
+        private string _workshopTypeId;
+        private string _inputsText;
+        private string _outputsText;
+        private string _inputProducts;
+        private string _outputProducts;
+
+        
 
         public override void RefreshValues()
         {
             base.RefreshValues();
             Name = _brothel.Name.ToString();
-            //base.Location = _brothel.Settlement.Name.ToString();
+            Location = _brothel.Settlement.Name.ToString();
             Income = (int) (Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
             IncomeValueText = DetermineIncomeText(Income);
             InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
@@ -108,6 +169,7 @@ namespace CaptivityEvents.Brothel
         private void ExecuteToggleBrothel(object identifier)
         {
             if (_brothel == null) return;
+
             if (!_brothel.IsRunning) GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, _brothel.Expense);
             _brothel.IsRunning = !_brothel.IsRunning;
             var onRefresh = _onRefresh;
@@ -127,84 +189,11 @@ namespace CaptivityEvents.Brothel
         {
             if (_brothel == null) return;
             GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, _brothel.Capital);
-            CEBrothelBehavior.BrothelInteraction(_brothel.Settlement, false);
+            Owner.BrothelInteraction(_brothel.Settlement, false);
 
             var onRefresh = _onRefresh;
 
             onRefresh?.Invoke();
         }
-
-
-        public string WorkshopTypeId
-        {
-            get => _workshopTypeId;
-            set
-            {
-                if (value == _workshopTypeId) return;
-
-                _workshopTypeId = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string InputsText
-        {
-            get => _inputsText;
-            set
-            {
-                if (value == _inputsText) return;
-
-                _inputsText = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string OutputsText
-        {
-            get => _outputsText;
-            set
-            {
-                if (value == _outputsText) return;
-
-                _outputsText = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string InputProducts
-        {
-            get => _inputProducts;
-            set
-            {
-                if (value == _inputProducts) return;
-
-                _inputProducts = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string OutputProducts
-        {
-            get => _outputProducts;
-            set
-            {
-                if (value == _outputProducts) return;
-
-                _outputProducts = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private readonly CEBrothel _brothel;
-
-        private string _workshopTypeId;
-
-        private string _inputsText;
-
-        private string _outputsText;
-
-        private string _inputProducts;
-
-        private string _outputProducts;
     }
 }

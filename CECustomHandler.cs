@@ -20,6 +20,66 @@ namespace CaptivityEvents.Custom
         private static readonly List<CEEvent> _AllEvents = new List<CEEvent>();
         private static readonly List<CECustom> _AllFlags = new List<CECustom>();
 
+        public static List<CEEvent> DeserializeXMLFileToObject(string XmlFilename)
+        {
+            var list = new List<CEEvent>();
+
+            try
+            {
+                if (string.IsNullOrEmpty(XmlFilename)) return null;
+                var textReader = new StreamReader(XmlFilename);
+                var xmlSerializer = new XmlSerializer(typeof(CEEvents));
+                var xsefsevents = (CEEvents) xmlSerializer.Deserialize(textReader);
+                list.AddRange(xsefsevents.CEEvent);
+            }
+            catch (Exception innerException)
+            {
+                var textObject = new TextObject("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
+                textObject.SetTextVariable("FILE", XmlFilename);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
+
+                throw new Exception("ERROR DeserializeXMLFileToObject:  -- filename: " + XmlFilename, innerException);
+            }
+
+            return list;
+        }
+
+        [DebuggerStepThroughAttribute]
+        public static void LogToFile(string msg)
+        {
+            if (CESettings.Instance != null && !CESettings.Instance.LogToggle) return;
+
+            try
+            {
+                LogMessage(msg);
+            }
+            catch (Exception)
+            {
+                LogMessage("FAILEDTOPOST: " + msg);
+            }
+        }
+
+
+        [DebuggerStepThroughAttribute]
+        public static void LogMessage(string msg)
+        {
+            if (_Lines >= 1000)
+            {
+                _TestLog = SetTestLog(_TestLog);
+                _Lines = 0;
+            }
+
+            var fullPath = (BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LogFile{0}.txt").Replace("{0}", _TestLog);
+            var file = new FileInfo(fullPath);
+            file.Directory?.Create();
+
+            if (_Lines == 0) File.WriteAllText((BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LogFile{0}.txt").Replace("{0}", _TestLog), "");
+
+            var contents = DateTime.Now + " -- " + msg + Environment.NewLine;
+            File.AppendAllText(fullPath, contents);
+            _Lines++;
+        }
+
         public static List<CECustom> GetFlags()
         {
             return _AllFlags;
@@ -221,29 +281,6 @@ namespace CaptivityEvents.Custom
             return result;
         }
 
-        public static List<CEEvent> DeserializeXMLFileToObject(string XmlFilename)
-        {
-            var list = new List<CEEvent>();
-
-            try
-            {
-                if (string.IsNullOrEmpty(XmlFilename)) return null;
-                var textReader = new StreamReader(XmlFilename);
-                var xmlSerializer = new XmlSerializer(typeof(CEEvents));
-                var xsefsevents = (CEEvents) xmlSerializer.Deserialize(textReader);
-                list.AddRange(xsefsevents.CEEvent);
-            }
-            catch (Exception innerException)
-            {
-                var textObject = new TextObject("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
-                textObject.SetTextVariable("FILE", XmlFilename);
-                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
-
-                throw new Exception("ERROR DeserializeXMLFileToObject:  -- filename: " + XmlFilename, innerException);
-            }
-
-            return list;
-        }
 
         [DebuggerStepThroughAttribute]
         private static void LogXMLIssueToFile(string msg, string xmlFile = "")
@@ -253,43 +290,6 @@ namespace CaptivityEvents.Custom
             file.Directory?.Create();
             if (_Lines == 0) File.WriteAllText(BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedXML.txt", "");
             var contents = xmlFile + " does not comply to CEEventsModal format described in CEEventsModal.xsd " + msg + Environment.NewLine;
-            File.AppendAllText(fullPath, contents);
-            _Lines++;
-        }
-
-
-        [DebuggerStepThroughAttribute]
-        public static void LogToFile(string msg)
-        {
-            if (CESettings.Instance != null && !CESettings.Instance.LogToggle) return;
-
-            try
-            {
-                LogMessage(msg);
-            }
-            catch (Exception)
-            {
-                LogMessage("FAILEDTOPOST: " + msg);
-            }
-        }
-
-
-        [DebuggerStepThroughAttribute]
-        public static void LogMessage(string msg)
-        {
-            if (_Lines >= 1000)
-            {
-                _TestLog = SetTestLog(_TestLog);
-                _Lines = 0;
-            }
-
-            var fullPath = (BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LogFile{0}.txt").Replace("{0}", _TestLog);
-            var file = new FileInfo(fullPath);
-            file.Directory?.Create();
-
-            if (_Lines == 0) File.WriteAllText((BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LogFile{0}.txt").Replace("{0}", _TestLog), "");
-
-            var contents = DateTime.Now + " -- " + msg + Environment.NewLine;
             File.AppendAllText(fullPath, contents);
             _Lines++;
         }

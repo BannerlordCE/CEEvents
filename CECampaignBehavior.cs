@@ -21,6 +21,138 @@ namespace CaptivityEvents.CampaignBehaviors
 {
     internal class CECampaignBehavior : CampaignBehaviorBase
     {
+        public static ExtraVariables ExtraProps => _extraVariables;
+
+        private int _hoursPassed;
+        private static List<Pregnancy> _heroPregnancies = new List<Pregnancy>();
+        private static List<ReturnEquipment> _returnEquipment = new List<ReturnEquipment>();
+        private static ExtraVariables _extraVariables = new ExtraVariables();
+
+
+        internal class Pregnancy
+        {
+            public Pregnancy(Hero pregnantHero, Hero father, CampaignTime dueDate)
+            {
+                Mother = pregnantHero;
+                Father = father;
+                DueDate = dueDate;
+                AlreadyOccured = false;
+            }
+
+            [SaveableField(1)]
+            public readonly Hero Mother;
+
+            [SaveableField(2)]
+            public readonly Hero Father;
+
+            [SaveableField(3)]
+            public readonly CampaignTime DueDate;
+
+            [SaveableField(4)]
+            public bool AlreadyOccured;
+        }
+
+
+        internal class ReturnEquipment
+        {
+            public ReturnEquipment(Hero captive, Equipment battleEquipment, Equipment civilianEquipment)
+            {
+                Captive = captive;
+                var randomElement = new Equipment(false);
+                randomElement.FillFrom(battleEquipment, false);
+                BattleEquipment = randomElement;
+                var randomElement2 = new Equipment(true);
+                randomElement2.FillFrom(civilianEquipment, false);
+                CivilianEquipment = randomElement2;
+                AlreadyOccured = false;
+            }
+
+            [SaveableField(1)]
+            public readonly Hero Captive;
+
+            [SaveableField(2)]
+            public readonly Equipment CivilianEquipment;
+
+            [SaveableField(3)]
+            public readonly Equipment BattleEquipment;
+
+            [SaveableField(4)]
+            public bool AlreadyOccured;
+        }
+
+        internal class ExtraVariables
+        {
+            public void ResetVariables()
+            {
+                Owner = null;
+                MenuToSwitchBackTo = null;
+                CurrentBackgroundMeshNameToSwitchBackTo = null;
+
+                CEContext.notificationCaptorCheck = false;
+                CEContext.notificationEventCheck = false;
+                CEContext.notificationCaptorExists = false;
+                CEContext.notificationEventExists = false;
+            }
+
+            [SaveableField(1)]
+            public Hero Owner;
+
+            [SaveableField(2)]
+            public string MenuToSwitchBackTo;
+
+            [SaveableField(3)]
+            public string CurrentBackgroundMeshNameToSwitchBackTo;
+        }
+
+
+        public static void AddReturnEquipment(Hero captive, Equipment battleEquipment, Equipment civilianEquipment)
+        {
+            if (!_returnEquipment.Exists(item => item.Captive == captive)) _returnEquipment.Add(new ReturnEquipment(captive, battleEquipment, civilianEquipment));
+        }
+
+        public static bool CheckIfPregnancyExists(Hero pregnantHero)
+        {
+            return _heroPregnancies.Any(pregnancy => pregnancy.Mother == pregnantHero);
+        }
+
+        public static bool ClearPregnancyList()
+        {
+            try
+            {
+                _heroPregnancies.ForEach(item =>
+                                         {
+                                             item.Mother.IsPregnant = false;
+                                         });
+                _heroPregnancies = new List<Pregnancy>();
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public override void RegisterEvents()
+        {
+            CampaignEvents.OnChildConceivedEvent.AddNonSerializedListener(this, RunOnChildConceived);
+
+            CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, RunHourlyTick);
+            CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, RunDailyTick);
+
+            CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, OnHeroKilled);
+        }
+
+        // Data
+        public override void SyncData(IDataStore dataStore)
+        {
+            dataStore.SyncData("_CEheroPregnancies", ref _heroPregnancies);
+            dataStore.SyncData("_CEreturnEquipment", ref _returnEquipment);
+            dataStore.SyncData("_CEextraVariables", ref _extraVariables);
+        }
+
+        
+
         private void RunOnChildConceived(Hero hero)
         {
             try
@@ -52,12 +184,9 @@ namespace CaptivityEvents.CampaignBehaviors
 
             try
             {
-                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty())
-                    CESubModule.LoadCampaignNotificationTexture(returnedEvent.NotificationName);
-                else if (returnedEvent.SexualContent)
-                    CESubModule.LoadCampaignNotificationTexture("CE_sexual_notification");
-                else
-                    CESubModule.LoadCampaignNotificationTexture("CE_castle_notification");
+                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) CESubModule.LoadCampaignNotificationTexture(returnedEvent.NotificationName);
+                else if (returnedEvent.SexualContent) CESubModule.LoadCampaignNotificationTexture("CE_sexual_notification");
+                else CESubModule.LoadCampaignNotificationTexture("CE_castle_notification");
             }
             catch (Exception e)
             {
@@ -80,12 +209,9 @@ namespace CaptivityEvents.CampaignBehaviors
 
             try
             {
-                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty())
-                    CESubModule.LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
-                else if (returnedEvent.SexualContent)
-                    CESubModule.LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
-                else
-                    CESubModule.LoadCampaignNotificationTexture("CE_random_notification", 1);
+                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) CESubModule.LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
+                else if (returnedEvent.SexualContent) CESubModule.LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
+                else CESubModule.LoadCampaignNotificationTexture("CE_random_notification", 1);
             }
             catch (Exception e)
             {
@@ -115,8 +241,7 @@ namespace CaptivityEvents.CampaignBehaviors
                                 {
                                     var randomNumber = MBRandom.RandomInt(100);
 
-                                    if (!CEContext.notificationEventExists && randomNumber < CESettings.Instance.EventRandomFireChance)
-                                        LaunchRandomEvent();
+                                    if (!CEContext.notificationEventExists && randomNumber < CESettings.Instance.EventRandomFireChance) LaunchRandomEvent();
                                     else if (!CEContext.notificationCaptorExists && randomNumber > CESettings.Instance.EventRandomFireChance) LaunchCaptorEvent();
                                 }
 
@@ -138,8 +263,8 @@ namespace CaptivityEvents.CampaignBehaviors
 
                                             if (returnedEvent != null)
                                             {
-                                                var Captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
-                                                returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(Captive);
+                                                var captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
+                                                returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
                                             }
                                         }
                                         else
@@ -397,28 +522,30 @@ namespace CaptivityEvents.CampaignBehaviors
                 }
 
                 // 1.4.2 version
-                    if (mother.IsHumanPlayerCharacter || pregnancy.Father == Hero.MainHero)
-                    {
-                        for (int i = 0; i < stillbornCount; i++)
-                        {
-                            ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(mother, null);
-                            LogEntry.AddLogEntry(childbirthLogEntry);
-                            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText()));
-                        }
-                        foreach (Hero newbornHero in aliveOffsprings)
-                        {
-                            ChildbirthLogEntry childbirthLogEntry2 = new ChildbirthLogEntry(mother, newbornHero);
-                            LogEntry.AddLogEntry(childbirthLogEntry2);
-                            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText()));
-                        }
+                if (!mother.IsHumanPlayerCharacter && pregnancy.Father != Hero.MainHero) return;
 
-                    // 1.4.1 Version
-                    //ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(pregnancy.Mother, aliveOffsprings, stillbornCount);
-                    //LogEntry.AddLogEntry(childbirthLogEntry);
-                    //if (mother == Hero.MainHero || pregnancy.Father == Hero.MainHero)
-                    //{
-                    //    Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(aliveOffsprings, childbirthLogEntry.GetEncyclopediaText()));
-                    //}
+
+                for (var i = 0; i < stillbornCount; i++)
+                {
+                    var childbirthLogEntry = new ChildbirthLogEntry(mother, null);
+                    LogEntry.AddLogEntry(childbirthLogEntry);
+                    Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText()));
+                }
+
+                foreach (var newbornHero in aliveOffsprings)
+                {
+                    var childbirthLogEntry2 = new ChildbirthLogEntry(mother, newbornHero);
+                    LogEntry.AddLogEntry(childbirthLogEntry2);
+                    Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText()));
+                }
+
+                // 1.4.1 Version
+                //ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(pregnancy.Mother, aliveOffsprings, stillbornCount);
+                //LogEntry.AddLogEntry(childbirthLogEntry);
+                //if (mother == Hero.MainHero || pregnancy.Father == Hero.MainHero)
+                //{
+                //    Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(aliveOffsprings, childbirthLogEntry.GetEncyclopediaText()));
+                //}
 
                 mother.IsPregnant = false;
                 pregnancy.AlreadyOccured = true;
@@ -426,6 +553,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 pregnancy.Mother.DynamicBodyProperties = new DynamicBodyProperties(pregnancy.Mother.DynamicBodyProperties.Age, MBRandom.RandomFloatRanged(0.4025f, 0.6025f), pregnancy.Mother.DynamicBodyProperties.Build);
             }
             catch (Exception e)
+
             {
                 CECustomHandler.LogMessage("Bad pregnancy");
                 CECustomHandler.LogMessage(e.Message + " : " + e);
@@ -475,138 +603,20 @@ namespace CaptivityEvents.CampaignBehaviors
             _hoursPassed++;
 
             if (CESettings.Instance != null && !(_hoursPassed > CESettings.Instance.EventOccuranceCaptor)) return false;
-            
+
             CEContext.notificationEventCheck = true;
             CEContext.notificationCaptorCheck = true;
             _hoursPassed = 0;
 
             return true;
-
         }
 
-        public static void AddReturnEquipment(Hero captive, Equipment battleEquipment, Equipment civilianEquipment)
-        {
-            if (!_returnEquipment.Exists(item => item.Captive == captive)) _returnEquipment.Add(new ReturnEquipment(captive, battleEquipment, civilianEquipment));
-        }
-
-        public static bool CheckIfPregnancyExists(Hero pregnantHero)
-        {
-            return _heroPregnancies.Any(pregnancy => pregnancy.Mother == pregnantHero);
-        }
-
-        public static bool ClearPregnancyList()
-        {
-            try
-            {
-                _heroPregnancies.ForEach(item =>
-                                         {
-                                             item.Mother.IsPregnant = false;
-                                         });
-                _heroPregnancies = new List<Pregnancy>();
-
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
+        
 
         private void OnHeroKilled(Hero victim, Hero killer, KillCharacterAction.KillCharacterActionDetail detail, bool showNotification)
         {
             if (victim.IsFemale && _heroPregnancies.Any(pregnancy => pregnancy.Mother == victim)) _heroPregnancies.RemoveAll(pregnancy => pregnancy.Mother == victim);
         }
 
-        public override void RegisterEvents()
-        {
-            CampaignEvents.OnChildConceivedEvent.AddNonSerializedListener(this, RunOnChildConceived);
-
-            CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, RunHourlyTick);
-            CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, RunDailyTick);
-
-            CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, OnHeroKilled);
-        }
-
-        // Data
-        public override void SyncData(IDataStore dataStore)
-        {
-            dataStore.SyncData("_CEheroPregnancies", ref _heroPregnancies);
-            dataStore.SyncData("_CEreturnEquipment", ref _returnEquipment);
-            dataStore.SyncData("_CEextraVariables", ref _extraVariables);
-        }
-
-        private int _hoursPassed;
-
-        private static List<Pregnancy> _heroPregnancies = new List<Pregnancy>();
-
-        private static List<ReturnEquipment> _returnEquipment = new List<ReturnEquipment>();
-
-
-        public static ExtraVariables ExtraProps => _extraVariables;
-
-        private static ExtraVariables _extraVariables = new ExtraVariables();
-
-        internal class Pregnancy
-        {
-            public Pregnancy(Hero pregnantHero, Hero father, CampaignTime dueDate)
-            {
-                Mother = pregnantHero;
-                Father = father;
-                DueDate = dueDate;
-                AlreadyOccured = false;
-            }
-
-            [SaveableField(1)] public readonly Hero Mother;
-
-            [SaveableField(2)] public readonly Hero Father;
-
-            [SaveableField(3)] public readonly CampaignTime DueDate;
-
-            [SaveableField(4)] public bool AlreadyOccured;
-        }
-
-        internal class ReturnEquipment
-        {
-            public ReturnEquipment(Hero captive, Equipment battleEquipment, Equipment civilianEquipment)
-            {
-                Captive = captive;
-                var randomElement = new Equipment(false);
-                randomElement.FillFrom(battleEquipment, false);
-                BattleEquipment = randomElement;
-                var randomElement2 = new Equipment(true);
-                randomElement2.FillFrom(civilianEquipment, false);
-                CivilianEquipment = randomElement2;
-                AlreadyOccured = false;
-            }
-
-            [SaveableField(1)] public readonly Hero Captive;
-
-            [SaveableField(2)] public readonly Equipment CivilianEquipment;
-
-            [SaveableField(3)] public readonly Equipment BattleEquipment;
-
-            [SaveableField(4)] public bool AlreadyOccured;
-        }
-
-        internal class ExtraVariables
-        {
-            public void ResetVariables()
-            {
-                Owner = null;
-                MenuToSwitchBackTo = null;
-                CurrentBackgroundMeshNameToSwitchBackTo = null;
-
-                CEContext.notificationCaptorCheck = false;
-                CEContext.notificationEventCheck = false;
-                CEContext.notificationCaptorExists = false;
-                CEContext.notificationEventExists = false;
-            }
-
-            [SaveableField(1)] public Hero Owner;
-
-            [SaveableField(2)] public string MenuToSwitchBackTo;
-
-            [SaveableField(3)] public string CurrentBackgroundMeshNameToSwitchBackTo;
-        }
     }
 }

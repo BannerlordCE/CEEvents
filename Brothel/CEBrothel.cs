@@ -9,21 +9,6 @@ namespace CaptivityEvents.Brothel
 {
     internal class CEBrothel
     {
-        public CEBrothel(Settlement settlement)
-        {
-            Settlement = settlement;
-            Expense = 200;
-            InitialCapital = 5000;
-            Capital = 5000;
-        }
-
-        public void ChangeGold(int amount)
-        {
-            Capital = MBMath.ClampInt(Capital + amount, 1, 10000);
-        }
-
-        public int ProfitMade => Math.Max(Capital - InitialCapital, 0);
-
         [SaveableField(1)]
         public Settlement Settlement;
 
@@ -31,24 +16,44 @@ namespace CaptivityEvents.Brothel
         public List<CharacterObject> CaptiveProstitutes;
 
         [SaveableField(3)]
-        public Hero Owner = null;
+        public Hero Owner;
 
         [SaveableField(5)]
-        public bool IsRunning = true;
+        public bool IsRunning;
 
         [SaveableField(6)]
-        public int NotRunnedDays = 0;
+        public int NotRunnedDays;
 
         [SaveableField(7)]
-        public TextObject Name = new TextObject("{=CEEVENTS1099}Brothel");
+        public readonly TextObject Name;
 
         [SaveableField(8)]
-        public int Capital = 5000; //Warning: field value ignored during initialization
+        public int Capital;
 
         [SaveableField(9)]
-        public int Expense = 200;
+        public readonly int Expense;
 
         [SaveableField(10)]
-        public int InitialCapital = 5000;
+        public readonly int InitialCapital;
+
+        public int ProfitMade => Math.Max(Capital - InitialCapital, 0);
+
+        public CEBrothel(Settlement settlement)
+        {
+            Settlement = settlement;
+            Expense = 200;
+            InitialCapital = 5000;
+            Capital = 5000;
+            Name = new TextObject("{=CEEVENTS1099}Brothel");
+            NotRunnedDays = 0;
+            IsRunning = true;
+            Owner = null;
+            CaptiveProstitutes = new List<CharacterObject>();
+        }
+
+        public void ChangeGold(int amount)
+        {
+            Capital = MBMath.ClampInt(Capital + amount, 1, 10000);
+        }
     }
 }

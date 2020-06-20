@@ -14,6 +14,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
+using CaptivityEvents.Enums;
 
 namespace CaptivityEvents.Events
 {
@@ -75,7 +76,6 @@ namespace CaptivityEvents.Events
 
             return null;
         }
-
 
         // Event Loaders
         public static void CELoadRandomEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
@@ -3796,7 +3796,7 @@ namespace CaptivityEvents.Events
                     PlayerEncounter.RestartPlayerEncounter(prisonerParty.Party, MobileParty.MainParty.Party);
                     PlayerEncounter.Update();
 
-                    CESubModule.huntState = CESubModule.HuntState.StartHunt;
+                    CESubModule.huntState = HuntState.StartHunt;
                     CampaignMission.OpenBattleMission(PlayerEncounter.GetBattleSceneForMapPosition(MobileParty.MainParty.Position2D));
                 }
                 catch (Exception)
@@ -3812,37 +3812,35 @@ namespace CaptivityEvents.Events
 
         public static void CEStripVictim(Hero captive)
         {
-            if (captive != null)
+            if (captive == null) return;
+            var randomElement = new Equipment(false);
+
+            var itemObjectBody = captive.IsFemale
+                ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
+                : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
+            randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
+            var randomElement2 = new Equipment(true);
+            randomElement2.FillFrom(randomElement, false);
+
+            if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captive, captive.BattleEquipment, captive.CivilianEquipment);
+
+            foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
             {
-                var randomElement = new Equipment(false);
-
-                var itemObjectBody = captive.IsFemale
-                    ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
-                    : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
-                randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
-                var randomElement2 = new Equipment(true);
-                randomElement2.FillFrom(randomElement, false);
-
-                if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captive, captive.BattleEquipment, captive.CivilianEquipment);
-
-                foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                try
                 {
-                    try
-                    {
-                        if (!captive.BattleEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(captive.BattleEquipment.GetEquipmentFromSlot(i).Item, 1);
-                    }
-                    catch (Exception) { }
-
-                    try
-                    {
-                        if (!captive.CivilianEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(captive.CivilianEquipment.GetEquipmentFromSlot(i).Item, 1);
-                    }
-                    catch (Exception) { }
+                    if (!captive.BattleEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(captive.BattleEquipment.GetEquipmentFromSlot(i).Item, 1);
                 }
+                catch (Exception) { }
 
-                EquipmentHelper.AssignHeroEquipmentFromEquipment(captive, randomElement);
-                EquipmentHelper.AssignHeroEquipmentFromEquipment(captive, randomElement2);
+                try
+                {
+                    if (!captive.CivilianEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(captive.CivilianEquipment.GetEquipmentFromSlot(i).Item, 1);
+                }
+                catch (Exception) { }
             }
+
+            EquipmentHelper.AssignHeroEquipmentFromEquipment(captive, randomElement);
+            EquipmentHelper.AssignHeroEquipmentFromEquipment(captive, randomElement2);
         }
 
         // Variable Loaders
@@ -3852,39 +3850,38 @@ namespace CaptivityEvents.Events
             {
                 var number = 0;
 
-                if (numpassed != null)
+                if (numpassed == null) return number;
+
+                if (numpassed.StartsWith("R"))
                 {
-                    if (numpassed.StartsWith("R"))
+                    var splitPass = numpassed.Split(' ');
+
+                    switch (splitPass.Length)
                     {
-                        var splitPass = numpassed.Split(' ');
+                        case 3:
+                            var numberOne = int.Parse(splitPass[1]);
+                            var numberTwo = int.Parse(splitPass[2]);
 
-                        switch (splitPass.Length)
-                        {
-                            case 3:
-                                var numberOne = int.Parse(splitPass[1]);
-                                var numberTwo = int.Parse(splitPass[2]);
+                            number = numberOne < numberTwo
+                                ? MBRandom.RandomInt(numberOne, numberTwo)
+                                : MBRandom.RandomInt(numberTwo, numberOne);
 
-                                number = numberOne < numberTwo
-                                    ? MBRandom.RandomInt(numberOne, numberTwo)
-                                    : MBRandom.RandomInt(numberTwo, numberOne);
+                            break;
 
-                                break;
+                        case 2:
+                            number = MBRandom.RandomInt(int.Parse(splitPass[1]));
 
-                            case 2:
-                                number = MBRandom.RandomInt(int.Parse(splitPass[1]));
+                            break;
 
-                                break;
+                        default:
+                            number = MBRandom.RandomInt();
 
-                            default:
-                                number = MBRandom.RandomInt();
-
-                                break;
-                        }
+                            break;
                     }
-                    else
-                    {
-                        number = int.Parse(numpassed);
-                    }
+                }
+                else
+                {
+                    number = int.Parse(numpassed);
                 }
 
                 return number;
@@ -3903,39 +3900,38 @@ namespace CaptivityEvents.Events
             {
                 var number = 0f;
 
-                if (numpassed != null)
+                if (numpassed == null) return number;
+
+                if (numpassed.StartsWith("R"))
                 {
-                    if (numpassed.StartsWith("R"))
+                    var splitPass = numpassed.Split(' ');
+
+                    switch (splitPass.Length)
                     {
-                        var splitPass = numpassed.Split(' ');
+                        case 3:
+                            var numberOne = float.Parse(splitPass[1]);
+                            var numberTwo = float.Parse(splitPass[2]);
 
-                        switch (splitPass.Length)
-                        {
-                            case 3:
-                                var numberOne = float.Parse(splitPass[1]);
-                                var numberTwo = float.Parse(splitPass[2]);
+                            number = numberOne < numberTwo
+                                ? MBRandom.RandomFloatRanged(numberOne, numberTwo)
+                                : MBRandom.RandomFloatRanged(numberTwo, numberOne);
 
-                                number = numberOne < numberTwo
-                                    ? MBRandom.RandomFloatRanged(numberOne, numberTwo)
-                                    : MBRandom.RandomFloatRanged(numberTwo, numberOne);
+                            break;
 
-                                break;
+                        case 2:
+                            number = MBRandom.RandomFloatRanged(float.Parse(splitPass[1]));
 
-                            case 2:
-                                number = MBRandom.RandomFloatRanged(float.Parse(splitPass[1]));
+                            break;
 
-                                break;
+                        default:
+                            number = MBRandom.RandomFloat;
 
-                            default:
-                                number = MBRandom.RandomFloat;
-
-                                break;
-                        }
+                            break;
                     }
-                    else
-                    {
-                        number = float.Parse(numpassed);
-                    }
+                }
+                else
+                {
+                    number = float.Parse(numpassed);
                 }
 
                 return number;

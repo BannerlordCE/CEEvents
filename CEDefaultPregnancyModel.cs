@@ -6,21 +6,11 @@ namespace CaptivityEvents.Models
     internal class CEDefaultPregnancyModel : PregnancyModel
     {
         public override float CharacterFertilityProbability => 0.95f;
-
         public override float PregnancyDurationInDays => 3f;
-
         public override float MaternalMortalityProbabilityInLabor => 0.015f;
-
         public override float StillbirthProbability => 0.01f;
-
         public override float DeliveringFemaleOffspringProbability => 0.51f;
-
         public override float DeliveringTwinsProbability => 0.03f;
-
-        private static bool IsHeroAgeSuitableForPregnancy(Hero hero)
-        {
-            return hero.Age >= 18f && hero.Age <= 45f;
-        }
 
         public override float GetDailyChanceOfPregnancyForHero(Hero hero)
         {
@@ -48,6 +38,12 @@ namespace CaptivityEvents.Models
             return num;
         }
 
+        private static bool IsHeroAgeSuitableForPregnancy(Hero hero)
+        {
+            return hero.Age >= 18f && hero.Age <= 45f;
+        }
+
+       
         //private const int MinPregnancyAge = 18;
 
         //private const int MaxPregnancyAge = 45;

@@ -35,56 +35,52 @@ namespace CaptivityEvents.CampaignBehaviors
         {
             var prisonerSizeLimit = mobileParty.Party.PrisonerSizeLimit;
 
-            if (mobileParty.PrisonRoster.TotalManCount > prisonerSizeLimit)
+            if (mobileParty.PrisonRoster.TotalManCount <= prisonerSizeLimit) return;
+            
+            var num = mobileParty.PrisonRoster.TotalManCount - prisonerSizeLimit;
+
+            for (var i = 0; i < num; i++)
             {
-                var num = mobileParty.PrisonRoster.TotalManCount - prisonerSizeLimit;
+                var totalManCount = mobileParty.PrisonRoster.TotalManCount;
+                var flag = mobileParty.PrisonRoster.TotalRegulars > 0;
+                var randomFloat = MBRandom.RandomFloat;
 
-                for (var i = 0; i < num; i++)
-                {
-                    var totalManCount = mobileParty.PrisonRoster.TotalManCount;
-                    var flag = mobileParty.PrisonRoster.TotalRegulars > 0;
-                    var randomFloat = MBRandom.RandomFloat;
+                var num2 = flag
+                    ? (int) (mobileParty.PrisonRoster.TotalRegulars * randomFloat)
+                    : (int) (mobileParty.PrisonRoster.TotalManCount * randomFloat);
+                CharacterObject character = null;
 
-                    var num2 = flag
-                        ? (int) (mobileParty.PrisonRoster.TotalRegulars * randomFloat)
-                        : (int) (mobileParty.PrisonRoster.TotalManCount * randomFloat);
-                    CharacterObject character = null;
+                foreach (var troopRosterElement in mobileParty.PrisonRoster)
+                    if (!troopRosterElement.Character.IsHero || !flag)
+                    {
+                        num2 -= troopRosterElement.Number;
 
-                    foreach (var troopRosterElement in mobileParty.PrisonRoster)
-                        if (!troopRosterElement.Character.IsHero || !flag)
-                        {
-                            num2 -= troopRosterElement.Number;
+                        if (num2 > 0) continue;
+                            
+                        character = troopRosterElement.Character;
+                        break;
+                    }
 
-                            if (num2 <= 0)
-                            {
-                                character = troopRosterElement.Character;
-
-                                break;
-                            }
-                        }
-
-                    ApplyEscapeChanceToExceededPrisoners(character, mobileParty);
-                }
+                ApplyEscapeChanceToExceededPrisoners(character, mobileParty);
             }
         }
 
         private void ApplyEscapeChanceToExceededPrisoners(CharacterObject character, MobileParty capturerParty)
         {
-            var num = 0.1f;
+            const float num = 0.1f;
 
             if (capturerParty.IsGarrison || capturerParty.IsMilitia || character.IsPlayerCharacter || character.IsHero && !CESettings.Instance.PrisonerHeroEscapeAllowed || !character.IsHero && !CESettings.Instance.PrisonerNonHeroEscapeAllowed) return;
 
-            if (MBRandom.RandomFloat < num)
+            if (!(MBRandom.RandomFloat < num)) return;
+
+            if (character.IsHero)
             {
-                if (character.IsHero)
-                {
-                    EndCaptivityAction.ApplyByEscape(character.HeroObject);
+                EndCaptivityAction.ApplyByEscape(character.HeroObject);
 
-                    return;
-                }
-
-                capturerParty.PrisonRoster.AddToCounts(character, -1);
+                return;
             }
+
+            capturerParty.PrisonRoster.AddToCounts(character, -1);
         }
     }
 }

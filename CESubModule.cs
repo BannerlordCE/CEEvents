@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
+using CaptivityEvents.Enums;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
 using CaptivityEvents.Models;
@@ -30,33 +31,11 @@ namespace CaptivityEvents
 {
     public class CESubModule : MBSubModuleBase
     {
-        // Brothel State
-        public enum BrothelState
-        {
-            Normal,
-            Start,
-            FadeIn,
-            Black,
-            FadeOut
-        }
-
         // Dungeon State
-        public enum DungeonState
-        {
-            Normal,
-            StartWalking,
-            FadeIn
-        }
+        
 
         // Hunt State
-        public enum HuntState
-        {
-            Normal,
-            StartHunt,
-            HeadStart,
-            Hunting,
-            AfterBattle
-        }
+        
 
         public static List<CEEvent> CEEvents = new List<CEEvent>();
         private static List<CECustom> _ceFlags = new List<CECustom>();
@@ -107,82 +86,7 @@ namespace CaptivityEvents
         private bool _isLoaded;
         private bool _isLoadedInGame;
 
-        public static void LoadTexture(string name, bool swap = false, bool forcelog = false)
-        {
-            try
-            {
-                if (!swap)
-                {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[34] = name == "default"
-                        ? CEEventImageList["default_female_prison"]
-                        : CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[13] = name == "default"
-                        ? CEEventImageList["default_female"]
-                        : CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[28] = name == "default"
-                        ? CEEventImageList["default_male_prison"]
-                        : CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[12] = name == "default"
-                        ? CEEventImageList["default_male"]
-                        : CEEventImageList[name];
-                }
-                else
-                {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[34] = name == "default"
-                        ? CEEventImageList["default_male_prison"]
-                        : CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[13] = name == "default"
-                        ? CEEventImageList["default_male"]
-                        : CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[28] = name == "default"
-                        ? CEEventImageList["default_female_prison"]
-                        : CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[12] = name == "default"
-                        ? CEEventImageList["default_female"]
-                        : CEEventImageList[name];
-                }
-            }
-            catch (Exception e)
-            {
-                if (forcelog)
-                {
-                    InformationManager.DisplayMessage(new InformationMessage("Failure to load " + name + ". Refer to LogFileFC.txt in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs", Colors.Red));
-                    CECustomHandler.LogMessage("Failure to load " + name + " - exception : " + e.Message);
-                }
-                else
-                {
-                    CECustomHandler.LogToFile("Failed to load the texture of " + name);
-                }
-            }
-        }
-
-        public static void LoadCampaignNotificationTexture(string name, int sheet = 0, bool forcelog = false)
-        {
-            try
-            {
-                UIResourceManager.SpriteData.SpriteCategories["ce_notification_icons"].SpriteSheets[sheet] = name == "default"
-                    ? CEEventImageList["CE_default_notification"]
-                    : CEEventImageList[name];
-            }
-            catch (Exception e)
-            {
-                if (forcelog)
-                {
-                    InformationManager.DisplayMessage(new InformationMessage("Failure to load " + name + ". Refer to LogFileFC.txt in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs", Colors.Red));
-                    CECustomHandler.LogMessage("Failure to load " + name + " - exception : " + e.Message);
-                }
-                else
-                {
-                    CECustomHandler.LogToFile("Failed to load the texture of " + name);
-                }
-            }
-        }
 
         protected override void OnSubModuleLoad()
         {
@@ -344,6 +248,87 @@ namespace CaptivityEvents
             CECustomHandler.LogMessage("Loaded " + CEEventImageList.Count + " images and " + CEEvents.Count + " events.");
         }
 
+
+
+
+        public static void LoadTexture(string name, bool swap = false, bool forcelog = false)
+        {
+            try
+            {
+                if (!swap)
+                {
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[34] = name == "default"
+                        ? CEEventImageList["default_female_prison"]
+                        : CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[13] = name == "default"
+                        ? CEEventImageList["default_female"]
+                        : CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[28] = name == "default"
+                        ? CEEventImageList["default_male_prison"]
+                        : CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[12] = name == "default"
+                        ? CEEventImageList["default_male"]
+                        : CEEventImageList[name];
+                }
+                else
+                {
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[34] = name == "default"
+                        ? CEEventImageList["default_male_prison"]
+                        : CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[13] = name == "default"
+                        ? CEEventImageList["default_male"]
+                        : CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[28] = name == "default"
+                        ? CEEventImageList["default_female_prison"]
+                        : CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[12] = name == "default"
+                        ? CEEventImageList["default_female"]
+                        : CEEventImageList[name];
+                }
+            }
+            catch (Exception e)
+            {
+                if (forcelog)
+                {
+                    InformationManager.DisplayMessage(new InformationMessage("Failure to load " + name + ". Refer to LogFileFC.txt in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs", Colors.Red));
+                    CECustomHandler.LogMessage("Failure to load " + name + " - exception : " + e.Message);
+                }
+                else
+                {
+                    CECustomHandler.LogToFile("Failed to load the texture of " + name);
+                }
+            }
+        }
+
+        public static void LoadCampaignNotificationTexture(string name, int sheet = 0, bool forcelog = false)
+        {
+            try
+            {
+                UIResourceManager.SpriteData.SpriteCategories["ce_notification_icons"].SpriteSheets[sheet] = name == "default"
+                    ? CEEventImageList["CE_default_notification"]
+                    : CEEventImageList[name];
+            }
+            catch (Exception e)
+            {
+                if (forcelog)
+                {
+                    InformationManager.DisplayMessage(new InformationMessage("Failure to load " + name + ". Refer to LogFileFC.txt in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs", Colors.Red));
+                    CECustomHandler.LogMessage("Failure to load " + name + " - exception : " + e.Message);
+                }
+                else
+                {
+                    CECustomHandler.LogToFile("Failed to load the texture of " + name);
+                }
+            }
+        }
+
+       
         protected override void OnBeforeInitialModuleScreenSetAsRoot()
         {
             base.OnBeforeInitialModuleScreenSetAsRoot();
@@ -385,10 +370,8 @@ namespace CaptivityEvents
                 MessageBox.Show($"Error Initializing Captivity Events:\n\n{ex}");
             }
 
-            foreach (var listedEvent in CEEvents)
+            foreach (var listedEvent in CEEvents.Where(listedEvent => !listedEvent.Name.IsStringNoneOrEmpty()))
             {
-                if (listedEvent.Name.IsStringNoneOrEmpty()) continue;
-
                 if (listedEvent.MultipleListOfCustomFlags != null && listedEvent.MultipleListOfCustomFlags.Count > 0)
                     if (!_ceFlags.Exists(match => match.CEFlags.Any(x => listedEvent.MultipleListOfCustomFlags.Contains(x))))
                         continue;
@@ -458,19 +441,16 @@ namespace CaptivityEvents
         {
             if (Campaign.Current == null) return true;
 
-            if (!CESettings.Instance.PrisonerEscapeBehavior) return base.DoLoading(game);
+            if (CESettings.Instance != null && !CESettings.Instance.PrisonerEscapeBehavior) return base.DoLoading(game);
             var dailyTickHeroEvent = CampaignEvents.DailyTickHeroEvent;
 
             if (dailyTickHeroEvent != null)
             {
                 dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerEscapeCampaignBehavior>());
-                if (!CESettings.Instance.PrisonerAutoRansom) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
+                if (CESettings.Instance != null && !CESettings.Instance.PrisonerAutoRansom) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
             }
-                    IMbEvent<MobileParty> hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
-                    if (hourlyPartyTick != null)
-                    {
-                        hourlyPartyTick.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerEscapeCampaignBehavior>());
-                    }
+            IMbEvent<MobileParty> hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
+            hourlyPartyTick?.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerEscapeCampaignBehavior>());
 
             var barterablesRequested = CampaignEvents.BarterablesRequested;
             barterablesRequested?.ClearListeners(Campaign.Current.GetCampaignBehavior<SetPrisonerFreeBarterBehavior>());
@@ -486,9 +466,9 @@ namespace CaptivityEvents
         private void AddBehaviours(CampaignGameStarter campaignStarter)
         {
             campaignStarter.AddBehavior(new CECampaignBehavior());
-            if (CESettings.Instance.ProstitutionControl) campaignStarter.AddBehavior(new CEBrothelBehavior());
+            if (CESettings.Instance != null && CESettings.Instance.ProstitutionControl) campaignStarter.AddBehavior(new CEBrothelBehavior());
 
-            if (CESettings.Instance.PrisonerEscapeBehavior)
+            if (CESettings.Instance != null && CESettings.Instance.PrisonerEscapeBehavior)
             {
                 campaignStarter.AddBehavior(new CEPrisonerEscapeCampaignBehavior());
                 campaignStarter.AddBehavior(new CESetPrisonerFreeBarterBehavior());
@@ -498,8 +478,8 @@ namespace CaptivityEvents
             //{
             //    ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
             //}
-            if (CESettings.Instance.EventCaptiveOn) ReplaceModel<PlayerCaptivityModel, CEPlayerCaptivityModel>(campaignStarter);
-            if (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue) CEPrisonerDialogue.AddPrisonerLines(campaignStarter);
+            if (CESettings.Instance != null && CESettings.Instance.EventCaptiveOn) ReplaceModel<PlayerCaptivityModel, CEPlayerCaptivityModel>(campaignStarter);
+            if (CESettings.Instance != null && (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue)) CEPrisonerDialogue.AddPrisonerLines(campaignStarter);
 
             AddCustomEvents(campaignStarter);
 

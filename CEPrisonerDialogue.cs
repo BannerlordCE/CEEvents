@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using CaptivityEvents.Custom;
+using CaptivityEvents.Enums;
 using CaptivityEvents.Events;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
@@ -114,7 +115,7 @@ namespace CaptivityEvents
 
                 CESubModule.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("_barrier_passage_center");
                 CESubModule.AgentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => agent.Character == CharacterObject.OneToOneConversationCharacter);
-                CESubModule.dungeonState = CESubModule.DungeonState.StartWalking;
+                CESubModule.dungeonState = DungeonState.StartWalking;
             }
             catch (Exception e)
             {

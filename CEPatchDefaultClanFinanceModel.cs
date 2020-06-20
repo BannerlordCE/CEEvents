@@ -10,14 +10,22 @@ namespace CaptivityEvents.Patches
     [HarmonyPatch(typeof(DefaultClanFinanceModel), "CalculateClanIncome")]
     internal class CEPatchDefaultClanFinanceModel
     {
+        internal CEBrothelSession Session { get; set; }
+
+        public CEPatchDefaultClanFinanceModel(CEBrothelSession session)
+        {
+            Session = session;
+        }
+
+
         [HarmonyPrepare]
-        private static bool ShouldPatch()
+        private bool ShouldPatch()
         {
             return CESettings.Instance != null && CESettings.Instance.ProstitutionControl;
         }
 
         [HarmonyPostfix]
-        private static void CalculateClanIncome(Clan clan, ref ExplainedNumber goldChange, bool applyWithdrawals = false)
+        private void CalculateClanIncome(Clan clan, ref ExplainedNumber goldChange, bool applyWithdrawals = false)
         {
             if (clan.IsEliminated) return;
             if (Clan.PlayerClan != clan) return;
@@ -25,7 +33,7 @@ namespace CaptivityEvents.Patches
             var num = 0;
             var num2 = 0;
 
-            foreach (var brothel in CEBrothelBehavior.GetPlayerBrothels())
+            foreach (var brothel in Session.GetPlayerBrothels())
                 if (brothel.IsRunning)
                 {
                     var num3 = (int) (Math.Max(0, brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
