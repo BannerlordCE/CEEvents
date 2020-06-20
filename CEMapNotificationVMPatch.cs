@@ -1,8 +1,9 @@
-﻿using CaptivityEvents.CampaignBehaviours;
-using CaptivityEvents.Custom;
-using HarmonyLib;
-using System;
+﻿using System;
 using System.Reflection;
+using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Custom;
+using CaptivityEvents.Events;
+using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
@@ -10,7 +11,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
-namespace CaptivityEvents.Patches
+namespace CaptivityEvents
 {
 	[HarmonyPatch(typeof(MapNotificationVM), "DetermineNotificationType")]
 	internal class CEMapNotificationVMPatch
@@ -70,8 +71,8 @@ namespace CaptivityEvents.Patches
 				{
 					// Declare Variables
 					CharacterObject Captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
-					string returnString = CECampaignBehavior.ReturnWeightedChoiceOfEventsPartyLeader(Captive);
-					if (!returnString.IsStringNoneOrEmpty())
+					var returnString = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(Captive);
+					if (returnString != null)
 					{
 						if (Game.Current.GameStateManager.ActiveState is MapState mapState)
 						{
@@ -82,11 +83,11 @@ namespace CaptivityEvents.Patches
 							}
 							else
 							{
-								CESubModule.menuToSwitchBackTo = mapState.GameMenuId;
-								CESubModule.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+								CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
+                                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
 							}
 
-							GameMenu.SwitchToMenu(returnString);
+							GameMenu.SwitchToMenu(returnString.Name);
 						}
 					}
 				}

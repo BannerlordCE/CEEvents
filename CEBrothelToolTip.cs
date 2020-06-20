@@ -9,13 +9,12 @@ namespace CaptivityEvents.Brothel
         {
             UpdateTooltip(tooltipVM, args[0] as CEBrothel);
         }
-
-        private static void UpdateTooltip(this TooltipVM tooltipVM, CEBrothel brothel)
+        public static void UpdateTooltip(this TooltipVM tooltipVM, CEBrothel brothel)
         {
             tooltipVM.Mode = 1;
             tooltipVM.AddProperty("", new TextObject("{=CEEVENTS1099}Brothel").ToString(), 0, TooltipProperty.TooltipPropertyFlags.Title);
-            tooltipVM.AddProperty(new TextObject("{=qRqnrtdX}Owner").ToString(), brothel.Owner.Name.ToString());
-            tooltipVM.AddProperty(new TextObject("{=CEBROTHEL0994}Notable Prostitutes").ToString(), "None");
+            tooltipVM.AddProperty(new TextObject("{=qRqnrtdX}Owner", null).ToString(), brothel.Owner.Name.ToString(), 0, TooltipProperty.TooltipPropertyFlags.None);
+            tooltipVM.AddProperty(new TextObject("{=CEBROTHEL0994}Notable Prostitutes", null).ToString(), "None", 0, TooltipProperty.TooltipPropertyFlags.None);
         }
     }
 }

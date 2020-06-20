@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\Win64_Shipping_Client\</OutputPath>
+    <OutputPath>C:\Users\logra\AppData\Roaming\Vortex\mountandblade2bannerlord\mods\zCaptivityEvents1.4.2.1002\Modules\zCaptivityEvents\bin\Win64_Shipping_Client\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -39,37 +39,38 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Brothel\CEBrothel.cs" />
-    <Compile Include="Brothel\CEBrothelBehavior.cs" />
-    <Compile Include="Brothel\CEBrothelToolTip.cs" />
-    <Compile Include="Brothel\CEBrothelClanFinanceItemVM.cs" />
-    <Compile Include="CEConsole.cs" />
-    <Compile Include="CEDefaultPregnancyModel.cs" />
-    <Compile Include="CEEventChecker.cs" />
-    <Compile Include="CECustom.cs" />
-    <Compile Include="CEEventManager.cs" />
-    <Compile Include="CEEventMapNotification.cs" />
+    <Compile Include="CEBrothel.cs" />
+    <Compile Include="CEBrothelBehavior.cs" />
+    <Compile Include="CEBrothelClanFinanceItemVM.cs" />
+    <Compile Include="CEBrothelToolTip.cs" />
+    <Compile Include="CECampaignBehavior.cs" />
     <Compile Include="CECaptorMapNotification.cs" />
     <Compile Include="CECaptorMapNotificationItemVM.cs" />
-    <Compile Include="CEEventMapNotificationItemVM.cs" />
-    <Compile Include="CEContext.cs" />
-    <Compile Include="CEPatchClanIncomeVM.cs" />
-    <Compile Include="CEPatchDefaultClanFinanceModel.cs" />
-    <Compile Include="CEPatchMapNotificationVM.cs" />
-    <Compile Include="CEPrisonerEscapeCampaignBehavior.cs" />
+    <Compile Include="CEConsole.cs" />
+    <Compile Include="CECustom.cs" />
     <Compile Include="CECustomEvent.cs" />
     <Compile Include="CECustomHandler.cs" />
+    <Compile Include="CEDefaultPregnancyModel.cs" />
+    <Compile Include="CEEventChecker.cs" />
+    <Compile Include="CEEventLoader.cs" />
+    <Compile Include="CEEventManager.cs" />
+    <Compile Include="CEEventMapNotification.cs" />
+    <Compile Include="CEEventMapNotificationItemVM.cs" />
+    <Compile Include="CEHelper.cs" />
+    <Compile Include="CEMapNotificationVMPatch.cs" />
+    <Compile Include="CEPatchClanIncomeVM.cs" />
+    <Compile Include="CEPatchDefaultClanFinanceModel.cs" />
     <Compile Include="CEPatchHero.cs" />
-    <Compile Include="CESaveable.cs" />
-    <Compile Include="CESettings.cs" />
-    <Compile Include="CECampaignBehavior.cs" />
+    <Compile Include="CEPatchMapNotificationVM.cs" />
     <Compile Include="CEPlayerCaptivityModel.cs" />
-    <Compile Include="CESkills.cs" />
     <Compile Include="CEPrisonerDialogue.cs" />
+    <Compile Include="CEPrisonerEscapeCampaignBehavior.cs" />
+    <Compile Include="CESaveable.cs" />
+    <Compile Include="CESetPrisonerFreeBarterBehavior.cs" />
+    <Compile Include="CESettings.cs" />
+    <Compile Include="CESkills.cs" />
     <Compile Include="CEStrings.cs" />
     <Compile Include="CESubModule.cs" />
-    <Compile Include="CEEventLoader.cs" />
-    <Compile Include="CESetPrisonerFreeBarterBehavior.cs" />
     <Compile Include="CEWhereAreMyThingsIssueBehavior.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

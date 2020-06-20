@@ -10,28 +10,19 @@ namespace CaptivityEvents.Patches
     [HarmonyPatch(typeof(ClanIncomeVM), "RefreshList")]
     internal class CEPatchClanIncomeVM
     {
-
-        public MethodInfo GetDefaultIncome = AccessTools.Method(typeof(ClanIncomeVM), "GetDefaultIncome");
-        public MethodInfo OnIncomeSelection = AccessTools.Method(typeof(ClanIncomeVM), "OnIncomeSelection");
-        internal CEBrothelSession Session { get; set; }
-
-
-        public CEPatchClanIncomeVM(CEBrothelSession session)
-        {
-            Session = session;
-        }
-
+        public static MethodInfo GetDefaultIncome = AccessTools.Method(typeof(ClanIncomeVM), "GetDefaultIncome");
+        public static MethodInfo OnIncomeSelection = AccessTools.Method(typeof(ClanIncomeVM), "OnIncomeSelection");
 
         [HarmonyPrepare]
-        private bool ShouldPatch()
+        private static bool ShouldPatch()
         {
-            return CESettings.Instance != null && CESettings.Instance.ProstitutionControl;
+            return CESettings.Instance.ProstitutionControl;
         }
 
         [HarmonyPostfix]
-        public void RefreshList(ClanIncomeVM __instance)
+        public static void RefreshList(ClanIncomeVM __instance)
         {
-            foreach (var brothel in Session.GetPlayerBrothels())
+            foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
             {
                 __instance.Incomes.Add(new CEBrothelClanFinanceItemVM(brothel, new Action<ClanFinanceIncomeItemBaseVM>((ClanFinanceIncomeItemBaseVM brothelIncome) =>
                 {
