@@ -8,91 +8,82 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.Core;
-using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
 namespace CaptivityEvents
 {
-	[HarmonyPatch(typeof(MapNotificationVM), "DetermineNotificationType")]
-	internal class CEMapNotificationVMPatch
-	{
-		public static MethodInfo RemoveNotificationItem = AccessTools.Method(typeof(MapNotificationVM), "RemoveNotificationItem");
+    [HarmonyPatch(typeof(MapNotificationVM), "DetermineNotificationType")]
+    internal class CEMapNotificationVMPatch
+    {
+        public static MethodInfo RemoveNotificationItem = AccessTools.Method(typeof(MapNotificationVM), "RemoveNotificationItem");
 
-		[HarmonyPrepare]
-		private static bool ShouldPatch()
-		{
-			CECustomHandler.ForceLogToFile("EventCaptorNotifications: " + CESettings.Instance.EventCaptorNotifications + ".");
-			return CESettings.Instance.EventCaptorNotifications;
-		}
+        [HarmonyPrepare]
+        private static bool ShouldPatch()
+        {
+            CECustomHandler.ForceLogToFile("EventCaptorNotifications: " + (CESettings.Instance != null && CESettings.Instance.EventCaptorNotifications) + ".");
 
-		[HarmonyPostfix]
-		private static void DetermineNotificationType(MapNotificationVM __instance, ref MapNotificationItemBaseVM __result)
-		{
-			if (__result.Data.TitleText.Equals(new TextObject("Captor Event", null)))
-			{
-				__result = new NewTestNotificationItemVM(__result.Data, null, new Action<MapNotificationItemBaseVM>((MapNotificationItemBaseVM item) =>
-				{
-					object[] parameters = new object[1];
-					parameters[0] = item;
-					RemoveNotificationItem.Invoke(__instance, parameters);
-				}));
-			}
-		}
+            return CESettings.Instance != null && CESettings.Instance.EventCaptorNotifications;
+        }
 
-		public class NewTestNotificationItemVM : MapNotificationItemBaseVM
-		{
+        [HarmonyPostfix]
+        private static void DetermineNotificationType(MapNotificationVM __instance, ref MapNotificationItemBaseVM __result)
+        {
+            if (__result.Data.TitleText.Equals(new TextObject("Captor Event")))
+                __result = new NewTestNotificationItemVM(__result.Data, null, item =>
+                                                                              {
+                                                                                  var parameters = new object[1];
+                                                                                  parameters[0] = item;
+                                                                                  RemoveNotificationItem.Invoke(__instance, parameters);
+                                                                              });
+        }
 
-			public NewTestNotificationItemVM(InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
-			{
-				base.NotificationIdentifier = "death";
-				_onInspect = delegate ()
-				{
-					OnNewTestNotificationInspect();
-				};
-			}
+        public class NewTestNotificationItemVM : MapNotificationItemBaseVM
+        {
+            public NewTestNotificationItemVM(InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
+            {
+                NotificationIdentifier = "death";
 
-			public override void ManualRefreshRelevantStatus()
-			{
-				base.ManualRefreshRelevantStatus();
-				if (MobileParty.MainParty.Party.PrisonRoster.Count == 0)
-				{
-					CESubModule.notificationExists = false;
-					CESubModule.LoadCampaignNotificationTexture("default");
-					base.ExecuteRemove();
-				}
-			}
+                _onInspect = OnNewTestNotificationInspect;
+            }
 
-			private void OnNewTestNotificationInspect()
-			{
-				CESubModule.notificationExists = false;
-				CESubModule.LoadCampaignNotificationTexture("default");
-				base.ExecuteRemove();
-				if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
-				{
-					// Declare Variables
-					CharacterObject Captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
-					var returnString = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(Captive);
-					if (returnString != null)
-					{
-						if (Game.Current.GameStateManager.ActiveState is MapState mapState)
-						{
-							Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-							if (!mapState.AtMenu)
-							{
-								GameMenu.ActivateGameMenu("prisoner_wait");
-							}
-							else
-							{
-								CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
-                                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-							}
+            public override void ManualRefreshRelevantStatus()
+            {
+                base.ManualRefreshRelevantStatus();
 
-							GameMenu.SwitchToMenu(returnString.Name);
-						}
-					}
-				}
-			}
+                if (MobileParty.MainParty.Party.PrisonRoster.Count != 0) return;
+                CESubModule.notificationExists = false;
+                CESubModule.LoadCampaignNotificationTexture("default");
+                ExecuteRemove();
+            }
 
-		}
-	}
+            private void OnNewTestNotificationInspect()
+            {
+                CESubModule.notificationExists = false;
+                CESubModule.LoadCampaignNotificationTexture("default");
+                ExecuteRemove();
+
+                if (MobileParty.MainParty.Party.PrisonRoster.Count <= 0) return;
+                // Declare Variables
+                var captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
+                var returnString = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
+
+                if (returnString == null) return;
+
+                if (!(Game.Current.GameStateManager.ActiveState is MapState mapState)) return;
+                Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+
+                if (!mapState.AtMenu)
+                {
+                    GameMenu.ActivateGameMenu("prisoner_wait");
+                }
+                else
+                {
+                    CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
+                    CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                }
+
+                GameMenu.SwitchToMenu(returnString.Name);
+            }
+        }
+    }
 }

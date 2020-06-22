@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using CaptivityEvents.Helper;
 using CaptivityEvents.Notifications;
 using HarmonyLib;
@@ -16,38 +15,39 @@ namespace CaptivityEvents
         [HarmonyPrepare]
         private static bool ShouldPatch()
         {
-            return CESettings.Instance.EventCaptorNotifications;
+            return CESettings.Instance != null && CESettings.Instance.EventCaptorNotifications;
         }
 
         [HarmonyPostfix]
         private static void DetermineNotificationType(MapNotificationVM __instance, ref MapNotificationItemBaseVM __result, InformationData data)
         {
-            Type type = data.GetType();
-            if (type.Equals(typeof(CECaptorMapNotification)))
-            {
-                CECaptorMapNotification captorMapNotification = data as CECaptorMapNotification;
-                __result = new CECaptorMapNotificationItemVM(captorMapNotification.CaptorEvent, data, null, new Action<MapNotificationItemBaseVM>((MapNotificationItemBaseVM item) =>
-                {
-                    CEHelper.notificationCaptorExists = false;
-                    CESubModule.LoadCampaignNotificationTexture("default");
+            var type = data.GetType();
 
-                    object[] parameters = new object[1];
-                    parameters[0] = item;
-                    RemoveNotificationItem.Invoke(__instance, parameters);
-                }));
+            if (type == typeof(CECaptorMapNotification))
+            {
+                if (data is CECaptorMapNotification captorMapNotification)
+                    __result = new CECaptorMapNotificationItemVM(captorMapNotification.CaptorEvent, data, null, item =>
+                                                                                                                {
+                                                                                                                    CEHelper.notificationCaptorExists = false;
+                                                                                                                    CESubModule.LoadCampaignNotificationTexture("default");
+
+                                                                                                                    var parameters = new object[1];
+                                                                                                                    parameters[0] = item;
+                                                                                                                    RemoveNotificationItem.Invoke(__instance, parameters);
+                                                                                                                });
             }
-            else if (type.Equals(typeof(CEEventMapNotification)))
+            else if (type == typeof(CEEventMapNotification))
             {
-                CEEventMapNotification eventMapNotification = data as CEEventMapNotification;
-                __result = new CEEventMapNotificationItemVM(eventMapNotification.RandomEvent, data, null, new Action<MapNotificationItemBaseVM>((MapNotificationItemBaseVM item) =>
-                {
-                    CEHelper.notificationEventExists = false;
-                    CESubModule.LoadCampaignNotificationTexture("default", 1);
+                if (data is CEEventMapNotification eventMapNotification)
+                    __result = new CEEventMapNotificationItemVM(eventMapNotification.RandomEvent, data, null, item =>
+                                                                                                              {
+                                                                                                                  CEHelper.notificationEventExists = false;
+                                                                                                                  CESubModule.LoadCampaignNotificationTexture("default", 1);
 
-                    object[] parameters = new object[1];
-                    parameters[0] = item;
-                    RemoveNotificationItem.Invoke(__instance, parameters);
-                }));
+                                                                                                                  var parameters = new object[1];
+                                                                                                                  parameters[0] = item;
+                                                                                                                  RemoveNotificationItem.Invoke(__instance, parameters);
+                                                                                                              });
             }
         }
     }

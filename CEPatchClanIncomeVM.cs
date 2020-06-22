@@ -1,8 +1,6 @@
-﻿using CaptivityEvents.Brothel;
+﻿using System.Reflection;
+using CaptivityEvents.Brothel;
 using HarmonyLib;
-using System;
-using System.Reflection;
-using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories;
 
 namespace CaptivityEvents.Patches
@@ -16,21 +14,19 @@ namespace CaptivityEvents.Patches
         [HarmonyPrepare]
         private static bool ShouldPatch()
         {
-            return CESettings.Instance.ProstitutionControl;
+            return CESettings.Instance != null && CESettings.Instance.ProstitutionControl;
         }
 
         [HarmonyPostfix]
         public static void RefreshList(ClanIncomeVM __instance)
         {
-            foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
-            {
-                __instance.Incomes.Add(new CEBrothelClanFinanceItemVM(brothel, new Action<ClanFinanceIncomeItemBaseVM>((ClanFinanceIncomeItemBaseVM brothelIncome) =>
-                {
-                    OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome });
-                }), new Action(__instance.OnRefresh)));
-            }
+            foreach (var brothel in CEBrothelBehavior.GetPlayerBrothels())
+                __instance.Incomes.Add(new CEBrothelClanFinanceItemVM(brothel, brothelIncome =>
+                                                                               {
+                                                                                   OnIncomeSelection.Invoke(__instance, new object[] {brothelIncome});
+                                                                               }, __instance.OnRefresh));
             __instance.RefreshTotalIncome();
-            OnIncomeSelection.Invoke(__instance, new object[] { GetDefaultIncome.Invoke(__instance, null) });
+            OnIncomeSelection.Invoke(__instance, new[] {GetDefaultIncome.Invoke(__instance, null)});
             __instance.RefreshValues();
         }
     }

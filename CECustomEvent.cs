@@ -60,7 +60,7 @@ namespace CaptivityEvents.Custom
         RansomAndBribe,
         Trade,
         RebelPrisoners,
-        GainRandomPrisoners,
+        GainRandomPrisoners
     }
 
     [DebuggerStepThrough]
@@ -143,7 +143,7 @@ namespace CaptivityEvents.Custom
         SeasonFall,
         CaptivesOutNumber,
         HeroIsFactionLeader,
-        PlayerIsNotBusy,
+        PlayerIsNotBusy
     }
 
     [DebuggerStepThrough]

@@ -40,17 +40,15 @@ namespace CaptivityEvents.Brothel
         public int NotRunnedDays = 0;
 
         [SaveableField(7)]
-        public TextObject Name = new TextObject("{=CEEVENTS1099}Brothel");
+        public readonly TextObject Name = new TextObject("{=CEEVENTS1099}Brothel");
 
         [SaveableField(8)]
-        public int Capital = 5000;
+        public int Capital;
 
         [SaveableField(9)]
-        public int Expense = 200;
+        public readonly int Expense;
 
         [SaveableField(10)]
-        public int InitialCapital = 5000;
-
-
+        public readonly int InitialCapital;
     }
 }
