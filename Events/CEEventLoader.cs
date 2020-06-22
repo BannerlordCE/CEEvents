@@ -22,63 +22,14 @@ namespace CaptivityEvents.Events
         // Waiting Menus
         public static string CEWaitingList()
         {
-            var eventNames = new List<string>();
-
-            if (CESubModule.CEWaitingList != null && CESubModule.CEWaitingList.Count > 0)
-            {
-                CECustomHandler.LogToFile("Having " + CESubModule.CEWaitingList.Count + " of events to weight and check conditions on.");
-
-                foreach (var listEvent in CESubModule.CEWaitingList)
-                {
-                    var result = CEEventChecker.FlagsDoMatchEventConditions(listEvent, CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
-
-                    if (result == null)
-                    {
-                        var weightedChance = 10;
-
-                        try
-                        {
-                            if (listEvent.WeightedChanceOfOccuring != null) weightedChance = GetIntFromXML(listEvent.WeightedChanceOfOccuring);
-                        }
-                        catch (Exception)
-                        {
-                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring");
-                        }
-
-                        for (var a = weightedChance; a > 0; a--) eventNames.Add(listEvent.Name);
-                    }
-                    else
-                    {
-                        CECustomHandler.LogToFile(result);
-                    }
-                }
-
-                CECustomHandler.LogToFile("Number of Filtered events is " + eventNames.Count);
-
-                try
-                {
-                    if (eventNames.Count > 0)
-                    {
-                        var test = MBRandom.Random.Next(0, eventNames.Count - 1);
-                        var randomWeightedChoice = eventNames[test];
-
-                        return randomWeightedChoice;
-                    }
-                }
-                catch (Exception)
-                {
-                    CECustomHandler.ForceLogToFile("Waiting Menu: Something is broken?");
-                }
-            }
-
-            CECustomHandler.LogToFile("Number of Filtered events is " + eventNames.Count);
-
-            return null;
+            return new WaitingList().CEWaitingList();
         }
 
         // Event Loaders
         public static void CELoadRandomEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
+
+            var varLoader = new VariablesLoader();
             gameStarter.AddGameMenu(listedEvent.Name, listedEvent.Text, args =>
                                                                         {
                                                                             args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
@@ -103,7 +54,7 @@ namespace CaptivityEvents.Events
 
                                                                                     try
                                                                                     {
-                                                                                        if (!listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = GetFloatFromXML(listedEvent.BackgroundAnimationSpeed);
+                                                                                        if (!listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = varLoader.GetFloatFromXML(listedEvent.BackgroundAnimationSpeed);
                                                                                     }
                                                                                     catch (Exception e)
                                                                                     {
@@ -132,7 +83,7 @@ namespace CaptivityEvents.Events
             // Leave if no Options
             if (listedEvent.Options == null) return;
             // Sort Options
-            var sorted = listedEvent.Options.OrderBy(item => GetIntFromXML(item.Order)).ToList();
+            var sorted = listedEvent.Options.OrderBy(item => varLoader.GetIntFromXML(item.Order)).ToList();
 
             foreach (var op in sorted)
                 gameStarter.AddGameMenuOption(listedEvent.Name, listedEvent.Name + op.Order, op.OptionText, args =>
@@ -186,8 +137,8 @@ namespace CaptivityEvents.Events
                                                                                                                     {
                                                                                                                         var level = 0;
 
-                                                                                                                        if (op.GoldTotal != null && op.GoldTotal != "") level = GetIntFromXML(op.GoldTotal);
-                                                                                                                        else if (listedEvent.GoldTotal != null && listedEvent.GoldTotal != "") level = GetIntFromXML(listedEvent.GoldTotal);
+                                                                                                                        if (op.GoldTotal != null && op.GoldTotal != "") level = varLoader.GetIntFromXML(op.GoldTotal);
+                                                                                                                        else if (listedEvent.GoldTotal != null && listedEvent.GoldTotal != "") level = varLoader.GetIntFromXML(listedEvent.GoldTotal);
                                                                                                                         else CECustomHandler.LogToFile("Missing GoldTotal");
                                                                                                                         MBTextManager.SetTextVariable("MONEY_AMOUNT", level);
                                                                                                                     }
@@ -214,7 +165,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMoraleAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.IsMobile && PartyBase.MainParty.MobileParty.Morale < GetIntFromXML(op.ReqMoraleAbove))
+                                                                                                                        if (PartyBase.MainParty.IsMobile && PartyBase.MainParty.MobileParty.Morale < varLoader.GetIntFromXML(op.ReqMoraleAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_morale_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -228,7 +179,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMoraleBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.IsMobile && PartyBase.MainParty.MobileParty.Morale > GetIntFromXML(op.ReqMoraleBelow))
+                                                                                                                        if (PartyBase.MainParty.IsMobile && PartyBase.MainParty.MobileParty.Morale > varLoader.GetIntFromXML(op.ReqMoraleBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_morale_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -243,7 +194,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqTroopsAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.NumberOfHealthyMembers < GetIntFromXML(op.ReqTroopsAbove))
+                                                                                                                        if (PartyBase.MainParty.NumberOfHealthyMembers < varLoader.GetIntFromXML(op.ReqTroopsAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -257,7 +208,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqTroopsBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.NumberOfHealthyMembers > GetIntFromXML(op.ReqTroopsBelow))
+                                                                                                                        if (PartyBase.MainParty.NumberOfHealthyMembers > varLoader.GetIntFromXML(op.ReqTroopsBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -272,7 +223,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMaleTroopsAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < GetIntFromXML(op.ReqMaleTroopsAbove))
+                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < varLoader.GetIntFromXML(op.ReqMaleTroopsAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -286,7 +237,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMaleTroopsBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < GetIntFromXML(op.ReqMaleTroopsBelow))
+                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < varLoader.GetIntFromXML(op.ReqMaleTroopsBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -301,7 +252,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqFemaleTroopsAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) < GetIntFromXML(op.ReqFemaleTroopsAbove))
+                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) < varLoader.GetIntFromXML(op.ReqFemaleTroopsAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -315,7 +266,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqFemaleTroopsBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) > GetIntFromXML(op.ReqFemaleTroopsBelow))
+                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) > varLoader.GetIntFromXML(op.ReqFemaleTroopsBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -330,7 +281,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqCaptivesAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.NumberOfPrisoners < GetIntFromXML(op.ReqCaptivesAbove))
+                                                                                                                        if (PartyBase.MainParty.NumberOfPrisoners < varLoader.GetIntFromXML(op.ReqCaptivesAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -344,7 +295,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqCaptivesBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.NumberOfPrisoners > GetIntFromXML(op.ReqCaptivesBelow))
+                                                                                                                        if (PartyBase.MainParty.NumberOfPrisoners > varLoader.GetIntFromXML(op.ReqCaptivesBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -359,7 +310,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMaleCaptivesAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < GetIntFromXML(op.ReqMaleCaptivesAbove))
+                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < varLoader.GetIntFromXML(op.ReqMaleCaptivesAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -373,7 +324,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMaleCaptivesBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < GetIntFromXML(op.ReqMaleCaptivesBelow))
+                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < varLoader.GetIntFromXML(op.ReqMaleCaptivesBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -388,7 +339,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqFemaleCaptivesAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) < GetIntFromXML(op.ReqFemaleCaptivesAbove))
+                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) < varLoader.GetIntFromXML(op.ReqFemaleCaptivesAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -402,7 +353,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqFemaleCaptivesBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) > GetIntFromXML(op.ReqFemaleCaptivesBelow))
+                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) > varLoader.GetIntFromXML(op.ReqFemaleCaptivesBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -417,7 +368,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqHeroHealthAbovePercentage))
-                                                                                                                        if (Hero.MainHero.HitPoints < GetIntFromXML(op.ReqHeroHealthAbovePercentage))
+                                                                                                                        if (Hero.MainHero.HitPoints < varLoader.GetIntFromXML(op.ReqHeroHealthAbovePercentage))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_health", "low");
                                                                                                                             args.IsEnabled = false;
@@ -431,7 +382,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqHeroHealthBelowPercentage))
-                                                                                                                        if (Hero.MainHero.HitPoints > GetIntFromXML(op.ReqHeroHealthBelowPercentage))
+                                                                                                                        if (Hero.MainHero.HitPoints > varLoader.GetIntFromXML(op.ReqHeroHealthBelowPercentage))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_health", "high");
                                                                                                                             args.IsEnabled = false;
@@ -448,7 +399,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqHeroSlaveLevelAbove))
-                                                                                                                        if (slave < GetIntFromXML(op.ReqHeroSlaveLevelAbove))
+                                                                                                                        if (slave < varLoader.GetIntFromXML(op.ReqHeroSlaveLevelAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_slavery_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -462,7 +413,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqHeroSlaveLevelBelow))
-                                                                                                                        if (slave > GetIntFromXML(op.ReqHeroSlaveLevelBelow))
+                                                                                                                        if (slave > varLoader.GetIntFromXML(op.ReqHeroSlaveLevelBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_slavery_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -479,7 +430,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqHeroProstituteLevelAbove))
-                                                                                                                        if (prostitute < GetIntFromXML(op.ReqHeroProstituteLevelAbove))
+                                                                                                                        if (prostitute < varLoader.GetIntFromXML(op.ReqHeroProstituteLevelAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_prostitution_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -493,7 +444,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqHeroProstituteLevelBelow))
-                                                                                                                        if (prostitute > GetIntFromXML(op.ReqHeroProstituteLevelBelow))
+                                                                                                                        if (prostitute > varLoader.GetIntFromXML(op.ReqHeroProstituteLevelBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_prostitution_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -522,7 +473,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!op.ReqHeroSkillLevelAbove.IsStringNoneOrEmpty())
-                                                                                                                            if (skillLevel < GetIntFromXML(op.ReqHeroSkillLevelAbove))
+                                                                                                                            if (skillLevel < varLoader.GetIntFromXML(op.ReqHeroSkillLevelAbove))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_skill_level", "low");
                                                                                                                                 text.SetTextVariable("SKILL", op.ReqHeroSkill);
@@ -538,7 +489,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!op.ReqHeroSkillLevelBelow.IsStringNoneOrEmpty())
-                                                                                                                            if (skillLevel > GetIntFromXML(op.ReqHeroSkillLevelBelow))
+                                                                                                                            if (skillLevel > varLoader.GetIntFromXML(op.ReqHeroSkillLevelBelow))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_skill_level", "high");
                                                                                                                                 text.SetTextVariable("SKILL", op.ReqHeroSkill);
@@ -570,7 +521,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqHeroTraitLevelAbove))
-                                                                                                                            if (traitLevel < GetIntFromXML(op.ReqHeroTraitLevelAbove))
+                                                                                                                            if (traitLevel < varLoader.GetIntFromXML(op.ReqHeroTraitLevelAbove))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_trait_level", "low");
                                                                                                                                 text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(op.ReqHeroTrait));
@@ -586,7 +537,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqHeroTraitLevelBelow))
-                                                                                                                            if (traitLevel > GetIntFromXML(op.ReqHeroTraitLevelBelow))
+                                                                                                                            if (traitLevel > varLoader.GetIntFromXML(op.ReqHeroTraitLevelBelow))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_trait_level", "high");
                                                                                                                                 text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(op.ReqHeroTrait));
@@ -604,7 +555,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqGoldAbove))
-                                                                                                                        if (Hero.MainHero.Gold < GetIntFromXML(op.ReqGoldAbove))
+                                                                                                                        if (Hero.MainHero.Gold < varLoader.GetIntFromXML(op.ReqGoldAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_gold_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -618,7 +569,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqGoldBelow))
-                                                                                                                        if (Hero.MainHero.Gold > GetIntFromXML(op.ReqGoldBelow))
+                                                                                                                        if (Hero.MainHero.Gold > varLoader.GetIntFromXML(op.ReqGoldBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_gold_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -670,8 +621,8 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            var level = 0;
 
-                                                                                                                           if (!string.IsNullOrEmpty(op.GoldTotal)) level = GetIntFromXML(op.GoldTotal);
-                                                                                                                           else if (!string.IsNullOrEmpty(listedEvent.GoldTotal)) level = GetIntFromXML(listedEvent.GoldTotal);
+                                                                                                                           if (!string.IsNullOrEmpty(op.GoldTotal)) level = varLoader.GetIntFromXML(op.GoldTotal);
+                                                                                                                           else if (!string.IsNullOrEmpty(listedEvent.GoldTotal)) level = varLoader.GetIntFromXML(listedEvent.GoldTotal);
                                                                                                                            else CECustomHandler.LogToFile("Missing GoldTotal");
 
                                                                                                                            GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, level);
@@ -687,8 +638,8 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            var level = 0;
 
-                                                                                                                           if (!string.IsNullOrEmpty(op.TraitTotal)) level = GetIntFromXML(op.TraitTotal);
-                                                                                                                           else if (!string.IsNullOrEmpty(listedEvent.TraitTotal)) level = GetIntFromXML(listedEvent.TraitTotal);
+                                                                                                                           if (!string.IsNullOrEmpty(op.TraitTotal)) level = varLoader.GetIntFromXML(op.TraitTotal);
+                                                                                                                           else if (!string.IsNullOrEmpty(listedEvent.TraitTotal)) level = varLoader.GetIntFromXML(listedEvent.TraitTotal);
                                                                                                                            else CECustomHandler.LogToFile("Missing Trait TraitTotal");
 
                                                                                                                            if (!string.IsNullOrEmpty(op.TraitToLevel)) TraitModifier(Hero.MainHero, op.TraitToLevel, level);
@@ -706,8 +657,8 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            var level = 0;
 
-                                                                                                                           if (!op.SkillTotal.IsStringNoneOrEmpty()) level = GetIntFromXML(op.SkillTotal);
-                                                                                                                           else if (!listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = GetIntFromXML(listedEvent.SkillTotal);
+                                                                                                                           if (!op.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(op.SkillTotal);
+                                                                                                                           else if (!listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(listedEvent.SkillTotal);
                                                                                                                            else CECustomHandler.LogToFile("Missing Skill SkillTotal");
 
                                                                                                                            if (!op.SkillToLevel.IsStringNoneOrEmpty()) SkillModifier(Hero.MainHero, op.SkillToLevel, level);
@@ -725,11 +676,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.SlaveryTotal))
                                                                                                                            {
-                                                                                                                               VictimSlaveryModifier(GetIntFromXML(op.SlaveryTotal), Hero.MainHero);
+                                                                                                                               VictimSlaveryModifier(varLoader.GetIntFromXML(op.SlaveryTotal), Hero.MainHero);
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.SlaveryTotal))
                                                                                                                            {
-                                                                                                                               VictimSlaveryModifier(GetIntFromXML(listedEvent.SlaveryTotal), Hero.MainHero);
+                                                                                                                               VictimSlaveryModifier(varLoader.GetIntFromXML(listedEvent.SlaveryTotal), Hero.MainHero);
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -752,11 +703,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.ProstitutionTotal))
                                                                                                                            {
-                                                                                                                               VictimProstitutionModifier(GetIntFromXML(op.ProstitutionTotal), Hero.MainHero);
+                                                                                                                               VictimProstitutionModifier(varLoader.GetIntFromXML(op.ProstitutionTotal), Hero.MainHero);
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.ProstitutionTotal))
                                                                                                                            {
-                                                                                                                               VictimProstitutionModifier(GetIntFromXML(listedEvent.ProstitutionTotal), Hero.MainHero);
+                                                                                                                               VictimProstitutionModifier(varLoader.GetIntFromXML(listedEvent.ProstitutionTotal), Hero.MainHero);
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -779,11 +730,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.RenownTotal))
                                                                                                                            {
-                                                                                                                               RenownModifier(GetIntFromXML(op.RenownTotal), Hero.MainHero);
+                                                                                                                               RenownModifier(varLoader.GetIntFromXML(op.RenownTotal), Hero.MainHero);
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.RenownTotal))
                                                                                                                            {
-                                                                                                                               RenownModifier(GetIntFromXML(listedEvent.RenownTotal), Hero.MainHero);
+                                                                                                                               RenownModifier(varLoader.GetIntFromXML(listedEvent.RenownTotal), Hero.MainHero);
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -802,11 +753,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.HealthTotal))
                                                                                                                            {
-                                                                                                                               Hero.MainHero.HitPoints += GetIntFromXML(op.HealthTotal);
+                                                                                                                               Hero.MainHero.HitPoints += varLoader.GetIntFromXML(op.HealthTotal);
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.HealthTotal))
                                                                                                                            {
-                                                                                                                               Hero.MainHero.HitPoints += GetIntFromXML(listedEvent.HealthTotal);
+                                                                                                                               Hero.MainHero.HitPoints += varLoader.GetIntFromXML(listedEvent.HealthTotal);
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -825,11 +776,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.MoraleTotal))
                                                                                                                            {
-                                                                                                                               MoralChange(GetIntFromXML(op.MoraleTotal), PartyBase.MainParty);
+                                                                                                                               MoralChange(varLoader.GetIntFromXML(op.MoraleTotal), PartyBase.MainParty);
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.MoraleTotal))
                                                                                                                            {
-                                                                                                                               MoralChange(GetIntFromXML(listedEvent.MoraleTotal), PartyBase.MainParty);
+                                                                                                                               MoralChange(varLoader.GetIntFromXML(listedEvent.MoraleTotal), PartyBase.MainParty);
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -848,11 +799,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.PregnancyRiskModifier))
                                                                                                                            {
-                                                                                                                               ImpregnationChance(Hero.MainHero, GetIntFromXML(op.PregnancyRiskModifier));
+                                                                                                                               ImpregnationChance(Hero.MainHero, varLoader.GetIntFromXML(op.PregnancyRiskModifier));
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.PregnancyRiskModifier))
                                                                                                                            {
-                                                                                                                               ImpregnationChance(Hero.MainHero, GetIntFromXML(listedEvent.PregnancyRiskModifier));
+                                                                                                                               ImpregnationChance(Hero.MainHero, varLoader.GetIntFromXML(listedEvent.PregnancyRiskModifier));
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -947,9 +898,9 @@ namespace CaptivityEvents.Events
 
                                                                                                                                try
                                                                                                                                {
-                                                                                                                                   weightedChance = GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
-                                                                                                                                                                      ? triggerEvent.EventWeight
-                                                                                                                                                                      : triggeredEvent.WeightedChanceOfOccuring);
+                                                                                                                                   weightedChance = varLoader.GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
+                                                                                                                                                                                ? triggerEvent.EventWeight
+                                                                                                                                                                                : triggeredEvent.WeightedChanceOfOccuring);
                                                                                                                                }
                                                                                                                                catch (Exception)
                                                                                                                                {
@@ -1002,11 +953,12 @@ namespace CaptivityEvents.Events
                                                                                                                    {
                                                                                                                        CECaptorContinue(args);
                                                                                                                    }
-                                                                                                               }, false, GetIntFromXML(op.Order));
+                                                                                                               }, false, varLoader.GetIntFromXML(op.Order));
         }
 
         public static void CELoadCaptiveEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
+            var varLoader = new VariablesLoader();
             if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
                 gameStarter.AddWaitGameMenu(listedEvent.Name, listedEvent.Text, args =>
                                                                                 {
@@ -1032,7 +984,7 @@ namespace CaptivityEvents.Events
 
                                                                                             try
                                                                                             {
-                                                                                                if (!listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = GetFloatFromXML(listedEvent.BackgroundAnimationSpeed);
+                                                                                                if (!listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = varLoader.GetFloatFromXML(listedEvent.BackgroundAnimationSpeed);
                                                                                             }
                                                                                             catch (Exception e)
                                                                                             {
@@ -1174,7 +1126,7 @@ namespace CaptivityEvents.Events
 
                                                                                         try
                                                                                         {
-                                                                                            if (!listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = GetFloatFromXML(listedEvent.BackgroundAnimationSpeed);
+                                                                                            if (!listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = varLoader.GetFloatFromXML(listedEvent.BackgroundAnimationSpeed);
                                                                                         }
                                                                                         catch (Exception e)
                                                                                         {
@@ -1257,7 +1209,7 @@ namespace CaptivityEvents.Events
             if (listedEvent.Options == null) return;
 
             // Sort Options
-            var sorted = listedEvent.Options.OrderBy(item => GetIntFromXML(item.Order)).ToList();
+            var sorted = listedEvent.Options.OrderBy(item => varLoader.GetIntFromXML(item.Order)).ToList();
 
             foreach (var op in sorted)
                 gameStarter.AddGameMenuOption(listedEvent.Name, listedEvent.Name + op.Order, op.OptionText, args =>
@@ -1278,8 +1230,8 @@ namespace CaptivityEvents.Events
                                                                                                                     {
                                                                                                                         var level = 0;
 
-                                                                                                                        if (!string.IsNullOrEmpty(op.GoldTotal)) level = GetIntFromXML(op.GoldTotal);
-                                                                                                                        else if (!string.IsNullOrEmpty(listedEvent.GoldTotal)) level = GetIntFromXML(listedEvent.GoldTotal);
+                                                                                                                        if (!string.IsNullOrEmpty(op.GoldTotal)) level = varLoader.GetIntFromXML(op.GoldTotal);
+                                                                                                                        else if (!string.IsNullOrEmpty(listedEvent.GoldTotal)) level = varLoader.GetIntFromXML(listedEvent.GoldTotal);
                                                                                                                         else CECustomHandler.LogToFile("Missing GoldTotal");
                                                                                                                         MBTextManager.SetTextVariable("MONEY_AMOUNT", level);
                                                                                                                     }
@@ -1293,8 +1245,8 @@ namespace CaptivityEvents.Events
                                                                                                                     {
                                                                                                                         var level = 0;
 
-                                                                                                                        if (!string.IsNullOrEmpty(op.CaptorGoldTotal)) level = GetIntFromXML(op.CaptorGoldTotal);
-                                                                                                                        else if (!string.IsNullOrEmpty(listedEvent.CaptorGoldTotal)) level = GetIntFromXML(listedEvent.CaptorGoldTotal);
+                                                                                                                        if (!string.IsNullOrEmpty(op.CaptorGoldTotal)) level = varLoader.GetIntFromXML(op.CaptorGoldTotal);
+                                                                                                                        else if (!string.IsNullOrEmpty(listedEvent.CaptorGoldTotal)) level = varLoader.GetIntFromXML(listedEvent.CaptorGoldTotal);
                                                                                                                         else CECustomHandler.LogToFile("Missing CaptorGoldTotal");
                                                                                                                         MBTextManager.SetTextVariable("CAPTOR_MONEY_AMOUNT", level);
                                                                                                                     }
@@ -1366,7 +1318,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMoraleAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.Morale < GetIntFromXML(op.ReqMoraleAbove))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.Morale < varLoader.GetIntFromXML(op.ReqMoraleAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_morale_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -1380,7 +1332,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMoraleBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.Morale > GetIntFromXML(op.ReqMoraleBelow))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.Morale > varLoader.GetIntFromXML(op.ReqMoraleBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_morale_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -1395,7 +1347,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqTroopsAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.NumberOfHealthyMembers < GetIntFromXML(op.ReqTroopsAbove))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.NumberOfHealthyMembers < varLoader.GetIntFromXML(op.ReqTroopsAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -1409,7 +1361,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqTroopsBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.NumberOfHealthyMembers > GetIntFromXML(op.ReqTroopsBelow))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.NumberOfHealthyMembers > varLoader.GetIntFromXML(op.ReqTroopsBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -1424,7 +1376,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMaleTroopsAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.MemberRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < GetIntFromXML(op.ReqMaleTroopsAbove))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.MemberRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < varLoader.GetIntFromXML(op.ReqMaleTroopsAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -1438,7 +1390,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMaleTroopsBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.MemberRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < GetIntFromXML(op.ReqMaleTroopsBelow))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.MemberRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < varLoader.GetIntFromXML(op.ReqMaleTroopsBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -1453,7 +1405,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqFemaleTroopsAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.MemberRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) < GetIntFromXML(op.ReqFemaleTroopsAbove))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.MemberRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) < varLoader.GetIntFromXML(op.ReqFemaleTroopsAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -1467,7 +1419,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqFemaleTroopsBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.MemberRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) > GetIntFromXML(op.ReqFemaleTroopsBelow))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.MemberRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) > varLoader.GetIntFromXML(op.ReqFemaleTroopsBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -1482,7 +1434,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqCaptivesAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.NumberOfPrisoners < GetIntFromXML(op.ReqCaptivesAbove))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.NumberOfPrisoners < varLoader.GetIntFromXML(op.ReqCaptivesAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -1496,7 +1448,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqCaptivesBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.NumberOfPrisoners > GetIntFromXML(op.ReqCaptivesBelow))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.NumberOfPrisoners > varLoader.GetIntFromXML(op.ReqCaptivesBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -1511,7 +1463,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMaleCaptivesAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.PrisonRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < GetIntFromXML(op.ReqMaleCaptivesAbove))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.PrisonRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < varLoader.GetIntFromXML(op.ReqMaleCaptivesAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -1525,7 +1477,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMaleCaptivesBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.PrisonRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < GetIntFromXML(op.ReqMaleCaptivesBelow))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.PrisonRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) < varLoader.GetIntFromXML(op.ReqMaleCaptivesBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -1540,7 +1492,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqFemaleCaptivesAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.PrisonRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) < GetIntFromXML(op.ReqFemaleCaptivesAbove))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.PrisonRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) < varLoader.GetIntFromXML(op.ReqFemaleCaptivesAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -1554,7 +1506,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqFemaleCaptivesBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PlayerCaptivity.CaptorParty.PrisonRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) > GetIntFromXML(op.ReqFemaleCaptivesBelow))
+                                                                                                                        if (PlayerCaptivity.CaptorParty.PrisonRoster.Count(troopRosterElement => { return troopRosterElement.Character.IsFemale; }) > varLoader.GetIntFromXML(op.ReqFemaleCaptivesBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -1571,7 +1523,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqHeroCaptorRelationAbove))
-                                                                                                                            if (PlayerCaptivity.CaptorParty.LeaderHero.GetRelationWithPlayer() < GetFloatFromXML(op.ReqHeroCaptorRelationAbove))
+                                                                                                                            if (PlayerCaptivity.CaptorParty.LeaderHero.GetRelationWithPlayer() < varLoader.GetFloatFromXML(op.ReqHeroCaptorRelationAbove))
                                                                                                                             {
                                                                                                                                 var textResponse4 = GameTexts.FindText("str_CE_relationship", "low");
                                                                                                                                 textResponse4.SetTextVariable("HERO", PlayerCaptivity.CaptorParty.LeaderHero.Name.ToString());
@@ -1587,7 +1539,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqHeroCaptorRelationBelow))
-                                                                                                                            if (PlayerCaptivity.CaptorParty.LeaderHero.GetRelationWithPlayer() > GetFloatFromXML(op.ReqHeroCaptorRelationBelow))
+                                                                                                                            if (PlayerCaptivity.CaptorParty.LeaderHero.GetRelationWithPlayer() > varLoader.GetFloatFromXML(op.ReqHeroCaptorRelationBelow))
                                                                                                                             {
                                                                                                                                 var textResponse3 = GameTexts.FindText("str_CE_relationship", "high");
                                                                                                                                 textResponse3.SetTextVariable("HERO", PlayerCaptivity.CaptorParty.LeaderHero.Name.ToString());
@@ -1605,7 +1557,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqHeroHealthAbovePercentage))
-                                                                                                                        if (Hero.MainHero.HitPoints < GetIntFromXML(op.ReqHeroHealthAbovePercentage))
+                                                                                                                        if (Hero.MainHero.HitPoints < varLoader.GetIntFromXML(op.ReqHeroHealthAbovePercentage))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_health", "low");
                                                                                                                             args.IsEnabled = false;
@@ -1619,7 +1571,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqHeroHealthBelowPercentage))
-                                                                                                                        if (Hero.MainHero.HitPoints > GetIntFromXML(op.ReqHeroHealthBelowPercentage))
+                                                                                                                        if (Hero.MainHero.HitPoints > varLoader.GetIntFromXML(op.ReqHeroHealthBelowPercentage))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_health", "high");
                                                                                                                             args.IsEnabled = false;
@@ -1636,7 +1588,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqHeroSlaveLevelAbove))
-                                                                                                                        if (slave < GetIntFromXML(op.ReqHeroSlaveLevelAbove))
+                                                                                                                        if (slave < varLoader.GetIntFromXML(op.ReqHeroSlaveLevelAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_slavery_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -1650,7 +1602,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqHeroSlaveLevelBelow))
-                                                                                                                        if (slave > GetIntFromXML(op.ReqHeroSlaveLevelBelow))
+                                                                                                                        if (slave > varLoader.GetIntFromXML(op.ReqHeroSlaveLevelBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_slavery_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -1667,7 +1619,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqHeroProstituteLevelAbove))
-                                                                                                                        if (prostitute < GetIntFromXML(op.ReqHeroProstituteLevelAbove))
+                                                                                                                        if (prostitute < varLoader.GetIntFromXML(op.ReqHeroProstituteLevelAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_prostitution_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -1681,7 +1633,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqHeroProstituteLevelBelow))
-                                                                                                                        if (prostitute > GetIntFromXML(op.ReqHeroProstituteLevelBelow))
+                                                                                                                        if (prostitute > varLoader.GetIntFromXML(op.ReqHeroProstituteLevelBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_prostitution_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -1710,7 +1662,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqHeroTraitLevelAbove))
-                                                                                                                            if (traitLevel < GetIntFromXML(op.ReqHeroTraitLevelAbove))
+                                                                                                                            if (traitLevel < varLoader.GetIntFromXML(op.ReqHeroTraitLevelAbove))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_trait_level", "low");
                                                                                                                                 text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(op.ReqHeroTrait));
@@ -1726,7 +1678,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqHeroTraitLevelBelow))
-                                                                                                                            if (traitLevel > GetIntFromXML(op.ReqHeroTraitLevelBelow))
+                                                                                                                            if (traitLevel > varLoader.GetIntFromXML(op.ReqHeroTraitLevelBelow))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_trait_level", "high");
                                                                                                                                 text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(op.ReqHeroTrait));
@@ -1759,7 +1711,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqCaptorTraitLevelAbove))
-                                                                                                                            if (traitLevel < GetIntFromXML(op.ReqCaptorTraitLevelAbove))
+                                                                                                                            if (traitLevel < varLoader.GetIntFromXML(op.ReqCaptorTraitLevelAbove))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_trait_captor_level", "low");
                                                                                                                                 text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(op.ReqCaptorTrait));
@@ -1775,7 +1727,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqCaptorTraitLevelBelow))
-                                                                                                                            if (traitLevel > GetIntFromXML(op.ReqCaptorTraitLevelBelow))
+                                                                                                                            if (traitLevel > varLoader.GetIntFromXML(op.ReqCaptorTraitLevelBelow))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_trait_captor_level", "high");
                                                                                                                                 text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(op.ReqCaptorTrait));
@@ -1807,7 +1759,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!op.ReqHeroSkillLevelAbove.IsStringNoneOrEmpty())
-                                                                                                                            if (skillLevel < GetIntFromXML(op.ReqHeroSkillLevelAbove))
+                                                                                                                            if (skillLevel < varLoader.GetIntFromXML(op.ReqHeroSkillLevelAbove))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_skill_level", "low");
                                                                                                                                 text.SetTextVariable("SKILL", op.ReqHeroSkill);
@@ -1823,7 +1775,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!op.ReqHeroSkillLevelBelow.IsStringNoneOrEmpty())
-                                                                                                                            if (skillLevel > GetIntFromXML(op.ReqHeroSkillLevelBelow))
+                                                                                                                            if (skillLevel > varLoader.GetIntFromXML(op.ReqHeroSkillLevelBelow))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_skill_level", "high");
                                                                                                                                 text.SetTextVariable("SKILL", op.ReqHeroSkill);
@@ -1856,7 +1808,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!op.ReqCaptorSkillLevelAbove.IsStringNoneOrEmpty())
-                                                                                                                            if (skillLevel < GetIntFromXML(op.ReqCaptorSkillLevelAbove))
+                                                                                                                            if (skillLevel < varLoader.GetIntFromXML(op.ReqCaptorSkillLevelAbove))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_skill_captor_level", "low");
                                                                                                                                 text.SetTextVariable("SKILL", op.ReqCaptorSkill);
@@ -1872,7 +1824,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (op.ReqCaptorSkillLevelBelow.IsStringNoneOrEmpty())
-                                                                                                                            if (skillLevel > GetIntFromXML(op.ReqCaptorSkillLevelBelow))
+                                                                                                                            if (skillLevel > varLoader.GetIntFromXML(op.ReqCaptorSkillLevelBelow))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_skill_captor_level", "high");
                                                                                                                                 text.SetTextVariable("SKILL", op.ReqCaptorSkill);
@@ -1890,7 +1842,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqGoldAbove))
-                                                                                                                        if (Hero.MainHero.Gold < GetIntFromXML(op.ReqGoldAbove))
+                                                                                                                        if (Hero.MainHero.Gold < varLoader.GetIntFromXML(op.ReqGoldAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_gold_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -1904,7 +1856,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqGoldBelow))
-                                                                                                                        if (Hero.MainHero.Gold > GetIntFromXML(op.ReqGoldBelow))
+                                                                                                                        if (Hero.MainHero.Gold > varLoader.GetIntFromXML(op.ReqGoldBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_gold_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -1964,8 +1916,8 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            var level = 0;
 
-                                                                                                                           if (!string.IsNullOrEmpty(op.GoldTotal)) level = GetIntFromXML(op.GoldTotal);
-                                                                                                                           else if (!string.IsNullOrEmpty(listedEvent.GoldTotal)) level = GetIntFromXML(listedEvent.GoldTotal);
+                                                                                                                           if (!string.IsNullOrEmpty(op.GoldTotal)) level = varLoader.GetIntFromXML(op.GoldTotal);
+                                                                                                                           else if (!string.IsNullOrEmpty(listedEvent.GoldTotal)) level = varLoader.GetIntFromXML(listedEvent.GoldTotal);
                                                                                                                            else CECustomHandler.LogToFile("Missing GoldTotal");
 
                                                                                                                            GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, level);
@@ -1981,8 +1933,8 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            var level = 0;
 
-                                                                                                                           if (!string.IsNullOrEmpty(op.TraitTotal)) level = GetIntFromXML(op.TraitTotal);
-                                                                                                                           else if (!string.IsNullOrEmpty(listedEvent.TraitTotal)) level = GetIntFromXML(listedEvent.TraitTotal);
+                                                                                                                           if (!string.IsNullOrEmpty(op.TraitTotal)) level = varLoader.GetIntFromXML(op.TraitTotal);
+                                                                                                                           else if (!string.IsNullOrEmpty(listedEvent.TraitTotal)) level = varLoader.GetIntFromXML(listedEvent.TraitTotal);
                                                                                                                            else CECustomHandler.LogToFile("Missing Trait TraitTotal");
 
                                                                                                                            if (!string.IsNullOrEmpty(op.TraitToLevel)) TraitModifier(Hero.MainHero, op.TraitToLevel, level);
@@ -2000,8 +1952,8 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            var level = 0;
 
-                                                                                                                           if (!op.SkillTotal.IsStringNoneOrEmpty()) level = GetIntFromXML(op.SkillTotal);
-                                                                                                                           else if (!listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = GetIntFromXML(listedEvent.SkillTotal);
+                                                                                                                           if (!op.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(op.SkillTotal);
+                                                                                                                           else if (!listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(listedEvent.SkillTotal);
                                                                                                                            else CECustomHandler.LogToFile("Missing Skill SkillTotal");
 
                                                                                                                            if (!op.SkillToLevel.IsStringNoneOrEmpty()) SkillModifier(Hero.MainHero, op.SkillToLevel, level);
@@ -2019,11 +1971,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.SlaveryTotal))
                                                                                                                            {
-                                                                                                                               VictimSlaveryModifier(GetIntFromXML(op.SlaveryTotal), Hero.MainHero);
+                                                                                                                               VictimSlaveryModifier(varLoader.GetIntFromXML(op.SlaveryTotal), Hero.MainHero);
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.SlaveryTotal))
                                                                                                                            {
-                                                                                                                               VictimSlaveryModifier(GetIntFromXML(listedEvent.SlaveryTotal), Hero.MainHero);
+                                                                                                                               VictimSlaveryModifier(varLoader.GetIntFromXML(listedEvent.SlaveryTotal), Hero.MainHero);
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -2046,11 +1998,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.ProstitutionTotal))
                                                                                                                            {
-                                                                                                                               VictimProstitutionModifier(GetIntFromXML(op.ProstitutionTotal), Hero.MainHero);
+                                                                                                                               VictimProstitutionModifier(varLoader.GetIntFromXML(op.ProstitutionTotal), Hero.MainHero);
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.ProstitutionTotal))
                                                                                                                            {
-                                                                                                                               VictimProstitutionModifier(GetIntFromXML(listedEvent.ProstitutionTotal), Hero.MainHero);
+                                                                                                                               VictimProstitutionModifier(varLoader.GetIntFromXML(listedEvent.ProstitutionTotal), Hero.MainHero);
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -2073,11 +2025,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.RenownTotal))
                                                                                                                            {
-                                                                                                                               RenownModifier(GetIntFromXML(op.RenownTotal), Hero.MainHero);
+                                                                                                                               RenownModifier(varLoader.GetIntFromXML(op.RenownTotal), Hero.MainHero);
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.RenownTotal))
                                                                                                                            {
-                                                                                                                               RenownModifier(GetIntFromXML(listedEvent.RenownTotal), Hero.MainHero);
+                                                                                                                               RenownModifier(varLoader.GetIntFromXML(listedEvent.RenownTotal), Hero.MainHero);
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -2096,11 +2048,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.HealthTotal))
                                                                                                                            {
-                                                                                                                               Hero.MainHero.HitPoints += GetIntFromXML(op.HealthTotal);
+                                                                                                                               Hero.MainHero.HitPoints += varLoader.GetIntFromXML(op.HealthTotal);
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.HealthTotal))
                                                                                                                            {
-                                                                                                                               Hero.MainHero.HitPoints += GetIntFromXML(listedEvent.HealthTotal);
+                                                                                                                               Hero.MainHero.HitPoints += varLoader.GetIntFromXML(listedEvent.HealthTotal);
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -2119,11 +2071,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.MoraleTotal))
                                                                                                                            {
-                                                                                                                               MoralChange(GetIntFromXML(op.MoraleTotal), PlayerCaptivity.CaptorParty);
+                                                                                                                               MoralChange(varLoader.GetIntFromXML(op.MoraleTotal), PlayerCaptivity.CaptorParty);
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.MoraleTotal))
                                                                                                                            {
-                                                                                                                               MoralChange(GetIntFromXML(listedEvent.MoraleTotal), PlayerCaptivity.CaptorParty);
+                                                                                                                               MoralChange(varLoader.GetIntFromXML(listedEvent.MoraleTotal), PlayerCaptivity.CaptorParty);
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -2142,11 +2094,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.PregnancyRiskModifier))
                                                                                                                            {
-                                                                                                                               CaptivityImpregnationChance(Hero.MainHero, GetIntFromXML(op.PregnancyRiskModifier));
+                                                                                                                               CaptivityImpregnationChance(Hero.MainHero, varLoader.GetIntFromXML(op.PregnancyRiskModifier));
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.PregnancyRiskModifier))
                                                                                                                            {
-                                                                                                                               CaptivityImpregnationChance(Hero.MainHero, GetIntFromXML(listedEvent.PregnancyRiskModifier));
+                                                                                                                               CaptivityImpregnationChance(Hero.MainHero, varLoader.GetIntFromXML(listedEvent.PregnancyRiskModifier));
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -2165,11 +2117,11 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            if (!string.IsNullOrEmpty(op.PregnancyRiskModifier))
                                                                                                                            {
-                                                                                                                               CaptivityImpregnationChance(Hero.MainHero, GetIntFromXML(op.PregnancyRiskModifier), false, false);
+                                                                                                                               CaptivityImpregnationChance(Hero.MainHero, varLoader.GetIntFromXML(op.PregnancyRiskModifier), false, false);
                                                                                                                            }
                                                                                                                            else if (!string.IsNullOrEmpty(listedEvent.PregnancyRiskModifier))
                                                                                                                            {
-                                                                                                                               CaptivityImpregnationChance(Hero.MainHero, GetIntFromXML(listedEvent.PregnancyRiskModifier), false, false);
+                                                                                                                               CaptivityImpregnationChance(Hero.MainHero, varLoader.GetIntFromXML(listedEvent.PregnancyRiskModifier), false, false);
                                                                                                                            }
                                                                                                                            else
                                                                                                                            {
@@ -2190,8 +2142,8 @@ namespace CaptivityEvents.Events
                                                                                                                            try
                                                                                                                            {
                                                                                                                                RelationsModifier(PlayerCaptivity.CaptorParty.MobileParty.LeaderHero, !string.IsNullOrEmpty(op.RelationTotal)
-                                                                                                                                                     ? GetIntFromXML(op.RelationTotal)
-                                                                                                                                                     : GetIntFromXML(listedEvent.RelationTotal));
+                                                                                                                                                     ? varLoader.GetIntFromXML(op.RelationTotal)
+                                                                                                                                                     : varLoader.GetIntFromXML(listedEvent.RelationTotal));
                                                                                                                            }
                                                                                                                            catch (Exception)
                                                                                                                            {
@@ -2215,8 +2167,8 @@ namespace CaptivityEvents.Events
                                                                                                                            {
                                                                                                                                var level = 0;
 
-                                                                                                                               if (!string.IsNullOrEmpty(op.CaptorGoldTotal)) level = GetIntFromXML(op.CaptorGoldTotal);
-                                                                                                                               else if (!string.IsNullOrEmpty(listedEvent.CaptorGoldTotal)) level = GetIntFromXML(listedEvent.CaptorGoldTotal);
+                                                                                                                               if (!string.IsNullOrEmpty(op.CaptorGoldTotal)) level = varLoader.GetIntFromXML(op.CaptorGoldTotal);
+                                                                                                                               else if (!string.IsNullOrEmpty(listedEvent.CaptorGoldTotal)) level = varLoader.GetIntFromXML(listedEvent.CaptorGoldTotal);
                                                                                                                                else CECustomHandler.LogToFile("Missing CaptorGoldTotal");
 
                                                                                                                                GiveGoldAction.ApplyBetweenCharacters(null, PlayerCaptivity.CaptorParty.MobileParty.LeaderHero, level);
@@ -2230,7 +2182,7 @@ namespace CaptivityEvents.Events
                                                                                                                        if (op.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorTrait))
                                                                                                                            try
                                                                                                                            {
-                                                                                                                               var level = GetIntFromXML(!string.IsNullOrEmpty(op.TraitTotal)
+                                                                                                                               var level = varLoader.GetIntFromXML(!string.IsNullOrEmpty(op.TraitTotal)
                                                                                                                                                              ? op.TraitTotal
                                                                                                                                                              : listedEvent.TraitTotal);
 
@@ -2247,8 +2199,8 @@ namespace CaptivityEvents.Events
                                                                                                                        if (op.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorRenown))
                                                                                                                            try
                                                                                                                            {
-                                                                                                                               if (!string.IsNullOrEmpty(op.RenownTotal)) RenownModifier(GetIntFromXML(op.RenownTotal), PlayerCaptivity.CaptorParty.LeaderHero);
-                                                                                                                               else RenownModifier(GetIntFromXML(listedEvent.RenownTotal), PlayerCaptivity.CaptorParty.LeaderHero);
+                                                                                                                               if (!string.IsNullOrEmpty(op.RenownTotal)) RenownModifier(varLoader.GetIntFromXML(op.RenownTotal), PlayerCaptivity.CaptorParty.LeaderHero);
+                                                                                                                               else RenownModifier(varLoader.GetIntFromXML(listedEvent.RenownTotal), PlayerCaptivity.CaptorParty.LeaderHero);
                                                                                                                            }
                                                                                                                            catch (Exception)
                                                                                                                            {
@@ -2397,7 +2349,7 @@ namespace CaptivityEvents.Events
 
                                                                                                                                try
                                                                                                                                {
-                                                                                                                                   weightedChance = GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
+                                                                                                                                   weightedChance = varLoader.GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
                                                                                                                                                                       ? triggerEvent.EventWeight
                                                                                                                                                                       : triggeredEvent.WeightedChanceOfOccuring);
                                                                                                                                }
@@ -2455,8 +2407,8 @@ namespace CaptivityEvents.Events
                                                                                                                    {
                                                                                                                        try
                                                                                                                        {
-                                                                                                                           if (!string.IsNullOrEmpty(op.EscapeChance)) CECaptivityEscapeAttempt(args, GetIntFromXML(op.EscapeChance));
-                                                                                                                           else CECaptivityEscapeAttempt(args, GetIntFromXML(listedEvent.EscapeChance));
+                                                                                                                           if (!string.IsNullOrEmpty(op.EscapeChance)) CECaptivityEscapeAttempt(args, varLoader.GetIntFromXML(op.EscapeChance));
+                                                                                                                           else CECaptivityEscapeAttempt(args, varLoader.GetIntFromXML(listedEvent.EscapeChance));
                                                                                                                        }
                                                                                                                        catch (Exception)
                                                                                                                        {
@@ -2478,11 +2430,12 @@ namespace CaptivityEvents.Events
                                                                                                                    {
                                                                                                                        CECaptivityContinue(args);
                                                                                                                    }
-                                                                                                               }, false, GetIntFromXML(op.Order));
+                                                                                                               }, false, varLoader.GetIntFromXML(op.Order));
         }
 
         public static void CELoadCaptorEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
+            var varLoader = new VariablesLoader();
             gameStarter.AddGameMenu(listedEvent.Name, listedEvent.Text, args =>
                                                                         {
                                                                             Hero captiveHero = null;
@@ -2527,7 +2480,7 @@ namespace CaptivityEvents.Events
 
                                                                                     try
                                                                                     {
-                                                                                        if (!listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = GetFloatFromXML(listedEvent.BackgroundAnimationSpeed);
+                                                                                        if (!listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = varLoader.GetFloatFromXML(listedEvent.BackgroundAnimationSpeed);
                                                                                     }
                                                                                     catch (Exception e)
                                                                                     {
@@ -2549,7 +2502,7 @@ namespace CaptivityEvents.Events
                                                                         });
 
             // Sort Options
-            var sorted = listedEvent.Options.OrderBy(item => GetIntFromXML(item.Order)).ToList();
+            var sorted = listedEvent.Options.OrderBy(item => varLoader.GetIntFromXML(item.Order)).ToList();
 
             foreach (var op in sorted)
                 gameStarter.AddGameMenuOption(listedEvent.Name, listedEvent.Name + op.Order, op.OptionText, args =>
@@ -2580,8 +2533,8 @@ namespace CaptivityEvents.Events
                                                                                                                     {
                                                                                                                         var level = 0;
 
-                                                                                                                        if (!string.IsNullOrEmpty(op.CaptorGoldTotal)) level = GetIntFromXML(op.CaptorGoldTotal);
-                                                                                                                        else if (!string.IsNullOrEmpty(listedEvent.CaptorGoldTotal)) level = GetIntFromXML(listedEvent.CaptorGoldTotal);
+                                                                                                                        if (!string.IsNullOrEmpty(op.CaptorGoldTotal)) level = varLoader.GetIntFromXML(op.CaptorGoldTotal);
+                                                                                                                        else if (!string.IsNullOrEmpty(listedEvent.CaptorGoldTotal)) level = varLoader.GetIntFromXML(listedEvent.CaptorGoldTotal);
                                                                                                                         else CECustomHandler.LogToFile("Missing CaptorGoldTotal");
                                                                                                                         MBTextManager.SetTextVariable("CAPTOR_MONEY_AMOUNT", level);
                                                                                                                     }
@@ -2608,7 +2561,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqHeroCaptorRelationAbove))
-                                                                                                                            if (listedEvent.Captive.HeroObject.GetRelationWithPlayer() < GetFloatFromXML(op.ReqHeroCaptorRelationAbove))
+                                                                                                                            if (listedEvent.Captive.HeroObject.GetRelationWithPlayer() < varLoader.GetFloatFromXML(op.ReqHeroCaptorRelationAbove))
                                                                                                                             {
                                                                                                                                 var textResponse4 = GameTexts.FindText("str_CE_relationship", "low");
                                                                                                                                 textResponse4.SetTextVariable("HERO", listedEvent.Captive.HeroObject.Name.ToString());
@@ -2624,7 +2577,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqHeroCaptorRelationBelow))
-                                                                                                                            if (listedEvent.Captive.HeroObject.GetRelationWithPlayer() > GetFloatFromXML(op.ReqHeroCaptorRelationBelow))
+                                                                                                                            if (listedEvent.Captive.HeroObject.GetRelationWithPlayer() > varLoader.GetFloatFromXML(op.ReqHeroCaptorRelationBelow))
                                                                                                                             {
                                                                                                                                 var textResponse3 = GameTexts.FindText("str_CE_relationship", "high");
                                                                                                                                 textResponse3.SetTextVariable("HERO", listedEvent.Captive.HeroObject.Name.ToString());
@@ -2642,7 +2595,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMoraleAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.IsMobile && PartyBase.MainParty.MobileParty.Morale < GetIntFromXML(op.ReqMoraleAbove))
+                                                                                                                        if (PartyBase.MainParty.IsMobile && PartyBase.MainParty.MobileParty.Morale < varLoader.GetIntFromXML(op.ReqMoraleAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_morale_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -2656,7 +2609,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMoraleBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.IsMobile && PartyBase.MainParty.MobileParty.Morale > GetIntFromXML(op.ReqMoraleBelow))
+                                                                                                                        if (PartyBase.MainParty.IsMobile && PartyBase.MainParty.MobileParty.Morale > varLoader.GetIntFromXML(op.ReqMoraleBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_morale_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -2671,7 +2624,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqTroopsAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.NumberOfHealthyMembers < GetIntFromXML(op.ReqTroopsAbove))
+                                                                                                                        if (PartyBase.MainParty.NumberOfHealthyMembers < varLoader.GetIntFromXML(op.ReqTroopsAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -2685,7 +2638,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqTroopsBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.NumberOfHealthyMembers > GetIntFromXML(op.ReqTroopsBelow))
+                                                                                                                        if (PartyBase.MainParty.NumberOfHealthyMembers > varLoader.GetIntFromXML(op.ReqTroopsBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -2700,7 +2653,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMaleTroopsAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < GetIntFromXML(op.ReqMaleTroopsAbove))
+                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < varLoader.GetIntFromXML(op.ReqMaleTroopsAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -2714,7 +2667,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMaleTroopsBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < GetIntFromXML(op.ReqMaleTroopsBelow))
+                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < varLoader.GetIntFromXML(op.ReqMaleTroopsBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -2729,7 +2682,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqFemaleTroopsAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) < GetIntFromXML(op.ReqFemaleTroopsAbove))
+                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) < varLoader.GetIntFromXML(op.ReqFemaleTroopsAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -2743,7 +2696,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqFemaleTroopsBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > GetIntFromXML(op.ReqFemaleTroopsBelow))
+                                                                                                                        if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > varLoader.GetIntFromXML(op.ReqFemaleTroopsBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -2758,7 +2711,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqCaptivesAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.NumberOfPrisoners < GetIntFromXML(op.ReqCaptivesAbove))
+                                                                                                                        if (PartyBase.MainParty.NumberOfPrisoners < varLoader.GetIntFromXML(op.ReqCaptivesAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -2772,7 +2725,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqCaptivesBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.NumberOfPrisoners > GetIntFromXML(op.ReqCaptivesBelow))
+                                                                                                                        if (PartyBase.MainParty.NumberOfPrisoners > varLoader.GetIntFromXML(op.ReqCaptivesBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -2787,7 +2740,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMaleCaptivesAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < GetIntFromXML(op.ReqMaleCaptivesAbove))
+                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < varLoader.GetIntFromXML(op.ReqMaleCaptivesAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -2801,7 +2754,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqMaleCaptivesBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < GetIntFromXML(op.ReqMaleCaptivesBelow))
+                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < varLoader.GetIntFromXML(op.ReqMaleCaptivesBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -2816,7 +2769,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqFemaleCaptivesAbove.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) < GetIntFromXML(op.ReqFemaleCaptivesAbove))
+                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) < varLoader.GetIntFromXML(op.ReqFemaleCaptivesAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -2830,7 +2783,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!op.ReqFemaleCaptivesBelow.IsStringNoneOrEmpty())
-                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > GetIntFromXML(op.ReqFemaleCaptivesBelow))
+                                                                                                                        if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > varLoader.GetIntFromXML(op.ReqFemaleCaptivesBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -2859,7 +2812,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqHeroTraitLevelAbove))
-                                                                                                                            if (traitLevel < GetIntFromXML(op.ReqHeroTraitLevelAbove))
+                                                                                                                            if (traitLevel < varLoader.GetIntFromXML(op.ReqHeroTraitLevelAbove))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_trait_captive_level", "low");
                                                                                                                                 text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(op.ReqHeroTrait));
@@ -2875,7 +2828,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqHeroTraitLevelBelow))
-                                                                                                                            if (traitLevel > GetIntFromXML(op.ReqHeroTraitLevelBelow))
+                                                                                                                            if (traitLevel > varLoader.GetIntFromXML(op.ReqHeroTraitLevelBelow))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_trait_captive_level", "high");
                                                                                                                                 text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(op.ReqHeroTrait));
@@ -2907,7 +2860,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqCaptorTraitLevelAbove))
-                                                                                                                            if (traitLevel < GetIntFromXML(op.ReqCaptorTraitLevelAbove))
+                                                                                                                            if (traitLevel < varLoader.GetIntFromXML(op.ReqCaptorTraitLevelAbove))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_trait_level", "low");
                                                                                                                                 text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(op.ReqCaptorTrait));
@@ -2923,7 +2876,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!string.IsNullOrEmpty(op.ReqCaptorTraitLevelBelow))
-                                                                                                                            if (traitLevel > GetIntFromXML(op.ReqCaptorTraitLevelBelow))
+                                                                                                                            if (traitLevel > varLoader.GetIntFromXML(op.ReqCaptorTraitLevelBelow))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_trait_level", "high");
                                                                                                                                 text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(op.ReqCaptorTrait));
@@ -2955,7 +2908,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!op.ReqHeroSkillLevelAbove.IsStringNoneOrEmpty())
-                                                                                                                            if (skillLevel < GetIntFromXML(op.ReqHeroSkillLevelAbove))
+                                                                                                                            if (skillLevel < varLoader.GetIntFromXML(op.ReqHeroSkillLevelAbove))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_skill_captive_level", "low");
                                                                                                                                 text.SetTextVariable("SKILL", op.ReqHeroSkill);
@@ -2971,7 +2924,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!op.ReqHeroSkillLevelBelow.IsStringNoneOrEmpty())
-                                                                                                                            if (skillLevel > GetIntFromXML(op.ReqHeroSkillLevelBelow))
+                                                                                                                            if (skillLevel > varLoader.GetIntFromXML(op.ReqHeroSkillLevelBelow))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_skill_captive_level", "high");
                                                                                                                                 text.SetTextVariable("SKILL", op.ReqHeroSkill);
@@ -3003,7 +2956,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (!op.ReqCaptorSkillLevelAbove.IsStringNoneOrEmpty())
-                                                                                                                            if (skillLevel < GetIntFromXML(op.ReqCaptorSkillLevelAbove))
+                                                                                                                            if (skillLevel < varLoader.GetIntFromXML(op.ReqCaptorSkillLevelAbove))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_skill_level", "low");
                                                                                                                                 text.SetTextVariable("SKILL", op.ReqCaptorSkill);
@@ -3019,7 +2972,7 @@ namespace CaptivityEvents.Events
                                                                                                                     try
                                                                                                                     {
                                                                                                                         if (op.ReqCaptorSkillLevelBelow.IsStringNoneOrEmpty())
-                                                                                                                            if (skillLevel > GetIntFromXML(op.ReqCaptorSkillLevelBelow))
+                                                                                                                            if (skillLevel > varLoader.GetIntFromXML(op.ReqCaptorSkillLevelBelow))
                                                                                                                             {
                                                                                                                                 var text = GameTexts.FindText("str_CE_skill_level", "high");
                                                                                                                                 text.SetTextVariable("SKILL", op.ReqCaptorSkill);
@@ -3037,7 +2990,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqGoldAbove))
-                                                                                                                        if (Hero.MainHero.Gold < GetIntFromXML(op.ReqGoldAbove))
+                                                                                                                        if (Hero.MainHero.Gold < varLoader.GetIntFromXML(op.ReqGoldAbove))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_gold_level", "low");
                                                                                                                             args.IsEnabled = false;
@@ -3051,7 +3004,7 @@ namespace CaptivityEvents.Events
                                                                                                                 try
                                                                                                                 {
                                                                                                                     if (!string.IsNullOrEmpty(op.ReqGoldBelow))
-                                                                                                                        if (Hero.MainHero.Gold > GetIntFromXML(op.ReqGoldBelow))
+                                                                                                                        if (Hero.MainHero.Gold > varLoader.GetIntFromXML(op.ReqGoldBelow))
                                                                                                                         {
                                                                                                                             args.Tooltip = GameTexts.FindText("str_CE_gold_level", "high");
                                                                                                                             args.IsEnabled = false;
@@ -3096,8 +3049,8 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            var level = 0;
 
-                                                                                                                           if (!string.IsNullOrEmpty(op.CaptorGoldTotal)) level = GetIntFromXML(op.CaptorGoldTotal);
-                                                                                                                           else if (!string.IsNullOrEmpty(listedEvent.CaptorGoldTotal)) level = GetIntFromXML(listedEvent.CaptorGoldTotal);
+                                                                                                                           if (!string.IsNullOrEmpty(op.CaptorGoldTotal)) level = varLoader.GetIntFromXML(op.CaptorGoldTotal);
+                                                                                                                           else if (!string.IsNullOrEmpty(listedEvent.CaptorGoldTotal)) level = varLoader.GetIntFromXML(listedEvent.CaptorGoldTotal);
                                                                                                                            else CECustomHandler.LogToFile("Missing CaptorGoldTotal");
 
                                                                                                                            GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, level);
@@ -3113,8 +3066,8 @@ namespace CaptivityEvents.Events
                                                                                                                        {
                                                                                                                            var level = 0;
 
-                                                                                                                           if (!op.SkillTotal.IsStringNoneOrEmpty()) level = GetIntFromXML(op.SkillTotal);
-                                                                                                                           else if (!listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = GetIntFromXML(listedEvent.SkillTotal);
+                                                                                                                           if (!op.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(op.SkillTotal);
+                                                                                                                           else if (!listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(listedEvent.SkillTotal);
                                                                                                                            else CECustomHandler.LogToFile("Missing Skill SkillTotal");
 
                                                                                                                            if (!op.SkillToLevel.IsStringNoneOrEmpty()) SkillModifier(Hero.MainHero, op.SkillToLevel, level);
@@ -3130,7 +3083,7 @@ namespace CaptivityEvents.Events
                                                                                                                    if (op.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorTrait))
                                                                                                                        try
                                                                                                                        {
-                                                                                                                           var level = GetIntFromXML(!string.IsNullOrEmpty(op.TraitTotal)
+                                                                                                                           var level = varLoader.GetIntFromXML(!string.IsNullOrEmpty(op.TraitTotal)
                                                                                                                                                          ? op.TraitTotal
                                                                                                                                                          : listedEvent.TraitTotal);
 
@@ -3148,8 +3101,8 @@ namespace CaptivityEvents.Events
                                                                                                                        try
                                                                                                                        {
                                                                                                                            RenownModifier(!string.IsNullOrEmpty(op.RenownTotal)
-                                                                                                                                              ? GetIntFromXML(op.RenownTotal)
-                                                                                                                                              : GetIntFromXML(listedEvent.RenownTotal), Hero.MainHero);
+                                                                                                                                              ? varLoader.GetIntFromXML(op.RenownTotal)
+                                                                                                                                              : varLoader.GetIntFromXML(listedEvent.RenownTotal), Hero.MainHero);
                                                                                                                        }
                                                                                                                        catch (Exception)
                                                                                                                        {
@@ -3162,8 +3115,8 @@ namespace CaptivityEvents.Events
                                                                                                                        try
                                                                                                                        {
                                                                                                                            MoralChange(!string.IsNullOrEmpty(op.MoraleTotal)
-                                                                                                                                           ? GetIntFromXML(op.MoraleTotal)
-                                                                                                                                           : GetIntFromXML(listedEvent.MoraleTotal), PartyBase.MainParty);
+                                                                                                                                           ? varLoader.GetIntFromXML(op.MoraleTotal)
+                                                                                                                                           : varLoader.GetIntFromXML(listedEvent.MoraleTotal), PartyBase.MainParty);
                                                                                                                        }
                                                                                                                        catch (Exception)
                                                                                                                        {
@@ -3191,8 +3144,8 @@ namespace CaptivityEvents.Events
                                                                                                                            try
                                                                                                                            {
                                                                                                                                VictimSlaveryModifier(!string.IsNullOrEmpty(op.SlaveryTotal)
-                                                                                                                                                         ? GetIntFromXML(op.SlaveryTotal)
-                                                                                                                                                         : GetIntFromXML(listedEvent.SlaveryTotal), captiveHero);
+                                                                                                                                                         ? varLoader.GetIntFromXML(op.SlaveryTotal)
+                                                                                                                                                         : varLoader.GetIntFromXML(listedEvent.SlaveryTotal), captiveHero);
                                                                                                                            }
                                                                                                                            catch (Exception)
                                                                                                                            {
@@ -3209,8 +3162,8 @@ namespace CaptivityEvents.Events
                                                                                                                            try
                                                                                                                            {
                                                                                                                                VictimProstitutionModifier(!string.IsNullOrEmpty(op.ProstitutionTotal)
-                                                                                                                                                              ? GetIntFromXML(op.ProstitutionTotal)
-                                                                                                                                                              : GetIntFromXML(listedEvent.ProstitutionTotal), captiveHero);
+                                                                                                                                                              ? varLoader.GetIntFromXML(op.ProstitutionTotal)
+                                                                                                                                                              : varLoader.GetIntFromXML(listedEvent.ProstitutionTotal), captiveHero);
                                                                                                                            }
                                                                                                                            catch (Exception)
                                                                                                                            {
@@ -3223,8 +3176,8 @@ namespace CaptivityEvents.Events
                                                                                                                            try
                                                                                                                            {
                                                                                                                                RelationsModifier(captiveHero, !string.IsNullOrEmpty(op.RelationTotal)
-                                                                                                                                                     ? GetIntFromXML(op.RelationTotal)
-                                                                                                                                                     : GetIntFromXML(listedEvent.RelationTotal));
+                                                                                                                                                     ? varLoader.GetIntFromXML(op.RelationTotal)
+                                                                                                                                                     : varLoader.GetIntFromXML(listedEvent.RelationTotal));
                                                                                                                            }
                                                                                                                            catch (Exception)
                                                                                                                            {
@@ -3248,8 +3201,8 @@ namespace CaptivityEvents.Events
                                                                                                                            {
                                                                                                                                var level = 0;
 
-                                                                                                                               if (!string.IsNullOrEmpty(op.GoldTotal)) level = GetIntFromXML(op.GoldTotal);
-                                                                                                                               else if (!string.IsNullOrEmpty(listedEvent.GoldTotal)) level = GetIntFromXML(listedEvent.GoldTotal);
+                                                                                                                               if (!string.IsNullOrEmpty(op.GoldTotal)) level = varLoader.GetIntFromXML(op.GoldTotal);
+                                                                                                                               else if (!string.IsNullOrEmpty(listedEvent.GoldTotal)) level = varLoader.GetIntFromXML(listedEvent.GoldTotal);
                                                                                                                                else CECustomHandler.LogToFile("Missing GoldTotal");
 
                                                                                                                                GiveGoldAction.ApplyBetweenCharacters(null, captiveHero, level);
@@ -3263,7 +3216,7 @@ namespace CaptivityEvents.Events
                                                                                                                        if (op.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeTrait))
                                                                                                                            try
                                                                                                                            {
-                                                                                                                               var level = GetIntFromXML(!string.IsNullOrEmpty(op.TraitTotal)
+                                                                                                                               var level = varLoader.GetIntFromXML(!string.IsNullOrEmpty(op.TraitTotal)
                                                                                                                                                              ? op.TraitTotal
                                                                                                                                                              : listedEvent.TraitTotal);
 
@@ -3282,8 +3235,8 @@ namespace CaptivityEvents.Events
                                                                                                                            {
                                                                                                                                var level = 0;
 
-                                                                                                                               if (!op.SkillTotal.IsStringNoneOrEmpty()) level = GetIntFromXML(op.SkillTotal);
-                                                                                                                               else if (!listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = GetIntFromXML(listedEvent.SkillTotal);
+                                                                                                                               if (!op.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(op.SkillTotal);
+                                                                                                                               else if (!listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(listedEvent.SkillTotal);
                                                                                                                                else CECustomHandler.LogToFile("Missing Skill SkillTotal");
 
                                                                                                                                if (!op.SkillToLevel.IsStringNoneOrEmpty()) SkillModifier(captiveHero, op.SkillToLevel, level);
@@ -3300,8 +3253,8 @@ namespace CaptivityEvents.Events
                                                                                                                            try
                                                                                                                            {
                                                                                                                                RenownModifier(!string.IsNullOrEmpty(op.RenownTotal)
-                                                                                                                                                  ? GetIntFromXML(op.RenownTotal)
-                                                                                                                                                  : GetIntFromXML(listedEvent.RenownTotal), captiveHero);
+                                                                                                                                                  ? varLoader.GetIntFromXML(op.RenownTotal)
+                                                                                                                                                  : varLoader.GetIntFromXML(listedEvent.RenownTotal), captiveHero);
                                                                                                                            }
                                                                                                                            catch (Exception)
                                                                                                                            {
@@ -3314,8 +3267,8 @@ namespace CaptivityEvents.Events
                                                                                                                            try
                                                                                                                            {
                                                                                                                                captiveHero.HitPoints += !string.IsNullOrEmpty(op.HealthTotal)
-                                                                                                                                   ? GetIntFromXML(op.HealthTotal)
-                                                                                                                                   : GetIntFromXML(listedEvent.HealthTotal);
+                                                                                                                                   ? varLoader.GetIntFromXML(op.HealthTotal)
+                                                                                                                                   : varLoader.GetIntFromXML(listedEvent.HealthTotal);
                                                                                                                            }
                                                                                                                            catch (Exception)
                                                                                                                            {
@@ -3328,8 +3281,8 @@ namespace CaptivityEvents.Events
                                                                                                                            try
                                                                                                                            {
                                                                                                                                CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(op.PregnancyRiskModifier)
-                                                                                                                                                               ? GetIntFromXML(op.PregnancyRiskModifier)
-                                                                                                                                                               : GetIntFromXML(listedEvent.PregnancyRiskModifier));
+                                                                                                                                                               ? varLoader.GetIntFromXML(op.PregnancyRiskModifier)
+                                                                                                                                                               : varLoader.GetIntFromXML(listedEvent.PregnancyRiskModifier));
                                                                                                                            }
                                                                                                                            catch (Exception)
                                                                                                                            {
@@ -3340,8 +3293,8 @@ namespace CaptivityEvents.Events
                                                                                                                            try
                                                                                                                            {
                                                                                                                                CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(op.PregnancyRiskModifier)
-                                                                                                                                                               ? GetIntFromXML(op.PregnancyRiskModifier)
-                                                                                                                                                               : GetIntFromXML(listedEvent.PregnancyRiskModifier), false, false);
+                                                                                                                                                               ? varLoader.GetIntFromXML(op.PregnancyRiskModifier)
+                                                                                                                                                               : varLoader.GetIntFromXML(listedEvent.PregnancyRiskModifier), false, false);
                                                                                                                            }
                                                                                                                            catch (Exception)
                                                                                                                            {
@@ -3421,7 +3374,7 @@ namespace CaptivityEvents.Events
 
                                                                                                                                try
                                                                                                                                {
-                                                                                                                                   weightedChance = GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
+                                                                                                                                   weightedChance = varLoader.GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
                                                                                                                                                                       ? triggerEvent.EventWeight
                                                                                                                                                                       : triggeredEvent.WeightedChanceOfOccuring);
                                                                                                                                }
@@ -3478,7 +3431,7 @@ namespace CaptivityEvents.Events
                                                                                                                    {
                                                                                                                        CECaptorContinue(args);
                                                                                                                    }
-                                                                                                               }, false, GetIntFromXML(op.Order));
+                                                                                                               }, false, varLoader.GetIntFromXML(op.Order));
         }
 
         // Captive Specific Functions
@@ -3854,106 +3807,7 @@ namespace CaptivityEvents.Events
         }
 
         // Variable Loaders
-        public static int GetIntFromXML(string numpassed)
-        {
-            try
-            {
-                var number = 0;
-
-                if (numpassed == null) return number;
-
-                if (numpassed.StartsWith("R"))
-                {
-                    var splitPass = numpassed.Split(' ');
-
-                    switch (splitPass.Length)
-                    {
-                        case 3:
-                            var numberOne = int.Parse(splitPass[1]);
-                            var numberTwo = int.Parse(splitPass[2]);
-
-                            number = numberOne < numberTwo
-                                ? MBRandom.RandomInt(numberOne, numberTwo)
-                                : MBRandom.RandomInt(numberTwo, numberOne);
-
-                            break;
-
-                        case 2:
-                            number = MBRandom.RandomInt(int.Parse(splitPass[1]));
-
-                            break;
-
-                        default:
-                            number = MBRandom.RandomInt();
-
-                            break;
-                    }
-                }
-                else
-                {
-                    number = int.Parse(numpassed);
-                }
-
-                return number;
-            }
-            catch (Exception)
-            {
-                CECustomHandler.ForceLogToFile("Failed to parse " + numpassed);
-
-                return 0;
-            }
-        }
-
-        public static float GetFloatFromXML(string numpassed)
-        {
-            try
-            {
-                var number = 0f;
-
-                if (numpassed == null) return number;
-
-                if (numpassed.StartsWith("R"))
-                {
-                    var splitPass = numpassed.Split(' ');
-
-                    switch (splitPass.Length)
-                    {
-                        case 3:
-                            var numberOne = float.Parse(splitPass[1]);
-                            var numberTwo = float.Parse(splitPass[2]);
-
-                            number = numberOne < numberTwo
-                                ? MBRandom.RandomFloatRanged(numberOne, numberTwo)
-                                : MBRandom.RandomFloatRanged(numberTwo, numberOne);
-
-                            break;
-
-                        case 2:
-                            number = MBRandom.RandomFloatRanged(float.Parse(splitPass[1]));
-
-                            break;
-
-                        default:
-                            number = MBRandom.RandomFloat;
-
-                            break;
-                    }
-                }
-                else
-                {
-                    number = float.Parse(numpassed);
-                }
-
-                return number;
-            }
-            catch (Exception)
-            {
-                CECustomHandler.LogToFile("Failed to parse " + numpassed);
-
-                return 0f;
-            }
-        }
-
+        
         // Dynamic Functions
         private static void CEKillPlayer(Hero killer)
         {

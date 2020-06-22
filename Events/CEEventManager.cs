@@ -163,7 +163,7 @@ namespace CaptivityEvents.Events
 
                             try
                             {
-                                weightedChance = CEEventLoader.GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                                weightedChance = new VariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
                             }
                             catch (Exception)
                             {
@@ -215,7 +215,7 @@ namespace CaptivityEvents.Events
 
                             try
                             {
-                                if (listEvent.WeightedChanceOfOccuring != null) weightedChance = CEEventLoader.GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                                if (listEvent.WeightedChanceOfOccuring != null) weightedChance = new VariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
                             }
                             catch (Exception)
                             {
@@ -268,7 +268,7 @@ namespace CaptivityEvents.Events
 
                         try
                         {
-                            weightedChance = CEEventLoader.GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                            weightedChance = new VariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
                         }
                         catch (Exception)
                         {
