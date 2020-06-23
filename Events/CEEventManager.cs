@@ -121,19 +121,17 @@ namespace CaptivityEvents.Events
 
                     if (specificCaptive == null) return "$FAILTOFINDHERO";
 
-                    if (foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                    if (!foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor)) return flag;
+                    var result = CEEventChecker.FlagsDoMatchEventConditions(foundevent, specificCaptive, PartyBase.MainParty);
+
+                    if (force || result == null)
                     {
-                        var result = CEEventChecker.FlagsDoMatchEventConditions(foundevent, specificCaptive, PartyBase.MainParty);
+                        foundevent.Captive = specificCaptive;
 
-                        if (force || result == null)
-                        {
-                            foundevent.Captive = specificCaptive;
-
-                            return foundevent.Name;
-                        }
-
-                        flag = "$" + result;
+                        return foundevent.Name;
                     }
+
+                    flag = "$" + result;
                 }
             }
             else

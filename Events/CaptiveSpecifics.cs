@@ -10,7 +10,7 @@ namespace CaptivityEvents.Events
 {
     public class CaptiveSpecifics
     {
-        internal void CECaptivityContinue(MenuCallbackArgs args)
+        internal void CECaptivityContinue(ref MenuCallbackArgs args)
         {
             CESubModule.animationPlayEvent = false;
 
@@ -45,7 +45,7 @@ namespace CaptivityEvents.Events
             }
         }
 
-        internal void CECaptivityEscapeAttempt(MenuCallbackArgs args, int escapeChance = 10)
+        internal void CECaptivityEscapeAttempt(ref MenuCallbackArgs args, int escapeChance = 10)
         {
             if (MBRandom.Random.Next(100) < escapeChance + new ScoresCalculation().EscapeProwessScore(Hero.MainHero))
             {
@@ -71,7 +71,7 @@ namespace CaptivityEvents.Events
                                           : "CE_captivity_sexual_escape_success_male");
         }
 
-        internal void CECaptivityLeave(MenuCallbackArgs args)
+        internal void CECaptivityLeave(ref MenuCallbackArgs args)
         {
             CESubModule.LoadTexture("default");
             var captorParty = PlayerCaptivity.CaptorParty;
@@ -118,7 +118,7 @@ namespace CaptivityEvents.Events
             else PlayerCaptivity.EndCaptivity();
         }
 
-        internal void CECaptivityEscape(MenuCallbackArgs args)
+        internal void CECaptivityEscape(ref MenuCallbackArgs args)
         {
             CECampaignBehavior.ExtraProps.Owner = null;
             var wasInSettlement = PlayerCaptivity.CaptorParty.IsSettlement;
@@ -141,7 +141,7 @@ namespace CaptivityEvents.Events
             PlayerCaptivity.EndCaptivity();
         }
 
-        internal void CECaptivityChange(MenuCallbackArgs args, PartyBase party)
+        internal void CECaptivityChange(ref MenuCallbackArgs args, PartyBase party)
         {
             try
             {

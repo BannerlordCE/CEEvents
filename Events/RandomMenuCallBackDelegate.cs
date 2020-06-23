@@ -678,7 +678,7 @@ namespace CaptivityEvents.Events
                 if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToCaravan))
                     try
                     {
-                        var party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; });
+                        var party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan);
                         if (party != null) MBTextManager.SetTextVariable("BUYERCARAVAN", party.Name);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }
@@ -688,9 +688,9 @@ namespace CaptivityEvents.Events
                     try
                     {
                         var settlement = PartyBase.MainParty.MobileParty.CurrentSettlement;
-                        var notable = settlement.Notables.Where(findFirstNotable => { return !findFirstNotable.IsFemale; }).GetRandomElement();
+                        var notable = settlement.Notables.Where(findFirstNotable => !findFirstNotable.IsFemale).GetRandomElement();
                         CECampaignBehavior.ExtraProps.Owner = notable;
-                        new CaptiveSpecifics().CECaptivityChange(args, settlement.Party);
+                        new CaptiveSpecifics().CECaptivityChange(ref args, settlement.Party);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
             }
