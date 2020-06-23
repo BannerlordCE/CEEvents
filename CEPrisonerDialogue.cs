@@ -37,8 +37,8 @@ namespace CaptivityEvents
         private static void ConversationCEEventLordCaptureOnConsequence()
         {
             Campaign.Current.CurrentConversationContext = ConversationContext.Default;
-            CEEventLoader.CEStripVictim(CharacterObject.OneToOneConversationCharacter.HeroObject);
-            if (CharacterObject.OneToOneConversationCharacter.HeroObject.GetSkillValue(CESkills.Slavery) < 50) CEEventLoader.RelationsModifier(CharacterObject.OneToOneConversationCharacter.HeroObject, -10);
+            new CaptorSpecifics().CEStripVictim(CharacterObject.OneToOneConversationCharacter.HeroObject);
+            if (CharacterObject.OneToOneConversationCharacter.HeroObject.GetSkillValue(CESkills.Slavery) < 50) new Dynamics().RelationsModifier(CharacterObject.OneToOneConversationCharacter.HeroObject, -10);
             TakePrisonerAction.Apply(Campaign.Current.MainParty.Party, CharacterObject.OneToOneConversationCharacter.HeroObject);
         }
 

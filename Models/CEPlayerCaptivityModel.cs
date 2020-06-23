@@ -510,10 +510,11 @@ namespace CaptivityEvents.Models
         /// <returns></returns>
         private string DefaultOverridenCheckCaptivityChange(float dt)
         {
+            var d = new Dynamics();
             if (PlayerCaptivity.CaptorParty.IsMobile && !PlayerCaptivity.CaptorParty.MobileParty.IsActive)
             {
                 CECampaignBehavior.ExtraProps.Owner = null;
-                CEEventLoader.VictimSlaveryModifier(0, Hero.MainHero, true);
+                d.VictimSlaveryModifier(0, Hero.MainHero, true);
 
                 return "menu_captivity_end_by_party_removed";
             }
@@ -521,7 +522,7 @@ namespace CaptivityEvents.Models
             if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MapFaction == Hero.MainHero.Clan)
             {
                 CECampaignBehavior.ExtraProps.Owner = null;
-                CEEventLoader.VictimSlaveryModifier(0, Hero.MainHero, true);
+                d.VictimSlaveryModifier(0, Hero.MainHero, true);
 
                 return "menu_captivity_end_by_ally_party_saved";
             }
@@ -533,7 +534,7 @@ namespace CaptivityEvents.Models
                 if (prostituteSkillFlag == 0)
                 {
                     CECampaignBehavior.ExtraProps.Owner = null;
-                    CEEventLoader.VictimSlaveryModifier(0, Hero.MainHero, true);
+                    d.VictimSlaveryModifier(0, Hero.MainHero, true);
 
                     return "menu_captivity_end_by_ally_party_saved";
                 }
@@ -559,7 +560,7 @@ namespace CaptivityEvents.Models
 
             if (!PlayerCaptivity.CaptorParty.IsMobile || PlayerCaptivity.CaptorParty.MapEvent == null) return null;
             CECampaignBehavior.ExtraProps.Owner = null;
-            CEEventLoader.VictimSlaveryModifier(0, Hero.MainHero, true);
+            d.VictimSlaveryModifier(0, Hero.MainHero, true);
 
             return "menu_escape_captivity_during_battle";
 

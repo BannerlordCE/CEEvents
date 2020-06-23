@@ -404,10 +404,11 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
-                    CEEventLoader.VictimProstitutionModifier(0, hero, true);
-                    CEEventLoader.VictimProstitutionModifier(0, hero, false, false);
-                    CEEventLoader.VictimSlaveryModifier(0, hero, true);
-                    CEEventLoader.VictimSlaveryModifier(0, hero, false, false);
+                    var d = new Dynamics();
+                    d.VictimProstitutionModifier(0, hero, true);
+                    d.VictimProstitutionModifier(0, hero, false, false);
+                    d.VictimSlaveryModifier(0, hero, true);
+                    d.VictimSlaveryModifier(0, hero, false, false);
                     CECampaignBehavior.ExtraProps.ResetVariables();
 
                     return "Successfully reset status";

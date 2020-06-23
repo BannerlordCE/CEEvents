@@ -379,31 +379,31 @@ namespace CaptivityEvents
                 MessageBox.Show($"Error Initializing Captivity Events:\n\n{ex}");
             }
 
-            foreach (var listedEvent in CEEvents.Where(listedEvent => !listedEvent.Name.IsStringNoneOrEmpty()))
+            foreach (var _listedEvent in CEEvents.Where(_listedEvent => !_listedEvent.Name.IsStringNoneOrEmpty()))
             {
-                if (listedEvent.MultipleListOfCustomFlags != null && listedEvent.MultipleListOfCustomFlags.Count > 0)
-                    if (!CEFlags.Exists(match => match.CEFlags.Any(x => listedEvent.MultipleListOfCustomFlags.Contains(x))))
+                if (_listedEvent.MultipleListOfCustomFlags != null && _listedEvent.MultipleListOfCustomFlags.Count > 0)
+                    if (!CEFlags.Exists(match => match.CEFlags.Any(x => _listedEvent.MultipleListOfCustomFlags.Contains(x))))
                         continue;
 
-                if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEEvents.FindAll(matchEvent => matchEvent.Name == listedEvent.Name).Count > 1) continue;
+                if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEEvents.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 1) continue;
 
                 if (!CEHelper.brothelFlagFemale)
-                    if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale))
+                    if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale))
                         CEHelper.brothelFlagFemale = true;
 
                 if (!CEHelper.brothelFlagMale)
-                    if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale))
+                    if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale))
                         CEHelper.brothelFlagMale = true;
 
-                if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
+                if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
                 {
-                    CEWaitingList.Add(listedEvent);
+                    CEWaitingList.Add(_listedEvent);
                 }
                 else
                 {
-                    if (!listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent)) CECallableEvents.Add(listedEvent);
+                    if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent)) CECallableEvents.Add(_listedEvent);
 
-                    CEEventList.Add(listedEvent);
+                    CEEventList.Add(_listedEvent);
                 }
             }
 
@@ -536,44 +536,44 @@ namespace CaptivityEvents
             foreach (var waitingEvent in CEWaitingList) AddEvent(gameStarter, waitingEvent, CEEvents);
 
             // Listed Event Load
-            foreach (var listedEvent in CEEventList) AddEvent(gameStarter, listedEvent, CEEvents);
+            foreach (var _listedEvent in CEEventList) AddEvent(gameStarter, _listedEvent, CEEvents);
         }
 
-        private void AddEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
+        private void AddEvent(CampaignGameStarter gameStarter, CEEvent _listedEvent, List<CEEvent> eventList)
         {
-            CECustomHandler.LogToFile("Loading Event: " + listedEvent.Name);
+            CECustomHandler.LogToFile("Loading Event: " + _listedEvent.Name);
 
             try
             {
-                if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                 {
-                    CEEventLoader.CELoadCaptorEvent(gameStarter, listedEvent, eventList);
+                    CEEventLoader.CELoadCaptorEvent(gameStarter, _listedEvent, eventList);
                 }
-                else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                 {
-                    CEEventLoader.CELoadCaptiveEvent(gameStarter, listedEvent, eventList);
+                    CEEventLoader.CELoadCaptiveEvent(gameStarter, _listedEvent, eventList);
                 }
-                else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                 {
-                    CEEventLoader.CELoadRandomEvent(gameStarter, listedEvent, eventList);
+                    CEEventLoader.CELoadRandomEvent(gameStarter, _listedEvent, eventList);
                 }
                 else
                 {
-                    CECustomHandler.ForceLogToFile("Failed to load " + listedEvent.Name + " contains no category flag (Captor, Captive, Random)");
+                    CECustomHandler.ForceLogToFile("Failed to load " + _listedEvent.Name + " contains no category flag (Captor, Captive, Random)");
                     var textObject = new TextObject("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
-                    textObject.SetTextVariable("NAME", listedEvent.Name);
+                    textObject.SetTextVariable("NAME", _listedEvent.Name);
                     textObject.SetTextVariable("TEST", "TEST");
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
                 }
             }
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("Failed to load " + listedEvent.Name + " exception: " + e.Message + " stacktrace: " + e.StackTrace);
+                CECustomHandler.ForceLogToFile("Failed to load " + _listedEvent.Name + " exception: " + e.Message + " stacktrace: " + e.StackTrace);
 
                 if (!_isLoadedInGame)
                 {
                     var textObject = new TextObject("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
-                    textObject.SetTextVariable("NAME", listedEvent.Name);
+                    textObject.SetTextVariable("NAME", _listedEvent.Name);
                     textObject.SetTextVariable("ERROR", e.Message);
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
                 }

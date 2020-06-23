@@ -783,9 +783,9 @@ namespace CaptivityEvents.Brothel
             try
             {
                 GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, prostitutionCost);
-                var ProstitutionSkill = CESkills.Prostitution;
-                if (Hero.MainHero.GetSkillValue(ProstitutionSkill) < 100) Hero.MainHero.SetSkillValue(ProstitutionSkill, 100);
-                CEEventLoader.VictimProstitutionModifier(MBRandom.RandomInt(1, 10), Hero.MainHero, false, true, true);
+                var prostitutionSkill = CESkills.Prostitution;
+                if (Hero.MainHero.GetSkillValue(prostitutionSkill) < 100) Hero.MainHero.SetSkillValue(prostitutionSkill, 100);
+                new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(1, 10), Hero.MainHero, false, true, true);
 
                 switch (Settlement.CurrentSettlement.Culture.GetCultureCode())
                 {
@@ -915,8 +915,9 @@ namespace CaptivityEvents.Brothel
             var prostitutionSkill = CESkills.Prostitution;
             _hasBoughtTunToParty = false;
 
-            if (Hero.MainHero.GetSkillValue(prostitutionSkill) > 500) CEEventLoader.VictimProstitutionModifier(MBRandom.RandomInt(-300, -200), Hero.MainHero, false, false);
-            else if (Hero.MainHero.GetSkillValue(prostitutionSkill) > 100) CEEventLoader.VictimProstitutionModifier(MBRandom.RandomInt(-40, -10), Hero.MainHero, false, false);
+            var d = new Dynamics();
+            if (Hero.MainHero.GetSkillValue(prostitutionSkill) > 500) d.VictimProstitutionModifier(MBRandom.RandomInt(-300, -200), Hero.MainHero, false, false);
+            else if (Hero.MainHero.GetSkillValue(prostitutionSkill) > 100) d.VictimProstitutionModifier(MBRandom.RandomInt(-40, -10), Hero.MainHero, false, false);
         }
 
         public override void RegisterEvents()

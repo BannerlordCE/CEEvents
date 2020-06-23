@@ -44,6 +44,14 @@
     <Compile Include="Brothel\CEBrothelClanFinanceItemVM.cs" />
     <Compile Include="Brothel\CEBrothelToolTip.cs" />
     <Compile Include="CampaignBehaviors\CECampaignBehavior.cs" />
+    <Compile Include="Events\CaptiveMenuCallBackDelegate.cs" />
+    <Compile Include="Events\CaptiveSpecifics.cs" />
+    <Compile Include="Events\CaptorMenuCallBackDelegate.cs" />
+    <Compile Include="Events\CaptorSpecifics.cs" />
+    <Compile Include="Events\Dynamics.cs" />
+    <Compile Include="Events\ImpregnationSystem.cs" />
+    <Compile Include="Events\RandomMenuCallBackDelegate.cs" />
+    <Compile Include="Events\ScoresCalculation.cs" />
     <Compile Include="Events\VariablesLoader.cs" />
     <Compile Include="Events\WaitingList.cs" />
     <Compile Include="Notifications\CECaptorMapNotification.cs" />
