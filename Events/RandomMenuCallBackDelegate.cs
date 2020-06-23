@@ -14,18 +14,18 @@ namespace CaptivityEvents.Events
 {
     public class RandomMenuCallBackDelegate
     {
-        private readonly CEEvent __listedEvent;
+        private readonly CEEvent _listedEvent;
         private readonly List<CEEvent> _eventList;
         private readonly Option _option;
 
-        internal RandomMenuCallBackDelegate(CEEvent _listedEvent)
+        internal RandomMenuCallBackDelegate(CEEvent listedEvent)
         {
-            __listedEvent = _listedEvent;
+            this._listedEvent = listedEvent;
         }
 
-        internal RandomMenuCallBackDelegate(CEEvent _listedEvent, Option option, List<CEEvent> eventList)
+        internal RandomMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
-            __listedEvent = _listedEvent;
+            this._listedEvent = listedEvent;
             _option = option;
             _eventList = eventList;
         }
@@ -41,25 +41,25 @@ namespace CaptivityEvents.Events
 
             try
             {
-                var backgroundName = __listedEvent.BackgroundName;
+                var backgroundName = _listedEvent.BackgroundName;
 
                 if (!backgroundName.IsStringNoneOrEmpty())
                 {
                     CESubModule.animationPlayEvent = false;
                     CESubModule.LoadTexture(backgroundName);
                 }
-                else if (__listedEvent.BackgroundAnimation != null && __listedEvent.BackgroundAnimation.Count > 0)
+                else if (_listedEvent.BackgroundAnimation != null && _listedEvent.BackgroundAnimation.Count > 0)
                 {
-                    CESubModule.animationImageList = __listedEvent.BackgroundAnimation;
+                    CESubModule.animationImageList = _listedEvent.BackgroundAnimation;
                     CESubModule.animationIndex = 0;
                     CESubModule.animationPlayEvent = true;
                     var speed = 0.03f;
 
                     try
                     {
-                        if (!__listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = varLoader.GetFloatFromXML(__listedEvent.BackgroundAnimationSpeed);
+                        if (!_listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = varLoader.GetFloatFromXML(_listedEvent.BackgroundAnimationSpeed);
                     }
-                    catch (Exception e) { CECustomHandler.LogToFile("Failed to load BackgroundAnimationSpeed for " + __listedEvent.Name + " : Exception: " + e); }
+                    catch (Exception e) { CECustomHandler.LogToFile("Failed to load BackgroundAnimationSpeed for " + _listedEvent.Name + " : Exception: " + e); }
 
                     CESubModule.animationSpeed = speed;
                 }
@@ -71,7 +71,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception)
             {
-                CECustomHandler.LogToFile("Failed to load background for " + __listedEvent.Name);
+                CECustomHandler.LogToFile("Failed to load background for " + _listedEvent.Name);
                 CESubModule.LoadTexture("default_random");
             }
 
@@ -126,7 +126,7 @@ namespace CaptivityEvents.Events
                     var level = 0;
 
                     if (!string.IsNullOrEmpty(_option.GoldTotal)) level = varLoader.GetIntFromXML(_option.GoldTotal);
-                    else if (!string.IsNullOrEmpty(__listedEvent.GoldTotal)) level = varLoader.GetIntFromXML(__listedEvent.GoldTotal);
+                    else if (!string.IsNullOrEmpty(_listedEvent.GoldTotal)) level = varLoader.GetIntFromXML(_listedEvent.GoldTotal);
                     else CECustomHandler.LogToFile("Missing GoldTotal");
                     MBTextManager.SetTextVariable("MONEY_AMOUNT", level);
                 }
@@ -497,7 +497,7 @@ namespace CaptivityEvents.Events
                     var skillToLevel = "";
 
                     if (!string.IsNullOrEmpty(_option.SkillToLevel)) skillToLevel = _option.SkillToLevel;
-                    else if (!string.IsNullOrEmpty(__listedEvent.SkillToLevel)) skillToLevel = __listedEvent.SkillToLevel;
+                    else if (!string.IsNullOrEmpty(_listedEvent.SkillToLevel)) skillToLevel = _listedEvent.SkillToLevel;
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
 
                     foreach (var skillObject in SkillObject.All)
@@ -526,7 +526,7 @@ namespace CaptivityEvents.Events
                     var level = 0;
 
                     if (!string.IsNullOrEmpty(_option.GoldTotal)) level = varLoader.GetIntFromXML(_option.GoldTotal);
-                    else if (!string.IsNullOrEmpty(__listedEvent.GoldTotal)) level = varLoader.GetIntFromXML(__listedEvent.GoldTotal);
+                    else if (!string.IsNullOrEmpty(_listedEvent.GoldTotal)) level = varLoader.GetIntFromXML(_listedEvent.GoldTotal);
                     else CECustomHandler.LogToFile("Missing GoldTotal");
 
                     GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, level);
@@ -540,11 +540,11 @@ namespace CaptivityEvents.Events
                     var level = 0;
 
                     if (!string.IsNullOrEmpty(_option.TraitTotal)) level = varLoader.GetIntFromXML(_option.TraitTotal);
-                    else if (!string.IsNullOrEmpty(__listedEvent.TraitTotal)) level = varLoader.GetIntFromXML(__listedEvent.TraitTotal);
+                    else if (!string.IsNullOrEmpty(_listedEvent.TraitTotal)) level = varLoader.GetIntFromXML(_listedEvent.TraitTotal);
                     else CECustomHandler.LogToFile("Missing Trait TraitTotal");
 
                     if (!string.IsNullOrEmpty(_option.TraitToLevel)) dynamics.TraitModifier(Hero.MainHero, _option.TraitToLevel, level);
-                    else if (!string.IsNullOrEmpty(__listedEvent.TraitToLevel)) dynamics.TraitModifier(Hero.MainHero, __listedEvent.TraitToLevel, level);
+                    else if (!string.IsNullOrEmpty(_listedEvent.TraitToLevel)) dynamics.TraitModifier(Hero.MainHero, _listedEvent.TraitToLevel, level);
                     else CECustomHandler.LogToFile("Missing TraitToLevel");
                 }
                 catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
@@ -556,11 +556,11 @@ namespace CaptivityEvents.Events
                     var level = 0;
 
                     if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(_option.SkillTotal);
-                    else if (!__listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(__listedEvent.SkillTotal);
+                    else if (!_listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(_listedEvent.SkillTotal);
                     else CECustomHandler.LogToFile("Missing Skill SkillTotal");
 
                     if (!_option.SkillToLevel.IsStringNoneOrEmpty()) dynamics.SkillModifier(Hero.MainHero, _option.SkillToLevel, level);
-                    else if (!__listedEvent.SkillToLevel.IsStringNoneOrEmpty()) dynamics.SkillModifier(Hero.MainHero, __listedEvent.SkillToLevel, level);
+                    else if (!_listedEvent.SkillToLevel.IsStringNoneOrEmpty()) dynamics.SkillModifier(Hero.MainHero, _listedEvent.SkillToLevel, level);
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
                 }
                 catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
@@ -570,7 +570,7 @@ namespace CaptivityEvents.Events
                 try
                 {
                     if (!string.IsNullOrEmpty(_option.SlaveryTotal)) { dynamics.VictimSlaveryModifier(varLoader.GetIntFromXML(_option.SlaveryTotal), Hero.MainHero); }
-                    else if (!string.IsNullOrEmpty(__listedEvent.SlaveryTotal)) { dynamics.VictimSlaveryModifier(varLoader.GetIntFromXML(__listedEvent.SlaveryTotal), Hero.MainHero); }
+                    else if (!string.IsNullOrEmpty(_listedEvent.SlaveryTotal)) { dynamics.VictimSlaveryModifier(varLoader.GetIntFromXML(_listedEvent.SlaveryTotal), Hero.MainHero); }
                     else
                     {
                         CECustomHandler.LogToFile("Missing SlaveryTotal");
@@ -588,7 +588,7 @@ namespace CaptivityEvents.Events
                 try
                 {
                     if (!string.IsNullOrEmpty(_option.ProstitutionTotal)) { dynamics.VictimProstitutionModifier(varLoader.GetIntFromXML(_option.ProstitutionTotal), Hero.MainHero); }
-                    else if (!string.IsNullOrEmpty(__listedEvent.ProstitutionTotal)) { dynamics.VictimProstitutionModifier(varLoader.GetIntFromXML(__listedEvent.ProstitutionTotal), Hero.MainHero); }
+                    else if (!string.IsNullOrEmpty(_listedEvent.ProstitutionTotal)) { dynamics.VictimProstitutionModifier(varLoader.GetIntFromXML(_listedEvent.ProstitutionTotal), Hero.MainHero); }
                     else
                     {
                         CECustomHandler.LogToFile("Missing ProstitutionTotal");
@@ -606,7 +606,7 @@ namespace CaptivityEvents.Events
                 try
                 {
                     if (!string.IsNullOrEmpty(_option.RenownTotal)) { dynamics.RenownModifier(varLoader.GetIntFromXML(_option.RenownTotal), Hero.MainHero); }
-                    else if (!string.IsNullOrEmpty(__listedEvent.RenownTotal)) { dynamics.RenownModifier(varLoader.GetIntFromXML(__listedEvent.RenownTotal), Hero.MainHero); }
+                    else if (!string.IsNullOrEmpty(_listedEvent.RenownTotal)) { dynamics.RenownModifier(varLoader.GetIntFromXML(_listedEvent.RenownTotal), Hero.MainHero); }
                     else
                     {
                         CECustomHandler.LogToFile("Missing RenownTotal");
@@ -620,7 +620,7 @@ namespace CaptivityEvents.Events
                 try
                 {
                     if (!string.IsNullOrEmpty(_option.HealthTotal)) { Hero.MainHero.HitPoints += varLoader.GetIntFromXML(_option.HealthTotal); }
-                    else if (!string.IsNullOrEmpty(__listedEvent.HealthTotal)) { Hero.MainHero.HitPoints += varLoader.GetIntFromXML(__listedEvent.HealthTotal); }
+                    else if (!string.IsNullOrEmpty(_listedEvent.HealthTotal)) { Hero.MainHero.HitPoints += varLoader.GetIntFromXML(_listedEvent.HealthTotal); }
                     else
                     {
                         CECustomHandler.LogToFile("Invalid HealthTotal");
@@ -634,7 +634,7 @@ namespace CaptivityEvents.Events
                 try
                 {
                     if (!string.IsNullOrEmpty(_option.MoraleTotal)) { dynamics.MoralChange(varLoader.GetIntFromXML(_option.MoraleTotal), PartyBase.MainParty); }
-                    else if (!string.IsNullOrEmpty(__listedEvent.MoraleTotal)) { dynamics.MoralChange(varLoader.GetIntFromXML(__listedEvent.MoraleTotal), PartyBase.MainParty); }
+                    else if (!string.IsNullOrEmpty(_listedEvent.MoraleTotal)) { dynamics.MoralChange(varLoader.GetIntFromXML(_listedEvent.MoraleTotal), PartyBase.MainParty); }
                     else
                     {
                         CECustomHandler.LogToFile("Missing MoralTotal");
@@ -650,7 +650,7 @@ namespace CaptivityEvents.Events
                     var i = new ImpregnationSystem();
 
                     if (!string.IsNullOrEmpty(_option.PregnancyRiskModifier)) { i.ImpregnationChance(Hero.MainHero, varLoader.GetIntFromXML(_option.PregnancyRiskModifier)); }
-                    else if (!string.IsNullOrEmpty(__listedEvent.PregnancyRiskModifier)) { i.ImpregnationChance(Hero.MainHero, varLoader.GetIntFromXML(__listedEvent.PregnancyRiskModifier)); }
+                    else if (!string.IsNullOrEmpty(_listedEvent.PregnancyRiskModifier)) { i.ImpregnationChance(Hero.MainHero, varLoader.GetIntFromXML(_listedEvent.PregnancyRiskModifier)); }
                     else
                     {
                         CECustomHandler.LogToFile("Missing PregnancyRiskModifier");

@@ -18,14 +18,14 @@ namespace CaptivityEvents.Events
         private readonly List<CEEvent> _eventList;
         private readonly Option _option;
 
-        internal CaptorMenuCallBackDelegate(CEEvent _listedEvent)
+        internal CaptorMenuCallBackDelegate(CEEvent listedEvent)
         {
-            _listedEvent = _listedEvent;
+            _listedEvent = listedEvent;
         }
 
-        internal CaptorMenuCallBackDelegate(CEEvent _listedEvent, Option option, List<CEEvent> eventList)
+        internal CaptorMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
-            _listedEvent = _listedEvent;
+            _listedEvent = listedEvent;
             _option = option;
             _eventList = eventList;
         }
