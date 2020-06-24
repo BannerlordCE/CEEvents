@@ -52,6 +52,7 @@
     <Compile Include="Events\ImpregnationSystem.cs" />
     <Compile Include="Events\RandomMenuCallBackDelegate.cs" />
     <Compile Include="Events\ScoresCalculation.cs" />
+    <Compile Include="Events\SharedCallBackHelper.cs" />
     <Compile Include="Events\VariablesLoader.cs" />
     <Compile Include="Events\WaitingList.cs" />
     <Compile Include="Notifications\CECaptorMapNotification.cs" />
