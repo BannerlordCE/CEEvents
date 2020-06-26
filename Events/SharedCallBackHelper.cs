@@ -220,26 +220,25 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceChangeMorale()
         {
-            var party = PlayerCaptivity.IsCaptive == true
-                ? PlayerCaptivity.CaptorParty          //captive         
-                : PartyBase.MainParty;                 //random, captor
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
 
+            var party = PlayerCaptivity.IsCaptive
+                ? PlayerCaptivity.CaptorParty //captive         
+                : PartyBase.MainParty; //random, captor
 
-            
-                if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
-
-                try
+            try
+            {
+                if (!string.IsNullOrEmpty(_option.MoraleTotal)) { _dynamics.MoralChange(_variables.GetIntFromXML(_option.MoraleTotal), party); }
+                else if (!string.IsNullOrEmpty(_listedEvent.MoraleTotal)) { _dynamics.MoralChange(_variables.GetIntFromXML(_listedEvent.MoraleTotal), party); }
+                else
                 {
-                    if (!string.IsNullOrEmpty(_option.MoraleTotal)) { _dynamics.MoralChange(_variables.GetIntFromXML(_option.MoraleTotal), party); }
-                    else if (!string.IsNullOrEmpty(_listedEvent.MoraleTotal)) { _dynamics.MoralChange(_variables.GetIntFromXML(_listedEvent.MoraleTotal), party); }
-                    else
-                    {
-                        CECustomHandler.LogToFile("Missing MoralTotal");
-                        _dynamics.MoralChange(MBRandom.RandomInt(-5, 5), party);
-                    }
+                    CECustomHandler.LogToFile("Missing MoralTotal");
+                    _dynamics.MoralChange(MBRandom.RandomInt(-5, 5), party);
                 }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid MoralTotal"); }
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid MoralTotal"); }
         }
+
 
         private void ConsequenceChangeMorale(PartyBase party)
         {
