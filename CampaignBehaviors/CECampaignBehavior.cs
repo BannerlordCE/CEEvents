@@ -93,119 +93,121 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private void RunHourlyTick()
         {
-            if (CESettings.Instance.EventCaptorOn && Hero.MainHero.IsPartyLeader)
-                if (CheckEventHourly())
+            if (CESettings.Instance.EventCaptorOn && Hero.MainHero.IsPartyLeader && CheckEventHourly())
+            {
+                CECustomHandler.LogToFile("Checking Campaign Events");
+
+                try
                 {
-                    CECustomHandler.LogToFile("Checking Campaign Events");
-
-                    try
+                    if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
                     {
-                        if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
+                        if (CESettings.Instance.EventCaptorNotifications)
                         {
-                            if (CESettings.Instance.EventCaptorNotifications)
+                            if (CESettings.Instance.EventRandomEnabled && (!CEHelper.notificationEventExists || !CEHelper.notificationCaptorExists))
                             {
-                                if (CESettings.Instance.EventRandomEnabled && (!CEHelper.notificationEventExists || !CEHelper.notificationCaptorExists))
-                                {
-                                    var randomNumber = MBRandom.RandomInt(100);
+                                var randomNumber = MBRandom.RandomInt(100);
 
-                                    if (!CEHelper.notificationEventExists && randomNumber < CESettings.Instance.EventRandomFireChance) LaunchRandomEvent();
-                                    else if (!CEHelper.notificationCaptorExists && randomNumber > CESettings.Instance.EventRandomFireChance) LaunchCaptorEvent();
-                                }
-                                else
-                                {
-                                    LaunchCaptorEvent();
-                                }
+                                if (!CEHelper.notificationEventExists && randomNumber < CESettings.Instance.EventRandomFireChance) LaunchRandomEvent();
+                                else if (!CEHelper.notificationCaptorExists && randomNumber > CESettings.Instance.EventRandomFireChance) LaunchCaptorEvent();
                             }
                             else
                             {
-                                if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+                                LaunchCaptorEvent();
+                            }
+                        }
+                        else
+                        {
+                            if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+                            {
+                                CEEvent returnedEvent;
+
+                                if (CESettings.Instance.EventRandomEnabled)
                                 {
-                                    CEEvent returnedEvent;
-
-                                    if (CESettings.Instance.EventRandomEnabled)
+                                    if (MBRandom.RandomInt(100) < CESettings.Instance.EventRandomFireChance)
                                     {
-                                        if (MBRandom.RandomInt(100) < CESettings.Instance.EventRandomFireChance)
-                                        {
-                                            returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
+                                        returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
 
-                                            if (returnedEvent != null)
-                                            {
-                                                var captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
-                                                returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
-                                            }
-                                        }
-                                        else
+                                        if (returnedEvent != null)
                                         {
                                             var captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
                                             returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
-                                            if (returnedEvent != null) returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
                                         }
                                     }
                                     else
                                     {
                                         var captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
                                         returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
-                                    }
-
-                                    if (returnedEvent != null)
-                                    {
-                                        Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-
-                                        if (!mapState.AtMenu)
-                                        {
-                                            GameMenu.ActivateGameMenu("prisoner_wait");
-                                        }
-                                        else
-                                        {
-                                            _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                                            _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                                        }
-
-                                        GameMenu.SwitchToMenu(returnedEvent.Name);
+                                        if (returnedEvent != null) returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
                                     }
                                 }
-                            }
-                        }
-                        else if (CESettings.Instance.EventRandomEnabled)
-                        {
-                            if (CESettings.Instance.EventCaptorNotifications)
-                            {
-                                LaunchRandomEvent();
-                            }
-                            else
-                            {
-                                if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+                                else
                                 {
-                                    var returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
+                                    var captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
+                                    returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
+                                }
 
-                                    if (returnedEvent != null)
+                                if (returnedEvent != null)
+                                {
+                                    Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+
+                                    if (!mapState.AtMenu)
                                     {
-                                        Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-
-                                        if (!mapState.AtMenu)
-                                        {
-                                            GameMenu.ActivateGameMenu("prisoner_wait");
-                                        }
-                                        else
-                                        {
-                                            _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                                            _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                                        }
-
-                                        GameMenu.SwitchToMenu(returnedEvent.Name);
+                                        GameMenu.ActivateGameMenu("prisoner_wait");
                                     }
+                                    else
+                                    {
+                                        _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
+                                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                                    }
+
+                                    GameMenu.SwitchToMenu(returnedEvent.Name);
                                 }
                             }
                         }
                     }
-                    catch (Exception e)
+                    else if (CESettings.Instance.EventRandomEnabled)
                     {
-                        CECustomHandler.ForceLogToFile("CheckEventHourly Failure");
-                        CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+                        if (CESettings.Instance.EventCaptorNotifications)
+                        {
+                            LaunchRandomEvent();
+                        }
+                        else
+                        {
+                            if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+                            {
+                                var returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
+
+                                if (returnedEvent != null)
+                                {
+                                    Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+
+                                    if (!mapState.AtMenu)
+                                    {
+                                        GameMenu.ActivateGameMenu("prisoner_wait");
+                                    }
+                                    else
+                                    {
+                                        _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
+                                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                                    }
+
+                                    GameMenu.SwitchToMenu(returnedEvent.Name);
+                                }
+                            }
+                        }
                     }
                 }
+                catch (Exception e)
+                {
+                    CECustomHandler.ForceLogToFile("CheckEventHourly Failure");
+                    CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+                }
+            }
 
-            ;
+
+
+
+            
 
             try
             {
@@ -245,6 +247,11 @@ namespace CaptivityEvents.CampaignBehaviors
                 }
             }
         }
+
+
+
+
+
 
         public void RunDailyTick()
         {

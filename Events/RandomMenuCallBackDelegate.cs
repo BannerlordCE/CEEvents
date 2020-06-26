@@ -38,7 +38,7 @@ namespace CaptivityEvents.Events
                                                                    ? "wait_prisoner_female"
                                                                    : "wait_prisoner_male");
 
-            LoadBackgroundImage();
+            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default_random");
 
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                               ? 1
@@ -83,7 +83,20 @@ namespace CaptivityEvents.Events
             var h = new SharedCallBackHelper(_listedEvent, _option);
             var c = new CaptorSpecifics();
 
-            h.ProceedToSharedCallBacks();
+            //h.ProceedToSharedCallBacks();
+            h.ConsequenceXP();
+            h.ConsequenceLeaveSpouse();
+            h.ConsequenceGold();
+            h.ConsequenceChangeGold();
+            h.ConsequenceChangeTrait();
+            h.ConsequenceChangeSkill();
+            h.ConsequenceSlaveryLevel();
+            h.ConsequenceSlaveryFlags();
+            h.ConsequenceProstitutionLevel();
+            h.ConsequenceProstitutionFlags();
+            h.ConsequenceRenown();
+            h.ConsequenceChangeHealth();
+            h.ConsequenceChangeMorale();
 
 
             ConsequenceImpregnation();
@@ -775,7 +788,7 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape) || _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) args.optionLeaveType = GameMenuOption.LeaveType.Escape;
         }
 
-        private void LoadBackgroundImage()
+        /*private void LoadBackgroundImage()
         {
             try
             {
@@ -812,7 +825,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Failed to load background for " + _listedEvent.Name);
                 CESubModule.LoadTexture("default_random");
             }
-        }
+        }*/
 
 #endregion
     }

@@ -34,28 +34,9 @@ namespace CaptivityEvents.Events
         {
             var varLoader = new VariablesLoader();
 
-            Hero captiveHero = null;
+            SetNames(ref args);
 
-            try
-            {
-                if (_listedEvent.Captive != null)
-                {
-                    if (_listedEvent.Captive.IsHero) captiveHero = _listedEvent.Captive.HeroObject;
-                    MBTextManager.SetTextVariable("CAPTIVE_NAME", _listedEvent.Captive.Name);
-                }
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
-
-            var text = args.MenuContext.GameMenu.GetText();
-            if (MobileParty.MainParty.CurrentSettlement != null) text.SetTextVariable("SETTLEMENT_NAME", MobileParty.MainParty.CurrentSettlement.Name);
-            text.SetTextVariable("PARTY_NAME", MobileParty.MainParty.Name);
-            text.SetTextVariable("CAPTOR_NAME", Hero.MainHero.Name);
-
-            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                       ? "wait_prisoner_female"
-                                                       : "wait_prisoner_male");
-
-            try
+            /*try
             {
                 var backgroundName = _listedEvent.BackgroundName;
 
@@ -85,7 +66,31 @@ namespace CaptivityEvents.Events
                     CESubModule.LoadTexture("captor_default");
                 }
             }
-            catch (Exception) { CECustomHandler.ForceLogToFile("Background failed to load on " + _listedEvent.Name); }
+            catch (Exception) { CECustomHandler.ForceLogToFile("Background failed to load on " + _listedEvent.Name); }*/
+            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("captor_default");
+        }
+
+        private void SetNames(ref MenuCallbackArgs args)
+        {
+            try
+            {
+                if (_listedEvent.Captive != null)
+                {
+                    //Hero captiveHero = null;
+                    //if (_listedEvent.Captive.IsHero) captiveHero = _listedEvent.Captive.HeroObject; //WARNING: captiveHero never used
+                    MBTextManager.SetTextVariable("CAPTIVE_NAME", _listedEvent.Captive.Name);
+                }
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
+
+            var text = args.MenuContext.GameMenu.GetText();
+            if (MobileParty.MainParty.CurrentSettlement != null) text.SetTextVariable("SETTLEMENT_NAME", MobileParty.MainParty.CurrentSettlement.Name);
+            text.SetTextVariable("PARTY_NAME", MobileParty.MainParty.Name);
+            text.SetTextVariable("CAPTOR_NAME", Hero.MainHero.Name);
+
+            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                       ? "wait_prisoner_female"
+                                                       : "wait_prisoner_male");
         }
 
         internal bool CaptorEventOptionGameMenu(MenuCallbackArgs args)
@@ -138,35 +143,8 @@ namespace CaptivityEvents.Events
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.EmptyIcon)) args.optionLeaveType = GameMenuOption.LeaveType.Default;
 
-            // ReqHeroCaptorRelation
-            if (_listedEvent.Captive.HeroObject != null)
-            {
-                try
-                {
-                    if (!string.IsNullOrEmpty(_option.ReqHeroCaptorRelationAbove))
-                        if (_listedEvent.Captive.HeroObject.GetRelationWithPlayer() < varLoader.GetFloatFromXML(_option.ReqHeroCaptorRelationAbove))
-                        {
-                            var textResponse4 = GameTexts.FindText("str_CE_relationship", "low");
-                            textResponse4.SetTextVariable("HERO", _listedEvent.Captive.HeroObject.Name.ToString());
-                            args.Tooltip = textResponse4;
-                            args.IsEnabled = false;
-                        }
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptorRelationAbove / Failed "); }
 
-                try
-                {
-                    if (!string.IsNullOrEmpty(_option.ReqHeroCaptorRelationBelow))
-                        if (_listedEvent.Captive.HeroObject.GetRelationWithPlayer() > varLoader.GetFloatFromXML(_option.ReqHeroCaptorRelationBelow))
-                        {
-                            var textResponse3 = GameTexts.FindText("str_CE_relationship", "high");
-                            textResponse3.SetTextVariable("HERO", _listedEvent.Captive.HeroObject.Name.ToString());
-                            args.Tooltip = textResponse3;
-                            args.IsEnabled = false;
-                        }
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptorRelationBelow / Failed "); }
-            }
+            ReqHeroCaptorRelation(ref args);
 
             // ReqMorale
             try
@@ -897,5 +875,49 @@ namespace CaptivityEvents.Events
             }
             else { c.CECaptorContinue(args); }
         }
+
+
+#region private
+
+        private void ReqHeroCaptorRelation(ref MenuCallbackArgs args)
+        {
+            if (_listedEvent.Captive.HeroObject == null) return;
+
+            try
+            {
+                if (!string.IsNullOrEmpty(_option.ReqHeroCaptorRelationAbove)) ReqHeroCaptorRelationAbove(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptorRelationAbove / Failed "); }
+
+            try
+            {
+                if (ReqHeroCaptorRelationBelow(ref args)) return;
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptorRelationBelow / Failed "); }
+        }
+
+        private bool ReqHeroCaptorRelationBelow(ref MenuCallbackArgs args)
+        {
+            if (string.IsNullOrEmpty(_option.ReqHeroCaptorRelationBelow)) return true;
+
+            if (!(_listedEvent.Captive.HeroObject.GetRelationWithPlayer() > new VariablesLoader().GetFloatFromXML(_option.ReqHeroCaptorRelationBelow))) return false;
+            var textResponse3 = GameTexts.FindText("str_CE_relationship", "high");
+            textResponse3.SetTextVariable("HERO", _listedEvent.Captive.HeroObject.Name.ToString());
+            args.Tooltip = textResponse3;
+            args.IsEnabled = false;
+
+            return false;
+        }
+
+        private void ReqHeroCaptorRelationAbove(ref MenuCallbackArgs args)
+        {
+            if (!(_listedEvent.Captive.HeroObject.GetRelationWithPlayer() < new VariablesLoader().GetFloatFromXML(_option.ReqHeroCaptorRelationAbove))) return;
+            var textResponse4 = GameTexts.FindText("str_CE_relationship", "low");
+            textResponse4.SetTextVariable("HERO", _listedEvent.Captive.HeroObject.Name.ToString());
+            args.Tooltip = textResponse4;
+            args.IsEnabled = false;
+        }
+
+#endregion
     }
 }

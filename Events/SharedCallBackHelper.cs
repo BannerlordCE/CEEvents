@@ -26,6 +26,7 @@ namespace CaptivityEvents.Events
 
         internal void ProceedToSharedCallBacks()
         {
+            /*
             ConsequenceXP();
             ConsequenceLeaveSpouse();
             ConsequenceGold();
@@ -39,22 +40,23 @@ namespace CaptivityEvents.Events
             ConsequenceRenown();
             ConsequenceChangeHealth();
             ConsequenceChangeMorale();
+            */
         }
 
 
 #region private
 
-        private void ConsequenceXP()
+        internal void ConsequenceXP()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveXP)) GiveXP();
         }
 
-        private void ConsequenceLeaveSpouse()
+        internal void ConsequenceLeaveSpouse()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveLeaveSpouse)) _dynamics.ChangeSpouse(Hero.MainHero, null);
         }
 
-        private void GiveXP()
+        internal void GiveXP()
         {
             try
             {
@@ -69,7 +71,7 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("GiveXP Failed"); }
         }
 
-        private void ConsequenceGold()
+        internal void ConsequenceGold()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) return;
 
@@ -80,7 +82,7 @@ namespace CaptivityEvents.Events
             GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, content);
         }
 
-        private void ConsequenceChangeGold()
+        internal void ConsequenceChangeGold()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) return;
 
@@ -97,7 +99,7 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
         }
 
-        private void ConsequenceChangeTrait()
+        internal void ConsequenceChangeTrait()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeTrait)) return;
 
@@ -117,7 +119,7 @@ namespace CaptivityEvents.Events
         }
 
 
-        private void ConsequenceChangeSkill()
+        internal void ConsequenceChangeSkill()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSkill)) return;
 
@@ -136,7 +138,7 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }
 
-        private void ConsequenceSlaveryLevel()
+        internal void ConsequenceSlaveryLevel()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSlaveryLevel)) return;
 
@@ -154,13 +156,13 @@ namespace CaptivityEvents.Events
         }
 
 
-        private void ConsequenceSlaveryFlags()
+        internal void ConsequenceSlaveryFlags()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddSlaveryFlag)) _dynamics.VictimSlaveryModifier(1, Hero.MainHero, true, false, true);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveSlaveryFlag)) _dynamics.VictimSlaveryModifier(0, Hero.MainHero, true, false, true);
         }
 
-        private void ConsequenceProstitutionLevel()
+        internal void ConsequenceProstitutionLevel()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeProstitutionLevel)) return;
 
@@ -177,13 +179,13 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid ProstitutionTotal"); }
         }
 
-        private void ConsequenceProstitutionFlags()
+        internal void ConsequenceProstitutionFlags()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag)) _dynamics.VictimProstitutionModifier(1, Hero.MainHero, true, false, true);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) _dynamics.VictimProstitutionModifier(0, Hero.MainHero, true, false, true);
         }
 
-        private void ConsequenceRenown()
+        internal void ConsequenceRenown()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRenown)) return;
 
@@ -200,7 +202,7 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid RenownTotal"); }
         }
 
-        private void ConsequenceChangeHealth()
+        internal void ConsequenceChangeHealth()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeHealth)) return;
 
@@ -218,7 +220,7 @@ namespace CaptivityEvents.Events
         }
 
 
-        private void ConsequenceChangeMorale()
+        internal void ConsequenceChangeMorale()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
 
@@ -240,7 +242,7 @@ namespace CaptivityEvents.Events
         }
 
 
-        private void ConsequenceChangeMorale(PartyBase party)
+        internal void ConsequenceChangeMorale(PartyBase party)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
 
@@ -255,6 +257,67 @@ namespace CaptivityEvents.Events
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid MoralTotal"); }
+        }
+
+
+        internal void LoadBackgroundImage(string textureFlag = "default_random")
+        {
+            try
+            {
+                var backgroundName = _listedEvent.BackgroundName;
+
+                if (!backgroundName.IsStringNoneOrEmpty())
+                {
+                    CESubModule.animationPlayEvent = false;
+                    CESubModule.LoadTexture(backgroundName);
+                }
+                else if (_listedEvent.BackgroundAnimation != null && _listedEvent.BackgroundAnimation.Count > 0)
+                {
+                    CESubModule.animationImageList = _listedEvent.BackgroundAnimation;
+                    CESubModule.animationIndex = 0;
+                    CESubModule.animationPlayEvent = true;
+                    var speed = 0.03f;
+
+                    try
+                    {
+                        if (!_listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = _variables.GetFloatFromXML(_listedEvent.BackgroundAnimationSpeed);
+                    }
+                    catch (Exception e)
+                    {
+                        var m = "Failed to load BackgroundAnimationSpeed for " + _listedEvent.Name + " : Exception: " + e;
+
+                        switch (textureFlag)  //TODO: Not all 3 shared the same file logger so I need to switch the flag.  Is that right?
+                        {
+                            case "default_random":
+                            case "captor_default":
+                                CECustomHandler.LogToFile(m);
+                                break;
+                            default:
+                                CECustomHandler.ForceLogToFile(m);
+                                break;
+                        }
+                    }
+
+                    CESubModule.animationSpeed = speed;
+                }
+                else
+                {
+                    CESubModule.animationPlayEvent = false;
+                    if (textureFlag == "default_random") CESubModule.LoadTexture(textureFlag);  //TODO: Only random will force random image.  Is that right?
+                }
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Failed to load background for " + _listedEvent.Name);
+
+                switch (textureFlag)        //TODO: Random doesn't try to set the background on a catch.  Validate if it's intended.
+                {
+                    case "default_random":
+                    case "captor_default":
+                        CESubModule.LoadTexture(textureFlag);
+                        break;
+                }
+            }
         }
 
 #endregion
