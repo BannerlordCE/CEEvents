@@ -44,7 +44,7 @@ namespace CaptivityEvents.Events
         }
 
 
-#region private
+        #region private
 
         internal void ConsequenceXP()
         {
@@ -285,17 +285,8 @@ namespace CaptivityEvents.Events
                     catch (Exception e)
                     {
                         var m = "Failed to load BackgroundAnimationSpeed for " + _listedEvent.Name + " : Exception: " + e;
-
-                        switch (textureFlag)  
-                        {
-                            case "default_random":
-                            case "captor_default":
-                                CECustomHandler.LogToFile(m);
-                                break;
-                            default:
-                                CECustomHandler.ForceLogToFile(m);
-                                break;
-                        }
+                        // Will force log if cannot load animation speed
+                        CECustomHandler.ForceLogToFile(m);
                     }
 
                     CESubModule.animationSpeed = speed;
@@ -303,16 +294,16 @@ namespace CaptivityEvents.Events
                 else
                 {
                     CESubModule.animationPlayEvent = false;
-                    CESubModule.LoadTexture("default_random");  
+                    CESubModule.LoadTexture(textureFlag);
                 }
             }
             catch (Exception)
             {
-                CECustomHandler.LogToFile("Failed to load background for " + _listedEvent.Name);
-                CESubModule.LoadTexture("default_random");
+                CECustomHandler.ForceLogToFile("Failed to load background for " + _listedEvent.Name);
+                CESubModule.LoadTexture(textureFlag);
             }
         }
 
-#endregion
+        #endregion
     }
 }

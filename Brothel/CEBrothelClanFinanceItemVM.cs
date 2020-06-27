@@ -14,7 +14,7 @@ namespace CaptivityEvents.Brothel
         {
             _brothel = brothel;
 
-            // 1.4.2
+            // 1.4.2 Needs to be Modified for 1.4.1
             IncomeTypeAsEnum = IncomeTypes.None;
             var component = _brothel.Settlement.GetComponent<SettlementComponent>();
             var workshopType = WorkshopType.Find("pottery_shop");

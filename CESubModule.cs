@@ -442,7 +442,7 @@ namespace CaptivityEvents
             if (!(game.GameType is Campaign) || !_isLoaded) return;
             game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings_xml.xml");
             InitalizeAttributes(game);
-            var campaignStarter = (CampaignGameStarter) gameStarter;
+            var campaignStarter = (CampaignGameStarter)gameStarter;
             AddBehaviours(campaignStarter);
         }
 
@@ -669,63 +669,58 @@ namespace CaptivityEvents
 
                     if (Hero.MainHero.IsFemale)
                     {
-                        if (!mapState.AtMenu)
-                        {
-                            GameMenu.ActivateGameMenu("prisoner_wait");
-                        }
-                        else
-                        {
-                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
-                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                        }
-
-                        var triggeredEvent = captiveToPlay.IsFemale
-                            ? CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu")
-                            : CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
-                        triggeredEvent.Captive = captiveToPlay;
 
                         try
                         {
+                            var triggeredEvent = captiveToPlay.IsFemale ? CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu") : CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
+                            triggeredEvent.Captive = captiveToPlay;
+
+                            if (!mapState.AtMenu)
+                            {
+                                GameMenu.ActivateGameMenu("prisoner_wait");
+                            }
+                            else
+                            {
+                                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
+                                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                            }
+
                             GameMenu.SwitchToMenu(triggeredEvent.Name);
+                            mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
                         }
                         catch (Exception)
                         {
-                            CECustomHandler.ForceLogToFile("Missing : " + triggeredEvent.Name);
+                            CECustomHandler.ForceLogToFile("Missing : CE_captor_female_sexual_menu/CE_captor_female_sexual_menu_m");
                         }
 
-                        mapState.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                                       ? "wait_prisoner_female"
-                                                                       : "wait_prisoner_male");
+
                     }
                     else
                     {
-                        if (!mapState.AtMenu)
-                        {
-                            GameMenu.ActivateGameMenu("prisoner_wait");
-                        }
-                        else
-                        {
-                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
-                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                        }
-
-                        var triggeredEvent = captiveToPlay.IsFemale
-                            ? CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu")
-                            : CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
-                        triggeredEvent.Captive = captiveToPlay;
 
                         try
                         {
+                            var triggeredEvent = captiveToPlay.IsFemale ? CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu") : CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
+                            triggeredEvent.Captive = captiveToPlay;
+
+                            if (!mapState.AtMenu)
+                            {
+                                GameMenu.ActivateGameMenu("prisoner_wait");
+                            }
+                            else
+                            {
+                                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
+                                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                            }
+
                             GameMenu.SwitchToMenu(triggeredEvent.Name);
+                            mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
                         }
                         catch (Exception)
                         {
-                            CECustomHandler.ForceLogToFile("Missing : " + triggeredEvent.Name);
+                            CECustomHandler.ForceLogToFile("Missing : CE_captor_male_sexual_menu/CE_captor_male_sexual_menu_m");
                         }
 
-                        mapState.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                                       ? "wait_prisoner_female"
-                                                                       : "wait_prisoner_male");
                     }
 
                     captiveToPlay = null;
@@ -911,7 +906,10 @@ namespace CaptivityEvents
                     huntState = HuntState.Hunting;
                 }
             }
-            else if ((huntState == HuntState.HeadStart || huntState == HuntState.Hunting) && Game.Current.GameStateManager.ActiveState is MapState mapstate) //warning why mapstate?
+            else if ((huntState == HuntState.HeadStart || huntState == HuntState.Hunting) && Game.Current.GameStateManager.ActiveState is MapState mapstate && mapstate.IsActive) 
+                //warning why mapstate? // PS Add TODO for questions if you have hard to find them in file. 
+                
+                //mapstate is to prevent a crash that occurs if the player encounter update updates before the active state of map state is up, the only way around it is declare the map state variable.
             {
                 huntState = HuntState.AfterBattle;
                 PlayerEncounter.SetPlayerVictorious();
@@ -919,6 +917,8 @@ namespace CaptivityEvents
                 PlayerEncounter.Update();
             }
             else if (huntState == HuntState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState) //warning why mapstate?
+                //Checks to see if mapstate is not in menu state, should connect it to the on menu exit listener.
+                //TODO: move all of these to their proper listeners and out of the OnApplicationTick
             {
                 if (PlayerEncounter.Current == null)
                 {

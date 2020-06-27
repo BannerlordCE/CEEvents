@@ -410,11 +410,7 @@ namespace CaptivityEvents.Brothel
 
         private void AddPeopleToTownTavern(Settlement settlement, Dictionary<string, int> unusedUsablePointCount)
         {
-            unusedUsablePointCount.TryGetValue("npc_common", out var num);
-            num -= 3;
-
             Brothel.AddLocationCharacters(CreateTavernkeeper, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, 1);
-
             Brothel.AddLocationCharacters(CreateTavernWench, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, 1);
 
             Brothel.AddLocationCharacters(CreateMusician, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, 1);
@@ -422,6 +418,9 @@ namespace CaptivityEvents.Brothel
 
             unusedUsablePointCount.TryGetValue("npc_dancer", out var dancers);
             if (dancers > 0) Brothel.AddLocationCharacters(CreateDancer, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, dancers);
+
+            unusedUsablePointCount.TryGetValue("npc_common", out var num);
+            num -= 3;
 
             if (num <= 0) return;
 
