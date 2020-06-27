@@ -273,37 +273,7 @@ namespace CaptivityEvents.Custom
                 if (CESettings.Instance == null) return;
                 if (!CESettings.Instance.LogToggle) return;
 
-                if (Lines >= 1000)
-                {
-                    switch (TestLog)
-                    {
-                        case "FC":
-                            TestLog = "RT";
-
-                            break;
-
-                        case "RT":
-                            TestLog = "LT";
-
-                            break;
-
-                        default:
-                            TestLog = "FC";
-
-                            break;
-                    }
-
-                    Lines = 0;
-                }
-
-                var fullPath = (BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LogFile{0}.txt").Replace("{0}", TestLog);
-                var file = new FileInfo(fullPath);
-                file.Directory?.Create();
-                if (Lines == 0) File.WriteAllText((BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LogFile{0}.txt").Replace("{0}", TestLog), "");
-
-                var contents = DateTime.Now + " -- " + msg + Environment.NewLine;
-                File.AppendAllText(fullPath, contents);
-                Lines++;
+                ForceLogToFile(msg);
             }
             catch (Exception)
             {
