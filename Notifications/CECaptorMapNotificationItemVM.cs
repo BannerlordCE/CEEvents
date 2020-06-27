@@ -40,7 +40,7 @@ namespace CaptivityEvents.Notifications
             }
             else if (CEHelper.notificationCaptorExists)
             {
-                if (!MobileParty.MainParty.Party.PrisonRoster.Contains(_captorEvent.Captive) || CEEventChecker.FlagsDoMatchEventConditions(_captorEvent, _captorEvent.Captive, PartyBase.MainParty) != null)
+                if (!MobileParty.MainParty.Party.PrisonRoster.Contains(_captorEvent.Captive) || new CEEventChecker(_captorEvent).FlagsDoMatchEventConditions(_captorEvent.Captive, PartyBase.MainParty) != null)
                 {
                     CEHelper.notificationCaptorCheck = false;
                     CEHelper.notificationCaptorExists = false;
@@ -61,7 +61,7 @@ namespace CaptivityEvents.Notifications
             if (MobileParty.MainParty.Party.PrisonRoster.Count > 0 && MobileParty.MainParty.Party.PrisonRoster.Contains(_captorEvent.Captive))
             {
                 // Declare Variables
-                var returnString = CEEventChecker.FlagsDoMatchEventConditions(_captorEvent, _captorEvent.Captive, PartyBase.MainParty);
+                var returnString = new CEEventChecker(_captorEvent).FlagsDoMatchEventConditions(_captorEvent.Captive, PartyBase.MainParty);
 
                 if (returnString == null)
                 {

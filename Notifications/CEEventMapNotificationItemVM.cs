@@ -37,7 +37,7 @@ namespace CaptivityEvents.Notifications
             }
             else if (CECampaignBehavior.ExtraProps != null && CEHelper.notificationEventCheck)
             {
-                if (CEEventChecker.FlagsDoMatchEventConditions(_randomEvent, CharacterObject.PlayerCharacter) != null)
+                if (new CEEventChecker(_randomEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter) != null)
                 {
                     CEHelper.notificationEventCheck = false;
                     CEHelper.notificationEventExists = false;
@@ -54,7 +54,7 @@ namespace CaptivityEvents.Notifications
         {
             CEHelper.notificationEventExists = false;
             ExecuteRemove();
-            var result = CEEventChecker.FlagsDoMatchEventConditions(_randomEvent, CharacterObject.PlayerCharacter);
+            var result = new CEEventChecker(_randomEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
 
             if (result == null)
             {

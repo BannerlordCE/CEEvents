@@ -32,7 +32,7 @@ namespace CaptivityEvents.Events
             {
                 if (!force && foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                 {
-                    var result = CEEventChecker.FlagsDoMatchEventConditions(foundevent, CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                    var result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
 
                     if (result == null) flag = foundevent.Name;
                     else flag = "$" + result;
@@ -68,7 +68,7 @@ namespace CaptivityEvents.Events
             {
                 if (foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                 {
-                    var result = CEEventChecker.FlagsDoMatchEventConditions(foundevent, CharacterObject.PlayerCharacter);
+                    var result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
 
                     if (force || result == null) flag = foundevent.Name;
                     else flag = "$" + result;
@@ -103,7 +103,7 @@ namespace CaptivityEvents.Events
                     foreach (var character in PartyBase.MainParty.PrisonRoster.Troops)
                         if (foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                         {
-                            var result = CEEventChecker.FlagsDoMatchEventConditions(foundevent, character, PartyBase.MainParty);
+                            var result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(character, PartyBase.MainParty);
 
                             if (force || result == null)
                             {
@@ -122,7 +122,7 @@ namespace CaptivityEvents.Events
                     if (specificCaptive == null) return "$FAILTOFINDHERO";
 
                     if (!foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor)) return flag;
-                    var result = CEEventChecker.FlagsDoMatchEventConditions(foundevent, specificCaptive, PartyBase.MainParty);
+                    var result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(specificCaptive, PartyBase.MainParty);
 
                     if (force || result == null)
                     {
@@ -153,7 +153,7 @@ namespace CaptivityEvents.Events
                 foreach (var listEvent in CESubModule.CECallableEvents)
                     if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                     {
-                        var result = CEEventChecker.FlagsDoMatchEventConditions(listEvent, CharacterObject.PlayerCharacter);
+                        var result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
 
                         if (result == null)
                         {
@@ -205,7 +205,7 @@ namespace CaptivityEvents.Events
                 foreach (var listEvent in CESubModule.CECallableEvents)
                     if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                     {
-                        var result = CEEventChecker.FlagsDoMatchEventConditions(listEvent, CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                        var result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
 
                         if (result == null)
                         {
@@ -258,7 +258,7 @@ namespace CaptivityEvents.Events
             foreach (var listEvent in CESubModule.CECallableEvents)
                 if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                 {
-                    var result = CEEventChecker.FlagsDoMatchEventConditions(listEvent, captive, PartyBase.MainParty);
+                    var result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(captive, PartyBase.MainParty);
 
                     if (result == null)
                     {

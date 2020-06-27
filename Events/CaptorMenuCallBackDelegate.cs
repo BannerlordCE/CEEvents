@@ -384,7 +384,7 @@ namespace CaptivityEvents.Events
 
                         if (!triggerEvent.EventUseConditions.IsStringNoneOrEmpty() && triggerEvent.EventUseConditions == "True")
                         {
-                            var conditionMatched = CEEventChecker.FlagsDoMatchEventConditions(triggeredEvent, _listedEvent.Captive, PartyBase.MainParty);
+                            var conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(_listedEvent.Captive, PartyBase.MainParty);
 
                             if (conditionMatched != null)
                             {

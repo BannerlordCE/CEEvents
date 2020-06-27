@@ -18,7 +18,7 @@ namespace CaptivityEvents.Events
 
                 foreach (var listEvent in CESubModule.CEWaitingList)
                 {
-                    var result = CEEventChecker.FlagsDoMatchEventConditions(listEvent, CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                    var result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
 
                     if (result == null)
                     {
