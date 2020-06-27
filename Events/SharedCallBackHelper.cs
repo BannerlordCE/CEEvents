@@ -286,7 +286,7 @@ namespace CaptivityEvents.Events
                     {
                         var m = "Failed to load BackgroundAnimationSpeed for " + _listedEvent.Name + " : Exception: " + e;
 
-                        switch (textureFlag)  //TODO: Not all 3 shared the same file logger so I need to switch the flag.  Is that right?-
+                        switch (textureFlag)  
                         {
                             case "default_random":
                             case "captor_default":
@@ -303,20 +303,13 @@ namespace CaptivityEvents.Events
                 else
                 {
                     CESubModule.animationPlayEvent = false;
-                    if (textureFlag == "default_random") CESubModule.LoadTexture(textureFlag);  //TODO: Only random will force random image.  Is that right?
+                    CESubModule.LoadTexture("default_random");  
                 }
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Failed to load background for " + _listedEvent.Name);
-
-                switch (textureFlag)        //TODO: Random doesn't try to set the background on a catch.  Validate if it's intended.
-                {
-                    case "default_random":
-                    case "captor_default":
-                        CESubModule.LoadTexture(textureFlag);
-                        break;
-                }
+                CESubModule.LoadTexture("default_random");
             }
         }
 
