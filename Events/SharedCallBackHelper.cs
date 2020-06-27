@@ -286,7 +286,7 @@ namespace CaptivityEvents.Events
                     {
                         var m = "Failed to load BackgroundAnimationSpeed for " + _listedEvent.Name + " : Exception: " + e;
 
-                        switch (textureFlag)  //TODO: Not all 3 shared the same file logger so I need to switch the flag.  Is that right?
+                        switch (textureFlag)  //TODO: Not all 3 shared the same file logger so I need to switch the flag.  Is that right?-
                         {
                             case "default_random":
                             case "captor_default":
