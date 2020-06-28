@@ -227,7 +227,7 @@ namespace CaptivityEvents.Events
         }
 
 
-#region private
+        #region private
 
         private bool SeasonCheck(ref bool eventMatchingCondition)
         {
@@ -772,18 +772,8 @@ namespace CaptivityEvents.Events
             if (captive.IsHero && captive.HeroObject != null && (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptiveIsHero) || captive.IsPlayerCharacter))
             {
                 var captiveHero = captive.HeroObject;
-                //HeroChecks(captiveHero); // Please fix the lag and the wrong flags, in this file.
+                return HeroChecks(captiveHero) && (nonRandomBehaviour && CaptiveHaveItemCheck(captiveHero) && RelationCheck(captorParty, captiveHero) || HeroHaveItemCheck(captorParty));
 
-                if (nonRandomBehaviour)
-                {
-                    CaptiveHaveItemCheck(captiveHero);
-
-                    RelationCheck(captorParty, captiveHero);
-                }
-                else
-                {
-                    HeroHaveItemCheck(captorParty);
-                }
             }
             else if (captive.IsHero && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptiveIsNonHero) && captive.HeroObject != null)
             {
@@ -1221,6 +1211,6 @@ namespace CaptivityEvents.Events
             return false;
         }
 
-#endregion
+        #endregion
     }
 }

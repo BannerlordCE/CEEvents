@@ -79,31 +79,30 @@ namespace CaptivityEvents
 
     public class CESubModule : MBSubModuleBase
     {
-        public List<CECustom> CEFlags = new List<CECustom>();
-        public  float playerSpeed = 0f;
-        public  float brothelFadeIn = 2f;
-        public  float brothelBlack = 10f;
-        public  float brothelFadeOut = 2f;
+
+        // Complete Loss of Data if not static
+        public static List<CECustom> CEFlags = new List<CECustom>();
+        public static float playerSpeed = 0f;
+        public static float brothelFadeIn = 2f;
+        public static float brothelBlack = 10f;
+        public static float brothelFadeOut = 2f;
 
 
-        private bool _isLoaded;
-        private bool _isLoadedInGame;
-        private readonly Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
-        private float lastCheck;
-        private float dungeonFadeOut = 2f;
-        private  float brothelTimerOne;
-        private  float brothelTimerTwo;
-        private  float brothelTimerThree;
-        private  readonly float brothelSoundMin = 1f;
-        private  readonly float brothelSoundMax = 3f;
-        private readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
+        private static bool _isLoaded;
+        private static bool _isLoadedInGame;
+        // All Images lost if not static
+        private static readonly Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
+        private static float lastCheck;
+        private static float dungeonFadeOut = 2f;
+        private static float brothelTimerOne;
+        private static float brothelTimerTwo;
+        private static float brothelTimerThree;
+        private static readonly float brothelSoundMin = 1f;
+        private static readonly float brothelSoundMax = 3f;
+        private static readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
 
 
-        
-
-        
-
-        public  void LoadTexture(string name, bool swap = false, bool forcelog = false)
+        public void LoadTexture(string name, bool swap = false, bool forcelog = false)
         {
             try
             {
