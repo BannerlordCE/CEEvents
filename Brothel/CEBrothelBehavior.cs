@@ -324,7 +324,7 @@ namespace CaptivityEvents.Brothel
             townsman.IsFemale = templateToCopy.IsFemale;
             townsman.Level = templateToCopy.Level;
             townsman.Name = templateToCopy.Name;
-            townsman.StringId = customerStrings.GetRandomElement();
+            townsman.StringId = CustomerStrings.GetRandomElement();
             townsman.HairTags = templateToCopy.HairTags;
             townsman.BeardTags = templateToCopy.BeardTags;
             townsman.InitializeEquipmentsOnLoad(templateToCopy.AllEquipments.ToList());
@@ -709,31 +709,31 @@ namespace CaptivityEvents.Brothel
                 switch (Settlement.CurrentSettlement.Culture.GetCultureCode())
                 {
                     case CultureCode.Sturgia:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a");
 
                         break;
 
                     case CultureCode.Vlandia:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i");
 
                         break;
 
                     case CultureCode.Aserai:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a");
 
                         break;
 
                     case CultureCode.Empire:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
 
                         break;
 
                     case CultureCode.Battania:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_wodden_straw_a");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_wodden_straw_a");
 
                         break;
                     case CultureCode.Khuzait:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_f");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_f");
 
                         break;
                     case CultureCode.Invalid:
@@ -742,13 +742,13 @@ namespace CaptivityEvents.Brothel
                     case CultureCode.Vakken:
                     case CultureCode.AnyOtherCulture:
                     default:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
 
                         break;
                 }
 
-                CESubModule.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => { return agent.Character == CharacterObject.OneToOneConversationCharacter; });
-                CESubModule.brothelState = CESubModule.BrothelState.Start;
+                CEPersistence.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => agent.Character == CharacterObject.OneToOneConversationCharacter);
+                CEPersistence.brothelState = CEPersistence.BrothelState.Start;
             }
             catch (Exception e)
             {
@@ -757,11 +757,11 @@ namespace CaptivityEvents.Brothel
         }
 
         // Customer Conditions
-        private static readonly string[] customerStrings = {"customer_confident", "customer_tired"};
+        private static readonly string[] CustomerStrings = {"customer_confident", "customer_tired"};
 
-        private static readonly string[] responses = {"{=CEBROTHEL1019}That's too much, no thanks.", "{=CEBROTHEL1049}Alright, here you go."};
+        private static readonly string[] Responses = {"{=CEBROTHEL1019}That's too much, no thanks.", "{=CEBROTHEL1049}Alright, here you go."};
 
-        private static readonly string[] rageResponses = {"{=CEBROTHEL1065}Well perhaps you should, you sure look like a {?PLAYER.GENDER}whore{?}prostitute{\\?}!", "{=CEBROTHEL1066}My apologies, {?PLAYER.GENDER}milady{?}my lord{\\?}!"};
+        private static readonly string[] RageResponses = {"{=CEBROTHEL1065}Well perhaps you should, you sure look like a {?PLAYER.GENDER}whore{?}prostitute{\\?}!", "{=CEBROTHEL1066}My apologies, {?PLAYER.GENDER}milady{?}my lord{\\?}!"};
 
         private bool ConversationWithCustomerNotMetRequirements()
         {
@@ -790,31 +790,31 @@ namespace CaptivityEvents.Brothel
                 switch (Settlement.CurrentSettlement.Culture.GetCultureCode())
                 {
                     case CultureCode.Sturgia:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a");
 
                         break;
 
                     case CultureCode.Vlandia:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i");
 
                         break;
 
                     case CultureCode.Aserai:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a");
 
                         break;
 
                     case CultureCode.Empire:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
 
                         break;
 
                     case CultureCode.Battania:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
 
                         break;
                     case CultureCode.Khuzait:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_b");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_b");
 
                         break;
                     case CultureCode.Invalid:
@@ -823,13 +823,13 @@ namespace CaptivityEvents.Brothel
                     case CultureCode.Vakken:
                     case CultureCode.AnyOtherCulture:
                     default:
-                        CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
+                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
 
                         break;
                 }
 
-                CESubModule.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => { return agent.Character == CharacterObject.OneToOneConversationCharacter; });
-                CESubModule.brothelState = CESubModule.BrothelState.Start;
+                CEPersistence.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => { return agent.Character == CharacterObject.OneToOneConversationCharacter; });
+                CEPersistence.brothelState = CEPersistence.BrothelState.Start;
             }
             catch (Exception e)
             {
@@ -842,11 +842,11 @@ namespace CaptivityEvents.Brothel
         {
             if (MBRandom.RandomInt(0, 100) > 20)
             {
-                MBTextManager.SetTextVariable("RESPONSE_STRING", new TextObject(responses[0]));
+                MBTextManager.SetTextVariable("RESPONSE_STRING", new TextObject(Responses[0]));
             }
             else
             {
-                MBTextManager.SetTextVariable("RESPONSE_STRING", new TextObject(responses[1]));
+                MBTextManager.SetTextVariable("RESPONSE_STRING", new TextObject(Responses[1]));
                 ConversationCustomerConsequenceSex();
             }
 
@@ -856,8 +856,8 @@ namespace CaptivityEvents.Brothel
         private bool ConversationWithCustomerRandomResponseRage()
         {
             MBTextManager.SetTextVariable("RESPONSE_STRING", MBRandom.RandomInt(0, 100) > 40
-                                              ? new TextObject(rageResponses[0])
-                                              : new TextObject(rageResponses[1]));
+                                              ? new TextObject(RageResponses[0])
+                                              : new TextObject(RageResponses[1]));
 
             return true;
         }

@@ -12,11 +12,11 @@ namespace CaptivityEvents.Events
         {
             var eventNames = new List<string>();
 
-            if (CESubModule.CEWaitingList != null && CESubModule.CEWaitingList.Count > 0)
+            if (CEPersistence.CEWaitingList != null && CEPersistence.CEWaitingList.Count > 0)
             {
-                CECustomHandler.LogToFile("Having " + CESubModule.CEWaitingList.Count + " of events to weight and check conditions on.");
+                CECustomHandler.LogToFile("Having " + CEPersistence.CEWaitingList.Count + " of events to weight and check conditions on.");
 
-                foreach (var listEvent in CESubModule.CEWaitingList)
+                foreach (var listEvent in CEPersistence.CEWaitingList)
                 {
                     var result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
 

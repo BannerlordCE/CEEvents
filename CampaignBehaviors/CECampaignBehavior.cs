@@ -51,9 +51,10 @@ namespace CaptivityEvents.CampaignBehaviors
 
             try
             {
-                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) CESubModule.LoadCampaignNotificationTexture(returnedEvent.NotificationName);
-                else if (returnedEvent.SexualContent) CESubModule.LoadCampaignNotificationTexture("CE_sexual_notification");
-                else CESubModule.LoadCampaignNotificationTexture("CE_castle_notification");
+                var t = new CESubModule();
+                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) t.LoadCampaignNotificationTexture(returnedEvent.NotificationName);
+                else if (returnedEvent.SexualContent) t.LoadCampaignNotificationTexture("CE_sexual_notification");
+                else t.LoadCampaignNotificationTexture("CE_castle_notification");
             }
             catch (Exception e)
             {
@@ -76,9 +77,10 @@ namespace CaptivityEvents.CampaignBehaviors
 
             try
             {
-                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) CESubModule.LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
-                else if (returnedEvent.SexualContent) CESubModule.LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
-                else CESubModule.LoadCampaignNotificationTexture("CE_random_notification", 1);
+                var t = new CESubModule();
+                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) t.LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
+                else if (returnedEvent.SexualContent) t.LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
+                else t.LoadCampaignNotificationTexture("CE_random_notification", 1);
             }
             catch (Exception e)
             {

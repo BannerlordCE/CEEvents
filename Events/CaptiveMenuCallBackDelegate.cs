@@ -42,7 +42,6 @@ namespace CaptivityEvents.Events
                                                        ? "wait_prisoner_female"
                                                        : "wait_prisoner_male");
 
-            //LoadBackgroundImage();
             new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default_random");
 
             if (PlayerCaptivity.IsCaptive) SetCaptiveTextVariables(ref args);
@@ -162,7 +161,7 @@ namespace CaptivityEvents.Events
 
 #region private
 
-        private static void ConsequenceEscaping()
+        private void ConsequenceEscaping()
         {
             if (!CESettings.Instance.SexualContent)
                 GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
@@ -176,8 +175,6 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceKillCaptor()
         {
-            
-
             if (PlayerCaptivity.CaptorParty.LeaderHero != null) KillCharacterAction.ApplyByMurder(PlayerCaptivity.CaptorParty.LeaderHero, Hero.MainHero);
 
             if (PlayerCaptivity.CaptorParty.IsMobile) DestroyPartyAction.Apply(null, PlayerCaptivity.CaptorParty.MobileParty);

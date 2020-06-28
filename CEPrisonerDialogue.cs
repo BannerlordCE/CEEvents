@@ -11,7 +11,7 @@ namespace CaptivityEvents
 {
     internal class CEPrisonerDialogue
     {
-        public static void AddPrisonerLines(CampaignGameStarter campaignGameStarter)
+        public void AddPrisonerLines(CampaignGameStarter campaignGameStarter)
         {
             campaignGameStarter.AddPlayerLine("LordDefeatedCaptureCEMod", "defeated_lord_answer", "LordDefeatedCaptureCEModAnswer", "{=CEEVENTS1107}Time to strip you of your belongings.", null, ConversationCEEventLordCaptureOnConsequence);
             campaignGameStarter.AddDialogLine("LordDefeatedReturn", "LordDefeatedCaptureCEModAnswer", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, null);
@@ -34,15 +34,17 @@ namespace CaptivityEvents
             campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "close_window", "{=CEEVENTS1051}Nevermind.", null, null);
         }
 
-        private static void ConversationCEEventLordCaptureOnConsequence()
+        private void ConversationCEEventLordCaptureOnConsequence()
         {
             Campaign.Current.CurrentConversationContext = ConversationContext.Default;
             new CaptorSpecifics().CEStripVictim(CharacterObject.OneToOneConversationCharacter.HeroObject);
+
             if (CharacterObject.OneToOneConversationCharacter.HeroObject.GetSkillValue(CESkills.Slavery) < 50) new Dynamics().RelationsModifier(CharacterObject.OneToOneConversationCharacter.HeroObject, -10);
+            
             TakePrisonerAction.Apply(Campaign.Current.MainParty.Party, CharacterObject.OneToOneConversationCharacter.HeroObject);
         }
 
-        private static bool ConversationConditionTalkToPrisonerInCell()
+        private bool ConversationConditionTalkToPrisonerInCell()
         {
             var captive = CharacterObject.OneToOneConversationCharacter;
 
@@ -61,7 +63,7 @@ namespace CaptivityEvents
             return Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.PartyBelongedToAsPrisoner != null && Hero.OneToOneConversationHero.PartyBelongedToAsPrisoner.IsSettlement && Hero.OneToOneConversationHero.HeroState == Hero.CharacterStates.Prisoner;
         }
 
-        private static bool ConversationConditionTalkToPrisonerInParty()
+        private bool ConversationConditionTalkToPrisonerInParty()
         {
             var captive = CharacterObject.OneToOneConversationCharacter;
 
@@ -80,7 +82,7 @@ namespace CaptivityEvents
             return Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.PartyBelongedToAsPrisoner != null && Hero.OneToOneConversationHero.PartyBelongedToAsPrisoner.IsMobile && Hero.OneToOneConversationHero.HeroState == Hero.CharacterStates.Prisoner;
         }
 
-        private static bool ConversationCEEventResponseInPartyOnCondition()
+        private bool ConversationCEEventResponseInPartyOnCondition()
         {
             var captive = CharacterObject.OneToOneConversationCharacter;
 
@@ -99,22 +101,22 @@ namespace CaptivityEvents
             return true;
         }
 
-        private static void ConversationCEEventInPartyOnConsequence()
+        private void ConversationCEEventInPartyOnConsequence()
         {
-            CESubModule.captivePlayEvent = true;
-            CESubModule.captiveToPlay = CharacterObject.OneToOneConversationCharacter;
+            CEPersistence.captivePlayEvent = true;
+            CEPersistence.captiveToPlay = CharacterObject.OneToOneConversationCharacter;
         }
 
-        private static void ConversationCEEventInCellOnConsequence()
+        private void ConversationCEEventInCellOnConsequence()
         {
             try
             {
-                CESubModule.captivePlayEvent = true;
-                CESubModule.captiveToPlay = CharacterObject.OneToOneConversationCharacter;
+                CEPersistence.captivePlayEvent = true;
+                CEPersistence.captiveToPlay = CharacterObject.OneToOneConversationCharacter;
 
-                CESubModule.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("_barrier_passage_center");
-                CESubModule.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => agent.Character == CharacterObject.OneToOneConversationCharacter);
-                CESubModule.dungeonState = CESubModule.DungeonState.StartWalking;
+                CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("_barrier_passage_center");
+                CEPersistence.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => agent.Character == CharacterObject.OneToOneConversationCharacter);
+                CEPersistence.dungeonState = CEPersistence.DungeonState.StartWalking;
             }
             catch (Exception e)
             {

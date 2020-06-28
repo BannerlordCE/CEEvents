@@ -10,7 +10,7 @@ namespace CaptivityEvents
     [HarmonyPatch(typeof(MapNotificationVM), "DetermineNotificationType")]
     internal class CEMapNotificationVM
     {
-        public static MethodInfo RemoveNotificationItem = AccessTools.Method(typeof(MapNotificationVM), "RemoveNotificationItem");
+        public static readonly MethodInfo RemoveNotificationItem = AccessTools.Method(typeof(MapNotificationVM), "RemoveNotificationItem");
 
         [HarmonyPrepare]
         private static bool ShouldPatch()
@@ -22,6 +22,7 @@ namespace CaptivityEvents
         private static void DetermineNotificationType(MapNotificationVM __instance, ref MapNotificationItemBaseVM __result, InformationData data)
         {
             var type = data.GetType();
+            var t = new CESubModule();
 
             if (type == typeof(CECaptorMapNotification))
             {
@@ -29,7 +30,7 @@ namespace CaptivityEvents
                     __result = new CECaptorMapNotificationItemVM(captorMapNotification.CaptorEvent, data, null, item =>
                                                                                                                 {
                                                                                                                     CEHelper.notificationCaptorExists = false;
-                                                                                                                    CESubModule.LoadCampaignNotificationTexture("default");
+                                                                                                                    t.LoadCampaignNotificationTexture("default");
 
                                                                                                                     var parameters = new object[1];
                                                                                                                     parameters[0] = item;
@@ -42,7 +43,7 @@ namespace CaptivityEvents
                     __result = new CEEventMapNotificationItemVM(eventMapNotification.RandomEvent, data, null, item =>
                                                                                                               {
                                                                                                                   CEHelper.notificationEventExists = false;
-                                                                                                                  CESubModule.LoadCampaignNotificationTexture("default", 1);
+                                                                                                                  t.LoadCampaignNotificationTexture("default", 1);
 
                                                                                                                   var parameters = new object[1];
                                                                                                                   parameters[0] = item;

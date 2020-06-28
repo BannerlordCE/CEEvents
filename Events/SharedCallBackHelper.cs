@@ -262,20 +262,22 @@ namespace CaptivityEvents.Events
 
         internal void LoadBackgroundImage(string textureFlag = "default_random")
         {
+            var t = new CESubModule();
+
             try
             {
                 var backgroundName = _listedEvent.BackgroundName;
 
                 if (!backgroundName.IsStringNoneOrEmpty())
                 {
-                    CESubModule.animationPlayEvent = false;
-                    CESubModule.LoadTexture(backgroundName);
+                    CEPersistence.animationPlayEvent = false;
+                    t.LoadTexture(backgroundName);
                 }
                 else if (_listedEvent.BackgroundAnimation != null && _listedEvent.BackgroundAnimation.Count > 0)
                 {
-                    CESubModule.animationImageList = _listedEvent.BackgroundAnimation;
-                    CESubModule.animationIndex = 0;
-                    CESubModule.animationPlayEvent = true;
+                    CEPersistence.animationImageList = _listedEvent.BackgroundAnimation;
+                    CEPersistence.animationIndex = 0;
+                    CEPersistence.animationPlayEvent = true;
                     var speed = 0.03f;
 
                     try
@@ -298,18 +300,18 @@ namespace CaptivityEvents.Events
                         }
                     }
 
-                    CESubModule.animationSpeed = speed;
+                    CEPersistence.animationSpeed = speed;
                 }
                 else
                 {
-                    CESubModule.animationPlayEvent = false;
-                    CESubModule.LoadTexture("default_random");  
+                    CEPersistence.animationPlayEvent = false;
+                    t.LoadTexture("default_random");  
                 }
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Failed to load background for " + _listedEvent.Name);
-                CESubModule.LoadTexture("default_random");
+                t.LoadTexture("default_random");
             }
         }
 

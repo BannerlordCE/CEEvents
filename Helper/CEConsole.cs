@@ -331,13 +331,13 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckParameters(strings, 1)) searchTerm = strings[0];
 
-                if (CESubModule.CEEvents == null || CESubModule.CEEvents.Count <= 0) return "Failed to load event list.";
+                if (CEPersistence.CEEvents == null || CEPersistence.CEEvents.Count <= 0) return "Failed to load event list.";
                 var text = "";
                 var searchActive = !searchTerm.IsStringNoneOrEmpty();
 
                 if (searchActive) searchTerm = searchTerm.ToLower();
 
-                foreach (var ceEvent in CESubModule.CEEvents)
+                foreach (var ceEvent in CEPersistence.CEEvents)
                     if (searchActive)
                     {
                         if (ceEvent.Name.ToLower().IndexOf(searchTerm, StringComparison.Ordinal) != -1) text = text + ceEvent.Name + "\n";

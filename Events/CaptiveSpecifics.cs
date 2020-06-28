@@ -12,7 +12,8 @@ namespace CaptivityEvents.Events
     {
         internal void CECaptivityContinue(ref MenuCallbackArgs args)
         {
-            CESubModule.animationPlayEvent = false;
+            CEPersistence.animationPlayEvent = false;
+            var t = new CESubModule();
 
             try
             {
@@ -26,7 +27,7 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        CESubModule.LoadTexture("default");
+                        t.LoadTexture("default");
 
                         GameMenu.SwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement
                                                   ? "settlement_wait"
@@ -35,7 +36,7 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
-                    CESubModule.LoadTexture("default");
+                    t.LoadTexture("default");
                     GameMenu.ExitToLast();
                 }
             }
@@ -73,49 +74,54 @@ namespace CaptivityEvents.Events
 
         internal void CECaptivityLeave(ref MenuCallbackArgs args)
         {
-            CESubModule.LoadTexture("default");
+            new CESubModule().LoadTexture("default");
             var captorParty = PlayerCaptivity.CaptorParty;
             CECampaignBehavior.ExtraProps.Owner = null;
 
-            if (captorParty.IsSettlement && captorParty.Settlement.IsTown)
-                try
+            if (!captorParty.IsSettlement || !captorParty.Settlement.IsTown)
+            {
+                PlayerCaptivity.EndCaptivity();
+
+                return;
+            }
+
+            try
+            {
+                if (Hero.MainHero.IsAlive)
                 {
-                    if (Hero.MainHero.IsAlive)
-                    {
-                        if (Hero.MainHero.IsWounded) Hero.MainHero.HitPoints = 20;
+                    if (Hero.MainHero.IsWounded) Hero.MainHero.HitPoints = 20;
 
-                        if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.IsMobile) PlayerCaptivity.CaptorParty.MobileParty.SetDoNotAttackMainParty(12);
-                        PlayerEncounter.ProtectPlayerSide();
-                        MobileParty.MainParty.IsDisorganized = false;
-                        PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, 1, true);
-                    }
-
-                    if (Campaign.Current.CurrentMenuContext != null) GameMenu.SwitchToMenu("town");
-
-                    if (Hero.MainHero.IsAlive)
-                    {
-                        Hero.MainHero.ChangeState(Hero.CharacterStates.Active);
-                        Hero.MainHero.DaysLeftToRespawn = 0;
-                    }
-
-                    if (captorParty.IsActive) captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject);
-
-                    if (Hero.MainHero.IsAlive)
-                    {
-                        MobileParty.MainParty.IsActive = true;
-                        PartyBase.MainParty.SetAsCameraFollowParty();
-                        MobileParty.MainParty.SetMoveModeHold();
-                        SkillLevelingManager.OnMainHeroReleasedFromCaptivity(PlayerCaptivity.CaptivityStartTime.ElapsedHoursUntilNow);
-                        PartyBase.MainParty.UpdateVisibilityAndInspected(true);
-                    }
-
-                    PlayerCaptivity.CaptorParty = null;
+                    if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.IsMobile) PlayerCaptivity.CaptorParty.MobileParty.SetDoNotAttackMainParty(12);
+                    PlayerEncounter.ProtectPlayerSide();
+                    MobileParty.MainParty.IsDisorganized = false;
+                    PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, 1, true);
                 }
-                catch (Exception)
+
+                if (Campaign.Current.CurrentMenuContext != null) GameMenu.SwitchToMenu("town");
+
+                if (Hero.MainHero.IsAlive)
                 {
-                    PlayerCaptivity.EndCaptivity();
+                    Hero.MainHero.ChangeState(Hero.CharacterStates.Active);
+                    Hero.MainHero.DaysLeftToRespawn = 0;
                 }
-            else PlayerCaptivity.EndCaptivity();
+
+                if (captorParty.IsActive) captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject);
+
+                if (Hero.MainHero.IsAlive)
+                {
+                    MobileParty.MainParty.IsActive = true;
+                    PartyBase.MainParty.SetAsCameraFollowParty();
+                    MobileParty.MainParty.SetMoveModeHold();
+                    SkillLevelingManager.OnMainHeroReleasedFromCaptivity(PlayerCaptivity.CaptivityStartTime.ElapsedHoursUntilNow);
+                    PartyBase.MainParty.UpdateVisibilityAndInspected(true);
+                }
+
+                PlayerCaptivity.CaptorParty = null;
+            }
+            catch (Exception)
+            {
+                PlayerCaptivity.EndCaptivity();
+            }
         }
 
         internal void CECaptivityEscape(ref MenuCallbackArgs args)
@@ -137,7 +143,7 @@ namespace CaptivityEvents.Events
                 textObject.SetTextVariable("SETTLEMENT", settlementName);
             }
 
-            CESubModule.LoadTexture("default");
+            new CESubModule().LoadTexture("default");
             PlayerCaptivity.EndCaptivity();
         }
 

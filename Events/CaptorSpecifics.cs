@@ -35,7 +35,7 @@ namespace CaptivityEvents.Events
             }
 
             Campaign.Current.TimeControlMode = Campaign.Current.LastTimeControlMode;
-            CESubModule.LoadTexture("default");
+            new CESubModule().LoadTexture("default");
         }
 
         internal void CEKillPrisoners(MenuCallbackArgs args, int amount = 10, bool killHeroes = false)
@@ -193,7 +193,7 @@ namespace CaptivityEvents.Events
                     PlayerEncounter.RestartPlayerEncounter(prisonerParty.Party, MobileParty.MainParty.Party);
                     PlayerEncounter.Update();
 
-                    CESubModule.huntState = CESubModule.HuntState.StartHunt;
+                    CEPersistence.huntState = CEPersistence.HuntState.StartHunt;
                     CampaignMission.OpenBattleMission(PlayerEncounter.GetBattleSceneForMapPosition(MobileParty.MainParty.Position2D));
                 }
                 catch (Exception)

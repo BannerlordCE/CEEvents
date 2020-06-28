@@ -24,9 +24,9 @@ namespace CaptivityEvents.Events
 
             var flag = "$FAILEDTOFIND";
 
-            if (CESubModule.CEEventList == null || CESubModule.CEEventList.Count <= 0) return flag;
+            if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
-            var foundevent = CESubModule.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
+            var foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
 
             if (foundevent != null)
             {
@@ -60,9 +60,9 @@ namespace CaptivityEvents.Events
 
             var flag = "$FAILEDTOFIND";
 
-            if (CESubModule.CEEventList == null || CESubModule.CEEventList.Count <= 0) return flag;
+            if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
-            var foundevent = CESubModule.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
+            var foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
 
             if (foundevent != null)
             {
@@ -92,9 +92,9 @@ namespace CaptivityEvents.Events
 
             var flag = "$FAILEDTOFIND";
 
-            if (CESubModule.CEEventList == null || CESubModule.CEEventList.Count <= 0) return flag;
+            if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
-            var foundevent = CESubModule.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
+            var foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
 
             if (foundevent != null)
             {
@@ -146,11 +146,11 @@ namespace CaptivityEvents.Events
         {
             var events = new List<CEEvent>();
 
-            if (CESubModule.CECallableEvents != null && CESubModule.CECallableEvents.Count > 0)
+            if (CEPersistence.CECallableEvents != null && CEPersistence.CECallableEvents.Count > 0)
             {
-                CECustomHandler.LogToFile("Having " + CESubModule.CECallableEvents.Count + " of events to weight and check conditions on.");
+                CECustomHandler.LogToFile("Having " + CEPersistence.CECallableEvents.Count + " of events to weight and check conditions on.");
 
-                foreach (var listEvent in CESubModule.CECallableEvents)
+                foreach (var listEvent in CEPersistence.CECallableEvents)
                     if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                     {
                         var result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
@@ -198,11 +198,11 @@ namespace CaptivityEvents.Events
         {
             var events = new List<CEEvent>();
 
-            if (CESubModule.CECallableEvents != null && CESubModule.CECallableEvents.Count > 0)
+            if (CEPersistence.CECallableEvents != null && CEPersistence.CECallableEvents.Count > 0)
             {
-                CECustomHandler.LogToFile("Having " + CESubModule.CECallableEvents.Count + " of events to weight and check conditions on.");
+                CECustomHandler.LogToFile("Having " + CEPersistence.CECallableEvents.Count + " of events to weight and check conditions on.");
 
-                foreach (var listEvent in CESubModule.CECallableEvents)
+                foreach (var listEvent in CEPersistence.CECallableEvents)
                     if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                     {
                         var result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
@@ -252,10 +252,10 @@ namespace CaptivityEvents.Events
 
             CECustomHandler.LogToFile("Number of Filitered events is " + events.Count);
 
-            if (CESubModule.CECallableEvents == null || CESubModule.CECallableEvents.Count <= 0) return null;
-            CECustomHandler.LogToFile("Having " + CESubModule.CECallableEvents.Count + " of events to weight and check conditions on.");
+            if (CEPersistence.CECallableEvents == null || CEPersistence.CECallableEvents.Count <= 0) return null;
+            CECustomHandler.LogToFile("Having " + CEPersistence.CECallableEvents.Count + " of events to weight and check conditions on.");
 
-            foreach (var listEvent in CESubModule.CECallableEvents)
+            foreach (var listEvent in CEPersistence.CECallableEvents)
                 if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                 {
                     var result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(captive, PartyBase.MainParty);

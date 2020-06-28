@@ -8,17 +8,6 @@ using TaleWorlds.Library;
 
 namespace CaptivityEvents.Events
 {
-    [Serializable]
-    public class CESkippingEventException : Exception
-    {
-        public CESkippingEventException() { }
-
-        public CESkippingEventException(string message) : base(message) { }
-
-        public CESkippingEventException(string message, Exception inner) : base(message, inner) { }
-    }
-
-
     internal class CEEventChecker
     {
         private readonly CEEvent _listEvent;
@@ -184,46 +173,123 @@ namespace CaptivityEvents.Events
                 captorParty = PartyBase.MainParty;
             }
 
-            try
-            {
-                ValidateEvent();
-                SettingsCheck();
-                GenderCheck(captive);
-                SlaveryCheck(captive);
-                ProstitutionCheck(captive);
-                AgeCheck(captive);
-                TraitCheck(captive);
-                SkillCheck(captive);
-                HealthCheck(captive);
-                HeroCheck(captive, captorParty, nonRandomBehaviour);
-                PlayerCheck();
-                IsOwnedByNotableCheck();
-                CaptorCheck(captorParty);
-                CaptivesOutNumberCheck(captorParty);
-                TroopsCheck(captorParty);
-                MaleTroopsCheck(captorParty);
-                FemaleTroopsCheck(captorParty);
-                CaptiveCheck(captorParty);
-                MaleCaptivesCheck(captorParty);
-                FemaleCaptivesCheck(captorParty);
-                MoraleCheck(captorParty);
 
-                if (nonRandomBehaviour)
-                {
-                    CaptorTraitCheck(captorParty);
-                    CaptorSkillCheck(captorParty);
-                    CaptorItemCheck(captorParty);
-                    CaptorPartyGenderCheck(captorParty);
-                }
+            var response = ValidateEvent();
 
-                LocationAndEventCheck(captorParty, out var eventMatchingCondition);
-                TimeCheck(ref eventMatchingCondition);
-                SeasonCheck(eventMatchingCondition);
-            }
-            catch (CESkippingEventException e)
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = SettingsCheck();
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = GenderCheck(captive);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = SlaveryCheck(captive);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = ProstitutionCheck(captive);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = AgeCheck(captive);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = TraitCheck(captive);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = SkillCheck(captive);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = HealthCheck(captive);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = HeroCheck(captive, captorParty, nonRandomBehaviour);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = PlayerCheck();
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = IsOwnedByNotableCheck();
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = CaptorCheck(captorParty);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = CaptivesOutNumberCheck(captorParty);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = TroopsCheck(captorParty);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = MaleTroopsCheck(captorParty);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = FemaleTroopsCheck(captorParty);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = CaptiveCheck(captorParty);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = MaleCaptivesCheck(captorParty);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = FemaleCaptivesCheck(captorParty);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = MoraleCheck(captorParty);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+
+            if (nonRandomBehaviour)
             {
-                return e.Message;
+                response = CaptorTraitCheck(captorParty);
+
+                if (!string.IsNullOrEmpty(response)) return response;
+
+                response = CaptorSkillCheck(captorParty);
+
+                if (!string.IsNullOrEmpty(response)) return response;
+
+                response = CaptorItemCheck(captorParty);
+
+                if (!string.IsNullOrEmpty(response)) return response;
+
+                response = CaptorPartyGenderCheck(captorParty);
+
+                if (!string.IsNullOrEmpty(response)) return response;
             }
+
+            response = LocationAndEventCheck(captorParty, out var eventMatchingCondition);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = TimeCheck(ref eventMatchingCondition);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
+            response = SeasonCheck(ref eventMatchingCondition);
+
+            if (!string.IsNullOrEmpty(response)) return response;
+
 
             _listEvent.Captive = captive;
 
@@ -231,9 +297,9 @@ namespace CaptivityEvents.Events
         }
 
 
-        #region private
+#region private
 
-        private void SeasonCheck(bool eventMatchingCondition)
+        private string SeasonCheck(ref bool eventMatchingCondition)
         {
             var hasWinterFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.SeasonWinter);
             var hasSummerFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.SeasonSpring);
@@ -242,20 +308,24 @@ namespace CaptivityEvents.Events
 
             if (hasWinterFlag || hasSummerFlag) eventMatchingCondition = hasSummerFlag && CampaignTime.Now.GetSeasonOfYear == 1 || hasFallFlag && CampaignTime.Now.GetSeasonOfYear == 2 || hasWinterFlag && CampaignTime.Now.GetSeasonOfYear == 3 || hasSpringFlag && (CampaignTime.Now.GetSeasonOfYear == 4 || CampaignTime.Now.GetSeasonOfYear == 0);
 
-            if (!eventMatchingCondition) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the seasons conditions.");
+            if (!eventMatchingCondition) return "Skipping event " + _listEvent.Name + " it does not match the seasons conditions.";
+
+            return "";
         }
 
-        private void TimeCheck(ref bool eventMatchingCondition)
+        private string TimeCheck(ref bool eventMatchingCondition)
         {
             var hasNightFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.TimeNight);
             var hasDayFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.TimeDay);
 
             if (hasNightFlag || hasDayFlag) eventMatchingCondition = hasNightFlag && Campaign.Current.IsNight || hasDayFlag && Campaign.Current.IsDay;
 
-            if (!eventMatchingCondition) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the time conditions.");
+            if (!eventMatchingCondition) return "Skipping event " + _listEvent.Name + " it does not match the time conditions.";
+
+            return "";
         }
 
-        private void LocationAndEventCheck(PartyBase captorParty, out bool eventMatchingCondition)
+        private string LocationAndEventCheck(PartyBase captorParty, out bool eventMatchingCondition)
         {
             var hasCityFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity);
             var hasDungeonFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationDungeon);
@@ -381,20 +451,24 @@ namespace CaptivityEvents.Events
                 }
             }
 
-            if (!eventMatchingCondition) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the location conditions.");
+            if (!eventMatchingCondition) return "Skipping event " + _listEvent.Name + " it does not match the location conditions.";
+
+            return "";
         }
 
-        private void CaptorPartyGenderCheck(PartyBase captorParty)
+        private string CaptorPartyGenderCheck(PartyBase captorParty)
         {
-            if (captorParty?.Leader != null && captorParty.Leader.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsMale)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsMale.");
-            if (captorParty?.Leader != null && !captorParty.Leader.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale/Femdom.");
+            if (captorParty?.Leader != null && captorParty.Leader.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsMale)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsMale.";
+            if (captorParty?.Leader != null && !captorParty.Leader.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale/Femdom.";
+
+            return "";
         }
 
-        private void CaptorItemCheck(PartyBase captorParty)
+        private string CaptorItemCheck(PartyBase captorParty)
         {
             try
             {
-                if (_listEvent.ReqCaptorPartyHaveItem.IsStringNoneOrEmpty()) return;
+                if (_listEvent.ReqCaptorPartyHaveItem.IsStringNoneOrEmpty()) return "";
 
                 var flagHaveItem = false;
                 var foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqCaptorPartyHaveItem);
@@ -429,21 +503,23 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.ItemRoster.FindIndexOfItem(foundItem) != -1) flagHaveItem = true;
 
-                if (!flagHaveItem) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroPartyHaveItem.");
+                if (!flagHaveItem) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroPartyHaveItem.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Incorrect ReqCaptorItem / Failed ");
             }
+
+            return "";
         }
 
-        private void CaptorSkillCheck(PartyBase captorParty)
+        private string CaptorSkillCheck(PartyBase captorParty)
         {
             try
             {
-                if (_listEvent.ReqCaptorSkill.IsStringNoneOrEmpty()) return;
+                if (_listEvent.ReqCaptorSkill.IsStringNoneOrEmpty()) return "";
 
-                if (captorParty.LeaderHero == null) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkill.");
+                if (captorParty.LeaderHero == null) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkill.";
 
                 var skillLevel = captorParty.LeaderHero.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _listEvent.ReqCaptorSkill));
 
@@ -451,7 +527,7 @@ namespace CaptivityEvents.Events
                 {
                     if (!_listEvent.ReqCaptorSkillLevelAbove.IsStringNoneOrEmpty())
                         if (skillLevel < new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelAbove))
-                            throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelAbove.");
+                            return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelAbove.";
                 }
                 catch (Exception)
                 {
@@ -460,9 +536,9 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    if (_listEvent.ReqCaptorSkillLevelBelow.IsStringNoneOrEmpty()) return;
+                    if (_listEvent.ReqCaptorSkillLevelBelow.IsStringNoneOrEmpty()) return "";
 
-                    if (skillLevel > new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelBelow)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelBelow.");
+                    if (skillLevel > new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelBelow)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelBelow.";
                 }
                 catch (Exception)
                 {
@@ -473,15 +549,17 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.LogToFile("Incorrect ReqCaptorTrait / Failed ");
             }
+
+            return "";
         }
 
-        private void CaptorTraitCheck(PartyBase captorParty)
+        private string CaptorTraitCheck(PartyBase captorParty)
         {
             try
             {
-                if (_listEvent.ReqCaptorTrait.IsStringNoneOrEmpty()) return;
+                if (_listEvent.ReqCaptorTrait.IsStringNoneOrEmpty()) return "";
 
-                if (captorParty.LeaderHero == null) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTrait.");
+                if (captorParty.LeaderHero == null) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTrait.";
 
                 var traitLevel = captorParty.LeaderHero.GetTraitLevel(TraitObject.Find(_listEvent.ReqCaptorTrait));
 
@@ -489,7 +567,7 @@ namespace CaptivityEvents.Events
                 {
                     if (!_listEvent.ReqCaptorTraitLevelAbove.IsStringNoneOrEmpty())
                         if (traitLevel < new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptorTraitLevelAbove))
-                            throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTraitLevelAbove.");
+                            return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTraitLevelAbove.";
                 }
                 catch (Exception)
                 {
@@ -498,9 +576,9 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    if (_listEvent.ReqCaptorTraitLevelBelow.IsStringNoneOrEmpty()) return;
+                    if (_listEvent.ReqCaptorTraitLevelBelow.IsStringNoneOrEmpty()) return "";
 
-                    if (traitLevel > new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptorTraitLevelBelow)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTraitLevelBelow.");
+                    if (traitLevel > new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptorTraitLevelBelow)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTraitLevelBelow.";
                 }
                 catch (Exception)
                 {
@@ -511,15 +589,17 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.LogToFile("Incorrect ReqCaptorTrait / Failed ");
             }
+
+            return "";
         }
 
-        private void MoraleCheck(PartyBase captorParty)
+        private string MoraleCheck(PartyBase captorParty)
         {
             try
             {
                 if (!_listEvent.ReqMoraleAbove.IsStringNoneOrEmpty())
                     if (captorParty.IsMobile && captorParty.MobileParty.Morale < new VariablesLoader().GetIntFromXML(_listEvent.ReqMoraleAbove))
-                        throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMoraleAbove.");
+                        return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMoraleAbove.";
             }
             catch (Exception)
             {
@@ -528,23 +608,25 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (_listEvent.ReqMoraleBelow.IsStringNoneOrEmpty()) return;
+                if (_listEvent.ReqMoraleBelow.IsStringNoneOrEmpty()) return "";
 
-                if (captorParty.IsMobile && captorParty.MobileParty.Morale > new VariablesLoader().GetIntFromXML(_listEvent.ReqMoraleBelow)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMoraleBelow.");
+                if (captorParty.IsMobile && captorParty.MobileParty.Morale > new VariablesLoader().GetIntFromXML(_listEvent.ReqMoraleBelow)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMoraleBelow.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Incorrect ReqMoraleBelow / Failed ");
             }
+
+            return "";
         }
 
-        private void FemaleCaptivesCheck(PartyBase captorParty)
+        private string FemaleCaptivesCheck(PartyBase captorParty)
         {
             try
             {
                 if (!_listEvent.ReqFemaleCaptivesAbove.IsStringNoneOrEmpty())
                     if (captorParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) < new VariablesLoader().GetIntFromXML(_listEvent.ReqFemaleCaptivesAbove))
-                        throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleCaptivesAbove.");
+                        return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleCaptivesAbove.";
             }
             catch (Exception)
             {
@@ -553,23 +635,25 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (_listEvent.ReqFemaleCaptivesBelow.IsStringNoneOrEmpty()) return;
+                if (_listEvent.ReqFemaleCaptivesBelow.IsStringNoneOrEmpty()) return "";
 
-                if (captorParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > new VariablesLoader().GetIntFromXML(_listEvent.ReqFemaleCaptivesBelow)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleCaptivesAbove.");
+                if (captorParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > new VariablesLoader().GetIntFromXML(_listEvent.ReqFemaleCaptivesBelow)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleCaptivesAbove.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Incorrect ReqFemaleCaptivesAbove / Failed ");
             }
+
+            return "";
         }
 
-        private void MaleCaptivesCheck(PartyBase captorParty)
+        private string MaleCaptivesCheck(PartyBase captorParty)
         {
             try
             {
                 if (!_listEvent.ReqMaleCaptivesAbove.IsStringNoneOrEmpty())
                     if (captorParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < new VariablesLoader().GetIntFromXML(_listEvent.ReqMaleCaptivesAbove))
-                        throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleCaptivesAbove.");
+                        return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleCaptivesAbove.";
             }
             catch (Exception)
             {
@@ -578,23 +662,25 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (_listEvent.ReqMaleCaptivesBelow.IsStringNoneOrEmpty()) return;
+                if (_listEvent.ReqMaleCaptivesBelow.IsStringNoneOrEmpty()) return "";
 
-                if (captorParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) > new VariablesLoader().GetIntFromXML(_listEvent.ReqMaleCaptivesBelow)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleCaptivesBelow.");
+                if (captorParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) > new VariablesLoader().GetIntFromXML(_listEvent.ReqMaleCaptivesBelow)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleCaptivesBelow.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Incorrect ReqMaleCaptivesBelow / Failed ");
             }
+
+            return "";
         }
 
-        private void CaptiveCheck(PartyBase captorParty)
+        private string CaptiveCheck(PartyBase captorParty)
         {
             try
             {
                 if (!_listEvent.ReqCaptivesAbove.IsStringNoneOrEmpty())
                     if (captorParty.NumberOfPrisoners < new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesAbove))
-                        throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesAbove.");
+                        return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesAbove.";
             }
             catch (Exception)
             {
@@ -603,23 +689,25 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (_listEvent.ReqCaptivesBelow.IsStringNoneOrEmpty()) return;
+                if (_listEvent.ReqCaptivesBelow.IsStringNoneOrEmpty()) return "";
 
-                if (captorParty.NumberOfPrisoners > new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesBelow)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesBelow.");
+                if (captorParty.NumberOfPrisoners > new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesBelow)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesBelow.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Incorrect ReqCaptivesBelow / Failed ");
             }
+
+            return "";
         }
 
-        private void FemaleTroopsCheck(PartyBase captorParty)
+        private string FemaleTroopsCheck(PartyBase captorParty)
         {
             try
             {
                 if (!_listEvent.ReqFemaleTroopsAbove.IsStringNoneOrEmpty())
                     if (captorParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) < new VariablesLoader().GetIntFromXML(_listEvent.ReqFemaleTroopsAbove))
-                        throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleTroopsAbove.");
+                        return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleTroopsAbove.";
             }
             catch (Exception)
             {
@@ -630,21 +718,23 @@ namespace CaptivityEvents.Events
             {
                 if (!_listEvent.ReqFemaleTroopsBelow.IsStringNoneOrEmpty())
                     if (captorParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > new VariablesLoader().GetIntFromXML(_listEvent.ReqFemaleTroopsBelow))
-                        throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleTroopsBelow.");
+                        return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleTroopsBelow.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Incorrect ReqFemaleTroopsBelow / Failed ");
             }
+
+            return "";
         }
 
-        private void MaleTroopsCheck(PartyBase captorParty)
+        private string MaleTroopsCheck(PartyBase captorParty)
         {
             try
             {
                 if (!_listEvent.ReqMaleTroopsAbove.IsStringNoneOrEmpty())
                     if (captorParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < new VariablesLoader().GetIntFromXML(_listEvent.ReqMaleTroopsAbove))
-                        throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleTroopsAbove.");
+                        return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleTroopsAbove.";
             }
             catch (Exception)
             {
@@ -653,23 +743,25 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (_listEvent.ReqMaleTroopsBelow.IsStringNoneOrEmpty()) return;
+                if (_listEvent.ReqMaleTroopsBelow.IsStringNoneOrEmpty()) return "";
 
-                if (captorParty.MemberRoster.Count(troopRosterElement => { return !troopRosterElement.Character.IsFemale; }) > new VariablesLoader().GetIntFromXML(_listEvent.ReqMaleTroopsBelow)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleTroopsBelow.");
+                if (captorParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) > new VariablesLoader().GetIntFromXML(_listEvent.ReqMaleTroopsBelow)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleTroopsBelow.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Incorrect ReqMaleTroopsBelow / Failed ");
             }
+
+            return "";
         }
 
-        private void TroopsCheck(PartyBase captorParty)
+        private string TroopsCheck(PartyBase captorParty)
         {
             try
             {
                 if (!_listEvent.ReqTroopsAbove.IsStringNoneOrEmpty())
                     if (captorParty.NumberOfRegularMembers < new VariablesLoader().GetIntFromXML(_listEvent.ReqTroopsAbove))
-                        throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsAbove.");
+                        return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsAbove.";
             }
             catch (Exception)
             {
@@ -678,45 +770,50 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (_listEvent.ReqTroopsBelow.IsStringNoneOrEmpty()) return;
+                if (_listEvent.ReqTroopsBelow.IsStringNoneOrEmpty()) return "";
 
-                if (captorParty.NumberOfRegularMembers > new VariablesLoader().GetIntFromXML(_listEvent.ReqTroopsBelow)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsBelow.");
+                if (captorParty.NumberOfRegularMembers > new VariablesLoader().GetIntFromXML(_listEvent.ReqTroopsBelow)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsBelow.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Incorrect ReqTroopsBelow / Failed ");
             }
+
+            return "";
         }
 
-        private void CaptivesOutNumberCheck(PartyBase captorParty)
+        private string CaptivesOutNumberCheck(PartyBase captorParty)
         {
-            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptivesOutNumber) && captorParty.NumberOfPrisoners < captorParty.NumberOfHealthyMembers) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptivesOutNumber.");
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptivesOutNumber) && captorParty.NumberOfPrisoners < captorParty.NumberOfHealthyMembers) return "Skipping event " + _listEvent.Name + " it does not match the conditions. CaptivesOutNumber.";
+            return "";
         }
 
-        private void CaptorCheck(PartyBase captorParty)
+        private string CaptorCheck(PartyBase captorParty)
         {
-            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorIsHero) && captorParty.LeaderHero == null) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorIsHero.");
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorIsHero) && captorParty.LeaderHero == null) return "Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorIsHero.";
+            return "";
         }
 
-        private void IsOwnedByNotableCheck()
+        private string IsOwnedByNotableCheck()
         {
             var skipFlags = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnedByNotable) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroNotOwnedByNotable);
             var isOwnedFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnedByNotable) && !skipFlags;
             var isNotOwnedFlag = !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnedByNotable) && !skipFlags;
 
-            if (!isOwnedFlag && !isNotOwnedFlag) return;
+            if (!isOwnedFlag && !isNotOwnedFlag) return "";
 
-            if (isOwnedFlag && CECampaignBehavior.ExtraProps.Owner == null) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. isOwnedFlag.");
-            if (isNotOwnedFlag && CECampaignBehavior.ExtraProps.Owner != null) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. isNotOwnedFlag.");
+            if (isOwnedFlag && CECampaignBehavior.ExtraProps.Owner == null) return "Skipping event " + _listEvent.Name + " it does not match the conditions. isOwnedFlag.";
+            if (isNotOwnedFlag && CECampaignBehavior.ExtraProps.Owner != null) return "Skipping event " + _listEvent.Name + " it does not match the conditions. isNotOwnedFlag.";
+            return "";
         }
 
-        private void PlayerCheck()
+        private string PlayerCheck()
         {
             try
             {
                 if (!string.IsNullOrEmpty(_listEvent.ReqGoldAbove))
                     if (Hero.MainHero.Gold < new VariablesLoader().GetIntFromXML(_listEvent.ReqGoldAbove))
-                        throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqGoldAbove.");
+                        return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqGoldAbove.";
             }
             catch (Exception)
             {
@@ -725,17 +822,18 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (string.IsNullOrEmpty(_listEvent.ReqGoldBelow)) return;
+                if (string.IsNullOrEmpty(_listEvent.ReqGoldBelow)) return "";
 
-                if (Hero.MainHero.Gold > new VariablesLoader().GetIntFromXML(_listEvent.ReqGoldBelow)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqGoldBelow.");
+                if (Hero.MainHero.Gold > new VariablesLoader().GetIntFromXML(_listEvent.ReqGoldBelow)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqGoldBelow.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Incorrect ReqGoldBelow / Failed ");
             }
+            return "";
         }
 
-        private void HeroCheck(CharacterObject captive, PartyBase captorParty, bool nonRandomBehaviour)
+        private string HeroCheck(CharacterObject captive, PartyBase captorParty, bool nonRandomBehaviour)
         {
             if (captive.IsHero && captive.HeroObject != null && (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptiveIsHero) || captive.IsPlayerCharacter))
             {
@@ -754,19 +852,20 @@ namespace CaptivityEvents.Events
             }
             else if (captive.IsHero && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptiveIsNonHero) && captive.HeroObject != null)
             {
-                throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. " + captive.Name + " CaptiveIsNonHero.");
+                return "Skipping event " + _listEvent.Name + " it does not match the conditions. " + captive.Name + " CaptiveIsNonHero.";
             }
             else if (!captive.IsHero && captive.HeroObject == null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptiveIsHero))
             {
-                throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. " + captive.Name + " CaptiveIsHero.");
+                return "Skipping event " + _listEvent.Name + " it does not match the conditions. " + captive.Name + " CaptiveIsHero.";
             }
+            return "";
         }
 
-        private void HeroHaveItemCheck(PartyBase captorParty)
+        private string HeroHaveItemCheck(PartyBase captorParty)
         {
             try
             {
-                if (_listEvent.ReqHeroPartyHaveItem.IsStringNoneOrEmpty()) return;
+                if (_listEvent.ReqHeroPartyHaveItem.IsStringNoneOrEmpty()) return "";
 
                 var flagHaveItem = false;
                 var foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
@@ -801,21 +900,22 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.ItemRoster.FindIndexOfItem(foundItem) != -1) flagHaveItem = true;
 
-                if (!flagHaveItem) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroPartyHaveItem.");
+                if (!flagHaveItem) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroPartyHaveItem.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Missing ReqCaptiveHaveItem");
             }
+            return "";
         }
 
-        private void RelationCheck(PartyBase captorParty, Hero captiveHero)
+        private string RelationCheck(PartyBase captorParty, Hero captiveHero)
         {
             try
             {
                 if (!string.IsNullOrEmpty(_listEvent.ReqHeroCaptorRelationAbove) && captorParty.LeaderHero != null)
                     if (captiveHero.GetRelation(captorParty.LeaderHero) < new VariablesLoader().GetFloatFromXML(_listEvent.ReqHeroCaptorRelationAbove))
-                        throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroCaptorRelationAbove.");
+                        return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroCaptorRelationAbove.";
             }
             catch (Exception)
             {
@@ -824,18 +924,18 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (string.IsNullOrEmpty(_listEvent.ReqHeroCaptorRelationBelow) || captorParty.LeaderHero == null) return;
+                if (string.IsNullOrEmpty(_listEvent.ReqHeroCaptorRelationBelow) || captorParty.LeaderHero == null) return "";
 
-                if (captiveHero.GetRelation(captorParty.LeaderHero) > new VariablesLoader().GetFloatFromXML(_listEvent.ReqHeroCaptorRelationBelow))
-                    throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroCaptorRelationBelow.");
+                if (captiveHero.GetRelation(captorParty.LeaderHero) > new VariablesLoader().GetFloatFromXML(_listEvent.ReqHeroCaptorRelationBelow)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroCaptorRelationBelow.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Missing ReqHeroCaptorRelationBelow");
             }
+            return "";
         }
 
-        private void CaptiveHaveItemCheck(Hero captiveHero)
+        private string CaptiveHaveItemCheck(Hero captiveHero)
         {
             try
             {
@@ -878,7 +978,7 @@ namespace CaptivityEvents.Events
                             catch (Exception) { }
                         }
 
-                        if (!flagHaveItem) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroPartyHaveItem.");
+                        if (!flagHaveItem) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroPartyHaveItem.";
                     }
                 }
             }
@@ -886,28 +986,30 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.LogToFile("Missing ReqCaptiveHaveItem");
             }
+            return "";
         }
 
-        private void HeroChecks(Hero captiveHero)
+        private string HeroChecks(Hero captiveHero)
         {
-            if (captiveHero.IsChild && _listEvent.SexualContent) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. SexualContent Child Detected.");
-            if (captiveHero.Children.Count == 0 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroHaveOffspring)) throw new CESkippingEventException( "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroHaveOffspring.");
-            if (!captiveHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(captiveHero) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsPregnant)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsPregnant.");
-            if ((captiveHero.IsPregnant || CECampaignBehavior.CheckIfPregnancyExists(captiveHero)) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotPregnant)) throw new CESkippingEventException( "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsNotPregnant.");
-            if (captiveHero.Spouse == null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroHaveSpouse)) throw new CESkippingEventException( "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroHaveSpouse.");
-            if (captiveHero.Spouse != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroNotHaveSpouse)) throw new CESkippingEventException( "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroNotHaveSpouse.");
-            if (captiveHero.OwnedCommonAreas.Count == 0 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnsFief)) throw new CESkippingEventException( "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroOwnsFief.");
-            if ((captiveHero.Clan == null || captiveHero != captiveHero.Clan.Leader) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsClanLeader)) throw new CESkippingEventException( "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsClanLeader.");
-            if (!captiveHero.IsFactionLeader && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsFactionLeader)) throw new CESkippingEventException( "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsFactionLeader.");
+            if (captiveHero.IsChild && _listEvent.SexualContent) return "Skipping event " + _listEvent.Name + " it does not match the conditions. SexualContent Child Detected.";
+            if (captiveHero.Children.Count == 0 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroHaveOffspring)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroHaveOffspring.";
+            if (!captiveHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(captiveHero) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsPregnant)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsPregnant.";
+            if ((captiveHero.IsPregnant || CECampaignBehavior.CheckIfPregnancyExists(captiveHero)) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotPregnant)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsNotPregnant.";
+            if (captiveHero.Spouse == null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroHaveSpouse)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroHaveSpouse.";
+            if (captiveHero.Spouse != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroNotHaveSpouse)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroNotHaveSpouse.";
+            if (captiveHero.OwnedCommonAreas.Count == 0 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnsFief)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroOwnsFief.";
+            if ((captiveHero.Clan == null || captiveHero != captiveHero.Clan.Leader) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsClanLeader)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsClanLeader.";
+            if (!captiveHero.IsFactionLeader && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsFactionLeader)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsFactionLeader.";
+            return "";
         }
 
-        private void HealthCheck(CharacterObject captive)
+        private string HealthCheck(CharacterObject captive)
         {
             try
             {
                 if (!string.IsNullOrEmpty(_listEvent.ReqHeroHealthBelowPercentage))
                     if (captive.HitPoints > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroHealthBelowPercentage))
-                        throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroHealthBelowPercentage.");
+                        return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroHealthBelowPercentage.";
             }
             catch (Exception)
             {
@@ -916,21 +1018,22 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (string.IsNullOrEmpty(_listEvent.ReqHeroHealthAbovePercentage)) return;
+                if (string.IsNullOrEmpty(_listEvent.ReqHeroHealthAbovePercentage)) return "";
 
-                if (captive.HitPoints < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroHealthAbovePercentage)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroHealthAbovePercentage.");
+                if (captive.HitPoints < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroHealthAbovePercentage)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroHealthAbovePercentage.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Missing ReqHeroHealthAbovePercentage");
             }
+            return "";
         }
 
-        private void SkillCheck(CharacterObject captive)
+        private string SkillCheck(CharacterObject captive)
         {
             try
             {
-                if (_listEvent.ReqHeroSkill.IsStringNoneOrEmpty()) return;
+                if (_listEvent.ReqHeroSkill.IsStringNoneOrEmpty()) return "";
 
                 var skillLevel = captive.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _listEvent.ReqHeroSkill));
 
@@ -938,7 +1041,7 @@ namespace CaptivityEvents.Events
                 {
                     if (!_listEvent.ReqHeroSkillLevelAbove.IsStringNoneOrEmpty())
                         if (skillLevel < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelAbove))
-                            throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelAbove.");
+                            return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelAbove.";
                 }
                 catch (Exception)
                 {
@@ -947,9 +1050,9 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    if (_listEvent.ReqHeroSkillLevelBelow.IsStringNoneOrEmpty()) return;
+                    if (_listEvent.ReqHeroSkillLevelBelow.IsStringNoneOrEmpty()) return "";
 
-                    if (skillLevel > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelBelow)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelBelow.");
+                    if (skillLevel > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelBelow)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelBelow.";
                 }
                 catch (Exception)
                 {
@@ -960,13 +1063,14 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.LogToFile("Incorrect ReqHeroSkill / Failed ");
             }
+            return "";
         }
 
-        private void TraitCheck(CharacterObject captive)
+        private string TraitCheck(CharacterObject captive)
         {
             try
             {
-                if (_listEvent.ReqHeroTrait.IsStringNoneOrEmpty()) return;
+                if (_listEvent.ReqHeroTrait.IsStringNoneOrEmpty()) return "";
 
                 var traitLevel = captive.GetTraitLevel(TraitObject.Find(_listEvent.ReqHeroTrait));
 
@@ -974,7 +1078,7 @@ namespace CaptivityEvents.Events
                 {
                     if (!string.IsNullOrEmpty(_listEvent.ReqHeroTraitLevelAbove))
                         if (traitLevel < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroTraitLevelAbove))
-                            throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroTraitLevelAbove.");
+                            return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroTraitLevelAbove.";
                 }
                 catch (Exception)
                 {
@@ -983,9 +1087,9 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    if (string.IsNullOrEmpty(_listEvent.ReqHeroTraitLevelBelow)) return;
+                    if (string.IsNullOrEmpty(_listEvent.ReqHeroTraitLevelBelow)) return "";
 
-                    if (traitLevel > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroTraitLevelBelow)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroTraitLevelBelow.");
+                    if (traitLevel > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroTraitLevelBelow)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroTraitLevelBelow.";
                 }
                 catch (Exception)
                 {
@@ -996,15 +1100,16 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.LogToFile("Missing ReqTrait");
             }
+            return "";
         }
 
-        private void AgeCheck(CharacterObject captive)
+        private string AgeCheck(CharacterObject captive)
         {
             try
             {
                 if (!string.IsNullOrEmpty(_listEvent.ReqHeroMinAge))
                     if (captive.Age < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroMinAge))
-                        throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroMinAge.");
+                        return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroMinAge.";
             }
             catch (Exception)
             {
@@ -1013,17 +1118,18 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (string.IsNullOrEmpty(_listEvent.ReqHeroMaxAge)) return;
+                if (string.IsNullOrEmpty(_listEvent.ReqHeroMaxAge)) return "";
 
-                if (captive.Age > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroMaxAge)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroMaxAge.");
+                if (captive.Age > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroMaxAge)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroMaxAge.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Missing ReqHeroMaxAge");
             }
+            return "";
         }
 
-        private void ProstitutionCheck(CharacterObject captive)
+        private string ProstitutionCheck(CharacterObject captive)
         {
             var skipFlags = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotProstitute);
             var heroProstituteFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && !skipFlags;
@@ -1047,7 +1153,7 @@ namespace CaptivityEvents.Events
                         {
                             if (!string.IsNullOrEmpty(_listEvent.ReqHeroProstituteLevelAbove))
                                 if (prostitute < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelAbove))
-                                    throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelAbove.");
+                                    return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelAbove.";
                         }
                         catch (Exception)
                         {
@@ -1058,7 +1164,7 @@ namespace CaptivityEvents.Events
                         {
                             if (!string.IsNullOrEmpty(_listEvent.ReqHeroProstituteLevelBelow))
                                 if (prostitute > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelBelow))
-                                    throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelBelow.");
+                                    return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelBelow.";
                         }
                         catch (Exception)
                         {
@@ -1069,15 +1175,16 @@ namespace CaptivityEvents.Events
                     if (prostituteSkillFlag == 0 && heroNotProstituteFlag) prostituteFlag = true;
                 }
 
-                if (!prostituteFlag) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions for ProstituteFlag.");
+                if (!prostituteFlag) return "Skipping event " + _listEvent.Name + " it does not match the conditions for ProstituteFlag.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Failed prostituteFlag");
             }
+            return "";
         }
 
-        private void SlaveryCheck(CharacterObject captive)
+        private string SlaveryCheck(CharacterObject captive)
         {
             var skipFlags = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsSlave) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotSlave);
             var heroIsSlave = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsSlave) && !skipFlags;
@@ -1101,7 +1208,7 @@ namespace CaptivityEvents.Events
                         {
                             if (!string.IsNullOrEmpty(_listEvent.ReqHeroSlaveLevelAbove))
                                 if (slave < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelAbove))
-                                    throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelAbove.");
+                                    return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelAbove.";
                         }
                         catch (Exception)
                         {
@@ -1112,7 +1219,7 @@ namespace CaptivityEvents.Events
                         {
                             if (!string.IsNullOrEmpty(_listEvent.ReqHeroSlaveLevelBelow))
                                 if (slave > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelBelow))
-                                    throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelBelow.");
+                                    return "Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelBelow.";
                         }
                         catch (Exception)
                         {
@@ -1123,37 +1230,43 @@ namespace CaptivityEvents.Events
                     if (slaveSkillFlag == 0 && heroIsNotSlave) slaveCondition = true;
                 }
 
-                if (!slaveCondition) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions for slave level flags.");
+                if (!slaveCondition) return "Skipping event " + _listEvent.Name + " it does not match the conditions for slave level flags.";
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Failed slaveFlag");
             }
+            return "";
         }
 
-        private void GenderCheck(CharacterObject captive)
+        private string GenderCheck(CharacterObject captive)
         {
-            if (!captive.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroGenderIsFemale.");
-            if (captive.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroGenderIsMale.");
+            if (!captive.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroGenderIsFemale.";
+            if (captive.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale)) return "Skipping event " + _listEvent.Name + " it does not match the conditions. HeroGenderIsMale.";
+            return "";
         }
 
-        private void SettingsCheck()
+        private string SettingsCheck()
         {
-            if (CESettings.Instance != null && !CESettings.Instance.SexualContent && _listEvent.SexualContent) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " SexualContent events disabled.");
-            if (!CESettings.Instance.NonSexualContent && !_listEvent.SexualContent) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " NonSexualContent events disabled.");
-            if (!CESettings.Instance.FemdomControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Femdom)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " Femdom events disabled.");
-            if (!CESettings.Instance.CommonControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Common)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " Common events disabled.");
-            if (!CESettings.Instance.BestialityControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Bestiality)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " Bestiality events disabled.");
-            if (!CESettings.Instance.ProstitutionControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " Prostitution events disabled.");
-            if (!CESettings.Instance.RomanceControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Romance)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " Romance events disabled.");
-            if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) throw new CESkippingEventException("Skipping event " + _listEvent.Name + " Player is busy.");
+            if (CESettings.Instance != null && !CESettings.Instance.SexualContent && _listEvent.SexualContent) return "Skipping event " + _listEvent.Name + " SexualContent events disabled.";
+            if (!CESettings.Instance.NonSexualContent && !_listEvent.SexualContent) return "Skipping event " + _listEvent.Name + " NonSexualContent events disabled.";
+            if (!CESettings.Instance.FemdomControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Femdom)) return "Skipping event " + _listEvent.Name + " Femdom events disabled.";
+            if (!CESettings.Instance.CommonControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Common)) return "Skipping event " + _listEvent.Name + " Common events disabled.";
+            if (!CESettings.Instance.BestialityControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Bestiality)) return "Skipping event " + _listEvent.Name + " Bestiality events disabled.";
+            if (!CESettings.Instance.ProstitutionControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution)) return "Skipping event " + _listEvent.Name + " Prostitution events disabled.";
+            if (!CESettings.Instance.RomanceControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Romance)) return "Skipping event " + _listEvent.Name + " Romance events disabled.";
+            if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) return "Skipping event " + _listEvent.Name + " Player is busy.";
+
+            return "";
         }
 
-        private void ValidateEvent()
+        private string ValidateEvent()
         {
-            if (_listEvent == null) throw new CESkippingEventException("Something is not right in FlagsDoMatchEventConditions.  Expected an event but got null.");
+            return _listEvent == null
+                ? "Something is not right in FlagsDoMatchEventConditions.  Expected an event but got null."
+                : "";
         }
 
-        #endregion
+#endregion
     }
 }
