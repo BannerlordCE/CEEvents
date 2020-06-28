@@ -204,7 +204,6 @@ namespace CaptivityEvents.Events
                         if (conditionMatched != null)
                         {
                             CECustomHandler.LogToFile(conditionMatched);
-
                             continue;
                         }
                     }
