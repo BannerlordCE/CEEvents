@@ -37,7 +37,6 @@ namespace CaptivityEvents.Events
             new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("captor_default");
         }
 
-
         internal bool CaptorEventOptionGameMenu(MenuCallbackArgs args)
         {
             PlayerIsNotBusy(ref args);
@@ -61,14 +60,8 @@ namespace CaptivityEvents.Events
             return true;
         }
 
-
         internal void CaptorConsequenceWaitGameMenu(MenuCallbackArgs args)
         {
-            var score = new ScoresCalculation();
-            var varLoader = new VariablesLoader();
-            var dynamics = new Dynamics();
-            var i = new ImpregnationSystem();
-            var c = new CaptorSpecifics();
             Hero captiveHero = null;
 
             try
@@ -81,290 +74,44 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
 
-            // Captor Gold
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveCaptorGold))
-            {
-                var content = score.AttractivenessScore(captiveHero);
-                var currentValue = captiveHero.GetSkillValue(CESkills.Prostitution);
-                content += currentValue / 2;
-                content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveCaptorGold);
-                GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, content);
-            }
-
-            // Captor Change Gold
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorGold))
-                try
-                {
-                    var level = 0;
-
-                    if (!string.IsNullOrEmpty(_option.CaptorGoldTotal)) level = varLoader.GetIntFromXML(_option.CaptorGoldTotal);
-                    else if (!string.IsNullOrEmpty(_listedEvent.CaptorGoldTotal)) level = varLoader.GetIntFromXML(_listedEvent.CaptorGoldTotal);
-                    else CECustomHandler.LogToFile("Missing CaptorGoldTotal");
-
-                    GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, level);
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid CaptorGoldTotal"); }
-
-            // Captor Skill
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorSkill))
-                try
-                {
-                    var level = 0;
-
-                    if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(_option.SkillTotal);
-                    else if (!_listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(_listedEvent.SkillTotal);
-                    else CECustomHandler.LogToFile("Missing Skill SkillTotal");
-
-                    if (!_option.SkillToLevel.IsStringNoneOrEmpty()) dynamics.SkillModifier(Hero.MainHero, _option.SkillToLevel, level);
-                    else if (!_listedEvent.SkillToLevel.IsStringNoneOrEmpty()) dynamics.SkillModifier(Hero.MainHero, _listedEvent.SkillToLevel, level);
-                    else CECustomHandler.LogToFile("Missing SkillToLevel");
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
-
-            // Captor Trait
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorTrait))
-                try
-                {
-                    var level = varLoader.GetIntFromXML(!string.IsNullOrEmpty(_option.TraitTotal)
-                                                            ? _option.TraitTotal
-                                                            : _listedEvent.TraitTotal);
-
-                    dynamics.TraitModifier(Hero.MainHero, !string.IsNullOrEmpty(_option.TraitToLevel)
-                                               ? _option.TraitToLevel
-                                               : _listedEvent.TraitToLevel, level);
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Missing Trait Flags"); }
-
-            // Captor Renown
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorRenown))
-                try
-                {
-                    dynamics.RenownModifier(!string.IsNullOrEmpty(_option.RenownTotal)
-                                                ? varLoader.GetIntFromXML(_option.RenownTotal)
-                                                : varLoader.GetIntFromXML(_listedEvent.RenownTotal), Hero.MainHero);
-                }
-                catch (Exception)
-                {
-                    CECustomHandler.LogToFile("Missing RenownTotal");
-                    dynamics.RenownModifier(MBRandom.RandomInt(-5, 5), Hero.MainHero);
-                }
-
-            // ChangeMorale
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale))
-                try
-                {
-                    dynamics.MoralChange(!string.IsNullOrEmpty(_option.MoraleTotal)
-                                             ? varLoader.GetIntFromXML(_option.MoraleTotal)
-                                             : varLoader.GetIntFromXML(_listedEvent.MoraleTotal), PartyBase.MainParty);
-                }
-                catch (Exception)
-                {
-                    CECustomHandler.LogToFile("Missing MoralTotal");
-                    dynamics.MoralChange(MBRandom.RandomInt(-5, 5), PlayerCaptivity.CaptorParty);
-                }
+            CaptorGold(captiveHero);
+            CaptorChangeGold();
+            CaptorSkill();
+            CaptorTrait();
+            CaptorRenown();
+            ChangeMorale();
 
             if (captiveHero != null)
             {
-                // Leave Spouse
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveLeaveSpouse)) dynamics.ChangeSpouse(captiveHero, null);
-
-                // Force Marry
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveMarryCaptor)) dynamics.ChangeSpouse(captiveHero, Hero.MainHero);
-
-                // Change Clan
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeClan)) dynamics.ChangeClan(captiveHero, Hero.MainHero);
-
-                // Slavery Flags
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddSlaveryFlag)) dynamics.VictimSlaveryModifier(1, captiveHero, true, false, true);
-                else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveSlaveryFlag)) dynamics.VictimSlaveryModifier(0, captiveHero, true, false, true);
-
-                // Slavery Level
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSlaveryLevel))
-                    try
-                    {
-                        dynamics.VictimSlaveryModifier(!string.IsNullOrEmpty(_option.SlaveryTotal)
-                                                           ? varLoader.GetIntFromXML(_option.SlaveryTotal)
-                                                           : varLoader.GetIntFromXML(_listedEvent.SlaveryTotal), captiveHero);
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Missing SlaveryTotal");
-                        dynamics.VictimSlaveryModifier(1, captiveHero);
-                    }
-
-                // Prostitution Flags
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag)) dynamics.VictimProstitutionModifier(1, captiveHero, true, false, true);
-                else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) dynamics.VictimProstitutionModifier(0, captiveHero, true, false, true);
-
-                // Prostitution Level
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeProstitutionLevel))
-                    try
-                    {
-                        dynamics.VictimProstitutionModifier(!string.IsNullOrEmpty(_option.ProstitutionTotal)
-                                                                ? varLoader.GetIntFromXML(_option.ProstitutionTotal)
-                                                                : varLoader.GetIntFromXML(_listedEvent.ProstitutionTotal), captiveHero);
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Missing ProstitutionTotal");
-                        dynamics.VictimProstitutionModifier(1, captiveHero);
-                    }
-
-                // Relations
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRelation))
-                    try
-                    {
-                        dynamics.RelationsModifier(captiveHero, !string.IsNullOrEmpty(_option.RelationTotal)
-                                                       ? varLoader.GetIntFromXML(_option.RelationTotal)
-                                                       : varLoader.GetIntFromXML(_listedEvent.RelationTotal));
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Missing RelationTotal");
-                        dynamics.RelationsModifier(captiveHero, MBRandom.RandomInt(-5, 5));
-                    }
-
-                // Gold
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold))
-                {
-                    var content = score.AttractivenessScore(captiveHero);
-                    var currentValue = captiveHero.GetSkillValue(CESkills.Prostitution);
-                    content += currentValue / 2;
-                    content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveGold);
-                    GiveGoldAction.ApplyBetweenCharacters(null, captiveHero, content);
-                }
-
-                // Change Gold
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold))
-                    try
-                    {
-                        var level = 0;
-
-                        if (!string.IsNullOrEmpty(_option.GoldTotal)) level = varLoader.GetIntFromXML(_option.GoldTotal);
-                        else if (!string.IsNullOrEmpty(_listedEvent.GoldTotal)) level = varLoader.GetIntFromXML(_listedEvent.GoldTotal);
-                        else CECustomHandler.LogToFile("Missing GoldTotal");
-
-                        GiveGoldAction.ApplyBetweenCharacters(null, captiveHero, level);
-                    }
-                    catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
-
-                // Trait
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeTrait))
-                    try
-                    {
-                        var level = varLoader.GetIntFromXML(!string.IsNullOrEmpty(_option.TraitTotal)
-                                                                ? _option.TraitTotal
-                                                                : _listedEvent.TraitTotal);
-
-                        dynamics.TraitModifier(captiveHero, !string.IsNullOrEmpty(_option.TraitToLevel)
-                                                   ? _option.TraitToLevel
-                                                   : _listedEvent.TraitToLevel, level);
-                    }
-                    catch (Exception) { CECustomHandler.LogToFile("Missing Trait Flags"); }
-
-                // Skill
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSkill))
-                    try
-                    {
-                        var level = 0;
-
-                        if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(_option.SkillTotal);
-                        else if (!_listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = varLoader.GetIntFromXML(_listedEvent.SkillTotal);
-                        else CECustomHandler.LogToFile("Missing Skill SkillTotal");
-
-                        if (!_option.SkillToLevel.IsStringNoneOrEmpty()) dynamics.SkillModifier(captiveHero, _option.SkillToLevel, level);
-                        else if (!_listedEvent.SkillToLevel.IsStringNoneOrEmpty()) dynamics.SkillModifier(captiveHero, _listedEvent.SkillToLevel, level);
-                        else CECustomHandler.LogToFile("Missing SkillToLevel");
-                    }
-                    catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
-
-                // Renown
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRenown))
-                    try
-                    {
-                        dynamics.RenownModifier(!string.IsNullOrEmpty(_option.RenownTotal)
-                                                    ? varLoader.GetIntFromXML(_option.RenownTotal)
-                                                    : varLoader.GetIntFromXML(_listedEvent.RenownTotal), captiveHero);
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Missing RenownTotal");
-                        dynamics.RenownModifier(MBRandom.RandomInt(-5, 5), captiveHero);
-                    }
-
-                // ChangeHealth
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeHealth))
-                    try
-                    {
-                        captiveHero.HitPoints += !string.IsNullOrEmpty(_option.HealthTotal)
-                            ? varLoader.GetIntFromXML(_option.HealthTotal)
-                            : varLoader.GetIntFromXML(_listedEvent.HealthTotal);
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Missing HealthTotal");
-                        captiveHero.HitPoints += MBRandom.RandomInt(-20, 20);
-                    }
-
-                // Impregnation
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationHero))
-                    try
-                    {
-                        i.CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
-                                                          ? varLoader.GetIntFromXML(_option.PregnancyRiskModifier)
-                                                          : varLoader.GetIntFromXML(_listedEvent.PregnancyRiskModifier));
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Missing PregnancyRiskModifier");
-                        i.CaptivityImpregnationChance(captiveHero, 30);
-                    }
-                else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationRisk))
-                    try
-                    {
-                        i.CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
-                                                          ? varLoader.GetIntFromXML(_option.PregnancyRiskModifier)
-                                                          : varLoader.GetIntFromXML(_listedEvent.PregnancyRiskModifier), false, false);
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Missing PregnancyRiskModifier");
-                        i.CaptivityImpregnationChance(captiveHero, 30, false, false);
-                    }
-
-                // Strip
-                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip)) c.CEStripVictim(captiveHero);
+                LeaveSpouse(captiveHero);
+                ForceMarry(captiveHero);
+                ChangeClan(captiveHero);
+                SlaveryFlags(captiveHero);
+                SlaveryLevel(captiveHero);
+                ProstitutionFlags(captiveHero);
+                ProstitutionLevel(captiveHero);
+                Relations(captiveHero);
+                Gold(captiveHero);
+                ChangeGold(captiveHero);
+                Trait(captiveHero);
+                Skill(captiveHero);
+                Renown(captiveHero);
+                ChangeHealth(captiveHero);
+                Impregnation(captiveHero);
+                Strip(captiveHero);
             }
 
-            // Escape
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape))
-            {
-                if (_listedEvent.Captive.IsHero) EndCaptivityAction.ApplyByEscape(_listedEvent.Captive.HeroObject);
-                else PartyBase.MainParty.PrisonRoster.AddToCounts(_listedEvent.Captive, -1);
-            }
-
-            // Gain Random Prisoners
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GainRandomPrisoners)) dynamics.CEGainRandomPrisoners(PartyBase.MainParty);
-
-            // Kill Prisoner
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner))
-            {
-                if (_listedEvent.Captive.IsHero) KillCharacterAction.ApplyByExecution(_listedEvent.Captive.HeroObject, Hero.MainHero);
-                else PartyBase.MainParty.PrisonRoster.AddToCounts(_listedEvent.Captive, -1);
-            }
-
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor)) dynamics.CEKillPlayer(_listedEvent.Captive.HeroObject);
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillAllPrisoners)) c.CEKillPrisoners(args, PartyBase.MainParty.PrisonRoster.Count(), true);
-            // Kill Random
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomPrisoners)) c.CEKillPrisoners(args);
+            Escape();
+            GainRandomPrisoners();
+            KillPrisoner(ref args);
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StripHero) && captiveHero != null)
             {
                 if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
                 InventoryManager.OpenScreenAsInventoryOf(Hero.MainHero.PartyBelongedTo.Party.MobileParty, captiveHero.CharacterObject);
             }
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners)) { c.CEPrisonerRebel(args); }
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.HuntPrisoners)) { c.CEHuntPrisoners(args); }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners)) { new CaptorSpecifics().CEPrisonerRebel(args); }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.HuntPrisoners)) { new CaptorSpecifics().CEHuntPrisoners(args); }
             else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0)
             {
                 var eventNames = new List<CEEvent>();
@@ -398,7 +145,7 @@ namespace CaptivityEvents.Events
 
                         try
                         {
-                            weightedChance = varLoader.GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
+                            weightedChance = new VariablesLoader().GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
                                                                          ? triggerEvent.EventWeight
                                                                          : triggeredEvent.WeightedChanceOfOccuring);
                         }
@@ -420,15 +167,15 @@ namespace CaptivityEvents.Events
                         catch (Exception)
                         {
                             CECustomHandler.ForceLogToFile("Couldn't find " + eventNames[number] + " in events.");
-                            c.CECaptorContinue(args);
+                            new CaptorSpecifics().CECaptorContinue(args);
                         }
                     }
-                    else { c.CECaptorContinue(args); }
+                    else { new CaptorSpecifics().CECaptorContinue(args); }
                 }
                 catch (Exception)
                 {
                     CECustomHandler.LogToFile("MBRandom.Random in events Failed.");
-                    c.CECaptorContinue(args);
+                    new CaptorSpecifics().CECaptorContinue(args);
                 }
             }
             else if (!string.IsNullOrEmpty(_option.TriggerEventName))
@@ -442,14 +189,348 @@ namespace CaptivityEvents.Events
                 catch (Exception)
                 {
                     CECustomHandler.ForceLogToFile("Couldn't find " + _option.TriggerEventName + " in events.");
-                    c.CECaptorContinue(args);
+                    new CaptorSpecifics().CECaptorContinue(args);
                 }
             }
-            else { c.CECaptorContinue(args); }
+            else { new CaptorSpecifics().CECaptorContinue(args); }
         }
 
 
 #region private
+
+        
+        private void KillPrisoner(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner))
+            {
+                if (_listedEvent.Captive.IsHero) KillCharacterAction.ApplyByExecution(_listedEvent.Captive.HeroObject, Hero.MainHero);
+                else PartyBase.MainParty.PrisonRoster.AddToCounts(_listedEvent.Captive, -1);
+            }
+
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor)) new Dynamics().CEKillPlayer(_listedEvent.Captive.HeroObject);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillAllPrisoners)) new CaptorSpecifics().CEKillPrisoners(args, PartyBase.MainParty.PrisonRoster.Count(), true);
+            // Kill Random
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomPrisoners)) new CaptorSpecifics().CEKillPrisoners(args);
+        }
+
+        private void GainRandomPrisoners()
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GainRandomPrisoners)) new Dynamics().CEGainRandomPrisoners(PartyBase.MainParty);
+        }
+
+        private void Escape()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) return;
+
+            if (_listedEvent.Captive.IsHero) EndCaptivityAction.ApplyByEscape(_listedEvent.Captive.HeroObject);
+            else PartyBase.MainParty.PrisonRoster.AddToCounts(_listedEvent.Captive, -1);
+        }
+
+        private void Strip(Hero captiveHero)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip)) new CaptorSpecifics().CEStripVictim(captiveHero);
+        }
+
+        private void Impregnation(Hero captiveHero)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationHero))
+                try
+                {
+                    new ImpregnationSystem().CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
+                                                      ? new VariablesLoader().GetIntFromXML(_option.PregnancyRiskModifier)
+                                                      : new VariablesLoader().GetIntFromXML(_listedEvent.PregnancyRiskModifier));
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Missing PregnancyRiskModifier");
+                    new ImpregnationSystem().CaptivityImpregnationChance(captiveHero, 30);
+                }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationRisk))
+                try
+                {
+                    new ImpregnationSystem().CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
+                                                      ? new VariablesLoader().GetIntFromXML(_option.PregnancyRiskModifier)
+                                                      : new VariablesLoader().GetIntFromXML(_listedEvent.PregnancyRiskModifier), false, false);
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Missing PregnancyRiskModifier");
+                    new ImpregnationSystem().CaptivityImpregnationChance(captiveHero, 30, false, false);
+                }
+        }
+
+        private void ChangeHealth(Hero captiveHero)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeHealth)) return;
+
+            try
+            {
+                captiveHero.HitPoints += !string.IsNullOrEmpty(_option.HealthTotal)
+                    ? new VariablesLoader().GetIntFromXML(_option.HealthTotal)
+                    : new VariablesLoader().GetIntFromXML(_listedEvent.HealthTotal);
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Missing HealthTotal");
+                captiveHero.HitPoints += MBRandom.RandomInt(-20, 20);
+            }
+        }
+
+        private void Renown(Hero captiveHero)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRenown)) return;
+
+            try
+            {
+                new Dynamics().RenownModifier(!string.IsNullOrEmpty(_option.RenownTotal)
+                                                  ? new VariablesLoader().GetIntFromXML(_option.RenownTotal)
+                                                  : new VariablesLoader().GetIntFromXML(_listedEvent.RenownTotal), captiveHero);
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Missing RenownTotal");
+                new Dynamics().RenownModifier(MBRandom.RandomInt(-5, 5), captiveHero);
+            }
+        }
+
+        private void Skill(Hero captiveHero)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSkill)) return;
+
+            try
+            {
+                var level = 0;
+
+                if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = new VariablesLoader().GetIntFromXML(_option.SkillTotal);
+                else if (!_listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = new VariablesLoader().GetIntFromXML(_listedEvent.SkillTotal);
+                else CECustomHandler.LogToFile("Missing Skill SkillTotal");
+
+                if (!_option.SkillToLevel.IsStringNoneOrEmpty()) new Dynamics().SkillModifier(captiveHero, _option.SkillToLevel, level);
+                else if (!_listedEvent.SkillToLevel.IsStringNoneOrEmpty()) new Dynamics().SkillModifier(captiveHero, _listedEvent.SkillToLevel, level);
+                else CECustomHandler.LogToFile("Missing SkillToLevel");
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
+        }
+
+        private void Trait(Hero captiveHero)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeTrait)) return;
+
+            try
+            {
+                var level = new VariablesLoader().GetIntFromXML(!string.IsNullOrEmpty(_option.TraitTotal)
+                                                        ? _option.TraitTotal
+                                                        : _listedEvent.TraitTotal);
+
+                new Dynamics().TraitModifier(captiveHero, !string.IsNullOrEmpty(_option.TraitToLevel)
+                                           ? _option.TraitToLevel
+                                           : _listedEvent.TraitToLevel, level);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Missing Trait Flags"); }
+        }
+
+        private void ChangeGold(Hero captiveHero)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) return;
+
+            try
+            {
+                var level = 0;
+
+                if (!string.IsNullOrEmpty(_option.GoldTotal)) level = new VariablesLoader().GetIntFromXML(_option.GoldTotal);
+                else if (!string.IsNullOrEmpty(_listedEvent.GoldTotal)) level = new VariablesLoader().GetIntFromXML(_listedEvent.GoldTotal);
+                else CECustomHandler.LogToFile("Missing GoldTotal");
+
+                GiveGoldAction.ApplyBetweenCharacters(null, captiveHero, level);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
+        }
+
+        private void Gold(Hero captiveHero)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) return;
+
+            var content = new ScoresCalculation().AttractivenessScore(captiveHero);
+            var currentValue = captiveHero.GetSkillValue(CESkills.Prostitution);
+            content += currentValue / 2;
+            content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveGold);
+            GiveGoldAction.ApplyBetweenCharacters(null, captiveHero, content);
+        }
+
+        private void Relations(Hero captiveHero)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRelation)) return;
+
+            try
+            {
+                new Dynamics().RelationsModifier(captiveHero, !string.IsNullOrEmpty(_option.RelationTotal)
+                                               ? new VariablesLoader().GetIntFromXML(_option.RelationTotal)
+                                               : new VariablesLoader().GetIntFromXML(_listedEvent.RelationTotal));
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Missing RelationTotal");
+                new Dynamics().RelationsModifier(captiveHero, MBRandom.RandomInt(-5, 5));
+            }
+        }
+
+        private void ProstitutionLevel(Hero captiveHero)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeProstitutionLevel)) return;
+
+            try
+            {
+                new Dynamics().VictimProstitutionModifier(!string.IsNullOrEmpty(_option.ProstitutionTotal)
+                                                        ? new VariablesLoader().GetIntFromXML(_option.ProstitutionTotal)
+                                                        : new VariablesLoader().GetIntFromXML(_listedEvent.ProstitutionTotal), captiveHero);
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Missing ProstitutionTotal");
+                new Dynamics().VictimProstitutionModifier(1, captiveHero);
+            }
+        }
+
+        private void ProstitutionFlags(Hero captiveHero)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag)) new Dynamics().VictimProstitutionModifier(1, captiveHero, true, false, true);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) new Dynamics().VictimProstitutionModifier(0, captiveHero, true, false, true);
+        }
+
+        private void SlaveryLevel(Hero captiveHero)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSlaveryLevel)) return;
+
+            try
+            {
+                new Dynamics().VictimSlaveryModifier(!string.IsNullOrEmpty(_option.SlaveryTotal)
+                                                   ? new VariablesLoader().GetIntFromXML(_option.SlaveryTotal)
+                                                   : new VariablesLoader().GetIntFromXML(_listedEvent.SlaveryTotal), captiveHero);
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Missing SlaveryTotal");
+                new Dynamics().VictimSlaveryModifier(1, captiveHero);
+            }
+        }
+
+        private void SlaveryFlags(Hero captiveHero)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddSlaveryFlag)) new Dynamics().VictimSlaveryModifier(1, captiveHero, true, false, true);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveSlaveryFlag)) new Dynamics().VictimSlaveryModifier(0, captiveHero, true, false, true);
+        }
+
+        private void ChangeClan(Hero captiveHero)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeClan)) new Dynamics().ChangeClan(captiveHero, Hero.MainHero);
+        }
+
+        private void ForceMarry(Hero captiveHero)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveMarryCaptor)) new Dynamics().ChangeSpouse(captiveHero, Hero.MainHero);
+        }
+
+        private void LeaveSpouse(Hero captiveHero)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveLeaveSpouse)) new Dynamics().ChangeSpouse(captiveHero, null);
+        }
+
+        private void ChangeMorale()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
+
+            try
+            {
+                new Dynamics().MoralChange(!string.IsNullOrEmpty(_option.MoraleTotal)
+                                         ? new VariablesLoader().GetIntFromXML(_option.MoraleTotal)
+                                         : new VariablesLoader().GetIntFromXML(_listedEvent.MoraleTotal), PartyBase.MainParty);
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Missing MoralTotal");
+                new Dynamics().MoralChange(MBRandom.RandomInt(-5, 5), PlayerCaptivity.CaptorParty);
+            }
+        }
+
+        private void CaptorRenown()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorRenown)) return;
+
+            try
+            {
+                new Dynamics().RenownModifier(!string.IsNullOrEmpty(_option.RenownTotal)
+                                            ? new VariablesLoader().GetIntFromXML(_option.RenownTotal)
+                                            : new VariablesLoader().GetIntFromXML(_listedEvent.RenownTotal), Hero.MainHero);
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Missing RenownTotal");
+                new Dynamics().RenownModifier(MBRandom.RandomInt(-5, 5), Hero.MainHero);
+            }
+        }
+
+        private void CaptorTrait()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorTrait)) return;
+
+            try
+            {
+                var level = new VariablesLoader().GetIntFromXML(!string.IsNullOrEmpty(_option.TraitTotal)
+                                                                    ? _option.TraitTotal
+                                                                    : _listedEvent.TraitTotal);
+
+                new Dynamics().TraitModifier(Hero.MainHero, !string.IsNullOrEmpty(_option.TraitToLevel)
+                                           ? _option.TraitToLevel
+                                           : _listedEvent.TraitToLevel, level);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Missing Trait Flags"); }
+        }
+
+        private void CaptorSkill()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorSkill)) return;
+
+            try
+            {
+                var level = 0;
+
+                if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = new VariablesLoader().GetIntFromXML(_option.SkillTotal);
+                else if (!_listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = new VariablesLoader().GetIntFromXML(_listedEvent.SkillTotal);
+                else CECustomHandler.LogToFile("Missing Skill SkillTotal");
+
+                if (!_option.SkillToLevel.IsStringNoneOrEmpty()) new Dynamics().SkillModifier(Hero.MainHero, _option.SkillToLevel, level);
+                else if (!_listedEvent.SkillToLevel.IsStringNoneOrEmpty()) new Dynamics().SkillModifier(Hero.MainHero, _listedEvent.SkillToLevel, level);
+                else CECustomHandler.LogToFile("Missing SkillToLevel");
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
+        }
+
+        private void CaptorChangeGold()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorGold)) return;
+
+            try
+            {
+                var level = 0;
+
+                if (!string.IsNullOrEmpty(_option.CaptorGoldTotal)) level = new VariablesLoader().GetIntFromXML(_option.CaptorGoldTotal);
+                else if (!string.IsNullOrEmpty(_listedEvent.CaptorGoldTotal)) level = new VariablesLoader().GetIntFromXML(_listedEvent.CaptorGoldTotal);
+                else CECustomHandler.LogToFile("Missing CaptorGoldTotal");
+
+                GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, level);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid CaptorGoldTotal"); }
+        }
+
+        private void CaptorGold(Hero captiveHero)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveCaptorGold)) return;
+            var content = new ScoresCalculation().AttractivenessScore(captiveHero);
+            var currentValue = captiveHero.GetSkillValue(CESkills.Prostitution);
+            content += currentValue / 2;
+            content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveCaptorGold);
+            GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, content);
+        }
 
         private void ReqGold(ref MenuCallbackArgs args)
         {
@@ -483,7 +564,6 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_gold_level", "low");
             args.IsEnabled = false;
         }
-
 
         private void ReqCaptorSkill(ref MenuCallbackArgs args)
         {
