@@ -295,14 +295,24 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
+<<<<<<< HEAD
                     CEPersistence.animationPlayEvent = false;
-                    new CESubModule().LoadTexture(textureFlag);
+                    t.LoadTexture("default_random");  
+=======
+                    CESubModule.animationPlayEvent = false;
+                    CESubModule.LoadTexture(textureFlag);
+>>>>>>> b8d2bfd024e189955c8017ed135643c746935035
                 }
             }
             catch (Exception)
             {
+<<<<<<< HEAD
+                CECustomHandler.LogToFile("Failed to load background for " + _listedEvent.Name);
+                t.LoadTexture("default_random");
+=======
                 CECustomHandler.ForceLogToFile("Failed to load background for " + _listedEvent.Name);
-                new CESubModule().LoadTexture(textureFlag);
+                CESubModule.LoadTexture(textureFlag);
+>>>>>>> b8d2bfd024e189955c8017ed135643c746935035
             }
         }
 

@@ -50,6 +50,7 @@ namespace CaptivityEvents.Helper
                 }
 
                 if (!flag) return "Wrong input.\nFormat is \"captivity.force_fire_event [EventName] [CaptiveName]\".";
+
                 string result;
 
                 if (PlayerCaptivity.IsCaptive)
@@ -152,8 +153,6 @@ namespace CaptivityEvents.Helper
                             return "Failed to launch event, incorrect game state.";
                         }
                 }
-
-                return "Wrong input.\nFormat is \"captivity.force_fire_event [EventName] [CaptiveName]\".";
             }
             catch (Exception e)
             {

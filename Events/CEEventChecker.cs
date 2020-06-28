@@ -838,6 +838,7 @@ namespace CaptivityEvents.Events
             if (captive.IsHero && captive.HeroObject != null && (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptiveIsHero) || captive.IsPlayerCharacter))
             {
                 var captiveHero = captive.HeroObject;
+                //HeroChecks(captiveHero); // Please fix the lag and the wrong flags, in this file.
 
                 if (nonRandomBehaviour)
                 {
