@@ -1,9 +1,11 @@
-﻿using Helpers;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Helpers;
 using TaleWorlds.CampaignSystem;
 
 namespace CaptivityEvents.Models
 {
-    internal class CEDefaultPregnancyModel : PregnancyModel
+    public class CEDefaultPregnancyModel : PregnancyModel
     {
         public override float CharacterFertilityProbability => 0.95f;
 
@@ -22,18 +24,53 @@ namespace CaptivityEvents.Models
             return hero.Age >= 18f && hero.Age <= 45f;
         }
 
+        private bool IsHeroAgeSuitableForPregnancy(CEHero hero) //I created this overload for the unit test example.
+        {
+            return hero.Age >= 18f && hero.Age <= 45f;
+        }
+
+
+
+
+        private float GeneratePregnancyFactorNumber(float age, float explainedNumber)
+        {
+            return (6.5f - (age - 18f) * 0.23f) * 0.02f * explainedNumber;
+        }
+
+
+
         public override float GetDailyChanceOfPregnancyForHero(Hero hero)
+        {
+            //Arrange decoupling of dependencies; unit tests can<t run on dependencies because the system isn<t running.
+            CEHero h = new CEHero
+                       {
+                           Age = hero.Age,
+                           IsFertile = hero.IsFertile,
+                           Children = GetListOfHeroesFrom(hero.Children),
+                           Spouse = GetListOfHeroesFrom(hero.Spouse)
+                       };
+
+            ExplainedNumber explainedNumber = new ExplainedNumber(1f);
+            PerkHelper.AddPerkBonusForCharacter(DefaultPerks.Medicine.PerfectHealth, hero.Clan.Leader.CharacterObject, ref explainedNumber);
+            float perkBonus = explainedNumber.ResultNumber;
+
+            float result = CEGetDailyChanceOfPregnancyForHero(h, perkBonus);
+
+            return result;
+            
+            
+        }
+
+        public float CEGetDailyChanceOfPregnancyForHero(CEHero ceHero, float perkBonus)
         {
             float num = 0f;
 
-            if (hero.Spouse != null && hero.IsFertile && IsHeroAgeSuitableForPregnancy(hero))
+            if (ceHero.Spouse != null && ceHero.IsFertile && IsHeroAgeSuitableForPregnancy(ceHero))
             {
-                ExplainedNumber explainedNumber = new ExplainedNumber(1f);
-                PerkHelper.AddPerkBonusForCharacter(DefaultPerks.Medicine.PerfectHealth, hero.Clan.Leader.CharacterObject, ref explainedNumber);
-                num = (6.5f - (hero.Age - 18f) * 0.23f) * 0.02f * explainedNumber.ResultNumber;
+                num = GeneratePregnancyFactorNumber(ceHero.Age, perkBonus);
             }
 
-            switch (hero.Children.Count)
+            switch (ceHero.Children.Count)
             {
                 case 0:
                     num *= 3f;
@@ -48,8 +85,28 @@ namespace CaptivityEvents.Models
             return num;
         }
 
+
+        private List<CEHero> GetListOfHeroesFrom(List<Hero> heroes)
+        {
+            return heroes.Select(hero => new CEHero {Age = hero.Age, IsFertile = hero.IsFertile}).ToList();
+        }
+
+        private CEHero GetListOfHeroesFrom(Hero hero)
+        {
+            return new CEHero{ Age = hero.Age, IsFertile = hero.IsFertile };
+        }
+
         private const int MinPregnancyAge = 18;
 
         private const int MaxPregnancyAge = 45;
+    }
+
+
+    public class CEHero
+    {
+        public CEHero Spouse;
+        public bool IsFertile;
+        public float Age;
+        public List<CEHero> Children;
     }
 }
