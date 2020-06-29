@@ -5,6 +5,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CharacterDevelopment.Managers;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
+using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Events
 {
@@ -13,13 +14,12 @@ namespace CaptivityEvents.Events
         internal void CECaptivityContinue(ref MenuCallbackArgs args)
         {
             CEPersistence.animationPlayEvent = false;
-            var t = new CESubModule();
 
             try
             {
                 if (PlayerCaptivity.CaptorParty != null)
                 {
-                    var waitingList = new WaitingList().CEWaitingList();
+                    string waitingList = new WaitingList().CEWaitingList();
 
                     if (waitingList != null)
                     {
@@ -27,7 +27,7 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        t.LoadTexture("default");
+                        new CESubModule().LoadTexture("default");
 
                         GameMenu.SwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement
                                                   ? "settlement_wait"
@@ -36,7 +36,7 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
-                    t.LoadTexture("default");
+                    new CESubModule().LoadTexture("default");
                     GameMenu.ExitToLast();
                 }
             }
@@ -75,7 +75,7 @@ namespace CaptivityEvents.Events
         internal void CECaptivityLeave(ref MenuCallbackArgs args)
         {
             new CESubModule().LoadTexture("default");
-            var captorParty = PlayerCaptivity.CaptorParty;
+            PartyBase captorParty = PlayerCaptivity.CaptorParty;
             CECampaignBehavior.ExtraProps.Owner = null;
 
             if (!captorParty.IsSettlement || !captorParty.Settlement.IsTown)
@@ -127,17 +127,18 @@ namespace CaptivityEvents.Events
         internal void CECaptivityEscape(ref MenuCallbackArgs args)
         {
             CECampaignBehavior.ExtraProps.Owner = null;
-            var wasInSettlement = PlayerCaptivity.CaptorParty.IsSettlement;
-            var currentSettlement = PlayerCaptivity.CaptorParty.Settlement;
+            bool wasInSettlement = PlayerCaptivity.CaptorParty.IsSettlement;
+            Settlement currentSettlement = PlayerCaptivity.CaptorParty.Settlement;
 
-            var textObject = GameTexts.FindText("str_CE_escape_success", wasInSettlement
+            TextObject textObject = GameTexts.FindText("str_CE_escape_success", wasInSettlement
                                                     ? "settlement"
                                                     : null);
+
             textObject.SetTextVariable("PLAYER_HERO", Hero.MainHero.Name);
 
             if (wasInSettlement)
             {
-                var settlementName = currentSettlement != null
+                string settlementName = currentSettlement != null
                     ? currentSettlement.Name.ToString()
                     : "ERROR";
                 textObject.SetTextVariable("SETTLEMENT", settlementName);

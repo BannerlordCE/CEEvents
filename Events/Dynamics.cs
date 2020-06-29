@@ -6,6 +6,7 @@ using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
+using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Events
 {
@@ -35,11 +36,11 @@ namespace CaptivityEvents.Events
 
         internal void ChangeSpouse(Hero hero, Hero spouseHero)
         {
-            var heroSpouse = hero.Spouse;
+            Hero heroSpouse = hero.Spouse;
 
             if (heroSpouse != null)
             {
-                var textObject = GameTexts.FindText("str_CE_spouse_leave");
+                TextObject textObject = GameTexts.FindText("str_CE_spouse_leave");
                 textObject.SetTextVariable("HERO", hero.Name);
                 textObject.SetTextVariable("SPOUSE", heroSpouse.Name);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
@@ -50,11 +51,11 @@ namespace CaptivityEvents.Events
             }
 
             if (spouseHero == null) return;
-            var spouseHeroSpouse = spouseHero.Spouse;
+            Hero spouseHeroSpouse = spouseHero.Spouse;
 
             if (spouseHeroSpouse != null)
             {
-                var textObject3 = GameTexts.FindText("str_CE_spouse_leave");
+                TextObject textObject3 = GameTexts.FindText("str_CE_spouse_leave");
                 textObject3.SetTextVariable("HERO", hero.Name);
                 textObject3.SetTextVariable("SPOUSE", spouseHeroSpouse.Name);
                 InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
@@ -69,18 +70,18 @@ namespace CaptivityEvents.Events
 
         internal void TraitModifier(Hero hero, string trait, int amount = 0)
         {
-            var found = false;
+            bool found = false;
 
-            foreach (var traitObject in DefaultTraits.Personality)
+            foreach (TraitObject traitObject in DefaultTraits.Personality)
                 if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                 {
                     found = true;
-                    var currentTraitLevel = hero.GetTraitLevel(traitObject);
-                    var newNumber = currentTraitLevel + amount;
+                    int currentTraitLevel = hero.GetTraitLevel(traitObject);
+                    int newNumber = currentTraitLevel + amount;
                     if (newNumber >= traitObject.MinValue && newNumber <= traitObject.MaxValue) hero.SetTraitLevel(traitObject, newNumber);
 
                     if (amount == 0) continue;
-                    var textObject = GameTexts.FindText("str_CE_trait_level");
+                    TextObject textObject = GameTexts.FindText("str_CE_trait_level");
                     textObject.SetTextVariable("HERO", hero.Name);
 
                     textObject.SetTextVariable("POSITIVE", amount >= 0
@@ -91,16 +92,16 @@ namespace CaptivityEvents.Events
                 }
 
             if (!found)
-                foreach (var traitObject in DefaultTraits.SkillCategories)
+                foreach (TraitObject traitObject in DefaultTraits.SkillCategories)
                     if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                     {
                         found = true;
-                        var currentTraitLevel = hero.GetTraitLevel(traitObject);
-                        var newNumber = currentTraitLevel + amount;
+                        int currentTraitLevel = hero.GetTraitLevel(traitObject);
+                        int newNumber = currentTraitLevel + amount;
                         if (newNumber >= traitObject.MinValue && newNumber <= traitObject.MaxValue) hero.SetTraitLevel(traitObject, newNumber);
 
                         if (amount == 0) continue;
-                        var textObject = GameTexts.FindText("str_CE_trait_level");
+                        TextObject textObject = GameTexts.FindText("str_CE_trait_level");
                         textObject.SetTextVariable("HERO", hero.Name);
 
                         textObject.SetTextVariable("POSITIVE", amount >= 0
@@ -113,18 +114,18 @@ namespace CaptivityEvents.Events
             if (found) return;
 
             {
-                foreach (var traitObject in DefaultTraits.All)
+                foreach (TraitObject traitObject in DefaultTraits.All)
                     if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                     {
                         found = true;
-                        var currentTraitLevel = hero.GetTraitLevel(traitObject);
-                        var newNumber = currentTraitLevel + amount;
+                        int currentTraitLevel = hero.GetTraitLevel(traitObject);
+                        int newNumber = currentTraitLevel + amount;
                         if (newNumber >= traitObject.MinValue && newNumber <= traitObject.MaxValue) hero.SetTraitLevel(traitObject, newNumber);
 
                         if (amount == 0) continue;
                         if (CESettings.Instance != null && !CESettings.Instance.LogToggle) continue;
 
-                        var textObject = GameTexts.FindText("str_CE_trait_level");
+                        TextObject textObject = GameTexts.FindText("str_CE_trait_level");
                         textObject.SetTextVariable("HERO", hero.Name);
 
                         textObject.SetTextVariable("POSITIVE", amount >= 0
@@ -140,17 +141,17 @@ namespace CaptivityEvents.Events
 
         internal void SkillModifier(Hero hero, string skill, int amount = 0)
         {
-            foreach (var skillObject in SkillObject.All)
+            foreach (SkillObject skillObject in SkillObject.All)
                 if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
                 {
-                    var currentSkillLevel = hero.GetSkillValue(skillObject);
-                    var newNumber = currentSkillLevel + amount;
+                    int currentSkillLevel = hero.GetSkillValue(skillObject);
+                    int newNumber = currentSkillLevel + amount;
                     if (newNumber < 0) newNumber = 0;
 
                     hero.SetSkillValue(skillObject, newNumber);
 
                     if (amount == 0) continue;
-                    var textObject = GameTexts.FindText("str_CE_level_skill");
+                    TextObject textObject = GameTexts.FindText("str_CE_level_skill");
                     textObject.SetTextVariable("HERO", hero.Name);
 
                     textObject.SetTextVariable("NEGATIVE", amount > 0
@@ -170,18 +171,18 @@ namespace CaptivityEvents.Events
         internal void VictimSlaveryModifier(int amount, Hero hero, bool updateFlag = false, bool displayMessage = true, bool quickInformation = false)
         {
             if (hero == null) return;
-            var slaverySkill = CESkills.Slavery;
-            var slaveryFlag = CESkills.IsSlave;
+            SkillObject slaverySkill = CESkills.Slavery;
+            SkillObject slaveryFlag = CESkills.IsSlave;
 
             if (updateFlag)
             {
-                var currentLevel = hero.GetSkillValue(slaveryFlag);
+                int currentLevel = hero.GetSkillValue(slaveryFlag);
 
                 if (amount == 0)
                 {
                     if ((displayMessage || quickInformation) && currentLevel != 0)
                     {
-                        var textObject = GameTexts.FindText("str_CE_level_leave");
+                        TextObject textObject = GameTexts.FindText("str_CE_level_leave");
                         textObject.SetTextVariable("HERO", hero.Name);
                         textObject.SetTextVariable("OCCUPATION", slaveryFlag.Name);
                         if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
@@ -193,7 +194,7 @@ namespace CaptivityEvents.Events
                 {
                     if ((displayMessage || quickInformation) && currentLevel != 1)
                     {
-                        var textObject = GameTexts.FindText("str_CE_level_enter");
+                        TextObject textObject = GameTexts.FindText("str_CE_level_enter");
                         textObject.SetTextVariable("HERO", hero.Name);
                         textObject.SetTextVariable("OCCUPATION", slaveryFlag.Name);
                         if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
@@ -216,7 +217,7 @@ namespace CaptivityEvents.Events
             {
                 if ((displayMessage || quickInformation) && hero.GetSkillValue(skill) > 0)
                 {
-                    var textObject = GameTexts.FindText("str_CE_level_start");
+                    TextObject textObject = GameTexts.FindText("str_CE_level_start");
                     textObject.SetTextVariable("SKILL", skill.Name);
                     textObject.SetTextVariable("HERO", hero.Name);
 
@@ -232,13 +233,13 @@ namespace CaptivityEvents.Events
             }
             else
             {
-                var currentValue = hero.GetSkillValue(skill);
-                var valueToSet = currentValue + amount;
+                int currentValue = hero.GetSkillValue(skill);
+                int valueToSet = currentValue + amount;
                 if (valueToSet < 1) valueToSet = 1;
                 hero.SetSkillValue(skill, valueToSet);
 
                 if (!displayMessage && !quickInformation) return;
-                var textObject = GameTexts.FindText("str_CE_level_skill");
+                TextObject textObject = GameTexts.FindText("str_CE_level_skill");
                 textObject.SetTextVariable("HERO", hero.Name);
                 textObject.SetTextVariable("SKILL", skill.Name);
 
@@ -284,8 +285,8 @@ namespace CaptivityEvents.Events
 
         internal void CEGainRandomPrisoners(PartyBase party)
         {
-            var nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.IsVillage);
-            //var villagerPartyTemplate = nearest.Culture.VillagerPartyTemplate; //warning never used.
+            Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.IsVillage);
+            //PartyTemplateObject villagerPartyTemplate = nearest.Culture.VillagerPartyTemplate; Will be used in figuring out on what to give
             MBRandom.RandomInt(1, 10);
             party.AddPrisoner(nearest.Culture.VillageWoman, 10, 7);
             party.AddPrisoner(nearest.Culture.Villager, 10, 7);
@@ -294,18 +295,18 @@ namespace CaptivityEvents.Events
         internal void VictimProstitutionModifier(int amount, Hero hero, bool updateFlag = false, bool displayMessage = true, bool quickInformation = false)
         {
             if (hero == null) return;
-            var prostitutionSkill = CESkills.Prostitution;
-            var prostitutionFlag = CESkills.IsProstitute;
+            SkillObject prostitutionSkill = CESkills.Prostitution;
+            SkillObject prostitutionFlag = CESkills.IsProstitute;
 
             if (updateFlag)
             {
-                var currentLevel = hero.GetSkillValue(prostitutionFlag);
+                int currentLevel = hero.GetSkillValue(prostitutionFlag);
 
                 if (amount == 0)
                 {
                     if ((displayMessage || quickInformation) && currentLevel != 0)
                     {
-                        var textObject = GameTexts.FindText("str_CE_level_leave");
+                        TextObject textObject = GameTexts.FindText("str_CE_level_leave");
                         textObject.SetTextVariable("HERO", hero.Name);
                         textObject.SetTextVariable("OCCUPATION", prostitutionFlag.Name);
                         if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
@@ -317,7 +318,7 @@ namespace CaptivityEvents.Events
                 {
                     if ((displayMessage || quickInformation) && currentLevel != 1)
                     {
-                        var textObject = GameTexts.FindText("str_CE_level_enter");
+                        TextObject textObject = GameTexts.FindText("str_CE_level_enter");
                         textObject.SetTextVariable("HERO", hero.Name);
                         textObject.SetTextVariable("OCCUPATION", prostitutionFlag.Name);
                         if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
@@ -337,7 +338,7 @@ namespace CaptivityEvents.Events
         internal void MoralChange(int amount, PartyBase partyBase)
         {
             if (!partyBase.IsMobile || amount == 0) return;
-            var textObject = GameTexts.FindText("str_CE_morale_level");
+            TextObject textObject = GameTexts.FindText("str_CE_morale_level");
             textObject.SetTextVariable("PARTY", partyBase.Name);
 
             textObject.SetTextVariable("POSITIVE", amount >= 0
@@ -354,7 +355,7 @@ namespace CaptivityEvents.Events
             hero.Clan.Renown += amount;
             if (CESettings.Instance != null && hero.Clan.Renown < CESettings.Instance.RenownMin) hero.Clan.Renown = CESettings.Instance.RenownMin;
 
-            var textObject = GameTexts.FindText("str_CE_renown_level");
+            TextObject textObject = GameTexts.FindText("str_CE_renown_level");
             textObject.SetTextVariable("HERO", hero.Name);
 
             textObject.SetTextVariable("POSITIVE", amount >= 0
@@ -369,12 +370,12 @@ namespace CaptivityEvents.Events
             if (hero1 == null || relationChange == 0) return;
             if (hero2 == null) hero2 = Hero.MainHero;
 
-            Campaign.Current.Models.DiplomacyModel.GetHeroesForEffectiveRelation(hero1, hero2, out var hero3, out var hero4);
-            var value = CharacterRelationManager.GetHeroRelation(hero3, hero4) + relationChange;
+            Campaign.Current.Models.DiplomacyModel.GetHeroesForEffectiveRelation(hero1, hero2, out Hero hero3, out Hero hero4);
+            int value = CharacterRelationManager.GetHeroRelation(hero3, hero4) + relationChange;
             value = MBMath.ClampInt(value, -100, 100);
             hero3.SetPersonalRelation(hero4, value);
 
-            var textObject = GameTexts.FindText("str_CE_relationship_level");
+            TextObject textObject = GameTexts.FindText("str_CE_relationship_level");
             textObject.SetTextVariable("PLAYER_HERO", hero2.Name);
             textObject.SetTextVariable("HERO", hero1.Name);
 

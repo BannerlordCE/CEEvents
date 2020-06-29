@@ -10,30 +10,30 @@ namespace CaptivityEvents.Events
     {
         public string CEWaitingList()
         {
-            var eventNames = new List<string>();
+            List<string> eventNames = new List<string>();
 
             if (CEPersistence.CEWaitingList != null && CEPersistence.CEWaitingList.Count > 0)
             {
                 CECustomHandler.LogToFile("Having " + CEPersistence.CEWaitingList.Count + " of events to weight and check conditions on.");
 
-                foreach (var listEvent in CEPersistence.CEWaitingList)
+                foreach (CEEvent listEvent in CEPersistence.CEWaitingList)
                 {
-                    var result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                    string result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
 
                     if (result == null)
                     {
-                        var weightedChance = 10;
+                        int weightedChance = 10;
 
                         try
                         {
-                            if (listEvent.WeightedChanceOfOccuring != null) weightedChance = new VariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                            if (listEvent.WeightedChanceOfOccuring != null) weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
                         }
                         catch (Exception)
                         {
                             CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring");
                         }
 
-                        for (var a = weightedChance; a > 0; a--) eventNames.Add(listEvent.Name);
+                        for (int a = weightedChance; a > 0; a--) eventNames.Add(listEvent.Name);
                     }
                     else
                     {
@@ -47,8 +47,8 @@ namespace CaptivityEvents.Events
                 {
                     if (eventNames.Count > 0)
                     {
-                        var test = MBRandom.Random.Next(0, eventNames.Count - 1);
-                        var randomWeightedChoice = eventNames[test];
+                        int test = MBRandom.Random.Next(0, eventNames.Count - 1);
+                        string randomWeightedChoice = eventNames[test];
 
                         return randomWeightedChoice;
                     }

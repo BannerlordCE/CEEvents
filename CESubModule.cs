@@ -85,11 +85,6 @@ namespace CaptivityEvents
 
     public class CESubModule : MBSubModuleBase
     {
-
-        
-        
-
-
         private static bool _isLoaded;
         private static bool _isLoadedInGame;
         // All Images lost if not static
@@ -185,10 +180,10 @@ namespace CaptivityEvents
         {
             base.OnSubModuleLoad();
 
-            var ceModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
-            var modversion = ceModule.Version;
-            var nativeModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
-            var gameversion = nativeModule.Version;
+            ModuleInfo ceModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
+            ApplicationVersion modversion = ceModule.Version;
+            ModuleInfo nativeModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
+            ApplicationVersion gameversion = nativeModule.Version;
 
             if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor || gameversion.Revision != modversion.Revision)
             {
@@ -196,15 +191,15 @@ namespace CaptivityEvents
                 MessageBox.Show("Warning:\n Captivity Events " + modversion + " has the detected the wrong game version. Please download the correct version for " + gameversion + ". Or continue at your own risk.", "Captivity Events has the detected the wrong version");
             }
 
-            var modulesFound = Utilities.GetModulesNames();
-            var modulePaths = new List<string>();
+            string[] modulesFound = Utilities.GetModulesNames();
+            List<string> modulePaths = new List<string>();
 
             CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
 
-            foreach (var moduleID in modulesFound)
+            foreach (string moduleID in modulesFound)
                 try
                 {
-                    var moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
+                    ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
 
                     if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
 
@@ -229,29 +224,29 @@ namespace CaptivityEvents
             CEPersistence.CEFlags = CECustomHandler.GetFlags();
 
             // Load Images
-            var fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
-            var requiredPath = fullPath + "CaptivityRequired";
+            string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
+            string requiredPath = fullPath + "CaptivityRequired";
 
             // Get Required
-            var requiredImages = Directory.GetFiles(requiredPath, "*.png", SearchOption.AllDirectories);
+            string[] requiredImages = Directory.GetFiles(requiredPath, "*.png", SearchOption.AllDirectories);
 
             // Get All in ModuleLoader
-            var files = Directory.GetFiles(fullPath, "*.png", SearchOption.AllDirectories);
+            string[] files = Directory.GetFiles(fullPath, "*.png", SearchOption.AllDirectories);
 
             // Module Image Load
             if (modulePaths.Count != 0)
-                foreach (var filepath in modulePaths)
+                foreach (string filepath in modulePaths)
                     try
                     {
-                        var moduleFiles = Directory.GetFiles(filepath, "*.png", SearchOption.AllDirectories);
+                        string[] moduleFiles = Directory.GetFiles(filepath, "*.png", SearchOption.AllDirectories);
 
-                        foreach (var file in moduleFiles)
+                        foreach (string file in moduleFiles)
                             if (!CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
                                 try
                                 {
-                                    var texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+                                    TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                     texture.PreloadTexture();
-                                    var texture2D = new Texture(new EngineTexture(texture));
+                                    Texture texture2D = new Texture(new EngineTexture(texture));
                                     CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
                                 catch (Exception e)
@@ -265,16 +260,16 @@ namespace CaptivityEvents
             // Captivity Location Image Load
             try
             {
-                foreach (var file in files)
+                foreach (string file in files)
                 {
                     if (requiredImages.Contains(file)) continue;
 
                     if (!CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
                         try
                         {
-                            var texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+                            TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                             texture.PreloadTexture();
-                            var texture2D = new Texture(new EngineTexture(texture));
+                            Texture texture2D = new Texture(new EngineTexture(texture));
                             CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                         }
                         catch (Exception e)
@@ -284,15 +279,15 @@ namespace CaptivityEvents
                     else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
                 }
 
-                foreach (var file in requiredImages)
+                foreach (string file in requiredImages)
                 {
                     if (CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file))) continue;
 
                     try
                     {
-                        var texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+                        TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                         texture.PreloadTexture();
-                        var texture2D = new Texture(new EngineTexture(texture));
+                        Texture texture2D = new Texture(new EngineTexture(texture));
                         CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                     }
                     catch (Exception e)
@@ -303,20 +298,20 @@ namespace CaptivityEvents
 
                 // Load the Notifications Sprite
                 // 1.4.1 Checked
-                var loadedData = new SpriteData("CESpriteData");
+                SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
-                var categoryName = "ce_notification_icons";
-                var partNameCaptor = "CEEventNotification\\notification_captor";
-                var partNameEvent = "CEEventNotification\\notification_event";
-                var spriteData = UIResourceManager.SpriteData;
+                string categoryName = "ce_notification_icons";
+                string partNameCaptor = "CEEventNotification\\notification_captor";
+                string partNameEvent = "CEEventNotification\\notification_event";
+                SpriteData spriteData = UIResourceManager.SpriteData;
                 spriteData.SpriteCategories.Add(categoryName, loadedData.SpriteCategories[categoryName]);
                 spriteData.SpritePartNames.Add(partNameCaptor, loadedData.SpritePartNames[partNameCaptor]);
                 spriteData.SpritePartNames.Add(partNameEvent, loadedData.SpritePartNames[partNameEvent]);
                 spriteData.SpriteNames.Add(partNameCaptor, new SpriteGeneric(partNameCaptor, loadedData.SpritePartNames[partNameCaptor]));
                 spriteData.SpriteNames.Add(partNameEvent, new SpriteGeneric(partNameEvent, loadedData.SpritePartNames[partNameEvent]));
 
-                var spriteCategory = spriteData.SpriteCategories[categoryName];
+                SpriteCategory spriteCategory = spriteData.SpriteCategories[categoryName];
                 spriteCategory.SpriteSheets.Add(CEEventImageList["CE_default_notification"]);
                 spriteCategory.SpriteSheets.Add(CEEventImageList["CE_default_notification"]);
                 spriteCategory.Load(UIResourceManager.ResourceContext, UIResourceManager.UIResourceDepot);
@@ -351,14 +346,14 @@ namespace CaptivityEvents
 
             try
             {
-                var harmony = new Harmony("com.CE.captivityEvents");
-                var dict = Harmony.VersionInfo(out var myVersion);
+                Harmony harmony = new Harmony("com.CE.captivityEvents");
+                Dictionary<string, Version> dict = Harmony.VersionInfo(out Version myVersion);
                 CECustomHandler.ForceLogToFile("My version: " + myVersion);
 
-                foreach (var entry in dict)
+                foreach (KeyValuePair<string, Version> entry in dict)
                 {
-                    var id = entry.Key;
-                    var version = entry.Value;
+                    string id = entry.Key;
+                    Version version = entry.Value;
                     CECustomHandler.ForceLogToFile("Mod " + id + " uses Harmony version " + version);
                 }
 
@@ -374,7 +369,7 @@ namespace CaptivityEvents
                 MessageBox.Show($"Error Initializing Captivity Events:\n\n{ex}");
             }
 
-            foreach (var _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !_listedEvent.Name.IsStringNoneOrEmpty()))
+            foreach (CEEvent _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !_listedEvent.Name.IsStringNoneOrEmpty()))
             {
                 if (_listedEvent.MultipleListOfCustomFlags != null && _listedEvent.MultipleListOfCustomFlags.Count > 0)
                     if (!CEPersistence.CEFlags.Exists(match => match.CEFlags.Any(x => _listedEvent.MultipleListOfCustomFlags.Contains(x))))
@@ -411,7 +406,7 @@ namespace CaptivityEvents
             {
                 try
                 {
-                    var textObject = new TextObject("{=CEEVENTS1000}Captivity Events Loaded with {EVENT_COUNT} Events and {IMAGE_COUNT} Images.\n^o^ Enjoy your events. Remember to endorse!");
+                    TextObject textObject = new TextObject("{=CEEVENTS1000}Captivity Events Loaded with {EVENT_COUNT} Events and {IMAGE_COUNT} Images.\n^o^ Enjoy your events. Remember to endorse!");
                     textObject.SetTextVariable("EVENT_COUNT", CEPersistence.CEEvents.Count);
                     textObject.SetTextVariable("IMAGE_COUNT", CEEventImageList.Count);
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
@@ -437,7 +432,7 @@ namespace CaptivityEvents
             if (!(game.GameType is Campaign) || !_isLoaded) return;
             game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings_xml.xml");
             InitalizeAttributes(game);
-            var campaignStarter = (CampaignGameStarter)gameStarter;
+            CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
             AddBehaviours(campaignStarter);
         }
 
@@ -446,7 +441,7 @@ namespace CaptivityEvents
             if (Campaign.Current == null) return true;
 
             if (CESettings.Instance != null && !CESettings.Instance.PrisonerEscapeBehavior) return base.DoLoading(game);
-            var dailyTickHeroEvent = CampaignEvents.DailyTickHeroEvent;
+            IMbEvent<Hero> dailyTickHeroEvent = CampaignEvents.DailyTickHeroEvent;
 
             if (dailyTickHeroEvent != null)
             {
@@ -454,10 +449,10 @@ namespace CaptivityEvents
                 if (CESettings.Instance != null && !CESettings.Instance.PrisonerAutoRansom) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
             }
 
-            var hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
+            IMbEvent<MobileParty> hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
             hourlyPartyTick?.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerEscapeCampaignBehavior>());
 
-            var barterablesRequested = CampaignEvents.BarterablesRequested;
+            IMbEvent<BarterData> barterablesRequested = CampaignEvents.BarterablesRequested;
             barterablesRequested?.ClearListeners(Campaign.Current.GetCampaignBehavior<SetPrisonerFreeBarterBehavior>());
 
             return base.DoLoading(game);
@@ -498,9 +493,9 @@ namespace CaptivityEvents
         protected void ReplaceModel<TBaseType, TChildType>(IGameStarter gameStarter) where TBaseType : GameModel where TChildType : GameModel
         {
             if (!(gameStarter.Models is IList<GameModel> list)) return;
-            var flag = false;
+            bool flag = false;
 
-            for (var i = 0; i < list.Count; i++)
+            for (int i = 0; i < list.Count; i++)
                 if (list[i] is TBaseType)
                 {
                     flag = true;
@@ -513,9 +508,9 @@ namespace CaptivityEvents
         protected void ReplaceBehaviour<TBaseType, TChildType>(CampaignGameStarter gameStarter) where TBaseType : CampaignBehaviorBase where TChildType : CampaignBehaviorBase
         {
             if (!(gameStarter.CampaignBehaviors is IList<CampaignBehaviorBase> list)) return;
-            var flag = false;
+            bool flag = false;
 
-            for (var i = 0; i < list.Count; i++)
+            for (int i = 0; i < list.Count; i++)
                 if (list[i] is TBaseType)
                 {
                     flag = true;
@@ -528,10 +523,10 @@ namespace CaptivityEvents
         private void AddCustomEvents(CampaignGameStarter gameStarter)
         {
             // Waiting Menu Load
-            foreach (var waitingEvent in CEPersistence.CEWaitingList) AddEvent(gameStarter, waitingEvent, CEPersistence.CEEvents);
+            foreach (CEEvent waitingEvent in CEPersistence.CEWaitingList) AddEvent(gameStarter, waitingEvent, CEPersistence.CEEvents);
 
             // Listed Event Load
-            foreach (var listedEvent in CEPersistence.CEEventList) AddEvent(gameStarter, listedEvent, CEPersistence.CEEvents);
+            foreach (CEEvent listedEvent in CEPersistence.CEEventList) AddEvent(gameStarter, listedEvent, CEPersistence.CEEvents);
         }
 
         private void AddEvent(CampaignGameStarter gameStarter, CEEvent _listedEvent, List<CEEvent> eventList)
@@ -555,7 +550,7 @@ namespace CaptivityEvents
                 else
                 {
                     CECustomHandler.ForceLogToFile("Failed to load " + _listedEvent.Name + " contains no category flag (Captor, Captive, Random)");
-                    var textObject = new TextObject("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
+                    TextObject textObject = new TextObject("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
                     textObject.SetTextVariable("NAME", _listedEvent.Name);
                     textObject.SetTextVariable("TEST", "TEST");
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
@@ -567,7 +562,7 @@ namespace CaptivityEvents
 
                 if (!_isLoadedInGame)
                 {
-                    var textObject = new TextObject("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
+                    TextObject textObject = new TextObject("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
                     textObject.SetTextVariable("NAME", _listedEvent.Name);
                     textObject.SetTextVariable("ERROR", e.Message);
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
@@ -609,11 +604,11 @@ namespace CaptivityEvents
                             {
                                 try
                                 {
-                                    var behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
+                                    MissionCameraFadeView behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
 
                                     Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
 
-                                    var worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
+                                    WorldPosition worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
 
                                     if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
                                     {
@@ -667,7 +662,7 @@ namespace CaptivityEvents
 
                         try
                         {
-                            var triggeredEvent = CEPersistence.captiveToPlay.IsFemale ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu") : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
+                            CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu") : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
                             triggeredEvent.Captive = CEPersistence.captiveToPlay;
 
                             if (!mapState.AtMenu)
@@ -695,7 +690,7 @@ namespace CaptivityEvents
 
                         try
                         {
-                            var triggeredEvent = CEPersistence.captiveToPlay.IsFemale ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu") : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
+                            CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu") : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
                             triggeredEvent.Captive = CEPersistence.captiveToPlay;
 
                             if (!mapState.AtMenu)
@@ -750,11 +745,11 @@ namespace CaptivityEvents
                         {
                             try
                             {
-                                var behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
+                                MissionCameraFadeView behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
 
                                 Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
 
-                                var worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
+                                WorldPosition worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
 
                                 if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
                                 {
@@ -813,7 +808,7 @@ namespace CaptivityEvents
 
                             try
                             {
-                                var soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(Agent.Main.GetAgentVoiceDefinition()); }).GetRandomElement().Value;
+                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(Agent.Main.GetAgentVoiceDefinition()); }).GetRandomElement().Value;
                                 Mission.Current.MakeSound(soundnum, Agent.Main.Frame.origin, true, false, -1, -1);
                             }
                             catch (Exception) { }
@@ -824,7 +819,7 @@ namespace CaptivityEvents
 
                             try
                             {
-                                var soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(CEPersistence.agentTalkingTo.GetAgentVoiceDefinition()); }).GetRandomElement().Value;
+                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(CEPersistence.agentTalkingTo.GetAgentVoiceDefinition()); }).GetRandomElement().Value;
                                 Mission.Current.MakeSound(soundnum, Agent.Main.Frame.origin, true, false, -1, -1);
                             }
                             catch (Exception) { }
@@ -858,7 +853,7 @@ namespace CaptivityEvents
                         case CEPersistence.HuntState.StartHunt:
                             if (Mission.Current != null && Mission.Current.IsLoadingFinished && Mission.Current.Time > 2f && Mission.Current.Agents != null)
                             {
-                                foreach (var agent2 in from agent in Mission.Current.Agents
+                                foreach (Agent agent2 in from agent in Mission.Current.Agents
                                                        where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
                                                        select agent) ForceAgentDropEquipment(agent2);
                                 missionState.CurrentMission.ClearCorpses();
@@ -872,11 +867,11 @@ namespace CaptivityEvents
                         case CEPersistence.HuntState.HeadStart:
                             if (Mission.Current != null && Mission.Current.Time > CESettings.Instance.HuntBegins && Mission.Current.Agents != null)
                             {
-                                foreach (var agent2 in from agent in Mission.Current.Agents
+                                foreach (Agent agent2 in from agent in Mission.Current.Agents
                                                        where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
                                                        select agent)
                                 {
-                                    var component = agent2.GetComponent<MoraleAgentComponent>();
+                                    MoraleAgentComponent component = agent2.GetComponent<MoraleAgentComponent>();
                                     component?.Panic();
                                     agent2.DestinationSpeed = 0.5f;
                                 }
@@ -902,17 +897,13 @@ namespace CaptivityEvents
                 }
             }
             else if ((CEPersistence.huntState == CEPersistence.HuntState.HeadStart || CEPersistence.huntState == CEPersistence.HuntState.Hunting) && Game.Current.GameStateManager.ActiveState is MapState mapstate && mapstate.IsActive) 
-                //warning why mapstate? // PS Add TODO for questions if you have hard to find them in file. 
-                
-                //mapstate is to prevent a crash that occurs if the player encounter update updates before the active state of map state is up, the only way around it is declare the map state variable.
             {
                 CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
                 PlayerEncounter.SetPlayerVictorious();
                 if (CESettings.Instance.HuntLetPrisonersEscape) PlayerEncounter.EnemySurrender = true;
                 PlayerEncounter.Update();
             }
-            else if (CEPersistence.huntState == CEPersistence.HuntState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState) //warning why mapstate?
-                //Checks to see if mapstate is not in menu state, should connect it to the on menu exit listener.
+            else if (CEPersistence.huntState == CEPersistence.HuntState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState)
                 //TODO: move all of these to their proper listeners and out of the OnApplicationTick
             {
                 if (PlayerEncounter.Current == null)

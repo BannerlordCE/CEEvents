@@ -4,25 +4,25 @@ using TaleWorlds.Core;
 
 namespace CaptivityEvents.Events
 {
-    public class VariablesLoader
+    public class CEVariablesLoader
     {
         public int GetIntFromXML(string numpassed)
         {
             try
             {
-                var number = 0;
+                int number = 0;
 
                 if (numpassed == null) return number;
 
                 if (numpassed.StartsWith("R"))
                 {
-                    var splitPass = numpassed.Split(' ');
+                    string[] splitPass = numpassed.Split(' ');
 
                     switch (splitPass.Length)
                     {
                         case 3:
-                            var numberOne = int.Parse(splitPass[1]);
-                            var numberTwo = int.Parse(splitPass[2]);
+                            int numberOne = int.Parse(splitPass[1]);
+                            int numberTwo = int.Parse(splitPass[2]);
 
                             number = numberOne < numberTwo
                                 ? MBRandom.RandomInt(numberOne, numberTwo)
@@ -60,19 +60,19 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                var number = 0f;
+                float number = 0f;
 
                 if (numpassed == null) return number;
 
                 if (numpassed.StartsWith("R"))
                 {
-                    var splitPass = numpassed.Split(' ');
+                    string[] splitPass = numpassed.Split(' ');
 
                     switch (splitPass.Length)
                     {
                         case 3:
-                            var numberOne = float.Parse(splitPass[1]);
-                            var numberTwo = float.Parse(splitPass[2]);
+                            float numberOne = float.Parse(splitPass[1]);
+                            float numberTwo = float.Parse(splitPass[2]);
 
                             number = numberOne < numberTwo
                                 ? MBRandom.RandomFloatRanged(numberOne, numberTwo)

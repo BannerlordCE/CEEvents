@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -26,9 +27,9 @@ namespace CaptivityEvents.Helper
                 if (!CampaignCheats.CheckCheatUsage(ref CampaignCheats.ErrorType)) return CampaignCheats.ErrorType;
 
                 if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.force_fire_event [EventName] [CaptiveName]\".";
-                var flag = false;
+                bool flag = false;
 
-                var eventName = "";
+                string eventName = "";
                 string heroName = null;
 
                 if (CampaignCheats.CheckParameters(strings, 1))
@@ -171,9 +172,9 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.fire_ceevent [EventName] [CaptiveName]\".";
 
-                var flag = false;
+                bool flag = false;
 
-                var eventName = "";
+                string eventName = "";
                 string heroName = null;
 
                 if (CampaignCheats.CheckParameters(strings, 1))
@@ -331,12 +332,12 @@ namespace CaptivityEvents.Helper
                 if (CampaignCheats.CheckParameters(strings, 1)) searchTerm = strings[0];
 
                 if (CEPersistence.CEEvents == null || CEPersistence.CEEvents.Count <= 0) return "Failed to load event list.";
-                var text = "";
-                var searchActive = !searchTerm.IsStringNoneOrEmpty();
+                string text = "";
+                bool searchActive = !searchTerm.IsStringNoneOrEmpty();
 
                 if (searchActive) searchTerm = searchTerm.ToLower();
 
-                foreach (var ceEvent in CEPersistence.CEEvents)
+                foreach (CEEvent ceEvent in CEPersistence.CEEvents)
                     if (searchActive)
                     {
                         if (ceEvent.Name.ToLower().IndexOf(searchTerm, StringComparison.Ordinal) != -1) text = text + ceEvent.Name + "\n";
@@ -368,7 +369,7 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckParameters(strings, 1)) searchTerm = strings[0];
 
-                var hero = searchTerm.IsStringNoneOrEmpty()
+                Hero hero = searchTerm.IsStringNoneOrEmpty()
                     ? Hero.MainHero
                     : Campaign.Current.Heroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
 
@@ -395,7 +396,7 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckParameters(strings, 1)) searchTerm = strings[0];
 
-                var hero = searchTerm.IsStringNoneOrEmpty()
+                Hero hero = searchTerm.IsStringNoneOrEmpty()
                     ? Hero.MainHero
                     : Campaign.Current.Heroes.FirstOrDefault(heroToFind => { return heroToFind.Name.ToString() == searchTerm; });
 
@@ -403,7 +404,7 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
-                    var d = new Dynamics();
+                    Dynamics d = new Dynamics();
                     d.VictimProstitutionModifier(0, hero, true);
                     d.VictimProstitutionModifier(0, hero, false, false);
                     d.VictimSlaveryModifier(0, hero, true);
@@ -437,7 +438,7 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
-                    var successful = CECampaignBehavior.ClearPregnancyList();
+                    bool successful = CECampaignBehavior.ClearPregnancyList();
 
                     return successful
                         ? "Successfully cleared pregnancies of Captivity Events"
@@ -465,7 +466,7 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
-                    var successful = CECampaignBehavior.ClearPregnancyList();
+                    bool successful = CECampaignBehavior.ClearPregnancyList();
                     CEBrothelBehavior.CleanList();
                     ResetStatus(new List<string>());
 
@@ -495,9 +496,8 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckHelp(strings) && CampaignCheats.CheckParameters(strings, 1)) return "Format is \"captivity.play_sound [SOUND_ID]\".";
 
-                var searchTerm = strings[0];
-
-                var id = 0;
+                string searchTerm = strings[0];
+                int id = 0;
 
                 try
                 {

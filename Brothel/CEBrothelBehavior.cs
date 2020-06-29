@@ -21,7 +21,7 @@ namespace CaptivityEvents.Brothel
 {
     internal class CEBrothelBehavior : CampaignBehaviorBase
     {
-        private static readonly Location Brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanIfSettlementAccessModelLetsPlayer", "CanAlways", "CanAlways", "CanIfGrownUpMaleOrHero", new[] {"empire_house_c_tavern_a", "", "", ""}, null);
+        private static readonly Location Brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanIfSettlementAccessModelLetsPlayer", "CanAlways", "CanAlways", "CanIfGrownUpMaleOrHero", new[] { "empire_house_c_tavern_a", "", "", "" }, null);
 
         private bool _isBrothelInitialized;
 
@@ -61,8 +61,8 @@ namespace CaptivityEvents.Brothel
         // Ransom Functions
         private static int GetRansomValueOfAllPrisoners()
         {
-            var num = 0;
-            foreach (var troopRosterElement in PartyBase.MainParty.PrisonRoster) num += troopRosterElement.Character.PrisonerRansomValue(Hero.MainHero) * troopRosterElement.Number;
+            int num = 0;
+            foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster) num += troopRosterElement.Character.PrisonerRansomValue(Hero.MainHero) * troopRosterElement.Number;
 
             return num;
         }
@@ -71,7 +71,7 @@ namespace CaptivityEvents.Brothel
         {
             if (PartyBase.MainParty.PrisonRoster.Count <= 0) return false;
 
-            var ransomValueOfAllPrisoners = GetRansomValueOfAllPrisoners();
+            int ransomValueOfAllPrisoners = GetRansomValueOfAllPrisoners();
             MBTextManager.SetTextVariable("RANSOM_AMOUNT", ransomValueOfAllPrisoners);
             args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
 
@@ -123,7 +123,7 @@ namespace CaptivityEvents.Brothel
         private static void BrothelDistrictOnInit(MenuCallbackArgs args)
         {
             Campaign.Current.GameMenuManager.MenuLocations.Clear();
-            var settlement = Settlement.CurrentSettlement ?? MobileParty.MainParty.CurrentSettlement;
+            Settlement settlement = Settlement.CurrentSettlement ?? MobileParty.MainParty.CurrentSettlement;
             Brothel.SetOwnerComplex(settlement.LocationComplex);
 
             switch (settlement.Culture.GetCultureCode())
@@ -192,7 +192,7 @@ namespace CaptivityEvents.Brothel
 
         private static void VisitBrothelOnConsequence(MenuCallbackArgs args)
         {
-            if (((TownEncounter) PlayerEncounter.LocationEncounter).IsAmbush)
+            if (((TownEncounter)PlayerEncounter.LocationEncounter).IsAmbush)
             {
                 GameMenu.ActivateGameMenu("menu_town_thugs_start");
 
@@ -219,25 +219,25 @@ namespace CaptivityEvents.Brothel
 
         public static void ProstitutionMenuJoinOnConsequence(MenuCallbackArgs args)
         {
-            var ProstitueFlag = CESkills.IsProstitute;
+            SkillObject ProstitueFlag = CESkills.IsProstitute;
             Hero.MainHero.SetSkillValue(ProstitueFlag, 1);
-            var ProstitutionSkill = CESkills.Prostitution;
+            SkillObject ProstitutionSkill = CESkills.Prostitution;
 
             if (Hero.MainHero.GetSkillValue(ProstitutionSkill) < 100) Hero.MainHero.SetSkillValue(ProstitutionSkill, 100);
-            var textObject = GameTexts.FindText("str_CE_join_prostitution");
+            TextObject textObject = GameTexts.FindText("str_CE_join_prostitution");
             textObject.SetTextVariable("PLAYER_HERO", Hero.MainHero.Name);
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
             InformationManager.AddQuickInformation(textObject, 0, CharacterObject.PlayerCharacter, "event:/ui/notification/relation");
 
             CEPlayerCaptivityModel.captureOverride = true;
-            var capturerParty = SettlementHelper.FindNearestSettlement(settlement => settlement.IsTown).Party;
-            var prisonerCharacter = Hero.MainHero;
+            PartyBase capturerParty = SettlementHelper.FindNearestSettlement(settlement => settlement.IsTown).Party;
+            Hero prisonerCharacter = Hero.MainHero;
             prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
             prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
             while (PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter)) PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, -1, true);
             capturerParty.AddPrisoner(prisonerCharacter.CharacterObject, 1);
             if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(capturerParty);
-            var test = CEEventLoader.CEWaitingList();
+            string test = CEEventLoader.CEWaitingList();
             GameMenu.ExitToLast();
             if (test != null) GameMenu.ActivateGameMenu(test);
         }
@@ -246,7 +246,7 @@ namespace CaptivityEvents.Brothel
         // Brothel Mission
         public void LocationCharactersAreReadyToSpawn(Dictionary<string, int> unusedUsablePointCount)
         {
-            var settlement = PlayerEncounter.LocationEncounter.Settlement;
+            Settlement settlement = PlayerEncounter.LocationEncounter.Settlement;
 
             if (CampaignMission.Current.Location != Brothel || _isBrothelInitialized) return;
             //LocationComplex.Current.AddPassage(settlement.LocationComplex.GetLocationWithId("center"), brothel);
@@ -256,11 +256,11 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateTavernkeeper(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            var owner = MBObjectManager.Instance.CreateObject<CharacterObject>();
+            CharacterObject owner = MBObjectManager.Instance.CreateObject<CharacterObject>();
 
             if (DoesOwnBrothelInSettlement(Settlement.CurrentSettlement))
             {
-                var templateToCopy = CharacterObject.CreateFrom(culture.TavernWench);
+                CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.TavernWench);
                 owner.Culture = templateToCopy.Culture;
                 owner.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
                 owner.CurrentFormationClass = templateToCopy.CurrentFormationClass;
@@ -277,7 +277,7 @@ namespace CaptivityEvents.Brothel
             }
             else
             {
-                var templateToCopy2 = CharacterObject.CreateFrom(culture.Tavernkeeper);
+                CharacterObject templateToCopy2 = CharacterObject.CreateFrom(culture.Tavernkeeper);
                 owner.Culture = templateToCopy2.Culture;
                 owner.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge);
                 owner.CurrentFormationClass = templateToCopy2.CurrentFormationClass;
@@ -313,8 +313,8 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateTownsManForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            var templateToCopy = CharacterObject.CreateFrom(culture.Townsman);
-            var townsman = MBObjectManager.Instance.CreateObject<CharacterObject>();
+            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.Townsman);
+            CharacterObject townsman = MBObjectManager.Instance.CreateObject<CharacterObject>();
             townsman.Culture = templateToCopy.Culture;
             townsman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
             townsman.CurrentFormationClass = templateToCopy.CurrentFormationClass;
@@ -339,8 +339,8 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateTavernWench(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            var templateToCopy = CharacterObject.CreateFrom(culture.TavernWench);
-            var townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
+            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.TavernWench);
+            CharacterObject townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
             townswoman.Culture = templateToCopy.Culture;
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
             townswoman.CurrentFormationClass = templateToCopy.CurrentFormationClass;
@@ -356,15 +356,15 @@ namespace CaptivityEvents.Brothel
             townswoman.InitializeEquipmentsOnLoad(templateToCopy.AllEquipments.ToList());
 
 
-            var agentData = new AgentData(new SimpleAgentOrigin(townswoman)).Monster(Campaign.Current.HumanMonsterSettlement).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge));
+            AgentData agentData = new AgentData(new SimpleAgentOrigin(townswoman)).Monster(Campaign.Current.HumanMonsterSettlement).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge));
 
-            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "sp_tavern_wench", true, relation, "as_human_barmaid", true) {PrefabNamesForBones = {{agentData.AgentMonster.OffHandItemBoneIndex, "kitchen_pitcher_b_tavern"}}};
+            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "sp_tavern_wench", true, relation, "as_human_barmaid", true) { PrefabNamesForBones = { { agentData.AgentMonster.OffHandItemBoneIndex, "kitchen_pitcher_b_tavern" } } };
         }
 
         private static LocationCharacter CreateDancer(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            var templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer);
-            var townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
+            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer);
+            CharacterObject townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
             townswoman.Culture = templateToCopy.Culture;
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
             townswoman.CurrentFormationClass = templateToCopy.CurrentFormationClass;
@@ -384,8 +384,8 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateTownsWomanForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            var templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer);
-            var townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
+            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer);
+            CharacterObject townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
             townswoman.Culture = templateToCopy.Culture;
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
             townswoman.CurrentFormationClass = templateToCopy.CurrentFormationClass;
@@ -416,17 +416,17 @@ namespace CaptivityEvents.Brothel
             Brothel.AddLocationCharacters(CreateMusician, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, 1);
             Brothel.AddLocationCharacters(CreateRansomBroker, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, 1);
 
-            unusedUsablePointCount.TryGetValue("npc_dancer", out var dancers);
+            unusedUsablePointCount.TryGetValue("npc_dancer", out int dancers);
             if (dancers > 0) Brothel.AddLocationCharacters(CreateDancer, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, dancers);
 
-            unusedUsablePointCount.TryGetValue("npc_common", out var num);
+            unusedUsablePointCount.TryGetValue("npc_common", out int num);
             num -= 3;
 
             if (num <= 0) return;
 
-            var num2 = (int) (num * 0.2f);
+            int num2 = (int)(num * 0.2f);
             if (num2 > 0) Brothel.AddLocationCharacters(CreateTownsManForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num2);
-            var num3 = (int) (num * 0.3f);
+            int num3 = (int)(num * 0.3f);
             if (num3 > 0) Brothel.AddLocationCharacters(CreateTownsWomanForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num3);
         }
 
@@ -655,7 +655,7 @@ namespace CaptivityEvents.Brothel
         }
 
         // Prostitute Conditions
-        private static readonly string[] prostituteStrings = {"prostitute_confident", "prostitute_confident", "prostitute_tired"};
+        private static readonly string[] prostituteStrings = { "prostitute_confident", "prostitute_confident", "prostitute_tired" };
 
         private bool ConversationWithProstitute()
         {
@@ -756,11 +756,11 @@ namespace CaptivityEvents.Brothel
         }
 
         // Customer Conditions
-        private static readonly string[] CustomerStrings = {"customer_confident", "customer_tired"};
+        private static readonly string[] CustomerStrings = { "customer_confident", "customer_tired" };
 
-        private static readonly string[] Responses = {"{=CEBROTHEL1019}That's too much, no thanks.", "{=CEBROTHEL1049}Alright, here you go."};
+        private static readonly string[] Responses = { "{=CEBROTHEL1019}That's too much, no thanks.", "{=CEBROTHEL1049}Alright, here you go." };
 
-        private static readonly string[] RageResponses = {"{=CEBROTHEL1065}Well perhaps you should, you sure look like a {?PLAYER.GENDER}whore{?}prostitute{\\?}!", "{=CEBROTHEL1066}My apologies, {?PLAYER.GENDER}milady{?}my lord{\\?}!"};
+        private static readonly string[] RageResponses = { "{=CEBROTHEL1065}Well perhaps you should, you sure look like a {?PLAYER.GENDER}whore{?}prostitute{\\?}!", "{=CEBROTHEL1066}My apologies, {?PLAYER.GENDER}milady{?}my lord{\\?}!" };
 
         private bool ConversationWithCustomerNotMetRequirements()
         {
@@ -782,7 +782,7 @@ namespace CaptivityEvents.Brothel
             try
             {
                 GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, prostitutionCost);
-                var prostitutionSkill = CESkills.Prostitution;
+                SkillObject prostitutionSkill = CESkills.Prostitution;
                 if (Hero.MainHero.GetSkillValue(prostitutionSkill) < 100) Hero.MainHero.SetSkillValue(prostitutionSkill, 100);
                 new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(1, 10), Hero.MainHero, false, true, true);
 
@@ -880,11 +880,11 @@ namespace CaptivityEvents.Brothel
 
             try
             {
-                foreach (var brothel in from brothel in GetPlayerBrothels()
-                                        let town = brothel.Settlement.Town
-                                        where !town.IsRebeling
-                                        where brothel.IsRunning
-                                        select brothel)
+                foreach (CEBrothel brothel in from brothel in GetPlayerBrothels()
+                                              let town = brothel.Settlement.Town
+                                              where !town.IsRebeling
+                                              where brothel.IsRunning
+                                              select brothel)
                 {
                     brothel.ChangeGold(MBRandom.RandomInt(50, 400));
 
@@ -892,14 +892,14 @@ namespace CaptivityEvents.Brothel
 
                     if (brothel.Settlement.OwnerClan == Clan.PlayerClan)
                     {
-                        var textObject3 = new TextObject("{CEBROTHEL0998}The brothel of {SETTLEMENT} has gone bankrupted, and is no longer active.");
+                        TextObject textObject3 = new TextObject("{CEBROTHEL0998}The brothel of {SETTLEMENT} has gone bankrupted, and is no longer active.");
                         textObject3.SetTextVariable("SETTLEMENT", brothel.Settlement.Name);
                         InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
                         brothel.IsRunning = false;
                     }
                     else
                     {
-                        var textObject3 = new TextObject("{CEBROTHEL0999}The brothel of {SETTLEMENT} has gone bankrupted, and has been requisitioned.");
+                        TextObject textObject3 = new TextObject("{CEBROTHEL0999}The brothel of {SETTLEMENT} has gone bankrupted, and has been requisitioned.");
                         textObject3.SetTextVariable("SETTLEMENT", brothel.Settlement.Name);
                         InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
                         BrothelInteraction(brothel.Settlement, false);
@@ -911,12 +911,11 @@ namespace CaptivityEvents.Brothel
 
         public void WeeklyTick()
         {
-            var prostitutionSkill = CESkills.Prostitution;
+            SkillObject prostitutionSkill = CESkills.Prostitution;
             _hasBoughtTunToParty = false;
 
-            var d = new Dynamics();
-            if (Hero.MainHero.GetSkillValue(prostitutionSkill) > 500) d.VictimProstitutionModifier(MBRandom.RandomInt(-300, -200), Hero.MainHero, false, false);
-            else if (Hero.MainHero.GetSkillValue(prostitutionSkill) > 100) d.VictimProstitutionModifier(MBRandom.RandomInt(-40, -10), Hero.MainHero, false, false);
+            if (Hero.MainHero.GetSkillValue(prostitutionSkill) > 500) new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(-300, -200), Hero.MainHero, false, false);
+            else if (Hero.MainHero.GetSkillValue(prostitutionSkill) > 100) new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(-40, -10), Hero.MainHero, false, false);
         }
 
         public override void RegisterEvents()
@@ -963,7 +962,7 @@ namespace CaptivityEvents.Brothel
         {
             try
             {
-                var data = _brothelList.FirstOrDefault(brothelData => brothelData.Settlement.StringId == settlement.StringId);
+                CEBrothel data = _brothelList.FirstOrDefault(brothelData => brothelData.Settlement.StringId == settlement.StringId);
                 if (data == null) AddBrothelData(settlement);
 
                 return true;
@@ -980,15 +979,7 @@ namespace CaptivityEvents.Brothel
             {
                 if (ContainsBrothelData(settlement))
                 {
-                    var ceBrothels = _brothelList.Where(brothel => brothel.Settlement.StringId == settlement.StringId).Select(brothel =>
-                                                                                                                              {
-                                                                                                                                  brothel.Owner = flagToPurchase
-                                                                                                                                      ? Hero.MainHero
-                                                                                                                                      : null;
-                                                                                                                                  brothel.Capital = brothel.InitialCapital;
-
-                                                                                                                                  return brothel;
-                                                                                                                              }).ToList();
+                    List<CEBrothel> ceBrothels = _brothelList.Where(brothel => brothel.Settlement.StringId == settlement.StringId).Select(brothel => { brothel.Owner = flagToPurchase ? Hero.MainHero : null; brothel.Capital = brothel.InitialCapital; return brothel; }).ToList();
                 }
             }
             catch (Exception) { }
@@ -998,7 +989,7 @@ namespace CaptivityEvents.Brothel
         {
             try
             {
-                var testLocation = _brothelList.FirstOrDefault(brothel => { return brothel.Settlement.StringId == settlement.StringId; });
+                CEBrothel testLocation = _brothelList.FirstOrDefault(brothel => { return brothel.Settlement.StringId == settlement.StringId; });
 
                 if (testLocation != null) return testLocation.CaptiveProstitutes;
             }
@@ -1015,12 +1006,7 @@ namespace CaptivityEvents.Brothel
 
                 if (!ContainsBrothelData(settlement)) return;
 
-                var ceBrothels = _brothelList.Where(brothel => brothel.Settlement.StringId == settlement.StringId).Select(brothel =>
-                                                                                                                          {
-                                                                                                                              brothel.CaptiveProstitutes.Remove(prisoner);
-
-                                                                                                                              return brothel;
-                                                                                                                          }).ToList();
+                List<CEBrothel> ceBrothels = _brothelList.Where(brothel => brothel.Settlement.StringId == settlement.StringId).Select(brothel => { brothel.CaptiveProstitutes.Remove(prisoner); return brothel; }).ToList();
                 MobileParty.MainParty.PrisonRoster.AddToCounts(prisoner, 1, prisoner.IsHero);
             }
             catch (Exception)
@@ -1037,12 +1023,7 @@ namespace CaptivityEvents.Brothel
 
                 if (!ContainsBrothelData(settlement)) return;
 
-                var ceBrothels = _brothelList.Where(brothel => brothel.Settlement.StringId == settlement.StringId).Select(brothel =>
-                                                                                                                          {
-                                                                                                                              brothel.CaptiveProstitutes.Add(prisoner);
-
-                                                                                                                              return brothel;
-                                                                                                                          }).ToList();
+                List<CEBrothel> ceBrothels = _brothelList.Where(brothel => brothel.Settlement.StringId == settlement.StringId).Select(brothel => { brothel.CaptiveProstitutes.Add(prisoner); return brothel; }).ToList();
                 MobileParty.MainParty.PrisonRoster.RemoveTroop(prisoner);
             }
             catch (Exception)

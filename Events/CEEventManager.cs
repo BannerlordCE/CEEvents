@@ -14,25 +14,25 @@ namespace CaptivityEvents.Events
         // Flags and Conditions
         public static void PrintDebugInGameTextMessage(string v)
         {
-            var textObject = new TextObject(v);
+            TextObject textObject = new TextObject(v);
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
         }
 
         public static string FireSpecificEvent(string specificEvent, bool force = false)
         {
-            var eventNames = new List<string>();
+            List<string> eventNames = new List<string>();
 
-            var flag = "$FAILEDTOFIND";
+            string flag = "$FAILEDTOFIND";
 
             if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
-            var foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
+            CEEvent foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
 
             if (foundevent != null)
             {
                 if (!force && foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                 {
-                    var result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                    string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
 
                     if (result == null) flag = foundevent.Name;
                     else flag = "$" + result;
@@ -56,19 +56,19 @@ namespace CaptivityEvents.Events
 
         public static string FireSpecificEventRandom(string specificEvent, bool force = false)
         {
-            var eventNames = new List<string>();
+            List<string> eventNames = new List<string>();
 
-            var flag = "$FAILEDTOFIND";
+            string flag = "$FAILEDTOFIND";
 
             if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
-            var foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
+            CEEvent foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
 
             if (foundevent != null)
             {
                 if (foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                 {
-                    var result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                    string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
 
                     if (force || result == null) flag = foundevent.Name;
                     else flag = "$" + result;
@@ -88,22 +88,22 @@ namespace CaptivityEvents.Events
 
         public static string FireSpecificEventPartyLeader(string specificEvent, bool force = false, string heroname = null)
         {
-            var eventNames = new List<string>();
+            List<string> eventNames = new List<string>();
 
-            var flag = "$FAILEDTOFIND";
+            string flag = "$FAILEDTOFIND";
 
             if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
-            var foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
+            CEEvent foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
 
             if (foundevent != null)
             {
                 if (heroname == null)
                 {
-                    foreach (var character in PartyBase.MainParty.PrisonRoster.Troops)
+                    foreach (CharacterObject character in PartyBase.MainParty.PrisonRoster.Troops)
                         if (foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                         {
-                            var result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(character, PartyBase.MainParty);
+                            string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(character, PartyBase.MainParty);
 
                             if (force || result == null)
                             {
@@ -117,12 +117,12 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
-                    var specificCaptive = PartyBase.MainParty.PrisonRoster.Troops.FirstOrDefault(charaterobject => charaterobject.Name.ToString() == heroname);
+                    CharacterObject specificCaptive = PartyBase.MainParty.PrisonRoster.Troops.FirstOrDefault(charaterobject => charaterobject.Name.ToString() == heroname);
 
                     if (specificCaptive == null) return "$FAILTOFINDHERO";
 
                     if (!foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor)) return flag;
-                    var result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(specificCaptive, PartyBase.MainParty);
+                    string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(specificCaptive, PartyBase.MainParty);
 
                     if (force || result == null)
                     {
@@ -144,31 +144,31 @@ namespace CaptivityEvents.Events
 
         public static CEEvent ReturnWeightedChoiceOfEventsRandom()
         {
-            var events = new List<CEEvent>();
+            List<CEEvent> events = new List<CEEvent>();
 
             if (CEPersistence.CECallableEvents != null && CEPersistence.CECallableEvents.Count > 0)
             {
                 CECustomHandler.LogToFile("Having " + CEPersistence.CECallableEvents.Count + " of events to weight and check conditions on.");
 
-                foreach (var listEvent in CEPersistence.CECallableEvents)
+                foreach (CEEvent listEvent in CEPersistence.CECallableEvents)
                     if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                     {
-                        var result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                        string result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
 
                         if (result == null)
                         {
-                            var weightedChance = 10;
+                            int weightedChance = 10;
 
                             try
                             {
-                                weightedChance = new VariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                                weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
                             }
                             catch (Exception)
                             {
                                 CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring");
                             }
 
-                            for (var a = weightedChance; a > 0; a--) events.Add(listEvent);
+                            for (int a = weightedChance; a > 0; a--) events.Add(listEvent);
                         }
                         else
                         {
@@ -196,31 +196,31 @@ namespace CaptivityEvents.Events
 
         public static CEEvent ReturnWeightedChoiceOfEvents()
         {
-            var events = new List<CEEvent>();
+            List<CEEvent> events = new List<CEEvent>();
 
             if (CEPersistence.CECallableEvents != null && CEPersistence.CECallableEvents.Count > 0)
             {
                 CECustomHandler.LogToFile("Having " + CEPersistence.CECallableEvents.Count + " of events to weight and check conditions on.");
 
-                foreach (var listEvent in CEPersistence.CECallableEvents)
+                foreach (CEEvent listEvent in CEPersistence.CECallableEvents)
                     if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                     {
-                        var result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                        string result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
 
                         if (result == null)
                         {
-                            var weightedChance = 10;
+                            int weightedChance = 10;
 
                             try
                             {
-                                if (listEvent.WeightedChanceOfOccuring != null) weightedChance = new VariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                                if (listEvent.WeightedChanceOfOccuring != null) weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
                             }
                             catch (Exception)
                             {
                                 CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring");
                             }
 
-                            for (var a = weightedChance; a > 0; a--) events.Add(listEvent);
+                            for (int a = weightedChance; a > 0; a--) events.Add(listEvent);
                         }
                         else
                         {
@@ -248,32 +248,32 @@ namespace CaptivityEvents.Events
 
         public static CEEvent ReturnWeightedChoiceOfEventsPartyLeader(CharacterObject captive)
         {
-            var events = new List<CEEvent>();
+            List<CEEvent> events = new List<CEEvent>();
 
             CECustomHandler.LogToFile("Number of Filitered events is " + events.Count);
 
             if (CEPersistence.CECallableEvents == null || CEPersistence.CECallableEvents.Count <= 0) return null;
             CECustomHandler.LogToFile("Having " + CEPersistence.CECallableEvents.Count + " of events to weight and check conditions on.");
 
-            foreach (var listEvent in CEPersistence.CECallableEvents)
+            foreach (CEEvent listEvent in CEPersistence.CECallableEvents)
                 if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                 {
-                    var result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(captive, PartyBase.MainParty);
+                    string result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(captive, PartyBase.MainParty);
 
                     if (result == null)
                     {
-                        var weightedChance = 10;
+                        int weightedChance = 10;
 
                         try
                         {
-                            weightedChance = new VariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                            weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
                         }
                         catch (Exception)
                         {
                             CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring");
                         }
 
-                        for (var a = weightedChance; a > 0; a--) events.Add(listEvent);
+                        for (int a = weightedChance; a > 0; a--) events.Add(listEvent);
                     }
                     else
                     {

@@ -22,13 +22,13 @@ namespace CaptivityEvents.Patches
             if (clan.IsEliminated) return;
 
             if (Clan.PlayerClan != clan) return;
-            var num = 0;
-            var num2 = 0;
+            int num = 0;
+            int num2 = 0;
 
-            foreach (var brothel in CEBrothelBehavior.GetPlayerBrothels())
+            foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
                 if (brothel.IsRunning)
                 {
-                    var num3 = (int) (Math.Max(0, brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
+                    int num3 = (int) (Math.Max(0, brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
                     num += num3;
                     if (applyWithdrawals && num3 > 0) brothel.ChangeGold(-num3);
 

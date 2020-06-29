@@ -30,11 +30,9 @@ namespace CaptivityEvents
         {
             if (__result.Data.TitleText.Equals(new TextObject("Captor Event")))
                 __result = new NewTestNotificationItemVM(__result.Data, null, item =>
-                                                                              {
-                                                                                  var parameters = new object[1];
-                                                                                  parameters[0] = item;
-                                                                                  RemoveNotificationItem.Invoke(__instance, parameters);
-                                                                              });
+                {
+                    RemoveNotificationItem.Invoke(__instance, new object[] { item });
+                });
         }
 
         public class NewTestNotificationItemVM : MapNotificationItemBaseVM
@@ -64,10 +62,10 @@ namespace CaptivityEvents
 
                 if (MobileParty.MainParty.Party.PrisonRoster.Count <= 0) return;
                 // Declare Variables
-                var captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
-                var returnString = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
+                CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
+                CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
 
-                if (returnString == null) return;
+                if (returnedEvent == null) return;
 
                 if (!(Game.Current.GameStateManager.ActiveState is MapState mapState)) return;
                 Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
@@ -82,7 +80,7 @@ namespace CaptivityEvents
                     CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                 }
 
-                GameMenu.SwitchToMenu(returnString.Name);
+                GameMenu.SwitchToMenu(returnedEvent.Name);
             }
         }
     }

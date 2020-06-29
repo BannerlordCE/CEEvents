@@ -53,7 +53,7 @@
     <Compile Include="Events\RandomMenuCallBackDelegate.cs" />
     <Compile Include="Events\ScoresCalculation.cs" />
     <Compile Include="Events\SharedCallBackHelper.cs" />
-    <Compile Include="Events\VariablesLoader.cs" />
+    <Compile Include="Events\CEVariablesLoader.cs" />
     <Compile Include="Events\WaitingList.cs" />
     <Compile Include="Notifications\CECaptorMapNotification.cs" />
     <Compile Include="Notifications\CECaptorMapNotificationItemVM.cs" />

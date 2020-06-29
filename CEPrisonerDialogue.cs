@@ -46,7 +46,7 @@ namespace CaptivityEvents
 
         private bool ConversationConditionTalkToPrisonerInCell()
         {
-            var captive = CharacterObject.OneToOneConversationCharacter;
+            CharacterObject captive = CharacterObject.OneToOneConversationCharacter;
 
             if (captive != null && captive.IsHero && captive.HeroObject.GetSkillValue(CESkills.IsSlave) == 1)
             {
@@ -65,7 +65,7 @@ namespace CaptivityEvents
 
         private bool ConversationConditionTalkToPrisonerInParty()
         {
-            var captive = CharacterObject.OneToOneConversationCharacter;
+            CharacterObject captive = CharacterObject.OneToOneConversationCharacter;
 
             if (captive != null && captive.IsHero && captive.HeroObject.GetSkillValue(CESkills.IsSlave) == 1)
             {
@@ -84,7 +84,7 @@ namespace CaptivityEvents
 
         private bool ConversationCEEventResponseInPartyOnCondition()
         {
-            var captive = CharacterObject.OneToOneConversationCharacter;
+            CharacterObject captive = CharacterObject.OneToOneConversationCharacter;
 
             if (captive != null && captive.IsHero && captive.HeroObject.GetSkillValue(CESkills.IsSlave) == 1)
             {

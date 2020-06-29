@@ -20,7 +20,7 @@ namespace CaptivityEvents.CampaignBehaviors
             if (!hero.IsPrisoner || hero.PartyBelongedToAsPrisoner == null || hero == Hero.MainHero) return;
             if (CESettings.Instance != null && (!CESettings.Instance.PrisonerHeroEscapeAllowed && (hero.PartyBelongedToAsPrisoner.LeaderHero == Hero.MainHero || hero.PartyBelongedToAsPrisoner.IsSettlement && hero.PartyBelongedToAsPrisoner.Settlement.OwnerClan == Clan.PlayerClan))) return;
 
-            var num = 0.075f;
+            float num = 0.075f;
             if (hero.PartyBelongedToAsPrisoner.IsMobile) num *= 6f - (float) Math.Pow(Math.Min(81, hero.PartyBelongedToAsPrisoner.NumberOfHealthyMembers), 0.25);
 
             if (hero.PartyBelongedToAsPrisoner == PartyBase.MainParty || hero.PartyBelongedToAsPrisoner.IsSettlement && hero.PartyBelongedToAsPrisoner.Settlement.OwnerClan == Clan.PlayerClan)
@@ -33,23 +33,23 @@ namespace CaptivityEvents.CampaignBehaviors
 
         public void HourlyPartyTick(MobileParty mobileParty)
         {
-            var prisonerSizeLimit = mobileParty.Party.PrisonerSizeLimit;
+            int prisonerSizeLimit = mobileParty.Party.PrisonerSizeLimit;
 
             if  (mobileParty.PrisonRoster.TotalManCount <= prisonerSizeLimit) return;
-            var num = mobileParty.PrisonRoster.TotalManCount - prisonerSizeLimit;
+            int num = mobileParty.PrisonRoster.TotalManCount - prisonerSizeLimit;
 
-            for (var i = 0; i < num; i++)
+            for (int i = 0; i < num; i++)
             {
-                var totalManCount = mobileParty.PrisonRoster.TotalManCount;
-                var flag = mobileParty.PrisonRoster.TotalRegulars > 0;
-                var randomFloat = MBRandom.RandomFloat;
+                int totalManCount = mobileParty.PrisonRoster.TotalManCount;
+                bool flag = mobileParty.PrisonRoster.TotalRegulars > 0;
+                float randomFloat = MBRandom.RandomFloat;
 
-                var num2 = flag
+                int num2 = flag
                     ? (int) (mobileParty.PrisonRoster.TotalRegulars * randomFloat)
                     : (int) (mobileParty.PrisonRoster.TotalManCount * randomFloat);
                 CharacterObject character = null;
 
-                foreach (var troopRosterElement in mobileParty.PrisonRoster)
+                foreach (TroopRosterElement troopRosterElement in mobileParty.PrisonRoster)
                     if (!troopRosterElement.Character.IsHero || !flag)
                     {
                         num2 -= troopRosterElement.Number;

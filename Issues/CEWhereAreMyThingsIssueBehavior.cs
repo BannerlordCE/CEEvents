@@ -39,7 +39,7 @@ namespace CaptivityEvents.Issues
 
             protected override QuestBase GenerateIssueQuest(string questId)
             {
-                var stolenGearDuration = 0.0f; //Set default duration here if needed.
+                float stolenGearDuration = 0.0f; //Set default duration here if needed.
                 if (CESettings.Instance != null) stolenGearDuration = CESettings.Instance.StolenGearDuration;
 
                 return new CEWhereAreMyThingsIssueQuest(questId, IssueOwner, CampaignTime.DaysFromNow(stolenGearDuration), RewardGold, new Equipment(Hero.MainHero.BattleEquipment), new Equipment(Hero.MainHero.CivilianEquipment));
@@ -59,7 +59,7 @@ namespace CaptivityEvents.Issues
 
             protected override bool CanPlayerTakeQuestConditions(Hero issueGiver, out PreconditionFlags flag, out Hero relationHero, out SkillObject skill)
             {
-                var flag2 = issueGiver.GetRelationWithPlayer() >= -10f;
+                bool flag2 = issueGiver.GetRelationWithPlayer() >= -10f;
 
                 flag = flag2
                     ? PreconditionFlags.None
@@ -92,7 +92,7 @@ namespace CaptivityEvents.Issues
             {
                 get
                 {
-                    var textObject = PlayerAcceptedQuestLogText;
+                    TextObject textObject = PlayerAcceptedQuestLogText;
 
                     return textObject;
                 }
@@ -174,7 +174,7 @@ namespace CaptivityEvents.Issues
             {
                 get
                 {
-                    var textObject = new TextObject("{=CEEVENTS1077}{QUEST_GIVER.LINK} of {QUEST_SETTLEMENT.LINK} has found your equipment you must find {?QUEST_GIVER.GENDER}her{?}him{\\?}. Otherwise they will sell it.");
+                    TextObject textObject = new TextObject("{=CEEVENTS1077}{QUEST_GIVER.LINK} of {QUEST_SETTLEMENT.LINK} has found your equipment you must find {?QUEST_GIVER.GENDER}her{?}him{\\?}. Otherwise they will sell it.");
                     StringHelpers.SetCharacterProperties("QUEST_GIVER", QuestGiver.CharacterObject, null, textObject);
                     StringHelpers.SetSettlementProperties("QUEST_SETTLEMENT", QuestGiver.CurrentSettlement, textObject);
 
@@ -186,7 +186,7 @@ namespace CaptivityEvents.Issues
             {
                 get
                 {
-                    var textObject = new TextObject("{=CEEVENTS1076}You have recovered your equipment back from {QUEST_GIVER.LINK}.");
+                    TextObject textObject = new TextObject("{=CEEVENTS1076}You have recovered your equipment back from {QUEST_GIVER.LINK}.");
                     StringHelpers.SetCharacterProperties("QUEST_GIVER", QuestGiver.CharacterObject, null, textObject);
 
                     return textObject;
@@ -197,7 +197,7 @@ namespace CaptivityEvents.Issues
             {
                 get
                 {
-                    var textObject = new TextObject("{=CEEVENTS1075}You have failed to recover your equipment.");
+                    TextObject textObject = new TextObject("{=CEEVENTS1075}You have failed to recover your equipment.");
 
                     return textObject;
                 }
@@ -207,7 +207,7 @@ namespace CaptivityEvents.Issues
             {
                 get
                 {
-                    var textObject = new TextObject("{=CEEVENTS1074}You have failed to recover your equipment in time.");
+                    TextObject textObject = new TextObject("{=CEEVENTS1074}You have failed to recover your equipment in time.");
 
                     return textObject;
                 }

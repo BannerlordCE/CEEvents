@@ -14,12 +14,12 @@ namespace CaptivityEvents.CampaignBehaviors
 
         public void CheckForBarters(BarterData args)
         {
-            var offererParty = args.OffererParty;
-            var otherParty = args.OtherParty;
+            PartyBase offererParty = args.OffererParty;
+            PartyBase otherParty = args.OtherParty;
 
             if (offererParty == null || otherParty == null) return;
 
-            foreach (var characterObject in offererParty.PrisonerHeroes())
+            foreach (CharacterObject characterObject in offererParty.PrisonerHeroes())
                 if (characterObject.IsHero && !FactionManager.IsAtWarAgainstFaction(characterObject.HeroObject.MapFaction, otherParty.MapFaction))
                     if (CESettings.Instance != null && (!CESettings.Instance.PrisonerAutoRansom && (!characterObject.IsPlayerCharacter || offererParty == PartyBase.MainParty)))
                     {
@@ -27,7 +27,7 @@ namespace CaptivityEvents.CampaignBehaviors
                         args.AddBarterable<PrisonerBarterGroup>(barterable);
                     }
 
-            foreach (var characterObject2 in otherParty.PrisonerHeroes())
+            foreach (CharacterObject characterObject2 in otherParty.PrisonerHeroes())
                 if (characterObject2.IsHero && !FactionManager.IsAtWarAgainstFaction(characterObject2.HeroObject.MapFaction, offererParty.MapFaction))
                     if (CESettings.Instance != null && (!CESettings.Instance.PrisonerAutoRansom && (!characterObject2.IsPlayerCharacter || otherParty == PartyBase.MainParty)))
                     {
