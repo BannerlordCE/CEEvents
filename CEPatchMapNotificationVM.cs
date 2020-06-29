@@ -1,53 +1,48 @@
-﻿using CaptivityEvents.Helper;
+﻿using System;
+using System.Reflection;
+using CaptivityEvents.Helper;
 using CaptivityEvents.Notifications;
 using HarmonyLib;
-using System;
-using System.Reflection;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.Core;
 
-namespace CaptivityEvents.Patches
+namespace CaptivityEvents
 {
     [HarmonyPatch(typeof(MapNotificationVM), "DetermineNotificationType")]
-    internal class CEMapNotificationVMPatch
+    internal class CEMapNotificationVM
     {
-        public static MethodInfo RemoveNotificationItem = AccessTools.Method(typeof(MapNotificationVM), "RemoveNotificationItem");
+        public static readonly MethodInfo RemoveNotificationItem = AccessTools.Method(typeof(MapNotificationVM), "RemoveNotificationItem");
 
         [HarmonyPrepare]
         private static bool ShouldPatch()
         {
-            return CESettings.Instance.EventCaptorNotifications;
+            return CESettings.Instance != null && CESettings.Instance.EventCaptorNotifications;
         }
 
         [HarmonyPostfix]
         private static void DetermineNotificationType(MapNotificationVM __instance, ref MapNotificationItemBaseVM __result, InformationData data)
         {
             Type type = data.GetType();
-            if (type.Equals(typeof(CECaptorMapNotification)))
-            {
-                CECaptorMapNotification captorMapNotification = data as CECaptorMapNotification;
-                __result = new CECaptorMapNotificationItemVM(captorMapNotification.CaptorEvent, data, null, new Action<MapNotificationItemBaseVM>((MapNotificationItemBaseVM item) =>
-                {
-                    CEHelper.notificationCaptorExists = false;
-                    CESubModule.LoadCampaignNotificationTexture("default");
 
-                    object[] parameters = new object[1];
-                    parameters[0] = item;
-                    RemoveNotificationItem.Invoke(__instance, parameters);
-                }));
+            if (type == typeof(CECaptorMapNotification))
+            {
+                if (data is CECaptorMapNotification captorMapNotification)
+                    __result = new CECaptorMapNotificationItemVM(captorMapNotification.CaptorEvent, data, null, item =>
+                    {
+                        CEHelper.notificationCaptorExists = false;
+                        new CESubModule().LoadCampaignNotificationTexture("default");
+                        RemoveNotificationItem.Invoke(__instance, new object[] { item });
+                    });
             }
-            else if (type.Equals(typeof(CEEventMapNotification)))
+            else if (type == typeof(CEEventMapNotification))
             {
-                CEEventMapNotification eventMapNotification = data as CEEventMapNotification;
-                __result = new CEEventMapNotificationItemVM(eventMapNotification.RandomEvent, data, null, new Action<MapNotificationItemBaseVM>((MapNotificationItemBaseVM item) =>
-                {
-                    CEHelper.notificationEventExists = false;
-                    CESubModule.LoadCampaignNotificationTexture("default", 1);
-
-                    object[] parameters = new object[1];
-                    parameters[0] = item;
-                    RemoveNotificationItem.Invoke(__instance, parameters);
-                }));
+                if (data is CEEventMapNotification eventMapNotification)
+                    __result = new CEEventMapNotificationItemVM(eventMapNotification.RandomEvent, data, null, item =>
+                    {
+                        CEHelper.notificationEventExists = false;
+                        new CESubModule().LoadCampaignNotificationTexture("default", 1);
+                        RemoveNotificationItem.Invoke(__instance, new object[] { item });
+                    });
             }
         }
     }

@@ -5,13 +5,13 @@ namespace CaptivityEvents
 {
     internal static class CESkills
     {
-        public static SkillObject Prostitution => CESkills.SkillProstitution;
+        public static SkillObject Prostitution => SkillProstitution;
 
-        public static SkillObject Slavery => CESkills.SkillSlavery;
+        public static SkillObject Slavery => SkillSlavery;
 
-        public static bool IsInitialized => CESkills._initialized;
+        public static bool IsInitialized => Initialized;
 
-        internal static bool _initialized = false;
+        internal static bool Initialized;
 
         internal static CharacterAttribute CEAttribute { get; private set; }
 
@@ -27,13 +27,13 @@ namespace CaptivityEvents
 
         public static void RegisterAll(Game game)
         {
-            CEAttribute = game.ObjectManager.RegisterPresumedObject<CharacterAttribute>(new CharacterAttribute("CEAttribute"));
-            SkillProstitution = game.ObjectManager.RegisterPresumedObject<SkillObject>(new SkillObject("Prostitution"));
-            SkillSlavery = game.ObjectManager.RegisterPresumedObject<SkillObject>(new SkillObject("Slavery"));
+            CEAttribute = game.ObjectManager.RegisterPresumedObject(new CharacterAttribute("CEAttribute"));
+            SkillProstitution = game.ObjectManager.RegisterPresumedObject(new SkillObject("Prostitution"));
+            SkillSlavery = game.ObjectManager.RegisterPresumedObject(new SkillObject("Slavery"));
 
-            CEFlags = game.ObjectManager.RegisterPresumedObject<CharacterAttribute>(new CharacterAttribute("CEFlags"));
-            IsProstitute = game.ObjectManager.RegisterPresumedObject<SkillObject>(new SkillObject("IsProstitute"));
-            IsSlave = game.ObjectManager.RegisterPresumedObject<SkillObject>(new SkillObject("IsSlave"));
+            CEFlags = game.ObjectManager.RegisterPresumedObject(new CharacterAttribute("CEFlags"));
+            IsProstitute = game.ObjectManager.RegisterPresumedObject(new SkillObject("IsProstitute"));
+            IsSlave = game.ObjectManager.RegisterPresumedObject(new SkillObject("IsSlave"));
 
             InitializeAll();
         }
@@ -48,7 +48,7 @@ namespace CaptivityEvents
             IsProstitute.Initialize(new TextObject("{=CEEVENTS1104}prostitute"), new TextObject("IsProstitute Flag"), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEFlags);
             IsSlave.Initialize(new TextObject("{=CEEVENTS1103}slave"), new TextObject("IsSlave Flag"), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEFlags);
 
-            _initialized = true;
+            Initialized = true;
         }
     }
 }
