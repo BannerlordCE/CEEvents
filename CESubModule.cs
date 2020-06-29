@@ -57,6 +57,7 @@ namespace CaptivityEvents
             AfterBattle
         }
 
+        // Complete Loss of Data if not static
         public static List<CEEvent> CEEvents = new List<CEEvent>();
         public static List<CEEvent> CEEventList = new List<CEEvent>();
         public static List<CEEvent> CEWaitingList = new List<CEEvent>();
@@ -64,7 +65,7 @@ namespace CaptivityEvents
         public static bool captivePlayEvent;
         public static CharacterObject captiveToPlay;
         public static bool animationPlayEvent;
-        public static List<string> animationImageList = null;
+        public static List<string> animationImageList = new List<string>();
         public static int animationIndex;
         public static float animationSpeed = 0.03f;
         public static DungeonState dungeonState = DungeonState.Normal;
@@ -73,6 +74,11 @@ namespace CaptivityEvents
         public static BrothelState brothelState = BrothelState.Normal;
         public static HuntState huntState = HuntState.Normal;
         public static bool notificationExists;
+        public static List<CECustom> CEFlags = new List<CECustom>();
+        public static float playerSpeed = 0f;
+        public static float brothelFadeIn = 2f;
+        public static float brothelBlack = 10f;
+        public static float brothelFadeOut = 2f;
     }
 
 
@@ -80,12 +86,8 @@ namespace CaptivityEvents
     public class CESubModule : MBSubModuleBase
     {
 
-        // Complete Loss of Data if not static
-        public static List<CECustom> CEFlags = new List<CECustom>();
-        public static float playerSpeed = 0f;
-        public static float brothelFadeIn = 2f;
-        public static float brothelBlack = 10f;
-        public static float brothelFadeOut = 2f;
+        
+        
 
 
         private static bool _isLoaded;
@@ -224,7 +226,7 @@ namespace CaptivityEvents
 
             // Load Events
             CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
-            CEFlags = CECustomHandler.GetFlags();
+            CEPersistence.CEFlags = CECustomHandler.GetFlags();
 
             // Load Images
             var fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
@@ -375,7 +377,7 @@ namespace CaptivityEvents
             foreach (var _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !_listedEvent.Name.IsStringNoneOrEmpty()))
             {
                 if (_listedEvent.MultipleListOfCustomFlags != null && _listedEvent.MultipleListOfCustomFlags.Count > 0)
-                    if (!CEFlags.Exists(match => match.CEFlags.Any(x => _listedEvent.MultipleListOfCustomFlags.Contains(x))))
+                    if (!CEPersistence.CEFlags.Exists(match => match.CEFlags.Any(x => _listedEvent.MultipleListOfCustomFlags.Contains(x))))
                         continue;
 
                 if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEPersistence.CEEvents.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 1) continue;
@@ -758,24 +760,24 @@ namespace CaptivityEvents
                                 {
                                     CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
                                     Mission.Current.MainAgent.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
-                                    brothelFadeIn = 3f;
+                                    CEPersistence.brothelFadeIn = 3f;
                                 }
                                 else
                                 {
                                     CEPersistence.agentTalkingTo.DisableScriptedMovement();
                                     CEPersistence.agentTalkingTo.HandleStopUsingAction();
                                     CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
-                                    brothelFadeIn = 3f;
+                                    CEPersistence.brothelFadeIn = 3f;
                                 }
 
-                                behaviour.BeginFadeOutAndIn(brothelFadeIn, brothelBlack, brothelFadeOut);
+                                behaviour.BeginFadeOutAndIn(CEPersistence.brothelFadeIn, CEPersistence.brothelBlack, CEPersistence.brothelFadeOut);
                             }
                             catch (Exception)
                             {
                                 CECustomHandler.ForceLogToFile("Failed MissionCameraFadeView.");
                             }
 
-                            brothelTimerOne = missionStateBrothel.CurrentMission.Time + brothelFadeIn;
+                            brothelTimerOne = missionStateBrothel.CurrentMission.Time + CEPersistence.brothelFadeIn;
                             CEPersistence.brothelState = CEPersistence.BrothelState.FadeIn;
                         }
 
@@ -784,7 +786,7 @@ namespace CaptivityEvents
                     case CEPersistence.BrothelState.FadeIn:
                         if (brothelTimerOne < missionStateBrothel.CurrentMission.Time)
                         {
-                            brothelTimerOne = missionStateBrothel.CurrentMission.Time + brothelBlack;
+                            brothelTimerOne = missionStateBrothel.CurrentMission.Time + CEPersistence.brothelBlack;
                             brothelTimerTwo = missionStateBrothel.CurrentMission.Time + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
                             brothelTimerThree = missionStateBrothel.CurrentMission.Time + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
 
@@ -802,7 +804,7 @@ namespace CaptivityEvents
                         {
                             Mission.Current.MainAgentServer.Controller = Agent.ControllerType.Player;
 
-                            brothelTimerOne = missionStateBrothel.CurrentMission.Time + brothelFadeOut;
+                            brothelTimerOne = missionStateBrothel.CurrentMission.Time + CEPersistence.brothelFadeOut;
                             CEPersistence.brothelState = CEPersistence.BrothelState.FadeOut;
                         }
                         else if (brothelTimerTwo < missionStateBrothel.CurrentMission.Time)
