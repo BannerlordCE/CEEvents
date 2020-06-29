@@ -13,7 +13,7 @@ namespace CaptivityEvents.Events
     {
         internal void CECaptivityContinue(ref MenuCallbackArgs args)
         {
-            CEPersistence.AnimationPlayEvent = false;
+            CEPersistence.animationPlayEvent = false;
 
             try
             {

@@ -247,14 +247,14 @@ namespace CaptivityEvents.Events
 
                 if (!backgroundName.IsStringNoneOrEmpty())
                 {
-                    CEPersistence.AnimationPlayEvent = false;
+                    CEPersistence.animationPlayEvent = false;
                     new CESubModule().LoadTexture(backgroundName);
                 }
                 else if (_listedEvent.BackgroundAnimation != null && _listedEvent.BackgroundAnimation.Count > 0)
                 {
-                    CEPersistence.AnimationImageList = _listedEvent.BackgroundAnimation;
-                    CEPersistence.AnimationIndex = 0;
-                    CEPersistence.AnimationPlayEvent = true;
+                    CEPersistence.animationImageList = _listedEvent.BackgroundAnimation;
+                    CEPersistence.animationIndex = 0;
+                    CEPersistence.animationPlayEvent = true;
                     float speed = 0.03f;
 
                     try
@@ -267,11 +267,11 @@ namespace CaptivityEvents.Events
                         CECustomHandler.ForceLogToFile("Failed to load BackgroundAnimationSpeed for " + _listedEvent.Name + " : Exception: " + e);
                     }
 
-                    CEPersistence.AnimationSpeed = speed;
+                    CEPersistence.animationSpeed = speed;
                 }
                 else
                 {
-                    CEPersistence.AnimationPlayEvent = false;
+                    CEPersistence.animationPlayEvent = false;
                     new CESubModule().LoadTexture(textureFlag);
                 }
             }
