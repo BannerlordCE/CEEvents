@@ -340,3 +340,5 @@ ASALocalRun/
 healthchecksdb
 
 /VSCODEWORKSPACE.code-workspace
+*.ncrunchsolution
+*.orig
