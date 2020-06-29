@@ -42,10 +42,10 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                var prisonerCount = MobileParty.MainParty.PrisonRoster.Count;
+                int prisonerCount = MobileParty.MainParty.PrisonRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
                 MobileParty.MainParty.PrisonRoster.KillNumberOfMenRandomly(amount, killHeroes);
-                var textObject = GameTexts.FindText("str_CE_kill_prisoners");
+                TextObject textObject = GameTexts.FindText("str_CE_kill_prisoners");
                 textObject.SetTextVariable("HERO", Hero.MainHero.Name);
                 textObject.SetTextVariable("AMOUNT", amount);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
@@ -58,7 +58,7 @@ namespace CaptivityEvents.Events
 
         internal void CEPrisonerRebel(MenuCallbackArgs args)
         {
-            var releasedPrisoners = new TroopRoster();
+            TroopRoster releasedPrisoners = new TroopRoster();
 
             try
             {
@@ -73,15 +73,15 @@ namespace CaptivityEvents.Events
             if (!releasedPrisoners.IsEmpty())
                 try
                 {
-                    var prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives");
+                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives");
 
-                    var leader = releasedPrisoners.FirstOrDefault(hasHero => hasHero.Character.IsHero);
+                    TroopRosterElement leader = releasedPrisoners.FirstOrDefault(hasHero => hasHero.Character.IsHero);
 
                     if (leader.Character != null)
                     {
-                        var clan = leader.Character.HeroObject.Clan;
-                        var defaultPartyTemplate = clan.DefaultPartyTemplate;
-                        var nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlement(settlement => true);
+                        Clan clan = leader.Character.HeroObject.Clan;
+                        PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
+                        Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlement(settlement => true);
                         prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Lord);
                         prisonerParty.MemberRoster.Clear();
                         prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
@@ -96,9 +96,9 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        var clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
-                        var defaultPartyTemplate = clan.DefaultPartyTemplate;
-                        var nearest = SettlementHelper.FindNearestSettlement(settlement => true);
+                        Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
+                        PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
+                        Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => true);
                         prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Bandit);
                         prisonerParty.MemberRoster.Clear();
                         prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
@@ -134,15 +134,15 @@ namespace CaptivityEvents.Events
 
         internal void CEHuntPrisoners(MenuCallbackArgs args, int amount = 20)
         {
-            var releasedPrisoners = new TroopRoster();
+            TroopRoster releasedPrisoners = new TroopRoster();
 
             if (CESettings.Instance != null) amount = CESettings.Instance.AmountOfTroopsForHunt;
 
             try
             {
-                for (var i = 0; i < amount; i++)
+                for (int i = 0; i < amount; i++)
                 {
-                    var test = MobileParty.MainParty.PrisonRoster.Where(troop => !troop.Character.IsHero).GetRandomElement();
+                    TroopRosterElement test = MobileParty.MainParty.PrisonRoster.Where(troop => !troop.Character.IsHero).GetRandomElement();
 
                     if (test.Character == null) continue;
 
@@ -161,12 +161,12 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    var prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives");
+                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives");
 
-                    var clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
+                    Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                     
-                    var defaultPartyTemplate = clan.DefaultPartyTemplate;
-                    var nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
+                    PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
+                    Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
                     prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0f, 0f, MobileParty.PartyTypeEnum.Bandit);
                     prisonerParty.MemberRoster.Clear();
@@ -210,13 +210,13 @@ namespace CaptivityEvents.Events
         public void CEStripVictim(Hero captive)
         {
             if (captive == null) return;
-            var randomElement = new Equipment(false);
+            Equipment randomElement = new Equipment(false);
 
-            var itemObjectBody = captive.IsFemale
+            ItemObject itemObjectBody = captive.IsFemale
                 ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
                 : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
             randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
-            var randomElement2 = new Equipment(true);
+            Equipment randomElement2 = new Equipment(true);
             randomElement2.FillFrom(randomElement, false);
 
             if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captive, captive.BattleEquipment, captive.CivilianEquipment);

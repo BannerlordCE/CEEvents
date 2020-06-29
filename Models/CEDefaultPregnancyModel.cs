@@ -24,11 +24,11 @@ namespace CaptivityEvents.Models
 
         public override float GetDailyChanceOfPregnancyForHero(Hero hero)
         {
-            var num = 0f;
+            float num = 0f;
 
             if (hero.Spouse != null && hero.IsFertile && IsHeroAgeSuitableForPregnancy(hero))
             {
-                var explainedNumber = new ExplainedNumber(1f);
+                ExplainedNumber explainedNumber = new ExplainedNumber(1f);
                 PerkHelper.AddPerkBonusForCharacter(DefaultPerks.Medicine.PerfectHealth, hero.Clan.Leader.CharacterObject, ref explainedNumber);
                 num = (6.5f - (hero.Age - 18f) * 0.23f) * 0.02f * explainedNumber.ResultNumber;
             }

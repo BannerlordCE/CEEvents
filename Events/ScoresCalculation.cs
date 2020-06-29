@@ -9,7 +9,7 @@ namespace CaptivityEvents.Events
         {
             if (targetHero == null) return 10;
 
-            var num = 0;
+            int num = 0;
             if (targetHero.GetPerkValue(DefaultPerks.Medicine.PerfectHealth)) num += 10;
 
             if (targetHero.GetPerkValue(DefaultPerks.Steward.Prominence)) num += 15;

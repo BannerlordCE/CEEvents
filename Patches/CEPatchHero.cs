@@ -18,7 +18,7 @@ namespace CaptivityEvents.Patches
             }
             else
             {
-                var flag2 = CEHelper.spouseTwo != null && __instance == CEHelper.spouseTwo;
+                bool flag2 = CEHelper.spouseTwo != null && __instance == CEHelper.spouseTwo;
                 if (flag2) __result = CEHelper.spouseOne;
             }
         }

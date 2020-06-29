@@ -17,7 +17,7 @@ namespace CaptivityEvents.Events
         {
             get
             {
-                var t = _message;
+                string t = _message;
                 _message = "";
 
                 return t;
@@ -32,7 +32,7 @@ namespace CaptivityEvents.Events
 
         public static string CheckFlags(CharacterObject captive, PartyBase captorParty = null)
         {
-            var returnString = "";
+            string returnString = "";
 
             if (captorParty == null) captorParty = PartyBase.MainParty;
 
@@ -43,7 +43,7 @@ namespace CaptivityEvents.Events
                                : "Male")
                            + "\n";
 
-            var slaveSkillFlag = captive.GetSkillValue(CESkills.IsSlave);
+            int slaveSkillFlag = captive.GetSkillValue(CESkills.IsSlave);
 
             returnString = returnString
                            + "Captive is Slave: "
@@ -52,7 +52,7 @@ namespace CaptivityEvents.Events
                                : "False")
                            + "\n";
 
-            var prostituteSkillFlag = captive.GetSkillValue(CESkills.IsProstitute);
+            int prostituteSkillFlag = captive.GetSkillValue(CESkills.IsProstitute);
 
             returnString = returnString
                            + "Captive is Prostitute: "
@@ -71,7 +71,7 @@ namespace CaptivityEvents.Events
 
                     try
                     {
-                        var hasCaravan = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
+                        bool hasCaravan = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
                         if (hasCaravan) returnString += "(visitedByCaravanFlag)";
                     }
                     catch (Exception)
@@ -81,7 +81,7 @@ namespace CaptivityEvents.Events
 
                     try
                     {
-                        var hasLord = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
+                        bool hasLord = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
                         if (hasLord) returnString += "(VisitedByLordFlag)";
                     }
                     catch (Exception)
@@ -100,7 +100,7 @@ namespace CaptivityEvents.Events
 
                     try
                     {
-                        var hasLord = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
+                        bool hasLord = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
                         if (hasLord) returnString += "(VisitedByLordFlag)";
                     }
                     catch (Exception)
@@ -121,7 +121,7 @@ namespace CaptivityEvents.Events
 
                     try
                     {
-                        var hasCaravan = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
+                        bool hasCaravan = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
                         if (hasCaravan) returnString += "(visitedByCaravanFlag)";
                     }
                     catch (Exception)
@@ -131,7 +131,7 @@ namespace CaptivityEvents.Events
 
                     try
                     {
-                        var hasLord = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
+                        bool hasLord = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
                         if (hasLord) returnString += "(VisitedByLordFlag)";
                     }
                     catch (Exception)
@@ -148,7 +148,7 @@ namespace CaptivityEvents.Events
 
                     try
                     {
-                        var hasLord = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
+                        bool hasLord = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty; }) != null;
                         if (hasLord) returnString += "(VisitedByLordFlag)";
                     }
                     catch (Exception)
@@ -178,7 +178,7 @@ namespace CaptivityEvents.Events
 
         public string FlagsDoMatchEventConditions(CharacterObject captive, PartyBase captorParty = null)
         {
-            var nonRandomBehaviour = true;
+            bool nonRandomBehaviour = true;
 
             if (captorParty == null)
             {
@@ -216,7 +216,7 @@ namespace CaptivityEvents.Events
                 if (!CaptorPartyGenderCheck(captorParty)) return LatestMessage;
             }
 
-            if (!LocationAndEventCheck(captorParty, out var eventMatchingCondition)) return LatestMessage;
+            if (!LocationAndEventCheck(captorParty, out bool eventMatchingCondition)) return LatestMessage;
             if (!TimeCheck(ref eventMatchingCondition)) return LatestMessage;
             if (!SeasonCheck(ref eventMatchingCondition)) return LatestMessage;
 
@@ -231,10 +231,10 @@ namespace CaptivityEvents.Events
 
         private bool SeasonCheck(ref bool eventMatchingCondition)
         {
-            var hasWinterFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.SeasonWinter);
-            var hasSummerFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.SeasonSpring);
-            var hasSpringFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.SeasonSummer);
-            var hasFallFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.SeasonFall);
+            bool hasWinterFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.SeasonWinter);
+            bool hasSummerFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.SeasonSpring);
+            bool hasSpringFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.SeasonSummer);
+            bool hasFallFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.SeasonFall);
 
             if (hasWinterFlag || hasSummerFlag) eventMatchingCondition = hasSummerFlag && CampaignTime.Now.GetSeasonOfYear == 1 || hasFallFlag && CampaignTime.Now.GetSeasonOfYear == 2 || hasWinterFlag && CampaignTime.Now.GetSeasonOfYear == 3 || hasSpringFlag && (CampaignTime.Now.GetSeasonOfYear == 4 || CampaignTime.Now.GetSeasonOfYear == 0);
 
@@ -245,8 +245,8 @@ namespace CaptivityEvents.Events
 
         private bool TimeCheck(ref bool eventMatchingCondition)
         {
-            var hasNightFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.TimeNight);
-            var hasDayFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.TimeDay);
+            bool hasNightFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.TimeNight);
+            bool hasDayFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.TimeDay);
 
             if (hasNightFlag || hasDayFlag) eventMatchingCondition = hasNightFlag && Campaign.Current.IsNight || hasDayFlag && Campaign.Current.IsDay;
 
@@ -257,17 +257,17 @@ namespace CaptivityEvents.Events
 
         private bool LocationAndEventCheck(PartyBase captorParty, out bool eventMatchingCondition)
         {
-            var hasCityFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity);
-            var hasDungeonFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationDungeon);
-            var hasVillageFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationVillage);
-            var hasHideoutFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationHideout);
-            var hasCastleFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCastle);
-            var hasPartyInTownFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInTown);
-            var hasTravelingFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationTravellingParty);
-            var visitedByCaravanFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByCaravan);
-            var visitedByLordFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByLord);
-            var duringSiegeFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DuringSiege);
-            var duringRaidFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DuringRaid);
+            bool hasCityFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity);
+            bool hasDungeonFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationDungeon);
+            bool hasVillageFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationVillage);
+            bool hasHideoutFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationHideout);
+            bool hasCastleFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCastle);
+            bool hasPartyInTownFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInTown);
+            bool hasTravelingFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationTravellingParty);
+            bool visitedByCaravanFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByCaravan);
+            bool visitedByLordFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByLord);
+            bool duringSiegeFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DuringSiege);
+            bool duringRaidFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DuringRaid);
 
             eventMatchingCondition = true;
 
@@ -375,7 +375,7 @@ namespace CaptivityEvents.Events
 
                         if (duringSiegeFlag != (captorParty.MobileParty.BesiegerCamp != null)) eventMatchingCondition = false;
 
-                        var raidingEvent = captorParty.MapEvent != null && captorParty.MapEvent.IsRaid && captorParty.MapFaction.IsAtWarWith(captorParty.MapEvent.MapEventSettlement.MapFaction) && captorParty.MapEvent.DefenderSide.TroopCount == 0;
+                        bool raidingEvent = captorParty.MapEvent != null && captorParty.MapEvent.IsRaid && captorParty.MapFaction.IsAtWarWith(captorParty.MapEvent.MapEventSettlement.MapFaction) && captorParty.MapEvent.DefenderSide.TroopCount == 0;
                         if (duringRaidFlag != raidingEvent) eventMatchingCondition = false;
                     }
                 }
@@ -400,15 +400,15 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqCaptorPartyHaveItem.IsStringNoneOrEmpty()) return true;
 
-                var flagHaveItem = false;
-                var foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqCaptorPartyHaveItem);
+                bool flagHaveItem = false;
+                ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqCaptorPartyHaveItem);
 
                 if (captorParty.LeaderHero != null)
                     foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
                     {
                         try
                         {
-                            var battleItem = captorParty.LeaderHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
+                            ItemObject battleItem = captorParty.LeaderHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
 
                             if (battleItem != null && battleItem == foundItem)
                             {
@@ -421,7 +421,7 @@ namespace CaptivityEvents.Events
 
                         try
                         {
-                            var civilianItem = captorParty.LeaderHero.CivilianEquipment.GetEquipmentFromSlot(i).Item;
+                            ItemObject civilianItem = captorParty.LeaderHero.CivilianEquipment.GetEquipmentFromSlot(i).Item;
 
                             if (civilianItem == null || civilianItem != foundItem) continue;
                             flagHaveItem = true;
@@ -451,12 +451,12 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.LeaderHero == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkill.");
 
-                var skillLevel = captorParty.LeaderHero.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _listEvent.ReqCaptorSkill));
+                int skillLevel = captorParty.LeaderHero.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _listEvent.ReqCaptorSkill));
 
                 try
                 {
                     if (!_listEvent.ReqCaptorSkillLevelAbove.IsStringNoneOrEmpty())
-                        if (skillLevel < new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelAbove))
+                        if (skillLevel < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelAbove))
                             return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelAbove.");
                 }
                 catch (Exception)
@@ -468,7 +468,7 @@ namespace CaptivityEvents.Events
                 {
                     if (_listEvent.ReqCaptorSkillLevelBelow.IsStringNoneOrEmpty()) return true;
 
-                    if (skillLevel > new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelBelow.");
+                    if (skillLevel > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelBelow.");
                 }
                 catch (Exception)
                 {
@@ -491,12 +491,12 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.LeaderHero == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTrait.");
 
-                var traitLevel = captorParty.LeaderHero.GetTraitLevel(TraitObject.Find(_listEvent.ReqCaptorTrait));
+                int traitLevel = captorParty.LeaderHero.GetTraitLevel(TraitObject.Find(_listEvent.ReqCaptorTrait));
 
                 try
                 {
                     if (!_listEvent.ReqCaptorTraitLevelAbove.IsStringNoneOrEmpty())
-                        if (traitLevel < new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptorTraitLevelAbove))
+                        if (traitLevel < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptorTraitLevelAbove))
                             return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTraitLevelAbove.");
                 }
                 catch (Exception)
@@ -508,7 +508,7 @@ namespace CaptivityEvents.Events
                 {
                     if (_listEvent.ReqCaptorTraitLevelBelow.IsStringNoneOrEmpty()) return true;
 
-                    if (traitLevel > new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptorTraitLevelBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTraitLevelBelow.");
+                    if (traitLevel > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptorTraitLevelBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTraitLevelBelow.");
                 }
                 catch (Exception)
                 {
@@ -528,7 +528,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqMoraleAbove.IsStringNoneOrEmpty())
-                    if (captorParty.IsMobile && captorParty.MobileParty.Morale < new VariablesLoader().GetIntFromXML(_listEvent.ReqMoraleAbove))
+                    if (captorParty.IsMobile && captorParty.MobileParty.Morale < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMoraleAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMoraleAbove.");
             }
             catch (Exception)
@@ -540,7 +540,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqMoraleBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.IsMobile && captorParty.MobileParty.Morale > new VariablesLoader().GetIntFromXML(_listEvent.ReqMoraleBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMoraleBelow.");
+                if (captorParty.IsMobile && captorParty.MobileParty.Morale > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMoraleBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMoraleBelow.");
             }
             catch (Exception)
             {
@@ -555,7 +555,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqFemaleCaptivesAbove.IsStringNoneOrEmpty())
-                    if (captorParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) < new VariablesLoader().GetIntFromXML(_listEvent.ReqFemaleCaptivesAbove))
+                    if (captorParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleCaptivesAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleCaptivesAbove.");
             }
             catch (Exception)
@@ -567,7 +567,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqFemaleCaptivesBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > new VariablesLoader().GetIntFromXML(_listEvent.ReqFemaleCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleCaptivesAbove.");
+                if (captorParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleCaptivesAbove.");
             }
             catch (Exception)
             {
@@ -582,7 +582,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqMaleCaptivesAbove.IsStringNoneOrEmpty())
-                    if (captorParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < new VariablesLoader().GetIntFromXML(_listEvent.ReqMaleCaptivesAbove))
+                    if (captorParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleCaptivesAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleCaptivesAbove.");
             }
             catch (Exception)
@@ -594,7 +594,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqMaleCaptivesBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) > new VariablesLoader().GetIntFromXML(_listEvent.ReqMaleCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleCaptivesBelow.");
+                if (captorParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleCaptivesBelow.");
             }
             catch (Exception)
             {
@@ -609,7 +609,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqCaptivesAbove.IsStringNoneOrEmpty())
-                    if (captorParty.NumberOfPrisoners < new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesAbove))
+                    if (captorParty.NumberOfPrisoners < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesAbove.");
             }
             catch (Exception)
@@ -621,7 +621,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqCaptivesBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.NumberOfPrisoners > new VariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesBelow.");
+                if (captorParty.NumberOfPrisoners > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesBelow.");
             }
             catch (Exception)
             {
@@ -636,7 +636,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqFemaleTroopsAbove.IsStringNoneOrEmpty())
-                    if (captorParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) < new VariablesLoader().GetIntFromXML(_listEvent.ReqFemaleTroopsAbove))
+                    if (captorParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleTroopsAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleTroopsAbove.");
             }
             catch (Exception)
@@ -647,7 +647,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqFemaleTroopsBelow.IsStringNoneOrEmpty())
-                    if (captorParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > new VariablesLoader().GetIntFromXML(_listEvent.ReqFemaleTroopsBelow))
+                    if (captorParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleTroopsBelow))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleTroopsBelow.");
             }
             catch (Exception)
@@ -663,7 +663,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqMaleTroopsAbove.IsStringNoneOrEmpty())
-                    if (captorParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < new VariablesLoader().GetIntFromXML(_listEvent.ReqMaleTroopsAbove))
+                    if (captorParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleTroopsAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleTroopsAbove.");
             }
             catch (Exception)
@@ -675,7 +675,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqMaleTroopsBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) > new VariablesLoader().GetIntFromXML(_listEvent.ReqMaleTroopsBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleTroopsBelow.");
+                if (captorParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleTroopsBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleTroopsBelow.");
             }
             catch (Exception)
             {
@@ -690,7 +690,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqTroopsAbove.IsStringNoneOrEmpty())
-                    if (captorParty.NumberOfRegularMembers < new VariablesLoader().GetIntFromXML(_listEvent.ReqTroopsAbove))
+                    if (captorParty.NumberOfRegularMembers < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqTroopsAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsAbove.");
             }
             catch (Exception)
@@ -702,7 +702,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqTroopsBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.NumberOfRegularMembers > new VariablesLoader().GetIntFromXML(_listEvent.ReqTroopsBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsBelow.");
+                if (captorParty.NumberOfRegularMembers > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqTroopsBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsBelow.");
             }
             catch (Exception)
             {
@@ -728,9 +728,9 @@ namespace CaptivityEvents.Events
 
         private bool IsOwnedByNotableCheck()
         {
-            var skipFlags = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnedByNotable) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroNotOwnedByNotable);
-            var isOwnedFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnedByNotable) && !skipFlags;
-            var isNotOwnedFlag = !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnedByNotable) && !skipFlags;
+            bool skipFlags = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnedByNotable) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroNotOwnedByNotable);
+            bool isOwnedFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnedByNotable) && !skipFlags;
+            bool isNotOwnedFlag = !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnedByNotable) && !skipFlags;
 
             if (!isOwnedFlag && !isNotOwnedFlag) return true;
 
@@ -745,7 +745,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!string.IsNullOrEmpty(_listEvent.ReqGoldAbove))
-                    if (Hero.MainHero.Gold < new VariablesLoader().GetIntFromXML(_listEvent.ReqGoldAbove))
+                    if (Hero.MainHero.Gold < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqGoldAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqGoldAbove.");
             }
             catch (Exception)
@@ -757,7 +757,7 @@ namespace CaptivityEvents.Events
             {
                 if (string.IsNullOrEmpty(_listEvent.ReqGoldBelow)) return true;
 
-                if (Hero.MainHero.Gold > new VariablesLoader().GetIntFromXML(_listEvent.ReqGoldBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqGoldBelow.");
+                if (Hero.MainHero.Gold > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqGoldBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqGoldBelow.");
             }
             catch (Exception)
             {
@@ -771,7 +771,7 @@ namespace CaptivityEvents.Events
         {
             if (captive.IsHero && captive.HeroObject != null && (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptiveIsHero) || captive.IsPlayerCharacter))
             {
-                var captiveHero = captive.HeroObject;
+                Hero captiveHero = captive.HeroObject;
                 return HeroChecks(captiveHero) && (nonRandomBehaviour && CaptiveHaveItemCheck(captiveHero) && RelationCheck(captorParty, captiveHero) || HeroHaveItemCheck(captorParty));
 
             }
@@ -793,15 +793,15 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqHeroPartyHaveItem.IsStringNoneOrEmpty()) return true;
 
-                var flagHaveItem = false;
-                var foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
+                bool flagHaveItem = false;
+                ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
 
                 if (captorParty.LeaderHero != null)
                     foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
                     {
                         try
                         {
-                            var battleItem = captorParty.LeaderHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
+                            ItemObject battleItem = captorParty.LeaderHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
 
                             if (battleItem != null && battleItem == foundItem)
                             {
@@ -814,7 +814,7 @@ namespace CaptivityEvents.Events
 
                         try
                         {
-                            var civilianItem = captorParty.LeaderHero.CivilianEquipment.GetEquipmentFromSlot(i).Item;
+                            ItemObject civilianItem = captorParty.LeaderHero.CivilianEquipment.GetEquipmentFromSlot(i).Item;
 
                             if (civilianItem == null || civilianItem != foundItem) continue;
                             flagHaveItem = true;
@@ -841,7 +841,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!string.IsNullOrEmpty(_listEvent.ReqHeroCaptorRelationAbove) && captorParty.LeaderHero != null)
-                    if (captiveHero.GetRelation(captorParty.LeaderHero) < new VariablesLoader().GetFloatFromXML(_listEvent.ReqHeroCaptorRelationAbove))
+                    if (captiveHero.GetRelation(captorParty.LeaderHero) < new CEVariablesLoader().GetFloatFromXML(_listEvent.ReqHeroCaptorRelationAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroCaptorRelationAbove.");
             }
             catch (Exception)
@@ -853,7 +853,7 @@ namespace CaptivityEvents.Events
             {
                 if (string.IsNullOrEmpty(_listEvent.ReqHeroCaptorRelationBelow) || captorParty.LeaderHero == null) return true;
 
-                if (captiveHero.GetRelation(captorParty.LeaderHero) > new VariablesLoader().GetFloatFromXML(_listEvent.ReqHeroCaptorRelationBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroCaptorRelationBelow.");
+                if (captiveHero.GetRelation(captorParty.LeaderHero) > new CEVariablesLoader().GetFloatFromXML(_listEvent.ReqHeroCaptorRelationBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroCaptorRelationBelow.");
             }
             catch (Exception)
             {
@@ -869,17 +869,17 @@ namespace CaptivityEvents.Events
             {
                 if (!_listEvent.ReqHeroPartyHaveItem.IsStringNoneOrEmpty())
                 {
-                    var foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
+                    ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
 
                     if (foundItem == null) return LogError("ReqCaptiveHaveItem " + _listEvent.ReqHeroPartyHaveItem + " not found for " + _listEvent.Name);
 
-                    var flagHaveItem = false;
+                    bool flagHaveItem = false;
 
                     foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
                     {
                         try
                         {
-                            var battleItem = captiveHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
+                            ItemObject battleItem = captiveHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
 
                             if (battleItem != null && battleItem == foundItem)
                             {
@@ -892,7 +892,7 @@ namespace CaptivityEvents.Events
 
                         try
                         {
-                            var civilianItem = captiveHero.CivilianEquipment.GetEquipmentFromSlot(i).Item;
+                            ItemObject civilianItem = captiveHero.CivilianEquipment.GetEquipmentFromSlot(i).Item;
 
                             if (civilianItem == null || civilianItem != foundItem) continue;
                             flagHaveItem = true;
@@ -933,7 +933,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!string.IsNullOrEmpty(_listEvent.ReqHeroHealthBelowPercentage))
-                    if (captive.HitPoints > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroHealthBelowPercentage))
+                    if (captive.HitPoints > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroHealthBelowPercentage))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroHealthBelowPercentage.");
             }
             catch (Exception)
@@ -945,7 +945,7 @@ namespace CaptivityEvents.Events
             {
                 if (string.IsNullOrEmpty(_listEvent.ReqHeroHealthAbovePercentage)) return true;
 
-                if (captive.HitPoints < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroHealthAbovePercentage)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroHealthAbovePercentage.");
+                if (captive.HitPoints < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroHealthAbovePercentage)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroHealthAbovePercentage.");
             }
             catch (Exception)
             {
@@ -961,12 +961,12 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqHeroSkill.IsStringNoneOrEmpty()) return true;
 
-                var skillLevel = captive.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _listEvent.ReqHeroSkill));
+                int skillLevel = captive.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _listEvent.ReqHeroSkill));
 
                 try
                 {
                     if (!_listEvent.ReqHeroSkillLevelAbove.IsStringNoneOrEmpty())
-                        if (skillLevel < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelAbove))
+                        if (skillLevel < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelAbove))
                             return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelAbove.");
                 }
                 catch (Exception)
@@ -978,7 +978,7 @@ namespace CaptivityEvents.Events
                 {
                     if (_listEvent.ReqHeroSkillLevelBelow.IsStringNoneOrEmpty()) return true;
 
-                    if (skillLevel > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelBelow.");
+                    if (skillLevel > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelBelow.");
                 }
                 catch (Exception)
                 {
@@ -999,12 +999,12 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqHeroTrait.IsStringNoneOrEmpty()) return true;
 
-                var traitLevel = captive.GetTraitLevel(TraitObject.Find(_listEvent.ReqHeroTrait));
+                int traitLevel = captive.GetTraitLevel(TraitObject.Find(_listEvent.ReqHeroTrait));
 
                 try
                 {
                     if (!string.IsNullOrEmpty(_listEvent.ReqHeroTraitLevelAbove))
-                        if (traitLevel < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroTraitLevelAbove))
+                        if (traitLevel < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroTraitLevelAbove))
                             return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroTraitLevelAbove.");
                 }
                 catch (Exception)
@@ -1016,7 +1016,7 @@ namespace CaptivityEvents.Events
                 {
                     if (string.IsNullOrEmpty(_listEvent.ReqHeroTraitLevelBelow)) return true;
 
-                    if (traitLevel > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroTraitLevelBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroTraitLevelBelow.");
+                    if (traitLevel > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroTraitLevelBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroTraitLevelBelow.");
                 }
                 catch (Exception)
                 {
@@ -1036,7 +1036,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!string.IsNullOrEmpty(_listEvent.ReqHeroMinAge))
-                    if (captive.Age < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroMinAge))
+                    if (captive.Age < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroMinAge))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroMinAge.");
             }
             catch (Exception)
@@ -1048,7 +1048,7 @@ namespace CaptivityEvents.Events
             {
                 if (string.IsNullOrEmpty(_listEvent.ReqHeroMaxAge)) return true;
 
-                if (captive.Age > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroMaxAge)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroMaxAge.");
+                if (captive.Age > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroMaxAge)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroMaxAge.");
             }
             catch (Exception)
             {
@@ -1060,28 +1060,28 @@ namespace CaptivityEvents.Events
 
         private bool ProstitutionCheck(CharacterObject captive)
         {
-            var skipFlags = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotProstitute);
-            var heroProstituteFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && !skipFlags;
-            var heroNotProstituteFlag = !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && !skipFlags;
+            bool skipFlags = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotProstitute);
+            bool heroProstituteFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && !skipFlags;
+            bool heroNotProstituteFlag = !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && !skipFlags;
 
-            var prostituteFlag = true;
+            bool prostituteFlag = true;
 
             try
             {
                 if (heroProstituteFlag || heroNotProstituteFlag)
                 {
                     prostituteFlag = false;
-                    var prostituteSkillFlag = captive.GetSkillValue(CESkills.IsProstitute);
+                    int prostituteSkillFlag = captive.GetSkillValue(CESkills.IsProstitute);
 
                     if (prostituteSkillFlag != 0 && heroProstituteFlag)
                     {
                         prostituteFlag = true;
-                        var prostitute = captive.GetSkillValue(CESkills.Prostitution);
+                        int prostitute = captive.GetSkillValue(CESkills.Prostitution);
 
                         try
                         {
                             if (!string.IsNullOrEmpty(_listEvent.ReqHeroProstituteLevelAbove))
-                                if (prostitute < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelAbove))
+                                if (prostitute < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelAbove))
                                     return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelAbove.");
                         }
                         catch (Exception)
@@ -1092,7 +1092,7 @@ namespace CaptivityEvents.Events
                         try
                         {
                             if (!string.IsNullOrEmpty(_listEvent.ReqHeroProstituteLevelBelow))
-                                if (prostitute > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelBelow))
+                                if (prostitute > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelBelow))
                                     return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelBelow.");
                         }
                         catch (Exception)
@@ -1116,28 +1116,28 @@ namespace CaptivityEvents.Events
 
         private bool SlaveryCheck(CharacterObject captive)
         {
-            var skipFlags = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsSlave) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotSlave);
-            var heroIsSlave = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsSlave) && !skipFlags;
-            var heroIsNotSlave = !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsSlave) && !skipFlags;
+            bool skipFlags = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsSlave) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotSlave);
+            bool heroIsSlave = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsSlave) && !skipFlags;
+            bool heroIsNotSlave = !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsSlave) && !skipFlags;
 
-            var slaveCondition = true;
+            bool slaveCondition = true;
 
             try
             {
                 if (heroIsSlave || heroIsNotSlave)
                 {
                     slaveCondition = false;
-                    var slaveSkillFlag = captive.GetSkillValue(CESkills.IsSlave);
+                    int slaveSkillFlag = captive.GetSkillValue(CESkills.IsSlave);
 
                     if (slaveSkillFlag != 0 && heroIsSlave)
                     {
                         slaveCondition = true;
-                        var slave = captive.GetSkillValue(CESkills.Slavery);
+                        int slave = captive.GetSkillValue(CESkills.Slavery);
 
                         try
                         {
                             if (!string.IsNullOrEmpty(_listEvent.ReqHeroSlaveLevelAbove))
-                                if (slave < new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelAbove))
+                                if (slave < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelAbove))
                                     return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelAbove.");
                         }
                         catch (Exception)
@@ -1148,7 +1148,7 @@ namespace CaptivityEvents.Events
                         try
                         {
                             if (!string.IsNullOrEmpty(_listEvent.ReqHeroSlaveLevelBelow))
-                                if (slave > new VariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelBelow))
+                                if (slave > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelBelow))
                                     return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelBelow.");
                         }
                         catch (Exception)

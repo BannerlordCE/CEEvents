@@ -22,8 +22,8 @@ namespace CaptivityEvents.Models
 
         private bool CheckTimeElapsedMoreThanHours(CampaignTime eventBeginTime, float hoursToWait)
         {
-            var elapsedHoursUntilNow = eventBeginTime.ElapsedHoursUntilNow;
-            var randomNumber = PlayerCaptivity.RandomNumber;
+            float elapsedHoursUntilNow = eventBeginTime.ElapsedHoursUntilNow;
+            float randomNumber = PlayerCaptivity.RandomNumber;
 
             return hoursToWait * (0.5 + randomNumber) < elapsedHoursUntilNow;
         }
@@ -31,8 +31,8 @@ namespace CaptivityEvents.Models
         private bool CheckEvent()
         {
             if (PlayerCaptivity.CaptorParty == null) return false;
-            var gameProcess = MiscHelper.GetGameProcess();
-            var num = (1f + gameProcess * 1f) * (PlayerCaptivity.CaptorParty.IsSettlement ? CESettings.Instance.EventOccuranceSettlement : PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.Leader != null && PlayerCaptivity.CaptorParty.Leader.IsHero ? CESettings.Instance.EventOccuranceLord : CESettings.Instance.EventOccuranceOther);
+            float gameProcess = MiscHelper.GetGameProcess();
+            float num = (1f + gameProcess * 1f) * (PlayerCaptivity.CaptorParty.IsSettlement ? CESettings.Instance.EventOccuranceSettlement : PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.Leader != null && PlayerCaptivity.CaptorParty.Leader.IsHero ? CESettings.Instance.EventOccuranceLord : CESettings.Instance.EventOccuranceOther);
 
             return CheckTimeElapsedMoreThanHours(PlayerCaptivity.LastCheckTime, num);
 
@@ -60,15 +60,15 @@ namespace CaptivityEvents.Models
             }
 
             if (CESettings.Instance != null && !CESettings.Instance.StolenGear) return false;
-            var randomElement = new Equipment(false);
+            Equipment randomElement = new Equipment(false);
 
             if (CESettings.Instance != null && MBRandom.Random.Next(100) < CESettings.Instance.BetterOutFitChance)
             {
-                var bodyString = "";
-                var legString = "";
-                var headString = "";
-                var capeString = "";
-                var glovesString = "";
+                string bodyString = "";
+                string legString = "";
+                string headString = "";
+                string capeString = "";
+                string glovesString = "";
 
                 switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
                 {
@@ -200,37 +200,37 @@ namespace CaptivityEvents.Models
 
                 if (bodyString != "")
                 {
-                    var itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(bodyString);
+                    ItemObject itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(bodyString);
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
                 }
 
                 if (legString != "")
                 {
-                    var itemObjectLeg = MBObjectManager.Instance.GetObject<ItemObject>(legString);
+                    ItemObject itemObjectLeg = MBObjectManager.Instance.GetObject<ItemObject>(legString);
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Leg, new EquipmentElement(itemObjectLeg));
                 }
 
                 if (capeString != "")
                 {
-                    var itemObjectCape = MBObjectManager.Instance.GetObject<ItemObject>(capeString);
+                    ItemObject itemObjectCape = MBObjectManager.Instance.GetObject<ItemObject>(capeString);
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Cape, new EquipmentElement(itemObjectCape));
                 }
 
                 if (headString != "")
                 {
-                    var itemObjectHead = MBObjectManager.Instance.GetObject<ItemObject>(headString);
+                    ItemObject itemObjectHead = MBObjectManager.Instance.GetObject<ItemObject>(headString);
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Head, new EquipmentElement(itemObjectHead));
                 }
 
                 if (glovesString != "")
                 {
-                    var itemObjectGloves = MBObjectManager.Instance.GetObject<ItemObject>(glovesString);
+                    ItemObject itemObjectGloves = MBObjectManager.Instance.GetObject<ItemObject>(glovesString);
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Gloves, new EquipmentElement(itemObjectGloves));
                 }
             }
             else
             {
-                var itemObjectBody = Hero.MainHero.IsFemale
+                ItemObject itemObjectBody = Hero.MainHero.IsFemale
                     ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
                     : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
                 randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
@@ -314,7 +314,7 @@ namespace CaptivityEvents.Models
                             break;
                     }
 
-                var itemObjectWeapon0 = MBObjectManager.Instance.GetObject<ItemObject>(item);
+                ItemObject itemObjectWeapon0 = MBObjectManager.Instance.GetObject<ItemObject>(item);
                 randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Weapon0, new EquipmentElement(itemObjectWeapon0));
             }
 
@@ -371,22 +371,22 @@ namespace CaptivityEvents.Models
                         break;
                 }
 
-                var itemObjectWeapon2 = MBObjectManager.Instance.GetObject<ItemObject>(rangedItem);
+                ItemObject itemObjectWeapon2 = MBObjectManager.Instance.GetObject<ItemObject>(rangedItem);
                 randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Weapon2, new EquipmentElement(itemObjectWeapon2));
 
                 if (rangedAmmo != null)
                 {
-                    var itemObjectWeapon3 = MBObjectManager.Instance.GetObject<ItemObject>(rangedAmmo);
+                    ItemObject itemObjectWeapon3 = MBObjectManager.Instance.GetObject<ItemObject>(rangedAmmo);
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Weapon3, new EquipmentElement(itemObjectWeapon3));
                 }
             }
             else
             {
-                var itemObjectWeapon2 = MBObjectManager.Instance.GetObject<ItemObject>("throwing_stone");
+                ItemObject itemObjectWeapon2 = MBObjectManager.Instance.GetObject<ItemObject>("throwing_stone");
                 randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Weapon2, new EquipmentElement(itemObjectWeapon2));
             }
 
-            var randomElement2 = new Equipment(true);
+            Equipment randomElement2 = new Equipment(true);
             randomElement2.FillFrom(randomElement, false);
 
             if (CESettings.Instance != null && MBRandom.Random.Next(100)
@@ -394,8 +394,8 @@ namespace CaptivityEvents.Models
                     ? Hero.MainHero.GetSkillValue(DefaultSkills.Riding) / 275 * 100
                     : CESettings.Instance.HorseChance))
             {
-                var poorHorse = MBObjectManager.Instance.GetObject<ItemObject>("sumpter_horse");
-                var horseEquipment = new EquipmentElement(poorHorse);
+                ItemObject poorHorse = MBObjectManager.Instance.GetObject<ItemObject>("sumpter_horse");
+                EquipmentElement horseEquipment = new EquipmentElement(poorHorse);
 
                 randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Horse, horseEquipment);
             }
@@ -403,16 +403,16 @@ namespace CaptivityEvents.Models
             if (CESettings.Instance != null && (CESettings.Instance.StolenGearQuest && MBRandom.Random.Next(100) < CESettings.Instance.StolenGearChance))
             {
                 Hero issueOwner = null;
-                var listOfSettlements = new List<TextObject>();
+                List<TextObject> listOfSettlements = new List<TextObject>();
 
                 while (issueOwner == null)
                 {
-                    var nearestSettlement = SettlementHelper.FindNearestSettlement(settlement => !listOfSettlements.Contains(settlement.Name));
+                    Settlement nearestSettlement = SettlementHelper.FindNearestSettlement(settlement => !listOfSettlements.Contains(settlement.Name));
                     listOfSettlements.Add(nearestSettlement.Name);
 
                     if (nearestSettlement.IsUnderRaid || nearestSettlement.IsRaided) continue;
 
-                    foreach (var hero in nearestSettlement.Notables.Where(hero => hero.Issue == null && !hero.IsOccupiedByAnEvent()))
+                    foreach (Hero hero in nearestSettlement.Notables.Where(hero => hero.Issue == null && !hero.IsOccupiedByAnEvent()))
                     {
                         issueOwner = hero;
 
@@ -420,7 +420,7 @@ namespace CaptivityEvents.Models
                     }
 
                     if (issueOwner == null) continue;
-                    var potentialIssueData = new PotentialIssueData(CEWhereAreMyThingsIssueBehavior.OnStartIssue, typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), 0.25f);
+                    PotentialIssueData potentialIssueData = new PotentialIssueData(CEWhereAreMyThingsIssueBehavior.OnStartIssue, typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), 0.25f);
 
                     Campaign.Current.IssueManager.CreateNewIssue(potentialIssueData, issueOwner);
                     Campaign.Current.IssueManager.StartIssueQuest(issueOwner);
@@ -470,7 +470,7 @@ namespace CaptivityEvents.Models
                 PlayerCaptivity.LastCheckTime = CampaignTime.Now;
 
                 CECustomHandler.LogToFile("About to choose a event!");
-                var captiveEvent = CEEventManager.ReturnWeightedChoiceOfEvents();
+                CEEvent captiveEvent = CEEventManager.ReturnWeightedChoiceOfEvents();
 
                 if (captiveEvent != null) return captiveEvent.Name;
             }
@@ -495,7 +495,7 @@ namespace CaptivityEvents.Models
 
                 CECustomHandler.LogToFile("About to choose a settlement event!");
                 //PrintDebugInGameTextMessage("About to choose a settlement event!");
-                var captiveEvent = CEEventManager.ReturnWeightedChoiceOfEvents();
+                CEEvent captiveEvent = CEEventManager.ReturnWeightedChoiceOfEvents();
 
                 if (captiveEvent != null) return captiveEvent.Name;
             }
@@ -510,7 +510,7 @@ namespace CaptivityEvents.Models
         /// <returns></returns>
         private string DefaultOverridenCheckCaptivityChange(float dt)
         {
-            var d = new Dynamics();
+            Dynamics d = new Dynamics();
             if (PlayerCaptivity.CaptorParty.IsMobile && !PlayerCaptivity.CaptorParty.MobileParty.IsActive)
             {
                 CECampaignBehavior.ExtraProps.Owner = null;
@@ -529,7 +529,7 @@ namespace CaptivityEvents.Models
 
             if (PlayerCaptivity.CaptorParty.IsSettlement && PlayerCaptivity.CaptorParty.MapFaction == Hero.MainHero.Clan)
             {
-                var prostituteSkillFlag = Hero.MainHero.GetSkillValue(CESkills.IsProstitute);
+                int prostituteSkillFlag = Hero.MainHero.GetSkillValue(CESkills.IsProstitute);
 
                 if (prostituteSkillFlag == 0)
                 {

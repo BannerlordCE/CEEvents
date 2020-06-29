@@ -20,7 +20,7 @@ namespace CaptivityEvents.Patches
         [HarmonyPostfix]
         public static void RefreshList(ClanIncomeVM __instance)
         {
-            foreach (var brothel in CEBrothelBehavior.GetPlayerBrothels())
+            foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
                 __instance.Incomes.Add(new CEBrothelClanFinanceItemVM(brothel, brothelIncome =>
                                                                                {
                                                                                    OnIncomeSelection.Invoke(__instance, new object[] {brothelIncome});

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using CaptivityEvents.Helper;
 using CaptivityEvents.Notifications;
 using HarmonyLib;
@@ -21,34 +22,27 @@ namespace CaptivityEvents
         [HarmonyPostfix]
         private static void DetermineNotificationType(MapNotificationVM __instance, ref MapNotificationItemBaseVM __result, InformationData data)
         {
-            var type = data.GetType();
-            var t = new CESubModule();
+            Type type = data.GetType();
 
             if (type == typeof(CECaptorMapNotification))
             {
                 if (data is CECaptorMapNotification captorMapNotification)
                     __result = new CECaptorMapNotificationItemVM(captorMapNotification.CaptorEvent, data, null, item =>
-                                                                                                                {
-                                                                                                                    CEHelper.notificationCaptorExists = false;
-                                                                                                                    t.LoadCampaignNotificationTexture("default");
-
-                                                                                                                    var parameters = new object[1];
-                                                                                                                    parameters[0] = item;
-                                                                                                                    RemoveNotificationItem.Invoke(__instance, parameters);
-                                                                                                                });
+                    {
+                        CEHelper.notificationCaptorExists = false;
+                        new CESubModule().LoadCampaignNotificationTexture("default");
+                        RemoveNotificationItem.Invoke(__instance, new object[] { item });
+                    });
             }
             else if (type == typeof(CEEventMapNotification))
             {
                 if (data is CEEventMapNotification eventMapNotification)
                     __result = new CEEventMapNotificationItemVM(eventMapNotification.RandomEvent, data, null, item =>
-                                                                                                              {
-                                                                                                                  CEHelper.notificationEventExists = false;
-                                                                                                                  t.LoadCampaignNotificationTexture("default", 1);
-
-                                                                                                                  var parameters = new object[1];
-                                                                                                                  parameters[0] = item;
-                                                                                                                  RemoveNotificationItem.Invoke(__instance, parameters);
-                                                                                                              });
+                    {
+                        CEHelper.notificationEventExists = false;
+                        new CESubModule().LoadCampaignNotificationTexture("default", 1);
+                        RemoveNotificationItem.Invoke(__instance, new object[] { item });
+                    });
             }
         }
     }

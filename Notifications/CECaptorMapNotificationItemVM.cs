@@ -61,7 +61,7 @@ namespace CaptivityEvents.Notifications
             if (MobileParty.MainParty.Party.PrisonRoster.Count > 0 && MobileParty.MainParty.Party.PrisonRoster.Contains(_captorEvent.Captive))
             {
                 // Declare Variables
-                var returnString = new CEEventChecker(_captorEvent).FlagsDoMatchEventConditions(_captorEvent.Captive, PartyBase.MainParty);
+                string returnString = new CEEventChecker(_captorEvent).FlagsDoMatchEventConditions(_captorEvent.Captive, PartyBase.MainParty);
 
                 if (returnString == null)
                 {
@@ -85,13 +85,13 @@ namespace CaptivityEvents.Notifications
                 }
                 else
                 {
-                    var textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
+                    TextObject textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
                 }
             }
             else
             {
-                var textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
+                TextObject textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
             }
         }

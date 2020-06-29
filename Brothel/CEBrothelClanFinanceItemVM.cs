@@ -16,8 +16,8 @@ namespace CaptivityEvents.Brothel
 
             // 1.4.2 Needs to be Modified for 1.4.1
             IncomeTypeAsEnum = IncomeTypes.None;
-            var component = _brothel.Settlement.GetComponent<SettlementComponent>();
-            var workshopType = WorkshopType.Find("pottery_shop");
+            SettlementComponent component = _brothel.Settlement.GetComponent<SettlementComponent>();
+            WorkshopType workshopType = WorkshopType.Find("pottery_shop");
             WorkshopTypeId = workshopType.StringId;
 
             ImageName = component != null
@@ -42,13 +42,13 @@ namespace CaptivityEvents.Brothel
 
         protected override void PopulateActionList()
         {
-            var sellingCost = _brothel.Capital;
-            var hint = GetBrothelSellHintText(sellingCost);
+            int sellingCost = _brothel.Capital;
+            string hint = GetBrothelSellHintText(sellingCost);
             ActionList.Add(new StringItemWithEnabledAndHintVM(ExecuteSellBrothel, new TextObject("{=PHkC8Gia}Sell").ToString(), true, null, hint));
 
-            var isCurrentlyActive = _brothel.IsRunning;
-            var costToStart = _brothel.Expense;
-            var hint2 = GetBrothelRunningHintText(isCurrentlyActive, costToStart);
+            bool isCurrentlyActive = _brothel.IsRunning;
+            int costToStart = _brothel.Expense;
+            string hint2 = GetBrothelRunningHintText(isCurrentlyActive, costToStart);
 
             ActionList.Add(isCurrentlyActive
                                ? new StringItemWithEnabledAndHintVM(ExecuteToggleBrothel, new TextObject("{=CEBROTHEL0995}Stop Operations").ToString(), true, null, hint2)
@@ -65,7 +65,7 @@ namespace CaptivityEvents.Brothel
 
             if (_brothel.NotRunnedDays > 0)
             {
-                var textObject = new TextObject("{=*}{DAYS} days ago");
+                TextObject textObject = new TextObject("{=*}{DAYS} days ago");
                 textObject.SetTextVariable("DAYS", _brothel.NotRunnedDays);
                 ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=*}Last Run").ToString(), textObject.ToString()));
             }
@@ -88,7 +88,7 @@ namespace CaptivityEvents.Brothel
 
         private static string GetBrothelRunningHintText(bool isRunning, int costToStart)
         {
-            var textObject = new TextObject("The brothel is currently {?ISRUNNING}active{?}not active, you will need {AMOUNT} denars to begin operations again{\\?}.");
+            TextObject textObject = new TextObject("The brothel is currently {?ISRUNNING}active{?}not active, you will need {AMOUNT} denars to begin operations again{\\?}.");
 
             textObject.SetTextVariable("ISRUNNING", isRunning
                                            ? 1
@@ -103,14 +103,14 @@ namespace CaptivityEvents.Brothel
             if (_brothel == null) return;
             if (!_brothel.IsRunning) GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, _brothel.Expense);
             _brothel.IsRunning = !_brothel.IsRunning;
-            var onRefresh = _onRefresh;
+            Action onRefresh = _onRefresh;
 
             onRefresh?.Invoke();
         }
 
         private static string GetBrothelSellHintText(int sellCost)
         {
-            var textObject = new TextObject("{=CEBROTHEL1000}You can sell this brothel for {AMOUNT} denars.");
+            TextObject textObject = new TextObject("{=CEBROTHEL1000}You can sell this brothel for {AMOUNT} denars.");
             textObject.SetTextVariable("AMOUNT", sellCost);
 
             return textObject.ToString();
@@ -122,7 +122,7 @@ namespace CaptivityEvents.Brothel
             GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, _brothel.Capital);
             CEBrothelBehavior.BrothelInteraction(_brothel.Settlement, false);
 
-            var onRefresh = _onRefresh;
+            Action onRefresh = _onRefresh;
 
             onRefresh?.Invoke();
         }

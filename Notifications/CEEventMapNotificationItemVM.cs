@@ -54,7 +54,7 @@ namespace CaptivityEvents.Notifications
         {
             CEHelper.notificationEventExists = false;
             ExecuteRemove();
-            var result = new CEEventChecker(_randomEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+            string result = new CEEventChecker(_randomEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
 
             if (result == null)
             {
@@ -78,7 +78,7 @@ namespace CaptivityEvents.Notifications
             }
             else
             {
-                var textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
+                TextObject textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
             }
         }

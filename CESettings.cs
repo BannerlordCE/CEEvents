@@ -15,7 +15,7 @@ namespace CaptivityEvents
 
         public override IDictionary<string, Func<BaseSettings>> GetAvailablePresets()
         {
-            var basePresets = base.GetAvailablePresets(); // include the 'Default' preset that MCM provides
+            IDictionary<string, Func<BaseSettings>> basePresets = base.GetAvailablePresets(); // include the 'Default' preset that MCM provides
             basePresets.Add("Developer Mode", () => new CESettings {LogToggle = true});
             basePresets.Add("Hard Mode", () => new CESettings {StolenGear = true, StolenGearChance = 30f, BetterOutFitChance = 10, RenownMin = -300f});
             basePresets.Add("Easy Mode", () => new CESettings {StolenGear = false, RenownMin = 0f});
