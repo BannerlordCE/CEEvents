@@ -708,31 +708,31 @@ namespace CaptivityEvents.Brothel
                 switch (Settlement.CurrentSettlement.Culture.GetCultureCode())
                 {
                     case CultureCode.Sturgia:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a");
 
                         break;
 
                     case CultureCode.Vlandia:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i");
 
                         break;
 
                     case CultureCode.Aserai:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a");
 
                         break;
 
                     case CultureCode.Empire:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
 
                         break;
 
                     case CultureCode.Battania:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_wodden_straw_a");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_wodden_straw_a");
 
                         break;
                     case CultureCode.Khuzait:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_f");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_f");
 
                         break;
                     case CultureCode.Invalid:
@@ -741,13 +741,13 @@ namespace CaptivityEvents.Brothel
                     case CultureCode.Vakken:
                     case CultureCode.AnyOtherCulture:
                     default:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
 
                         break;
                 }
 
-                CEPersistence.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => agent.Character == CharacterObject.OneToOneConversationCharacter);
-                CEPersistence.brothelState = CEPersistence.BrothelState.Start;
+                CEPersistence.AgentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => agent.Character == CharacterObject.OneToOneConversationCharacter);
+                CEPersistence.BrothelState = CEPersistence.BrothelStates.Start;
             }
             catch (Exception e)
             {
@@ -789,31 +789,31 @@ namespace CaptivityEvents.Brothel
                 switch (Settlement.CurrentSettlement.Culture.GetCultureCode())
                 {
                     case CultureCode.Sturgia:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a");
 
                         break;
 
                     case CultureCode.Vlandia:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i");
 
                         break;
 
                     case CultureCode.Aserai:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a");
 
                         break;
 
                     case CultureCode.Empire:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
 
                         break;
 
                     case CultureCode.Battania:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
 
                         break;
                     case CultureCode.Khuzait:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_b");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_b");
 
                         break;
                     case CultureCode.Invalid:
@@ -822,13 +822,13 @@ namespace CaptivityEvents.Brothel
                     case CultureCode.Vakken:
                     case CultureCode.AnyOtherCulture:
                     default:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
+                        CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
 
                         break;
                 }
 
-                CEPersistence.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => { return agent.Character == CharacterObject.OneToOneConversationCharacter; });
-                CEPersistence.brothelState = CEPersistence.BrothelState.Start;
+                CEPersistence.AgentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => { return agent.Character == CharacterObject.OneToOneConversationCharacter; });
+                CEPersistence.BrothelState = CEPersistence.BrothelStates.Start;
             }
             catch (Exception e)
             {

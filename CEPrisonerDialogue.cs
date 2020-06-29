@@ -103,20 +103,20 @@ namespace CaptivityEvents
 
         private void ConversationCEEventInPartyOnConsequence()
         {
-            CEPersistence.captivePlayEvent = true;
-            CEPersistence.captiveToPlay = CharacterObject.OneToOneConversationCharacter;
+            CEPersistence.CaptivePlayEvent = true;
+            CEPersistence.CaptiveToPlay = CharacterObject.OneToOneConversationCharacter;
         }
 
         private void ConversationCEEventInCellOnConsequence()
         {
             try
             {
-                CEPersistence.captivePlayEvent = true;
-                CEPersistence.captiveToPlay = CharacterObject.OneToOneConversationCharacter;
+                CEPersistence.CaptivePlayEvent = true;
+                CEPersistence.CaptiveToPlay = CharacterObject.OneToOneConversationCharacter;
 
-                CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("_barrier_passage_center");
-                CEPersistence.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => agent.Character == CharacterObject.OneToOneConversationCharacter);
-                CEPersistence.dungeonState = CEPersistence.DungeonState.StartWalking;
+                CEPersistence.GameEntity = Mission.Current.Scene.GetFirstEntityWithName("_barrier_passage_center");
+                CEPersistence.AgentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => agent.Character == CharacterObject.OneToOneConversationCharacter);
+                CEPersistence.DungeonState = CEPersistence.DungeonStates.StartWalking;
             }
             catch (Exception e)
             {

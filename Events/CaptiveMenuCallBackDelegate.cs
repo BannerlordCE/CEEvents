@@ -42,7 +42,7 @@ namespace CaptivityEvents.Events
                                                        ? "wait_prisoner_female"
                                                        : "wait_prisoner_male");
 
-            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default_random");
+            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage();
 
             if (PlayerCaptivity.IsCaptive) SetCaptiveTextVariables(ref args);
 
@@ -58,8 +58,8 @@ namespace CaptivityEvents.Events
 
         internal void CaptiveTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt) //Warning: dt unused.
         {
-            var captiveTimeInDays = PlayerCaptivity.CaptiveTimeInDays;
-            var text = args.MenuContext.GameMenu.GetText();
+            int captiveTimeInDays = PlayerCaptivity.CaptiveTimeInDays;
+            TextObject text = args.MenuContext.GameMenu.GetText();
 
             SetCaptiveTimeInDays(captiveTimeInDays, ref text);
 
@@ -157,7 +157,6 @@ namespace CaptivityEvents.Events
             else _captive.CECaptivityContinue(ref args);
         }
 
-        
 
 #region private
 
@@ -204,6 +203,7 @@ namespace CaptivityEvents.Events
                         if (conditionMatched != null)
                         {
                             CECustomHandler.LogToFile(conditionMatched);
+
                             continue;
                         }
                     }
@@ -486,15 +486,6 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid PregnancyRiskModifier"); }
         }
 
-        
-        
-        
-
-        
-
-        
-
-        
 
         private void ConsequenceChangeClan()
         {
@@ -510,9 +501,6 @@ namespace CaptivityEvents.Events
             if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.LeaderHero != null) _dynamics.ChangeSpouse(Hero.MainHero, PlayerCaptivity.CaptorParty.LeaderHero);
         }
 
-        
-
-        
 
         private void ReqGold(ref MenuCallbackArgs args)
         {
@@ -1182,7 +1170,7 @@ namespace CaptivityEvents.Events
         private void SetCaptiveTextVariables(ref MenuCallbackArgs args)
         {
             if (!PlayerCaptivity.IsCaptive) return;
-            
+
             var captiveTimeInDays = PlayerCaptivity.CaptiveTimeInDays;
             var text = args.MenuContext.GameMenu.GetText();
 

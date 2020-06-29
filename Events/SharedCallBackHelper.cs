@@ -270,14 +270,14 @@ namespace CaptivityEvents.Events
 
                 if (!backgroundName.IsStringNoneOrEmpty())
                 {
-                    CEPersistence.animationPlayEvent = false;
+                    CEPersistence.AnimationPlayEvent = false;
                     t.LoadTexture(backgroundName);
                 }
                 else if (_listedEvent.BackgroundAnimation != null && _listedEvent.BackgroundAnimation.Count > 0)
                 {
-                    CEPersistence.animationImageList = _listedEvent.BackgroundAnimation;
-                    CEPersistence.animationIndex = 0;
-                    CEPersistence.animationPlayEvent = true;
+                    CEPersistence.AnimationImageList = _listedEvent.BackgroundAnimation;
+                    CEPersistence.AnimationIndex = 0;
+                    CEPersistence.AnimationPlayEvent = true;
                     var speed = 0.03f;
 
                     try
@@ -291,11 +291,11 @@ namespace CaptivityEvents.Events
                         CECustomHandler.ForceLogToFile(m);
                     }
 
-                    CEPersistence.animationSpeed = speed;
+                    CEPersistence.AnimationSpeed = speed;
                 }
                 else
                 {
-                    CEPersistence.animationPlayEvent = false;
+                    CEPersistence.AnimationPlayEvent = false;
                     new CESubModule().LoadTexture(textureFlag);
                 }
             }

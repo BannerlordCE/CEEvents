@@ -51,14 +51,14 @@ namespace CaptivityEvents
                 base.ManualRefreshRelevantStatus();
 
                 if (MobileParty.MainParty.Party.PrisonRoster.Count != 0) return;
-                CEPersistence.notificationExists = false;
+                CEPersistence.NotificationExists = false;
                 new CESubModule().LoadCampaignNotificationTexture("default");
                 ExecuteRemove();
             }
 
             private void OnNewTestNotificationInspect()
             {
-                CEPersistence.notificationExists = false;
+                CEPersistence.NotificationExists = false;
                 new CESubModule().LoadCampaignNotificationTexture("default");
                 ExecuteRemove();
 

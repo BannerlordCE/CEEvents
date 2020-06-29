@@ -193,7 +193,7 @@ namespace CaptivityEvents.Events
                     PlayerEncounter.RestartPlayerEncounter(prisonerParty.Party, MobileParty.MainParty.Party);
                     PlayerEncounter.Update();
 
-                    CEPersistence.huntState = CEPersistence.HuntState.StartHunt;
+                    CEPersistence.HuntState = CEPersistence.HuntStates.StartHunt;
                     CampaignMission.OpenBattleMission(PlayerEncounter.GetBattleSceneForMapPosition(MobileParty.MainParty.Position2D));
                 }
                 catch (Exception)
