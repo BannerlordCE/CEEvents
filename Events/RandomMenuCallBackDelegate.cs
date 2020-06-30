@@ -68,7 +68,7 @@ namespace CaptivityEvents.Events
             ReqMaleCaptives(ref args);
             ReqFemaleCaptives(ref args);
             ReqHeroHealthPercentage(ref args);
-            args = ReqSlavery(ref args);
+            ReqSlavery(ref args);
             ReqProstitute(ref args);
             ReqSkill(ref args);
             ReqTrait(ref args);
@@ -97,18 +97,13 @@ namespace CaptivityEvents.Events
             sharedCallBackHelper.ConsequenceChangeHealth();
             sharedCallBackHelper.ConsequenceChangeMorale();
 
-
             ConsequenceImpregnation();
             ConsequenceGainRandomPrisoners();
             ConsequenceSoldEvents(ref args);
 
-
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor)) _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
             else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0) ConsequenceRandomEventTrigger(ref args);
-
-
-            else if (!string.IsNullOrEmpty(_option.TriggerEventName)) // Single Event Trigger
-                ConsequenceSingleEventTrigger(ref args);
+            else if (!string.IsNullOrEmpty(_option.TriggerEventName)) ConsequenceSingleEventTrigger(ref args); // Single Event Trigger 
             else captorSpecifics.CECaptorContinue(args);
         }
 
@@ -199,6 +194,7 @@ namespace CaptivityEvents.Events
             ConsequenceSoldToSettlement(ref args);
             ConsequenceSoldToCaravan(ref args);
             ConsequenceSoldToNotable(ref args);
+            ConsequenceSoldToLordParty(ref args);
         }
 
         private void ConsequenceSoldToNotable(ref MenuCallbackArgs args)
@@ -225,6 +221,18 @@ namespace CaptivityEvents.Events
                 new CaptiveSpecifics().CECaptivityChange(ref args, party.Party);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }
+        }
+
+        private void ConsequenceSoldToLordParty(ref MenuCallbackArgs args)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToLordParty)) return;
+            
+            try
+            {
+                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty);
+                new CaptiveSpecifics().CECaptivityChange(ref args, party.Party);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Lord"); }
         }
 
         private void ConsequenceSoldToSettlement(ref MenuCallbackArgs args)
@@ -411,7 +419,7 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        private MenuCallbackArgs ReqSlavery(ref MenuCallbackArgs args)
+        private void ReqSlavery(ref MenuCallbackArgs args)
         {
             int slave = Hero.MainHero.GetSkillValue(CESkills.Slavery);
 
@@ -426,8 +434,6 @@ namespace CaptivityEvents.Events
                 if (!string.IsNullOrEmpty(_option.ReqHeroSlaveLevelBelow)) ReqHeroSlaveLevelBelow(ref args, slave);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroSlaveLevelBelow / Failed "); }
-
-            return args;
         }
 
         private void ReqHeroSlaveLevelBelow(ref MenuCallbackArgs args, int slave)

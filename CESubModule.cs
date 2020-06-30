@@ -37,7 +37,7 @@ namespace CaptivityEvents
             FadeIn
         }
 
-        
+
         public enum BrothelState
         {
             Normal,
@@ -46,8 +46,8 @@ namespace CaptivityEvents
             Black,
             FadeOut
         }
-        
-        
+
+
         public enum HuntState
         {
             Normal,
@@ -154,7 +154,7 @@ namespace CaptivityEvents
             }
         }
 
-        public  void LoadCampaignNotificationTexture(string name, int sheet = 0, bool forcelog = false)
+        public void LoadCampaignNotificationTexture(string name, int sheet = 0, bool forcelog = false)
         {
             try
             {
@@ -228,17 +228,14 @@ namespace CaptivityEvents
             string requiredPath = fullPath + "CaptivityRequired";
 
             // Get Required
-            string[] requiredImages = Directory.GetFiles(requiredPath, "*.png", SearchOption.AllDirectories);
-
-            // Get All in ModuleLoader
-            string[] files = Directory.GetFiles(fullPath, "*.png", SearchOption.AllDirectories);
+            string[] requiredImages = Directory.EnumerateFiles(requiredPath, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".png") || s.EndsWith(".gif")).ToArray();
 
             // Module Image Load
             if (modulePaths.Count != 0)
                 foreach (string filepath in modulePaths)
                     try
                     {
-                        string[] moduleFiles = Directory.GetFiles(filepath, "*.png", SearchOption.AllDirectories);
+                        string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".png") || s.EndsWith(".gif")).ToArray();
 
                         foreach (string file in moduleFiles)
                             if (!CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
@@ -260,6 +257,9 @@ namespace CaptivityEvents
             // Captivity Location Image Load
             try
             {
+                // Get All in ModuleLoader
+                string[] files = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".png") || s.EndsWith(".gif")).ToArray();
+
                 foreach (string file in files)
                 {
                     if (requiredImages.Contains(file)) continue;
@@ -854,8 +854,8 @@ namespace CaptivityEvents
                             if (Mission.Current != null && Mission.Current.IsLoadingFinished && Mission.Current.Time > 2f && Mission.Current.Agents != null)
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents
-                                                       where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
-                                                       select agent) ForceAgentDropEquipment(agent2);
+                                                         where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
+                                                         select agent) ForceAgentDropEquipment(agent2);
                                 missionState.CurrentMission.ClearCorpses();
 
                                 InformationManager.AddQuickInformation(new TextObject("{=CEEVENTS1069}Let's give them a headstart."), 100, CharacterObject.PlayerCharacter);
@@ -868,8 +868,8 @@ namespace CaptivityEvents
                             if (Mission.Current != null && Mission.Current.Time > CESettings.Instance.HuntBegins && Mission.Current.Agents != null)
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents
-                                                       where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
-                                                       select agent)
+                                                         where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
+                                                         select agent)
                                 {
                                     MoraleAgentComponent component = agent2.GetComponent<MoraleAgentComponent>();
                                     component?.Panic();
@@ -896,7 +896,7 @@ namespace CaptivityEvents
                     CEPersistence.huntState = CEPersistence.HuntState.Hunting;
                 }
             }
-            else if ((CEPersistence.huntState == CEPersistence.HuntState.HeadStart || CEPersistence.huntState == CEPersistence.HuntState.Hunting) && Game.Current.GameStateManager.ActiveState is MapState mapstate && mapstate.IsActive) 
+            else if ((CEPersistence.huntState == CEPersistence.HuntState.HeadStart || CEPersistence.huntState == CEPersistence.HuntState.Hunting) && Game.Current.GameStateManager.ActiveState is MapState mapstate && mapstate.IsActive)
             {
                 CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
                 PlayerEncounter.SetPlayerVictorious();
@@ -904,7 +904,7 @@ namespace CaptivityEvents
                 PlayerEncounter.Update();
             }
             else if (CEPersistence.huntState == CEPersistence.HuntState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState)
-                //TODO: move all of these to their proper listeners and out of the OnApplicationTick
+            //TODO: move all of these to their proper listeners and out of the OnApplicationTick
             {
                 if (PlayerEncounter.Current == null)
                 {
