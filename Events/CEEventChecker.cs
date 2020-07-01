@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
-using MCM.Abstractions.Settings.Models;
-using MCM.Extensions;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;

@@ -9,7 +9,7 @@ namespace CaptivityEvents
     public class CESettingsFlags
     {
 
-        public FluentGlobalSettings _settings { get; private set; }
+        private FluentGlobalSettings _settings;
 
         private static CESettingsFlags _instance;
 
