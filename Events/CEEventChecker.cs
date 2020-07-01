@@ -190,7 +190,9 @@ namespace CaptivityEvents.Events
             if (!SettingsCheck()) return LatestMessage;
             if (!GenderCheck(captive)) return LatestMessage;
             if (!SlaveryCheck(captive)) return LatestMessage;
+            if (!SlaveryLevelCheck(captive)) return LatestMessage;
             if (!ProstitutionCheck(captive)) return LatestMessage;
+            if (!ProstitutionLevelCheck(captive)) return LatestMessage;
             if (!AgeCheck(captive)) return LatestMessage;
             if (!TraitCheck(captive)) return LatestMessage;
             if (!SkillCheck(captive)) return LatestMessage;
@@ -1058,61 +1060,87 @@ namespace CaptivityEvents.Events
             return true;
         }
 
+        private bool ProstitutionLevelCheck(CharacterObject captive)
+        {
+            int prostitute = captive.GetSkillValue(CESkills.Prostitution);
+
+            try
+            {
+                if (!string.IsNullOrEmpty(_listEvent.ReqHeroProstituteLevelAbove))
+                    if (prostitute < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelAbove))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelAbove.");
+            }
+            catch (Exception)
+            {
+                return LogError("Missing ReqHeroProstituteLevelAbove");
+            }
+
+            try
+            {
+                if (!string.IsNullOrEmpty(_listEvent.ReqHeroProstituteLevelBelow))
+                    if (prostitute > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelBelow))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelBelow.");
+            }
+            catch (Exception)
+            {
+                return LogError("Missing ReqHeroProstituteLevelBelow");
+            }
+
+            return true;
+        }
+
         private bool ProstitutionCheck(CharacterObject captive)
         {
             bool skipFlags = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotProstitute);
             bool heroProstituteFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && !skipFlags;
             bool heroNotProstituteFlag = !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && !skipFlags;
 
-            bool prostituteFlag = true;
-
             try
             {
                 if (heroProstituteFlag || heroNotProstituteFlag)
                 {
-                    prostituteFlag = false;
                     int prostituteSkillFlag = captive.GetSkillValue(CESkills.IsProstitute);
 
-                    if (prostituteSkillFlag != 0 && heroProstituteFlag)
-                    {
-                        prostituteFlag = true;
-                        int prostitute = captive.GetSkillValue(CESkills.Prostitution);
-
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(_listEvent.ReqHeroProstituteLevelAbove))
-                                if (prostitute < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelAbove))
-                                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelAbove.");
-                        }
-                        catch (Exception)
-                        {
-                            return LogError("Missing ReqHeroProstituteLevelAbove");
-                        }
-
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(_listEvent.ReqHeroProstituteLevelBelow))
-                                if (prostitute > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelBelow))
-                                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelBelow.");
-                        }
-                        catch (Exception)
-                        {
-                            return LogError("Missing ReqHeroProstituteLevelBelow");
-                        }
-                    }
-
-                    if (prostituteSkillFlag == 0 && heroNotProstituteFlag) prostituteFlag = true;
+                    if (prostituteSkillFlag == 0 && heroProstituteFlag) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsProstitute.");
+                    if (prostituteSkillFlag != 0 && heroNotProstituteFlag) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsNotProstitute.");
                 }
-
-                if (!prostituteFlag) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions for ProstituteFlag.");
             }
             catch (Exception)
             {
-                return LogError("Failed prostituteFlag");
+                return LogError("Failed HeroIsProstitute HeroIsNotProstitute");
             }
 
             return true;
         }
+
+        private bool SlaveryLevelCheck(CharacterObject captive)
+        {
+            int slave = captive.GetSkillValue(CESkills.Slavery);
+
+            try
+            {
+                if (!string.IsNullOrEmpty(_listEvent.ReqHeroSlaveLevelAbove))
+                    if (slave < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelAbove))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelAbove.");
+            }
+            catch (Exception)
+            {
+                return LogError("Missing ReqHeroSlaveLevelAbove");
+            }
+
+            try
+            {
+                if (!string.IsNullOrEmpty(_listEvent.ReqHeroSlaveLevelBelow))
+                    if (slave > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelBelow))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelBelow.");
+            }
+            catch (Exception)
+            {
+                return LogError("Missing ReqHeroSlaveLevelBelow");
+            }
+
+            return true;
+        } 
 
         private bool SlaveryCheck(CharacterObject captive)
         {
@@ -1120,51 +1148,18 @@ namespace CaptivityEvents.Events
             bool heroIsSlave = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsSlave) && !skipFlags;
             bool heroIsNotSlave = !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsSlave) && !skipFlags;
 
-            bool slaveCondition = true;
-
             try
             {
                 if (heroIsSlave || heroIsNotSlave)
                 {
-                    slaveCondition = false;
                     int slaveSkillFlag = captive.GetSkillValue(CESkills.IsSlave);
-
-                    if (slaveSkillFlag != 0 && heroIsSlave)
-                    {
-                        slaveCondition = true;
-                        int slave = captive.GetSkillValue(CESkills.Slavery);
-
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(_listEvent.ReqHeroSlaveLevelAbove))
-                                if (slave < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelAbove))
-                                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelAbove.");
-                        }
-                        catch (Exception)
-                        {
-                            return LogError("Missing ReqHeroSlaveLevelAbove");
-                        }
-
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(_listEvent.ReqHeroSlaveLevelBelow))
-                                if (slave > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelBelow))
-                                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelBelow.");
-                        }
-                        catch (Exception)
-                        {
-                            return LogError("Missing ReqHeroSlaveLevelBelow");
-                        }
-                    }
-
-                    if (slaveSkillFlag == 0 && heroIsNotSlave) slaveCondition = true;
+                    if (slaveSkillFlag == 0 && heroIsSlave) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsSlave.");
+                    if (slaveSkillFlag != 0 && heroIsNotSlave) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsNotSlave.");
                 }
-
-                if (!slaveCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions for slave level flags.");
             }
             catch (Exception)
             {
-                return LogError("Failed slaveFlag");
+                return LogError("Failed HeroIsSlave HeroIsNotSlave");
             }
 
             return true;

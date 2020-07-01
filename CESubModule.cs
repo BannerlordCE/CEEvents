@@ -228,14 +228,17 @@ namespace CaptivityEvents
             string requiredPath = fullPath + "CaptivityRequired";
 
             // Get Required
-            string[] requiredImages = Directory.EnumerateFiles(requiredPath, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".png") || s.EndsWith(".gif")).ToArray();
+            string[] requiredImages = Directory.EnumerateFiles(requiredPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+
+            // Get All in ModuleLoader
+            string[] files = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
             // Module Image Load
             if (modulePaths.Count != 0)
                 foreach (string filepath in modulePaths)
                     try
                     {
-                        string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".png") || s.EndsWith(".gif")).ToArray();
+                        string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
                         foreach (string file in moduleFiles)
                             if (!CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
@@ -257,8 +260,6 @@ namespace CaptivityEvents
             // Captivity Location Image Load
             try
             {
-                // Get All in ModuleLoader
-                string[] files = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".png") || s.EndsWith(".gif")).ToArray();
 
                 foreach (string file in files)
                 {
@@ -296,6 +297,7 @@ namespace CaptivityEvents
                     }
                 }
 
+                CECustomHandler.ForceLogToFile("Loading Notification Sprites");
                 // Load the Notifications Sprite
                 // 1.4.1 Checked
                 SpriteData loadedData = new SpriteData("CESpriteData");
@@ -304,6 +306,7 @@ namespace CaptivityEvents
                 string categoryName = "ce_notification_icons";
                 string partNameCaptor = "CEEventNotification\\notification_captor";
                 string partNameEvent = "CEEventNotification\\notification_event";
+                
                 SpriteData spriteData = UIResourceManager.SpriteData;
                 spriteData.SpriteCategories.Add(categoryName, loadedData.SpriteCategories[categoryName]);
                 spriteData.SpritePartNames.Add(partNameCaptor, loadedData.SpritePartNames[partNameCaptor]);
@@ -322,7 +325,7 @@ namespace CaptivityEvents
             }
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("Failure to load textures. " + e);
+                CECustomHandler.ForceLogToFile("Failure to load textures, Critical failure. " + e);
             }
 
             CECustomHandler.ForceLogToFile("Loaded " + CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.");

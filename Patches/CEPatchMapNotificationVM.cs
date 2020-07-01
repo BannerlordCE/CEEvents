@@ -6,7 +6,7 @@ using HarmonyLib;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.Core;
 
-namespace CaptivityEvents
+namespace CaptivityEvents.Patches
 {
     [HarmonyPatch(typeof(MapNotificationVM), "DetermineNotificationType")]
     internal class CEMapNotificationVM

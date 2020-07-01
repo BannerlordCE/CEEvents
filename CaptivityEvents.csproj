@@ -71,11 +71,10 @@
     <Compile Include="Notifications\CEEventMapNotification.cs" />
     <Compile Include="Notifications\CEEventMapNotificationItemVM.cs" />
     <Compile Include="Helper\CEHelper.cs" />
-    <Compile Include="CEMapNotificationVMPatch.cs" />
     <Compile Include="Patches\CEPatchClanIncomeVM.cs" />
     <Compile Include="Patches\CEPatchDefaultClanFinanceModel.cs" />
     <Compile Include="Patches\CEPatchHero.cs" />
-    <Compile Include="CEPatchMapNotificationVM.cs" />
+    <Compile Include="Patches\CEPatchMapNotificationVM.cs" />
     <Compile Include="Models\CEPlayerCaptivityModel.cs" />
     <Compile Include="CEPrisonerDialogue.cs" />
     <Compile Include="CampaignBehaviors\CEPrisonerEscapeCampaignBehavior.cs" />
