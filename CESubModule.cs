@@ -659,9 +659,7 @@ namespace CaptivityEvents
 
                                     if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
                                     {
-                                        Vec2 followPosition = new Vec2(0f, -5f);
                                         CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
-                                        Agent.Main.SetColumnwiseFollowAgent(CEPersistence.agentTalkingTo, ref followPosition);
                                         dungeonFadeOut = 2f;
                                     }
                                     else
@@ -799,20 +797,17 @@ namespace CaptivityEvents
                                 Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
 
                                 WorldPosition worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
-                                Vec2 followPosition = new Vec2(0f, -5f);
 
                                 if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
                                 {
-                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
-                                    Mission.Current.MainAgent.SetColumnwiseFollowAgent(CEPersistence.agentTalkingTo, ref followPosition);
+                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
                                     CEPersistence.brothelFadeIn = 3f;
                                 }
                                 else
                                 {
                                     CEPersistence.agentTalkingTo.DisableScriptedMovement();
                                     CEPersistence.agentTalkingTo.HandleStopUsingAction();
-                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
-                                    Mission.Current.MainAgent.SetColumnwiseFollowAgent(CEPersistence.agentTalkingTo, ref followPosition);
+                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
                                     CEPersistence.brothelFadeIn = 3f;
                                 }
 

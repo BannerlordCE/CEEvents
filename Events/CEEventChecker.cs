@@ -1243,7 +1243,7 @@ namespace CaptivityEvents.Events
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return ForceLogError("Failure in CustomFlags: Missing flag for " + _listEvent.Name);
                 }
