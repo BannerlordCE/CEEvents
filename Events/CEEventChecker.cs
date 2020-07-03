@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -33,36 +34,45 @@ namespace CaptivityEvents.Events
         public static string CheckFlags(CharacterObject captive, PartyBase captorParty = null)
         {
             string returnString = "";
-
             if (captorParty == null) captorParty = PartyBase.MainParty;
 
-            returnString = returnString
-                           + "Captive Gender: "
+            returnString += "\n------- " + captive.Name + "'s Status -------\n";
+
+
+            returnString += "Gender: "
                            + (captive.IsFemale
                                ? "Female"
                                : "Male")
                            + "\n";
 
             int slaveSkillFlag = captive.GetSkillValue(CESkills.IsSlave);
-
-            returnString = returnString
-                           + "Captive is Slave: "
+            returnString += "Is Slave: "
                            + (slaveSkillFlag != 0
                                ? "True"
                                : "False")
                            + "\n";
 
-            int prostituteSkillFlag = captive.GetSkillValue(CESkills.IsProstitute);
+            int slaveSkillLevel = captive.GetSkillValue(CESkills.SkillSlavery);
+            returnString += "Slavery Level: " + slaveSkillLevel + "\n";
 
-            returnString = returnString
-                           + "Captive is Prostitute: "
+            int prostituteSkillFlag = captive.GetSkillValue(CESkills.IsProstitute);
+            returnString += "Is Prostitute: "
                            + (prostituteSkillFlag != 0
                                ? "True"
                                : "False")
                            + "\n";
 
-            returnString += "Location : ";
+            int prostituteSkillLevel = captive.GetSkillValue(CESkills.SkillProstitution);
+            returnString += "Prostitution Level: " + prostituteSkillLevel + "\n";
 
+            returnString += "Owner: "
+                            + (CECampaignBehavior.ExtraProps.Owner == null
+                                ? "None"
+                                : CECampaignBehavior.ExtraProps.Owner.Name.ToString())
+                            + "\n";
+
+
+            returnString += "Location : ";
             if (captorParty != null && captorParty.IsSettlement)
             {
                 if (captorParty.Settlement.IsTown)
@@ -171,6 +181,27 @@ namespace CaptivityEvents.Events
                 if (captorParty.MapEvent != null && captorParty.MapEvent.IsRaid && captorParty.MapFaction.IsAtWarWith(captorParty.MapEvent.MapEventSettlement.MapFaction) && captorParty.MapEvent.DefenderSide.TroopCount == 0) returnString += "(duringRaidFlag)";
             }
 
+            returnString += "\n\n\n------- Party Status -------";
+            if (captorParty.IsMobile) returnString += "\nMoral Total : " + captorParty.MobileParty.Morale;
+            if (captorParty != PartyBase.MainParty && captorParty?.Leader != null)
+            {
+                returnString += "\nParty Leader Name : " + captorParty.Leader.Name.ToString();
+                returnString += "\nParty Leader Hero : " + (captorParty.Leader.IsHero ? "True" : "False");
+                returnString += "\nParty Leader Gender : " + (captorParty.Leader.IsFemale ? "Female" : "Male");
+            }
+
+            returnString += "\n\n--- Party Members ---";
+
+            returnString += "\nTotal Females : " + captorParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale);
+            returnString += "\nTotal Males : " + captorParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale);
+            returnString += "\nTotal : " + captorParty.MemberRoster.Count();
+
+            returnString += "\n\n--- Captive Members ---";
+           
+            returnString += "\nTotal Females : " + captorParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale);
+            returnString += "\nTotal Males : " + captorParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale);
+            returnString += "\nTotal : " + captorParty.PrisonRoster.Count();
+
             returnString += "\nWork in progress\n";
 
             return returnString;
@@ -188,9 +219,12 @@ namespace CaptivityEvents.Events
 
             if (!ValidateEvent()) return LatestMessage;
             if (!SettingsCheck()) return LatestMessage;
+            if (!CustomFlagCheck()) return LatestMessage;
             if (!GenderCheck(captive)) return LatestMessage;
             if (!SlaveryCheck(captive)) return LatestMessage;
+            if (!SlaveryLevelCheck(captive)) return LatestMessage;
             if (!ProstitutionCheck(captive)) return LatestMessage;
+            if (!ProstitutionLevelCheck(captive)) return LatestMessage;
             if (!AgeCheck(captive)) return LatestMessage;
             if (!TraitCheck(captive)) return LatestMessage;
             if (!SkillCheck(captive)) return LatestMessage;
@@ -609,7 +643,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqCaptivesAbove.IsStringNoneOrEmpty())
-                    if (captorParty.NumberOfPrisoners < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesAbove))
+                    if (captorParty.PrisonRoster.Count() < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesAbove.");
             }
             catch (Exception)
@@ -621,7 +655,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqCaptivesBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.NumberOfPrisoners > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesBelow.");
+                if (captorParty.PrisonRoster.Count() > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesBelow.");
             }
             catch (Exception)
             {
@@ -690,7 +724,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqTroopsAbove.IsStringNoneOrEmpty())
-                    if (captorParty.NumberOfRegularMembers < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqTroopsAbove))
+                    if (captorParty.MemberRoster.Count() < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqTroopsAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsAbove.");
             }
             catch (Exception)
@@ -702,7 +736,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqTroopsBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.NumberOfRegularMembers > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqTroopsBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsBelow.");
+                if (captorParty.MemberRoster.Count() > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqTroopsBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsBelow.");
             }
             catch (Exception)
             {
@@ -1058,57 +1092,83 @@ namespace CaptivityEvents.Events
             return true;
         }
 
+        private bool ProstitutionLevelCheck(CharacterObject captive)
+        {
+            int prostitute = captive.GetSkillValue(CESkills.Prostitution);
+
+            try
+            {
+                if (!string.IsNullOrEmpty(_listEvent.ReqHeroProstituteLevelAbove))
+                    if (prostitute < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelAbove))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelAbove.");
+            }
+            catch (Exception)
+            {
+                return LogError("Missing ReqHeroProstituteLevelAbove");
+            }
+
+            try
+            {
+                if (!string.IsNullOrEmpty(_listEvent.ReqHeroProstituteLevelBelow))
+                    if (prostitute > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelBelow))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelBelow.");
+            }
+            catch (Exception)
+            {
+                return LogError("Missing ReqHeroProstituteLevelBelow");
+            }
+
+            return true;
+        }
+
         private bool ProstitutionCheck(CharacterObject captive)
         {
             bool skipFlags = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotProstitute);
             bool heroProstituteFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && !skipFlags;
             bool heroNotProstituteFlag = !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && !skipFlags;
 
-            bool prostituteFlag = true;
-
             try
             {
                 if (heroProstituteFlag || heroNotProstituteFlag)
                 {
-                    prostituteFlag = false;
                     int prostituteSkillFlag = captive.GetSkillValue(CESkills.IsProstitute);
 
-                    if (prostituteSkillFlag != 0 && heroProstituteFlag)
-                    {
-                        prostituteFlag = true;
-                        int prostitute = captive.GetSkillValue(CESkills.Prostitution);
-
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(_listEvent.ReqHeroProstituteLevelAbove))
-                                if (prostitute < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelAbove))
-                                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelAbove.");
-                        }
-                        catch (Exception)
-                        {
-                            return LogError("Missing ReqHeroProstituteLevelAbove");
-                        }
-
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(_listEvent.ReqHeroProstituteLevelBelow))
-                                if (prostitute > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroProstituteLevelBelow))
-                                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroProstituteLevelBelow.");
-                        }
-                        catch (Exception)
-                        {
-                            return LogError("Missing ReqHeroProstituteLevelBelow");
-                        }
-                    }
-
-                    if (prostituteSkillFlag == 0 && heroNotProstituteFlag) prostituteFlag = true;
+                    if (prostituteSkillFlag == 0 && heroProstituteFlag) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsProstitute.");
+                    if (prostituteSkillFlag != 0 && heroNotProstituteFlag) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsNotProstitute.");
                 }
-
-                if (!prostituteFlag) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions for ProstituteFlag.");
             }
             catch (Exception)
             {
-                return LogError("Failed prostituteFlag");
+                return LogError("Failed HeroIsProstitute HeroIsNotProstitute");
+            }
+
+            return true;
+        }
+
+        private bool SlaveryLevelCheck(CharacterObject captive)
+        {
+            int slave = captive.GetSkillValue(CESkills.Slavery);
+
+            try
+            {
+                if (!string.IsNullOrEmpty(_listEvent.ReqHeroSlaveLevelAbove))
+                    if (slave < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelAbove))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelAbove.");
+            }
+            catch (Exception)
+            {
+                return LogError("Missing ReqHeroSlaveLevelAbove");
+            }
+
+            try
+            {
+                if (!string.IsNullOrEmpty(_listEvent.ReqHeroSlaveLevelBelow))
+                    if (slave > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelBelow))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelBelow.");
+            }
+            catch (Exception)
+            {
+                return LogError("Missing ReqHeroSlaveLevelBelow");
             }
 
             return true;
@@ -1120,51 +1180,18 @@ namespace CaptivityEvents.Events
             bool heroIsSlave = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsSlave) && !skipFlags;
             bool heroIsNotSlave = !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsSlave) && !skipFlags;
 
-            bool slaveCondition = true;
-
             try
             {
                 if (heroIsSlave || heroIsNotSlave)
                 {
-                    slaveCondition = false;
                     int slaveSkillFlag = captive.GetSkillValue(CESkills.IsSlave);
-
-                    if (slaveSkillFlag != 0 && heroIsSlave)
-                    {
-                        slaveCondition = true;
-                        int slave = captive.GetSkillValue(CESkills.Slavery);
-
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(_listEvent.ReqHeroSlaveLevelAbove))
-                                if (slave < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelAbove))
-                                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelAbove.");
-                        }
-                        catch (Exception)
-                        {
-                            return LogError("Missing ReqHeroSlaveLevelAbove");
-                        }
-
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(_listEvent.ReqHeroSlaveLevelBelow))
-                                if (slave > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSlaveLevelBelow))
-                                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSlaveLevelBelow.");
-                        }
-                        catch (Exception)
-                        {
-                            return LogError("Missing ReqHeroSlaveLevelBelow");
-                        }
-                    }
-
-                    if (slaveSkillFlag == 0 && heroIsNotSlave) slaveCondition = true;
+                    if (slaveSkillFlag == 0 && heroIsSlave) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsSlave.");
+                    if (slaveSkillFlag != 0 && heroIsNotSlave) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsNotSlave.");
                 }
-
-                if (!slaveCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions for slave level flags.");
             }
             catch (Exception)
             {
-                return LogError("Failed slaveFlag");
+                return LogError("Failed HeroIsSlave HeroIsNotSlave");
             }
 
             return true;
@@ -1180,14 +1207,46 @@ namespace CaptivityEvents.Events
 
         private bool SettingsCheck()
         {
-            if (CESettings.Instance != null && !CESettings.Instance.SexualContent && _listEvent.SexualContent) return Error("Skipping event " + _listEvent.Name + " SexualContent events disabled.");
+            // Settings
+            if (!CESettings.Instance.SexualContent && _listEvent.SexualContent) return Error("Skipping event " + _listEvent.Name + " SexualContent events disabled.");
             if (!CESettings.Instance.NonSexualContent && !_listEvent.SexualContent) return Error("Skipping event " + _listEvent.Name + " NonSexualContent events disabled.");
+
+            // Default Flags
             if (!CESettings.Instance.FemdomControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Femdom)) return Error("Skipping event " + _listEvent.Name + " Femdom events disabled.");
             if (!CESettings.Instance.CommonControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Common)) return Error("Skipping event " + _listEvent.Name + " Common events disabled.");
             if (!CESettings.Instance.BestialityControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Bestiality)) return Error("Skipping event " + _listEvent.Name + " Bestiality events disabled.");
             if (!CESettings.Instance.ProstitutionControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution)) return Error("Skipping event " + _listEvent.Name + " Prostitution events disabled.");
             if (!CESettings.Instance.RomanceControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Romance)) return Error("Skipping event " + _listEvent.Name + " Romance events disabled.");
+
+            // Custom Flags
             if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) return Error("Skipping event " + _listEvent.Name + " Player is busy.");
+
+            return true;
+        }
+
+        private bool CustomFlagCheck()
+        {
+            if (_listEvent.MultipleListOfCustomFlags != null && _listEvent.MultipleListOfCustomFlags.Count > 0)
+            {
+                try
+                {
+                    int size = _listEvent.MultipleListOfCustomFlags.Count;
+                    for (int i = 0; i < size; i++)
+                    {
+                        KeyValuePair<string, bool> flagFound = CESettingsFlags.Instance.CustomFlags.First((flag) => { return flag.Key == _listEvent.MultipleListOfCustomFlags[i]; });
+
+                        if (flagFound.Value)
+                        {
+                            return Error("Skipping event " + _listEvent.Name + " " + _listEvent.MultipleListOfCustomFlags[i] + " events disabled.");
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    return ForceLogError("Failure in CustomFlags: Missing flag for " + _listEvent.Name);
+                }
+            }
+
 
             return true;
         }
@@ -1195,6 +1254,14 @@ namespace CaptivityEvents.Events
         private bool ValidateEvent()
         {
             return _listEvent != null || Error("Something is not right in FlagsDoMatchEventConditions.  Expected an event but got null.");
+        }
+
+        private bool ForceLogError(string message)
+        {
+
+            CECustomHandler.ForceLogToFile(message);
+
+            return Error(message);
         }
 
         private bool LogError(string message)

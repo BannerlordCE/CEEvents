@@ -37,7 +37,6 @@ namespace CaptivityEvents
             FadeIn
         }
 
-
         public enum BrothelState
         {
             Normal,
@@ -46,7 +45,6 @@ namespace CaptivityEvents
             Black,
             FadeOut
         }
-
 
         public enum HuntState
         {
@@ -57,45 +55,73 @@ namespace CaptivityEvents
             AfterBattle
         }
 
-        // Complete Loss of Data if not static
+        // Events
         public static List<CEEvent> CEEvents = new List<CEEvent>();
         public static List<CEEvent> CEEventList = new List<CEEvent>();
         public static List<CEEvent> CEWaitingList = new List<CEEvent>();
         public static List<CEEvent> CECallableEvents = new List<CEEvent>();
+
+        // Captive Variables
         public static bool captivePlayEvent;
         public static CharacterObject captiveToPlay;
+
+        // Animation Variables
         public static bool animationPlayEvent;
         public static List<string> animationImageList = new List<string>();
         public static int animationIndex;
         public static float animationSpeed = 0.03f;
-        public static DungeonState dungeonState = DungeonState.Normal;
+
+        public static bool notificationExists;
+
         public static Agent agentTalkingTo;
         public static GameEntity gameEntity = null;
-        public static BrothelState brothelState = BrothelState.Normal;
-        public static HuntState huntState = HuntState.Normal;
-        public static bool notificationExists;
-        public static List<CECustom> CEFlags = new List<CECustom>();
+
+        // Unknown
         public static float playerSpeed = 0f;
+
+        public static HuntState huntState = HuntState.Normal;
+        public static DungeonState dungeonState = DungeonState.Normal;
+        public static BrothelState brothelState = BrothelState.Normal;
+
+        // Fade out for Brothel
         public static float brothelFadeIn = 2f;
         public static float brothelBlack = 10f;
         public static float brothelFadeOut = 2f;
+
+        public static List<CECustom> CEFlags = new List<CECustom>();
     }
 
 
 
     public class CESubModule : MBSubModuleBase
     {
+        // Loaded Variables
         private static bool _isLoaded;
         private static bool _isLoadedInGame;
-        // All Images lost if not static
+
+        // Harmony
+        private Harmony _harmony;
+        public const string HarmonyId = "com.CE.captivityEvents";
+
+        // Images
         private static readonly Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
+
+        // Last Check on Animation Loop
         private static float lastCheck;
+
+        // Fade out for Dungeon
         private static float dungeonFadeOut = 2f;
+
+        // Timer for Brothel
         private static float brothelTimerOne;
         private static float brothelTimerTwo;
         private static float brothelTimerThree;
+
+        // Max Brothel Sound
         private static readonly float brothelSoundMin = 1f;
         private static readonly float brothelSoundMax = 3f;
+
+        // Sounds for Brothel
         private static readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
 
 
@@ -191,6 +217,15 @@ namespace CaptivityEvents
                 MessageBox.Show("Warning:\n Captivity Events " + modversion + " has the detected the wrong game version. Please download the correct version for " + gameversion + ". Or continue at your own risk.", "Captivity Events has the detected the wrong version");
             }
 
+            try
+            {
+                _harmony = new Harmony(HarmonyId);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed to initialize Harmony: " + e);
+            }
+
             string[] modulesFound = Utilities.GetModulesNames();
             List<string> modulePaths = new List<string>();
 
@@ -228,14 +263,17 @@ namespace CaptivityEvents
             string requiredPath = fullPath + "CaptivityRequired";
 
             // Get Required
-            string[] requiredImages = Directory.EnumerateFiles(requiredPath, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".png") || s.EndsWith(".gif")).ToArray();
+            string[] requiredImages = Directory.EnumerateFiles(requiredPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+
+            // Get All in ModuleLoader
+            string[] files = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
             // Module Image Load
             if (modulePaths.Count != 0)
                 foreach (string filepath in modulePaths)
                     try
                     {
-                        string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".png") || s.EndsWith(".gif")).ToArray();
+                        string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
                         foreach (string file in moduleFiles)
                             if (!CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
@@ -257,8 +295,6 @@ namespace CaptivityEvents
             // Captivity Location Image Load
             try
             {
-                // Get All in ModuleLoader
-                string[] files = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".png") || s.EndsWith(".gif")).ToArray();
 
                 foreach (string file in files)
                 {
@@ -296,6 +332,7 @@ namespace CaptivityEvents
                     }
                 }
 
+                CECustomHandler.ForceLogToFile("Loading Notification Sprites");
                 // Load the Notifications Sprite
                 // 1.4.1 Checked
                 SpriteData loadedData = new SpriteData("CESpriteData");
@@ -304,6 +341,7 @@ namespace CaptivityEvents
                 string categoryName = "ce_notification_icons";
                 string partNameCaptor = "CEEventNotification\\notification_captor";
                 string partNameEvent = "CEEventNotification\\notification_event";
+
                 SpriteData spriteData = UIResourceManager.SpriteData;
                 spriteData.SpriteCategories.Add(categoryName, loadedData.SpriteCategories[categoryName]);
                 spriteData.SpritePartNames.Add(partNameCaptor, loadedData.SpritePartNames[partNameCaptor]);
@@ -322,7 +360,7 @@ namespace CaptivityEvents
             }
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("Failure to load textures. " + e);
+                CECustomHandler.ForceLogToFile("Failure to load textures, Critical failure. " + e);
             }
 
             CECustomHandler.ForceLogToFile("Loaded " + CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.");
@@ -334,6 +372,7 @@ namespace CaptivityEvents
 
             try
             {
+                new CESettingsFlags().InitializeSettings(CEPersistence.CEFlags);
                 CECustomHandler.ForceLogToFile("Loaded CESettings: "
                                                + (CESettings.Instance != null && CESettings.Instance.LogToggle
                                                    ? "Logs are enabled."
@@ -346,7 +385,6 @@ namespace CaptivityEvents
 
             try
             {
-                Harmony harmony = new Harmony("com.CE.captivityEvents");
                 Dictionary<string, Version> dict = Harmony.VersionInfo(out Version myVersion);
                 CECustomHandler.ForceLogToFile("My version: " + myVersion);
 
@@ -361,7 +399,7 @@ namespace CaptivityEvents
                                                    ? "Patching Map Notifications: No Conflicts Detected : Enabled."
                                                    : "EventCaptorNotifications: Disabled.");
 
-                harmony.PatchAll();
+                _harmony.PatchAll();
             }
             catch (Exception ex)
             {
@@ -371,10 +409,6 @@ namespace CaptivityEvents
 
             foreach (CEEvent _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !_listedEvent.Name.IsStringNoneOrEmpty()))
             {
-                if (_listedEvent.MultipleListOfCustomFlags != null && _listedEvent.MultipleListOfCustomFlags.Count > 0)
-                    if (!CEPersistence.CEFlags.Exists(match => match.CEFlags.Any(x => _listedEvent.MultipleListOfCustomFlags.Contains(x))))
-                        continue;
-
                 if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEPersistence.CEEvents.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 1) continue;
 
                 if (!CEHelper.brothelFlagFemale)
@@ -434,6 +468,20 @@ namespace CaptivityEvents
             InitalizeAttributes(game);
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
             AddBehaviours(campaignStarter);
+        }
+
+        public override void OnGameEnd(Game game)
+        {
+            base.OnGameEnd(game);
+
+            if (_harmony != null)
+            {
+                try
+                {
+                    _harmony.UnpatchAll(HarmonyId);
+                }
+                catch (Exception) { }
+            }
         }
 
         public override bool DoLoading(Game game)
@@ -586,7 +634,6 @@ namespace CaptivityEvents
             brothelSounds.Add("male_06_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/06/stun"));
             brothelSounds.Add("male_07_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/07/stun"));
         }
-
 
         protected override void OnApplicationTick(float dt)
         {
@@ -754,14 +801,13 @@ namespace CaptivityEvents
                                 if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
                                 {
                                     CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
-                                    Mission.Current.MainAgent.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
                                     CEPersistence.brothelFadeIn = 3f;
                                 }
                                 else
                                 {
                                     CEPersistence.agentTalkingTo.DisableScriptedMovement();
                                     CEPersistence.agentTalkingTo.HandleStopUsingAction();
-                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
                                     CEPersistence.brothelFadeIn = 3f;
                                 }
 

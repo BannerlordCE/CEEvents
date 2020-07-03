@@ -47,6 +47,7 @@
     <Compile Include="Brothel\CEBrothelClanFinanceItemVM.cs" />
     <Compile Include="Brothel\CEBrothelToolTip.cs" />
     <Compile Include="CampaignBehaviors\CECampaignBehavior.cs" />
+    <Compile Include="CESettingsFlags.cs" />
     <Compile Include="Events\CaptiveMenuCallBackDelegate.cs" />
     <Compile Include="Events\CaptiveSpecifics.cs" />
     <Compile Include="Events\CaptorMenuCallBackDelegate.cs" />
@@ -71,11 +72,10 @@
     <Compile Include="Notifications\CEEventMapNotification.cs" />
     <Compile Include="Notifications\CEEventMapNotificationItemVM.cs" />
     <Compile Include="Helper\CEHelper.cs" />
-    <Compile Include="CEMapNotificationVMPatch.cs" />
     <Compile Include="Patches\CEPatchClanIncomeVM.cs" />
     <Compile Include="Patches\CEPatchDefaultClanFinanceModel.cs" />
     <Compile Include="Patches\CEPatchHero.cs" />
-    <Compile Include="CEPatchMapNotificationVM.cs" />
+    <Compile Include="Patches\CEPatchMapNotificationVM.cs" />
     <Compile Include="Models\CEPlayerCaptivityModel.cs" />
     <Compile Include="CEPrisonerDialogue.cs" />
     <Compile Include="CampaignBehaviors\CEPrisonerEscapeCampaignBehavior.cs" />

@@ -15,6 +15,7 @@ namespace CaptivityEvents.Brothel
             Expense = 200;
             InitialCapital = 5000;
             Capital = 5000;
+            CaptiveProstitutes = new List<CharacterObject>();
         }
 
         public void ChangeGold(int amount)
