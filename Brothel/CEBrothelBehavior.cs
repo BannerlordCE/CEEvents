@@ -26,10 +26,6 @@ namespace CaptivityEvents.Brothel
 
         private bool _isBrothelInitialized;
 
-        // fix this for testing using static right now
-        private static PartyScreenLogic _serverPartyScreenLogic;
-        private static PartyScreenMode _currentMode;
-
         private void AddGameMenus(CampaignGameStarter campaignGameStarter)
         {
             if (CESettings.Instance == null) return;
@@ -91,10 +87,9 @@ namespace CaptivityEvents.Brothel
         // New Manage
         private static bool ManagePrisonerCondition(MenuCallbackArgs args)
         {
-            if (PartyBase.MainParty.PrisonRoster.Count <= 0) return false;
             if (!DoesOwnBrothelInSettlement(Settlement.CurrentSettlement)) return false;
 
-            args.optionLeaveType = GameMenuOption.LeaveType.Escape;
+            args.optionLeaveType = GameMenuOption.LeaveType.Manage;
 
             return true;
         }
@@ -102,18 +97,11 @@ namespace CaptivityEvents.Brothel
         private static void ManagePrisoners()
         {
             GameMenu.SwitchToMenu("town_brothel");
-
-            _serverPartyScreenLogic = new PartyScreenLogic();
+            PartyScreenLogic _serverPartyScreenLogic = new PartyScreenLogic();
 
             // Reflection
-            foreach (FieldInfo fi in PartyScreenManager.Instance.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic))
-            {
-                if (fi.Name.Contains("_currentMode"))
-                {
-                    fi.SetValue(PartyScreenManager.Instance, PartyScreenMode.PrisonerManage);
-                    break;
-                }
-            }
+            FieldInfo fi = PartyScreenManager.Instance.GetType().GetField("_currentMode", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (fi != null) fi.SetValue(PartyScreenManager.Instance, PartyScreenMode.PrisonerManage);
 
             TroopRoster prisonRoster = new TroopRoster();
             List<CharacterObject> prisoners = FetchBrothelPrisoners(Hero.MainHero.CurrentSettlement);
@@ -135,14 +123,8 @@ namespace CaptivityEvents.Brothel
             Game.Current.GameStateManager.PushState(partyState, 0);
 
             // Reflection
-            foreach (FieldInfo fi in PartyScreenManager.Instance.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic))
-            {
-                if (fi.Name.Contains("_serverPartyScreenLogic"))
-                {
-                    fi.SetValue(PartyScreenManager.Instance, _serverPartyScreenLogic);
-                    break;
-                }
-            }
+            fi = PartyScreenManager.Instance.GetType().GetField("_serverPartyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (fi != null) fi.SetValue(PartyScreenManager.Instance, _serverPartyScreenLogic);
         }
 
         private static bool ManageBrothelDoneHandler(TroopRoster leftMemberRoster, TroopRoster leftPrisonRoster, TroopRoster rightMemberRoster, TroopRoster rightPrisonRoster, bool isForced, List<MobileParty> leftParties = null, List<MobileParty> rightParties = null)
@@ -217,6 +199,13 @@ namespace CaptivityEvents.Brothel
                     break;
             }
 
+            List<CharacterObject> brothelPrisoners = FetchBrothelPrisoners(Settlement.CurrentSettlement);
+            Brothel.RemoveAllCharacters();
+            foreach (CharacterObject brothelPrisoner in brothelPrisoners)
+            {
+                Brothel.AddCharacter(CreateBrothelPrisoner(brothelPrisoner, brothelPrisoner.Culture, LocationCharacter.CharacterRelations.Neutral));
+            }
+
             Campaign.Current.GameMenuManager.MenuLocations.Add(Brothel);
 
             if (CheckAndOpenNextLocation(args)) return;
@@ -242,7 +231,6 @@ namespace CaptivityEvents.Brothel
             if (((TownEncounter)PlayerEncounter.LocationEncounter).IsAmbush)
             {
                 GameMenu.ActivateGameMenu("menu_town_thugs_start");
-
                 return;
             }
 
@@ -461,20 +449,18 @@ namespace CaptivityEvents.Brothel
         {
             CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer);
             CharacterObject townswoman = CharacterObject.CreateFrom(prisoner);
-            townswoman.CurrentFormationClass = templateToCopy.CurrentFormationClass;
-            townswoman.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
             townswoman.Age = prisoner.Age;
+            townswoman.HairTags = prisoner.HairTags;
+            townswoman.BeardTags = prisoner.BeardTags;
             if (townswoman.Age < 21) townswoman.Age = 21;
 
-            // TODO Add specific dialogue for brothel prisoners
-            townswoman.StringId = prostituteStrings.GetRandomElement();
-
             string actionSetCode;
-
             if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
             else actionSetCode = "as_human_villager_in_tavern";
 
-            return new LocationCharacter(new AgentData(new SimpleAgentOrigin(townswoman, -1, Banner.CreateRandomBanner())).Monster(Campaign.Current.HumanMonsterSettlementSlow).Age((int)townswoman.Age), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, true);
+            // TODO Add specific dialogue for brothel prisoners
+            LocationCharacter tempCharacter = new LocationCharacter(new AgentData(new SimpleAgentOrigin(townswoman, -1, Banner.CreateRandomBanner())).Monster(Campaign.Current.HumanMonsterSettlementSlow).Age((int)townswoman.Age).CivilianEquipment(true), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, false);
+            return tempCharacter;
         }
 
         private void AddPeopleToTownTavern(Settlement settlement, Dictionary<string, int> unusedUsablePointCount)
@@ -501,7 +487,6 @@ namespace CaptivityEvents.Brothel
             List<CharacterObject> brothelPrisoners = FetchBrothelPrisoners(settlement);
             foreach (CharacterObject brothelPrisoner in brothelPrisoners)
             {
-                Brothel.AddLocationCharacters(delegate { return CreateBrothelPrisoner(brothelPrisoner, brothelPrisoner.Culture, LocationCharacter.CharacterRelations.Neutral); }, brothelPrisoner.Culture, LocationCharacter.CharacterRelations.Neutral, 1);
                 num3--;
             }
             if (num3 > 0) Brothel.AddLocationCharacters(CreateTownsWomanForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num3);
@@ -922,6 +907,15 @@ namespace CaptivityEvents.Brothel
             AddDialogs(campaignGameStarter);
         }
 
+        public void OnMissionEnded(IMission mission)
+        {
+            if (_isBrothelInitialized)
+            {
+                Brothel.RemoveAllCharacters();
+                _isBrothelInitialized = false;
+            }
+        }
+
         private void OnSettlementLeft(MobileParty party, Settlement settlement)
         {
             if (party != MobileParty.MainParty) return;
@@ -980,6 +974,7 @@ namespace CaptivityEvents.Brothel
             CampaignEvents.OnNewGameCreatedEvent.AddNonSerializedListener(this, AddGameMenus);
             CampaignEvents.OnGameLoadedEvent.AddNonSerializedListener(this, AddGameMenus);
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, OnSessionLaunched);
+            CampaignEvents.OnMissionEndedEvent.AddNonSerializedListener(this, OnMissionEnded);
             CampaignEvents.OnSettlementLeftEvent.AddNonSerializedListener(this, OnSettlementLeft);
             CampaignEvents.LocationCharactersAreReadyToSpawnEvent.AddNonSerializedListener(this, LocationCharactersAreReadyToSpawn);
         }
@@ -1051,7 +1046,7 @@ namespace CaptivityEvents.Brothel
             }
             catch (Exception) { }
 
-            return null;
+            return new List<CharacterObject>();
         }
 
         public static void SetBrothelPrisoners(Settlement settlement, TroopRoster prisoners)
