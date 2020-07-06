@@ -37,8 +37,21 @@ namespace CaptivityEvents.Events
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
             CaptiveMenuCallBackDelegate cb = new CaptiveMenuCallBackDelegate(listedEvent);
 
-            if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu)) gameStarter.AddWaitGameMenu(listedEvent.Name, listedEvent.Text, cb.CaptiveEventWaitGameMenu, cb.CaptiveConditionWaitGameMenu, cb.CaptiveConsequenceWaitGameMenu, cb.CaptiveTickWaitGameMenu, GameMenu.MenuAndOptionType.WaitMenuHideProgressAndHoursOption);
-            else gameStarter.AddGameMenu(listedEvent.Name, listedEvent.Text, cb.CaptiveEventGameMenu);
+            if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
+            {
+                gameStarter.AddWaitGameMenu(
+                    listedEvent.Name,
+                    listedEvent.Text,
+                    cb.CaptiveEventWaitGameMenu,
+                    cb.CaptiveConditionWaitGameMenu,
+                    cb.CaptiveConsequenceWaitGameMenu,
+                    cb.CaptiveTickWaitGameMenu,
+                    GameMenu.MenuAndOptionType.WaitMenuHideProgressAndHoursOption);
+            }
+            else
+            {
+                gameStarter.AddGameMenu(listedEvent.Name, listedEvent.Text, cb.CaptiveEventGameMenu);
+            }
 
             if (listedEvent.Options == null) return; // Leave if no Options
 

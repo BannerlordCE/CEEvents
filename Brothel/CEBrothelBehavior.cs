@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
@@ -25,16 +26,17 @@ namespace CaptivityEvents.Brothel
 
         private bool _isBrothelInitialized;
 
+        // fix this for testing using static right now
+        private static PartyScreenLogic _serverPartyScreenLogic;
+        private static PartyScreenMode _currentMode;
+
         private void AddGameMenus(CampaignGameStarter campaignGameStarter)
         {
             if (CESettings.Instance == null) return;
             if (!CESettings.Instance.ProstitutionControl) return;
 
             // Option Added To Town
-            campaignGameStarter.AddGameMenuOption("town", "town_brothel", "{=CEEVENTS1100}Go to the brothel district", CanGoToBrothelDistrictOnCondition, delegate
-                                                                                                                                                          {
-                                                                                                                                                              GameMenu.SwitchToMenu("town_brothel");
-                                                                                                                                                          }, false, 1);
+            campaignGameStarter.AddGameMenuOption("town", "town_brothel", "{=CEEVENTS1100}Go to the brothel district", CanGoToBrothelDistrictOnCondition, delegate { GameMenu.SwitchToMenu("town_brothel"); }, false, 1);
 
             campaignGameStarter.AddGameMenu("town_brothel", "{=CEEVENTS1098}You are in the brothel district", BrothelDistrictOnInit, GameOverlays.MenuOverlayType.SettlementWithCharacters);
 
@@ -42,20 +44,13 @@ namespace CaptivityEvents.Brothel
 
             campaignGameStarter.AddGameMenuOption("town_brothel", "town_brothel_prostitution", "{=CEEVENTS1102}Become a prostitute at the brothel", ProstitutionMenuJoinOnCondition, ProstitutionMenuJoinOnConsequence, false, 1);
 
-            campaignGameStarter.AddGameMenuOption("town_brothel", "town_brothel_sell_some_captives", "{=CEEVENTS1097}Sell some captives to the brothel", SellPrisonerOneStackOnCondition, delegate
-                                                                                                                                                                                          {
-                                                                                                                                                                                              ChooseRansomPrisoners();
-                                                                                                                                                                                          }, false, 2);
+            campaignGameStarter.AddGameMenuOption("town_brothel", "town_brothel_sell_some_captives", "{=CEEVENTS1097}Sell some captives to the slaver", SellPrisonerOneStackOnCondition, delegate { ChooseRansomPrisoners(); }, false, 2);
 
-            campaignGameStarter.AddGameMenuOption("town_brothel", "town_brothel_sell_all_prisoners", "{=CEEVENTS1096}Sell all captives to the brothel ({RANSOM_AMOUNT}{GOLD_ICON})", SellPrisonersCondition, delegate
-                                                                                                                                                                                                             {
-                                                                                                                                                                                                                 SellAllPrisoners();
-                                                                                                                                                                                                             }, false, 3);
+            campaignGameStarter.AddGameMenuOption("town_brothel", "town_brothel_sell_all_prisoners", "{=CEEVENTS1096}Sell all captives to the slaver ({RANSOM_AMOUNT}{GOLD_ICON})", SellPrisonersCondition, delegate { SellAllPrisoners(); }, false, 3);
 
-            campaignGameStarter.AddGameMenuOption("town_brothel", "town_brothel_back", "{=qWAmxyYz}Back to town center", BackOnCondition, delegate
-                                                                                                                                          {
-                                                                                                                                              GameMenu.SwitchToMenu("town");
-                                                                                                                                          }, true, 4);
+            campaignGameStarter.AddGameMenuOption("town_brothel", "town_brothel_manage_prisoners", "{=CEEVENTS1175}Manage brothel captives", ManagePrisonerCondition, delegate { ManagePrisoners(); }, false, 4);
+
+            campaignGameStarter.AddGameMenuOption("town_brothel", "town_brothel_back", "{=qWAmxyYz}Back to town center", BackOnCondition, delegate { GameMenu.SwitchToMenu("town"); }, true, 5);
         }
 
         // Ransom Functions
@@ -78,24 +73,90 @@ namespace CaptivityEvents.Brothel
             return true;
         }
 
+        private static bool SellPrisonerOneStackOnCondition(MenuCallbackArgs args)
+        {
+            if (PartyBase.MainParty.PrisonRoster.Count <= 0) return false;
+
+            args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
+
+            return true;
+        }
+
         private static void SellAllPrisoners()
         {
             SellPrisonersAction.ApplyForAllPrisoners(MobileParty.MainParty, MobileParty.MainParty.PrisonRoster, Settlement.CurrentSettlement);
             GameMenu.SwitchToMenu("town_brothel");
         }
 
+        // New Manage
+        private static bool ManagePrisonerCondition(MenuCallbackArgs args)
+        {
+            if (PartyBase.MainParty.PrisonRoster.Count <= 0) return false;
+            if (!DoesOwnBrothelInSettlement(Settlement.CurrentSettlement)) return false;
+
+            args.optionLeaveType = GameMenuOption.LeaveType.Escape;
+
+            return true;
+        }
+
+        private static void ManagePrisoners()
+        {
+            GameMenu.SwitchToMenu("town_brothel");
+
+            _serverPartyScreenLogic = new PartyScreenLogic();
+
+            // Reflection
+            foreach (FieldInfo fi in PartyScreenManager.Instance.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic))
+            {
+                if (fi.Name.Contains("_currentMode"))
+                {
+                    fi.SetValue(PartyScreenManager.Instance, PartyScreenMode.PrisonerManage);
+                    break;
+                }
+            }
+
+            TroopRoster prisonRoster = new TroopRoster();
+            List<CharacterObject> prisoners = FetchBrothelPrisoners(Hero.MainHero.CurrentSettlement);
+            foreach (CharacterObject prisoner in prisoners)
+            {
+                prisonRoster.AddToCounts(prisoner, 1, false);
+            }
+            int lefPartySizeLimit = 10 - prisonRoster.Count;
+            TextObject textObject = new TextObject("{=CEBROTHEL0984}The brothel of {SETTLEMENT}", null);
+            textObject.SetTextVariable("SETTLEMENT", Hero.MainHero.CurrentSettlement.Name);
+            _serverPartyScreenLogic.Initialize(new TroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
+            _serverPartyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
+            // TODO make it male and/or female depending on user settings
+            _serverPartyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(PartyScreenManager.TroopTransferableDelegate));
+            _serverPartyScreenLogic.SetDoneHandler(new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler));
+
+            PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
+            partyState.InitializeLogic(_serverPartyScreenLogic);
+            Game.Current.GameStateManager.PushState(partyState, 0);
+
+            // Reflection
+            foreach (FieldInfo fi in PartyScreenManager.Instance.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic))
+            {
+                if (fi.Name.Contains("_serverPartyScreenLogic"))
+                {
+                    fi.SetValue(PartyScreenManager.Instance, _serverPartyScreenLogic);
+                    break;
+                }
+            }
+        }
+
+        private static bool ManageBrothelDoneHandler(TroopRoster leftMemberRoster, TroopRoster leftPrisonRoster, TroopRoster rightMemberRoster, TroopRoster rightPrisonRoster, bool isForced, List<MobileParty> leftParties = null, List<MobileParty> rightParties = null)
+        {
+
+            SetBrothelPrisoners(Hero.MainHero.CurrentSettlement, leftPrisonRoster);
+            return true;
+        }
+        // Ends Here
+
         private static void ChooseRansomPrisoners()
         {
             GameMenu.SwitchToMenu("town_brothel");
             PartyScreenManager.OpenScreenAsRansom();
-        }
-
-        private static bool SellPrisonerOneStackOnCondition(MenuCallbackArgs args)
-        {
-            if (PartyBase.MainParty.PrisonRoster.Count <= 0) return false;
-            args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
-
-            return true;
         }
 
         // Back Condition
@@ -130,35 +191,22 @@ namespace CaptivityEvents.Brothel
             {
                 case CultureCode.Sturgia:
                     Brothel.SetSceneName(0, "sturgia_house_a_interior_tavern");
-
                     break;
-
                 case CultureCode.Vlandia:
                     Brothel.SetSceneName(0, "vlandia_tavern_interior_a");
-
                     break;
-
                 case CultureCode.Aserai:
                     Brothel.SetSceneName(0, "arabian_house_new_c_interior_b_tavern");
-
                     break;
-
                 case CultureCode.Empire:
                     Brothel.SetSceneName(0, "empire_house_c_tavern_a");
-
                     break;
-
                 case CultureCode.Battania:
                     Brothel.SetSceneName(0, "battania_tavern_interior_b");
-
                     break;
-
                 case CultureCode.Khuzait:
                     Brothel.SetSceneName(0, "khuzait_tavern_a");
-
                     break;
-
-
                 case CultureCode.Nord:
                 case CultureCode.Darshi:
                 case CultureCode.Vakken:
@@ -166,7 +214,6 @@ namespace CaptivityEvents.Brothel
                 case CultureCode.Invalid:
                 default:
                     Brothel.SetSceneName(0, "empire_house_c_tavern_a");
-
                     break;
             }
 
@@ -237,9 +284,10 @@ namespace CaptivityEvents.Brothel
             while (PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter)) PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, -1, true);
             capturerParty.AddPrisoner(prisonerCharacter.CharacterObject, 1);
             if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(capturerParty);
-            string test = CEEventLoader.CEWaitingList();
+            string waitingMenu = CEEventLoader.CEWaitingList();
             GameMenu.ExitToLast();
-            if (test != null) GameMenu.ActivateGameMenu(test);
+            if (waitingMenu != null) GameMenu.ActivateGameMenu(waitingMenu);
+            args.MenuContext.GameMenu.AllowWaitingAutomatically();
         }
 
 
@@ -249,6 +297,7 @@ namespace CaptivityEvents.Brothel
             Settlement settlement = PlayerEncounter.LocationEncounter.Settlement;
 
             if (CampaignMission.Current.Location != Brothel || _isBrothelInitialized) return;
+            //Passage from brothel to town -- need help setting town to brothel to link
             //LocationComplex.Current.AddPassage(settlement.LocationComplex.GetLocationWithId("center"), brothel);
             AddPeopleToTownTavern(settlement, unusedUsablePointCount);
             _isBrothelInitialized = true;
@@ -408,6 +457,26 @@ namespace CaptivityEvents.Brothel
             return new LocationCharacter(new AgentData(new SimpleAgentOrigin(townswoman, -1, Banner.CreateRandomBanner())).Monster(Campaign.Current.HumanMonsterSettlementSlow).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge)), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, true);
         }
 
+        private static LocationCharacter CreateBrothelPrisoner(CharacterObject prisoner, CultureObject culture, LocationCharacter.CharacterRelations relation)
+        {
+            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer);
+            CharacterObject townswoman = CharacterObject.CreateFrom(prisoner);
+            townswoman.CurrentFormationClass = templateToCopy.CurrentFormationClass;
+            townswoman.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
+            townswoman.Age = prisoner.Age;
+            if (townswoman.Age < 21) townswoman.Age = 21;
+
+            // TODO Add specific dialogue for brothel prisoners
+            townswoman.StringId = prostituteStrings.GetRandomElement();
+
+            string actionSetCode;
+
+            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
+            else actionSetCode = "as_human_villager_in_tavern";
+
+            return new LocationCharacter(new AgentData(new SimpleAgentOrigin(townswoman, -1, Banner.CreateRandomBanner())).Monster(Campaign.Current.HumanMonsterSettlementSlow).Age((int)townswoman.Age), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, true);
+        }
+
         private void AddPeopleToTownTavern(Settlement settlement, Dictionary<string, int> unusedUsablePointCount)
         {
             Brothel.AddLocationCharacters(CreateTavernkeeper, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, 1);
@@ -426,7 +495,15 @@ namespace CaptivityEvents.Brothel
 
             int num2 = (int)(num * 0.2f);
             if (num2 > 0) Brothel.AddLocationCharacters(CreateTownsManForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num2);
+
             int num3 = (int)(num * 0.3f);
+
+            List<CharacterObject> brothelPrisoners = FetchBrothelPrisoners(settlement);
+            foreach (CharacterObject brothelPrisoner in brothelPrisoners)
+            {
+                Brothel.AddLocationCharacters(delegate { return CreateBrothelPrisoner(brothelPrisoner, brothelPrisoner.Culture, LocationCharacter.CharacterRelations.Neutral); }, brothelPrisoner.Culture, LocationCharacter.CharacterRelations.Neutral, 1);
+                num3--;
+            }
             if (num3 > 0) Brothel.AddLocationCharacters(CreateTownsWomanForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num3);
         }
 
@@ -709,31 +786,21 @@ namespace CaptivityEvents.Brothel
                 {
                     case CultureCode.Sturgia:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a");
-
                         break;
-
                     case CultureCode.Vlandia:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i");
-
                         break;
-
                     case CultureCode.Aserai:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a");
-
                         break;
-
                     case CultureCode.Empire:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
-
                         break;
-
                     case CultureCode.Battania:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_wodden_straw_a");
-
                         break;
                     case CultureCode.Khuzait:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_f");
-
                         break;
                     case CultureCode.Invalid:
                     case CultureCode.Nord:
@@ -742,7 +809,6 @@ namespace CaptivityEvents.Brothel
                     case CultureCode.AnyOtherCulture:
                     default:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
-
                         break;
                 }
 
@@ -790,31 +856,21 @@ namespace CaptivityEvents.Brothel
                 {
                     case CultureCode.Sturgia:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a");
-
                         break;
-
                     case CultureCode.Vlandia:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i");
-
                         break;
-
                     case CultureCode.Aserai:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a");
-
                         break;
-
                     case CultureCode.Empire:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
-
                         break;
-
                     case CultureCode.Battania:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
-
                         break;
                     case CultureCode.Khuzait:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_b");
-
                         break;
                     case CultureCode.Invalid:
                     case CultureCode.Nord:
@@ -823,7 +879,6 @@ namespace CaptivityEvents.Brothel
                     case CultureCode.AnyOtherCulture:
                     default:
                         CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
-
                         break;
                 }
 
@@ -962,8 +1017,8 @@ namespace CaptivityEvents.Brothel
         {
             try
             {
-                CEBrothel data = _brothelList.FirstOrDefault(brothelData => brothelData.Settlement.StringId == settlement.StringId);
-                if (data == null) AddBrothelData(settlement);
+                int i = _brothelList.FindIndex(brothelData => brothelData.Settlement.StringId == settlement.StringId);
+                if (i == -1) AddBrothelData(settlement);
 
                 return true;
             }
@@ -979,7 +1034,9 @@ namespace CaptivityEvents.Brothel
             {
                 if (ContainsBrothelData(settlement))
                 {
-                    List<CEBrothel> ceBrothels = _brothelList.Where(brothel => brothel.Settlement.StringId == settlement.StringId).Select(brothel => { brothel.Owner = flagToPurchase ? Hero.MainHero : null; brothel.Capital = brothel.InitialCapital; return brothel; }).ToList();
+                    int i = _brothelList.FindIndex(brothelData => brothelData.Settlement.StringId == settlement.StringId);
+                    _brothelList[i].Owner = flagToPurchase ? Hero.MainHero : null;
+                    _brothelList[i].Capital = _brothelList[i].InitialCapital;
                 }
             }
             catch (Exception) { }
@@ -990,7 +1047,6 @@ namespace CaptivityEvents.Brothel
             try
             {
                 CEBrothel testLocation = _brothelList.FirstOrDefault(brothel => { return brothel.Settlement.StringId == settlement.StringId; });
-
                 if (testLocation != null) return testLocation.CaptiveProstitutes;
             }
             catch (Exception) { }
@@ -998,7 +1054,7 @@ namespace CaptivityEvents.Brothel
             return null;
         }
 
-        public static void RemovePrisoner(Settlement settlement, CharacterObject prisoner)
+        public static void SetBrothelPrisoners(Settlement settlement, TroopRoster prisoners)
         {
             try
             {
@@ -1006,16 +1062,39 @@ namespace CaptivityEvents.Brothel
 
                 if (!ContainsBrothelData(settlement)) return;
 
-                List<CEBrothel> ceBrothels = _brothelList.Where(brothel => brothel.Settlement.StringId == settlement.StringId).Select(brothel => { brothel.CaptiveProstitutes.Remove(prisoner); return brothel; }).ToList();
+                int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == settlement.StringId);
+
+                _brothelList[index].CaptiveProstitutes.Clear();
+                foreach (TroopRosterElement troop in prisoners)
+                {
+                    _brothelList[index].CaptiveProstitutes.Add(troop.Character);
+                }
+            }
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Failed to SetBrothelPrisoners");
+            }
+        }
+
+        public static void RemoveBrothelPrisoner(Settlement settlement, CharacterObject prisoner)
+        {
+            try
+            {
+                if (settlement == null) return;
+
+                if (!ContainsBrothelData(settlement)) return;
+
+                int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == settlement.StringId);
+                _brothelList[index].CaptiveProstitutes.Remove(prisoner);
                 MobileParty.MainParty.PrisonRoster.AddToCounts(prisoner, 1, prisoner.IsHero);
             }
             catch (Exception)
             {
-                CECustomHandler.ForceLogToFile("Failed to RemovePrisoner");
+                CECustomHandler.ForceLogToFile("Failed to RemoveBrothelPrisoner");
             }
         }
 
-        public static void AddPrisoner(Settlement settlement, CharacterObject prisoner)
+        public static void AddBrothelPrisoner(Settlement settlement, CharacterObject prisoner)
         {
             try
             {
@@ -1023,12 +1102,13 @@ namespace CaptivityEvents.Brothel
 
                 if (!ContainsBrothelData(settlement)) return;
 
-                List<CEBrothel> ceBrothels = _brothelList.Where(brothel => brothel.Settlement.StringId == settlement.StringId).Select(brothel => { brothel.CaptiveProstitutes.Add(prisoner); return brothel; }).ToList();
+                int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == settlement.StringId);
+                _brothelList[index].CaptiveProstitutes.Add(prisoner);
                 MobileParty.MainParty.PrisonRoster.RemoveTroop(prisoner);
             }
             catch (Exception)
             {
-                CECustomHandler.ForceLogToFile("Failed to AddPrisoner");
+                CECustomHandler.ForceLogToFile("Failed to AddBrothelPrisoner");
             }
         }
 

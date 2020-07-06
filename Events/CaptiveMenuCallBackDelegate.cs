@@ -51,6 +51,8 @@ namespace CaptivityEvents.Events
 
         internal bool CaptiveConditionWaitGameMenu(MenuCallbackArgs args)
         {
+            args.MenuContext.GameMenu.AllowWaitingAutomatically();
+            args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
 
