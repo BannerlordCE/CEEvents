@@ -84,9 +84,7 @@ namespace CaptivityEvents.Events
                     TextObject textObject = GameTexts.FindText("str_CE_trait_level");
                     textObject.SetTextVariable("HERO", hero.Name);
 
-                    textObject.SetTextVariable("POSITIVE", amount >= 0
-                                                   ? 1
-                                                   : 0);
+                    textObject.SetTextVariable("POSITIVE", amount >= 0 ? 1 : 0);
                     textObject.SetTextVariable("TRAIT", CEStrings.FetchTraitString(trait));
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
                 }
@@ -104,9 +102,7 @@ namespace CaptivityEvents.Events
                         TextObject textObject = GameTexts.FindText("str_CE_trait_level");
                         textObject.SetTextVariable("HERO", hero.Name);
 
-                        textObject.SetTextVariable("POSITIVE", amount >= 0
-                                                       ? 1
-                                                       : 0);
+                        textObject.SetTextVariable("POSITIVE", amount >= 0 ? 1 : 0);
                         textObject.SetTextVariable("TRAIT", CEStrings.FetchTraitString(trait));
                         InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
                     }
@@ -128,9 +124,7 @@ namespace CaptivityEvents.Events
                         TextObject textObject = GameTexts.FindText("str_CE_trait_level");
                         textObject.SetTextVariable("HERO", hero.Name);
 
-                        textObject.SetTextVariable("POSITIVE", amount >= 0
-                                                       ? 1
-                                                       : 0);
+                        textObject.SetTextVariable("POSITIVE", amount >= 0 ? 1 : 0);
                         textObject.SetTextVariable("TRAIT", trait);
                         InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
                     }
@@ -154,14 +148,10 @@ namespace CaptivityEvents.Events
                     TextObject textObject = GameTexts.FindText("str_CE_level_skill");
                     textObject.SetTextVariable("HERO", hero.Name);
 
-                    textObject.SetTextVariable("NEGATIVE", amount > 0
-                                                   ? 0
-                                                   : 1);
+                    textObject.SetTextVariable("NEGATIVE", amount > 0 ? 0 : 1);
                     textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
 
-                    textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1
-                                                   ? 1
-                                                   : 0);
+                    textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
                     textObject.SetTextVariable("SKILL", skill.ToLower());
                     textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
@@ -224,7 +214,6 @@ namespace CaptivityEvents.Events
                     if (hero.GetSkillValue(skill) > 1)
                     {
                         if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
-
                         if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
                     }
                 }
@@ -243,22 +232,8 @@ namespace CaptivityEvents.Events
                 textObject.SetTextVariable("HERO", hero.Name);
                 textObject.SetTextVariable("SKILL", skill.Name);
 
-                if (amount >= 0)
-                {
-                    textObject.SetTextVariable("NEGATIVE", 0);
-
-                    textObject.SetTextVariable("PLURAL", amount >= 2
-                                                   ? 1
-                                                   : 0);
-                }
-                else
-                {
-                    textObject.SetTextVariable("NEGATIVE", 1);
-
-                    textObject.SetTextVariable("PLURAL", amount <= -2
-                                                   ? 1
-                                                   : 0);
-                }
+                textObject.SetTextVariable("NEGATIVE", amount >= 0 ? 0 : 1);
+                textObject.SetTextVariable("PLURAL", amount >= 2 ? 1 : 0);
 
                 textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
                 textObject.SetTextVariable("TOTAL_AMOUNT", valueToSet);
@@ -341,9 +316,7 @@ namespace CaptivityEvents.Events
             TextObject textObject = GameTexts.FindText("str_CE_morale_level");
             textObject.SetTextVariable("PARTY", partyBase.Name);
 
-            textObject.SetTextVariable("POSITIVE", amount >= 0
-                                           ? 1
-                                           : 0);
+            textObject.SetTextVariable("POSITIVE", amount >= 0 ? 1 : 0);
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
             partyBase.MobileParty.RecentEventsMorale += amount;
         }
@@ -358,9 +331,7 @@ namespace CaptivityEvents.Events
             TextObject textObject = GameTexts.FindText("str_CE_renown_level");
             textObject.SetTextVariable("HERO", hero.Name);
 
-            textObject.SetTextVariable("POSITIVE", amount >= 0
-                                           ? 1
-                                           : 0);
+            textObject.SetTextVariable("POSITIVE", amount >= 0 ? 1 : 0);
             textObject.SetTextVariable("AMOUNT", Math.Abs(amount));
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
         }
@@ -379,9 +350,7 @@ namespace CaptivityEvents.Events
             textObject.SetTextVariable("PLAYER_HERO", hero2.Name);
             textObject.SetTextVariable("HERO", hero1.Name);
 
-            textObject.SetTextVariable("POSITIVE", relationChange >= 0
-                                           ? 1
-                                           : 0);
+            textObject.SetTextVariable("POSITIVE", relationChange >= 0 ? 1 : 0);
             textObject.SetTextVariable("AMOUNT", Math.Abs(relationChange));
             textObject.SetTextVariable("TOTAL", value);
             InformationManager.AddQuickInformation(textObject, 0, hero1.CharacterObject, "event:/ui/notification/relation");
