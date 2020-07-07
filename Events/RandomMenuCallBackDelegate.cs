@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
+using CaptivityEvents.Models;
+using Helpers;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
@@ -197,6 +199,29 @@ namespace CaptivityEvents.Events
             ConsequenceSoldToLordParty(ref args);
         }
 
+        internal void CERandomCaptivityChange(ref MenuCallbackArgs args, PartyBase party)
+        {
+            try
+            {
+                CEPlayerCaptivityModel.captureOverride = true;
+                Hero prisonerCharacter = Hero.MainHero;
+                prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
+                prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
+                while (PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter)) PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, -1, true);
+                party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
+
+                if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(party);
+                string waitingMenu = CEEventLoader.CEWaitingList();
+                GameMenu.ExitToLast();
+                if (waitingMenu != null) GameMenu.ActivateGameMenu(waitingMenu);
+                args.MenuContext.GameMenu.AllowWaitingAutomatically();
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.LogToFile("Failed to exception: " + e.Message + " stacktrace: " + e.StackTrace);
+            }
+        }
+
         private void ConsequenceSoldToNotable(ref MenuCallbackArgs args)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToNotable)) return;
@@ -206,7 +231,10 @@ namespace CaptivityEvents.Events
                 Settlement settlement = PartyBase.MainParty.MobileParty.CurrentSettlement;
                 Hero notable = settlement.Notables.Where(findFirstNotable => !findFirstNotable.IsFemale).GetRandomElement();
                 CECampaignBehavior.ExtraProps.Owner = notable;
-                new CaptiveSpecifics().CECaptivityChange(ref args, settlement.Party);
+
+                PartyBase party = PartyBase.MainParty.MobileParty.CurrentSettlement.Party;
+                CERandomCaptivityChange(ref args, party);
+
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
         }
@@ -218,7 +246,8 @@ namespace CaptivityEvents.Events
             try
             {
                 MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan);
-                new CaptiveSpecifics().CECaptivityChange(ref args, party.Party);
+                CERandomCaptivityChange(ref args, party.Party);
+
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }
         }
@@ -230,7 +259,7 @@ namespace CaptivityEvents.Events
             try
             {
                 MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty);
-                new CaptiveSpecifics().CECaptivityChange(ref args, party.Party);
+                CERandomCaptivityChange(ref args, party.Party);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Lord"); }
         }
@@ -241,8 +270,8 @@ namespace CaptivityEvents.Events
 
             try
             {
-                PartyBase party = Hero.MainHero.PartyBelongedTo.CurrentSettlement.Party;
-                new CaptiveSpecifics().CECaptivityChange(ref args, party);
+                PartyBase party = PartyBase.MainParty.MobileParty.CurrentSettlement.Party;
+                CERandomCaptivityChange(ref args, party);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
         }

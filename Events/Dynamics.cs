@@ -261,7 +261,7 @@ namespace CaptivityEvents.Events
                 }
 
                 textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
-                textObject.SetTextVariable("TOTAL_AMOUNT", currentValue + amount);
+                textObject.SetTextVariable("TOTAL_AMOUNT", valueToSet);
                 if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
 
                 if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");

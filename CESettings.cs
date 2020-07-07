@@ -88,17 +88,37 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
         public bool PrisonerEscapeBehavior { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1022}Hero Prisoner Escape Default", Order = 2, RequireRestart = true, HintText = "{=CESETTINGS1023}Allow the games default behaviour hero prisoners to escape from player. Depends on Modified Prisoner Escape Behavior.")]
+        [SettingPropertyInteger("{=CESETTINGS1098}Hero Prisoner Chance (Party)", -1, 100, Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1099}Hero prisoner daily escape chance from player's party, -1 means use regular calculation")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
-        public bool PrisonerHeroEscapeAllowed { get; set; } = false;
+        public int PrisonerHeroEscapeChanceParty { get; set; } = 0;
 
-        [SettingPropertyBool("{=CESETTINGS1024}Non-Hero Prisoner Escape Default", Order = 3, RequireRestart = true, HintText = "{=CESETTINGS1025}Allow the games default behaviour regarding non-hero prisoners to escape from player. Depends on Modified Prisoner Escape Behavior.")]
+        [SettingPropertyInteger("{=CESETTINGS1100}Hero Prisoner Chance (Settlement)", -1, 100, Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1101}Hero prisoner daily escape chance from player's settlements, -1 means use regular calculation")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
-        public bool PrisonerNonHeroEscapeAllowed { get; set; } = true;
+        public int PrisonerHeroEscapeChanceSettlement { get; set; } = 0;
 
-        [SettingPropertyBool("{=CESETTINGS1026}Games Default Auto Ransom System", Order = 4, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behaviour regarding auto-ransom. Depends on Modified Prisoner Escape Behavior.")]
+        [SettingPropertyInteger("{=CESETTINGS1102}Hero Prisoner Chance (Other)", -1, 100, Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1103}Hero prisoner daily escape chance from non-player sources, -1 means use regular calculation")]
+        [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
+        public int PrisonerHeroEscapeChanceOther { get; set; } = -1;
+
+        [SettingPropertyInteger("{=CESETTINGS1104}Regular Prisoner Escape Chance (Party)", -1, 100, Order = 5, RequireRestart = false, HintText = "{=CESETTINGS1105}Regular prisoner escape chance from player's party, -1 means use regular calculation, active only when prisoner exceeded")]
+        [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
+        public int PrisonerNonHeroEscapeChanceParty { get; set; } = 0;
+
+        [SettingPropertyInteger("{=CESETTINGS1106}Regular Prisoner Escape Chance (Settlement)", -1, 100, Order = 6, RequireRestart = false, HintText = "{=CESETTINGS1107}Regular prisoner escape chance from player's settlements, -1 means use regular calculation, active only when prisoner exceeded")]
+        [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
+        public int PrisonerNonHeroEscapeChanceSettlement { get; set; } = 0;
+
+        [SettingPropertyInteger("{=CESETTINGS1108}Regular Prisoner Escape Chance (Others)", -1, 100, Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1109}Regular prisoner escape chance from non-player sources, -1 means use regular calculation, active only when prisoner exceeded")]
+        [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
+        public int PrisonerNonHeroEscapeChanceOther { get; set; } = -1;
+
+        [SettingPropertyBool("{=CESETTINGS1026}Games Default Auto Ransom System", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behaviour regarding auto-ransom")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
         public bool PrisonerAutoRansom { get; set; } = false;
+
+        [SettingPropertyBool("{=CESETTINGS1110}Games Default Exceeded Prisoners System", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1111}Allows the games default behaviour regarding exceeded prisoner system, Hourly escape chance based on default 10% or above chances")]
+        [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
+        public bool PrisonerExceeded { get; set; } = false;
 
         // WILL BE REMOVED STARTS
 
