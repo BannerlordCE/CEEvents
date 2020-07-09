@@ -264,7 +264,6 @@ namespace CaptivityEvents.Brothel
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
             InformationManager.AddQuickInformation(textObject, 0, CharacterObject.PlayerCharacter, "event:/ui/notification/relation");
 
-            CEPlayerCaptivityModel.captureOverride = true;
             PartyBase capturerParty = SettlementHelper.FindNearestSettlement(settlement => settlement.IsTown).Party;
             Hero prisonerCharacter = Hero.MainHero;
             prisonerCharacter.CaptivityStartTime = CampaignTime.Now;

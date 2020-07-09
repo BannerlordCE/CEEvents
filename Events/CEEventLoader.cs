@@ -8,6 +8,7 @@ namespace CaptivityEvents.Events
 {
     internal class CEEventLoader
     {
+
         // Waiting Menus
         public static string CEWaitingList()
         {

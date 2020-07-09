@@ -138,6 +138,7 @@ namespace CaptivityEvents.Events
             h.ConsequenceRenown();
             h.ConsequenceChangeHealth();
             h.ConsequenceChangeMorale();
+            h.ConsequenceStripPlayer();
 
             ConsequenceForceMarry();
             ConsequenceChangeClan();
@@ -210,7 +211,7 @@ namespace CaptivityEvents.Events
                         }
                     }
 
-                    int weightedChance = 1;
+                    int weightedChance = 0;
 
                     try
                     {
@@ -219,6 +220,8 @@ namespace CaptivityEvents.Events
                                                                       : triggeredEvent.WeightedChanceOfOccuring);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
+
+                    if (weightedChance == 0) weightedChance = 1;
 
                     for (int a = weightedChance; a > 0; a--) eventNames.Add(triggeredEvent);
                 }

@@ -203,7 +203,6 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                CEPlayerCaptivityModel.captureOverride = true;
                 Hero prisonerCharacter = Hero.MainHero;
                 prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
                 prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);

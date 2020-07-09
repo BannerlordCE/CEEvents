@@ -74,6 +74,7 @@
     <Compile Include="Helper\CEHelper.cs" />
     <Compile Include="Patches\CEPatchClanIncomeVM.cs" />
     <Compile Include="Patches\CEPatchDefaultClanFinanceModel.cs" />
+    <Compile Include="Patches\CEPatchGameMenu.cs" />
     <Compile Include="Patches\CEPatchHero.cs" />
     <Compile Include="Patches\CEPatchMapNotificationVM.cs" />
     <Compile Include="Models\CEPlayerCaptivityModel.cs" />
