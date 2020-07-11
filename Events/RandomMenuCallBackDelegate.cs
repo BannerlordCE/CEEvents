@@ -257,7 +257,7 @@ namespace CaptivityEvents.Events
             
             try
             {
-                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty);
+                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty);
                 CERandomCaptivityChange(ref args, party.Party);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Lord"); }
@@ -775,7 +775,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-                MobileParty party = PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.First(mobileParty => { return mobileParty.IsLordParty; });
+                MobileParty party = PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty && !mobileParty.IsMainParty; });
                 if (party != null) MBTextManager.SetTextVariable("BUYERLORDPARTY", party.Name);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Lord"); }

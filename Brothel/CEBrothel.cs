@@ -13,8 +13,8 @@ namespace CaptivityEvents.Brothel
         {
             Settlement = settlement;
             Expense = 200;
-            InitialCapital = 5000;
-            Capital = 5000;
+            InitialCapital = 200;
+            Capital = 200;
             CaptiveProstitutes = new List<CharacterObject>();
         }
 

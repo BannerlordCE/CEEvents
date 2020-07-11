@@ -277,27 +277,21 @@ namespace CaptivityEvents.Events
                     {
                         case CultureCode.Sturgia:
                             headString = "nordic_fur_cap";
-
                             capeString = Hero.MainHero.IsFemale
                                 ? "female_hood"
                                 : "";
-
                             bodyString = Hero.MainHero.IsFemale
                                 ? "cut_dress"
                                 : "heavy_nordic_tunic";
-
                             legString = Hero.MainHero.IsFemale
                                 ? "ladys_shoe"
                                 : "rough_tied_boots";
                             glovesString = "armwraps";
-
                             break;
-
                         case CultureCode.Aserai:
                             headString = Hero.MainHero.IsFemale
                                 ? ""
                                 : "turban";
-
                             bodyString = Hero.MainHero.IsFemale
                                 ? "aserai_villager_female_dress"
                                 : "aserai_tunic_waistcoat";
@@ -307,75 +301,57 @@ namespace CaptivityEvents.Events
                                 : "wrapped_shoes";
                             capeString = "wrapped_scarf";
                             glovesString = "armwraps";
-
                             break;
-
                         case CultureCode.Khuzait:
                             headString = "fur_hat";
                             capeString = "wrapped_scarf";
-
                             bodyString = Hero.MainHero.IsFemale
                                 ? "khuzait_dress"
                                 : "steppe_armor";
-
                             legString = Hero.MainHero.IsFemale
                                 ? "ladys_shoe"
                                 : "rough_tied_boots";
                             glovesString = "armwraps";
-
                             break;
-
                         case CultureCode.Empire:
                             headString = Hero.MainHero.IsFemale
                                 ? "female_head_wrap"
                                 : "arming_cap";
-
                             bodyString = Hero.MainHero.IsFemale
                                 ? "vlandian_corset_dress"
                                 : "padded_leather_shirt";
-
                             legString = Hero.MainHero.IsFemale
                                 ? "ladys_shoe"
                                 : "rough_tied_boots";
                             capeString = "wrapped_scarf";
                             glovesString = "armwraps";
-
                             break;
-
                         case CultureCode.Battania:
                             headString = Hero.MainHero.IsFemale
                                 ? "female_head_wrap"
                                 : "wrapped_headcloth";
-
                             capeString = Hero.MainHero.IsFemale
                                 ? "wrapped_scarf"
                                 : "battania_shoulder_strap";
                             glovesString = "armwraps";
-
                             bodyString = Hero.MainHero.IsFemale
                                 ? "battania_dress_c"
                                 : "burlap_waistcoat";
                             legString = "ragged_boots";
-
                             break;
-
                         case CultureCode.Vlandia:
                             headString = Hero.MainHero.IsFemale
                                 ? "female_head_wrap"
                                 : "arming_cap";
-
                             bodyString = Hero.MainHero.IsFemale
                                 ? "vlandian_corset_dress"
                                 : "padded_leather_shirt";
-
                             legString = Hero.MainHero.IsFemale
                                 ? "ladys_shoe"
                                 : "ragged_boots";
                             capeString = "wrapped_scarf";
                             glovesString = "armwraps";
-
                             break;
-
                         case CultureCode.Invalid:
                         case CultureCode.Nord:
                         case CultureCode.Darshi:
@@ -385,19 +361,15 @@ namespace CaptivityEvents.Events
                             headString = Hero.MainHero.IsFemale
                                 ? "female_head_wrap"
                                 : "wrapped_headcloth";
-
                             capeString = Hero.MainHero.IsFemale
                                 ? "female_scarf"
                                 : "battania_shoulder_strap";
-
                             bodyString = Hero.MainHero.IsFemale
                                 ? "plain_dress"
                                 : "padded_leather_shirt";
-
                             legString = Hero.MainHero.IsFemale
                                 ? "ladys_shoe"
                                 : "ragged_boots";
-
                             break;
                     }
 
@@ -486,24 +458,16 @@ namespace CaptivityEvents.Events
                         {
                             case CultureCode.Sturgia:
                                 item = "seax";
-
                                 break;
-
                             case CultureCode.Aserai:
                                 item = "celtic_dagger";
-
                                 break;
-
                             case CultureCode.Empire:
                                 item = "gladius_b";
-
                                 break;
-
                             case CultureCode.Battania:
                                 item = "hooked_cleaver";
-
                                 break;
-
                             case CultureCode.Invalid:
                             case CultureCode.Vlandia:
                             case CultureCode.Khuzait:
@@ -513,7 +477,6 @@ namespace CaptivityEvents.Events
                             case CultureCode.AnyOtherCulture:
                             default:
                                 item = "seax";
-
                                 break;
                         }
 
@@ -535,32 +498,22 @@ namespace CaptivityEvents.Events
                         case CultureCode.Sturgia:
                             rangedItem = "nordic_shortbow";
                             rangedAmmo = "default_arrows";
-
                             break;
-
                         case CultureCode.Vlandia:
                             rangedItem = "crossbow_a";
                             rangedAmmo = "tournament_bolts";
-
                             break;
-
                         case CultureCode.Aserai:
                             rangedItem = "tribal_bow";
                             rangedAmmo = "default_arrows";
-
                             break;
-
                         case CultureCode.Empire:
                             rangedItem = "hunting_bow";
                             rangedAmmo = "default_arrows";
-
                             break;
-
                         case CultureCode.Battania:
                             rangedItem = "northern_javelin_2_t3";
-
                             break;
-
                         case CultureCode.Invalid:
                         case CultureCode.Khuzait:
                         case CultureCode.Nord:
@@ -570,7 +523,6 @@ namespace CaptivityEvents.Events
                         default:
                             rangedItem = "hunting_bow";
                             rangedAmmo = "default_arrows";
-
                             break;
                     }
 

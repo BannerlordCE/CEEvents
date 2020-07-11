@@ -207,8 +207,10 @@ namespace CaptivityEvents.Events
                 if (_listedEvent.Captive.IsHero) KillCharacterAction.ApplyByExecution(_listedEvent.Captive.HeroObject, Hero.MainHero);
                 else PartyBase.MainParty.PrisonRoster.AddToCounts(_listedEvent.Captive, -1);
             }
-
+            
+            // Kill Player
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor)) new Dynamics().CEKillPlayer(_listedEvent.Captive.HeroObject);
+            // Kill All
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillAllPrisoners)) new CaptorSpecifics().CEKillPrisoners(args, PartyBase.MainParty.PrisonRoster.Count(), true);
             // Kill Random
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomPrisoners)) new CaptorSpecifics().CEKillPrisoners(args);
@@ -223,8 +225,15 @@ namespace CaptivityEvents.Events
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) return;
 
-            if (_listedEvent.Captive.IsHero) EndCaptivityAction.ApplyByEscape(_listedEvent.Captive.HeroObject);
-            else PartyBase.MainParty.PrisonRoster.AddToCounts(_listedEvent.Captive, -1);
+            try
+            {
+                if (_listedEvent.Captive.IsHero) EndCaptivityAction.ApplyByEscape(_listedEvent.Captive.HeroObject);
+                else PartyBase.MainParty.PrisonRoster.AddToCounts(_listedEvent.Captive, -1);
+            } 
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failure of Captor Escape");
+            }
         }
 
         private void Strip(Hero captiveHero)

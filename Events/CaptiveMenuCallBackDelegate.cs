@@ -107,7 +107,7 @@ namespace CaptivityEvents.Events
             ReqCaptives(ref args);
             ReqMaleCaptives(ref args);
             ReqFemaleCaptives(ref args);
-            if (PlayerCaptivity.CaptorParty.LeaderHero != null) ReqHeroCaptorRelation(ref args);
+            ReqHeroCaptorRelation(ref args);
             ReqHeroHealthPercentage(ref args);
             ReqSlavery(ref args);
             ReqProstitute(ref args);
@@ -195,7 +195,6 @@ namespace CaptivityEvents.Events
                     if (triggeredEvent == null)
                     {
                         CECustomHandler.ForceLogToFile("Couldn't find " + triggerEvent.EventName + " in events.");
-
                         continue;
                     }
 
@@ -206,7 +205,6 @@ namespace CaptivityEvents.Events
                         if (conditionMatched != null)
                         {
                             CECustomHandler.LogToFile(conditionMatched);
-
                             continue;
                         }
                     }
@@ -320,8 +318,8 @@ namespace CaptivityEvents.Events
                 MobileParty party = null;
 
                 party = PlayerCaptivity.CaptorParty.IsSettlement
-                    ? PlayerCaptivity.CaptorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty)
-                    : PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty);
+                    ? PlayerCaptivity.CaptorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty)
+                    : PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty);
 
                 if (party == null) return;
 
@@ -820,8 +818,8 @@ namespace CaptivityEvents.Events
             try
             {
                 PartyBase party = PlayerCaptivity.CaptorParty.IsSettlement
-                    ? PlayerCaptivity.CaptorParty.Settlement.Parties.First(mobileParty => mobileParty.IsLordParty).Party
-                    : PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.First(mobileParty => mobileParty.IsLordParty).Party;
+                    ? PlayerCaptivity.CaptorParty.Settlement.Parties.First(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty).Party
+                    : PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.First(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty).Party;
 
                 MBTextManager.SetTextVariable("BUYERLORDPARTY", party.Name);
             }
@@ -889,6 +887,8 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroCaptorRelation(ref MenuCallbackArgs args)
         {
+            if (PlayerCaptivity.CaptorParty?.LeaderHero != null) return;
+
             try
             {
                 if (!_option.ReqHeroCaptorRelationAbove.IsStringNoneOrEmpty()) SetReqHeroCaptorRelationAbove(ref args);

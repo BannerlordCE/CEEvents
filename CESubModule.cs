@@ -88,7 +88,7 @@ namespace CaptivityEvents
         public static float brothelBlack = 10f;
         public static float brothelFadeOut = 2f;
 
-        public static List<CECustom> CEFlags = new List<CECustom>();
+        public static List<CECustom> CECustomModule = new List<CECustom>();
     }
 
 
@@ -256,7 +256,7 @@ namespace CaptivityEvents
 
             // Load Events
             CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
-            CEPersistence.CEFlags = CECustomHandler.GetFlags();
+            CEPersistence.CECustomModule = CECustomHandler.GetCustom();
 
             // Load Images
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
@@ -372,7 +372,7 @@ namespace CaptivityEvents
 
             try
             {
-                new CESettingsFlags().InitializeSettings(CEPersistence.CEFlags);
+                new CESettingsFlags().InitializeSettings(CEPersistence.CECustomModule);
                 CECustomHandler.ForceLogToFile("Loaded CESettings: "
                                                + (CESettings.Instance != null && CESettings.Instance.LogToggle
                                                    ? "Logs are enabled."

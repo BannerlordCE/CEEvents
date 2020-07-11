@@ -285,6 +285,7 @@ namespace CaptivityEvents.Brothel
 
             if (CampaignMission.Current.Location != Brothel || _isBrothelInitialized) return;
             //Passage from brothel to town -- need help setting town to brothel to link
+
             //LocationComplex.Current.AddPassage(settlement.LocationComplex.GetLocationWithId("center"), brothel);
             AddPeopleToTownTavern(settlement, unusedUsablePointCount);
             _isBrothelInitialized = true;
@@ -934,7 +935,9 @@ namespace CaptivityEvents.Brothel
                                               where brothel.IsRunning
                                               select brothel)
                 {
-                    brothel.ChangeGold(MBRandom.RandomInt(50, 400));
+                    int gold = MBRandom.RandomInt(-50, 200);
+                    gold += brothel.CaptiveProstitutes.Count * 200;
+                    brothel.ChangeGold(gold);
 
                     if (brothel.Capital >= 0 || Hero.MainHero.Gold >= Math.Abs(brothel.Capital)) continue;
 
@@ -1098,7 +1101,7 @@ namespace CaptivityEvents.Brothel
 
                 int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == settlement.StringId);
                 _brothelList[index].CaptiveProstitutes.Add(prisoner);
-                MobileParty.MainParty.PrisonRoster.RemoveTroop(prisoner);
+                MobileParty.MainParty.PrisonRoster.AddToCounts(prisoner, -1);
             }
             catch (Exception)
             {
