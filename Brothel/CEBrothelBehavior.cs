@@ -203,7 +203,7 @@ namespace CaptivityEvents.Brothel
             Brothel.RemoveAllCharacters();
             foreach (CharacterObject brothelPrisoner in brothelPrisoners)
             {
-                Brothel.AddCharacter(CreateBrothelPrisoner(brothelPrisoner, brothelPrisoner.Culture, LocationCharacter.CharacterRelations.Neutral));
+                Brothel.AddCharacter(CreateBrothelPrisoner(brothelPrisoner, Settlement.CurrentSettlement.Culture, LocationCharacter.CharacterRelations.Neutral));
             }
 
             Campaign.Current.GameMenuManager.MenuLocations.Add(Brothel);
@@ -452,14 +452,16 @@ namespace CaptivityEvents.Brothel
             townswoman.Age = prisoner.Age;
             townswoman.HairTags = prisoner.HairTags;
             townswoman.BeardTags = prisoner.BeardTags;
+            townswoman.TattooTags = prisoner.TattooTags;
             if (townswoman.Age < 21) townswoman.Age = 21;
+            townswoman.InitializeEquipmentsOnLoad(templateToCopy.AllEquipments.ToList());
+            // Remove any weapons
 
             string actionSetCode;
             if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
             else actionSetCode = "as_human_villager_in_tavern";
 
-            // TODO Add specific dialogue for brothel prisoners
-            LocationCharacter tempCharacter = new LocationCharacter(new AgentData(new SimpleAgentOrigin(townswoman, -1, Banner.CreateRandomBanner())).Monster(Campaign.Current.HumanMonsterSettlementSlow).Age((int)townswoman.Age).CivilianEquipment(true), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, false);
+            LocationCharacter tempCharacter = new LocationCharacter(new AgentData(new SimpleAgentOrigin(townswoman, -1, Banner.CreateRandomBanner())).Monster(Campaign.Current.HumanMonsterSettlementSlow).Age((int)townswoman.Age), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, false);
             return tempCharacter;
         }
 
@@ -512,6 +514,17 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddPlayerLine("tprostitute_owner_00_break", "tprostitute_owner_00", "tprostitute_owner_00_break_response", "{=CEBROTHEL1003}Go take a break.", null, null);
 
             campaignGameStarter.AddDialogLine("tprostitute_owner_00_break_r", "tprostitute_owner_00_break_response", "close_window", "{=CEBROTHEL1005}Thank you {?PLAYER.GENDER}milady{?}my lord{\\?}.", null, null);
+
+            // Owner Dialgoue Captives
+            campaignGameStarter.AddDialogLine("captive_requirements_owner", "start", "ccaptive_owner_00", "{=CEBROTHEL1067}This is no place for me, {?PLAYER.GENDER}milady{?}my lord{\\?}! What do you want?[ib:closed][rb:unsure]", () => ConversationWithCaptive(), null);
+
+            campaignGameStarter.AddPlayerLine("ccaptive_owner_00_yes", "ccaptive_owner_00", "ccaptive_service_00_yes_response", "{=CEBROTHEL1007}I will like to have some fun.", null, null);
+
+            campaignGameStarter.AddPlayerLine("ccaptive_owner_00_nevermind", "ccaptive_owner_00", "ccaptive_service_00_nevermind_response", "{=CEBROTHEL1011}Uh, nevermind.", null, null);
+
+            campaignGameStarter.AddDialogLine("ccaptive_service_00_yes_response_id", "ccaptive_service_00_yes_response", "close_window", "{=CEBROTHEL1043}Right this way...[ib:closed][rb:unsure]", null, ConversationProstituteConsequenceSex);
+
+            campaignGameStarter.AddDialogLine("ccaptive_service_00_nevermind_response_id", "ccaptive_service_00_nevermind_response", "close_window", "{=CEBROTHEL1044}Thank goodness...[ib:closed][rb:unsure]", null, null);
 
             // Requirements not met
             campaignGameStarter.AddDialogLine("prostitute_requirements_not_met", "start", "close_window", "{=CEBROTHEL1009}Sorry {?PLAYER.GENDER}milady{?}my lord{\\?}, I am currently very busy.", ConversationWithProstituteNotMetRequirements, null);
@@ -718,6 +731,11 @@ namespace CaptivityEvents.Brothel
 
         // Prostitute Conditions
         private static readonly string[] prostituteStrings = { "prostitute_confident", "prostitute_confident", "prostitute_tired" };
+
+        private bool ConversationWithCaptive()
+        {
+            return ContainsPrisoner(CharacterObject.OneToOneConversationCharacter);
+        }
 
         private bool ConversationWithProstitute()
         {
@@ -1062,9 +1080,9 @@ namespace CaptivityEvents.Brothel
                 int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == settlement.StringId);
 
                 _brothelList[index].CaptiveProstitutes.Clear();
-                foreach (TroopRosterElement troop in prisoners)
+                foreach (TroopRosterElement troopElement in prisoners)
                 {
-                    _brothelList[index].CaptiveProstitutes.Add(troop.Character);
+                    _brothelList[index].CaptiveProstitutes.Add(troopElement.Character);
                 }
             }
             catch (Exception)
@@ -1109,6 +1127,17 @@ namespace CaptivityEvents.Brothel
             }
         }
 
+        public static bool ContainsPrisoner(CharacterObject prisoner)
+        {
+
+            if (prisoner == null) return false;
+            if (Settlement.CurrentSettlement == null) return false;
+            if (!ContainsBrothelData(Settlement.CurrentSettlement)) return false;
+
+            int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == Settlement.CurrentSettlement.StringId);
+            return _brothelList[index].CaptiveProstitutes.Exists((captive) => { return captive.Name == prisoner.Name; });
+        }
+
         public override void SyncData(IDataStore dataStore)
         {
             dataStore.SyncData("SettlementsThatPlayerHasSpy", ref SettlementsThatPlayerHasSpy);
@@ -1121,6 +1150,14 @@ namespace CaptivityEvents.Brothel
 
         public static void CleanList()
         {
+            // Move all prisoners to players party
+            foreach (CEBrothel brothel in _brothelList)
+            {
+                foreach (CharacterObject captive in brothel.CaptiveProstitutes)
+                {
+                    MobileParty.MainParty.PrisonRoster.AddToCounts(captive, 1, captive.IsHero);
+                }
+            }
             _brothelList = new List<CEBrothel>();
         }
 

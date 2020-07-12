@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using CaptivityEvents.Brothel;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
@@ -435,6 +436,7 @@ namespace CaptivityEvents.CampaignBehaviors
             try
             {
                 if (returnEquipment.Captive.PartyBelongedToAsPrisoner != null) return;
+                if (CEBrothelBehavior.ContainsPrisoner(returnEquipment.Captive.CharacterObject)) return;
 
                 foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
                 {
