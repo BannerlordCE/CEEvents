@@ -372,7 +372,7 @@ namespace CaptivityEvents
 
             try
             {
-                new CESettingsFlags().InitializeSettings(CEPersistence.CECustomModule);
+                CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomModule);
                 CECustomHandler.ForceLogToFile("Loaded CESettings: "
                                                + (CESettings.Instance != null && CESettings.Instance.LogToggle
                                                    ? "Logs are enabled."

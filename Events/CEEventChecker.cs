@@ -1294,7 +1294,7 @@ namespace CaptivityEvents.Events
                     {
                         KeyValuePair<string, bool> flagFound = CESettingsFlags.Instance.CustomFlags.First((flag) => { return flag.Key == _listEvent.MultipleListOfCustomFlags[i]; });
 
-                        if (flagFound.Value)
+                        if (!flagFound.Value)
                         {
                             return Error("Skipping event " + _listEvent.Name + " " + _listEvent.MultipleListOfCustomFlags[i] + " events disabled.");
                         }

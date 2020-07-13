@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using CaptivityEvents.Custom;
 using Helpers;
 using TaleWorlds.CampaignSystem;
@@ -135,28 +136,43 @@ namespace CaptivityEvents.Events
 
         internal void SkillModifier(Hero hero, string skill, int amount = 0)
         {
-            foreach (SkillObject skillObject in SkillObject.All)
-                if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
-                {
-                    int currentSkillLevel = hero.GetSkillValue(skillObject);
-                    int newNumber = currentSkillLevel + amount;
-                    if (newNumber < 0) newNumber = 0;
+            if (amount != 0)
+            {
+                foreach (SkillObject skillObject in SkillObject.All)
+                    if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
+                    {
+                        int currentSkillLevel = hero.GetSkillValue(skillObject);
+                        int newNumber = currentSkillLevel + amount;
+                        if (newNumber < 0) newNumber = 0;
 
-                    hero.SetSkillValue(skillObject, newNumber);
+                        float xpToSet = Campaign.Current.Models.CharacterDevelopmentModel.GetXpRequiredForSkillLevel(newNumber);
+                        Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet, out int levels);
+                        hero.HeroDeveloper.SetPropertyValue(skillObject, xpToSet);
 
-                    if (amount == 0) continue;
-                    TextObject textObject = GameTexts.FindText("str_CE_level_skill");
-                    textObject.SetTextVariable("HERO", hero.Name);
+                        if (levels > 0)
+                        {
+                            MethodInfo mi = hero.HeroDeveloper.GetType().GetMethod("ChangeSkillLevelFromXpChange", BindingFlags.Instance | BindingFlags.NonPublic);
+                            if (mi != null) mi.Invoke(hero.HeroDeveloper, new object[] { skillObject, levels, false });
+                        } 
+                        else
+                        {
+                            hero.SetSkillValue(skillObject, newNumber);
+                        }
 
-                    textObject.SetTextVariable("NEGATIVE", amount > 0 ? 0 : 1);
-                    textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
+                        TextObject textObject = GameTexts.FindText("str_CE_level_skill");
+                        textObject.SetTextVariable("HERO", hero.Name);
 
-                    textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
-                    textObject.SetTextVariable("SKILL", skill.ToLower());
-                    textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
-                    InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
-                }
+                        textObject.SetTextVariable("NEGATIVE", amount > 0 ? 0 : 1);
+                        textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
+
+                        textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
+                        textObject.SetTextVariable("SKILL", skill.ToLower());
+                        textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
+                        InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
+                    }
+            }
         }
+
 
         internal void VictimSlaveryModifier(int amount, Hero hero, bool updateFlag = false, bool displayMessage = true, bool quickInformation = false)
         {
