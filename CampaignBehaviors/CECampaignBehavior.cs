@@ -203,7 +203,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     CECustomHandler.ForceLogToFile("CheckEventHourly Failure");
                     CECustomHandler.ForceLogToFile(e.Message + " : " + e);
                 }
-            }   
+            }
 
             try
             {
@@ -324,25 +324,16 @@ namespace CaptivityEvents.CampaignBehaviors
 
                         try
                         {
+                            // Crash on Template get objects? Missing equipment slot of 0? Mother Culture missing?
                             Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, isOffspringFemale, 0);
                             aliveOffsprings.Add(item);
                         }
                         catch (Exception e)
                         {
-                            try
-                            {
-                                CECustomHandler.ForceLogToFile("Bad pregnancy Unknown");
-                                CECustomHandler.ForceLogToFile(e.Message + " : " + e);
-                                Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, false, 0);
-                                aliveOffsprings.Add(item);
-                            }
-                            catch (Exception e2)
-                            {
-                                CECustomHandler.ForceLogToFile("Bad pregnancy Male");
-                                CECustomHandler.ForceLogToFile(e2.Message + " : " + e2);
-                                Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, true, 0);
-                                aliveOffsprings.Add(item);
-                            }
+                            CECustomHandler.ForceLogToFile("Bad pregnancy " + (isOffspringFemale ? "Female" : "Male"));
+                            CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+                            Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, !isOffspringFemale, 0);
+                            aliveOffsprings.Add(item);
                         }
                     }
                     else
@@ -435,8 +426,7 @@ namespace CaptivityEvents.CampaignBehaviors
         {
             try
             {
-                if (returnEquipment.Captive.PartyBelongedToAsPrisoner != null) return;
-                if (CEBrothelBehavior.ContainsPrisoner(returnEquipment.Captive.CharacterObject)) return;
+                if (returnEquipment.Captive.IsPrisoner || returnEquipment.Captive.PartyBelongedToAsPrisoner != null) return;
 
                 foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
                 {

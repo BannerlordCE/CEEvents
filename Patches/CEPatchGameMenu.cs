@@ -15,6 +15,7 @@ namespace CaptivityEvents.Patches
 
             switch (menuId)
             {
+                //Still Missing a State
                 case "defeated_and_taken_prisoner":
                     if (CESettings.Instance.SexualContent)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner_sexual" : "CE_defeated_and_taken_prisoner_sexual_male");

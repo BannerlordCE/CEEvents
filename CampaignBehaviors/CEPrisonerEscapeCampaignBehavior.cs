@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CaptivityEvents.Brothel;
+using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;

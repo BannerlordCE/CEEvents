@@ -64,7 +64,7 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public bool EventRandomEnabled { get; set; } = true;
 
-        [SettingPropertyFloatingInteger("{=CESETTINGS1014}Random Events Chance", -1f, 101f, "0", Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1015}If captives in party how often should random events fire over captor.")]
+        [SettingPropertyFloatingInteger("{=CESETTINGS1014}Random Events Ratio", -1f, 101f, "0", Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1015}If captives in party how often should random events fire over captor.")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public float EventRandomFireChance { get; set; } = 20f;
 
@@ -72,15 +72,19 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public bool EventCaptorGearCaptives { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1094}Allow escape during hunt", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1095}Allows prisoners to escape if not killed or wounded in the hunt")]
+        [SettingPropertyBool("{=CESETTINGS1112}Toggle Brothel Prisoner's Clothing (Hero)", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1113}Changes the brothel prisoner's clothing to the settlement's culture.")]
+        [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
+        public bool EventProstituteGear { get; set; } = true;
+
+        [SettingPropertyBool("{=CESETTINGS1094}Allow escape during hunt", Order = 10, RequireRestart = false, HintText = "{=CESETTINGS1095}Allows prisoners to escape if not killed or wounded in the hunt")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public bool HuntLetPrisonersEscape { get; set; } = false;
 
-        [SettingPropertyFloatingInteger("{=CESETTINGS1080}Hunting begins time after mission load", 5f, 60f, "0", Order = 10, RequireRestart = false, HintText = "{=CESETTINGS1081}Seconds to wait until hunt begins")]
+        [SettingPropertyFloatingInteger("{=CESETTINGS1080}Hunting begins time after mission load", 5f, 60f, "0", Order = 11, RequireRestart = false, HintText = "{=CESETTINGS1081}Seconds to wait until hunt begins")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public float HuntBegins { get; set; } = 7f;
 
-        [SettingPropertyInteger("{=CESETTINGS1082}Max amount of prisoners to spawn for hunt", 1, 100, Order = 11, RequireRestart = false, HintText = "{=CESETTINGS1083}Amount of prisoners that will spawn for hunt")]
+        [SettingPropertyInteger("{=CESETTINGS1082}Max amount of prisoners to spawn for hunt", 1, 100, Order = 12, RequireRestart = false, HintText = "{=CESETTINGS1083}Amount of prisoners that will spawn for hunt")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public int AmountOfTroopsForHunt { get; set; } = 15;
 
