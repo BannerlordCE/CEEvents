@@ -513,22 +513,23 @@ namespace CaptivityEvents
 
         private void AddBehaviours(CampaignGameStarter campaignStarter)
         {
-            campaignStarter.AddBehavior(new CECampaignBehavior());
-            if (CESettings.Instance != null && CESettings.Instance.ProstitutionControl) campaignStarter.AddBehavior(new CEBrothelBehavior());
+            if (CESettings.Instance == null) return;
 
-            if (CESettings.Instance != null && CESettings.Instance.PrisonerEscapeBehavior)
+            campaignStarter.AddBehavior(new CECampaignBehavior());
+            if (CESettings.Instance.ProstitutionControl)
+            {
+                CEBrothelBehavior brothelBehavior = new CEBrothelBehavior();
+                brothelBehavior.OnSessionLaunched(campaignStarter);
+                campaignStarter.AddBehavior(brothelBehavior);
+            }
+            if (CESettings.Instance.PrisonerEscapeBehavior)
             {
                 campaignStarter.AddBehavior(new CEPrisonerEscapeCampaignBehavior());
                 campaignStarter.AddBehavior(new CESetPrisonerFreeBarterBehavior());
             }
-
-            //if (CESettings.Instance.PregnancyToggle)
-            //{
-            //    ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
-            //}
-            if (CESettings.Instance != null && CESettings.Instance.EventCaptiveOn) ReplaceModel<PlayerCaptivityModel, CEPlayerCaptivityModel>(campaignStarter);
-
-            if (CESettings.Instance != null && (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue)) new CEPrisonerDialogue().AddPrisonerLines(campaignStarter);
+            if (CESettings.Instance.EventCaptiveOn) ReplaceModel<PlayerCaptivityModel, CEPlayerCaptivityModel>(campaignStarter);
+            if (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue) new CEPrisonerDialogue().AddPrisonerLines(campaignStarter);
+            //if (CESettings.Instance.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
 
             AddCustomEvents(campaignStarter);
 

@@ -232,7 +232,7 @@ namespace CaptivityEvents.Events
             } 
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("Failure of Captor Escape");
+                CECustomHandler.ForceLogToFile("Failure of Captor Escape: " + e.ToString());
             }
         }
 
