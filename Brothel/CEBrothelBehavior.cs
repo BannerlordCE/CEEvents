@@ -1366,6 +1366,7 @@ namespace CaptivityEvents.Brothel
                 {
                     MobileParty.MainParty.PrisonRoster.AddToCounts(captive, 1, captive.IsHero);
                 }
+                Hero.MainHero.ChangeHeroGold(brothelCost);
             }
             _brothelList = new List<CEBrothel>();
         }

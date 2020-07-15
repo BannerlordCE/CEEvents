@@ -62,6 +62,10 @@ namespace CaptivityEvents.Events
 
             try
             {
+                foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster)
+                {
+                    if (element.Character.IsHero) element.Character.HeroObject.ChangeState(Hero.CharacterStates.Active);
+                }
                 releasedPrisoners.Add(MobileParty.MainParty.PrisonRoster.ToFlattenedRoster());
                 MobileParty.MainParty.PrisonRoster.Clear();
             }

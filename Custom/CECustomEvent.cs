@@ -145,7 +145,9 @@ namespace CaptivityEvents.Custom
         CaptivesOutNumber,
         HeroIsFactionLeader,
         PlayerIsNotBusy,
-        StripEnabled
+        StripEnabled,
+        LocationPartyInVillage,
+        LocationPartyInCastle
     }
 
     [DebuggerStepThrough]

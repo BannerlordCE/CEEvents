@@ -463,11 +463,20 @@ namespace CaptivityEvents
 
         protected override void OnGameStart(Game game, IGameStarter gameStarter)
         {
+            CheckBugIssue();
             if (!(game.GameType is Campaign) || !_isLoaded) return;
             game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings_xml.xml");
             InitalizeAttributes(game);
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
             AddBehaviours(campaignStarter);
+        }
+
+        private void CheckBugIssue()
+        {
+            if (PlayerEncounter.Current == null) return;
+            if (PlayerEncounter.EncounteredMobileParty == null) return;
+            if (PlayerEncounter.EncounteredMobileParty.StringId != "Escaped_Captives") return;
+            CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
         }
 
         public override void OnGameEnd(Game game)

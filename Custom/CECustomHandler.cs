@@ -47,10 +47,10 @@ namespace CaptivityEvents.Custom
                                 if (XMLFileCompliesWithCustomXSD(text))
                                 {
                                     AllCustom.AddRange(DeserializeXMLFileToFlags(text));
-                                    ForceLogToFile("Custom Flags  Added: " + text);
+                                    ForceLogToFile("Custom Flags Added: " + text);
                                 }
 
-                                ForceLogToFile("Custom Flags  Added: " + AllCustom.Count());
+                                ForceLogToFile("Amount Added: " + AllCustom.Count());
 
                                 continue;
                             }

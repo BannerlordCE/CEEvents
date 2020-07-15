@@ -192,14 +192,14 @@ namespace CaptivityEvents.Events
 
             returnString += "\n\n--- Party Members ---";
 
-            returnString += "\nTotal Females : " + captorParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale);
-            returnString += "\nTotal Males : " + captorParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale);
+            returnString += "\nTotal Females : " + captorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } );
+            returnString += "\nTotal Males : " + captorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } );
             returnString += "\nTotal : " + captorParty.MemberRoster.Count();
 
             returnString += "\n\n--- Captive Members ---";
 
-            returnString += "\nTotal Females : " + captorParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale);
-            returnString += "\nTotal Males : " + captorParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale);
+            returnString += "\nTotal Females : " + captorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } );
+            returnString += "\nTotal Males : " + captorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } );
             returnString += "\nTotal : " + captorParty.PrisonRoster.Count();
 
             returnString += "\nWork in progress\n";
@@ -299,6 +299,8 @@ namespace CaptivityEvents.Events
             bool hasHideoutFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationHideout);
             bool hasCastleFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCastle);
             bool hasPartyInTownFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInTown);
+            bool hasPartyInVillageFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInVillage);
+            bool hasPartyInCastleFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInCastle);
             bool hasTravelingFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationTravellingParty);
             bool visitedByCaravanFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByCaravan);
             bool visitedByLordFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByLord);
@@ -342,7 +344,7 @@ namespace CaptivityEvents.Events
 
                     if (hasHideoutFlag && captorParty.Settlement.IsHideout()) eventMatchingCondition = true;
 
-                    if (hasCastleFlag && captorParty.Settlement.IsCastle)
+                    if ((hasCastleFlag || hasDungeonFlag) && captorParty.Settlement.IsCastle)
                     {
                         if (visitedByLordFlag)
                             try
@@ -388,9 +390,9 @@ namespace CaptivityEvents.Events
                         else eventMatchingCondition = true;
                     }
 
-                    if (hasVillageFlag && captorParty.MobileParty.CurrentSettlement.IsVillage) eventMatchingCondition = true;
+                    if (hasPartyInVillageFlag && captorParty.MobileParty.CurrentSettlement.IsVillage) eventMatchingCondition = true;
 
-                    if (hasCastleFlag && captorParty.MobileParty.CurrentSettlement.IsCastle)
+                    if (hasPartyInCastleFlag && captorParty.MobileParty.CurrentSettlement.IsCastle)
                     {
                         if (visitedByLordFlag)
                             try
@@ -645,7 +647,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqFemaleCaptivesAbove.IsStringNoneOrEmpty())
-                    if (captorParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleCaptivesAbove))
+                    if (captorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleCaptivesAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleCaptivesAbove.");
             }
             catch (Exception)
@@ -657,7 +659,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqFemaleCaptivesBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleCaptivesAbove.");
+                if (captorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleCaptivesAbove.");
             }
             catch (Exception)
             {
@@ -672,7 +674,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqMaleCaptivesAbove.IsStringNoneOrEmpty())
-                    if (captorParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleCaptivesAbove))
+                    if (captorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleCaptivesAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleCaptivesAbove.");
             }
             catch (Exception)
@@ -684,7 +686,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqMaleCaptivesBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleCaptivesBelow.");
+                if (captorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleCaptivesBelow.");
             }
             catch (Exception)
             {
@@ -699,7 +701,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqCaptivesAbove.IsStringNoneOrEmpty())
-                    if (captorParty.PrisonRoster.Count() < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesAbove))
+                    if (captorParty.NumberOfPrisoners < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesAbove.");
             }
             catch (Exception)
@@ -711,7 +713,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqCaptivesBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.PrisonRoster.Count() > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesBelow.");
+                if (captorParty.NumberOfPrisoners > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptivesBelow.");
             }
             catch (Exception)
             {
@@ -726,7 +728,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqFemaleTroopsAbove.IsStringNoneOrEmpty())
-                    if (captorParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleTroopsAbove))
+                    if (captorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleTroopsAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleTroopsAbove.");
             }
             catch (Exception)
@@ -737,7 +739,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqFemaleTroopsBelow.IsStringNoneOrEmpty())
-                    if (captorParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleTroopsBelow))
+                    if (captorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleTroopsBelow))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqFemaleTroopsBelow.");
             }
             catch (Exception)
@@ -753,7 +755,7 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqMaleTroopsAbove.IsStringNoneOrEmpty())
-                    if (captorParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleTroopsAbove))
+                    if (captorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleTroopsAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleTroopsAbove.");
             }
             catch (Exception)
@@ -765,7 +767,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqMaleTroopsBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleTroopsBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleTroopsBelow.");
+                if (captorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleTroopsBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqMaleTroopsBelow.");
             }
             catch (Exception)
             {
@@ -780,7 +782,8 @@ namespace CaptivityEvents.Events
             try
             {
                 if (!_listEvent.ReqTroopsAbove.IsStringNoneOrEmpty())
-                    if (captorParty.MemberRoster.Count() < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqTroopsAbove))
+                    if (captorParty.MemberRoster.Sum(troopRosterElement => { return troopRosterElement.Number; })
+                    < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqTroopsAbove))
                         return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsAbove.");
             }
             catch (Exception)
@@ -792,7 +795,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqTroopsBelow.IsStringNoneOrEmpty()) return true;
 
-                if (captorParty.MemberRoster.Count() > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqTroopsBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsBelow.");
+                if (captorParty.MemberRoster.Sum(troopRosterElement => { return troopRosterElement.Number; }) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqTroopsBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqTroopsBelow.");
             }
             catch (Exception)
             {
@@ -1275,7 +1278,10 @@ namespace CaptivityEvents.Events
             if (!CESettings.Instance.ProstitutionControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution)) return Error("Skipping event " + _listEvent.Name + " Prostitution events disabled.");
             if (!CESettings.Instance.RomanceControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Romance)) return Error("Skipping event " + _listEvent.Name + " Romance events disabled.");
 
-            if (!CESettings.Instance.StolenGear && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripEnabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear disabled.");
+            if (!CESettings.Instance.StolenGear && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripEnabled))
+            {
+                return Error("Skipping event " + _listEvent.Name + " StolenGear disabled.");
+            }
 
             // Custom Flags
             if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) return Error("Skipping event " + _listEvent.Name + " Player is busy.");
