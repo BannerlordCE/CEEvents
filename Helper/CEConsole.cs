@@ -516,6 +516,16 @@ namespace CaptivityEvents.Helper
                     {
                         Mission.Current.MakeSound(id, Agent.Main.Frame.origin, true, false, -1, -1);
 
+                        string text = "";
+                        List<GameEntity> entities = new List<GameEntity>();
+                        Mission.Current.Scene.GetEntities(ref entities);
+                        foreach (GameEntity test in entities)
+                        {
+                            text += test.Name + " : " + test.ToString() + "\n"; 
+                        }
+                        CECustomHandler.ForceLogToFile(text);
+
+
                         return string.Empty;
                     }
 

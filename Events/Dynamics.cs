@@ -352,7 +352,7 @@ namespace CaptivityEvents.Events
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
         }
 
-        internal void RelationsModifier(Hero hero1, int relationChange, Hero hero2 = null)
+        internal void RelationsModifier(Hero hero1, int relationChange, Hero hero2 = null, bool quickInformationMessage = true, bool regularMessage = false)
         {
             if (hero1 == null || relationChange == 0) return;
             if (hero2 == null) hero2 = Hero.MainHero;
@@ -369,7 +369,8 @@ namespace CaptivityEvents.Events
             textObject.SetTextVariable("POSITIVE", relationChange >= 0 ? 1 : 0);
             textObject.SetTextVariable("AMOUNT", Math.Abs(relationChange));
             textObject.SetTextVariable("TOTAL", value);
-            InformationManager.AddQuickInformation(textObject, 0, hero1.CharacterObject, "event:/ui/notification/relation");
+            if (quickInformationMessage) InformationManager.AddQuickInformation(textObject, 0, hero1.CharacterObject, "event:/ui/notification/relation");
+            if (regularMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
         }
 
         internal void ChangeClan(Hero hero, Hero owner)
