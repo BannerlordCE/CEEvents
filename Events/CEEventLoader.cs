@@ -43,7 +43,7 @@ namespace CaptivityEvents.Events
                 gameStarter.AddWaitGameMenu(
                     listedEvent.Name,
                     listedEvent.Text,
-                    cb.CaptiveEventWaitGameMenu,
+                    cb.CaptiveInitWaitGameMenu,
                     cb.CaptiveConditionWaitGameMenu,
                     cb.CaptiveConsequenceWaitGameMenu,
                     cb.CaptiveTickWaitGameMenu,

@@ -132,12 +132,19 @@ namespace CaptivityEvents.Events
 
                         if (!triggerEvent.EventUseConditions.IsStringNoneOrEmpty() && triggerEvent.EventUseConditions == "True")
                         {
-                            string conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(_listedEvent.Captive, PartyBase.MainParty);
+                            string conditionMatched = null;
+                            if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                            {
+                                conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(_listedEvent.Captive, PartyBase.MainParty);
+                            }
+                            else if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                            {
+                                conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                            }
 
                             if (conditionMatched != null)
                             {
                                 CECustomHandler.LogToFile(conditionMatched);
-
                                 continue;
                             }
                         }
@@ -163,7 +170,7 @@ namespace CaptivityEvents.Events
                         {
                             CEEvent triggeredEvent = eventNames[number];
                             triggeredEvent.Captive = _listedEvent.Captive;
-                            GameMenu.SwitchToMenu(triggeredEvent.Name);
+                            GameMenu.ActivateGameMenu(triggeredEvent.Name);
                         }
                         catch (Exception)
                         {

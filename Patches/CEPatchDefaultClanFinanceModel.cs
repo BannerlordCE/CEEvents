@@ -28,7 +28,7 @@ namespace CaptivityEvents.Patches
             foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
                 if (brothel.IsRunning)
                 {
-                    int num3 = (int) (Math.Max(0, brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
+                    int num3 = (int)(Math.Max(0, brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
                     num += num3;
                     if (applyWithdrawals && num3 > 0) brothel.ChangeGold(-num3);
 

@@ -23,7 +23,7 @@ namespace CaptivityEvents.Events
 
                     if (waitingList != null)
                     {
-                        GameMenu.SwitchToMenu(waitingList);
+                        GameMenu.ActivateGameMenu(waitingList);
                     }
                     else
                     {

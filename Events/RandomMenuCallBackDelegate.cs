@@ -146,7 +146,16 @@ namespace CaptivityEvents.Events
 
                     if (!triggerEvent.EventUseConditions.IsStringNoneOrEmpty() && triggerEvent.EventUseConditions == "True")
                     {
-                        string conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                        string conditionMatched = null;
+
+                        if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                        {
+                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                        }
+                        else if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                        {
+                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                        }
 
                         if (conditionMatched != null)
                         {
@@ -174,7 +183,10 @@ namespace CaptivityEvents.Events
                 {
                     int number = MBRandom.Random.Next(0, eventNames.Count - 1);
 
-                    try { GameMenu.SwitchToMenu(eventNames[number].Name); }
+                    try 
+                    { 
+                        GameMenu.SwitchToMenu(eventNames[number].Name); 
+                    }
                     catch (Exception)
                     {
                         CECustomHandler.ForceLogToFile("Couldn't find " + eventNames[number] + " in events.");
@@ -210,10 +222,6 @@ namespace CaptivityEvents.Events
                 party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
 
                 if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(party);
-                string waitingMenu = CEEventLoader.CEWaitingList();
-                GameMenu.ExitToLast();
-                if (waitingMenu != null) GameMenu.ActivateGameMenu(waitingMenu);
-                args.MenuContext.GameMenu.AllowWaitingAutomatically();
             }
             catch (Exception e)
             {

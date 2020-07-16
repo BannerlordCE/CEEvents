@@ -18,24 +18,54 @@ namespace CaptivityEvents.Events
     {
         internal void CECaptorContinue(MenuCallbackArgs args)
         {
-            if (CECampaignBehavior.ExtraProps.menuToSwitchBackTo != null)
-            {
-                GameMenu.SwitchToMenu(CECampaignBehavior.ExtraProps.menuToSwitchBackTo);
-                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
 
-                if (CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo != null)
+            CEPersistence.animationPlayEvent = false;
+
+            try
+            {
+                if (PlayerCaptivity.CaptorParty != null)
                 {
-                    args.MenuContext.SetBackgroundMeshName(CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo);
-                    CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
+                    string waitingList = new WaitingList().CEWaitingList();
+
+                    if (waitingList != null)
+                    {
+                        GameMenu.ActivateGameMenu(waitingList);
+                    }
+                    else
+                    {
+                        new CESubModule().LoadTexture("default");
+
+                        GameMenu.SwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement
+                                                  ? "settlement_wait"
+                                                  : "prisoner_wait");
+                    }
+                }
+                else
+                {
+                    if (CECampaignBehavior.ExtraProps.menuToSwitchBackTo != null)
+                    {
+                        GameMenu.SwitchToMenu(CECampaignBehavior.ExtraProps.menuToSwitchBackTo);
+                        CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
+
+                        if (CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo != null)
+                        {
+                            args.MenuContext.SetBackgroundMeshName(CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo);
+                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
+                        }
+                    }
+                    else
+                    {
+                        GameMenu.ExitToLast();
+                    }
+
+                    Campaign.Current.TimeControlMode = Campaign.Current.LastTimeControlMode;
+                    new CESubModule().LoadTexture("default");
                 }
             }
-            else
+            catch (Exception e)
             {
-                GameMenu.ExitToLast();
+                CECustomHandler.ForceLogToFile("Critical Error: CECaptorContinue : " + e);
             }
-
-            Campaign.Current.TimeControlMode = Campaign.Current.LastTimeControlMode;
-            new CESubModule().LoadTexture("default");
         }
 
         internal void CEKillPrisoners(MenuCallbackArgs args, int amount = 10, bool killHeroes = false)
@@ -58,6 +88,8 @@ namespace CaptivityEvents.Events
 
         internal void CEPrisonerRebel(MenuCallbackArgs args)
         {
+            CEPersistence.animationPlayEvent = false;
+
             TroopRoster releasedPrisoners = new TroopRoster();
 
             try
@@ -138,6 +170,8 @@ namespace CaptivityEvents.Events
 
         internal void CEHuntPrisoners(MenuCallbackArgs args, int amount = 20)
         {
+            CEPersistence.animationPlayEvent = false;
+
             TroopRoster releasedPrisoners = new TroopRoster();
 
             if (CESettings.Instance != null) amount = CESettings.Instance.AmountOfTroopsForHunt;

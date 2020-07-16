@@ -98,6 +98,8 @@ namespace CaptivityEvents.Custom
         LocationTravellingParty,
         LocationCaravan,
         LocationPartyInTown,
+        LocationPartyInCastle,
+        LocationPartyInVillage,
         LocationDungeon,
         LocationHideout,
         LocationTavern,
@@ -146,8 +148,6 @@ namespace CaptivityEvents.Custom
         HeroIsFactionLeader,
         PlayerIsNotBusy,
         StripEnabled,
-        LocationPartyInVillage,
-        LocationPartyInCastle
     }
 
     [DebuggerStepThrough]

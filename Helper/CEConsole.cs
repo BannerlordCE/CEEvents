@@ -470,9 +470,43 @@ namespace CaptivityEvents.Helper
                     CEBrothelBehavior.CleanList();
                     ResetStatus(new List<string>());
 
+                    Hero.MainHero.Children.ForEach(child =>
+                    {
+                        child.ChangeState(Hero.CharacterStates.Disabled);
+                    });
+
                     return successful
                         ? "Successfully cleaned save of captivity events data. Save the game now."
                         : "Failed to Clean";
+                }
+                catch (Exception)
+                {
+                    return "Failed";
+                }
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("fix_clan", "fixes")]
+        public static string FixClan(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.fix_clan \".";
+
+                try
+                {
+                    Hero.MainHero.Children.ForEach(child =>
+                    {
+                        child.Clan = Hero.MainHero.Clan;
+                    });
+
+                    return "Successfully fixed.";
                 }
                 catch (Exception)
                 {

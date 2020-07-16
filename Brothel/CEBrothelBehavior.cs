@@ -316,7 +316,6 @@ namespace CaptivityEvents.Brothel
             string waitingMenu = CEEventLoader.CEWaitingList();
             GameMenu.ExitToLast();
             if (waitingMenu != null) GameMenu.ActivateGameMenu(waitingMenu);
-            args.MenuContext.GameMenu.AllowWaitingAutomatically();
         }
         #endregion
 
@@ -1046,7 +1045,7 @@ namespace CaptivityEvents.Brothel
 
                     if (brothel.Settlement.OwnerClan == Clan.PlayerClan)
                     {
-                        TextObject textObject3 = new TextObject("{CEBROTHEL0998}The brothel of {SETTLEMENT} has gone bankrupted, and is no longer active.");
+                        TextObject textObject3 = new TextObject("{CEBROTHEL0998}The brothel of {SETTLEMENT} has gone bankrupted, and is no longer open.");
                         textObject3.SetTextVariable("SETTLEMENT", brothel.Settlement.Name);
                         InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
                         brothel.IsRunning = false;
