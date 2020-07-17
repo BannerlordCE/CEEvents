@@ -104,7 +104,7 @@ namespace CaptivityEvents
         public const string HarmonyId = "com.CE.captivityEvents";
 
         // Images
-        private static readonly Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
+        public static readonly Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
 
         // Last Check on Animation Loop
         private static float lastCheck;

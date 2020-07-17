@@ -38,9 +38,20 @@ namespace CaptivityEvents.Events
 
         internal void CaptiveInitWaitGameMenu(MenuCallbackArgs args)
         {
-            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                       ? "wait_prisoner_female"
-                                                       : "wait_prisoner_male");
+            if (PlayerCaptivity.CaptorParty.IsSettlement)
+            {
+                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                           ? "wait_prisoner_female"
+                                                           : "wait_prisoner_male");
+                CEHelper.settlementCheck = true;
+            }
+            else if (PlayerCaptivity.CaptorParty.IsMobile)
+            {
+                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                           ? "wait_captive_female"
+                                           : "wait_captive_male");
+                CEHelper.settlementCheck = false;
+            }
 
             new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage();
 
@@ -68,9 +79,40 @@ namespace CaptivityEvents.Events
 
             if (!PlayerCaptivity.IsCaptive) return;
 
-            if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement != null) text.SetTextVariable("SETTLEMENT_NAME", PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Name);
-            else if (PlayerCaptivity.CaptorParty.IsSettlement) text.SetTextVariable("SETTLEMENT_NAME", PlayerCaptivity.CaptorParty.Settlement.Name);
-            else text.SetTextVariable("PARTY_NAME", PlayerCaptivity.CaptorParty.Name);
+            if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement != null)
+            {
+                if (CEHelper.settlementCheck == false)
+                {
+                    string waitingList = new WaitingList().CEWaitingList();
+
+                    if (waitingList != null)
+                    {
+                        GameMenu.SwitchToMenu(waitingList);
+                    }
+                    // Leave menu on if there is no alternative menu
+                    CEHelper.settlementCheck = true;
+                }
+                else text.SetTextVariable("SETTLEMENT_NAME", PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Name);
+            }
+            else if (PlayerCaptivity.CaptorParty.IsSettlement)
+            {
+                text.SetTextVariable("SETTLEMENT_NAME", PlayerCaptivity.CaptorParty.Settlement.Name);
+            }
+            else
+            {
+                if (CEHelper.settlementCheck == true)
+                {
+                    string waitingList = new WaitingList().CEWaitingList();
+
+                    if (waitingList != null)
+                    {
+                        GameMenu.SwitchToMenu(waitingList);
+                    }
+                    // Leave menu on if there is no alternative menu
+                    CEHelper.settlementCheck = false;
+                }
+                else text.SetTextVariable("PARTY_NAME", PlayerCaptivity.CaptorParty.Name);
+            }
 
             if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.IsActive) PartyBase.MainParty.MobileParty.Position2D = PlayerCaptivity.CaptorParty.MobileParty.Position2D;
             else if (PlayerCaptivity.CaptorParty.IsSettlement) PartyBase.MainParty.MobileParty.Position2D = PlayerCaptivity.CaptorParty.Settlement.GatePosition;
@@ -82,7 +124,7 @@ namespace CaptivityEvents.Events
 
         internal void CaptiveEventGameMenu(MenuCallbackArgs args)
         {
-            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("captive_default");
+            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default");
 
             SetCaptiveTextVariables(ref args);
         }

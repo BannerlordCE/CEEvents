@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -10,8 +12,11 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
+using TaleWorlds.Engine.GauntletUI;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+using Path = System.IO.Path;
+using Texture = TaleWorlds.TwoDimension.Texture;
 
 namespace CaptivityEvents.Helper
 {
@@ -413,9 +418,9 @@ namespace CaptivityEvents.Helper
 
                     return "Successfully reset status";
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    return "Failed";
+                    return "Failed : " + e;
                 }
             }
             catch (Exception e)
@@ -444,9 +449,9 @@ namespace CaptivityEvents.Helper
                         ? "Successfully cleared pregnancies of Captivity Events"
                         : "Failed to Clear";
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    return "Failed";
+                    return "Failed : " + e;
                 }
             }
             catch (Exception e)
@@ -470,18 +475,13 @@ namespace CaptivityEvents.Helper
                     CEBrothelBehavior.CleanList();
                     ResetStatus(new List<string>());
 
-                    Hero.MainHero.Children.ForEach(child =>
-                    {
-                        child.ChangeState(Hero.CharacterStates.Disabled);
-                    });
-
                     return successful
                         ? "Successfully cleaned save of captivity events data. Save the game now."
                         : "Failed to Clean";
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    return "Failed";
+                    return "Failed : " + e;
                 }
             }
             catch (Exception e)
@@ -490,27 +490,169 @@ namespace CaptivityEvents.Helper
             }
         }
 
-        [CommandLineFunctionality.CommandLineArgumentFunction("fix_clan", "fixes")]
-        public static string FixClan(List<string> strings)
+        [CommandLineFunctionality.CommandLineArgumentFunction("fire_fix", "captivity")]
+        public static string FireFix(List<string> strings)
         {
             try
             {
                 Thread.Sleep(500);
 
-                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.fix_clan \".";
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.fire_fix \".";
 
                 try
                 {
                     Hero.MainHero.Children.ForEach(child =>
                     {
                         child.Clan = Hero.MainHero.Clan;
+                        if (child.CharacterObject.Occupation != Occupation.Lord)
+                        {
+                            PropertyInfo fi = child.CharacterObject.GetType().GetProperty("Occupation", BindingFlags.Instance | BindingFlags.Public);
+                            if (fi != null) fi.SetValue(child.CharacterObject, Occupation.Lord);
+                        }
                     });
 
-                    return "Successfully fixed.";
+                    return "Successfully fixed";
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    return "Failed";
+                    return "Failed : " + e;
+                }
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("reload_images", "captivity")]
+        public static string ReloadImages(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.reload_images \".";
+
+                try
+                {
+                    string[] modulesFound = Utilities.GetModulesNames();
+                    List<string> modulePaths = new List<string>();
+
+                    CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
+
+                    foreach (string moduleID in modulesFound)
+                        try
+                        {
+                            ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
+
+                            if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
+
+                            try
+                            {
+                                if (moduleInfo == null) continue;
+                                modulePaths.Insert(0, Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Id)));
+                            }
+                            catch (Exception)
+                            {
+                                if (moduleInfo != null) CECustomHandler.ForceLogToFile("Failed to Load " + moduleInfo.Name + " Events");
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            CECustomHandler.ForceLogToFile("Failed to fetch DependedModuleIds from " + moduleID);
+                        }
+
+                    // Load Images
+                    string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
+                    string requiredPath = fullPath + "CaptivityRequired";
+
+                    // Get Required
+                    string[] requiredImages = Directory.EnumerateFiles(requiredPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+
+                    // Get All in ModuleLoader
+                    string[] files = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+
+
+                    CESubModule.CEEventImageList.Clear();
+
+                    // Module Image Load
+                    if (modulePaths.Count != 0)
+                        foreach (string filepath in modulePaths)
+                            try
+                            {
+                                string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+
+                                foreach (string file in moduleFiles)
+                                    if (!CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                                        try
+                                        {
+                                            TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+                                            texture.PreloadTexture();
+                                            Texture texture2D = new Texture(new EngineTexture(texture));
+                                            CESubModule.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
+                                        }
+                                    else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            }
+                            catch (Exception) { }
+
+                    // Captivity Location Image Load
+                    try
+                    {
+
+                        foreach (string file in files)
+                        {
+                            if (requiredImages.Contains(file)) continue;
+
+                            if (!CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                                try
+                                {
+                                    TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+                                    texture.PreloadTexture();
+                                    Texture texture2D = new Texture(new EngineTexture(texture));
+                                    CESubModule.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                }
+                                catch (Exception e)
+                                {
+                                    CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
+                                }
+                            else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                        }
+
+                        foreach (string file in requiredImages)
+                        {
+                            if (CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file))) continue;
+
+                            try
+                            {
+                                TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+                                texture.PreloadTexture();
+                                Texture texture2D = new Texture(new EngineTexture(texture));
+                                CESubModule.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                            }
+                            catch (Exception e)
+                            {
+                                CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
+                            }
+                        }
+
+                        new CESubModule().LoadTexture("default", false, true);
+                    }
+                    catch (Exception e)
+                    {
+                        CECustomHandler.ForceLogToFile("Failure to load textures, Critical failure. " + e);
+                    }
+
+                    CECustomHandler.ForceLogToFile("Loaded " + CESubModule.CEEventImageList.Count + " images.");
+
+                    return "Loaded " + CESubModule.CEEventImageList.Count + " images.";
+                }
+                catch (Exception e)
+                {
+                    return "Failed : " + e;
                 }
             }
             catch (Exception e)
@@ -555,7 +697,7 @@ namespace CaptivityEvents.Helper
                         Mission.Current.Scene.GetEntities(ref entities);
                         foreach (GameEntity test in entities)
                         {
-                            text += test.Name + " : " + test.ToString() + "\n"; 
+                            text += test.Name + " : " + test.ToString() + "\n";
                         }
                         CECustomHandler.ForceLogToFile(text);
 
@@ -577,5 +719,7 @@ namespace CaptivityEvents.Helper
                 return "Sosig\n" + e;
             }
         }
+
+
     }
 }
