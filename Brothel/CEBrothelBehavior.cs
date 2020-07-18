@@ -1244,11 +1244,21 @@ namespace CaptivityEvents.Brothel
 
                 int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == settlement.StringId);
 
+                List<string> captivesFreed = new List<string>();
+
+                foreach (CharacterObject captive in _brothelList[index].CaptiveProstitutes)
+                {
+                    if (captive.IsHero)
+                    {
+                        captivesFreed.Add(captive.HeroObject.StringId);
+                    }
+                }
+
                 _brothelList[index].CaptiveProstitutes.Clear();
 
                 foreach (TroopRosterElement troopElement in prisoners)
                 {
-                    if (troopElement.Character.IsHero)
+                    if (troopElement.Character.IsHero && !captivesFreed.Contains(troopElement.Character.HeroObject.StringId))
                     {
                         if (troopElement.Character.HeroObject.GetSkillValue(CESkills.Slavery) < 50)
                         {

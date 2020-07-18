@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement;
@@ -33,7 +34,7 @@ namespace CaptivityEvents.Brothel
             Income = (int) (Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
             IncomeValueText = DetermineIncomeText(Income);
             InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
-            OutputsText = "";
+            OutputsText = new TextObject("{=CEBROTHEL0994}Notable Prostitutes").ToString();
             ActionList.Clear();
             ItemProperties.Clear();
             PopulateActionList();
@@ -61,7 +62,7 @@ namespace CaptivityEvents.Brothel
             ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0988}State").ToString(), _brothel.IsRunning
                                                                     ? new TextObject("{=CEBROTHEL0992}Normal").ToString()
                                                                     : new TextObject("{=CEBROTHEL0991}Closed").ToString()));
-            ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0977}Initial Capital").ToString(), _brothel.Capital.ToString()));
+            ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0977}Initial Capital").ToString(), _brothel.InitialCapital.ToString()));
             ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0990}Capital").ToString(), _brothel.Capital.ToString()));
             ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0989}Daily Wages").ToString(), _brothel.Expense.ToString()));
 
@@ -75,7 +76,7 @@ namespace CaptivityEvents.Brothel
             InputProducts = GameTexts.FindText("str_CE_brothel_description", _brothel.IsRunning
                                                    ? null
                                                    : "inactive").ToString();
-            OutputProducts = "";
+            OutputProducts = string.Join(",", _brothel.CaptiveProstitutes.Where(c => c.IsHero).Select(c => c.HeroObject.Name.ToString()).ToArray());
         }
 
         private void ExecuteBeginWorkshopHint()

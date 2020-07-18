@@ -486,7 +486,6 @@ namespace CaptivityEvents.CampaignBehaviors
                         LogEntry.AddLogEntry(childbirthLogEntry);
                         Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText()));
                     }
-
                     foreach (Hero newbornHero in aliveOffsprings)
                     {
                         ChildbirthLogEntry childbirthLogEntry2 = new ChildbirthLogEntry(mother, newbornHero);
