@@ -88,7 +88,7 @@ namespace CaptivityEvents
         public static float brothelBlack = 10f;
         public static float brothelFadeOut = 2f;
 
-        public static List<CECustom> CEFlags = new List<CECustom>();
+        public static List<CECustom> CECustomModule = new List<CECustom>();
     }
 
 
@@ -104,7 +104,7 @@ namespace CaptivityEvents
         public const string HarmonyId = "com.CE.captivityEvents";
 
         // Images
-        private static readonly Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
+        public static readonly Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
 
         // Last Check on Animation Loop
         private static float lastCheck;
@@ -127,6 +127,8 @@ namespace CaptivityEvents
 
         public void LoadTexture(string name, bool swap = false, bool forcelog = false)
         {
+            if (name.IsStringNoneOrEmpty()) return;
+
             try
             {
                 if (!swap)
@@ -256,7 +258,7 @@ namespace CaptivityEvents
 
             // Load Events
             CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
-            CEPersistence.CEFlags = CECustomHandler.GetFlags();
+            CEPersistence.CECustomModule = CECustomHandler.GetCustom();
 
             // Load Images
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
@@ -372,7 +374,7 @@ namespace CaptivityEvents
 
             try
             {
-                new CESettingsFlags().InitializeSettings(CEPersistence.CEFlags);
+                CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomModule);
                 CECustomHandler.ForceLogToFile("Loaded CESettings: "
                                                + (CESettings.Instance != null && CESettings.Instance.LogToggle
                                                    ? "Logs are enabled."
@@ -463,11 +465,20 @@ namespace CaptivityEvents
 
         protected override void OnGameStart(Game game, IGameStarter gameStarter)
         {
+            CheckBugIssue();
             if (!(game.GameType is Campaign) || !_isLoaded) return;
             game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings_xml.xml");
             InitalizeAttributes(game);
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
             AddBehaviours(campaignStarter);
+        }
+
+        private void CheckBugIssue()
+        {
+            if (PlayerEncounter.Current == null) return;
+            if (PlayerEncounter.EncounteredMobileParty == null) return;
+            if (PlayerEncounter.EncounteredMobileParty.StringId != "Escaped_Captives") return;
+            CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
         }
 
         public override void OnGameEnd(Game game)
@@ -513,22 +524,23 @@ namespace CaptivityEvents
 
         private void AddBehaviours(CampaignGameStarter campaignStarter)
         {
-            campaignStarter.AddBehavior(new CECampaignBehavior());
-            if (CESettings.Instance != null && CESettings.Instance.ProstitutionControl) campaignStarter.AddBehavior(new CEBrothelBehavior());
+            if (CESettings.Instance == null) return;
 
-            if (CESettings.Instance != null && CESettings.Instance.PrisonerEscapeBehavior)
+            campaignStarter.AddBehavior(new CECampaignBehavior());
+            if (CESettings.Instance.ProstitutionControl)
+            {
+                CEBrothelBehavior brothelBehavior = new CEBrothelBehavior();
+                brothelBehavior.OnSessionLaunched(campaignStarter);
+                campaignStarter.AddBehavior(brothelBehavior);
+            }
+            if (CESettings.Instance.PrisonerEscapeBehavior)
             {
                 campaignStarter.AddBehavior(new CEPrisonerEscapeCampaignBehavior());
                 campaignStarter.AddBehavior(new CESetPrisonerFreeBarterBehavior());
             }
-
-            //if (CESettings.Instance.PregnancyToggle)
-            //{
-            //    ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
-            //}
-            if (CESettings.Instance != null && CESettings.Instance.EventCaptiveOn) ReplaceModel<PlayerCaptivityModel, CEPlayerCaptivityModel>(campaignStarter);
-
-            if (CESettings.Instance != null && (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue)) new CEPrisonerDialogue().AddPrisonerLines(campaignStarter);
+            if (CESettings.Instance.EventCaptiveOn) ReplaceModel<PlayerCaptivityModel, CEPlayerCaptivityModel>(campaignStarter);
+            if (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue) new CEPrisonerDialogue().AddPrisonerLines(campaignStarter);
+            //if (CESettings.Instance.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
 
             AddCustomEvents(campaignStarter);
 
@@ -568,7 +580,7 @@ namespace CaptivityEvents
             if (!flag) gameStarter.AddBehavior(Activator.CreateInstance<TChildType>());
         }
 
-        private void AddCustomEvents(CampaignGameStarter gameStarter)
+        public void AddCustomEvents(CampaignGameStarter gameStarter)
         {
             // Waiting Menu Load
             foreach (CEEvent waitingEvent in CEPersistence.CEWaitingList) AddEvent(gameStarter, waitingEvent, CEPersistence.CEEvents);

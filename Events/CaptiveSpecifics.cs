@@ -23,7 +23,7 @@ namespace CaptivityEvents.Events
 
                     if (waitingList != null)
                     {
-                        GameMenu.SwitchToMenu(waitingList);
+                        GameMenu.ActivateGameMenu(waitingList);
                     }
                     else
                     {
@@ -48,7 +48,7 @@ namespace CaptivityEvents.Events
 
         internal void CECaptivityEscapeAttempt(ref MenuCallbackArgs args, int escapeChance = 10)
         {
-            if (MBRandom.Random.Next(100) < escapeChance + new ScoresCalculation().EscapeProwessScore(Hero.MainHero))
+            if (MBRandom.Random.Next(100) > escapeChance + new ScoresCalculation().EscapeProwessScore(Hero.MainHero))
             {
                 if (CESettings.Instance != null && !CESettings.Instance.SexualContent)
                     GameMenu.SwitchToMenu(Hero.MainHero.IsFemale

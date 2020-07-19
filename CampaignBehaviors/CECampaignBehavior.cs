@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using CaptivityEvents.Brothel;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
 using CaptivityEvents.Notifications;
 using Helpers;
+using MountAndBlade.CampaignBehaviors;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -202,14 +205,21 @@ namespace CaptivityEvents.CampaignBehaviors
                     CECustomHandler.ForceLogToFile("CheckEventHourly Failure");
                     CECustomHandler.ForceLogToFile(e.Message + " : " + e);
                 }
-            }   
+            }
 
             try
             {
                 _heroPregnancies.ForEach(item =>
                 {
-                    item.Mother.IsPregnant = true;
-                    CheckOffspringsToDeliver(item);
+                    if (item.Mother != null)
+                    {
+                        item.Mother.IsPregnant = true;
+                        CheckOffspringsToDeliver(item);
+                    }
+                    else
+                    {
+                        item.AlreadyOccured = true;
+                    }
                 });
 
                 _heroPregnancies.RemoveAll(item => item.AlreadyOccured);
@@ -242,11 +252,6 @@ namespace CaptivityEvents.CampaignBehaviors
                 }
             }
         }
-
-
-
-
-
 
         public void RunDailyTick()
         {
@@ -292,7 +297,103 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
-        // Checks
+        /// <summary>
+        /// Behaviour Duplicate found In PregnancyCampaignBehavior 
+        /// </summary>
+        /// <param name="mother"></param>
+        /// <param name="father"></param>
+        /// <param name="isOffspringFemale"></param>
+        /// <param name="age"></param>
+        /// <returns></returns>
+        private Hero DeliverOffSpring(Hero mother, Hero father, bool isOffspringFemale, int age = 1)
+        {
+            CharacterObject characterObject = isOffspringFemale ? mother.CharacterObject : father.CharacterObject;
+
+            // Reflection One
+            MethodInfo mi = typeof(HeroCreator).GetMethod("CreateNewHero", BindingFlags.NonPublic | BindingFlags.Static);
+            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, 0);
+            Hero hero = (Hero)mi.Invoke(null, new object[] { characterObject, age });
+
+            int becomeChildAge = Campaign.Current.Models.AgeModel.BecomeChildAge;
+            CharacterObject characterObject2 = CharacterObject.ChildTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= (float)becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
+
+            if (characterObject2 != null)
+            {
+                Equipment equipment = characterObject2.FirstCivilianEquipment.Clone(false);
+                Equipment equipment2 = new Equipment(false);
+                // TaleWorld's Bug
+                if (hero.BattleEquipment == null)
+                {
+                    PropertyInfo fi = hero.GetType().GetProperty("BattleEquipment", BindingFlags.Instance | BindingFlags.Public);
+                    if (fi != null) fi.SetValue(hero, new Equipment(false));
+                }
+                if (hero.CivilianEquipment == null)
+                {
+                    PropertyInfo fi = hero.GetType().GetProperty("CivilianEquipment", BindingFlags.Instance | BindingFlags.Public);
+                    if (fi != null) fi.SetValue(hero, new Equipment(true));
+                }
+                equipment2.FillFrom(equipment, false);
+                EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment);
+                EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment2);
+            }
+
+            hero.FirstName = NameGenerator.Current.GenerateHeroFirstName(hero, true);
+            hero.CharacterObject.Name = hero.FirstName;
+
+            // Reflection Two
+            mi = hero.HeroDeveloper.GetType().GetMethod("CheckInitialLevel", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (mi != null) mi.Invoke(hero.HeroDeveloper, new object[] { });
+
+            Campaign.Current.GetCampaignBehavior<IHeroCreationCampaignBehavior>().DeriveSkillsFromTraits(hero, characterObject);
+            hero.CharacterObject.IsFemale = isOffspringFemale;
+
+            if (hero.CharacterObject.Occupation != Occupation.Lord)
+            {
+                PropertyInfo fi = hero.CharacterObject.GetType().GetProperty("Occupation", BindingFlags.Instance | BindingFlags.Public);
+                if (fi != null) fi.SetValue(hero.CharacterObject, Occupation.Lord);
+            }
+
+            BodyProperties bodyPropertiesMin = mother.CharacterObject.GetBodyPropertiesMin(false);
+            BodyProperties bodyPropertiesMin2 = father.CharacterObject.GetBodyPropertiesMin(false);
+            int seed = isOffspringFemale ? mother.CharacterObject.GetDefaultFaceSeed(1) : father.CharacterObject.GetDefaultFaceSeed(1);
+            string hairTags = isOffspringFemale ? mother.CharacterObject.HairTags : father.CharacterObject.HairTags;
+            string tattooTags = isOffspringFemale ? mother.CharacterObject.TattooTags : father.CharacterObject.TattooTags;
+            hero.CharacterObject.StaticBodyPropertiesMin = BodyProperties.GetRandomBodyProperties(isOffspringFemale, bodyPropertiesMin, bodyPropertiesMin2, 1, seed, hairTags, father.CharacterObject.BeardTags, tattooTags).StaticProperties;
+            hero.Mother = mother;
+            hero.Father = father;
+            Settlement settlement;
+            if (hero.Mother == Hero.MainHero || hero.Father == Hero.MainHero)
+            {
+                settlement = (hero.Mother.CurrentSettlement ?? Hero.MainHero.HomeSettlement);
+            }
+            else
+            {
+                settlement = hero.Mother.HomeSettlement;
+            }
+            if (settlement == null && hero.Clan.Settlements.Any<Settlement>())
+            {
+                settlement = hero.Clan.Settlements.GetRandomElement<Settlement>();
+            }
+            hero.BornSettlement = settlement;
+            hero.IsNoble = father.IsNoble;
+            if (mother == Hero.MainHero || father == Hero.MainHero)
+            {
+                hero.HasMet = true;
+                hero.Clan = Clan.PlayerClan;
+            }
+            else
+            {
+                hero.Clan = father.Clan;
+            }
+            CampaignEventDispatcher.Instance.OnHeroCreated(hero, true);
+            int heroComesOfAge = Campaign.Current.Models.AgeModel.HeroComesOfAge;
+            return hero;
+        }
+
+        /// <summary>
+        /// Behaviour Duplicate found In PregnancyCampaignBehavior 
+        /// </summary>
+        /// <param name="pregnancy"></param>
         private void CheckOffspringsToDeliver(Pregnancy pregnancy)
         {
             try
@@ -300,7 +401,6 @@ namespace CaptivityEvents.CampaignBehaviors
                 if (!pregnancy.Mother.IsAlive)
                 {
                     pregnancy.AlreadyOccured = true;
-
                     return;
                 }
 
@@ -311,9 +411,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 bool flag = MBRandom.RandomFloat <= pregnancyModel.DeliveringTwinsProbability;
                 List<Hero> aliveOffsprings = new List<Hero>();
 
-                int num = flag
-                    ? 2
-                    : 1;
+                int num = flag ? 2 : 1;
                 int stillbornCount = 0;
 
                 for (int i = 0; i < num; i++)
@@ -323,25 +421,15 @@ namespace CaptivityEvents.CampaignBehaviors
 
                         try
                         {
-                            Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, isOffspringFemale, 0);
+                            Hero item = DeliverOffSpring(pregnancy.Mother, pregnancy.Father, isOffspringFemale, 0);
                             aliveOffsprings.Add(item);
                         }
                         catch (Exception e)
                         {
-                            try
-                            {
-                                CECustomHandler.ForceLogToFile("Bad pregnancy Unknown");
-                                CECustomHandler.ForceLogToFile(e.Message + " : " + e);
-                                Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, false, 0);
-                                aliveOffsprings.Add(item);
-                            }
-                            catch (Exception e2)
-                            {
-                                CECustomHandler.ForceLogToFile("Bad pregnancy Male");
-                                CECustomHandler.ForceLogToFile(e2.Message + " : " + e2);
-                                Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, true, 0);
-                                aliveOffsprings.Add(item);
-                            }
+                            CECustomHandler.ForceLogToFile("Bad pregnancy " + (isOffspringFemale ? "Female" : "Male"));
+                            CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+                            Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, !isOffspringFemale, 0);
+                            aliveOffsprings.Add(item);
                         }
                     }
                     else
@@ -398,7 +486,6 @@ namespace CaptivityEvents.CampaignBehaviors
                         LogEntry.AddLogEntry(childbirthLogEntry);
                         Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText()));
                     }
-
                     foreach (Hero newbornHero in aliveOffsprings)
                     {
                         ChildbirthLogEntry childbirthLogEntry2 = new ChildbirthLogEntry(mother, newbornHero);
@@ -434,7 +521,7 @@ namespace CaptivityEvents.CampaignBehaviors
         {
             try
             {
-                if (returnEquipment.Captive.PartyBelongedToAsPrisoner != null) return;
+                if (returnEquipment.Captive.IsPrisoner || returnEquipment.Captive.PartyBelongedToAsPrisoner != null) return;
 
                 foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
                 {

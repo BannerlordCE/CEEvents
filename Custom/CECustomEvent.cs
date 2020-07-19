@@ -60,7 +60,8 @@ namespace CaptivityEvents.Custom
         RansomAndBribe,
         Trade,
         RebelPrisoners,
-        GainRandomPrisoners
+        GainRandomPrisoners,
+        StripPlayer
     }
 
     [DebuggerStepThrough]
@@ -97,6 +98,8 @@ namespace CaptivityEvents.Custom
         LocationTravellingParty,
         LocationCaravan,
         LocationPartyInTown,
+        LocationPartyInCastle,
+        LocationPartyInVillage,
         LocationDungeon,
         LocationHideout,
         LocationTavern,
@@ -143,7 +146,8 @@ namespace CaptivityEvents.Custom
         SeasonFall,
         CaptivesOutNumber,
         HeroIsFactionLeader,
-        PlayerIsNotBusy
+        PlayerIsNotBusy,
+        StripEnabled,
     }
 
     [DebuggerStepThrough]
@@ -154,6 +158,21 @@ namespace CaptivityEvents.Custom
     {
         [XmlElement("RestrictedListOfFlags")]
         public RestrictedListOfFlags[] RestrictedListOfFlags { get; set; }
+    }
+
+    [DebuggerStepThrough]
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = true)]
+    [Serializable]
+    public class StripSettings
+    {
+        public bool Forced { get; set; }
+
+        public bool QuestEnabled { get; set; }
+
+        public string Clothing { get; set; }
+
+        public string Mount { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -304,6 +323,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("TriggerEvent", IsNullable = true)]
         public TriggerEvent[] TriggerEvents { get; set; }
+
+        [XmlElement("StripSettings", IsNullable = true)]
+        public StripSettings StripSettings { get; set; }
     }
 
     [DebuggerStepThrough]

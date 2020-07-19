@@ -11,6 +11,7 @@ namespace CaptivityEvents.Brothel
     {
         public CEBrothel(Settlement settlement)
         {
+            Level = 1;
             Settlement = settlement;
             Expense = 200;
             InitialCapital = 5000;
@@ -51,5 +52,8 @@ namespace CaptivityEvents.Brothel
 
         [SaveableField(10)]
         public readonly int InitialCapital;
+
+        [SaveableField(11)]
+        public readonly int Level;
     }
 }

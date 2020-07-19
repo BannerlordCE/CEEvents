@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
+using CaptivityEvents.Models;
+using Helpers;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
@@ -144,7 +146,16 @@ namespace CaptivityEvents.Events
 
                     if (!triggerEvent.EventUseConditions.IsStringNoneOrEmpty() && triggerEvent.EventUseConditions == "True")
                     {
-                        string conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                        string conditionMatched = null;
+
+                        if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                        {
+                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                        }
+                        else if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                        {
+                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                        }
 
                         if (conditionMatched != null)
                         {
@@ -172,7 +183,10 @@ namespace CaptivityEvents.Events
                 {
                     int number = MBRandom.Random.Next(0, eventNames.Count - 1);
 
-                    try { GameMenu.SwitchToMenu(eventNames[number].Name); }
+                    try 
+                    { 
+                        GameMenu.SwitchToMenu(eventNames[number].Name); 
+                    }
                     catch (Exception)
                     {
                         CECustomHandler.ForceLogToFile("Couldn't find " + eventNames[number] + " in events.");
@@ -197,6 +211,24 @@ namespace CaptivityEvents.Events
             ConsequenceSoldToLordParty(ref args);
         }
 
+        internal void CERandomCaptivityChange(ref MenuCallbackArgs args, PartyBase party)
+        {
+            try
+            {
+                Hero prisonerCharacter = Hero.MainHero;
+                prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
+                prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
+                while (PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter)) PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, -1, true);
+                party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
+
+                if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(party);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.LogToFile("Failed to exception: " + e.Message + " stacktrace: " + e.StackTrace);
+            }
+        }
+
         private void ConsequenceSoldToNotable(ref MenuCallbackArgs args)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToNotable)) return;
@@ -206,7 +238,10 @@ namespace CaptivityEvents.Events
                 Settlement settlement = PartyBase.MainParty.MobileParty.CurrentSettlement;
                 Hero notable = settlement.Notables.Where(findFirstNotable => !findFirstNotable.IsFemale).GetRandomElement();
                 CECampaignBehavior.ExtraProps.Owner = notable;
-                new CaptiveSpecifics().CECaptivityChange(ref args, settlement.Party);
+
+                PartyBase party = PartyBase.MainParty.MobileParty.CurrentSettlement.Party;
+                CERandomCaptivityChange(ref args, party);
+
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
         }
@@ -218,7 +253,8 @@ namespace CaptivityEvents.Events
             try
             {
                 MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan);
-                new CaptiveSpecifics().CECaptivityChange(ref args, party.Party);
+                CERandomCaptivityChange(ref args, party.Party);
+
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }
         }
@@ -229,8 +265,8 @@ namespace CaptivityEvents.Events
             
             try
             {
-                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty);
-                new CaptiveSpecifics().CECaptivityChange(ref args, party.Party);
+                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty);
+                CERandomCaptivityChange(ref args, party.Party);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Lord"); }
         }
@@ -241,8 +277,8 @@ namespace CaptivityEvents.Events
 
             try
             {
-                PartyBase party = Hero.MainHero.PartyBelongedTo.CurrentSettlement.Party;
-                new CaptiveSpecifics().CECaptivityChange(ref args, party);
+                PartyBase party = PartyBase.MainParty.MobileParty.CurrentSettlement.Party;
+                CERandomCaptivityChange(ref args, party);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
         }
@@ -496,14 +532,14 @@ namespace CaptivityEvents.Events
 
         private void ReqFemaleCaptivesBelow(ref MenuCallbackArgs args)
         {
-            if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) <= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleCaptivesBelow)) return;
+            if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) <= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleCaptivesBelow)) return;
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
             args.IsEnabled = false;
         }
 
         private void ReqFemaleCaptivesAbove(ref MenuCallbackArgs args)
         {
-            if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) >= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleCaptivesAbove)) return;
+            if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) >= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleCaptivesAbove)) return;
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
             args.IsEnabled = false;
         }
@@ -525,14 +561,14 @@ namespace CaptivityEvents.Events
 
         private void ReqMaleCaptivesBelow(ref MenuCallbackArgs args)
         {
-            if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) >= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleCaptivesBelow)) return;
+            if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) >= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleCaptivesBelow)) return;
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
             args.IsEnabled = false;
         }
 
         private void ReqMaleCaptivesAbove(ref MenuCallbackArgs args)
         {
-            if (PartyBase.MainParty.PrisonRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) >= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleCaptivesAbove)) return;
+            if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) >= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleCaptivesAbove)) return;
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
             args.IsEnabled = false;
         }
@@ -583,14 +619,14 @@ namespace CaptivityEvents.Events
 
         private void ReqFemaleTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) <= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleTroopsBelow)) return;
+            if (PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) <= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleTroopsBelow)) return;
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
             args.IsEnabled = false;
         }
 
         private void ReqFemaleTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => troopRosterElement.Character.IsFemale) >= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleTroopsAbove)) return;
+            if (PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) >= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleTroopsAbove)) return;
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
         }
@@ -612,14 +648,14 @@ namespace CaptivityEvents.Events
 
         private void ReqMaleTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) >= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleTroopsBelow)) return;
+            if (PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) >= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleTroopsBelow)) return;
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
             args.IsEnabled = false;
         }
 
         private void ReqMaleTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (PartyBase.MainParty.MemberRoster.Count(troopRosterElement => !troopRosterElement.Character.IsFemale) >= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleTroopsAbove)) return;
+            if (PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; } ) >= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleTroopsAbove)) return;
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
         }
@@ -747,7 +783,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-                MobileParty party = PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.First(mobileParty => { return mobileParty.IsLordParty; });
+                MobileParty party = PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty && !mobileParty.IsMainParty; });
                 if (party != null) MBTextManager.SetTextVariable("BUYERLORDPARTY", party.Name);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Lord"); }
