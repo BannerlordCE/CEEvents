@@ -53,7 +53,7 @@ namespace CaptivityEvents.Events
                 CEHelper.settlementCheck = false;
             }
 
-            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage();
+            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default");
 
             if (PlayerCaptivity.IsCaptive) SetCaptiveTextVariables(ref args);
 

@@ -590,7 +590,7 @@ namespace CaptivityEvents.Events
         }
 
 
-        internal void LoadBackgroundImage(string textureFlag = "default")
+        internal void LoadBackgroundImage(string textureFlag = "")
         {
             try
             {
