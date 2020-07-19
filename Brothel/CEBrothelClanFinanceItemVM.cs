@@ -14,11 +14,12 @@ namespace CaptivityEvents.Brothel
         public CEBrothelClanFinanceItemVM(CEBrothel brothel, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh) : base(onSelection, onRefresh)
         {
             _brothel = brothel;
-
+            
             IncomeTypeAsEnum = IncomeTypes.None;
             SettlementComponent component = _brothel.Settlement.GetComponent<SettlementComponent>();
             WorkshopType workshopType = WorkshopType.Find("pottery_shop");
             WorkshopTypeId = workshopType.StringId;
+
 
             // 1.4.1
             Visual = ((_brothel.Owner.CharacterObject != null) ? new ImageIdentifierVM(CharacterCode.CreateFrom(_brothel.Owner.CharacterObject)) : new ImageIdentifierVM(ImageIdentifierType.Null));
@@ -32,6 +33,7 @@ namespace CaptivityEvents.Brothel
         {
             base.RefreshValues();
 
+
             // 1.4.1
             TextObject textObject = new TextObject("{=CEBROTHEL0984}The brothel of {SETTLEMENT}");
             textObject.SetTextVariable("SETTLEMENT", _brothel.Settlement.Name);
@@ -41,6 +43,7 @@ namespace CaptivityEvents.Brothel
             Name = _brothel.Name.ToString();
             Location = _brothel.Settlement.Name.ToString();
             */
+            
             Income = (int) (Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
             IncomeValueText = DetermineIncomeText(Income);
             InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
