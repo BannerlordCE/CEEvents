@@ -596,7 +596,7 @@ namespace CaptivityEvents.Events
             {
                 string backgroundName = _listedEvent.BackgroundName;
 
-                if (!backgroundName.IsStringNoneOrEmpty())
+                if (backgroundName != null)
                 {
                     CEPersistence.animationPlayEvent = false;
                     new CESubModule().LoadTexture(backgroundName);
