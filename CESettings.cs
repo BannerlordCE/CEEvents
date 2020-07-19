@@ -1,9 +1,9 @@
-﻿using MCM.Abstractions.Attributes;
+﻿using System;
+using System.Collections.Generic;
+using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Settings.Base;
 using MCM.Abstractions.Settings.Base.Global;
-using System;
-using System.Collections.Generic;
 
 namespace CaptivityEvents
 {
@@ -16,24 +16,10 @@ namespace CaptivityEvents
         public override IDictionary<string, Func<BaseSettings>> GetAvailablePresets()
         {
             IDictionary<string, Func<BaseSettings>> basePresets = base.GetAvailablePresets(); // include the 'Default' preset that MCM provides
-            basePresets.Add("Developer Mode", () => new CESettings()
-            {
-                LogToggle = true,
-            });
-            basePresets.Add("Hard Mode", () => new CESettings()
-            {
-                StolenGear = true,
-                StolenGearChance = 30f,
-                BetterOutFitChance = 10,
-                RenownMin = -300f,
+            basePresets.Add("Developer Mode", () => new CESettings {LogToggle = true});
+            basePresets.Add("Hard Mode", () => new CESettings {StolenGear = true, StolenGearChance = 30f, BetterOutFitChance = 10, RenownMin = -300f});
+            basePresets.Add("Easy Mode", () => new CESettings {StolenGear = false, RenownMin = 0f});
 
-            });
-            basePresets.Add("Easy Mode", () => new CESettings()
-            {
-                StolenGear = false,
-                RenownMin = 0f,
-
-            });
             return basePresets;
         }
 
@@ -78,7 +64,7 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public bool EventRandomEnabled { get; set; } = true;
 
-        [SettingPropertyFloatingInteger("{=CESETTINGS1014}Random Events Chance", -1f, 101f, "0", Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1015}If captives in party how often should random events fire over captor.")]
+        [SettingPropertyFloatingInteger("{=CESETTINGS1014}Random Events Ratio", -1f, 101f, "0", Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1015}If captives in party how often should random events fire over captor.")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public float EventRandomFireChance { get; set; } = 20f;
 
@@ -86,15 +72,19 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public bool EventCaptorGearCaptives { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1094}Allow escape during hunt", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1095}Allows prisoners to escape if not killed or wounded in the hunt")]
+        [SettingPropertyBool("{=CESETTINGS1112}Toggle Brothel Prisoner's Clothing (Hero)", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1113}Changes the brothel prisoner's clothing to the settlement's culture.")]
+        [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
+        public bool EventProstituteGear { get; set; } = true;
+
+        [SettingPropertyBool("{=CESETTINGS1094}Allow escape during hunt", Order = 10, RequireRestart = false, HintText = "{=CESETTINGS1095}Allows prisoners to escape if not killed or wounded in the hunt")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public bool HuntLetPrisonersEscape { get; set; } = false;
 
-        [SettingPropertyFloatingInteger("{=CESETTINGS1080}Hunting begins time after mission load", 5f, 60f, "0", Order = 10, RequireRestart = false, HintText = "{=CESETTINGS1081}Seconds to wait until hunt begins")]
+        [SettingPropertyFloatingInteger("{=CESETTINGS1080}Hunting begins time after mission load", 5f, 60f, "0", Order = 11, RequireRestart = false, HintText = "{=CESETTINGS1081}Seconds to wait until hunt begins")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public float HuntBegins { get; set; } = 7f;
 
-        [SettingPropertyInteger("{=CESETTINGS1082}Max amount of prisoners to spawn for hunt", 1, 100, "0", Order = 11, RequireRestart = false, HintText = "{=CESETTINGS1083}Amount of prisoners that will spawn for hunt")]
+        [SettingPropertyInteger("{=CESETTINGS1082}Max amount of prisoners to spawn for hunt", 1, 100, Order = 12, RequireRestart = false, HintText = "{=CESETTINGS1083}Amount of prisoners that will spawn for hunt")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public int AmountOfTroopsForHunt { get; set; } = 15;
 
@@ -102,17 +92,37 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
         public bool PrisonerEscapeBehavior { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1022}Hero Prisoner Escape Default", Order = 2, RequireRestart = true, HintText = "{=CESETTINGS1023}Allow the games default behaviour hero prisoners to escape from player. Depends on Modified Prisoner Escape Behavior.")]
+        [SettingPropertyInteger("{=CESETTINGS1098}Hero Prisoner Chance (Party)", -1, 100, Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1099}Hero prisoner daily escape chance from player's party, -1 means use regular calculation")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
-        public bool PrisonerHeroEscapeAllowed { get; set; } = false;
+        public int PrisonerHeroEscapeChanceParty { get; set; } = 0;
 
-        [SettingPropertyBool("{=CESETTINGS1024}Non-Hero Prisoner Escape Default", Order = 3, RequireRestart = true, HintText = "{=CESETTINGS1025}Allow the games default behaviour regarding non-hero prisoners to escape from player. Depends on Modified Prisoner Escape Behavior.")]
+        [SettingPropertyInteger("{=CESETTINGS1100}Hero Prisoner Chance (Settlement)", -1, 100, Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1101}Hero prisoner daily escape chance from player's settlements, -1 means use regular calculation")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
-        public bool PrisonerNonHeroEscapeAllowed { get; set; } = true;
+        public int PrisonerHeroEscapeChanceSettlement { get; set; } = 0;
 
-        [SettingPropertyBool("{=CESETTINGS1026}Games Default Auto Ransom System", Order = 4, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behaviour regarding auto-ransom. Depends on Modified Prisoner Escape Behavior.")]
+        [SettingPropertyInteger("{=CESETTINGS1102}Hero Prisoner Chance (Other)", -1, 100, Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1103}Hero prisoner daily escape chance from non-player sources, -1 means use regular calculation")]
+        [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
+        public int PrisonerHeroEscapeChanceOther { get; set; } = -1;
+
+        [SettingPropertyInteger("{=CESETTINGS1104}Regular Prisoner Escape Chance (Party)", -1, 100, Order = 5, RequireRestart = false, HintText = "{=CESETTINGS1105}Regular prisoner escape chance from player's party, -1 means use regular calculation, active only when prisoner exceeded")]
+        [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
+        public int PrisonerNonHeroEscapeChanceParty { get; set; } = 0;
+
+        [SettingPropertyInteger("{=CESETTINGS1106}Regular Prisoner Escape Chance (Settlement)", -1, 100, Order = 6, RequireRestart = false, HintText = "{=CESETTINGS1107}Regular prisoner escape chance from player's settlements, -1 means use regular calculation, active only when prisoner exceeded")]
+        [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
+        public int PrisonerNonHeroEscapeChanceSettlement { get; set; } = 0;
+
+        [SettingPropertyInteger("{=CESETTINGS1108}Regular Prisoner Escape Chance (Others)", -1, 100, Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1109}Regular prisoner escape chance from non-player sources, -1 means use regular calculation, active only when prisoner exceeded")]
+        [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
+        public int PrisonerNonHeroEscapeChanceOther { get; set; } = -1;
+
+        [SettingPropertyBool("{=CESETTINGS1026}Games Default Auto Ransom System", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behaviour regarding auto-ransom")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
         public bool PrisonerAutoRansom { get; set; } = false;
+
+        [SettingPropertyBool("{=CESETTINGS1110}Games Default Exceeded Prisoners System", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1111}Allows the games default behaviour regarding exceeded prisoner system, Hourly escape chance based on default 10% or above chances")]
+        [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
+        public bool PrisonerExceeded { get; set; } = false;
 
         // WILL BE REMOVED STARTS
 
@@ -132,21 +142,21 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool ProstitutionControl { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1036}Femdom Events", Order = 5, RequireRestart = false, HintText = "{=CESETTINGS1037}Should Female Domination events be enabled.")]
+        [SettingPropertyBool("{=CESETTINGS1042}Slavery Events", Order = 5, RequireRestart = false, HintText = "{=CESETTINGS1043}Should Slavery events be enabled.")]
+        [SettingPropertyGroup("{=CESETTINGS0096}Events")]
+        public bool SlaveryToggle { get; set; } = true;
+
+        [SettingPropertyBool("{=CESETTINGS1036}Femdom Events", Order = 6, RequireRestart = false, HintText = "{=CESETTINGS1037}Should Female Domination events be enabled.")]
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool FemdomControl { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1038}Bestiality Events", Order = 6, RequireRestart = false, HintText = "{=CESETTINGS1039}Should Bestiality events be enabled.")]
+        [SettingPropertyBool("{=CESETTINGS1038}Bestiality Events", Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1039}Should Bestiality events be enabled.")]
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool BestialityControl { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1040}Romance Events", Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1041}Should Romance events be enabled.")]
+        [SettingPropertyBool("{=CESETTINGS1040}Romance Events", Order = 8, RequireRestart = false, HintText = "{=CESETTINGS1041}Should Romance events be enabled.")]
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool RomanceControl { get; set; } = true;
-
-        [SettingPropertyBool("{=CESETTINGS1042}Slavery Events", Order = 8, RequireRestart = false, HintText = "{=CESETTINGS1043}Should Slavery events be enabled.")]
-        [SettingPropertyGroup("{=CESETTINGS0096}Events")]
-        public bool SlaveryToggle { get; set; } = true;
 
         // WILL BE REMOVED ENDS
 
@@ -166,15 +176,15 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0094}Gear/{=CESETTINGS1093}Quest")]
         public float StolenGearChance { get; set; } = 99.9f;
 
-        [SettingPropertyInteger("{=CESETTINGS1052}Better OutFit Chance", 0, 100, "0", Order = 1, RequireRestart = false, HintText = "{=CESETTINGS1053}Likelyhood of receiving a better outfit (Given based on captors culture).")]
+        [SettingPropertyInteger("{=CESETTINGS1052}Better OutFit Chance", 0, 100, Order = 1, RequireRestart = false, HintText = "{=CESETTINGS1053}Likelyhood of receiving a better outfit (Given based on captors culture).")]
         [SettingPropertyGroup("{=CESETTINGS0094}Gear/{=CESETTINGS1090}Outfit")]
         public int BetterOutFitChance { get; set; } = 25;
 
-        [SettingPropertyInteger("{=CESETTINGS1054}Weapon Chance", 0, 100, "0", Order = 1, RequireRestart = false, HintText = "{=CESETTINGS1055}Likelyhood of receiving an weapon.")]
+        [SettingPropertyInteger("{=CESETTINGS1054}Weapon Chance", 0, 100, Order = 1, RequireRestart = false, HintText = "{=CESETTINGS1055}Likelyhood of receiving an weapon.")]
         [SettingPropertyGroup("{=CESETTINGS0094}Gear/{=CESETTINGS1091}Weapons")]
         public int WeaponChance { get; set; } = 75;
 
-        [SettingPropertyInteger("{=CESETTINGS1056}Better Weapon Chance", 0, 100, "0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1057}Likelyhood of receiving an better weapon.")]
+        [SettingPropertyInteger("{=CESETTINGS1056}Better Weapon Chance", 0, 100, Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1057}Likelyhood of receiving an better weapon.")]
         [SettingPropertyGroup("{=CESETTINGS0094}Gear/{=CESETTINGS1091}Weapons")]
         public int WeaponBetterChance { get; set; } = 20;
 
@@ -182,7 +192,7 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0094}Gear/{=CESETTINGS1091}Weapons")]
         public bool WeaponSkill { get; set; } = true;
 
-        [SettingPropertyInteger("{=CESETTINGS1060}Ranged Weapon Chance", 0, 100, "0", Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1061}Likelyhood of receiving an better ranged weapons.")]
+        [SettingPropertyInteger("{=CESETTINGS1060}Ranged Weapon Chance", 0, 100, Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1061}Likelyhood of receiving an better ranged weapons.")]
         [SettingPropertyGroup("{=CESETTINGS0094}Gear/{=CESETTINGS1091}Weapons")]
         public int RangedBetterChance { get; set; } = 5;
 
@@ -190,7 +200,7 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0094}Gear/{=CESETTINGS1091}Weapons")]
         public bool RangedSkill { get; set; } = true;
 
-        [SettingPropertyInteger("{=CESETTINGS1064}Horse Chance", 0, 100, "0", Order = 1, RequireRestart = false, HintText = "{=CESETTINGS1065}Likelyhood of receiving an horse.")]
+        [SettingPropertyInteger("{=CESETTINGS1064}Horse Chance", 0, 100, Order = 1, RequireRestart = false, HintText = "{=CESETTINGS1065}Likelyhood of receiving an horse.")]
         [SettingPropertyGroup("{=CESETTINGS0094}Gear/{=CESETTINGS1092}Horse")]
         public int HorseChance { get; set; } = 10;
 
@@ -206,7 +216,7 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
         public bool AttractivenessSkill { get; set; } = true;
 
-        [SettingPropertyInteger("{=CESETTINGS1068}Pregnancy Chance", 0, 100, "0", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1069}Likelyhood of impregnation, overrides various events")]
+        [SettingPropertyInteger("{=CESETTINGS1068}Pregnancy Chance", 0, 100, Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1069}Likelyhood of impregnation, overrides various events")]
         [SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
         public int PregnancyChance { get; set; } = 20;
 
@@ -228,6 +238,6 @@ namespace CaptivityEvents
 
         [SettingPropertyBool("{=CESETTINGS1088}Logging Toggle (Slows Down The Game)", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1089}Log the events (Debug Mode)")]
         [SettingPropertyGroup("{=CESETTINGS0095}Other")]
-        public bool LogToggle { get; set; } = false;
+        public bool LogToggle { get; set; }
     }
 }
