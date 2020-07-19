@@ -124,7 +124,7 @@ namespace CaptivityEvents.Events
 
         internal void CaptiveEventGameMenu(MenuCallbackArgs args)
         {
-            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default");
+            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage();
 
             SetCaptiveTextVariables(ref args);
         }

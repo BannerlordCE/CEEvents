@@ -127,6 +127,8 @@ namespace CaptivityEvents
 
         public void LoadTexture(string name, bool swap = false, bool forcelog = false)
         {
+            if (name.IsStringNoneOrEmpty()) return;
+
             try
             {
                 if (!swap)
@@ -578,7 +580,7 @@ namespace CaptivityEvents
             if (!flag) gameStarter.AddBehavior(Activator.CreateInstance<TChildType>());
         }
 
-        private void AddCustomEvents(CampaignGameStarter gameStarter)
+        public void AddCustomEvents(CampaignGameStarter gameStarter)
         {
             // Waiting Menu Load
             foreach (CEEvent waitingEvent in CEPersistence.CEWaitingList) AddEvent(gameStarter, waitingEvent, CEPersistence.CEEvents);

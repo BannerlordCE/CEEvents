@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using CaptivityEvents.Custom;
+using System.Collections.Generic;
 using System.Linq;
-using CaptivityEvents.Custom;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 
@@ -10,17 +10,20 @@ namespace CaptivityEvents.Events
     {
 
         // Waiting Menus
-        public static string CEWaitingList()
-        {
-            return new WaitingList().CEWaitingList();
-        }
+        public static string CEWaitingList() => new WaitingList().CEWaitingList();
 
         // Event Loaders
         public static void CELoadRandomEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
 
-            gameStarter.AddGameMenu(listedEvent.Name, listedEvent.Text, new RandomMenuCallBackDelegate(listedEvent).RandomEventGameMenu);
+            gameStarter.AddGameMenu(
+                listedEvent.Name,
+                listedEvent.Text,
+                new RandomMenuCallBackDelegate(listedEvent).RandomEventGameMenu,
+                TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
+                GameMenu.MenuFlags.none,
+                "CEEVENTS");
 
             if (listedEvent.Options == null) return; // Leave if no Options
 
@@ -29,7 +32,13 @@ namespace CaptivityEvents.Events
             foreach (Option op in sorted)
             {
                 RandomMenuCallBackDelegate mcb = new RandomMenuCallBackDelegate(listedEvent, op, eventList);
-                gameStarter.AddGameMenuOption(listedEvent.Name, listedEvent.Name + op.Order, op.OptionText, mcb.RandomEventConditionMenuOption, mcb.RandomEventConsequenceMenuOption, false, variablesLoader.GetIntFromXML(op.Order));
+                gameStarter.AddGameMenuOption(
+                    listedEvent.Name,
+                    listedEvent.Name + op.Order,
+                    op.OptionText,
+                    mcb.RandomEventConditionMenuOption,
+                    mcb.RandomEventConsequenceMenuOption,
+                    false, variablesLoader.GetIntFromXML(op.Order));
             }
         }
 
@@ -47,11 +56,21 @@ namespace CaptivityEvents.Events
                     cb.CaptiveConditionWaitGameMenu,
                     cb.CaptiveConsequenceWaitGameMenu,
                     cb.CaptiveTickWaitGameMenu,
-                    GameMenu.MenuAndOptionType.WaitMenuHideProgressAndHoursOption);
+                    GameMenu.MenuAndOptionType.WaitMenuHideProgressAndHoursOption,
+                    TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
+                    0,
+                    GameMenu.MenuFlags.none,
+                    "CEEVENTS");
             }
             else
             {
-                gameStarter.AddGameMenu(listedEvent.Name, listedEvent.Text, cb.CaptiveEventGameMenu);
+                gameStarter.AddGameMenu(
+                    listedEvent.Name,
+                    listedEvent.Text,
+                    cb.CaptiveEventGameMenu,
+                    TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
+                    GameMenu.MenuFlags.none,
+                    "CEEVENTS");
             }
 
             if (listedEvent.Options == null) return; // Leave if no Options
@@ -61,7 +80,14 @@ namespace CaptivityEvents.Events
             foreach (Option op in sorted)
             {
                 CaptiveMenuCallBackDelegate mcb = new CaptiveMenuCallBackDelegate(listedEvent, op, eventList);
-                gameStarter.AddGameMenuOption(listedEvent.Name, listedEvent.Name + op.Order, op.OptionText, mcb.CaptiveEventOptionGameMenu, mcb.CaptiveEventOptionConsequenceGameMenu, false, variablesLoader.GetIntFromXML(op.Order));
+                gameStarter.AddGameMenuOption(
+                    listedEvent.Name,
+                    listedEvent.Name + op.Order,
+                    op.OptionText,
+                    mcb.CaptiveEventOptionGameMenu,
+                    mcb.CaptiveEventOptionConsequenceGameMenu,
+                    false,
+                    variablesLoader.GetIntFromXML(op.Order));
             }
         }
 
@@ -69,14 +95,28 @@ namespace CaptivityEvents.Events
         {
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
 
-            gameStarter.AddGameMenu(listedEvent.Name, listedEvent.Text, new CaptorMenuCallBackDelegate(listedEvent).CaptorEventWaitGameMenu);
+            gameStarter.AddGameMenu(
+                listedEvent.Name,
+                listedEvent.Text,
+                new CaptorMenuCallBackDelegate(listedEvent).CaptorEventWaitGameMenu,
+                TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
+                GameMenu.MenuFlags.none,
+                "CEEVENTS");
 
             List<Option> sorted = listedEvent.Options.OrderBy(item => variablesLoader.GetIntFromXML(item.Order)).ToList(); // Sort Options
 
             foreach (Option op in sorted)
             {
                 CaptorMenuCallBackDelegate mcb = new CaptorMenuCallBackDelegate(listedEvent, op, eventList);
-                gameStarter.AddGameMenuOption(listedEvent.Name, listedEvent.Name + op.Order, op.OptionText, mcb.CaptorEventOptionGameMenu, mcb.CaptorConsequenceWaitGameMenu, false, variablesLoader.GetIntFromXML(op.Order));
+                gameStarter.AddGameMenuOption(
+                    listedEvent.Name,
+                    listedEvent.Name + op.Order,
+                    op.OptionText,
+                    mcb.CaptorEventOptionGameMenu,
+                    mcb.CaptorConsequenceWaitGameMenu,
+                    false,
+                    variablesLoader.GetIntFromXML(op.Order),
+                    false);
             }
         }
     }

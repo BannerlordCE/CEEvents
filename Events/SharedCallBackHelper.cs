@@ -590,13 +590,13 @@ namespace CaptivityEvents.Events
         }
 
 
-        internal void LoadBackgroundImage(string textureFlag = "default_random")
+        internal void LoadBackgroundImage(string textureFlag = "default")
         {
             try
             {
                 string backgroundName = _listedEvent.BackgroundName;
 
-                if (!backgroundName.IsStringNoneOrEmpty())
+                if (backgroundName != null)
                 {
                     CEPersistence.animationPlayEvent = false;
                     new CESubModule().LoadTexture(backgroundName);

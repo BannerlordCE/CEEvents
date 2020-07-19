@@ -661,6 +661,185 @@ namespace CaptivityEvents.Helper
             }
         }
 
+        [CommandLineFunctionality.CommandLineArgumentFunction("reload_events", "captivity")]
+        public static string ReloadEvents(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.reload_events \".";
+
+                try
+                {
+                    string[] modulesFound = Utilities.GetModulesNames();
+                    List<string> modulePaths = new List<string>();
+
+                    CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
+
+                    foreach (string moduleID in modulesFound)
+                        try
+                        {
+                            ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
+
+                            if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
+
+                            try
+                            {
+                                if (moduleInfo == null) continue;
+                                modulePaths.Insert(0, Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Id)));
+                            }
+                            catch (Exception)
+                            {
+                                if (moduleInfo != null) CECustomHandler.ForceLogToFile("Failed to Load " + moduleInfo.Name + " Events");
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            CECustomHandler.ForceLogToFile("Failed to fetch DependedModuleIds from " + moduleID);
+                        }
+
+                    // Events Removing
+                    MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
+                    if (mi != null) mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
+
+                    // Unload 
+                    CEPersistence.CEEvents.Clear();
+                    CEPersistence.CEEventList.Clear();
+                    CEPersistence.CEWaitingList.Clear();
+                    CEPersistence.CECallableEvents.Clear();
+
+                    // Load Events
+                    CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
+
+                    CEHelper.brothelFlagFemale = false;
+                    CEHelper.brothelFlagMale = false;
+
+                    // Go Through Events
+                    foreach (CEEvent _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !_listedEvent.Name.IsStringNoneOrEmpty()))
+                    {
+                        if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEPersistence.CEEvents.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 1) continue;
+
+                        if (!CEHelper.brothelFlagFemale)
+                            if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale))
+                                CEHelper.brothelFlagFemale = true;
+
+                        if (!CEHelper.brothelFlagMale)
+                            if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale))
+                                CEHelper.brothelFlagMale = true;
+
+                        if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
+                        {
+                            CEPersistence.CEWaitingList.Add(_listedEvent);
+                        }
+                        else
+                        {
+                            if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent)) CEPersistence.CECallableEvents.Add(_listedEvent);
+
+                            CEPersistence.CEEventList.Add(_listedEvent);
+                        }
+                    }
+
+                    new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager, Campaign.Current.CampaignGameLoadingType == Campaign.GameLoadingType.Tutorial));
+
+                    // Load Images
+                    string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
+                    string requiredPath = fullPath + "CaptivityRequired";
+
+                    // Get Required
+                    string[] requiredImages = Directory.EnumerateFiles(requiredPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+
+                    // Get All in ModuleLoader
+                    string[] files = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+
+                    CESubModule.CEEventImageList.Clear();
+
+                    // Module Image Load
+                    if (modulePaths.Count != 0)
+                        foreach (string filepath in modulePaths)
+                            try
+                            {
+                                string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+
+                                foreach (string file in moduleFiles)
+                                    if (!CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                                        try
+                                        {
+                                            TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+                                            texture.PreloadTexture();
+                                            Texture texture2D = new Texture(new EngineTexture(texture));
+                                            CESubModule.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
+                                        }
+                                    else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            }
+                            catch (Exception) { }
+
+                    // Captivity Location Image Load
+                    try
+                    {
+
+                        foreach (string file in files)
+                        {
+                            if (requiredImages.Contains(file)) continue;
+
+                            if (!CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                                try
+                                {
+                                    TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+                                    texture.PreloadTexture();
+                                    Texture texture2D = new Texture(new EngineTexture(texture));
+                                    CESubModule.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                }
+                                catch (Exception e)
+                                {
+                                    CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
+                                }
+                            else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                        }
+
+                        foreach (string file in requiredImages)
+                        {
+                            if (CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file))) continue;
+
+                            try
+                            {
+                                TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+                                texture.PreloadTexture();
+                                Texture texture2D = new Texture(new EngineTexture(texture));
+                                CESubModule.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                            }
+                            catch (Exception e)
+                            {
+                                CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
+                            }
+                        }
+
+                        new CESubModule().LoadTexture("default", false, true);
+                    }
+                    catch (Exception e)
+                    {
+                        CECustomHandler.ForceLogToFile("Failure to load textures, Critical failure. " + e);
+                    }
+
+                    CECustomHandler.ForceLogToFile("Loaded " + CESubModule.CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.");
+
+                    return "Loaded " + CESubModule.CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.";
+                }
+                catch (Exception e)
+                {
+                    return "Failed : " + e;
+                }
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
         [CommandLineFunctionality.CommandLineArgumentFunction("play_sound", "captivity")]
         public static string PlaySound(List<string> strings)
         {
