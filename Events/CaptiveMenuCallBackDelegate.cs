@@ -191,7 +191,6 @@ namespace CaptivityEvents.Events
             ConsequenceSpecificCaptor();
             ConsequenceSoldEvents(ref args);
             ConsequenceGainRandomPrisoners();
-            ConsequenceEscaping();
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor) && PlayerCaptivity.CaptorParty.NumberOfAllMembers == 1) ConsequenceKillCaptor();
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner)) _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
@@ -205,18 +204,6 @@ namespace CaptivityEvents.Events
 
 
         #region private
-
-        private void ConsequenceEscaping()
-        {
-            if (!CESettings.Instance.SexualContent)
-                GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
-                                          ? "CE_captivity_escape_success"
-                                          : "CE_captivity_escape_success_male");
-            else
-                GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
-                                          ? "CE_captivity_sexual_escape_success"
-                                          : "CE_captivity_sexual_escape_success_male");
-        }
 
         private void ConsequenceKillCaptor()
         {
