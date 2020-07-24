@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -406,7 +407,12 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceSpecificCaptor()
         {
-            if (PlayerCaptivity.CaptorParty == null) { CECustomHandler.ForceLogToFile("Using Wrong Category for the Event of " + _listedEvent.Name.ToString()); }
+            if (PlayerCaptivity.CaptorParty == null) { 
+                CECustomHandler.ForceLogToFile("Using Wrong Category for the Event of " + _listedEvent.Name.ToString());
+                InformationManager.DisplayMessage(new InformationMessage("Using Wrong Category for the Event of " + _listedEvent.Name.ToString(), Colors.Red));
+                GameMenu.ExitToLast();
+                return;
+            }
             if (PlayerCaptivity.CaptorParty.IsSettlement || !PlayerCaptivity.CaptorParty.IsMobile || PlayerCaptivity.CaptorParty.MobileParty.LeaderHero == null) return;
 
             ConsequenceSpecificCaptorRelations();

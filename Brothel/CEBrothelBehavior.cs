@@ -174,7 +174,8 @@ namespace CaptivityEvents.Brothel
                 Campaign.Current.GameMenuManager.SetNextMenu("town_brothel");
                 Campaign.Current.GameMenuManager.NextLocation = null;
                 Campaign.Current.GameMenuManager.PreviousLocation = null;
-            } catch (Exception) { }
+            }
+            catch (Exception) { }
 
             return true;
         }
@@ -240,7 +241,7 @@ namespace CaptivityEvents.Brothel
             catch (Exception)
             {
                 CECustomHandler.ForceLogToFile("Failed to load LocationComplex Brothel Statue ");
-            }     
+            }
 
             if (CheckAndOpenNextLocation(args)) return;
             args.MenuTitle = new TextObject("{=CEEVENTS1099}Brothel");
@@ -275,7 +276,8 @@ namespace CaptivityEvents.Brothel
                 PlayerEncounter.LocationEncounter.CreateAndOpenMissionController(Campaign.Current.GameMenuManager.NextLocation);
                 Campaign.Current.GameMenuManager.NextLocation = null;
                 Campaign.Current.GameMenuManager.PreviousLocation = null;
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 GameMenu.SwitchToMenu("town_brothel");
             }
@@ -519,12 +521,19 @@ namespace CaptivityEvents.Brothel
 
             int num3 = (int)(num * 0.3f);
 
+            int num4 = num - num2;
+
             List<CharacterObject> brothelPrisoners = FetchBrothelPrisoners(settlement);
             foreach (CharacterObject brothelPrisoner in brothelPrisoners)
             {
-                num3--;
+                if (brothelPrisoner.IsHero) num3--;
+                else num4--;
             }
-            if (num3 > 0) LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateTownsWomanForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num3);
+
+            if (num3 > 0)
+            {
+                LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateTownsWomanForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, Math.Max(num4, num3));
+            }
         }
 
         #endregion
@@ -1116,7 +1125,7 @@ namespace CaptivityEvents.Brothel
                     {
                         if (_brothelList[i].CaptiveProstitutes[y].IsHero)
                         {
-                            if (_brothelList[i].CaptiveProstitutes[y].HeroObject.GetSkillValue(prostitutionSkill) > 50) 
+                            if (_brothelList[i].CaptiveProstitutes[y].HeroObject.GetSkillValue(prostitutionSkill) > 50)
                                 new Dynamics().RenownModifier(MBRandom.RandomInt(-20, -5), _brothelList[i].CaptiveProstitutes[y].HeroObject);
 
                             _brothelList[i].CaptiveProstitutes[y].HeroObject.SetSkillValue(prostitutionSkill, MBRandom.RandomInt(10, 20));

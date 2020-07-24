@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
-using CaptivityEvents.Helper;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -126,7 +125,7 @@ namespace CaptivityEvents.Events
                         if (triggeredEvent == null)
                         {
                             CECustomHandler.ForceLogToFile("Couldn't find " + triggerEvent.EventName + " in events.");
-
+                            InformationManager.DisplayMessage(new InformationMessage("Couldn't find " + triggerEvent.EventName + " in events.", Colors.Red));           
                             continue;
                         }
 
@@ -175,6 +174,7 @@ namespace CaptivityEvents.Events
                         catch (Exception)
                         {
                             CECustomHandler.ForceLogToFile("Couldn't find " + eventNames[number] + " in events.");
+                            InformationManager.DisplayMessage(new InformationMessage("Couldn't find " + eventNames[number] + " in events.", Colors.Red));
                             new CaptorSpecifics().CECaptorContinue(args);
                         }
                     }
@@ -197,6 +197,7 @@ namespace CaptivityEvents.Events
                 catch (Exception)
                 {
                     CECustomHandler.ForceLogToFile("Couldn't find " + _option.TriggerEventName + " in events.");
+                    InformationManager.DisplayMessage(new InformationMessage("Couldn't find " + _option.TriggerEventName + " in events.", Colors.Red));
                     new CaptorSpecifics().CECaptorContinue(args);
                 }
             }

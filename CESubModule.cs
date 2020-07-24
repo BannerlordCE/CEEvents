@@ -714,40 +714,36 @@ namespace CaptivityEvents
                 {
                     if (Hero.MainHero.IsFemale)
                     {
-                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu") : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
+                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale 
+                            ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu") 
+                            : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
                         triggeredEvent.Captive = CEPersistence.captiveToPlay;
 
-                        if (!mapState.AtMenu)
-                        {
-                            GameMenu.ActivateGameMenu("prisoner_wait");
-                        }
-                        else
+                        if (mapState.AtMenu)
                         {
                             CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
                             CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                         }
 
-                        GameMenu.SwitchToMenu(triggeredEvent.Name);
+                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
                         mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
 
                     }
                     else
                     {
 
-                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu") : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
+                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale 
+                            ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu") 
+                            : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
                         triggeredEvent.Captive = CEPersistence.captiveToPlay;
 
-                        if (!mapState.AtMenu)
-                        {
-                            GameMenu.ActivateGameMenu("prisoner_wait");
-                        }
-                        else
+                        if (mapState.AtMenu)
                         {
                             CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
                             CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                         }
 
-                        GameMenu.SwitchToMenu(triggeredEvent.Name);
+                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
                         mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
                     }
                 }
