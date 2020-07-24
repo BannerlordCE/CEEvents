@@ -335,8 +335,8 @@ namespace CaptivityEvents
                 }
 
                 CECustomHandler.ForceLogToFile("Loading Notification Sprites");
-                // Load the Notifications Sprite
-                // 1.4.1 Checked
+
+                // Load the Notifications Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.4.3)
                 SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
@@ -465,8 +465,9 @@ namespace CaptivityEvents
 
         protected override void OnGameStart(Game game, IGameStarter gameStarter)
         {
+            if (!(game.GameType is Campaign)) return;
             CheckBugIssue();
-            if (!(game.GameType is Campaign) || !_isLoaded) return;
+            if (!_isLoaded) return;
             game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings_xml.xml");
             InitalizeAttributes(game);
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
@@ -475,10 +476,17 @@ namespace CaptivityEvents
 
         private void CheckBugIssue()
         {
-            if (PlayerEncounter.Current == null) return;
-            if (PlayerEncounter.EncounteredMobileParty == null) return;
-            if (PlayerEncounter.EncounteredMobileParty.StringId != "Escaped_Captives") return;
-            CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
+            try
+            {
+                if (PlayerEncounter.Current == null) return;
+                if (PlayerEncounter.EncounteredMobileParty == null) return;
+                if (PlayerEncounter.EncounteredMobileParty.StringId != "Escaped_Captives") return;
+                CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
+            }
+            catch (Exception)
+            {
+                return;
+            }
         }
 
         public override void OnGameEnd(Game game)
@@ -652,131 +660,21 @@ namespace CaptivityEvents
             if (Game.Current == null || Game.Current.GameStateManager == null) return;
 
             // CaptiveState
-            if (CEPersistence.captivePlayEvent)
-            {
-                // Dungeon
-                if (CEPersistence.dungeonState != CEPersistence.DungeonState.Normal && Game.Current.GameStateManager.ActiveState is MissionState missionStateDungeon && missionStateDungeon.CurrentMission.IsLoadingFinished)
-                    switch (CEPersistence.dungeonState)
-                    {
-                        case CEPersistence.DungeonState.StartWalking:
-                            if (CharacterObject.OneToOneConversationCharacter == null)
-                            {
-                                try
-                                {
-                                    MissionCameraFadeView behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
-
-                                    Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
-
-                                    WorldPosition worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
-
-                                    if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
-                                    {
-                                        CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
-                                        dungeonFadeOut = 2f;
-                                    }
-                                    else
-                                    {
-                                        CEPersistence.agentTalkingTo.DisableScriptedMovement();
-                                        CEPersistence.agentTalkingTo.HandleStopUsingAction();
-                                        CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
-                                        dungeonFadeOut = 2f;
-                                    }
-
-                                    behaviour.BeginFadeOut(dungeonFadeOut);
-                                }
-                                catch (Exception)
-                                {
-                                    CECustomHandler.ForceLogToFile("Failed MissionCameraFadeView.");
-                                }
-
-                                brothelTimerOne = missionStateDungeon.CurrentMission.Time + dungeonFadeOut;
-                                CEPersistence.dungeonState = CEPersistence.DungeonState.FadeIn;
-                            }
-
-                            break;
-                        case CEPersistence.DungeonState.FadeIn:
-                            if (brothelTimerOne < missionStateDungeon.CurrentMission.Time)
-                            {
-                                CEPersistence.agentTalkingTo.ResetAI();
-                                CEPersistence.dungeonState = CEPersistence.DungeonState.Normal;
-                                Mission.Current.EndMission();
-                            }
-
-                            break;
-                        case CEPersistence.DungeonState.Normal:
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-
-                // Party Menu -> Map State
-                if (Game.Current.GameStateManager.ActiveState is PartyState) Game.Current.GameStateManager.PopState();
-
-                // Map State -> Play Menu
-                if (Game.Current.GameStateManager.ActiveState is MapState mapState)
-                {
-                    CEPersistence.captivePlayEvent = false;
-
-                    if (Hero.MainHero.IsFemale)
-                    {
-
-                        try
-                        {
-                            CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu") : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
-                            triggeredEvent.Captive = CEPersistence.captiveToPlay;
-
-                            if (!mapState.AtMenu)
-                            {
-                                GameMenu.ActivateGameMenu("prisoner_wait");
-                            }
-                            else
-                            {
-                                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
-                                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                            }
-
-                            GameMenu.SwitchToMenu(triggeredEvent.Name);
-                            mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
-                        }
-                        catch (Exception)
-                        {
-                            CECustomHandler.ForceLogToFile("Missing : CE_captor_female_sexual_menu/CE_captor_female_sexual_menu_m");
-                        }
-
-
-                    }
-                    else
-                    {
-
-                        try
-                        {
-                            CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu") : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
-                            triggeredEvent.Captive = CEPersistence.captiveToPlay;
-
-                            if (!mapState.AtMenu)
-                            {
-                                GameMenu.ActivateGameMenu("prisoner_wait");
-                            }
-                            else
-                            {
-                                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
-                                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                            }
-
-                            GameMenu.SwitchToMenu(triggeredEvent.Name);
-                            mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
-                        }
-                        catch (Exception)
-                        {
-                            CECustomHandler.ForceLogToFile("Missing : CE_captor_male_sexual_menu/CE_captor_male_sexual_menu_m");
-                        }
-
-                    }
-
-                    CEPersistence.captiveToPlay = null;
-                }
-            }
+            CaptiveStateCheck();
 
             // Animated Background Menus
+            AnimationStateCheck();
+
+            // Brothel Event To Play
+            BrothelStateCheck();
+
+            // Hunt Event To Play
+            HuntStateCheck();
+        }
+
+        // TODO MOVE TO PROPER LISTENERS AND AWAY FROM ONAPPLICATIONTICK
+        private void AnimationStateCheck()
+        {
             if (CEPersistence.animationPlayEvent && Game.Current.GameStateManager.ActiveState is MapState)
                 try
                 {
@@ -794,9 +692,141 @@ namespace CaptivityEvents
                 {
                     CEPersistence.animationPlayEvent = false;
                 }
+        }
 
-            // Brothel Event To Play
-            if (CEPersistence.brothelState != CEPersistence.BrothelState.Normal && Game.Current.GameStateManager.ActiveState is MissionState missionStateBrothel && missionStateBrothel.CurrentMission.IsLoadingFinished)
+        private void CaptiveStateCheck()
+        {
+            // CaptiveState
+            if (!CEPersistence.captivePlayEvent) return;
+
+            // Dungeon
+            DungeonStateCheck();
+
+            // Party Menu -> Map State
+            if (Game.Current.GameStateManager.ActiveState is PartyState) Game.Current.GameStateManager.PopState();
+
+            // Map State -> Play Menu
+            if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+            {
+                CEPersistence.captivePlayEvent = false;
+
+                try
+                {
+                    if (Hero.MainHero.IsFemale)
+                    {
+                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu") : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
+                        triggeredEvent.Captive = CEPersistence.captiveToPlay;
+
+                        if (!mapState.AtMenu)
+                        {
+                            GameMenu.ActivateGameMenu("prisoner_wait");
+                        }
+                        else
+                        {
+                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
+                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                        }
+
+                        GameMenu.SwitchToMenu(triggeredEvent.Name);
+                        mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
+
+                    }
+                    else
+                    {
+
+                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu") : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
+                        triggeredEvent.Captive = CEPersistence.captiveToPlay;
+
+                        if (!mapState.AtMenu)
+                        {
+                            GameMenu.ActivateGameMenu("prisoner_wait");
+                        }
+                        else
+                        {
+                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
+                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                        }
+
+                        GameMenu.SwitchToMenu(triggeredEvent.Name);
+                        mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
+                    }
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.ForceLogToFile(
+                        Hero.MainHero.IsFemale
+                        ? "Missing : CE_captor_female_sexual_menu/CE_captor_female_sexual_menu_m"
+                        : "Missing : CE_captor_male_sexual_menu/CE_captor_male_sexual_menu_m");
+                }
+
+                CEPersistence.captiveToPlay = null;
+            }
+        }
+
+        private void DungeonStateCheck()
+        {
+            if (CEPersistence.dungeonState == CEPersistence.DungeonState.Normal) return;
+
+            // Dungeon
+            if (Game.Current.GameStateManager.ActiveState is MissionState missionStateDungeon && missionStateDungeon.CurrentMission.IsLoadingFinished)
+                switch (CEPersistence.dungeonState)
+                {
+                    case CEPersistence.DungeonState.StartWalking:
+                        if (CharacterObject.OneToOneConversationCharacter == null)
+                        {
+                            try
+                            {
+                                MissionCameraFadeView behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
+
+                                Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
+
+                                WorldPosition worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
+
+                                if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
+                                {
+                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                    dungeonFadeOut = 2f;
+                                }
+                                else
+                                {
+                                    CEPersistence.agentTalkingTo.DisableScriptedMovement();
+                                    CEPersistence.agentTalkingTo.HandleStopUsingAction();
+                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                    dungeonFadeOut = 2f;
+                                }
+
+                                behaviour.BeginFadeOut(dungeonFadeOut);
+                            }
+                            catch (Exception)
+                            {
+                                CECustomHandler.ForceLogToFile("Failed MissionCameraFadeView.");
+                            }
+
+                            brothelTimerOne = missionStateDungeon.CurrentMission.Time + dungeonFadeOut;
+                            CEPersistence.dungeonState = CEPersistence.DungeonState.FadeIn;
+                        }
+
+                        break;
+                    case CEPersistence.DungeonState.FadeIn:
+                        if (brothelTimerOne < missionStateDungeon.CurrentMission.Time)
+                        {
+                            CEPersistence.agentTalkingTo.ResetAI();
+                            CEPersistence.dungeonState = CEPersistence.DungeonState.Normal;
+                            Mission.Current.EndMission();
+                        }
+
+                        break;
+                    case CEPersistence.DungeonState.Normal:
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+        }
+
+        private void BrothelStateCheck()
+        {
+            if (CEPersistence.brothelState == CEPersistence.BrothelState.Normal) return;
+
+            if (Game.Current.GameStateManager.ActiveState is MissionState missionStateBrothel && missionStateBrothel.CurrentMission.IsLoadingFinished)
                 switch (CEPersistence.brothelState)
                 {
                     case CEPersistence.BrothelState.Start:
@@ -897,7 +927,10 @@ namespace CaptivityEvents
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+        }
 
+        private void HuntStateCheck()
+        {
             // Hunt Event To Play
             if (CEPersistence.huntState == CEPersistence.HuntState.Normal) return;
 

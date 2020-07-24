@@ -21,11 +21,12 @@ namespace CaptivityEvents.Brothel
             WorkshopTypeId = workshopType.StringId;
 
             // 1.4.1
-            Visual = ((_brothel.Owner.CharacterObject != null) ? new ImageIdentifierVM(CharacterCode.CreateFrom(_brothel.Owner.CharacterObject)) : new ImageIdentifierVM(ImageIdentifierType.Null));
-            // 1.4.2
             /*
-            ImageName = component != null ? component.WaitMeshName : "";
+            Visual = ((_brothel.Owner.CharacterObject != null) ? new ImageIdentifierVM(CharacterCode.CreateFrom(_brothel.Owner.CharacterObject)) : new ImageIdentifierVM(ImageIdentifierType.Null));
             */
+            // 1.4.2
+            ImageName = component != null ? component.WaitMeshName : "";
+            
         }
 
         public override void RefreshValues()
@@ -33,14 +34,14 @@ namespace CaptivityEvents.Brothel
             base.RefreshValues();
 
             // 1.4.1
+            /*
             TextObject textObject = new TextObject("{=CEBROTHEL0984}The brothel of {SETTLEMENT}");
             textObject.SetTextVariable("SETTLEMENT", _brothel.Settlement.Name);
             Name = textObject.ToString();
-            // 1.4.2
-            /*
-            Name = _brothel.Name.ToString();
-            Location = _brothel.Settlement.Name.ToString();
             */
+            // 1.4.2
+            Name = _brothel.Name.ToString();
+            Location = _brothel.Settlement.Name.ToString(); 
             Income = (int) (Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
             IncomeValueText = DetermineIncomeText(Income);
             InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
