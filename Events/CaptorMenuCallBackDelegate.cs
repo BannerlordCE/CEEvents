@@ -33,7 +33,6 @@ namespace CaptivityEvents.Events
         internal void CaptorEventWaitGameMenu(MenuCallbackArgs args)
         {
             SetNames(ref args);
-
             new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("captor_default");
         }
 
@@ -56,7 +55,6 @@ namespace CaptivityEvents.Events
             ReqSkill(ref args);
             ReqCaptorSkill(ref args);
             ReqGold(ref args);
-
             return true;
         }
 

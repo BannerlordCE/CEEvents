@@ -92,7 +92,7 @@ namespace CaptivityEvents.Models
 
             if (PlayerCaptivity.CaptorParty.IsSettlement && PlayerCaptivity.CaptorParty.MapFaction == Hero.MainHero.Clan)
             {
-                int prostituteSkillFlag = Hero.MainHero.GetSkillValue(CESkills.IsProstitute);
+                int prostituteSkillFlag = Hero.MainHero.GetSkillValue(CESkills.Prostitution);
 
                 if (prostituteSkillFlag < 50)
                 {

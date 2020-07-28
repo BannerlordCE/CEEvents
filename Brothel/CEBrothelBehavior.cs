@@ -104,36 +104,49 @@ namespace CaptivityEvents.Brothel
             ManageProstitutes();
         }
 
+        /// <summary>
+        /// Takes Example from OpenScreenAsManagePrisoners
+        /// </summary>
         private static void ManageProstitutes()
         {
             PartyScreenLogic _serverPartyScreenLogic = new PartyScreenLogic();
 
-            // Reflection
-            FieldInfo fi = PartyScreenManager.Instance.GetType().GetField("_currentMode", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (fi != null) fi.SetValue(PartyScreenManager.Instance, PartyScreenMode.PrisonerManage);
-
-            TroopRoster prisonRoster = new TroopRoster();
-            List<CharacterObject> prisoners = FetchBrothelPrisoners(Hero.MainHero.CurrentSettlement);
-            foreach (CharacterObject prisoner in prisoners)
+            try
             {
-                prisonRoster.AddToCounts(prisoner, 1, false);
+                // Reflection
+                FieldInfo fi = PartyScreenManager.Instance.GetType().GetField("_currentMode", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (fi != null) fi.SetValue(PartyScreenManager.Instance, PartyScreenMode.PrisonerManage);
+
+                TroopRoster prisonRoster = new TroopRoster();
+                List<CharacterObject> prisoners = FetchBrothelPrisoners(Hero.MainHero.CurrentSettlement);
+                foreach (CharacterObject prisoner in prisoners)
+                {
+                    prisonRoster.AddToCounts(prisoner, 1, false);
+                }
+
+                int lefPartySizeLimit = 10 - prisonRoster.Count;
+                TextObject textObject = new TextObject("{=CEBROTHEL0984}The brothel of {SETTLEMENT}", null);
+                textObject.SetTextVariable("SETTLEMENT", Hero.MainHero.CurrentSettlement.Name);
+
+                _serverPartyScreenLogic.Initialize(new TroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
+                _serverPartyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
+
+                _serverPartyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
+                _serverPartyScreenLogic.SetDoneHandler(new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler));
+
+                PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
+                partyState.InitializeLogic(_serverPartyScreenLogic);
+
+                // Reflection
+                fi = PartyScreenManager.Instance.GetType().GetField("_serverPartyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (fi != null) fi.SetValue(PartyScreenManager.Instance, _serverPartyScreenLogic);
+
+                Game.Current.GameStateManager.PushState(partyState, 0);
             }
-            int lefPartySizeLimit = 10 - prisonRoster.Count;
-            TextObject textObject = new TextObject("{=CEBROTHEL0984}The brothel of {SETTLEMENT}", null);
-            textObject.SetTextVariable("SETTLEMENT", Hero.MainHero.CurrentSettlement.Name);
-            _serverPartyScreenLogic.Initialize(new TroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
-            _serverPartyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
-
-            _serverPartyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
-            _serverPartyScreenLogic.SetDoneHandler(new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler));
-
-            PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
-            partyState.InitializeLogic(_serverPartyScreenLogic);
-            Game.Current.GameStateManager.PushState(partyState, 0);
-
-            // Reflection
-            fi = PartyScreenManager.Instance.GetType().GetField("_serverPartyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (fi != null) fi.SetValue(PartyScreenManager.Instance, _serverPartyScreenLogic);
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed to launch ManageProstitutes : " + e);
+            }
         }
 
         private static bool BrothelTroopTransferableDelegate(CharacterObject character, PartyScreenLogic.TroopType type, PartyScreenLogic.PartyRosterSide side, PartyBase LeftOwnerParty)
@@ -286,13 +299,9 @@ namespace CaptivityEvents.Brothel
         public static bool ProstitutionMenuJoinOnCondition(MenuCallbackArgs args)
         {
             args.optionLeaveType = GameMenuOption.LeaveType.Continue;
-
             MBTextManager.SetTextVariable("JOIN_STRING", DoesOwnBrothelInSettlement(Settlement.CurrentSettlement) ? "{=CEBROTHEL0978}Assist the prostitutes at your brothel" : "{=CEEVENTS1102}Become a prostitute at the brothel");
-
             if (!CEHelper.brothelFlagFemale && Hero.MainHero.IsFemale || !CEHelper.brothelFlagMale && !Hero.MainHero.IsFemale) return false;
-
             if (Campaign.Current.IsMainHeroDisguised) return false;
-
             return true;
         }
 
@@ -337,10 +346,10 @@ namespace CaptivityEvents.Brothel
 
             if (DoesOwnBrothelInSettlement(Settlement.CurrentSettlement))
             {
-                CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.TavernWench);
+                // 142 CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.TavernWench);
+                CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.TavernWench, true);
                 owner.Culture = templateToCopy.Culture;
                 owner.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-                owner.CurrentFormationClass = templateToCopy.CurrentFormationClass;
                 owner.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
                 owner.StaticBodyPropertiesMin = templateToCopy.StaticBodyPropertiesMin;
                 owner.StaticBodyPropertiesMax = templateToCopy.StaticBodyPropertiesMax;
@@ -354,10 +363,10 @@ namespace CaptivityEvents.Brothel
             }
             else
             {
-                CharacterObject templateToCopy2 = CharacterObject.CreateFrom(culture.Tavernkeeper);
+                // 142 CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.Tavernkeeper);
+                CharacterObject templateToCopy2 = CharacterObject.CreateFrom(culture.Tavernkeeper, true);
                 owner.Culture = templateToCopy2.Culture;
                 owner.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge);
-                owner.CurrentFormationClass = templateToCopy2.CurrentFormationClass;
                 owner.DefaultFormationGroup = templateToCopy2.DefaultFormationGroup;
                 owner.StaticBodyPropertiesMin = templateToCopy2.StaticBodyPropertiesMin;
                 owner.StaticBodyPropertiesMax = templateToCopy2.StaticBodyPropertiesMax;
@@ -376,7 +385,8 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateRansomBroker(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            BasicCharacterObject owner = CharacterObject.CreateFrom(culture.RansomBroker);
+            // 142 BasicCharacterObject owner = CharacterObject.CreateFrom(culture.RansomBroker);
+            BasicCharacterObject owner = CharacterObject.CreateFrom(culture.RansomBroker, true);
             owner.Name = new TextObject("{=CEEVENTS1065}Slave Trader");
             owner.StringId = "brothel_slaver";
 
@@ -390,11 +400,11 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateTownsManForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.Townsman);
+            // 142  CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.Townsman);
+            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.Townsman, true);
             CharacterObject townsman = MBObjectManager.Instance.CreateObject<CharacterObject>();
             townsman.Culture = templateToCopy.Culture;
             townsman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-            townsman.CurrentFormationClass = templateToCopy.CurrentFormationClass;
             townsman.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
             townsman.StaticBodyPropertiesMin = templateToCopy.StaticBodyPropertiesMin;
             townsman.StaticBodyPropertiesMax = templateToCopy.StaticBodyPropertiesMax;
@@ -416,11 +426,11 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateTavernWench(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.TavernWench);
+            // 142  CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.TavernWench);
+            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.TavernWench, true);
             CharacterObject townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
             townswoman.Culture = templateToCopy.Culture;
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-            townswoman.CurrentFormationClass = templateToCopy.CurrentFormationClass;
             townswoman.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
             townswoman.StaticBodyPropertiesMin = templateToCopy.StaticBodyPropertiesMin;
             townswoman.StaticBodyPropertiesMax = templateToCopy.StaticBodyPropertiesMax;
@@ -441,11 +451,11 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateDancer(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer);
+            // 142  CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer);
+            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer, true);
             CharacterObject townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
             townswoman.Culture = templateToCopy.Culture;
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-            townswoman.CurrentFormationClass = templateToCopy.CurrentFormationClass;
             townswoman.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
             townswoman.StaticBodyPropertiesMin = templateToCopy.StaticBodyPropertiesMin;
             townswoman.StaticBodyPropertiesMax = templateToCopy.StaticBodyPropertiesMax;
@@ -462,11 +472,11 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateTownsWomanForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer);
+            // 142  CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer);
+            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer, true);
             CharacterObject townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
             townswoman.Culture = templateToCopy.Culture;
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-            townswoman.CurrentFormationClass = templateToCopy.CurrentFormationClass;
             townswoman.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
             townswoman.StaticBodyPropertiesMin = templateToCopy.StaticBodyPropertiesMin;
             townswoman.StaticBodyPropertiesMax = templateToCopy.StaticBodyPropertiesMax;
@@ -1276,8 +1286,8 @@ namespace CaptivityEvents.Brothel
 
                         if (CESettings.Instance.EventProstituteGear)
                         {
-
-                            CharacterObject femaleDancer = CharacterObject.CreateFrom(settlement.Culture.FemaleDancer);
+                            // 142 CharacterObject femaleDancer = CharacterObject.CreateFrom(settlement.Culture.FemaleDancer);
+                            CharacterObject femaleDancer = CharacterObject.CreateFrom(settlement.Culture.FemaleDancer, true);
 
                             if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
 
@@ -1327,7 +1337,8 @@ namespace CaptivityEvents.Brothel
 
                 if (prisoner.IsHero && CESettings.Instance.EventProstituteGear)
                 {
-                    CharacterObject femaleDancer = CharacterObject.CreateFrom(settlement.Culture.FemaleDancer);
+                    // 142 CharacterObject femaleDancer = CharacterObject.CreateFrom(settlement.Culture.FemaleDancer);
+                    CharacterObject femaleDancer = CharacterObject.CreateFrom(settlement.Culture.FemaleDancer, true);
 
                     if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(prisoner.HeroObject, prisoner.HeroObject.BattleEquipment, prisoner.HeroObject.CivilianEquipment);
 

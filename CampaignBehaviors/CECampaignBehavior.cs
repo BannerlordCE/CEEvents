@@ -251,6 +251,15 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
+        public void ChangeWeight(float weight, Hero hero)
+        {
+            // 1.4.2 version
+            // hero.DynamicBodyProperties = new DynamicBodyProperties(hero.DynamicBodyProperties.Age, MBRandom.RandomFloatRanged(0.4025f, 0.6025f), hero.DynamicBodyProperties.Build);
+
+            // 1.4.3 version
+            hero.Weight = weight;
+        }
+
         public void RunDailyTick()
         {
             try
@@ -264,21 +273,32 @@ namespace CaptivityEvents.CampaignBehaviors
                 if (pregnancydue.DueDate.RemainingDaysFromNow < 1f)
                 {
                     textObject40 = new TextObject("{=CEEVENTS1061}You are about to give birth...");
-                    Hero.MainHero.DynamicBodyProperties = new DynamicBodyProperties(Hero.MainHero.DynamicBodyProperties.Age, 1f, Hero.MainHero.DynamicBodyProperties.Build);
+                    ChangeWeight(1f, Hero.MainHero);
                 }
                 else if (pregnancydue.DueDate.RemainingDaysFromNow < 10f)
                 {
                     textObject40 = new TextObject("{=CEEVENTS1062}Your baby begins kicking, you have {DAYS_REMAINING} days remaining.");
                     textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancydue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
-                    float weight = Hero.MainHero.DynamicBodyProperties.Weight;
-                    Hero.MainHero.DynamicBodyProperties = new DynamicBodyProperties(Hero.MainHero.DynamicBodyProperties.Age, MBMath.ClampFloat(weight + 0.3f, 0.3f, 1f), Hero.MainHero.DynamicBodyProperties.Build);
+
+                    // 1.4.2 version
+                    // float weight = Hero.MainHero.DynamicBodyProperties.Weight;
+
+                    // 1.4.3 version
+                    float weight = Hero.MainHero.Weight;
+
+                    ChangeWeight(MBMath.ClampFloat(weight + 0.3f, 0.3f, 1f), Hero.MainHero);
                 }
                 else if (pregnancydue.DueDate.RemainingDaysFromNow < 20f)
                 {
                     textObject40 = new TextObject("{=CEEVENTS1063}Your pregnant belly continues to swell, you have {DAYS_REMAINING} days remaining.");
                     textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancydue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
-                    float weight = Hero.MainHero.DynamicBodyProperties.Weight;
-                    Hero.MainHero.DynamicBodyProperties = new DynamicBodyProperties(Hero.MainHero.DynamicBodyProperties.Age, MBMath.ClampFloat(weight + 0.15f, 0.3f, 1f), Hero.MainHero.DynamicBodyProperties.Build);
+
+                    // 1.4.2 version
+                    // float weight = Hero.MainHero.DynamicBodyProperties.Weight;
+
+                    // 1.4.3 version
+                    float weight = Hero.MainHero.Weight;
+                    ChangeWeight(MBMath.ClampFloat(weight + 0.15f, 0.3f, 1f), Hero.MainHero);
                 }
                 else
                 {
@@ -475,7 +495,6 @@ namespace CaptivityEvents.CampaignBehaviors
                     InformationManager.AddQuickInformation(textObject);
                 }
 
-                // 1.4.2 version
                 if (mother.IsHumanPlayerCharacter || pregnancy.Father == Hero.MainHero)
                 {
                     for (int i = 0; i < stillbornCount; i++)
@@ -490,22 +509,12 @@ namespace CaptivityEvents.CampaignBehaviors
                         LogEntry.AddLogEntry(childbirthLogEntry2);
                         Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText()));
                     }
-                }
-
-                // 1.4.1 Version  
-                /*
-                ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(pregnancy.Mother, aliveOffsprings, stillbornCount);
-                LogEntry.AddLogEntry(childbirthLogEntry);
-                if (mother == Hero.MainHero || pregnancy.Father == Hero.MainHero)
-                {
-                    Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(aliveOffsprings, childbirthLogEntry.GetEncyclopediaText()));
-                }
-                */             
+                }      
 
                 mother.IsPregnant = false;
                 pregnancy.AlreadyOccured = true;
 
-                pregnancy.Mother.DynamicBodyProperties = new DynamicBodyProperties(pregnancy.Mother.DynamicBodyProperties.Age, MBRandom.RandomFloatRanged(0.4025f, 0.6025f), pregnancy.Mother.DynamicBodyProperties.Build);
+                ChangeWeight(MBRandom.RandomFloatRanged(0.4025f, 0.6025f), pregnancy.Mother);
             }
             catch (Exception e)
             {
