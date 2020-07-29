@@ -185,7 +185,6 @@ namespace CaptivityEvents.Brothel
                 Campaign.Current.GameMenuManager.PreviousLocation = null;
             }
             catch (Exception) { }
-
             return true;
         }
 
@@ -337,7 +336,7 @@ namespace CaptivityEvents.Brothel
         }
 
         public static CharacterObject HelperCreateFrom(CharacterObject character, bool traitsAndSkills) =>
-            // 143 return CharacterObject.CreateFrom(character, true);
+            // 143 return CharacterObject.CreateFrom(character, traitsAndSkills);
             CharacterObject.CreateFrom(character);
 
         private static LocationCharacter CreateTavernkeeper(CultureObject culture, LocationCharacter.CharacterRelations relation)
