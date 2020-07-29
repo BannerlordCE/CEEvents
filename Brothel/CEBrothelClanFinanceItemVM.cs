@@ -23,7 +23,6 @@ namespace CaptivityEvents.Brothel
         public override void RefreshValues()
         {
             base.RefreshValues();
-            // 1.4.2
             Name = _brothel.Name.ToString();
             WorkshopType workshopType = WorkshopType.Find("pottery_shop");
             WorkshopTypeId = workshopType.StringId;

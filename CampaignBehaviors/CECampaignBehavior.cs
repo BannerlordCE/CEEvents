@@ -251,13 +251,18 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
-        public void ChangeWeight(float weight, Hero hero)
+        /// <summary>
+        /// Change Weight
+        /// </summary>
+        /// <param name="weight"></param>
+        /// <param name="hero"></param>
+        private void ChangeWeight(float weight, Hero hero)
         {
             // 1.4.2 version
-            // hero.DynamicBodyProperties = new DynamicBodyProperties(hero.DynamicBodyProperties.Age, MBRandom.RandomFloatRanged(0.4025f, 0.6025f), hero.DynamicBodyProperties.Build);
+            hero.DynamicBodyProperties = new DynamicBodyProperties(hero.DynamicBodyProperties.Age, weight, hero.DynamicBodyProperties.Build);
 
             // 1.4.3 version
-            hero.Weight = weight;
+            //hero.Weight = weight;
         }
 
         public void RunDailyTick()
@@ -281,10 +286,10 @@ namespace CaptivityEvents.CampaignBehaviors
                     textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancydue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
 
                     // 1.4.2 version
-                    // float weight = Hero.MainHero.DynamicBodyProperties.Weight;
+                    float weight = Hero.MainHero.DynamicBodyProperties.Weight;
 
                     // 1.4.3 version
-                    float weight = Hero.MainHero.Weight;
+                    //float weight = Hero.MainHero.Weight;
 
                     ChangeWeight(MBMath.ClampFloat(weight + 0.3f, 0.3f, 1f), Hero.MainHero);
                 }
@@ -294,10 +299,11 @@ namespace CaptivityEvents.CampaignBehaviors
                     textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancydue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
 
                     // 1.4.2 version
-                    // float weight = Hero.MainHero.DynamicBodyProperties.Weight;
+                    float weight = Hero.MainHero.DynamicBodyProperties.Weight;
 
                     // 1.4.3 version
-                    float weight = Hero.MainHero.Weight;
+                    // float weight = Hero.MainHero.Weight;
+
                     ChangeWeight(MBMath.ClampFloat(weight + 0.15f, 0.3f, 1f), Hero.MainHero);
                 }
                 else

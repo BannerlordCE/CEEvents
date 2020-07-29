@@ -340,14 +340,19 @@ namespace CaptivityEvents.Brothel
             _isBrothelInitialized = true;
         }
 
+        public static CharacterObject HelperCreateFrom(CharacterObject character, bool traitsAndSkills)
+        {
+            // 143 return CharacterObject.CreateFrom(character, true);
+            return CharacterObject.CreateFrom(character);
+        }
+
         private static LocationCharacter CreateTavernkeeper(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
             CharacterObject owner = MBObjectManager.Instance.CreateObject<CharacterObject>();
 
             if (DoesOwnBrothelInSettlement(Settlement.CurrentSettlement))
             {
-                // 142 CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.TavernWench);
-                CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.TavernWench, true);
+                CharacterObject templateToCopy = HelperCreateFrom(culture.TavernWench, true);
                 owner.Culture = templateToCopy.Culture;
                 owner.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
                 owner.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
@@ -364,7 +369,7 @@ namespace CaptivityEvents.Brothel
             else
             {
                 // 142 CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.Tavernkeeper);
-                CharacterObject templateToCopy2 = CharacterObject.CreateFrom(culture.Tavernkeeper, true);
+                CharacterObject templateToCopy2 = HelperCreateFrom(culture.Tavernkeeper, true);
                 owner.Culture = templateToCopy2.Culture;
                 owner.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge);
                 owner.DefaultFormationGroup = templateToCopy2.DefaultFormationGroup;
@@ -385,8 +390,7 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateRansomBroker(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            // 142 BasicCharacterObject owner = CharacterObject.CreateFrom(culture.RansomBroker);
-            BasicCharacterObject owner = CharacterObject.CreateFrom(culture.RansomBroker, true);
+            BasicCharacterObject owner = HelperCreateFrom(culture.RansomBroker, true);
             owner.Name = new TextObject("{=CEEVENTS1065}Slave Trader");
             owner.StringId = "brothel_slaver";
 
@@ -400,8 +404,7 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateTownsManForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            // 142  CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.Townsman);
-            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.Townsman, true);
+            CharacterObject templateToCopy = HelperCreateFrom(culture.Townsman, true);
             CharacterObject townsman = MBObjectManager.Instance.CreateObject<CharacterObject>();
             townsman.Culture = templateToCopy.Culture;
             townsman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
@@ -426,8 +429,7 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateTavernWench(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            // 142  CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.TavernWench);
-            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.TavernWench, true);
+            CharacterObject templateToCopy = HelperCreateFrom(culture.TavernWench, true);
             CharacterObject townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
             townswoman.Culture = templateToCopy.Culture;
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
@@ -451,8 +453,7 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateDancer(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            // 142  CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer);
-            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer, true);
+            CharacterObject templateToCopy = HelperCreateFrom(culture.FemaleDancer, true);
             CharacterObject townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
             townswoman.Culture = templateToCopy.Culture;
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
@@ -472,8 +473,7 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateTownsWomanForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            // 142  CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer);
-            CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.FemaleDancer, true);
+            CharacterObject templateToCopy = HelperCreateFrom(culture.FemaleDancer, true);
             CharacterObject townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
             townswoman.Culture = templateToCopy.Culture;
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
@@ -1286,8 +1286,7 @@ namespace CaptivityEvents.Brothel
 
                         if (CESettings.Instance.EventProstituteGear)
                         {
-                            // 142 CharacterObject femaleDancer = CharacterObject.CreateFrom(settlement.Culture.FemaleDancer);
-                            CharacterObject femaleDancer = CharacterObject.CreateFrom(settlement.Culture.FemaleDancer, true);
+                            CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
 
                             if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
 
@@ -1337,8 +1336,7 @@ namespace CaptivityEvents.Brothel
 
                 if (prisoner.IsHero && CESettings.Instance.EventProstituteGear)
                 {
-                    // 142 CharacterObject femaleDancer = CharacterObject.CreateFrom(settlement.Culture.FemaleDancer);
-                    CharacterObject femaleDancer = CharacterObject.CreateFrom(settlement.Culture.FemaleDancer, true);
+                    CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
 
                     if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(prisoner.HeroObject, prisoner.HeroObject.BattleEquipment, prisoner.HeroObject.CivilianEquipment);
 

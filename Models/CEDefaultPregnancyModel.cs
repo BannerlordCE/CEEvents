@@ -30,13 +30,10 @@ namespace CaptivityEvents.Models
         }
 
 
-
-
         private float GeneratePregnancyFactorNumber(float age, float explainedNumber)
         {
             return (6.5f - (age - 18f) * 0.23f) * 0.02f * explainedNumber;
         }
-
 
 
         public override float GetDailyChanceOfPregnancyForHero(Hero hero)
@@ -56,8 +53,7 @@ namespace CaptivityEvents.Models
 
             float result = CEGetDailyChanceOfPregnancyForHero(h, perkBonus);
 
-            return result;
-            
+            return result;    
             
         }
 
