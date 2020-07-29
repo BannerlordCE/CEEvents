@@ -121,10 +121,10 @@ namespace CaptivityEvents.CampaignBehaviors
         private void ChangeWeight(Hero hero, int stage, float weight = 0.3f)
         {
             // 1.4.2
-            if (stage != 0) weight = hero.DynamicBodyProperties.Weight;
+            // if (stage != 0) weight = hero.DynamicBodyProperties.Weight;
 
             // 1.4.3
-            // if (stage != 0) weight = hero.Weight;
+            if (stage != 0) weight = hero.Weight;
 
             switch (stage)
             {
@@ -132,7 +132,6 @@ namespace CaptivityEvents.CampaignBehaviors
                     weight = MBMath.ClampFloat(weight + 0.01f, 0.3f, 0.7f);
                     break;
                 case 2:
-                    weight = hero.DynamicBodyProperties.Weight;
                     weight = MBMath.ClampFloat(weight + 0.01f, 0.3f, 0.95f);
                     break;
                 case 3:
@@ -143,10 +142,10 @@ namespace CaptivityEvents.CampaignBehaviors
             }
 
             // 1.4.2 version
-            hero.DynamicBodyProperties = new DynamicBodyProperties(hero.DynamicBodyProperties.Age, weight, hero.DynamicBodyProperties.Build);
+            // hero.DynamicBodyProperties = new DynamicBodyProperties(hero.DynamicBodyProperties.Age, weight, hero.DynamicBodyProperties.Build);
 
             // 1.4.3 version
-            //hero.Weight = weight;
+            hero.Weight = weight;
         }
 
         private void CalculatePregnancyWeight(Pregnancy pregnancy)

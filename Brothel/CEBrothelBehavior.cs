@@ -335,9 +335,13 @@ namespace CaptivityEvents.Brothel
             _isBrothelInitialized = true;
         }
 
-        public static CharacterObject HelperCreateFrom(CharacterObject character, bool traitsAndSkills) =>
-            // 143 return CharacterObject.CreateFrom(character, traitsAndSkills);
-            CharacterObject.CreateFrom(character);
+        public static CharacterObject HelperCreateFrom(CharacterObject character, bool traitsAndSkills)
+        {
+            // 1.4.3 
+            return CharacterObject.CreateFrom(character, traitsAndSkills);
+            // 1.4.2
+            // return CharacterObject.CreateFrom(character);
+        }
 
         private static LocationCharacter CreateTavernkeeper(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
@@ -734,7 +738,7 @@ namespace CaptivityEvents.Brothel
 
         private void ConversationSoldBrothel()
         {
-            GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, brothelCost);
+            GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, GetPlayerBrothel(Settlement.CurrentSettlement).Capital);
             BrothelInteraction(Settlement.CurrentSettlement, false);
         }
 
