@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Helpers;
+using System;
 using System.Collections.Generic;
-using Helpers;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
@@ -14,14 +14,11 @@ namespace CaptivityEvents.Issues
 
         public override void SyncData(IDataStore dataStore) { }
 
-        public static IssueBase OnStartIssue(PotentialIssueData pid, Hero issueOwner)
-        {
-            return new CEWhereAreMyThingsIssue(issueOwner);
-        }
+        public static IssueBase OnStartIssue(PotentialIssueData pid, Hero issueOwner) => new CEWhereAreMyThingsIssue(issueOwner);
 
         internal class CEWhereAreMyThingsIssue : IssueBase
         {
-            protected override int RewardGold => (int) (350f + 1500f * IssueDifficultyMultiplier);
+            protected override int RewardGold => (int)(350f + 1500f * IssueDifficultyMultiplier);
             protected override bool IsThereAlternativeSolution => false;
             protected override bool IsThereLordSolution => false;
             public override TextObject Title => new TextObject("{=CEEVENTS1089}Missing Equipment");
@@ -45,15 +42,9 @@ namespace CaptivityEvents.Issues
                 return new CEWhereAreMyThingsIssueQuest(questId, IssueOwner, CampaignTime.DaysFromNow(stolenGearDuration), RewardGold, new Equipment(Hero.MainHero.BattleEquipment), new Equipment(Hero.MainHero.CivilianEquipment));
             }
 
-            protected override float GetFrequency()
-            {
-                return 0.01f;
-            }
+            protected override float GetFrequency() => 0.01f;
 
-            public override bool IssueStayAliveConditions()
-            {
-                return true;
-            }
+            public override bool IssueStayAliveConditions() => true;
 
             protected override void CompleteIssueWithTimedOutConsequences() { }
 
@@ -102,8 +93,8 @@ namespace CaptivityEvents.Issues
 
             public CEWhereAreMyThingsIssueQuest(string questId, Hero giverHero, CampaignTime duration, int rewardGold, Equipment stolenBattleEquipment, Equipment stolenCivilianEquipment) : base(questId, giverHero, duration, rewardGold)
             {
-                this._stolenBattleEquipment = stolenBattleEquipment;
-                this._stolenCivilianEquipment = stolenCivilianEquipment;
+                _stolenBattleEquipment = stolenBattleEquipment;
+                _stolenCivilianEquipment = stolenCivilianEquipment;
                 AddTrackedObject(QuestGiver);
                 SetDialogs();
                 InitializeQuestOnCreation();

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CaptivityEvents.Custom;
+using System;
 using System.Collections.Generic;
-using CaptivityEvents.Custom;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 

@@ -1,13 +1,13 @@
-﻿using System;
+﻿using CaptivityEvents.Brothel;
+using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Custom;
+using CaptivityEvents.Events;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using CaptivityEvents.Brothel;
-using CaptivityEvents.CampaignBehaviors;
-using CaptivityEvents.Custom;
-using CaptivityEvents.Events;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
@@ -343,6 +343,7 @@ namespace CaptivityEvents.Helper
                 if (searchActive) searchTerm = searchTerm.ToLower();
 
                 foreach (CEEvent ceEvent in CEPersistence.CEEvents)
+                {
                     if (searchActive)
                     {
                         if (ceEvent.Name.ToLower().IndexOf(searchTerm, StringComparison.Ordinal) != -1) text = text + ceEvent.Name + "\n";
@@ -351,6 +352,7 @@ namespace CaptivityEvents.Helper
                     {
                         text = text + ceEvent.Name + "\n";
                     }
+                }
 
                 return text;
 
@@ -541,6 +543,7 @@ namespace CaptivityEvents.Helper
                     CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
 
                     foreach (string moduleID in modulesFound)
+                    {
                         try
                         {
                             ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
@@ -561,6 +564,7 @@ namespace CaptivityEvents.Helper
                         {
                             CECustomHandler.ForceLogToFile("Failed to fetch DependedModuleIds from " + moduleID);
                         }
+                    }
 
                     // Load Images
                     string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
@@ -577,13 +581,17 @@ namespace CaptivityEvents.Helper
 
                     // Module Image Load
                     if (modulePaths.Count != 0)
+                    {
                         foreach (string filepath in modulePaths)
+                        {
                             try
                             {
                                 string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
                                 foreach (string file in moduleFiles)
+                                {
                                     if (!CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                                    {
                                         try
                                         {
                                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
@@ -595,9 +603,13 @@ namespace CaptivityEvents.Helper
                                         {
                                             CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                         }
+                                    }
                                     else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                                }
                             }
                             catch (Exception) { }
+                        }
+                    }
 
                     // Captivity Location Image Load
                     try
@@ -608,6 +620,7 @@ namespace CaptivityEvents.Helper
                             if (requiredImages.Contains(file)) continue;
 
                             if (!CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                            {
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
@@ -619,6 +632,7 @@ namespace CaptivityEvents.Helper
                                 {
                                     CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                 }
+                            }
                             else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
                         }
 
@@ -678,6 +692,7 @@ namespace CaptivityEvents.Helper
                     CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
 
                     foreach (string moduleID in modulesFound)
+                    {
                         try
                         {
                             ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
@@ -698,6 +713,7 @@ namespace CaptivityEvents.Helper
                         {
                             CECustomHandler.ForceLogToFile("Failed to fetch DependedModuleIds from " + moduleID);
                         }
+                    }
 
                     // Events Removing
                     MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -721,12 +737,16 @@ namespace CaptivityEvents.Helper
                         if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEPersistence.CEEvents.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 1) continue;
 
                         if (!CEHelper.brothelFlagFemale)
+                        {
                             if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale))
                                 CEHelper.brothelFlagFemale = true;
+                        }
 
                         if (!CEHelper.brothelFlagMale)
+                        {
                             if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale))
                                 CEHelper.brothelFlagMale = true;
+                        }
 
                         if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
                         {
@@ -756,13 +776,17 @@ namespace CaptivityEvents.Helper
 
                     // Module Image Load
                     if (modulePaths.Count != 0)
+                    {
                         foreach (string filepath in modulePaths)
+                        {
                             try
                             {
                                 string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
                                 foreach (string file in moduleFiles)
+                                {
                                     if (!CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                                    {
                                         try
                                         {
                                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
@@ -774,9 +798,13 @@ namespace CaptivityEvents.Helper
                                         {
                                             CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                         }
+                                    }
                                     else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                                }
                             }
                             catch (Exception) { }
+                        }
+                    }
 
                     // Captivity Location Image Load
                     try
@@ -787,6 +815,7 @@ namespace CaptivityEvents.Helper
                             if (requiredImages.Contains(file)) continue;
 
                             if (!CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                            {
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
@@ -798,6 +827,7 @@ namespace CaptivityEvents.Helper
                                 {
                                     CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                 }
+                            }
                             else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
                         }
 

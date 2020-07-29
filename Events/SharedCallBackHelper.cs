@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Custom;
 using CaptivityEvents.Issues;
 using Helpers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
@@ -419,6 +419,7 @@ namespace CaptivityEvents.Events
                         < (CESettings.Instance.WeaponSkill
                             ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.OneHanded) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.TwoHanded) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Polearm) / 275 * 100))
                             : CESettings.Instance.WeaponChance))
+                    {
                         switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
                         {
                             case CultureCode.Sturgia:
@@ -453,7 +454,9 @@ namespace CaptivityEvents.Events
 
                                 break;
                         }
+                    }
                     else
+                    {
                         switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
                         {
                             case CultureCode.Sturgia:
@@ -479,6 +482,7 @@ namespace CaptivityEvents.Events
                                 item = "seax";
                                 break;
                         }
+                    }
 
                     ItemObject itemObjectWeapon0 = MBObjectManager.Instance.GetObject<ItemObject>(item);
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Weapon0, new EquipmentElement(itemObjectWeapon0));

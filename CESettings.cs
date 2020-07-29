@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using MCM.Abstractions.Attributes;
+﻿using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Settings.Base;
 using MCM.Abstractions.Settings.Base.Global;
+using System;
+using System.Collections.Generic;
 
 namespace CaptivityEvents
 {
@@ -16,9 +16,9 @@ namespace CaptivityEvents
         public override IDictionary<string, Func<BaseSettings>> GetAvailablePresets()
         {
             IDictionary<string, Func<BaseSettings>> basePresets = base.GetAvailablePresets(); // include the 'Default' preset that MCM provides
-            basePresets.Add("Developer Mode", () => new CESettings {LogToggle = true});
-            basePresets.Add("Hard Mode", () => new CESettings {StolenGear = true, StolenGearChance = 30f, BetterOutFitChance = 10, RenownMin = -300f});
-            basePresets.Add("Easy Mode", () => new CESettings {StolenGear = false, RenownMin = 0f});
+            basePresets.Add("Developer Mode", () => new CESettings { LogToggle = true });
+            basePresets.Add("Hard Mode", () => new CESettings { StolenGear = true, StolenGearChance = 30f, BetterOutFitChance = 10, RenownMin = -300f });
+            basePresets.Add("Easy Mode", () => new CESettings { StolenGear = false, RenownMin = 0f });
 
             return basePresets;
         }

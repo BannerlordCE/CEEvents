@@ -19,10 +19,7 @@ namespace CaptivityEvents.Brothel
             CaptiveProstitutes = new List<CharacterObject>();
         }
 
-        public void ChangeGold(int amount)
-        {
-            Capital = MBMath.ClampInt(Capital + amount, 1, 10000);
-        }
+        public void ChangeGold(int amount) => Capital = MBMath.ClampInt(Capital + amount, 1, 10000);
 
         public int ProfitMade => Math.Max(Capital - InitialCapital, 0);
 

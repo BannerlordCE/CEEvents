@@ -1,7 +1,7 @@
-﻿using System;
-using System.Reflection;
-using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Custom;
 using Helpers;
+using System;
+using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -74,6 +74,7 @@ namespace CaptivityEvents.Events
             bool found = false;
 
             foreach (TraitObject traitObject in DefaultTraits.Personality)
+            {
                 if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                 {
                     found = true;
@@ -89,9 +90,12 @@ namespace CaptivityEvents.Events
                     textObject.SetTextVariable("TRAIT", CEStrings.FetchTraitString(trait));
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
                 }
+            }
 
             if (!found)
+            {
                 foreach (TraitObject traitObject in DefaultTraits.SkillCategories)
+                {
                     if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                     {
                         found = true;
@@ -107,11 +111,14 @@ namespace CaptivityEvents.Events
                         textObject.SetTextVariable("TRAIT", CEStrings.FetchTraitString(trait));
                         InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
                     }
+                }
+            }
 
             if (found) return;
 
             {
                 foreach (TraitObject traitObject in DefaultTraits.All)
+                {
                     if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                     {
                         found = true;
@@ -129,6 +136,7 @@ namespace CaptivityEvents.Events
                         textObject.SetTextVariable("TRAIT", trait);
                         InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
                     }
+                }
 
                 if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + trait);
             }
@@ -139,6 +147,7 @@ namespace CaptivityEvents.Events
             if (amount != 0)
             {
                 foreach (SkillObject skillObject in SkillObject.All)
+                {
                     if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
                     {
                         int currentSkillLevel = hero.GetSkillValue(skillObject);
@@ -153,7 +162,7 @@ namespace CaptivityEvents.Events
                         {
                             MethodInfo mi = hero.HeroDeveloper.GetType().GetMethod("ChangeSkillLevelFromXpChange", BindingFlags.Instance | BindingFlags.NonPublic);
                             if (mi != null) mi.Invoke(hero.HeroDeveloper, new object[] { skillObject, levels, false });
-                        } 
+                        }
                         else
                         {
                             hero.SetSkillValue(skillObject, newNumber);
@@ -170,6 +179,7 @@ namespace CaptivityEvents.Events
                         textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
                         InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
                     }
+                }
             }
         }
 

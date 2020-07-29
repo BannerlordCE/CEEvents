@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using CaptivityEvents.Models;
+﻿using CaptivityEvents.Models;
 using FluentAssertions;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace CaptivityEventsTests
 {
@@ -21,7 +21,7 @@ namespace CaptivityEventsTests
         public void GIVEN_Hero_WHEN_Age18_IsFertile_Children0_HaveSpouse_PerkBonus1_Then_PregnancyChance39()
         {
             //Arrange
-            CEHero hero = new CEHero {Age = 18, IsFertile = true, Children = new List<CEHero>(), Spouse = new CEHero()};
+            CEHero hero = new CEHero { Age = 18, IsFertile = true, Children = new List<CEHero>(), Spouse = new CEHero() };
             float perkBonus = 1.0f;
             CEDefaultPregnancyModel sut = new CEDefaultPregnancyModel();
             float expectedResult = 0.39f;
@@ -46,8 +46,8 @@ namespace CaptivityEventsTests
         public void GIVEN_Hero_WHEN_Age18_IsFertile_Children1_HaveNoSpouse_PerkBonus1_Then_PregnancyChance0()
         {
             //Arrange
-            List<CEHero> child = new List<CEHero> {new CEHero()};
-            CEHero hero = new CEHero {Age = 18, IsFertile = true, Children = child, Spouse = null};
+            List<CEHero> child = new List<CEHero> { new CEHero() };
+            CEHero hero = new CEHero { Age = 18, IsFertile = true, Children = child, Spouse = null };
             float perkBonus = 1.0f;
             CEDefaultPregnancyModel sut = new CEDefaultPregnancyModel();
 
@@ -68,7 +68,7 @@ namespace CaptivityEventsTests
         public void GIVEN_Hero_WHEN_Age18_IsNotFertile_Then_PregnancyChance0()
         {
             //Arrange
-            CEHero hero = new CEHero {Age = 18, IsFertile = true, Children = new List<CEHero>(), Spouse = new CEHero()};
+            CEHero hero = new CEHero { Age = 18, IsFertile = true, Children = new List<CEHero>(), Spouse = new CEHero() };
             float perkBonus = 1.0f;
             CEDefaultPregnancyModel sut = new CEDefaultPregnancyModel();
             float expectedResult = 0.39f;
@@ -90,7 +90,7 @@ namespace CaptivityEventsTests
         public void GIVEN_Hero_WHEN_Age17_Then_PregnancyChance0()
         {
             //Arrange
-            CEHero hero = new CEHero {Age = 17, IsFertile = true, Children = new List<CEHero>(), Spouse = new CEHero()};
+            CEHero hero = new CEHero { Age = 17, IsFertile = true, Children = new List<CEHero>(), Spouse = new CEHero() };
             float perkBonus = 1.0f;
             CEDefaultPregnancyModel sut = new CEDefaultPregnancyModel();
             float expectedResult = 0.0f;
@@ -116,7 +116,7 @@ namespace CaptivityEventsTests
         public void GIVEN_Hero_WHEN_Age45_IsFertile_Children0_HaveSpouse_PerkBonus1_Then_PregnancyChanceIsBelow1()
         {
             //Arrange
-            CEHero hero = new CEHero {Age = 44, IsFertile = true, Children = new List<CEHero>(), Spouse = new CEHero()};
+            CEHero hero = new CEHero { Age = 44, IsFertile = true, Children = new List<CEHero>(), Spouse = new CEHero() };
             float perkBonus = 0.0029f;
             CEDefaultPregnancyModel sut = new CEDefaultPregnancyModel();
             float expectedResult = 9.04799963E-05F;
@@ -138,7 +138,7 @@ namespace CaptivityEventsTests
         public void GIVEN_Hero_WHEN_Age46_Then_PregnancyChance0()
         {
             //Arrange
-            CEHero hero = new CEHero {Age = 46, IsFertile = true, Children = new List<CEHero>(), Spouse = new CEHero()};
+            CEHero hero = new CEHero { Age = 46, IsFertile = true, Children = new List<CEHero>(), Spouse = new CEHero() };
             float perkBonus = 1.0f;
             CEDefaultPregnancyModel sut = new CEDefaultPregnancyModel();
             float expectedResult = 0.0f;

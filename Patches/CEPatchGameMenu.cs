@@ -8,7 +8,7 @@ using TaleWorlds.Core;
 namespace CaptivityEvents.Patches
 {
     [HarmonyPatch(typeof(GameMenu))]
-    class CEPatchGameMenu
+    internal class CEPatchGameMenu
     {
 
         [HarmonyPatch("ActivateGameMenu")]

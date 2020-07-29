@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using CaptivityEvents.CampaignBehaviors;
+﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Helper;
 using Helpers;
+using System.Collections.Generic;
+using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
@@ -27,7 +26,11 @@ namespace CaptivityEvents.Events
                     if (MBRandom.Random.Next(100)
                         >= (CESettings.Instance.AttractivenessSkill
                             ? score.AttractivenessScore(targetHero) / 20 + modifier
-                            : CESettings.Instance.PregnancyChance + modifier)) return;
+                            : CESettings.Instance.PregnancyChance + modifier))
+                    {
+                        return;
+                    }
+
                     Hero randomSoldier;
 
                     if (senderHero != null)
@@ -99,8 +102,11 @@ namespace CaptivityEvents.Events
                     && MBRandom.Random.Next(100)
                     >= (CESettings.Instance.AttractivenessSkill
                         ? score.AttractivenessScore(targetHero) / 20 + modifier
-                        : CESettings.Instance.PregnancyChance + modifier)) return;
-                
+                        : CESettings.Instance.PregnancyChance + modifier))
+                {
+                    return;
+                }
+
                 Hero randomSoldier;
 
                 if (senderHero != null)
@@ -172,7 +178,11 @@ namespace CaptivityEvents.Events
                     if (MBRandom.Random.Next(100)
                         >= (CESettings.Instance.AttractivenessSkill
                             ? scoresCalculation.AttractivenessScore(targetHero) / 20 + modifier
-                            : CESettings.Instance.PregnancyChance + modifier)) return;
+                            : CESettings.Instance.PregnancyChance + modifier))
+                    {
+                        return;
+                    }
+
                     Hero randomSoldier;
 
                     if (captorHero != null)
@@ -252,7 +262,11 @@ namespace CaptivityEvents.Events
                     && MBRandom.Random.Next(100)
                     >= (CESettings.Instance.AttractivenessSkill
                         ? scoresCalculation.AttractivenessScore(targetHero) / 20 + modifier
-                        : CESettings.Instance.PregnancyChance + modifier)) return;
+                        : CESettings.Instance.PregnancyChance + modifier))
+                {
+                    return;
+                }
+
                 Hero randomSoldier = null;
 
                 if (captorHero != null)
@@ -266,7 +280,7 @@ namespace CaptivityEvents.Events
                 else if (targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty != null)
                 {
                     IEnumerable<TroopRosterElement> femaleMembers = targetHero.PartyBelongedToAsPrisoner.MobileParty.MemberRoster.Where(characterObject => characterObject.Character.IsFemale);
-                    List<TroopRosterElement> troopRosterElements  = femaleMembers.ToList();
+                    List<TroopRosterElement> troopRosterElements = femaleMembers.ToList();
 
                     if (!troopRosterElements.Any()) return;
 
@@ -318,9 +332,6 @@ namespace CaptivityEvents.Events
             }
         }
 
-        private bool IsHeroAgeSuitableForPregnancy(Hero hero)
-        {
-            return hero != null && hero.Age >= 18f && hero.Age <= 45f && !CECampaignBehavior.CheckIfPregnancyExists(hero);
-        }
+        private bool IsHeroAgeSuitableForPregnancy(Hero hero) => hero != null && hero.Age >= 18f && hero.Age <= 45f && !CECampaignBehavior.CheckIfPregnancyExists(hero);
     }
 }

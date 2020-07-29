@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
 using CaptivityEvents.Notifications;
 using Helpers;
 using MountAndBlade.CampaignBehaviors;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -256,13 +256,61 @@ namespace CaptivityEvents.CampaignBehaviors
         /// </summary>
         /// <param name="weight"></param>
         /// <param name="hero"></param>
-        private void ChangeWeight(float weight, Hero hero)
+        private void ChangeWeight(Hero hero, int stage, float weight = 0.3f)
         {
+            // 1.4.2
+            if (stage != 0) weight = hero.DynamicBodyProperties.Weight;
+
+            // 1.4.3
+            // if (stage != 0) weight = hero.Weight;
+
+            switch (stage)
+            {
+                case 1:
+                    weight = MBMath.ClampFloat(weight + 0.15f, 0.3f, 1f);
+                    break;
+                case 2:
+                    weight = hero.DynamicBodyProperties.Weight;
+                    weight = MBMath.ClampFloat(weight + 0.3f, 0.3f, 1f);
+                    break;
+                case 3:
+                    weight = 1f;
+                    break;
+                default:
+                    break;
+            }
+
             // 1.4.2 version
             hero.DynamicBodyProperties = new DynamicBodyProperties(hero.DynamicBodyProperties.Age, weight, hero.DynamicBodyProperties.Build);
 
             // 1.4.3 version
             //hero.Weight = weight;
+        }
+
+        private void CalculatePregnancyWeight(Pregnancy pregnancy)
+        {
+            try
+            {
+                if (pregnancy == null || pregnancy.AlreadyOccured) return;
+
+                if (pregnancy.DueDate.RemainingDaysFromNow < 1f)
+                {
+                    ChangeWeight(pregnancy.Mother, 3);
+                }
+                else if (pregnancy.DueDate.RemainingDaysFromNow < 10f)
+                {
+                    ChangeWeight(pregnancy.Mother, 2);
+                }
+                else if (pregnancy.DueDate.RemainingDaysFromNow < 20f)
+                {
+                    ChangeWeight(pregnancy.Mother, 1);
+                }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed to handle alerts. CalculatePregnancyWeight");
+                CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+            }
         }
 
         public void RunDailyTick()
@@ -278,33 +326,16 @@ namespace CaptivityEvents.CampaignBehaviors
                 if (pregnancydue.DueDate.RemainingDaysFromNow < 1f)
                 {
                     textObject40 = new TextObject("{=CEEVENTS1061}You are about to give birth...");
-                    ChangeWeight(1f, Hero.MainHero);
                 }
                 else if (pregnancydue.DueDate.RemainingDaysFromNow < 10f)
                 {
                     textObject40 = new TextObject("{=CEEVENTS1062}Your baby begins kicking, you have {DAYS_REMAINING} days remaining.");
                     textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancydue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
-
-                    // 1.4.2 version
-                    float weight = Hero.MainHero.DynamicBodyProperties.Weight;
-
-                    // 1.4.3 version
-                    //float weight = Hero.MainHero.Weight;
-
-                    ChangeWeight(MBMath.ClampFloat(weight + 0.3f, 0.3f, 1f), Hero.MainHero);
                 }
                 else if (pregnancydue.DueDate.RemainingDaysFromNow < 20f)
                 {
                     textObject40 = new TextObject("{=CEEVENTS1063}Your pregnant belly continues to swell, you have {DAYS_REMAINING} days remaining.");
                     textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancydue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
-
-                    // 1.4.2 version
-                    float weight = Hero.MainHero.DynamicBodyProperties.Weight;
-
-                    // 1.4.3 version
-                    // float weight = Hero.MainHero.Weight;
-
-                    ChangeWeight(MBMath.ClampFloat(weight + 0.15f, 0.3f, 1f), Hero.MainHero);
                 }
                 else
                 {
@@ -339,7 +370,7 @@ namespace CaptivityEvents.CampaignBehaviors
             Hero hero = (Hero)mi.Invoke(null, new object[] { characterObject, age });
 
             int becomeChildAge = Campaign.Current.Models.AgeModel.BecomeChildAge;
-            CharacterObject characterObject2 = CharacterObject.ChildTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= (float)becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
+            CharacterObject characterObject2 = CharacterObject.ChildTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
 
             if (characterObject2 != null)
             {
@@ -428,6 +459,8 @@ namespace CaptivityEvents.CampaignBehaviors
                     return;
                 }
 
+                CalculatePregnancyWeight(pregnancy);
+
                 if (pregnancy.DueDate.IsFuture) return;
                 PregnancyModel pregnancyModel = Campaign.Current.Models.PregnancyModel;
 
@@ -439,6 +472,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 int stillbornCount = 0;
 
                 for (int i = 0; i < num; i++)
+                {
                     if (MBRandom.RandomFloat > pregnancyModel.StillbirthProbability)
                     {
                         bool isOffspringFemale = MBRandom.RandomFloat <= pregnancyModel.DeliveringFemaleOffspringProbability;
@@ -467,6 +501,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
                         stillbornCount++;
                     }
+                }
 
                 if (mother == Hero.MainHero || pregnancy.Father == Hero.MainHero)
                 {
@@ -515,12 +550,12 @@ namespace CaptivityEvents.CampaignBehaviors
                         LogEntry.AddLogEntry(childbirthLogEntry2);
                         Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText()));
                     }
-                }      
+                }
 
                 mother.IsPregnant = false;
                 pregnancy.AlreadyOccured = true;
 
-                ChangeWeight(MBRandom.RandomFloatRanged(0.4025f, 0.6025f), pregnancy.Mother);
+                ChangeWeight(pregnancy.Mother, 0, MBRandom.RandomFloatRanged(0.4025f, 0.6025f));
             }
             catch (Exception e)
             {
@@ -586,10 +621,7 @@ namespace CaptivityEvents.CampaignBehaviors
             if (!_returnEquipment.Exists(item => item.Captive == captive)) _returnEquipment.Add(new ReturnEquipment(captive, battleEquipment, civilianEquipment));
         }
 
-        public static bool CheckIfPregnancyExists(Hero pregnantHero)
-        {
-            return _heroPregnancies.Any(pregnancy => pregnancy.Mother == pregnantHero);
-        }
+        public static bool CheckIfPregnancyExists(Hero pregnantHero) => _heroPregnancies.Any(pregnancy => pregnancy.Mother == pregnantHero);
 
         public static bool ClearPregnancyList()
         {

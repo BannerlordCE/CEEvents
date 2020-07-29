@@ -11,9 +11,6 @@ namespace CaptivityEvents.Notifications
         public override TextObject TitleText => new TextObject("{=CEEVENTS1091}Captor Event");
         public override string SoundEventPath => "event:/ui/notification/alert";
 
-        public CECaptorMapNotification(CEEvent captorEvent, TextObject descriptionText) : base(descriptionText)
-        {
-            CaptorEvent = captorEvent;
-        }
+        public CECaptorMapNotification(CEEvent captorEvent, TextObject descriptionText) : base(descriptionText) => CaptorEvent = captorEvent;
     }
 }

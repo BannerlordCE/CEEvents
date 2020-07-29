@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using CaptivityEvents.CampaignBehaviors;
+﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -25,10 +24,7 @@ namespace CaptivityEvents.Events
         private readonly ImpregnationSystem _impregnation = new ImpregnationSystem();
         private readonly CaptiveSpecifics _captive = new CaptiveSpecifics();
 
-        internal CaptiveMenuCallBackDelegate(CEEvent listedEvent)
-        {
-            _listedEvent = listedEvent;
-        }
+        internal CaptiveMenuCallBackDelegate(CEEvent listedEvent) => _listedEvent = listedEvent;
 
         internal CaptiveMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
@@ -93,7 +89,10 @@ namespace CaptivityEvents.Events
                     // Leave menu on if there is no alternative menu
                     CEHelper.settlementCheck = true;
                 }
-                else text.SetTextVariable("SETTLEMENT_NAME", PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Name);
+                else
+                {
+                    text.SetTextVariable("SETTLEMENT_NAME", PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Name);
+                }
             }
             else if (PlayerCaptivity.CaptorParty.IsSettlement)
             {
@@ -112,7 +111,10 @@ namespace CaptivityEvents.Events
                     // Leave menu on if there is no alternative menu
                     CEHelper.settlementCheck = false;
                 }
-                else text.SetTextVariable("PARTY_NAME", PlayerCaptivity.CaptorParty.Name);
+                else
+                {
+                    text.SetTextVariable("PARTY_NAME", PlayerCaptivity.CaptorParty.Name);
+                }
             }
 
             if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.IsActive) PartyBase.MainParty.MobileParty.Position2D = PlayerCaptivity.CaptorParty.MobileParty.Position2D;
@@ -407,7 +409,8 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceSpecificCaptor()
         {
-            if (PlayerCaptivity.CaptorParty == null) { 
+            if (PlayerCaptivity.CaptorParty == null)
+            {
                 CECustomHandler.ForceLogToFile("Using Wrong Category for the Event of " + _listedEvent.Name.ToString());
                 InformationManager.DisplayMessage(new InformationMessage("Using Wrong Category for the Event of " + _listedEvent.Name.ToString(), Colors.Red));
                 GameMenu.ExitToLast();

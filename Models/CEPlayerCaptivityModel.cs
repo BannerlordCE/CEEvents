@@ -1,5 +1,4 @@
-﻿using CaptivityEvents.CampaignBehaviors;
-using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using Helpers;
 using TaleWorlds.CampaignSystem;
@@ -31,7 +30,7 @@ namespace CaptivityEvents.Models
         }
 
         /// <summary>
-        ///     Custom CheckCaptivityChange Function
+        /// Custom CheckCaptivityChange Function
         /// </summary>
         /// <param name="dt"></param>
         /// <returns>EventName</returns>
@@ -42,7 +41,6 @@ namespace CaptivityEvents.Models
             if (Hero.MainHero.Age < 18f)
             {
                 EndCaptivityAction.ApplyByReleasing(Hero.MainHero);
-
                 return "menu_captivity_end_by_party_removed";
             }
 
@@ -59,7 +57,6 @@ namespace CaptivityEvents.Models
             }
             else
             {
-
                 if (!CheckEvent()) return DefaultOverridenCheckCaptivityChange(dt);
                 PlayerCaptivity.LastCheckTime = CampaignTime.Now;
 

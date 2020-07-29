@@ -26,8 +26,8 @@ namespace CaptivityEvents.Brothel
             Name = _brothel.Name.ToString();
             WorkshopType workshopType = WorkshopType.Find("pottery_shop");
             WorkshopTypeId = workshopType.StringId;
-            Location = _brothel.Settlement.Name.ToString(); 
-            Income = (int) (Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
+            Location = _brothel.Settlement.Name.ToString();
+            Income = (int)(Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
             IncomeValueText = DetermineIncomeText(Income);
             InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
             OutputsText = new TextObject("{=CEBROTHEL0994}Notable Prostitutes").ToString();
@@ -80,10 +80,7 @@ namespace CaptivityEvents.Brothel
             if (_brothel != null) InformationManager.AddTooltipInformation(typeof(CEBrothel), _brothel);
         }
 
-        private void ExecuteEndHint()
-        {
-            InformationManager.HideInformations();
-        }
+        private void ExecuteEndHint() => InformationManager.HideInformations();
 
         private static string GetBrothelRunningHintText(bool isRunning, int costToStart)
         {

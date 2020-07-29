@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using CaptivityEvents.CampaignBehaviors;
+﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using HarmonyLib;
 using Helpers;
+using System;
+using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -107,6 +107,7 @@ namespace CaptivityEvents.Events
             }
 
             if (!releasedPrisoners.IsEmpty())
+            {
                 try
                 {
                     MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives");
@@ -165,6 +166,7 @@ namespace CaptivityEvents.Events
                 {
                     CECaptorContinue(args);
                 }
+            }
             else CECaptorContinue(args);
         }
 
@@ -202,7 +204,7 @@ namespace CaptivityEvents.Events
                     MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives");
 
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
-                    
+
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                     Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 

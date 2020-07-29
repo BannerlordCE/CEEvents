@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-using CaptivityEvents.Brothel;
+﻿using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
 using CaptivityEvents.Models;
 using HarmonyLib;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
@@ -234,6 +234,7 @@ namespace CaptivityEvents
             CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
 
             foreach (string moduleID in modulesFound)
+            {
                 try
                 {
                     ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
@@ -255,6 +256,7 @@ namespace CaptivityEvents
                 {
                     CECustomHandler.ForceLogToFile("Failed to fetch DependedModuleIds from " + moduleID);
                 }
+            }
 
             // Load Events
             CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
@@ -272,13 +274,17 @@ namespace CaptivityEvents
 
             // Module Image Load
             if (modulePaths.Count != 0)
+            {
                 foreach (string filepath in modulePaths)
+                {
                     try
                     {
                         string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
                         foreach (string file in moduleFiles)
+                        {
                             if (!CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                            {
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
@@ -290,9 +296,13 @@ namespace CaptivityEvents
                                 {
                                     CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                 }
+                            }
                             else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                        }
                     }
                     catch (Exception) { }
+                }
+            }
 
             // Captivity Location Image Load
             try
@@ -303,6 +313,7 @@ namespace CaptivityEvents
                     if (requiredImages.Contains(file)) continue;
 
                     if (!CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                    {
                         try
                         {
                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
@@ -314,6 +325,7 @@ namespace CaptivityEvents
                         {
                             CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                         }
+                    }
                     else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
                 }
 
@@ -414,12 +426,16 @@ namespace CaptivityEvents
                 if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEPersistence.CEEvents.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 1) continue;
 
                 if (!CEHelper.brothelFlagFemale)
+                {
                     if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale))
                         CEHelper.brothelFlagFemale = true;
+                }
 
                 if (!CEHelper.brothelFlagMale)
+                {
                     if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale))
                         CEHelper.brothelFlagMale = true;
+                }
 
                 if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
                 {
@@ -525,10 +541,7 @@ namespace CaptivityEvents
             return base.DoLoading(game);
         }
 
-        private void InitalizeAttributes(Game game)
-        {
-            CESkills.RegisterAll(game);
-        }
+        private void InitalizeAttributes(Game game) => CESkills.RegisterAll(game);
 
         private void AddBehaviours(CampaignGameStarter campaignStarter)
         {
@@ -564,11 +577,13 @@ namespace CaptivityEvents
             bool flag = false;
 
             for (int i = 0; i < list.Count; i++)
+            {
                 if (list[i] is TBaseType)
                 {
                     flag = true;
                     if (!(list[i] is TChildType)) list[i] = Activator.CreateInstance<TChildType>();
                 }
+            }
 
             if (!flag) gameStarter.AddModel(Activator.CreateInstance<TChildType>());
         }
@@ -579,11 +594,13 @@ namespace CaptivityEvents
             bool flag = false;
 
             for (int i = 0; i < list.Count; i++)
+            {
                 if (list[i] is TBaseType)
                 {
                     flag = true;
                     if (!(list[i] is TChildType)) list[i] = Activator.CreateInstance<TChildType>();
                 }
+            }
 
             if (!flag) gameStarter.AddBehavior(Activator.CreateInstance<TChildType>());
         }
@@ -676,6 +693,7 @@ namespace CaptivityEvents
         private void AnimationStateCheck()
         {
             if (CEPersistence.animationPlayEvent && Game.Current.GameStateManager.ActiveState is MapState)
+            {
                 try
                 {
                     if (Game.Current.ApplicationTime > lastCheck)
@@ -692,6 +710,7 @@ namespace CaptivityEvents
                 {
                     CEPersistence.animationPlayEvent = false;
                 }
+            }
         }
 
         private void CaptiveStateCheck()
@@ -714,8 +733,8 @@ namespace CaptivityEvents
                 {
                     if (Hero.MainHero.IsFemale)
                     {
-                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale 
-                            ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu") 
+                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale
+                            ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu")
                             : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
                         triggeredEvent.Captive = CEPersistence.captiveToPlay;
 
@@ -732,8 +751,8 @@ namespace CaptivityEvents
                     else
                     {
 
-                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale 
-                            ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu") 
+                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale
+                            ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu")
                             : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
                         triggeredEvent.Captive = CEPersistence.captiveToPlay;
 
@@ -765,6 +784,7 @@ namespace CaptivityEvents
 
             // Dungeon
             if (Game.Current.GameStateManager.ActiveState is MissionState missionStateDungeon && missionStateDungeon.CurrentMission.IsLoadingFinished)
+            {
                 switch (CEPersistence.dungeonState)
                 {
                     case CEPersistence.DungeonState.StartWalking:
@@ -816,6 +836,7 @@ namespace CaptivityEvents
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+            }
         }
 
         private void BrothelStateCheck()
@@ -823,6 +844,7 @@ namespace CaptivityEvents
             if (CEPersistence.brothelState == CEPersistence.BrothelState.Normal) return;
 
             if (Game.Current.GameStateManager.ActiveState is MissionState missionStateBrothel && missionStateBrothel.CurrentMission.IsLoadingFinished)
+            {
                 switch (CEPersistence.brothelState)
                 {
                     case CEPersistence.BrothelState.Start:
@@ -923,6 +945,7 @@ namespace CaptivityEvents
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+            }
         }
 
         private void HuntStateCheck()
@@ -942,7 +965,11 @@ namespace CaptivityEvents
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
-                                                         select agent) ForceAgentDropEquipment(agent2);
+                                                         select agent)
+                                {
+                                    ForceAgentDropEquipment(agent2);
+                                }
+
                                 missionState.CurrentMission.ClearCorpses();
 
                                 InformationManager.AddQuickInformation(new TextObject("{=CEEVENTS1069}Let's give them a headstart."), 100, CharacterObject.PlayerCharacter);
