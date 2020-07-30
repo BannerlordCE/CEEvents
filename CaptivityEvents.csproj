@@ -87,6 +87,7 @@
     <Compile Include="CEStrings.cs" />
     <Compile Include="CESubModule.cs" />
     <Compile Include="Issues\CEWhereAreMyThingsIssueBehavior.cs" />
+    <Compile Include="Patches\CEPatchPlayerCaptivity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
