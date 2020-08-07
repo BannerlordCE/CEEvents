@@ -174,7 +174,7 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
-        public void onDailyTick()
+        public void OnDailyTick()
         {
             try
             {
@@ -493,7 +493,7 @@ namespace CaptivityEvents.CampaignBehaviors
             if (victim.IsFemale && _heroPregnancies.Any(pregnancy => pregnancy.Mother == victim)) _heroPregnancies.RemoveAll(pregnancy => pregnancy.Mother == victim);
         }
 
-        private void onHourlyTick()
+        private void OnHourlyTick()
         {
             if (CESettings.Instance.EventCaptorOn && Hero.MainHero.IsPartyLeader && CheckEventHourly())
             {
@@ -655,8 +655,8 @@ namespace CaptivityEvents.CampaignBehaviors
         {
             CampaignEvents.OnChildConceivedEvent.AddNonSerializedListener(this, OnChildConceived);
 
-            CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, onHourlyTick);
-            CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, onDailyTick);
+            CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, OnHourlyTick);
+            CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, OnDailyTick);
 
             CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, OnHeroKilled);
         }

@@ -69,7 +69,31 @@ namespace CaptivityEvents.Events
             MarriageAction.Apply(hero, spouseHero);
         }
 
-        internal void TraitModifier(Hero hero, string trait, int amount = 0)
+        void TraitObjectModifier(TraitObject traitObject, Color color, Hero hero, string trait, int amount, int xp)
+        {
+
+            int currentTraitLevel = hero.GetTraitLevel(traitObject);
+            int newNumber = currentTraitLevel + amount;
+            if (newNumber < 0) newNumber = 0;
+
+            int xpToSet = xp == 0 ? Campaign.Current.Models.CharacterDevelopmentModel.GetTraitXpRequiredForTraitLevel(traitObject, newNumber) : xp;
+            Campaign.Current.Models.CharacterDevelopmentModel.GetTraitLevelForTraitXp(hero, traitObject, xpToSet, out int traitLevel, out int TraitXp);
+            hero.HeroDeveloper.SetPropertyValue(traitObject, TraitXp);
+
+            if (traitLevel != hero.GetTraitLevel(traitObject))
+            {
+                hero.SetTraitLevel(traitObject, traitLevel);
+
+                TextObject textObject = GameTexts.FindText("str_CE_trait_level");
+
+                textObject.SetTextVariable("POSITIVE", TraitXp >= 0 ? 1 : 0);
+
+                textObject.SetTextVariable("TRAIT", CEStrings.FetchTraitString(trait));
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
+            }
+        }
+
+        internal void TraitModifier(Hero hero, string trait, int amount, int xp)
         {
             bool found = false;
 
@@ -78,17 +102,7 @@ namespace CaptivityEvents.Events
                 if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                 {
                     found = true;
-                    int currentTraitLevel = hero.GetTraitLevel(traitObject);
-                    int newNumber = currentTraitLevel + amount;
-                    if (newNumber >= traitObject.MinValue && newNumber <= traitObject.MaxValue) hero.SetTraitLevel(traitObject, newNumber);
-
-                    if (amount == 0) continue;
-                    TextObject textObject = GameTexts.FindText("str_CE_trait_level");
-                    textObject.SetTextVariable("HERO", hero.Name);
-
-                    textObject.SetTextVariable("POSITIVE", amount >= 0 ? 1 : 0);
-                    textObject.SetTextVariable("TRAIT", CEStrings.FetchTraitString(trait));
-                    InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
+                    TraitObjectModifier(traitObject, Colors.Magenta, hero, trait, amount, xp);
                 }
             }
 
@@ -99,17 +113,7 @@ namespace CaptivityEvents.Events
                     if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                     {
                         found = true;
-                        int currentTraitLevel = hero.GetTraitLevel(traitObject);
-                        int newNumber = currentTraitLevel + amount;
-                        if (newNumber >= traitObject.MinValue && newNumber <= traitObject.MaxValue) hero.SetTraitLevel(traitObject, newNumber);
-
-                        if (amount == 0) continue;
-                        TextObject textObject = GameTexts.FindText("str_CE_trait_level");
-                        textObject.SetTextVariable("HERO", hero.Name);
-
-                        textObject.SetTextVariable("POSITIVE", amount >= 0 ? 1 : 0);
-                        textObject.SetTextVariable("TRAIT", CEStrings.FetchTraitString(trait));
-                        InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
+                        TraitObjectModifier(traitObject, Colors.Gray, hero, trait, amount, xp);
                     }
                 }
             }
@@ -122,19 +126,7 @@ namespace CaptivityEvents.Events
                     if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                     {
                         found = true;
-                        int currentTraitLevel = hero.GetTraitLevel(traitObject);
-                        int newNumber = currentTraitLevel + amount;
-                        if (newNumber >= traitObject.MinValue && newNumber <= traitObject.MaxValue) hero.SetTraitLevel(traitObject, newNumber);
-
-                        if (amount == 0) continue;
-                        if (CESettings.Instance != null && !CESettings.Instance.LogToggle) continue;
-
-                        TextObject textObject = GameTexts.FindText("str_CE_trait_level");
-                        textObject.SetTextVariable("HERO", hero.Name);
-
-                        textObject.SetTextVariable("POSITIVE", amount >= 0 ? 1 : 0);
-                        textObject.SetTextVariable("TRAIT", trait);
-                        InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
+                        TraitObjectModifier(traitObject, Colors.Blue, hero, trait, amount, xp);
                     }
                 }
 
@@ -142,45 +134,68 @@ namespace CaptivityEvents.Events
             }
         }
 
-        internal void SkillModifier(Hero hero, string skill, int amount = 0)
+        void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp)
         {
-            if (amount != 0)
+            if (xp == 0)
             {
-                foreach (SkillObject skillObject in SkillObject.All)
+                int currentSkillLevel = hero.GetSkillValue(skillObject);
+                int newNumber = currentSkillLevel + amount;
+                if (newNumber < 0) newNumber = 0;
+
+                float xpToSet = Campaign.Current.Models.CharacterDevelopmentModel.GetXpRequiredForSkillLevel(newNumber);
+                Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet, out int levels);
+                hero.HeroDeveloper.SetPropertyValue(skillObject, xpToSet);
+
+                if (levels > 0)
                 {
-                    if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
-                    {
-                        int currentSkillLevel = hero.GetSkillValue(skillObject);
-                        int newNumber = currentSkillLevel + amount;
-                        if (newNumber < 0) newNumber = 0;
+                    MethodInfo mi = hero.HeroDeveloper.GetType().GetMethod("ChangeSkillLevelFromXpChange", BindingFlags.Instance | BindingFlags.NonPublic);
+                    if (mi != null) mi.Invoke(hero.HeroDeveloper, new object[] { skillObject, levels, false });
+                }
+                else
+                {
+                    hero.SetSkillValue(skillObject, newNumber);
+                }
 
-                        float xpToSet = Campaign.Current.Models.CharacterDevelopmentModel.GetXpRequiredForSkillLevel(newNumber);
-                        Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet, out int levels);
-                        hero.HeroDeveloper.SetPropertyValue(skillObject, xpToSet);
+                if (levels == 0) return;
 
-                        if (levels > 0)
-                        {
-                            MethodInfo mi = hero.HeroDeveloper.GetType().GetMethod("ChangeSkillLevelFromXpChange", BindingFlags.Instance | BindingFlags.NonPublic);
-                            if (mi != null) mi.Invoke(hero.HeroDeveloper, new object[] { skillObject, levels, false });
-                        }
-                        else
-                        {
-                            hero.SetSkillValue(skillObject, newNumber);
-                        }
+                TextObject textObject = GameTexts.FindText("str_CE_level_skill");
+                textObject.SetTextVariable("HERO", hero.Name);
 
-                        TextObject textObject = GameTexts.FindText("str_CE_level_skill");
-                        textObject.SetTextVariable("HERO", hero.Name);
+                if (xp == 0)
+                    textObject.SetTextVariable("NEGATIVE", amount > 0 ? 0 : 1);
+                else
+                    textObject.SetTextVariable("NEGATIVE", xp >= 0 ? 0 : 1);
 
-                        textObject.SetTextVariable("NEGATIVE", amount > 0 ? 0 : 1);
-                        textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
+                textObject.SetTextVariable("NEGATIVE", amount > 0 ? 0 : 1);
+                textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(levels));
 
-                        textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
-                        textObject.SetTextVariable("SKILL", skill.ToLower());
-                        textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
-                        InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
-                    }
+                textObject.SetTextVariable("PLURAL", levels > 1 || levels < 1 ? 1 : 0);
+                textObject.SetTextVariable("SKILL", skill.ToLower());
+                textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
+            } 
+            else
+            {
+                hero.HeroDeveloper.AddSkillXp(skillObject, xp, true, true);
+            }
+
+            
+        }
+
+        internal void SkillModifier(Hero hero, string skill, int amount, int xp)
+        {
+            bool found = false;
+
+            foreach (SkillObject skillObject in SkillObject.All)
+            {
+                if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
+                {
+                    found = true;
+                    SkillObjectModifier(skillObject, Colors.Magenta, hero, skill, amount, xp);
                 }
             }
+
+            if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + skill);
         }
 
 

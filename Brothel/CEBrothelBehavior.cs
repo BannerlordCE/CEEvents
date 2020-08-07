@@ -184,7 +184,9 @@ namespace CaptivityEvents.Brothel
                 Campaign.Current.GameMenuManager.NextLocation = null;
                 Campaign.Current.GameMenuManager.PreviousLocation = null;
             }
-            catch (Exception) { }
+            catch (Exception) {
+                args.IsEnabled = false;
+            }
             return true;
         }
 

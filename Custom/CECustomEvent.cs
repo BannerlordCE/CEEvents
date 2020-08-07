@@ -316,7 +316,11 @@ namespace CaptivityEvents.Custom
 
         public string TraitTotal { get; set; }
 
+        public string TraitXPTotal { get; set; }
+
         public string SkillTotal { get; set; }
+
+        public string SkillXPTotal { get; set; }
 
         [XmlElement(Form = XmlSchemaForm.Unqualified)]
         public string TriggerEventName { get; set; }
@@ -469,7 +473,11 @@ namespace CaptivityEvents.Custom
 
         public string TraitTotal { get; set; }
 
+        public string TraitXPTotal { get; set; }
+
         public string SkillTotal { get; set; }
+
+        public string SkillXPTotal { get; set; }
 
         public string SkillToLevel { get; set; }
 

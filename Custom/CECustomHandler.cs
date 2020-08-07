@@ -40,15 +40,19 @@ namespace CaptivityEvents.Custom
 
                             if (Path.GetFileNameWithoutExtension(text).StartsWith("CEModuleCustom"))
                             {
-                                ForceLogToFile("Custom Flags Found: " + text);
+                                ForceLogToFile("Custom Settings Found: " + text);
 
                                 if (XMLFileCompliesWithCustomXSD(text))
                                 {
                                     AllCustom.AddRange(DeserializeXMLFileToFlags(text));
-                                    ForceLogToFile("Custom Flags Added: " + text);
+                                    ForceLogToFile("Custom Settings Added: " + text);
                                 }
 
-                                ForceLogToFile("Amount Added: " + AllCustom.Count());
+                                ForceLogToFile("Custom Skills Added: " + AllCustom.Sum((CECustom ce) =>
+                                {
+                                    if (ce.CESkills != null) return ce.CESkills.Count;
+                                    return 0;
+                                }));
 
                                 continue;
                             }

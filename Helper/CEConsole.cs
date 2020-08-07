@@ -577,7 +577,7 @@ namespace CaptivityEvents.Helper
                     string[] files = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
 
-                    CESubModule.CEEventImageList.Clear();
+                    CEPersistence.CEEventImageList.Clear();
 
                     // Module Image Load
                     if (modulePaths.Count != 0)
@@ -590,14 +590,14 @@ namespace CaptivityEvents.Helper
 
                                 foreach (string file in moduleFiles)
                                 {
-                                    if (!CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                                    if (!CEPersistence.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
                                     {
                                         try
                                         {
                                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                             texture.PreloadTexture();
                                             Texture texture2D = new Texture(new EngineTexture(texture));
-                                            CESubModule.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                            CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                         }
                                         catch (Exception e)
                                         {
@@ -619,14 +619,14 @@ namespace CaptivityEvents.Helper
                         {
                             if (requiredImages.Contains(file)) continue;
 
-                            if (!CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                            if (!CEPersistence.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
                             {
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                     texture.PreloadTexture();
                                     Texture texture2D = new Texture(new EngineTexture(texture));
-                                    CESubModule.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                    CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
                                 catch (Exception e)
                                 {
@@ -638,14 +638,14 @@ namespace CaptivityEvents.Helper
 
                         foreach (string file in requiredImages)
                         {
-                            if (CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file))) continue;
+                            if (CEPersistence.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file))) continue;
 
                             try
                             {
                                 TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                 texture.PreloadTexture();
                                 Texture texture2D = new Texture(new EngineTexture(texture));
-                                CESubModule.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                             }
                             catch (Exception e)
                             {
@@ -660,9 +660,9 @@ namespace CaptivityEvents.Helper
                         CECustomHandler.ForceLogToFile("Failure to load textures, Critical failure. " + e);
                     }
 
-                    CECustomHandler.ForceLogToFile("Loaded " + CESubModule.CEEventImageList.Count + " images.");
+                    CECustomHandler.ForceLogToFile("Loaded " + CEPersistence.CEEventImageList.Count + " images.");
 
-                    return "Loaded " + CESubModule.CEEventImageList.Count + " images.";
+                    return "Loaded " + CEPersistence.CEEventImageList.Count + " images.";
                 }
                 catch (Exception e)
                 {
@@ -772,7 +772,7 @@ namespace CaptivityEvents.Helper
                     // Get All in ModuleLoader
                     string[] files = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
-                    CESubModule.CEEventImageList.Clear();
+                    CEPersistence.CEEventImageList.Clear();
 
                     // Module Image Load
                     if (modulePaths.Count != 0)
@@ -785,14 +785,14 @@ namespace CaptivityEvents.Helper
 
                                 foreach (string file in moduleFiles)
                                 {
-                                    if (!CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                                    if (!CEPersistence.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
                                     {
                                         try
                                         {
                                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                             texture.PreloadTexture();
                                             Texture texture2D = new Texture(new EngineTexture(texture));
-                                            CESubModule.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                            CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                         }
                                         catch (Exception e)
                                         {
@@ -814,14 +814,14 @@ namespace CaptivityEvents.Helper
                         {
                             if (requiredImages.Contains(file)) continue;
 
-                            if (!CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                            if (!CEPersistence.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
                             {
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                     texture.PreloadTexture();
                                     Texture texture2D = new Texture(new EngineTexture(texture));
-                                    CESubModule.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                    CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
                                 catch (Exception e)
                                 {
@@ -833,14 +833,14 @@ namespace CaptivityEvents.Helper
 
                         foreach (string file in requiredImages)
                         {
-                            if (CESubModule.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file))) continue;
+                            if (CEPersistence.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file))) continue;
 
                             try
                             {
                                 TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                 texture.PreloadTexture();
                                 Texture texture2D = new Texture(new EngineTexture(texture));
-                                CESubModule.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                             }
                             catch (Exception e)
                             {
@@ -855,9 +855,9 @@ namespace CaptivityEvents.Helper
                         CECustomHandler.ForceLogToFile("Failure to load textures, Critical failure. " + e);
                     }
 
-                    CECustomHandler.ForceLogToFile("Loaded " + CESubModule.CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.");
+                    CECustomHandler.ForceLogToFile("Loaded " + CEPersistence.CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.");
 
-                    return "Loaded " + CESubModule.CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.";
+                    return "Loaded " + CEPersistence.CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.";
                 }
                 catch (Exception e)
                 {

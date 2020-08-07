@@ -1,4 +1,5 @@
-﻿using TaleWorlds.Core;
+﻿using System.Collections.Generic;
+using TaleWorlds.Core;
 using TaleWorlds.Localization;
 
 namespace CaptivityEvents
@@ -25,6 +26,18 @@ namespace CaptivityEvents
 
         internal static SkillObject IsSlave { get; private set; }
 
+
+        private static List<CESkillNode> _Skills = new List<CESkillNode>();
+
+        internal static List<SkillObject> CustomSkills { get; private set; }
+
+
+        public static void AddCustomSkill(CESkillNode skillNode)
+        {
+            _Skills.Add(skillNode);
+        }
+
+
         public static void RegisterAll(Game game)
         {
             CEAttribute = game.ObjectManager.RegisterPresumedObject(new CharacterAttribute("CEAttribute"));
@@ -34,6 +47,13 @@ namespace CaptivityEvents
             CEFlags = game.ObjectManager.RegisterPresumedObject(new CharacterAttribute("CEFlags"));
             IsProstitute = game.ObjectManager.RegisterPresumedObject(new SkillObject("IsProstitute"));
             IsSlave = game.ObjectManager.RegisterPresumedObject(new SkillObject("IsSlave"));
+
+            CustomSkills = new List<SkillObject>();
+
+            foreach (CESkillNode skill in _Skills)
+            {
+                CustomSkills.Add(game.ObjectManager.RegisterPresumedObject(new SkillObject(skill.Id)));
+            }
 
             InitializeAll();
         }
@@ -47,6 +67,11 @@ namespace CaptivityEvents
             CEFlags.Initialize(new TextObject("CEFlags"), new TextObject("CEFlags represents the ability to move with speed and force."), new TextObject("CEF"), CharacterAttributesEnum.Social);
             IsProstitute.Initialize(new TextObject("{=CEEVENTS1104}prostitute"), new TextObject("IsProstitute Flag"), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEFlags);
             IsSlave.Initialize(new TextObject("{=CEEVENTS1103}slave"), new TextObject("IsSlave Flag"), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEFlags);
+
+            for (int i = 0; i < CustomSkills.Count; i++)
+            {
+                CustomSkills[i].Initialize(new TextObject(_Skills[i].Name), new TextObject(_Skills[i].Name), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEAttribute);
+            }
 
             Initialized = true;
         }

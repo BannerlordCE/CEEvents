@@ -448,15 +448,20 @@ namespace CaptivityEvents.Events
 
             try
             {
-                int level = new CEVariablesLoader().GetIntFromXML(!string.IsNullOrEmpty(_option.TraitTotal)
-                                                         ? _option.TraitTotal
-                                                         : _listedEvent.TraitTotal);
+                int level = 0;
+                int xp = 0;
 
-                _dynamics.TraitModifier(PlayerCaptivity.CaptorParty.LeaderHero, !string.IsNullOrEmpty(_option.TraitToLevel)
-                                            ? _option.TraitToLevel
-                                            : _listedEvent.TraitToLevel, level);
+                if (!string.IsNullOrEmpty(_option.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.TraitTotal);
+                else if (!string.IsNullOrEmpty(_option.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.TraitXPTotal);
+                else if (!string.IsNullOrEmpty(_listedEvent.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitTotal);
+                else if (!string.IsNullOrEmpty(_listedEvent.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitXPTotal);
+                else CECustomHandler.LogToFile("Missing Trait TraitTotal");
+
+                if (!string.IsNullOrEmpty(_option.TraitToLevel)) _dynamics.TraitModifier(PlayerCaptivity.CaptorParty.LeaderHero, _option.TraitToLevel, level, xp);
+                else if (!string.IsNullOrEmpty(_listedEvent.TraitToLevel)) _dynamics.TraitModifier(PlayerCaptivity.CaptorParty.LeaderHero, _listedEvent.TraitToLevel, level, xp);
+                else CECustomHandler.LogToFile("Missing TraitToLevel");
             }
-            catch (Exception) { CECustomHandler.LogToFile("Missing Trait Flags"); }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
         }
 
         private void ConsequenceSpecificCaptorChangeGold()

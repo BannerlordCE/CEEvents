@@ -89,6 +89,9 @@ namespace CaptivityEvents
         public static float brothelFadeOut = 2f;
 
         public static List<CECustom> CECustomModule = new List<CECustom>();
+
+        // Images
+        public static Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
     }
 
 
@@ -102,9 +105,6 @@ namespace CaptivityEvents
         // Harmony
         private Harmony _harmony;
         public const string HarmonyId = "com.CE.captivityEvents";
-
-        // Images
-        public static readonly Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
 
         // Last Check on Animation Loop
         private static float lastCheck;
@@ -134,38 +134,38 @@ namespace CaptivityEvents
                 if (!swap)
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[34] = name == "default"
-                        ? CEEventImageList["default_female_prison"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_female_prison"]
+                        : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[13] = name == "default"
-                        ? CEEventImageList["default_female"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_female"]
+                        : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[28] = name == "default"
-                        ? CEEventImageList["default_male_prison"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_male_prison"]
+                        : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[12] = name == "default"
-                        ? CEEventImageList["default_male"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_male"]
+                        : CEPersistence.CEEventImageList[name];
                 }
                 else
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[34] = name == "default"
-                        ? CEEventImageList["default_male_prison"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_male_prison"]
+                        : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[13] = name == "default"
-                        ? CEEventImageList["default_male"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_male"]
+                        : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[28] = name == "default"
-                        ? CEEventImageList["default_female_prison"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_female_prison"]
+                        : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[12] = name == "default"
-                        ? CEEventImageList["default_female"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_female"]
+                        : CEPersistence.CEEventImageList[name];
                 }
             }
             catch (Exception e)
@@ -187,8 +187,8 @@ namespace CaptivityEvents
             try
             {
                 UIResourceManager.SpriteData.SpriteCategories["ce_notification_icons"].SpriteSheets[sheet] = name == "default"
-                    ? CEEventImageList["CE_default_notification"]
-                    : CEEventImageList[name];
+                    ? CEPersistence.CEEventImageList["CE_default_notification"]
+                    : CEPersistence.CEEventImageList[name];
             }
             catch (Exception e)
             {
@@ -283,14 +283,14 @@ namespace CaptivityEvents
 
                         foreach (string file in moduleFiles)
                         {
-                            if (!CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                            if (!CEPersistence.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
                             {
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                     texture.PreloadTexture();
                                     Texture texture2D = new Texture(new EngineTexture(texture));
-                                    CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                    CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
                                 catch (Exception e)
                                 {
@@ -312,14 +312,14 @@ namespace CaptivityEvents
                 {
                     if (requiredImages.Contains(file)) continue;
 
-                    if (!CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                    if (!CEPersistence.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
                     {
                         try
                         {
                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                             texture.PreloadTexture();
                             Texture texture2D = new Texture(new EngineTexture(texture));
-                            CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                            CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                         }
                         catch (Exception e)
                         {
@@ -331,14 +331,14 @@ namespace CaptivityEvents
 
                 foreach (string file in requiredImages)
                 {
-                    if (CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file))) continue;
+                    if (CEPersistence.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file))) continue;
 
                     try
                     {
                         TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                         texture.PreloadTexture();
                         Texture texture2D = new Texture(new EngineTexture(texture));
-                        CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                        CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                     }
                     catch (Exception e)
                     {
@@ -364,8 +364,8 @@ namespace CaptivityEvents
                 spriteData.SpriteNames.Add(partNameEvent, new SpriteGeneric(partNameEvent, loadedData.SpritePartNames[partNameEvent]));
 
                 SpriteCategory spriteCategory = spriteData.SpriteCategories[categoryName];
-                spriteCategory.SpriteSheets.Add(CEEventImageList["CE_default_notification"]);
-                spriteCategory.SpriteSheets.Add(CEEventImageList["CE_default_notification"]);
+                spriteCategory.SpriteSheets.Add(CEPersistence.CEEventImageList["CE_default_notification"]);
+                spriteCategory.SpriteSheets.Add(CEPersistence.CEEventImageList["CE_default_notification"]);
                 spriteCategory.Load(UIResourceManager.ResourceContext, UIResourceManager.UIResourceDepot);
 
                 UIResourceManager.BrushFactory.Initialize();
@@ -377,7 +377,7 @@ namespace CaptivityEvents
                 CECustomHandler.ForceLogToFile("Failure to load textures, Critical failure. " + e);
             }
 
-            CECustomHandler.ForceLogToFile("Loaded " + CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.");
+            CECustomHandler.ForceLogToFile("Loaded " + CEPersistence.CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.");
         }
 
         protected override void OnBeforeInitialModuleScreenSetAsRoot()
@@ -460,7 +460,7 @@ namespace CaptivityEvents
                 {
                     TextObject textObject = new TextObject("{=CEEVENTS1000}Captivity Events Loaded with {EVENT_COUNT} Events and {IMAGE_COUNT} Images.\n^o^ Enjoy your events. Remember to endorse!");
                     textObject.SetTextVariable("EVENT_COUNT", CEPersistence.CEEvents.Count);
-                    textObject.SetTextVariable("IMAGE_COUNT", CEEventImageList.Count);
+                    textObject.SetTextVariable("IMAGE_COUNT", CEPersistence.CEEventImageList.Count);
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
                     _isLoaded = true;
                 }
