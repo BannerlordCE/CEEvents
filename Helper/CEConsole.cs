@@ -2,6 +2,7 @@
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
+using CaptivityEvents.Notifications;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
 using TaleWorlds.Library;
+using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
@@ -93,7 +95,8 @@ namespace CaptivityEvents.Helper
                     }
                 }
 
-                result = CEEventManager.FireSpecificEventRandom(eventName, true);
+                CEEvent ceEvent = null;
+                result = CEEventManager.FireSpecificEventRandom(eventName, out ceEvent, true);
 
                 switch (result)
                 {
@@ -104,7 +107,7 @@ namespace CaptivityEvents.Helper
                     case "$EVENTCONDITIONSNOTMET":
                         if (PartyBase.MainParty.NumberOfPrisoners > 0)
                         {
-                            result = CEEventManager.FireSpecificEventPartyLeader(eventName, true, heroName);
+                            result = CEEventManager.FireSpecificEventPartyLeader(eventName, out ceEvent, true, heroName);
 
                             switch (result)
                             {
@@ -164,6 +167,54 @@ namespace CaptivityEvents.Helper
             {
                 return "Sosig\n" + e;
             }
+        }
+
+        private static void LaunchCaptorEvent(CEEvent returnedEvent)
+        {
+            if (CEHelper.notificationCaptorExists) return;
+
+            if (returnedEvent == null) return;
+            CEHelper.notificationCaptorExists = true;
+
+            try
+            {
+                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName);
+                else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_sexual_notification");
+                else new CESubModule().LoadCampaignNotificationTexture("CE_castle_notification");
+            }
+            catch (Exception e)
+            {
+                InformationManager.DisplayMessage(new InformationMessage("LoadCampaignNotificationTextureFailure", Colors.Red));
+
+                CECustomHandler.ForceLogToFile("LoadCampaignNotificationTexture");
+                CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+            }
+
+            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new CECaptorMapNotification(returnedEvent, new TextObject("{=CEEVENTS1090}Captor event is ready")));
+        }
+
+        private static void LaunchRandomEvent(CEEvent returnedEvent)
+        {
+            if (CEHelper.notificationEventExists) return;
+
+            if (returnedEvent == null) return;
+            CEHelper.notificationEventExists = true;
+
+            try
+            {
+                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
+                else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
+                else new CESubModule().LoadCampaignNotificationTexture("CE_random_notification", 1);
+            }
+            catch (Exception e)
+            {
+                InformationManager.DisplayMessage(new InformationMessage("LoadCampaignNotificationTextureFailure", Colors.Red));
+
+                CECustomHandler.ForceLogToFile("LoadCampaignNotificationTexture");
+                CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+            }
+
+            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new CEEventMapNotification(returnedEvent, new TextObject("{=CEEVENTS1059}Random event is ready")));
         }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("fire_event", "captivity")]
@@ -246,7 +297,9 @@ namespace CaptivityEvents.Helper
                     }
                 }
 
-                result = CEEventManager.FireSpecificEventRandom(eventName);
+                CEEvent returnedEvent = null;
+
+                result = CEEventManager.FireSpecificEventRandom(eventName, out returnedEvent);
 
                 switch (result)
                 {
@@ -257,7 +310,7 @@ namespace CaptivityEvents.Helper
                     case "$EVENTCONDITIONSNOTMET":
                         if (PartyBase.MainParty.NumberOfPrisoners > 0)
                         {
-                            result = CEEventManager.FireSpecificEventPartyLeader(eventName, false, heroName);
+                            result = CEEventManager.FireSpecificEventPartyLeader(eventName, out returnedEvent, false, heroName);
 
                             switch (result)
                             {
@@ -278,10 +331,17 @@ namespace CaptivityEvents.Helper
 
                                     if (Game.Current.GameStateManager.ActiveState is MapState mapStateCaptor)
                                     {
-                                        Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-                                        if (!mapStateCaptor.AtMenu) GameMenu.ActivateGameMenu("prisoner_wait");
+                                        if (CESettings.Instance.EventCaptorNotifications)
+                                        {
+                                            LaunchCaptorEvent(returnedEvent);
+                                        }
+                                        else
+                                        {
+                                            Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+                                            if (!mapStateCaptor.AtMenu) GameMenu.ActivateGameMenu("prisoner_wait");
 
-                                        GameMenu.SwitchToMenu(result);
+                                            GameMenu.SwitchToMenu(result);
+                                        }
 
                                         return "Successfully launched event.";
                                     }
@@ -300,10 +360,17 @@ namespace CaptivityEvents.Helper
 
                         if (Game.Current.GameStateManager.ActiveState is MapState mapStateRandom)
                         {
-                            Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-                            if (!mapStateRandom.AtMenu) GameMenu.ActivateGameMenu("prisoner_wait");
+                            if (CESettings.Instance.EventCaptorNotifications)
+                            {
+                                LaunchRandomEvent(returnedEvent);
+                            }
+                            else
+                            {
+                                Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+                                if (!mapStateRandom.AtMenu) GameMenu.ActivateGameMenu("prisoner_wait");
 
-                            GameMenu.SwitchToMenu(result);
+                                GameMenu.SwitchToMenu(result);
+                            }
 
                             return "Successfully launched event.";
                         }
@@ -383,6 +450,28 @@ namespace CaptivityEvents.Helper
                 return hero == null
                     ? "Hero not found."
                     : CEEventChecker.CheckFlags(hero.CharacterObject, PlayerCaptivity.CaptorParty);
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("debug_status", "captivity")]
+        public static string Debug(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.debug_status\".";
+
+                string debug = "";
+
+                debug += "Notification Status:\nCaptor Exists: " + CEHelper.notificationCaptorExists + "\nRandom Exists: " + CEHelper.notificationEventExists;
+
+
+                return debug;
             }
             catch (Exception e)
             {

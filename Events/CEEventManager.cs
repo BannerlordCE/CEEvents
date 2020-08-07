@@ -54,11 +54,12 @@ namespace CaptivityEvents.Events
             return flag;
         }
 
-        public static string FireSpecificEventRandom(string specificEvent, bool force = false)
+        public static string FireSpecificEventRandom(string specificEvent, out CEEvent ceEvent, bool force = false)
         {
             List<string> eventNames = new List<string>();
 
             string flag = "$FAILEDTOFIND";
+            ceEvent = null;
 
             if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
@@ -70,7 +71,11 @@ namespace CaptivityEvents.Events
                 {
                     string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
 
-                    if (force || result == null) flag = foundevent.Name;
+                    if (force || result == null)
+                    {
+                        flag = foundevent.Name;
+                        ceEvent = foundevent;
+                    }
                     else flag = "$" + result;
                 }
                 else
@@ -86,11 +91,12 @@ namespace CaptivityEvents.Events
             return flag;
         }
 
-        public static string FireSpecificEventPartyLeader(string specificEvent, bool force = false, string heroname = null)
+        public static string FireSpecificEventPartyLeader(string specificEvent, out CEEvent ceEvent, bool force = false, string heroname = null)
         {
             List<string> eventNames = new List<string>();
 
             string flag = "$FAILEDTOFIND";
+            ceEvent = null;
 
             if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
@@ -109,7 +115,7 @@ namespace CaptivityEvents.Events
                             if (force || result == null)
                             {
                                 foundevent.Captive = character;
-
+                                ceEvent = foundevent;
                                 return foundevent.Name;
                             }
 

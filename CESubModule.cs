@@ -346,8 +346,17 @@ namespace CaptivityEvents
                     }
                 }
 
-                CECustomHandler.ForceLogToFile("Loading Notification Sprites");
+                LoadTexture("default", false, true);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failure to load textures, Critical failure. " + e);
+            }
 
+            CECustomHandler.ForceLogToFile("Loading Notification Sprites");
+
+            try
+            {
                 // Load the Notifications Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.4.3)
                 SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
@@ -369,12 +378,10 @@ namespace CaptivityEvents
                 spriteCategory.Load(UIResourceManager.ResourceContext, UIResourceManager.UIResourceDepot);
 
                 UIResourceManager.BrushFactory.Initialize();
-
-                LoadTexture("default", false, true);
             }
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("Failure to load textures, Critical failure. " + e);
+                CECustomHandler.ForceLogToFile("Failure to load Notification Sprites, Critical failure. " + e);
             }
 
             CECustomHandler.ForceLogToFile("Loaded " + CEPersistence.CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.");
@@ -483,6 +490,7 @@ namespace CaptivityEvents
         {
             if (!(game.GameType is Campaign)) return;
             CheckBugIssue();
+            ResetHelper();
             if (!_isLoaded) return;
             game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings_xml.xml");
             InitalizeAttributes(game);
@@ -505,19 +513,18 @@ namespace CaptivityEvents
             }
         }
 
-        public override void OnGameEnd(Game game)
+        private void ResetHelper()
         {
-            base.OnGameEnd(game);
+            CEHelper.spouseOne = null;
+            CEHelper.spouseTwo = null;
+            CEHelper.settlementCheck = false;
 
-            if (_harmony != null)
-            {
-                try
-                {
-                    _harmony.UnpatchAll(HarmonyId);
-                }
-                catch (Exception) { }
-            }
+            CEHelper.notificationCaptorExists = false;
+            CEHelper.notificationCaptorCheck = false;
+            CEHelper.notificationEventExists = false;
+            CEHelper.notificationEventCheck = false;
         }
+
 
         public override bool DoLoading(Game game)
         {
