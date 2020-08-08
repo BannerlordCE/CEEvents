@@ -502,7 +502,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 {
                     Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(aliveOffsprings, childbirthLogEntry.GetEncyclopediaText()));
                 }
-                
+
                 mother.IsPregnant = false;
                 pregnancy.AlreadyOccured = true;
 
