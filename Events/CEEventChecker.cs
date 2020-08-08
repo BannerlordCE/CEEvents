@@ -1106,7 +1106,10 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.ReqHeroSkill.IsStringNoneOrEmpty()) return true;
 
-                int skillLevel = captive.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _listEvent.ReqHeroSkill));
+                SkillObject foundSkill = new Dynamics().FindSkill(_listEvent.ReqHeroSkill);
+                if (foundSkill == null) return LogError("Couldn't find " + _listEvent.ReqHeroSkill);
+
+                int skillLevel = captive.GetSkillValue(foundSkill);
 
                 try
                 {

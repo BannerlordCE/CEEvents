@@ -379,12 +379,19 @@ namespace CaptivityEvents.Events
         private void ReqSkill(ref MenuCallbackArgs args)
         {
             if (_option.ReqHeroSkill.IsStringNoneOrEmpty()) return;
-            int skillLevel;
+            int skillLevel = 0;
 
-            try { skillLevel = Hero.MainHero.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _option.ReqHeroSkill)); }
+            try
+            {
+                SkillObject foundSkill = new Dynamics().FindSkill(_option.ReqHeroSkill);
+                if (foundSkill == null)
+                    CECustomHandler.LogToFile("Invalid Skill");
+                else
+                    skillLevel = Hero.MainHero.GetSkillValue(foundSkill);
+            }
             catch (Exception)
             {
-                CECustomHandler.LogToFile("Invalid Skill Captive");
+                CECustomHandler.LogToFile("Invalid Skill");
                 skillLevel = 0;
             }
 

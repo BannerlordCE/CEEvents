@@ -645,7 +645,13 @@ namespace CaptivityEvents.Events
         {
             int skillLevel = 0;
 
-            try { skillLevel = Hero.MainHero.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _option.ReqCaptorSkill)); }
+            try {
+                SkillObject foundSkill = new Dynamics().FindSkill(_option.ReqCaptorSkill);
+                if (foundSkill == null)
+                    CECustomHandler.LogToFile("Invalid Skill Captor");
+                else
+                    skillLevel = Hero.MainHero.GetSkillValue(foundSkill);
+            }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Invalid Skill Captor");
@@ -700,7 +706,15 @@ namespace CaptivityEvents.Events
         {
             int skillLevel = 0;
 
-            try { skillLevel = _listedEvent.Captive.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _option.ReqHeroSkill)); }
+
+            try { 
+
+                SkillObject foundSkill = new Dynamics().FindSkill(_option.ReqHeroSkill);
+                if (foundSkill == null)
+                    CECustomHandler.LogToFile("Invalid Skill Captive");
+                else
+                    skillLevel = _listedEvent.Captive.GetSkillValue(foundSkill);
+            }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Invalid Skill Captive");

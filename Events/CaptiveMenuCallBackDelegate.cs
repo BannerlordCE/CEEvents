@@ -548,6 +548,7 @@ namespace CaptivityEvents.Events
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeClan)) return;
 
             if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.LeaderHero != null) _dynamics.ChangeClan(Hero.MainHero, PlayerCaptivity.CaptorParty.LeaderHero);
+            else if (PlayerCaptivity.CaptorParty != null && CECampaignBehavior.ExtraProps.Owner != null) _dynamics.ChangeClan(CECampaignBehavior.ExtraProps.Owner, Hero.MainHero);
         }
 
         private void ConsequenceForceMarry()
@@ -555,6 +556,7 @@ namespace CaptivityEvents.Events
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveMarryCaptor)) return;
 
             if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.LeaderHero != null) _dynamics.ChangeSpouse(Hero.MainHero, PlayerCaptivity.CaptorParty.LeaderHero);
+            else if (PlayerCaptivity.CaptorParty != null && CECampaignBehavior.ExtraProps.Owner != null) _dynamics.ChangeSpouse(Hero.MainHero, CECampaignBehavior.ExtraProps.Owner);
         }
 
         private void ReqGold(ref MenuCallbackArgs args)
@@ -595,7 +597,14 @@ namespace CaptivityEvents.Events
             if (PlayerCaptivity.CaptorParty.LeaderHero == null) args.IsEnabled = false;
             int skillLevel = 0;
 
-            try { skillLevel = PlayerCaptivity.CaptorParty.LeaderHero.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _option.ReqCaptorSkill)); }
+            try
+            {
+                SkillObject foundSkill = new Dynamics().FindSkill(_option.ReqCaptorSkill);
+                if (foundSkill == null)
+                    CECustomHandler.LogToFile("Invalid Skill Captor");
+                else
+                    skillLevel = PlayerCaptivity.CaptorParty.LeaderHero.GetSkillValue(foundSkill);
+            }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Invalid Skill Captor");
@@ -641,7 +650,14 @@ namespace CaptivityEvents.Events
 
             int skillLevel = 0;
 
-            try { skillLevel = Hero.MainHero.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _option.ReqHeroSkill)); }
+            try
+            {
+                SkillObject foundSkill = new Dynamics().FindSkill(_option.ReqHeroSkill);
+                if (foundSkill == null)
+                    CECustomHandler.LogToFile("Invalid Skill Captive");
+                else
+                    skillLevel = Hero.MainHero.GetSkillValue(foundSkill);
+            }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Invalid Skill Captive");
@@ -941,7 +957,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroCaptorRelation(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty?.LeaderHero != null) return;
+            if (PlayerCaptivity.CaptorParty?.LeaderHero == null) return;
 
             try
             {
