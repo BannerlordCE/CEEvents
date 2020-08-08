@@ -20,6 +20,7 @@ namespace CaptivityEvents.Brothel
             WorkshopType workshopType = WorkshopType.Find("pottery_shop");
             WorkshopTypeId = workshopType.StringId;
 
+
             // 1.4.1
             Visual = ((_brothel.Owner.CharacterObject != null) ? new ImageIdentifierVM(CharacterCode.CreateFrom(_brothel.Owner.CharacterObject)) : new ImageIdentifierVM(ImageIdentifierType.Null));
             // 1.4.2
@@ -41,6 +42,7 @@ namespace CaptivityEvents.Brothel
             Name = _brothel.Name.ToString();
             Location = _brothel.Settlement.Name.ToString();
             */
+
             Income = (int) (Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
             IncomeValueText = DetermineIncomeText(Income);
             InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
