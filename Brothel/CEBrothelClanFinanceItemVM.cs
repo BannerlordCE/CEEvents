@@ -14,20 +14,24 @@ namespace CaptivityEvents.Brothel
         public CEBrothelClanFinanceItemVM(CEBrothel brothel, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh) : base(onSelection, onRefresh)
         {
             _brothel = brothel;
+
             IncomeTypeAsEnum = IncomeTypes.Workshop;
             SettlementComponent component = _brothel.Settlement.GetComponent<SettlementComponent>();
             ImageName = component != null ? component.WaitMeshName : "";
             RefreshValues();
+
         }
 
         public override void RefreshValues()
         {
             base.RefreshValues();
+
             Name = _brothel.Name.ToString();
             WorkshopType workshopType = WorkshopType.Find("pottery_shop");
             WorkshopTypeId = workshopType.StringId;
             Location = _brothel.Settlement.Name.ToString();
             Income = (int)(Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
+
             IncomeValueText = DetermineIncomeText(Income);
             InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
             OutputsText = new TextObject("{=CEBROTHEL0994}Notable Prostitutes").ToString();

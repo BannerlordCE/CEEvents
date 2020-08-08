@@ -1,4 +1,4 @@
-﻿using CaptivityEvents.Custom;
+using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
 using CaptivityEvents.Notifications;
