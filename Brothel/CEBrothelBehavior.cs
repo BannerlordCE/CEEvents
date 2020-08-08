@@ -108,7 +108,7 @@ namespace CaptivityEvents.Brothel
         /// </summary>
         private static void ManageProstitutes()
         {
-            PartyScreenLogic _serverPartyScreenLogic = new PartyScreenLogic();
+            PartyScreenLogic _partyScreenLogic = new PartyScreenLogic();
 
             try
             {
@@ -127,18 +127,18 @@ namespace CaptivityEvents.Brothel
                 TextObject textObject = new TextObject("{=CEBROTHEL0984}The brothel of {SETTLEMENT}", null);
                 textObject.SetTextVariable("SETTLEMENT", Hero.MainHero.CurrentSettlement.Name);
 
-                _serverPartyScreenLogic.Initialize(new TroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
-                _serverPartyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
+                _partyScreenLogic.Initialize(new TroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
+                _partyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
 
-                _serverPartyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
-                _serverPartyScreenLogic.SetDoneHandler(new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler));
+                _partyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
+                _partyScreenLogic.SetDoneHandler(new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler));
 
                 PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
-                partyState.InitializeLogic(_serverPartyScreenLogic);
+                partyState.InitializeLogic(_partyScreenLogic);
 
-                // Reflection
-                fi = PartyScreenManager.Instance.GetType().GetField("_serverPartyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (fi != null) fi.SetValue(PartyScreenManager.Instance, _serverPartyScreenLogic);
+                // Reflection 1.4.2 REMEMBER TO VERIFY _partyScreenLogic from ServerpartyScreenLogic
+                fi = PartyScreenManager.Instance.GetType().GetField("_partyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (fi != null) fi.SetValue(PartyScreenManager.Instance, _partyScreenLogic);
 
                 Game.Current.GameStateManager.PushState(partyState, 0);
             }
@@ -168,7 +168,6 @@ namespace CaptivityEvents.Brothel
         private static bool BackOnCondition(MenuCallbackArgs args)
         {
             args.optionLeaveType = GameMenuOption.LeaveType.Leave;
-
             return true;
         }
 

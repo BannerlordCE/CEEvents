@@ -173,18 +173,30 @@ namespace CaptivityEvents.Events
                 textObject.SetTextVariable("SKILL", skill.ToLower());
                 textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
-            } 
+            }
             else
             {
                 hero.HeroDeveloper.AddSkillXp(skillObject, xp, true, true);
             }
 
-            
+
         }
 
         internal void SkillModifier(Hero hero, string skill, int amount, int xp)
         {
             bool found = false;
+
+            foreach (SkillObject skillObjectCustom in CESkills.CustomSkills)
+            {
+                if (skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill)
+                {
+                    found = true;
+                    SkillObjectModifier(skillObjectCustom, Colors.Magenta, hero, skill, amount, xp);
+                    break;
+                }
+            }
+
+            if (found) return;
 
             foreach (SkillObject skillObject in SkillObject.All)
             {
@@ -192,6 +204,7 @@ namespace CaptivityEvents.Events
                 {
                     found = true;
                     SkillObjectModifier(skillObject, Colors.Magenta, hero, skill, amount, xp);
+                    break;
                 }
             }
 
