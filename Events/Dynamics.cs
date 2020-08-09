@@ -365,7 +365,7 @@ namespace CaptivityEvents.Events
             }
         }
 
-        internal void MoralChange(int amount, PartyBase partyBase)
+        internal void MoraleChange(int amount, PartyBase partyBase)
         {
             if (!partyBase.IsMobile || amount == 0) return;
             TextObject textObject = GameTexts.FindText("str_CE_morale_level");

@@ -136,9 +136,15 @@ namespace CaptivityEvents.Brothel
                 PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
                 partyState.InitializeLogic(_partyScreenLogic);
 
-                // Reflection 1.4.2 REMEMBER TO VERIFY _partyScreenLogic from ServerpartyScreenLogic
+                // Reflection 1.4.2
+                fi = PartyScreenManager.Instance.GetType().GetField("_serverPartyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (fi != null) fi.SetValue(PartyScreenManager.Instance, _partyScreenLogic);
+
+                // Reflection 1.4.3
+                /*
                 fi = PartyScreenManager.Instance.GetType().GetField("_partyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (fi != null) fi.SetValue(PartyScreenManager.Instance, _partyScreenLogic);
+                */
 
                 Game.Current.GameStateManager.PushState(partyState, 0);
             }
@@ -339,9 +345,9 @@ namespace CaptivityEvents.Brothel
         public static CharacterObject HelperCreateFrom(CharacterObject character, bool traitsAndSkills)
         {
             // 1.4.3 
-            return CharacterObject.CreateFrom(character, traitsAndSkills);
+            // return CharacterObject.CreateFrom(character, traitsAndSkills);
             // 1.4.2
-            // return CharacterObject.CreateFrom(character);
+            return CharacterObject.CreateFrom(character);
         }
 
         private static LocationCharacter CreateTavernkeeper(CultureObject culture, LocationCharacter.CharacterRelations relation)

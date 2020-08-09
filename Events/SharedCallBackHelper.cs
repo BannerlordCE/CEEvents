@@ -246,12 +246,12 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (!string.IsNullOrEmpty(_option.MoraleTotal)) { _dynamics.MoralChange(new CEVariablesLoader().GetIntFromXML(_option.MoraleTotal), party); }
-                else if (!string.IsNullOrEmpty(_listedEvent.MoraleTotal)) { _dynamics.MoralChange(new CEVariablesLoader().GetIntFromXML(_listedEvent.MoraleTotal), party); }
+                if (!string.IsNullOrEmpty(_option.MoraleTotal)) { _dynamics.MoraleChange(new CEVariablesLoader().GetIntFromXML(_option.MoraleTotal), party); }
+                else if (!string.IsNullOrEmpty(_listedEvent.MoraleTotal)) { _dynamics.MoraleChange(new CEVariablesLoader().GetIntFromXML(_listedEvent.MoraleTotal), party); }
                 else
                 {
                     CECustomHandler.LogToFile("Missing MoralTotal");
-                    _dynamics.MoralChange(MBRandom.RandomInt(-5, 5), party);
+                    _dynamics.MoraleChange(MBRandom.RandomInt(-5, 5), party);
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid MoralTotal"); }
@@ -264,12 +264,12 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (!string.IsNullOrEmpty(_option.MoraleTotal)) { _dynamics.MoralChange(new CEVariablesLoader().GetIntFromXML(_option.MoraleTotal), party); }
-                else if (!string.IsNullOrEmpty(_listedEvent.MoraleTotal)) { _dynamics.MoralChange(new CEVariablesLoader().GetIntFromXML(_listedEvent.MoraleTotal), party); }
+                if (!string.IsNullOrEmpty(_option.MoraleTotal)) { _dynamics.MoraleChange(new CEVariablesLoader().GetIntFromXML(_option.MoraleTotal), party); }
+                else if (!string.IsNullOrEmpty(_listedEvent.MoraleTotal)) { _dynamics.MoraleChange(new CEVariablesLoader().GetIntFromXML(_listedEvent.MoraleTotal), party); }
                 else
                 {
                     CECustomHandler.LogToFile("Missing MoralTotal");
-                    _dynamics.MoralChange(MBRandom.RandomInt(-5, 5), party);
+                    _dynamics.MoraleChange(MBRandom.RandomInt(-5, 5), party);
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid MoralTotal"); }

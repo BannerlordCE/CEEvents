@@ -494,14 +494,14 @@ namespace CaptivityEvents.Events
 
             try
             {
-                new Dynamics().MoralChange(!string.IsNullOrEmpty(_option.MoraleTotal)
+                new Dynamics().MoraleChange(!string.IsNullOrEmpty(_option.MoraleTotal)
                                          ? new CEVariablesLoader().GetIntFromXML(_option.MoraleTotal)
                                          : new CEVariablesLoader().GetIntFromXML(_listedEvent.MoraleTotal), PartyBase.MainParty);
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Missing MoralTotal");
-                new Dynamics().MoralChange(MBRandom.RandomInt(-5, 5), PlayerCaptivity.CaptorParty);
+                new Dynamics().MoraleChange(MBRandom.RandomInt(-5, 5), PlayerCaptivity.CaptorParty);
             }
         }
 
