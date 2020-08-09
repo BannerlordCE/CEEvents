@@ -49,7 +49,7 @@ namespace CaptivityEvents.Events
                                : "False")
                            + "\n";
 
-            int slaveSkillLevel = captive.GetSkillValue(CESkills.SkillSlavery);
+            int slaveSkillLevel = captive.GetSkillValue(CESkills.Slavery);
             returnString += "Slavery Level: " + slaveSkillLevel + "\n";
 
             int prostituteSkillFlag = captive.GetSkillValue(CESkills.IsProstitute);
@@ -59,7 +59,7 @@ namespace CaptivityEvents.Events
                                : "False")
                            + "\n";
 
-            int prostituteSkillLevel = captive.GetSkillValue(CESkills.SkillProstitution);
+            int prostituteSkillLevel = captive.GetSkillValue(CESkills.Prostitution);
             returnString += "Prostitution Level: " + prostituteSkillLevel + "\n";
 
             returnString += "Owner: "
@@ -224,7 +224,8 @@ namespace CaptivityEvents.Events
             if (!ProstitutionLevelCheck(captive)) return LatestMessage;
             if (!AgeCheck(captive)) return LatestMessage;
             if (!TraitCheck(captive)) return LatestMessage;
-            if (!SkillCheck(captive)) return LatestMessage;
+            if (!HeroSkillCheck(captive)) return LatestMessage;
+            if (!SkillsCheck(captive)) return LatestMessage;
             if (!HealthCheck(captive)) return LatestMessage;
             if (!HeroCheck(captive, captorParty, nonRandomBehaviour)) return LatestMessage;
             if (!PlayerCheck()) return LatestMessage;
@@ -245,6 +246,7 @@ namespace CaptivityEvents.Events
             {
                 if (!CaptorTraitCheck(captorParty)) return LatestMessage;
                 if (!CaptorSkillCheck(captorParty)) return LatestMessage;
+                if (!CaptorSkillsCheck(captorParty)) return LatestMessage;
                 if (!CaptorItemCheck(captorParty)) return LatestMessage;
                 if (!CaptorPartyGenderCheck(captorParty)) return LatestMessage;
             }
@@ -1100,13 +1102,101 @@ namespace CaptivityEvents.Events
             return true;
         }
 
-        private bool SkillCheck(CharacterObject captive)
+        private bool CaptorSkillsCheck(PartyBase captorParty)
+        {
+            if (_listEvent.SkillsRequired == null) return true;
+
+            if (captorParty.Leader == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkill.");
+
+            return SkillsCheck(captorParty.Leader, true);
+        }
+
+
+        private bool SkillsCheck(CharacterObject character, bool captor = false)
+        {
+            try
+            {
+                if (_listEvent.SkillsRequired == null) return true;
+
+                foreach (SkillRequired skillRequired in _listEvent.SkillsRequired)
+                {
+                    if (captor && skillRequired.Ref == "Hero") continue;
+
+                    SkillObject foundSkill = CESkills.FindSkill(skillRequired.Id);
+                    if (foundSkill == null) return LogError("Couldn't find " + skillRequired.Id);
+                    int skillLevel = character.GetSkillValue(foundSkill);
+
+                    if (captor)
+                    {
+                        try
+                        {
+                            if (!_listEvent.ReqCaptorSkillLevelAbove.IsStringNoneOrEmpty())
+                            {
+                                if (skillLevel < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelAbove))
+                                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelAbove.");
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            return LogError("Missing ReqCaptorSkillLevelAbove");
+                        }
+
+                        try
+                        {
+                            if (_listEvent.ReqCaptorSkillLevelBelow.IsStringNoneOrEmpty()) return true;
+
+                            if (skillLevel > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelBelow))
+                                return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelBelow.");
+                        }
+                        catch (Exception)
+                        {
+                            return LogError("Missing ReqCaptorSkillLevelBelow");
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            if (!_listEvent.ReqHeroSkillLevelAbove.IsStringNoneOrEmpty())
+                            {
+                                if (skillLevel < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelAbove))
+                                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelAbove.");
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            return LogError("Missing ReqHeroSkillLevelAbove");
+                        }
+
+                        try
+                        {
+                            if (_listEvent.ReqHeroSkillLevelBelow.IsStringNoneOrEmpty()) return true;
+
+                            if (skillLevel > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelBelow.");
+                        }
+                        catch (Exception)
+                        {
+                            return LogError("Missing ReqHeroSkillLevelBelow");
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect SkillsRequired / Failed ");
+            }
+
+            return true;
+        }
+
+
+        private bool HeroSkillCheck(CharacterObject captive)
         {
             try
             {
                 if (_listEvent.ReqHeroSkill.IsStringNoneOrEmpty()) return true;
 
-                SkillObject foundSkill = new Dynamics().FindSkill(_listEvent.ReqHeroSkill);
+                SkillObject foundSkill = CESkills.FindSkill(_listEvent.ReqHeroSkill);
                 if (foundSkill == null) return LogError("Couldn't find " + _listEvent.ReqHeroSkill);
 
                 int skillLevel = captive.GetSkillValue(foundSkill);

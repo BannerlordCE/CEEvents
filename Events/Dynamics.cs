@@ -418,26 +418,5 @@ namespace CaptivityEvents.Events
             if (owner != null) hero.Clan = owner.Clan;
         }
 
-        internal SkillObject FindSkill(string skill)
-        {
-
-            foreach (SkillObject skillObjectCustom in CESkills.CustomSkills)
-            {
-                if (skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill)
-                {
-                    return skillObjectCustom;
-                }
-            }
-
-            foreach (SkillObject skillObject in SkillObject.All)
-            {
-                if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
-                {
-                    return skillObject;
-                }
-            }
-
-            return null;
-        }
     }
 }

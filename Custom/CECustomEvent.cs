@@ -61,7 +61,7 @@ namespace CaptivityEvents.Custom
         Trade,
         RebelPrisoners,
         GainRandomPrisoners,
-        StripPlayer
+        StripPlayer,
     }
 
     [DebuggerStepThrough]
@@ -189,15 +189,36 @@ namespace CaptivityEvents.Custom
         public string EventUseConditions { get; set; }
     }
 
-    [DebuggerStepThrough]
-    [XmlType(AnonymousType = true)]
-    [XmlRoot(Namespace = "", IsNullable = true)]
-    [Serializable]
-    public class TriggerEvents
+    public class SkillToLevel
     {
-        [XmlElement("TriggerEvent")]
-        public TriggerEvent[] Option { get; set; }
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string ByXP { get; set; }
+
+        [XmlAttribute()]
+        public string ByLevel { get; set; }
+
+        [XmlAttribute()]
+        public string Id { get; set; }
     }
+
+    public class SkillRequired
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Max { get; set; }
+
+        [XmlAttribute()]
+        public string Min { get; set; }
+
+        [XmlAttribute()]
+        public string Id { get; set; }
+    }
+
 
     [DebuggerStepThrough]
     [XmlType(AnonymousType = true)]
@@ -327,6 +348,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("TriggerEvent", IsNullable = true)]
         public TriggerEvent[] TriggerEvents { get; set; }
+
+        [XmlArrayItem("SkillToLevel", IsNullable = true)]
+        public SkillToLevel[] SkillsToLevel { get; set; }
 
         [XmlElement("StripSettings", IsNullable = true)]
         public StripSettings StripSettings { get; set; }
@@ -490,6 +514,9 @@ namespace CaptivityEvents.Custom
         public string ReqCaptorTrait { get; set; }
 
         public string ReqHeroTrait { get; set; }
+
+        [XmlArrayItem("SkillRequired", IsNullable = true)]
+        public SkillRequired[] SkillsRequired { get; set; }
 
         [XmlIgnore]
         public CharacterObject Captive { get; set; }

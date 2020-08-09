@@ -475,14 +475,18 @@ namespace CaptivityEvents
                 {
                     MessageBox.Show($"Error Initialising Captivity Events:\n\n{e.GetType()}");
                     CECustomHandler.ForceLogToFile("Failed to load: " + e);
-                    InformationManager.DisplayMessage(new InformationMessage("{=CEEVENTS1005}Error: Captivity Events failed to load events. Please refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs. Mod is disabled.", Colors.Red));
                     _isLoaded = false;
                 }
             }
             else
             {
-                InformationManager.DisplayMessage(new InformationMessage("{=CEEVENTS1005}Error: Captivity Events failed to load events. Please refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs. Mod is disabled.", Colors.Red));
                 _isLoaded = false;
+            }
+
+            if (!_isLoaded)
+            {
+                TextObject textObject = new TextObject("{=CEEVENTS1005}Error: Captivity Events failed to load events. Please refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs. Mod is disabled.");
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
             }
         }
 

@@ -383,7 +383,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-                SkillObject foundSkill = new Dynamics().FindSkill(_option.ReqHeroSkill);
+                SkillObject foundSkill = CESkills.FindSkill(_option.ReqHeroSkill);
                 if (foundSkill == null)
                     CECustomHandler.LogToFile("Invalid Skill");
                 else

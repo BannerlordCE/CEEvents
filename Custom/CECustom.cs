@@ -12,6 +12,15 @@ namespace CaptivityEvents
     [Serializable]
     public class CESkillNode
     {
+
+        public CESkillNode(string Id, string Name, string MinLevel = null, string MaxLevel = null)
+        {
+            this.MinLevel = MinLevel;
+            this.MaxLevel = MaxLevel;
+            this.Name = Name;
+            this.Id = Id;
+        }
+
         [XmlAttribute()]
         public string MinLevel { get; set; }
 
