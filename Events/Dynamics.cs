@@ -72,25 +72,29 @@ namespace CaptivityEvents.Events
         void TraitObjectModifier(TraitObject traitObject, Color color, Hero hero, string trait, int amount, int xp)
         {
 
-            int currentTraitLevel = hero.GetTraitLevel(traitObject);
-            int newNumber = currentTraitLevel + amount;
-            if (newNumber < 0) newNumber = 0;
-
-            int xpToSet = xp == 0 ? Campaign.Current.Models.CharacterDevelopmentModel.GetTraitXpRequiredForTraitLevel(traitObject, newNumber) : xp;
-            Campaign.Current.Models.CharacterDevelopmentModel.GetTraitLevelForTraitXp(hero, traitObject, xpToSet, out int traitLevel, out int TraitXp);
-            hero.HeroDeveloper.SetPropertyValue(traitObject, TraitXp);
-
-            if (traitLevel != hero.GetTraitLevel(traitObject))
+            if (xp == 0)
             {
-                hero.SetTraitLevel(traitObject, traitLevel);
+                int currentTraitLevel = hero.GetTraitLevel(traitObject);
+                int newNumber = currentTraitLevel + amount;
+                if (newNumber < 0) newNumber = 0;
+
+
+                hero.SetTraitLevel(traitObject, newNumber);
 
                 TextObject textObject = GameTexts.FindText("str_CE_trait_level");
 
-                textObject.SetTextVariable("POSITIVE", TraitXp >= 0 ? 1 : 0);
+                textObject.SetTextVariable("POSITIVE", newNumber >= 0 ? 1 : 0);
 
                 textObject.SetTextVariable("TRAIT", CEStrings.FetchTraitString(trait));
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
+
             }
+            else if (hero == Hero.MainHero)
+            {
+                Campaign.Current.PlayerTraitDeveloper.AddTraitXp(traitObject, xp);
+            }
+
+
         }
 
         internal void TraitModifier(Hero hero, string trait, int amount, int xp)
