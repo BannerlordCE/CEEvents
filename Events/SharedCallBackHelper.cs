@@ -115,7 +115,29 @@ namespace CaptivityEvents.Events
                 int level = 0;
                 int xp = 0;
 
-                if (_option.SkillsToLevel == null || _option.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref == "Hero") == 0)
+                if (_option.SkillsToLevel != null && _option.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref == "Hero") != 0)
+                {
+                    foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
+                    {
+
+                        if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+
+                        new Dynamics().SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp);
+                    }
+                }
+                else if (_listedEvent.SkillsToLevel != null && _listedEvent.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref == "Hero") != 0)
+                {
+                    foreach (SkillToLevel skillToLevel in _listedEvent.SkillsToLevel)
+                    {
+
+                        if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+
+                        new Dynamics().SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp);
+                    }
+                }
+                else
                 {
                     if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(_option.SkillTotal);
                     else if (!_option.SkillXPTotal.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(_option.SkillXPTotal);
@@ -127,17 +149,7 @@ namespace CaptivityEvents.Events
                     else if (!_listedEvent.SkillToLevel.IsStringNoneOrEmpty()) new Dynamics().SkillModifier(Hero.MainHero, _listedEvent.SkillToLevel, level, xp);
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
                 }
-                else
-                {
-                    foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
-                    {
 
-                        if (skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
-                        else if (skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
-
-                        new Dynamics().SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp);
-                    }
-                }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }

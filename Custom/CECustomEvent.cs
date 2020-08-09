@@ -349,8 +349,11 @@ namespace CaptivityEvents.Custom
         [XmlArrayItem("TriggerEvent", IsNullable = true)]
         public TriggerEvent[] TriggerEvents { get; set; }
 
-        [XmlArrayItem("SkillToLevel", IsNullable = true)]
+        [XmlArrayItem("Skill", IsNullable = true)]
         public SkillToLevel[] SkillsToLevel { get; set; }
+
+        [XmlArrayItem("SkillRequired", IsNullable = true)]
+        public SkillRequired[] SkillsRequired { get; set; }
 
         [XmlElement("StripSettings", IsNullable = true)]
         public StripSettings StripSettings { get; set; }
@@ -517,6 +520,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("SkillRequired", IsNullable = true)]
         public SkillRequired[] SkillsRequired { get; set; }
+
+        [XmlArrayItem("Skill", IsNullable = true)]
+        public SkillToLevel[] SkillsToLevel { get; set; }
 
         [XmlIgnore]
         public CharacterObject Captive { get; set; }

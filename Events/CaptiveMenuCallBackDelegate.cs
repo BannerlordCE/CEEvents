@@ -159,8 +159,10 @@ namespace CaptivityEvents.Events
             ReqProstitute(ref args);
             ReqTrait(ref args);
             ReqCaptorTrait(ref args);
-            ReqSkill(ref args);
+            ReqHeroSkill(ref args);
             ReqCaptorSkill(ref args);
+            ReqHeroSkills(ref args);
+            ReqCaptorSkills(ref args);
             ReqGold(ref args);
 
             return true;
@@ -452,7 +454,29 @@ namespace CaptivityEvents.Events
                 int level = 0;
                 int xp = 0;
 
-                if (_option.SkillsToLevel == null || _option.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref == "Captor") == 0)
+                if (_option.SkillsToLevel != null && _option.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref == "Captor") != 0)
+                {
+                    foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
+                    {
+
+                        if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+
+                        new Dynamics().SkillModifier(PlayerCaptivity.CaptorParty.LeaderHero, skillToLevel.Id, level, xp);
+                    }
+                }
+                else if (_listedEvent.SkillsToLevel != null && _listedEvent.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref == "Captor") != 0)
+                {
+                    foreach (SkillToLevel skillToLevel in _listedEvent.SkillsToLevel)
+                    {
+
+                        if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+
+                        new Dynamics().SkillModifier(PlayerCaptivity.CaptorParty.LeaderHero, skillToLevel.Id, level, xp);
+                    }
+                }
+                else
                 {
                     if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(_option.SkillTotal);
                     else if (!_option.SkillXPTotal.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(_option.SkillXPTotal);
@@ -464,17 +488,7 @@ namespace CaptivityEvents.Events
                     else if (!_listedEvent.SkillToLevel.IsStringNoneOrEmpty()) new Dynamics().SkillModifier(PlayerCaptivity.CaptorParty.LeaderHero, _listedEvent.SkillToLevel, level, xp);
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
                 }
-                else
-                {
-                    foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
-                    {
 
-                        if (skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
-                        else if (skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
-
-                        new Dynamics().SkillModifier(PlayerCaptivity.CaptorParty.LeaderHero, skillToLevel.Id, level, xp);
-                    }
-                }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }
@@ -627,6 +641,104 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
+        private void ReqCaptorSkills(ref MenuCallbackArgs args)
+        {
+            if (_option.SkillsRequired == null) return;
+
+            if (PlayerCaptivity.CaptorParty.LeaderHero == null)
+            {
+                args.IsEnabled = false;
+                return;
+            }
+
+            foreach (SkillRequired skillRequired in _option.SkillsRequired)
+            {
+                if (skillRequired.Ref == "Hero") continue;
+
+                SkillObject foundSkill = CESkills.FindSkill(skillRequired.Id);
+
+                if (foundSkill == null)
+                {
+                    CECustomHandler.ForceLogToFile("Could not find " + skillRequired.Id);
+                    return;
+                }
+
+                int skillLevel = PlayerCaptivity.CaptorParty.LeaderHero.GetSkillValue(foundSkill);
+
+                try
+                {
+                    if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min, "str_CE_skill_captor_level")) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredAbove"); }
+
+                try
+                {
+                    if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_captor_level")) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
+
+            }
+        }
+
+        private void ReqHeroSkills(ref MenuCallbackArgs args)
+        {
+            if (_option.SkillsRequired == null) return;
+
+            foreach (SkillRequired skillRequired in _option.SkillsRequired)
+            {
+                if (skillRequired.Ref == "Captor") continue;
+
+                SkillObject foundSkill = CESkills.FindSkill(skillRequired.Id);
+
+                if (foundSkill == null)
+                {
+                    CECustomHandler.ForceLogToFile("Could not find " + skillRequired.Id);
+                    return;
+                }
+
+                int skillLevel = Hero.MainHero.GetSkillValue(foundSkill);
+
+                try
+                {
+                    if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min, "str_CE_skill_level" )) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredAbove"); }
+
+                try
+                {
+                    if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_level")) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
+
+            }
+        }
+
+        private bool ReqSkillsLevelBelow(ref MenuCallbackArgs args, SkillObject skillRequired, int skillLevel, string max, string type)
+        {
+            if (max.IsStringNoneOrEmpty()) return false;
+            if (skillLevel <= new CEVariablesLoader().GetIntFromXML(max)) return false;
+
+            TextObject text = GameTexts.FindText(type, "high");
+            text.SetTextVariable("SKILL", skillRequired.Name);
+            args.Tooltip = text;
+            args.IsEnabled = false;
+
+            return true;
+        }
+
+        private bool ReqSkillsLevelAbove(ref MenuCallbackArgs args, SkillObject skillRequired, int skillLevel, string min, string type)
+        {
+            if (min.IsStringNoneOrEmpty()) return false;
+            if (skillLevel >= new CEVariablesLoader().GetIntFromXML(min)) return false;
+
+            TextObject text = GameTexts.FindText(type, "low");
+            text.SetTextVariable("SKILL", skillRequired.Name);
+            args.Tooltip = text;
+            args.IsEnabled = false;
+
+            return true;
+        }
+
         private void ReqCaptorSkill(ref MenuCallbackArgs args)
         {
             if (_option.ReqCaptorSkill.IsStringNoneOrEmpty()) return;
@@ -681,7 +793,7 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        private void ReqSkill(ref MenuCallbackArgs args)
+        private void ReqHeroSkill(ref MenuCallbackArgs args)
         {
             if (_option.ReqHeroSkill.IsStringNoneOrEmpty()) return;
 

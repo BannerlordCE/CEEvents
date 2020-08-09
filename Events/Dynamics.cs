@@ -156,8 +156,6 @@ namespace CaptivityEvents.Events
                     hero.SetSkillValue(skillObject, newNumber);
                 }
 
-                if (levels == 0) return;
-
                 TextObject textObject = GameTexts.FindText("str_CE_level_skill");
                 textObject.SetTextVariable("HERO", hero.Name);
 
@@ -166,10 +164,9 @@ namespace CaptivityEvents.Events
                 else
                     textObject.SetTextVariable("NEGATIVE", xp >= 0 ? 0 : 1);
 
-                textObject.SetTextVariable("NEGATIVE", amount > 0 ? 0 : 1);
-                textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(levels));
+                textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
 
-                textObject.SetTextVariable("PLURAL", levels > 1 || levels < 1 ? 1 : 0);
+                textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
                 textObject.SetTextVariable("SKILL", skill.ToLower());
                 textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));

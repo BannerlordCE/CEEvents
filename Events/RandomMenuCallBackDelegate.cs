@@ -67,7 +67,8 @@ namespace CaptivityEvents.Events
             ReqHeroHealthPercentage(ref args);
             ReqSlavery(ref args);
             ReqProstitute(ref args);
-            ReqSkill(ref args);
+            ReqHeroSkill(ref args);
+            ReqHeroSkills(ref args);
             ReqTrait(ref args);
             ReqGold(ref args);
 
@@ -376,7 +377,66 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        private void ReqSkill(ref MenuCallbackArgs args)
+        private void ReqHeroSkills(ref MenuCallbackArgs args)
+        {
+            if (_option.SkillsRequired == null) return;
+
+            foreach (SkillRequired skillRequired in _option.SkillsRequired)
+            {
+                if (skillRequired.Ref == "Captor") continue;
+
+                SkillObject foundSkill = CESkills.FindSkill(skillRequired.Id);
+
+                if (foundSkill == null)
+                {
+                    CECustomHandler.ForceLogToFile("Could not find " + skillRequired.Id);
+                    return;
+                }
+
+                int skillLevel = Hero.MainHero.GetSkillValue(foundSkill);
+
+                try
+                {
+                    if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min)) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredAbove"); }
+
+                try
+                {
+                    if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max)) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
+
+            }
+        }
+
+        private bool ReqSkillsLevelBelow(ref MenuCallbackArgs args, SkillObject skillRequired, int skillLevel, string max)
+        {
+            if (max.IsStringNoneOrEmpty()) return false;
+            if (skillLevel <= new CEVariablesLoader().GetIntFromXML(max)) return false;
+
+            TextObject text = GameTexts.FindText("str_CE_skill_level", "high");
+            text.SetTextVariable("SKILL", skillRequired.Name);
+            args.Tooltip = text;
+            args.IsEnabled = false;
+
+            return true;
+        }
+
+        private bool ReqSkillsLevelAbove(ref MenuCallbackArgs args, SkillObject skillRequired, int skillLevel, string min)
+        {
+            if (min.IsStringNoneOrEmpty()) return false;
+            if (skillLevel >= new CEVariablesLoader().GetIntFromXML(min)) return false;
+
+            TextObject text = GameTexts.FindText("str_CE_skill_level", "low");
+            text.SetTextVariable("SKILL", skillRequired.Name);
+            args.Tooltip = text;
+            args.IsEnabled = false;
+
+            return true;
+        }
+
+        private void ReqHeroSkill(ref MenuCallbackArgs args)
         {
             if (_option.ReqHeroSkill.IsStringNoneOrEmpty()) return;
             int skillLevel = 0;

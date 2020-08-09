@@ -1126,58 +1126,29 @@ namespace CaptivityEvents.Events
                     if (foundSkill == null) return LogError("Couldn't find " + skillRequired.Id);
                     int skillLevel = character.GetSkillValue(foundSkill);
 
-                    if (captor)
+                    try
                     {
-                        try
+                        if (!skillRequired.Min.IsStringNoneOrEmpty())
                         {
-                            if (!_listEvent.ReqCaptorSkillLevelAbove.IsStringNoneOrEmpty())
-                            {
-                                if (skillLevel < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelAbove))
-                                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelAbove.");
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            return LogError("Missing ReqCaptorSkillLevelAbove");
-                        }
-
-                        try
-                        {
-                            if (_listEvent.ReqCaptorSkillLevelBelow.IsStringNoneOrEmpty()) return true;
-
-                            if (skillLevel > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelBelow))
-                                return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelBelow.");
-                        }
-                        catch (Exception)
-                        {
-                            return LogError("Missing ReqCaptorSkillLevelBelow");
+                            if (skillLevel < new CEVariablesLoader().GetIntFromXML(skillRequired.Min))
+                                return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (captor ? "ReqCaptorSkillLevelAbove" : "ReqHeroSkillLevelAbove") + ".");
                         }
                     }
-                    else
+                    catch (Exception)
                     {
-                        try
-                        {
-                            if (!_listEvent.ReqHeroSkillLevelAbove.IsStringNoneOrEmpty())
-                            {
-                                if (skillLevel < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelAbove))
-                                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelAbove.");
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            return LogError("Missing ReqHeroSkillLevelAbove");
-                        }
+                        return LogError("Invalid Skill Required Min");
+                    }
 
-                        try
-                        {
-                            if (_listEvent.ReqHeroSkillLevelBelow.IsStringNoneOrEmpty()) return true;
+                    try
+                    {
+                        if (skillRequired.Max.IsStringNoneOrEmpty()) return true;
 
-                            if (skillLevel > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelBelow.");
-                        }
-                        catch (Exception)
-                        {
-                            return LogError("Missing ReqHeroSkillLevelBelow");
-                        }
+                        if (skillLevel > new CEVariablesLoader().GetIntFromXML(skillRequired.Max))
+                            return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (captor ? "ReqCaptorSkillLevelBelow" : "ReqHeroSkillLevelBelow") + ".");
+                    }
+                    catch (Exception)
+                    {
+                        return LogError("Invalid Skill Required Max");
                     }
                 }
             }
