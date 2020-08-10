@@ -62,6 +62,8 @@ namespace CaptivityEvents.Custom
         RebelPrisoners,
         GainRandomPrisoners,
         StripPlayer,
+        NoInformationMessage,
+        NoMessages
     }
 
     [DebuggerStepThrough]

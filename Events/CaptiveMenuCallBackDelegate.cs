@@ -548,17 +548,20 @@ namespace CaptivityEvents.Events
         private void ConsequenceSpecificCaptorRelations(Hero hero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRelation)) return;
+            bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
+            bool NoMessages = _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoMessages);
+
 
             try
             {
                 _dynamics.RelationsModifier(hero, !string.IsNullOrEmpty(_option.RelationTotal)
                                                 ? new CEVariablesLoader().GetIntFromXML(_option.RelationTotal)
-                                                : new CEVariablesLoader().GetIntFromXML(_listedEvent.RelationTotal));
+                                                : new CEVariablesLoader().GetIntFromXML(_listedEvent.RelationTotal), null, InformationMessage && !NoMessages, !InformationMessage && !NoMessages);
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Missing RelationTotal");
-                _dynamics.RelationsModifier(hero, MBRandom.RandomInt(-5, 5));
+                _dynamics.RelationsModifier(hero, MBRandom.RandomInt(-5, 5), null, InformationMessage && !NoMessages, !InformationMessage && !NoMessages);
             }
         }
 
