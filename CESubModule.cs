@@ -490,6 +490,11 @@ namespace CaptivityEvents
             }
         }
 
+        public override void OnNewGameCreated(Game game, object initializerObject) {
+            CEConsole.CleanSave(new List<string>());
+            base.OnNewGameCreated(game, initializerObject);
+        }
+
         protected override void OnGameStart(Game game, IGameStarter gameStarter)
         {
             if (!(game.GameType is Campaign)) return;
@@ -553,10 +558,12 @@ namespace CaptivityEvents
         }
 
         private void InitalizeAttributes(Game game) => CESkills.RegisterAll(game);
-
+        
         private void AddBehaviours(CampaignGameStarter campaignStarter)
         {
             if (CESettings.Instance == null) return;
+
+            LoadTexture("default", false, true);
 
             campaignStarter.AddBehavior(new CECampaignBehavior());
             if (CESettings.Instance.ProstitutionControl)
@@ -574,7 +581,8 @@ namespace CaptivityEvents
             if (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue) new CEPrisonerDialogue().AddPrisonerLines(campaignStarter);
             //if (CESettings.Instance.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
 
-            AddCustomEvents(campaignStarter);
+            if (_isLoadedInGame) CEConsole.ReloadEvents(new List<string>()); 
+            else AddCustomEvents(campaignStarter);
 
             if (_isLoadedInGame) return;
             TooltipVM.AddTooltipType(typeof(CEBrothel), CEBrothelToolTip.BrothelTypeTooltipAction);
