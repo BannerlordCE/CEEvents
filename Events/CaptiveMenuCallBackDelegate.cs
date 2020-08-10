@@ -418,7 +418,7 @@ namespace CaptivityEvents.Events
                 GameMenu.ExitToLast();
                 return;
             }
-            if (PlayerCaptivity.CaptorParty.IsSettlement && CECampaignBehavior.ExtraProps.Owner == null || !PlayerCaptivity.CaptorParty.IsMobile || PlayerCaptivity.CaptorParty.MobileParty.LeaderHero == null) return;
+            if (CECampaignBehavior.ExtraProps.Owner == null && (PlayerCaptivity.CaptorParty.IsSettlement || !PlayerCaptivity.CaptorParty.IsMobile || PlayerCaptivity.CaptorParty.MobileParty.LeaderHero == null)) return;
 
             Hero hero = CECampaignBehavior.ExtraProps.Owner ?? PlayerCaptivity.CaptorParty.MobileParty.LeaderHero;
 

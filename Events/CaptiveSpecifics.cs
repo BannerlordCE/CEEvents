@@ -111,7 +111,7 @@ namespace CaptivityEvents.Events
                 {
                     Hero.MainHero.ChangeState(Hero.CharacterStates.Active);
                     // 1.4.2 
-                    Hero.MainHero.DaysLeftToRespawn = 0;
+                    // Hero.MainHero.DaysLeftToRespawn = 0;
                 }
 
                 if (captorParty.IsActive) captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject);
