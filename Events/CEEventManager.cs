@@ -1,7 +1,7 @@
-﻿using System;
+﻿using CaptivityEvents.Custom;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using CaptivityEvents.Custom;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -54,11 +54,12 @@ namespace CaptivityEvents.Events
             return flag;
         }
 
-        public static string FireSpecificEventRandom(string specificEvent, bool force = false)
+        public static string FireSpecificEventRandom(string specificEvent, out CEEvent ceEvent, bool force = false)
         {
             List<string> eventNames = new List<string>();
 
             string flag = "$FAILEDTOFIND";
+            ceEvent = null;
 
             if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
@@ -70,7 +71,11 @@ namespace CaptivityEvents.Events
                 {
                     string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
 
-                    if (force || result == null) flag = foundevent.Name;
+                    if (force || result == null)
+                    {
+                        flag = foundevent.Name;
+                        ceEvent = foundevent;
+                    }
                     else flag = "$" + result;
                 }
                 else
@@ -86,11 +91,12 @@ namespace CaptivityEvents.Events
             return flag;
         }
 
-        public static string FireSpecificEventPartyLeader(string specificEvent, bool force = false, string heroname = null)
+        public static string FireSpecificEventPartyLeader(string specificEvent, out CEEvent ceEvent, bool force = false, string heroname = null)
         {
             List<string> eventNames = new List<string>();
 
             string flag = "$FAILEDTOFIND";
+            ceEvent = null;
 
             if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
@@ -101,6 +107,7 @@ namespace CaptivityEvents.Events
                 if (heroname == null)
                 {
                     foreach (CharacterObject character in PartyBase.MainParty.PrisonRoster.Troops)
+                    {
                         if (foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                         {
                             string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(character, PartyBase.MainParty);
@@ -108,12 +115,13 @@ namespace CaptivityEvents.Events
                             if (force || result == null)
                             {
                                 foundevent.Captive = character;
-
+                                ceEvent = foundevent;
                                 return foundevent.Name;
                             }
 
                             flag = "$" + result;
                         }
+                    }
                 }
                 else
                 {
@@ -151,6 +159,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Having " + CEPersistence.CECallableEvents.Count + " of events to weight and check conditions on.");
 
                 foreach (CEEvent listEvent in CEPersistence.CECallableEvents)
+                {
                     if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                     {
                         string result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
@@ -175,6 +184,7 @@ namespace CaptivityEvents.Events
                             CECustomHandler.LogToFile(result);
                         }
                     }
+                }
 
                 CECustomHandler.LogToFile("Number of Filtered events is " + events.Count);
 
@@ -203,6 +213,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Having " + CEPersistence.CECallableEvents.Count + " of events to weight and check conditions on.");
 
                 foreach (CEEvent listEvent in CEPersistence.CECallableEvents)
+                {
                     if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                     {
                         string result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
@@ -227,6 +238,7 @@ namespace CaptivityEvents.Events
                             CECustomHandler.LogToFile(result);
                         }
                     }
+                }
 
                 CECustomHandler.LogToFile("Number of Filtered events is " + events.Count);
 
@@ -256,6 +268,7 @@ namespace CaptivityEvents.Events
             CECustomHandler.LogToFile("Having " + CEPersistence.CECallableEvents.Count + " of events to weight and check conditions on.");
 
             foreach (CEEvent listEvent in CEPersistence.CECallableEvents)
+            {
                 if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                 {
                     string result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(captive, PartyBase.MainParty);
@@ -280,6 +293,7 @@ namespace CaptivityEvents.Events
                         CECustomHandler.LogToFile(result);
                     }
                 }
+            }
 
             CECustomHandler.LogToFile("Number of Filtered events is " + events.Count);
 

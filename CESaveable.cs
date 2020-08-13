@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using CaptivityEvents.Brothel;
+﻿using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Issues;
 using CaptivityEvents.Notifications;
+using System.Collections.Generic;
 using TaleWorlds.SaveSystem;
 
 namespace CaptivityEvents

@@ -1,6 +1,6 @@
-﻿using System;
-using CaptivityEvents.CampaignBehaviors;
+﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
+using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CharacterDevelopment.Managers;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -51,25 +51,33 @@ namespace CaptivityEvents.Events
             if (MBRandom.Random.Next(100) > escapeChance + new ScoresCalculation().EscapeProwessScore(Hero.MainHero))
             {
                 if (CESettings.Instance != null && !CESettings.Instance.SexualContent)
+                {
                     GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
                                               ? "CE_captivity_escape_failure"
                                               : "CE_captivity_escape_failure_male");
+                }
                 else
+                {
                     GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
                                               ? "CE_captivity_sexual_escape_failure"
                                               : "CE_captivity_sexual_escape_failure_male");
+                }
 
                 return;
             }
 
             if (CESettings.Instance != null && !CESettings.Instance.SexualContent)
+            {
                 GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
                                           ? "CE_captivity_escape_success"
                                           : "CE_captivity_escape_success_male");
+            }
             else
+            {
                 GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
                                           ? "CE_captivity_sexual_escape_success"
                                           : "CE_captivity_sexual_escape_success_male");
+            }
         }
 
         internal void CECaptivityLeave(ref MenuCallbackArgs args)
@@ -102,7 +110,8 @@ namespace CaptivityEvents.Events
                 if (Hero.MainHero.IsAlive)
                 {
                     Hero.MainHero.ChangeState(Hero.CharacterStates.Active);
-                    Hero.MainHero.DaysLeftToRespawn = 0;
+                    // 1.4.2 
+                    // Hero.MainHero.DaysLeftToRespawn = 0;
                 }
 
                 if (captorParty.IsActive) captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject);

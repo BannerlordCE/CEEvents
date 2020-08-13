@@ -1,5 +1,4 @@
-﻿using CaptivityEvents.Brothel;
-using System;
+﻿using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
@@ -27,9 +26,11 @@ namespace CaptivityEvents.CampaignBehaviors
             if (hero.PartyBelongedToAsPrisoner.IsMobile) num *= 6f - (float)Math.Pow(Math.Min(81, hero.PartyBelongedToAsPrisoner.NumberOfHealthyMembers), 0.25);
 
             if (hero.PartyBelongedToAsPrisoner == PartyBase.MainParty || hero.PartyBelongedToAsPrisoner.IsSettlement && hero.PartyBelongedToAsPrisoner.Settlement.OwnerClan == Clan.PlayerClan)
+            {
                 num *= hero.PartyBelongedToAsPrisoner.IsSettlement
                     ? 0.5f
                     : 0.33f;
+            }
 
             if (MBRandom.RandomFloat < num) EndCaptivityAction.ApplyByEscape(hero);
         }
@@ -73,6 +74,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 CharacterObject character = null;
 
                 foreach (TroopRosterElement troopRosterElement in mobileParty.PrisonRoster)
+                {
                     if (!troopRosterElement.Character.IsHero || !flag)
                     {
                         num2 -= troopRosterElement.Number;
@@ -82,6 +84,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
                         break;
                     }
+                }
 
                 ApplyEscapeChanceToExceededPrisoners(character, mobileParty);
             }

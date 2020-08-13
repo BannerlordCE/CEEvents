@@ -8,13 +8,14 @@ using TaleWorlds.Core;
 namespace CaptivityEvents.Patches
 {
     [HarmonyPatch(typeof(GameMenu))]
-    class CEPatchGameMenu
+    internal class CEPatchGameMenu
     {
 
         [HarmonyPatch("ActivateGameMenu")]
         [HarmonyPostfix]
         private static void ActivateGameMenu(string menuId)
         {
+            // 1.4.3 Doesn't call this (wait for hotfix)
             switch (menuId)
             {
                 case "defeated_and_taken_prisoner":
