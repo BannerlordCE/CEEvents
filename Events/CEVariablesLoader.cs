@@ -1,5 +1,5 @@
-﻿using System;
-using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Custom;
+using System;
 using TaleWorlds.Core;
 
 namespace CaptivityEvents.Events

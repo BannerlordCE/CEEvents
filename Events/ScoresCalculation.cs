@@ -19,9 +19,6 @@ namespace CaptivityEvents.Events
             return (targetHero.GetSkillValue(DefaultSkills.Charm) + targetHero.GetSkillValue(DefaultSkills.Athletics) / 2 + targetHero.GetSkillValue(DefaultSkills.Roguery) / 3 + targetHero.GetAttributeValue(CharacterAttributesEnum.Social) * 5 + num) / 2;
         }
 
-        internal int EscapeProwessScore(Hero targetHero)
-        {
-            return (targetHero.GetSkillValue(DefaultSkills.Tactics) / 4 + targetHero.GetSkillValue(DefaultSkills.Roguery) / 4) / 4;
-        }
+        internal int EscapeProwessScore(Hero targetHero) => (targetHero.GetSkillValue(DefaultSkills.Tactics) / 4 + targetHero.GetSkillValue(DefaultSkills.Roguery) / 4) / 4;
     }
 }

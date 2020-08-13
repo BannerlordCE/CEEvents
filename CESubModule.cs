@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-using CaptivityEvents.Brothel;
+﻿using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
 using CaptivityEvents.Models;
 using HarmonyLib;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
@@ -89,6 +89,9 @@ namespace CaptivityEvents
         public static float brothelFadeOut = 2f;
 
         public static List<CECustom> CECustomModule = new List<CECustom>();
+
+        // Images
+        public static Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
     }
 
 
@@ -102,9 +105,6 @@ namespace CaptivityEvents
         // Harmony
         private Harmony _harmony;
         public const string HarmonyId = "com.CE.captivityEvents";
-
-        // Images
-        public static readonly Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
 
         // Last Check on Animation Loop
         private static float lastCheck;
@@ -134,38 +134,38 @@ namespace CaptivityEvents
                 if (!swap)
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[34] = name == "default"
-                        ? CEEventImageList["default_female_prison"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_female_prison"]
+                        : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[13] = name == "default"
-                        ? CEEventImageList["default_female"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_female"]
+                        : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[28] = name == "default"
-                        ? CEEventImageList["default_male_prison"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_male_prison"]
+                        : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[12] = name == "default"
-                        ? CEEventImageList["default_male"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_male"]
+                        : CEPersistence.CEEventImageList[name];
                 }
                 else
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[34] = name == "default"
-                        ? CEEventImageList["default_male_prison"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_male_prison"]
+                        : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[13] = name == "default"
-                        ? CEEventImageList["default_male"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_male"]
+                        : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[28] = name == "default"
-                        ? CEEventImageList["default_female_prison"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_female_prison"]
+                        : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[12] = name == "default"
-                        ? CEEventImageList["default_female"]
-                        : CEEventImageList[name];
+                        ? CEPersistence.CEEventImageList["default_female"]
+                        : CEPersistence.CEEventImageList[name];
                 }
             }
             catch (Exception e)
@@ -187,8 +187,8 @@ namespace CaptivityEvents
             try
             {
                 UIResourceManager.SpriteData.SpriteCategories["ce_notification_icons"].SpriteSheets[sheet] = name == "default"
-                    ? CEEventImageList["CE_default_notification"]
-                    : CEEventImageList[name];
+                    ? CEPersistence.CEEventImageList["CE_default_notification"]
+                    : CEPersistence.CEEventImageList[name];
             }
             catch (Exception e)
             {
@@ -234,6 +234,7 @@ namespace CaptivityEvents
             CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
 
             foreach (string moduleID in modulesFound)
+            {
                 try
                 {
                     ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
@@ -255,6 +256,7 @@ namespace CaptivityEvents
                 {
                     CECustomHandler.ForceLogToFile("Failed to fetch DependedModuleIds from " + moduleID);
                 }
+            }
 
             // Load Events
             CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
@@ -272,27 +274,35 @@ namespace CaptivityEvents
 
             // Module Image Load
             if (modulePaths.Count != 0)
+            {
                 foreach (string filepath in modulePaths)
+                {
                     try
                     {
                         string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
                         foreach (string file in moduleFiles)
-                            if (!CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                        {
+                            if (!CEPersistence.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                            {
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                     texture.PreloadTexture();
                                     Texture texture2D = new Texture(new EngineTexture(texture));
-                                    CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                    CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
                                 catch (Exception e)
                                 {
                                     CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                 }
+                            }
                             else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                        }
                     }
                     catch (Exception) { }
+                }
+            }
 
             // Captivity Location Image Load
             try
@@ -302,31 +312,33 @@ namespace CaptivityEvents
                 {
                     if (requiredImages.Contains(file)) continue;
 
-                    if (!CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                    if (!CEPersistence.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file)))
+                    {
                         try
                         {
                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                             texture.PreloadTexture();
                             Texture texture2D = new Texture(new EngineTexture(texture));
-                            CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                            CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                         }
                         catch (Exception e)
                         {
                             CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                         }
+                    }
                     else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
                 }
 
                 foreach (string file in requiredImages)
                 {
-                    if (CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file))) continue;
+                    if (CEPersistence.CEEventImageList.ContainsKey(Path.GetFileNameWithoutExtension(file))) continue;
 
                     try
                     {
                         TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                         texture.PreloadTexture();
                         Texture texture2D = new Texture(new EngineTexture(texture));
-                        CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                        CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                     }
                     catch (Exception e)
                     {
@@ -334,9 +346,18 @@ namespace CaptivityEvents
                     }
                 }
 
-                CECustomHandler.ForceLogToFile("Loading Notification Sprites");
-                // Load the Notifications Sprite
-                // 1.4.1 Checked
+                LoadTexture("default", false, true);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failure to load textures, Critical failure. " + e);
+            }
+
+            CECustomHandler.ForceLogToFile("Loading Notification Sprites");
+
+            try
+            {
+                // Load the Notifications Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.4.3)
                 SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
@@ -352,20 +373,18 @@ namespace CaptivityEvents
                 spriteData.SpriteNames.Add(partNameEvent, new SpriteGeneric(partNameEvent, loadedData.SpritePartNames[partNameEvent]));
 
                 SpriteCategory spriteCategory = spriteData.SpriteCategories[categoryName];
-                spriteCategory.SpriteSheets.Add(CEEventImageList["CE_default_notification"]);
-                spriteCategory.SpriteSheets.Add(CEEventImageList["CE_default_notification"]);
+                spriteCategory.SpriteSheets.Add(CEPersistence.CEEventImageList["CE_default_notification"]);
+                spriteCategory.SpriteSheets.Add(CEPersistence.CEEventImageList["CE_default_notification"]);
                 spriteCategory.Load(UIResourceManager.ResourceContext, UIResourceManager.UIResourceDepot);
 
                 UIResourceManager.BrushFactory.Initialize();
-
-                LoadTexture("default", false, true);
             }
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("Failure to load textures, Critical failure. " + e);
+                CECustomHandler.ForceLogToFile("Failure to load Notification Sprites, Critical failure. " + e);
             }
 
-            CECustomHandler.ForceLogToFile("Loaded " + CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.");
+            CECustomHandler.ForceLogToFile("Loaded " + CEPersistence.CEEventImageList.Count + " images and " + CEPersistence.CEEvents.Count + " events.");
         }
 
         protected override void OnBeforeInitialModuleScreenSetAsRoot()
@@ -414,12 +433,16 @@ namespace CaptivityEvents
                 if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEPersistence.CEEvents.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 1) continue;
 
                 if (!CEHelper.brothelFlagFemale)
+                {
                     if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale))
                         CEHelper.brothelFlagFemale = true;
+                }
 
                 if (!CEHelper.brothelFlagMale)
+                {
                     if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale))
                         CEHelper.brothelFlagMale = true;
+                }
 
                 if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
                 {
@@ -444,7 +467,7 @@ namespace CaptivityEvents
                 {
                     TextObject textObject = new TextObject("{=CEEVENTS1000}Captivity Events Loaded with {EVENT_COUNT} Events and {IMAGE_COUNT} Images.\n^o^ Enjoy your events. Remember to endorse!");
                     textObject.SetTextVariable("EVENT_COUNT", CEPersistence.CEEvents.Count);
-                    textObject.SetTextVariable("IMAGE_COUNT", CEEventImageList.Count);
+                    textObject.SetTextVariable("IMAGE_COUNT", CEPersistence.CEEventImageList.Count);
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
                     _isLoaded = true;
                 }
@@ -452,21 +475,32 @@ namespace CaptivityEvents
                 {
                     MessageBox.Show($"Error Initialising Captivity Events:\n\n{e.GetType()}");
                     CECustomHandler.ForceLogToFile("Failed to load: " + e);
-                    InformationManager.DisplayMessage(new InformationMessage("{=CEEVENTS1005}Error: Captivity Events failed to load events. Please refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs. Mod is disabled.", Colors.Red));
                     _isLoaded = false;
                 }
             }
             else
             {
-                InformationManager.DisplayMessage(new InformationMessage("{=CEEVENTS1005}Error: Captivity Events failed to load events. Please refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs. Mod is disabled.", Colors.Red));
                 _isLoaded = false;
             }
+
+            if (!_isLoaded)
+            {
+                TextObject textObject = new TextObject("{=CEEVENTS1005}Error: Captivity Events failed to load events. Please refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs. Mod is disabled.");
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
+            }
+        }
+
+        public override void OnNewGameCreated(Game game, object initializerObject) {
+            CEConsole.CleanSave(new List<string>());
+            base.OnNewGameCreated(game, initializerObject);
         }
 
         protected override void OnGameStart(Game game, IGameStarter gameStarter)
         {
+            if (!(game.GameType is Campaign)) return;
             CheckBugIssue();
-            if (!(game.GameType is Campaign) || !_isLoaded) return;
+            ResetHelper();
+            if (!_isLoaded) return;
             game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings_xml.xml");
             InitalizeAttributes(game);
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
@@ -475,25 +509,31 @@ namespace CaptivityEvents
 
         private void CheckBugIssue()
         {
-            if (PlayerEncounter.Current == null) return;
-            if (PlayerEncounter.EncounteredMobileParty == null) return;
-            if (PlayerEncounter.EncounteredMobileParty.StringId != "Escaped_Captives") return;
-            CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
-        }
-
-        public override void OnGameEnd(Game game)
-        {
-            base.OnGameEnd(game);
-
-            if (_harmony != null)
+            try
             {
-                try
-                {
-                    _harmony.UnpatchAll(HarmonyId);
-                }
-                catch (Exception) { }
+                if (PlayerEncounter.Current == null) return;
+                if (PlayerEncounter.EncounteredMobileParty == null) return;
+                if (PlayerEncounter.EncounteredMobileParty.StringId != "Escaped_Captives") return;
+                CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
+            }
+            catch (Exception)
+            {
+                return;
             }
         }
+
+        private void ResetHelper()
+        {
+            CEHelper.spouseOne = null;
+            CEHelper.spouseTwo = null;
+            CEHelper.settlementCheck = false;
+
+            CEHelper.notificationCaptorExists = false;
+            CEHelper.notificationCaptorCheck = false;
+            CEHelper.notificationEventExists = false;
+            CEHelper.notificationEventCheck = false;
+        }
+
 
         public override bool DoLoading(Game game)
         {
@@ -517,14 +557,13 @@ namespace CaptivityEvents
             return base.DoLoading(game);
         }
 
-        private void InitalizeAttributes(Game game)
-        {
-            CESkills.RegisterAll(game);
-        }
-
+        private void InitalizeAttributes(Game game) => CESkills.RegisterAll(game);
+        
         private void AddBehaviours(CampaignGameStarter campaignStarter)
         {
             if (CESettings.Instance == null) return;
+
+            LoadTexture("default", false, true);
 
             campaignStarter.AddBehavior(new CECampaignBehavior());
             if (CESettings.Instance.ProstitutionControl)
@@ -542,7 +581,8 @@ namespace CaptivityEvents
             if (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue) new CEPrisonerDialogue().AddPrisonerLines(campaignStarter);
             //if (CESettings.Instance.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
 
-            AddCustomEvents(campaignStarter);
+            if (_isLoadedInGame) CEConsole.ReloadEvents(new List<string>()); 
+            else AddCustomEvents(campaignStarter);
 
             if (_isLoadedInGame) return;
             TooltipVM.AddTooltipType(typeof(CEBrothel), CEBrothelToolTip.BrothelTypeTooltipAction);
@@ -556,11 +596,13 @@ namespace CaptivityEvents
             bool flag = false;
 
             for (int i = 0; i < list.Count; i++)
+            {
                 if (list[i] is TBaseType)
                 {
                     flag = true;
                     if (!(list[i] is TChildType)) list[i] = Activator.CreateInstance<TChildType>();
                 }
+            }
 
             if (!flag) gameStarter.AddModel(Activator.CreateInstance<TChildType>());
         }
@@ -571,11 +613,13 @@ namespace CaptivityEvents
             bool flag = false;
 
             for (int i = 0; i < list.Count; i++)
+            {
                 if (list[i] is TBaseType)
                 {
                     flag = true;
                     if (!(list[i] is TChildType)) list[i] = Activator.CreateInstance<TChildType>();
                 }
+            }
 
             if (!flag) gameStarter.AddBehavior(Activator.CreateInstance<TChildType>());
         }
@@ -652,132 +696,23 @@ namespace CaptivityEvents
             if (Game.Current == null || Game.Current.GameStateManager == null) return;
 
             // CaptiveState
-            if (CEPersistence.captivePlayEvent)
-            {
-                // Dungeon
-                if (CEPersistence.dungeonState != CEPersistence.DungeonState.Normal && Game.Current.GameStateManager.ActiveState is MissionState missionStateDungeon && missionStateDungeon.CurrentMission.IsLoadingFinished)
-                    switch (CEPersistence.dungeonState)
-                    {
-                        case CEPersistence.DungeonState.StartWalking:
-                            if (CharacterObject.OneToOneConversationCharacter == null)
-                            {
-                                try
-                                {
-                                    MissionCameraFadeView behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
-
-                                    Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
-
-                                    WorldPosition worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
-
-                                    if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
-                                    {
-                                        CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
-                                        dungeonFadeOut = 2f;
-                                    }
-                                    else
-                                    {
-                                        CEPersistence.agentTalkingTo.DisableScriptedMovement();
-                                        CEPersistence.agentTalkingTo.HandleStopUsingAction();
-                                        CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
-                                        dungeonFadeOut = 2f;
-                                    }
-
-                                    behaviour.BeginFadeOut(dungeonFadeOut);
-                                }
-                                catch (Exception)
-                                {
-                                    CECustomHandler.ForceLogToFile("Failed MissionCameraFadeView.");
-                                }
-
-                                brothelTimerOne = missionStateDungeon.CurrentMission.Time + dungeonFadeOut;
-                                CEPersistence.dungeonState = CEPersistence.DungeonState.FadeIn;
-                            }
-
-                            break;
-                        case CEPersistence.DungeonState.FadeIn:
-                            if (brothelTimerOne < missionStateDungeon.CurrentMission.Time)
-                            {
-                                CEPersistence.agentTalkingTo.ResetAI();
-                                CEPersistence.dungeonState = CEPersistence.DungeonState.Normal;
-                                Mission.Current.EndMission();
-                            }
-
-                            break;
-                        case CEPersistence.DungeonState.Normal:
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-
-                // Party Menu -> Map State
-                if (Game.Current.GameStateManager.ActiveState is PartyState) Game.Current.GameStateManager.PopState();
-
-                // Map State -> Play Menu
-                if (Game.Current.GameStateManager.ActiveState is MapState mapState)
-                {
-                    CEPersistence.captivePlayEvent = false;
-
-                    if (Hero.MainHero.IsFemale)
-                    {
-
-                        try
-                        {
-                            CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu") : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
-                            triggeredEvent.Captive = CEPersistence.captiveToPlay;
-
-                            if (!mapState.AtMenu)
-                            {
-                                GameMenu.ActivateGameMenu("prisoner_wait");
-                            }
-                            else
-                            {
-                                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
-                                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                            }
-
-                            GameMenu.SwitchToMenu(triggeredEvent.Name);
-                            mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
-                        }
-                        catch (Exception)
-                        {
-                            CECustomHandler.ForceLogToFile("Missing : CE_captor_female_sexual_menu/CE_captor_female_sexual_menu_m");
-                        }
-
-
-                    }
-                    else
-                    {
-
-                        try
-                        {
-                            CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu") : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
-                            triggeredEvent.Captive = CEPersistence.captiveToPlay;
-
-                            if (!mapState.AtMenu)
-                            {
-                                GameMenu.ActivateGameMenu("prisoner_wait");
-                            }
-                            else
-                            {
-                                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
-                                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                            }
-
-                            GameMenu.SwitchToMenu(triggeredEvent.Name);
-                            mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
-                        }
-                        catch (Exception)
-                        {
-                            CECustomHandler.ForceLogToFile("Missing : CE_captor_male_sexual_menu/CE_captor_male_sexual_menu_m");
-                        }
-
-                    }
-
-                    CEPersistence.captiveToPlay = null;
-                }
-            }
+            CaptiveStateCheck();
 
             // Animated Background Menus
+            AnimationStateCheck();
+
+            // Brothel Event To Play
+            BrothelStateCheck();
+
+            // Hunt Event To Play
+            HuntStateCheck();
+        }
+
+        // TODO MOVE TO PROPER LISTENERS AND AWAY FROM ONAPPLICATIONTICK
+        private void AnimationStateCheck()
+        {
             if (CEPersistence.animationPlayEvent && Game.Current.GameStateManager.ActiveState is MapState)
+            {
                 try
                 {
                     if (Game.Current.ApplicationTime > lastCheck)
@@ -794,9 +729,141 @@ namespace CaptivityEvents
                 {
                     CEPersistence.animationPlayEvent = false;
                 }
+            }
+        }
 
-            // Brothel Event To Play
-            if (CEPersistence.brothelState != CEPersistence.BrothelState.Normal && Game.Current.GameStateManager.ActiveState is MissionState missionStateBrothel && missionStateBrothel.CurrentMission.IsLoadingFinished)
+        private void CaptiveStateCheck()
+        {
+            // CaptiveState
+            if (!CEPersistence.captivePlayEvent) return;
+
+            // Dungeon
+            DungeonStateCheck();
+
+            // Party Menu -> Map State
+            if (Game.Current.GameStateManager.ActiveState is PartyState) Game.Current.GameStateManager.PopState();
+
+            // Map State -> Play Menu
+            if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+            {
+                CEPersistence.captivePlayEvent = false;
+
+                try
+                {
+                    if (Hero.MainHero.IsFemale)
+                    {
+                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale
+                            ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu")
+                            : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
+                        triggeredEvent.Captive = CEPersistence.captiveToPlay;
+
+                        if (mapState.AtMenu)
+                        {
+                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
+                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                        }
+
+                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
+                        mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
+
+                    }
+                    else
+                    {
+
+                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale
+                            ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu")
+                            : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
+                        triggeredEvent.Captive = CEPersistence.captiveToPlay;
+
+                        if (mapState.AtMenu)
+                        {
+                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
+                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                        }
+
+                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
+                        mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
+                    }
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.ForceLogToFile(
+                        Hero.MainHero.IsFemale
+                        ? "Missing : CE_captor_female_sexual_menu/CE_captor_female_sexual_menu_m"
+                        : "Missing : CE_captor_male_sexual_menu/CE_captor_male_sexual_menu_m");
+                }
+
+                CEPersistence.captiveToPlay = null;
+            }
+        }
+
+        private void DungeonStateCheck()
+        {
+            if (CEPersistence.dungeonState == CEPersistence.DungeonState.Normal) return;
+
+            // Dungeon
+            if (Game.Current.GameStateManager.ActiveState is MissionState missionStateDungeon && missionStateDungeon.CurrentMission.IsLoadingFinished)
+            {
+                switch (CEPersistence.dungeonState)
+                {
+                    case CEPersistence.DungeonState.StartWalking:
+                        if (CharacterObject.OneToOneConversationCharacter == null)
+                        {
+                            try
+                            {
+                                MissionCameraFadeView behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
+
+                                Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
+
+                                WorldPosition worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
+
+                                if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
+                                {
+                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                    dungeonFadeOut = 2f;
+                                }
+                                else
+                                {
+                                    CEPersistence.agentTalkingTo.DisableScriptedMovement();
+                                    CEPersistence.agentTalkingTo.HandleStopUsingAction();
+                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                    dungeonFadeOut = 2f;
+                                }
+
+                                behaviour.BeginFadeOut(dungeonFadeOut);
+                            }
+                            catch (Exception)
+                            {
+                                CECustomHandler.ForceLogToFile("Failed MissionCameraFadeView.");
+                            }
+
+                            brothelTimerOne = missionStateDungeon.CurrentMission.Time + dungeonFadeOut;
+                            CEPersistence.dungeonState = CEPersistence.DungeonState.FadeIn;
+                        }
+
+                        break;
+                    case CEPersistence.DungeonState.FadeIn:
+                        if (brothelTimerOne < missionStateDungeon.CurrentMission.Time)
+                        {
+                            CEPersistence.agentTalkingTo.ResetAI();
+                            CEPersistence.dungeonState = CEPersistence.DungeonState.Normal;
+                            Mission.Current.EndMission();
+                        }
+
+                        break;
+                    case CEPersistence.DungeonState.Normal:
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        private void BrothelStateCheck()
+        {
+            if (CEPersistence.brothelState == CEPersistence.BrothelState.Normal) return;
+
+            if (Game.Current.GameStateManager.ActiveState is MissionState missionStateBrothel && missionStateBrothel.CurrentMission.IsLoadingFinished)
+            {
                 switch (CEPersistence.brothelState)
                 {
                     case CEPersistence.BrothelState.Start:
@@ -897,7 +964,11 @@ namespace CaptivityEvents
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+            }
+        }
 
+        private void HuntStateCheck()
+        {
             // Hunt Event To Play
             if (CEPersistence.huntState == CEPersistence.HuntState.Normal) return;
 
@@ -913,7 +984,11 @@ namespace CaptivityEvents
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
-                                                         select agent) ForceAgentDropEquipment(agent2);
+                                                         select agent)
+                                {
+                                    ForceAgentDropEquipment(agent2);
+                                }
+
                                 missionState.CurrentMission.ClearCorpses();
 
                                 InformationManager.AddQuickInformation(new TextObject("{=CEEVENTS1069}Let's give them a headstart."), 100, CharacterObject.PlayerCharacter);

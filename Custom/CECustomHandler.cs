@@ -20,14 +20,12 @@ namespace CaptivityEvents.Custom
         private static readonly List<CEEvent> AllEvents = new List<CEEvent>();
         private static readonly List<CECustom> AllCustom = new List<CECustom>();
 
-        public static List<CECustom> GetCustom()
-        {
-            return AllCustom;
-        }
+        public static List<CECustom> GetCustom() => AllCustom;
 
         public static List<CEEvent> GetAllVerifiedXSEFSEvents(List<string> modules)
         {
             if (modules.Count != 0)
+            {
                 foreach (string fullPath in modules)
                 {
                     ForceLogToFile("Found new module path to be checked " + fullPath);
@@ -42,15 +40,19 @@ namespace CaptivityEvents.Custom
 
                             if (Path.GetFileNameWithoutExtension(text).StartsWith("CEModuleCustom"))
                             {
-                                ForceLogToFile("Custom Flags Found: " + text);
+                                ForceLogToFile("Custom Settings Found: " + text);
 
                                 if (XMLFileCompliesWithCustomXSD(text))
                                 {
                                     AllCustom.AddRange(DeserializeXMLFileToFlags(text));
-                                    ForceLogToFile("Custom Flags Added: " + text);
+                                    ForceLogToFile("Custom Settings Added: " + text);
                                 }
 
-                                ForceLogToFile("Amount Added: " + AllCustom.Count());
+                                ForceLogToFile("Custom Skills Added: " + AllCustom.Sum((CECustom ce) =>
+                                {
+                                    if (ce.CESkills != null) return ce.CESkills.Count;
+                                    return 0;
+                                }));
 
                                 continue;
                             }
@@ -58,7 +60,7 @@ namespace CaptivityEvents.Custom
                             ForceLogToFile("Found: " + text);
 
                             if (!XMLFileCompliesWithStandardXSD(text)) continue;
-                            
+
                             AllEvents.AddRange(DeserializeXMLFileToObject(text));
                             ForceLogToFile("Added: " + text);
                         }
@@ -69,6 +71,7 @@ namespace CaptivityEvents.Custom
                         InformationManager.DisplayMessage(new InformationMessage("{=CEEVENTS1003}Failed to load captivity events more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt", Colors.Red));
                     }
                 }
+            }
 
             try
             {
@@ -96,7 +99,7 @@ namespace CaptivityEvents.Custom
                     ForceLogToFile("Found: " + text);
 
                     if (!XMLFileCompliesWithStandardXSD(text)) continue;
-                    
+
                     AllEvents.AddRange(DeserializeXMLFileToObject(text));
                     ForceLogToFile("Added: " + text);
                 }
@@ -124,7 +127,7 @@ namespace CaptivityEvents.Custom
                 xmlSchemaSet.Add(null, fullPath);
                 XDocument source = XDocument.Load(file);
 
-                source.Validate(xmlSchemaSet, delegate(object o, ValidationEventArgs e)
+                source.Validate(xmlSchemaSet, delegate (object o, ValidationEventArgs e)
                                               {
                                                   msg = msg + e.Message + Environment.NewLine;
                                               });
@@ -161,7 +164,7 @@ namespace CaptivityEvents.Custom
                 if (string.IsNullOrEmpty(XmlFilename)) return null;
                 StreamReader textReader = new StreamReader(XmlFilename);
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(CECustom));
-                CECustom xsefsevents = (CECustom) xmlSerializer.Deserialize(textReader);
+                CECustom xsefsevents = (CECustom)xmlSerializer.Deserialize(textReader);
                 list.Add(xsefsevents);
             }
             catch (Exception innerException)
@@ -200,7 +203,7 @@ namespace CaptivityEvents.Custom
                 xmlSchemaSet.Add(null, fullPath);
                 XDocument source = XDocument.Load(file);
 
-                source.Validate(xmlSchemaSet, delegate(object o, ValidationEventArgs e)
+                source.Validate(xmlSchemaSet, delegate (object o, ValidationEventArgs e)
                                               {
                                                   msg = msg + e.Message + Environment.NewLine;
                                               });
@@ -237,7 +240,7 @@ namespace CaptivityEvents.Custom
                 if (string.IsNullOrEmpty(XmlFilename)) return null;
                 StreamReader textReader = new StreamReader(XmlFilename);
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(CEEvents));
-                CEEvents xsefsevents = (CEEvents) xmlSerializer.Deserialize(textReader);
+                CEEvents xsefsevents = (CEEvents)xmlSerializer.Deserialize(textReader);
                 list.AddRange(xsefsevents.CEEvent);
             }
             catch (Exception innerException)

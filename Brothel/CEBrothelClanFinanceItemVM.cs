@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
@@ -15,35 +15,23 @@ namespace CaptivityEvents.Brothel
         {
             _brothel = brothel;
 
-            IncomeTypeAsEnum = IncomeTypes.None;
+            IncomeTypeAsEnum = IncomeTypes.Workshop;
             SettlementComponent component = _brothel.Settlement.GetComponent<SettlementComponent>();
-            WorkshopType workshopType = WorkshopType.Find("pottery_shop");
-            WorkshopTypeId = workshopType.StringId;
-
-
-            // 1.4.1
-            Visual = ((_brothel.Owner.CharacterObject != null) ? new ImageIdentifierVM(CharacterCode.CreateFrom(_brothel.Owner.CharacterObject)) : new ImageIdentifierVM(ImageIdentifierType.Null));
-            // 1.4.2
-            /*
             ImageName = component != null ? component.WaitMeshName : "";
-            */
+            RefreshValues();
+
         }
 
         public override void RefreshValues()
         {
             base.RefreshValues();
 
-            // 1.4.1
-            TextObject textObject = new TextObject("{=CEBROTHEL0984}The brothel of {SETTLEMENT}");
-            textObject.SetTextVariable("SETTLEMENT", _brothel.Settlement.Name);
-            Name = textObject.ToString();
-            // 1.4.2
-            /*
             Name = _brothel.Name.ToString();
+            WorkshopType workshopType = WorkshopType.Find("pottery_shop");
+            WorkshopTypeId = workshopType.StringId;
             Location = _brothel.Settlement.Name.ToString();
-            */
+            Income = (int)(Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
 
-            Income = (int) (Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
             IncomeValueText = DetermineIncomeText(Income);
             InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
             OutputsText = new TextObject("{=CEBROTHEL0994}Notable Prostitutes").ToString();
@@ -96,18 +84,13 @@ namespace CaptivityEvents.Brothel
             if (_brothel != null) InformationManager.AddTooltipInformation(typeof(CEBrothel), _brothel);
         }
 
-        private void ExecuteEndHint()
-        {
-            InformationManager.HideInformations();
-        }
+        private void ExecuteEndHint() => InformationManager.HideInformations();
 
         private static string GetBrothelRunningHintText(bool isRunning, int costToStart)
         {
             TextObject textObject = new TextObject("The brothel is currently {?ISRUNNING}open{?}closed, you will need {AMOUNT} denars to begin operations again{\\?}.");
 
-            textObject.SetTextVariable("ISRUNNING", isRunning
-                                           ? 1
-                                           : 0);
+            textObject.SetTextVariable("ISRUNNING", isRunning ? 1 : 0);
             if (!isRunning) textObject.SetTextVariable("AMOUNT", costToStart);
 
             return textObject.ToString();

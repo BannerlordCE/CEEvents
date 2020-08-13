@@ -61,7 +61,9 @@ namespace CaptivityEvents.Custom
         Trade,
         RebelPrisoners,
         GainRandomPrisoners,
-        StripPlayer
+        StripPlayer,
+        NoInformationMessage,
+        NoMessages
     }
 
     [DebuggerStepThrough]
@@ -189,15 +191,36 @@ namespace CaptivityEvents.Custom
         public string EventUseConditions { get; set; }
     }
 
-    [DebuggerStepThrough]
-    [XmlType(AnonymousType = true)]
-    [XmlRoot(Namespace = "", IsNullable = true)]
-    [Serializable]
-    public class TriggerEvents
+    public class SkillToLevel
     {
-        [XmlElement("TriggerEvent")]
-        public TriggerEvent[] Option { get; set; }
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string ByXP { get; set; }
+
+        [XmlAttribute()]
+        public string ByLevel { get; set; }
+
+        [XmlAttribute()]
+        public string Id { get; set; }
     }
+
+    public class SkillRequired
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Max { get; set; }
+
+        [XmlAttribute()]
+        public string Min { get; set; }
+
+        [XmlAttribute()]
+        public string Id { get; set; }
+    }
+
 
     [DebuggerStepThrough]
     [XmlType(AnonymousType = true)]
@@ -316,13 +339,23 @@ namespace CaptivityEvents.Custom
 
         public string TraitTotal { get; set; }
 
+        public string TraitXPTotal { get; set; }
+
         public string SkillTotal { get; set; }
+
+        public string SkillXPTotal { get; set; }
 
         [XmlElement(Form = XmlSchemaForm.Unqualified)]
         public string TriggerEventName { get; set; }
 
         [XmlArrayItem("TriggerEvent", IsNullable = true)]
         public TriggerEvent[] TriggerEvents { get; set; }
+
+        [XmlArrayItem("Skill", IsNullable = true)]
+        public SkillToLevel[] SkillsToLevel { get; set; }
+
+        [XmlArrayItem("SkillRequired", IsNullable = true)]
+        public SkillRequired[] SkillsRequired { get; set; }
 
         [XmlElement("StripSettings", IsNullable = true)]
         public StripSettings StripSettings { get; set; }
@@ -469,7 +502,11 @@ namespace CaptivityEvents.Custom
 
         public string TraitTotal { get; set; }
 
+        public string TraitXPTotal { get; set; }
+
         public string SkillTotal { get; set; }
+
+        public string SkillXPTotal { get; set; }
 
         public string SkillToLevel { get; set; }
 
@@ -482,6 +519,12 @@ namespace CaptivityEvents.Custom
         public string ReqCaptorTrait { get; set; }
 
         public string ReqHeroTrait { get; set; }
+
+        [XmlArrayItem("SkillRequired", IsNullable = true)]
+        public SkillRequired[] SkillsRequired { get; set; }
+
+        [XmlArrayItem("Skill", IsNullable = true)]
+        public SkillToLevel[] SkillsToLevel { get; set; }
 
         [XmlIgnore]
         public CharacterObject Captive { get; set; }
