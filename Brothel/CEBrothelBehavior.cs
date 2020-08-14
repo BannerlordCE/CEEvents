@@ -1159,6 +1159,10 @@ namespace CaptivityEvents.Brothel
                     {
                         if (!releasePrisoners)
                         {
+                            if (captive.IsHero)
+                            {
+                                captive.HeroObject.IsNoble = true;
+                            }
                             MobileParty.MainParty.PrisonRoster.AddToCounts(captive, 1, captive.IsHero);
                         }
                         else
@@ -1173,6 +1177,7 @@ namespace CaptivityEvents.Brothel
                                         continue;
                                     }
                                 }
+                                captive.HeroObject.IsNoble = true;
                                 MobileParty.MainParty.PrisonRoster.AddToCounts(captive, 1, true);
                                 EndCaptivityAction.ApplyByReleasing(captive.HeroObject, heroReleased);
                             }
@@ -1212,6 +1217,7 @@ namespace CaptivityEvents.Brothel
                 {
                     if (captive.IsHero)
                     {
+                        captive.HeroObject.IsNoble = true;
                         captivesFreed.Add(captive.HeroObject.StringId);
                     }
                 }
@@ -1220,28 +1226,36 @@ namespace CaptivityEvents.Brothel
 
                 foreach (TroopRosterElement troopElement in prisoners)
                 {
-                    if (troopElement.Character.IsHero && !captivesFreed.Contains(troopElement.Character.HeroObject.StringId))
+                    if (troopElement.Character.IsHero)
                     {
-                        if (troopElement.Character.HeroObject.GetSkillValue(CESkills.Slavery) < 50)
+                        troopElement.Character.HeroObject.IsNoble = false;
+                        if (!captivesFreed.Contains(troopElement.Character.HeroObject.StringId))
                         {
-                            new Dynamics().RelationsModifier(troopElement.Character.HeroObject, MBRandom.RandomInt(-10, -1), Hero.MainHero, false, true);
-                        }
+                            if (troopElement.Character.HeroObject.GetSkillValue(CESkills.Slavery) < 50)
+                            {
+                                new Dynamics().RelationsModifier(troopElement.Character.HeroObject, MBRandom.RandomInt(-10, -1), Hero.MainHero, false, true);
+                            }
 
-                        if (CESettings.Instance.EventProstituteGear)
-                        {
-                            CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
+                            if (CESettings.Instance.EventProstituteGear)
+                            {
+                                CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
 
-                            if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
+                                if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
 
-                            Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElement();
-                            Equipment randomBattle = new Equipment(false);
-                            randomBattle.FillFrom(randomCivilian, false);
+                                Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElement();
+                                Equipment randomBattle = new Equipment(false);
+                                randomBattle.FillFrom(randomCivilian, false);
 
-                            EquipmentHelper.AssignHeroEquipmentFromEquipment(troopElement.Character.HeroObject, randomCivilian);
-                            EquipmentHelper.AssignHeroEquipmentFromEquipment(troopElement.Character.HeroObject, randomBattle);
-                        }
+                                EquipmentHelper.AssignHeroEquipmentFromEquipment(troopElement.Character.HeroObject, randomCivilian);
+                                EquipmentHelper.AssignHeroEquipmentFromEquipment(troopElement.Character.HeroObject, randomBattle);
+                            }
+                        } 
                     }
-                    _brothelList[index].CaptiveProstitutes.Add(troopElement.Character);
+
+                    for (int i = 0; i < troopElement.Number; i++)
+                    {
+                        _brothelList[index].CaptiveProstitutes.Add(troopElement.Character);
+                    }
                 }
             }
             catch (Exception)
@@ -1259,6 +1273,12 @@ namespace CaptivityEvents.Brothel
 
                 int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == settlement.StringId);
                 _brothelList[index].CaptiveProstitutes.Remove(prisoner);
+
+                if (prisoner.IsHero)
+                {
+                    prisoner.HeroObject.IsNoble = true;
+                }
+
                 MobileParty.MainParty.PrisonRoster.AddToCounts(prisoner, 1, prisoner.IsHero);
             }
             catch (Exception)
@@ -1277,19 +1297,24 @@ namespace CaptivityEvents.Brothel
 
                 int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == settlement.StringId);
 
-                if (prisoner.IsHero && CESettings.Instance.EventProstituteGear)
+                if (prisoner.IsHero)
                 {
-                    CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
+                    prisoner.HeroObject.IsNoble = false;
+                    if (CESettings.Instance.EventProstituteGear)
+                    {
+                        CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
 
-                    if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(prisoner.HeroObject, prisoner.HeroObject.BattleEquipment, prisoner.HeroObject.CivilianEquipment);
+                        if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(prisoner.HeroObject, prisoner.HeroObject.BattleEquipment, prisoner.HeroObject.CivilianEquipment);
 
-                    Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElement();
-                    Equipment randomBattle = new Equipment(false);
-                    randomBattle.FillFrom(randomCivilian, false);
+                        Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElement();
+                        Equipment randomBattle = new Equipment(false);
+                        randomBattle.FillFrom(randomCivilian, false);
 
-                    EquipmentHelper.AssignHeroEquipmentFromEquipment(prisoner.HeroObject, randomCivilian);
-                    EquipmentHelper.AssignHeroEquipmentFromEquipment(prisoner.HeroObject, randomBattle);
+                        EquipmentHelper.AssignHeroEquipmentFromEquipment(prisoner.HeroObject, randomCivilian);
+                        EquipmentHelper.AssignHeroEquipmentFromEquipment(prisoner.HeroObject, randomBattle);
+                    }
                 }
+
                 _brothelList[index].CaptiveProstitutes.Add(prisoner);
                 MobileParty.MainParty.PrisonRoster.AddToCounts(prisoner, -1);
             }
