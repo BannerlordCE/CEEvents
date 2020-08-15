@@ -150,6 +150,7 @@ namespace CaptivityEvents.Custom
         HeroIsFactionLeader,
         PlayerIsNotBusy,
         StripEnabled,
+        StripDisabled,
     }
 
     [DebuggerStepThrough]
