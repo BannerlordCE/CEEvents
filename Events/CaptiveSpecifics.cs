@@ -89,7 +89,6 @@ namespace CaptivityEvents.Events
             if (!captorParty.IsSettlement || !captorParty.Settlement.IsTown)
             {
                 PlayerCaptivity.EndCaptivity();
-
                 return;
             }
 
@@ -99,12 +98,12 @@ namespace CaptivityEvents.Events
                 {
                     if (Hero.MainHero.IsWounded) Hero.MainHero.HitPoints = 20;
 
-                    if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.IsMobile) PlayerCaptivity.CaptorParty.MobileParty.SetDoNotAttackMainParty(12);
                     PlayerEncounter.ProtectPlayerSide();
                     MobileParty.MainParty.IsDisorganized = false;
                     PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, 1, true);
                 }
 
+                MobileParty.MainParty.CurrentSettlement = PlayerCaptivity.CaptorParty.Settlement;
                 if (Campaign.Current.CurrentMenuContext != null) GameMenu.SwitchToMenu("town");
 
                 if (Hero.MainHero.IsAlive)
@@ -121,7 +120,6 @@ namespace CaptivityEvents.Events
                     MobileParty.MainParty.IsActive = true;
                     PartyBase.MainParty.SetAsCameraFollowParty();
                     MobileParty.MainParty.SetMoveModeHold();
-                    SkillLevelingManager.OnMainHeroReleasedFromCaptivity(PlayerCaptivity.CaptivityStartTime.ElapsedHoursUntilNow);
                     PartyBase.MainParty.UpdateVisibilityAndInspected(true);
                 }
 
