@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
 
@@ -18,7 +19,13 @@ namespace CaptivityEvents.Issues
 
         internal class CEWhereAreMyThingsIssue : IssueBase
         {
-            protected override int RewardGold => (int)(350f + 1500f * IssueDifficultyMultiplier);
+            protected override int RewardGold
+            {
+                get
+                {
+                    return 500 + MathF.Round(1200f * base.IssueDifficultyMultiplier);
+                }
+            }
             protected override bool IsThereAlternativeSolution => false;
             protected override bool IsThereLordSolution => false;
             public override TextObject Title => new TextObject("{=CEEVENTS1089}Missing Equipment");
@@ -42,7 +49,14 @@ namespace CaptivityEvents.Issues
                 return new CEWhereAreMyThingsIssueQuest(questId, IssueOwner, CampaignTime.DaysFromNow(stolenGearDuration), RewardGold, new Equipment(Hero.MainHero.BattleEquipment), new Equipment(Hero.MainHero.CivilianEquipment));
             }
 
-            protected override float GetFrequency() => 0.01f;
+            //1.4.3
+            //protected override float GetFrequency() => 0.01f;
+
+            //1.5.0
+            public override IssueBase.IssueFrequency GetFrequency()
+            {
+                return IssueBase.IssueFrequency.Rare;
+            }
 
             public override bool IssueStayAliveConditions() => true;
 

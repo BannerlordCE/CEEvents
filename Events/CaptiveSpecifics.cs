@@ -2,7 +2,6 @@
 using CaptivityEvents.Custom;
 using System;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.CharacterDevelopment.Managers;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
@@ -109,8 +108,6 @@ namespace CaptivityEvents.Events
                 if (Hero.MainHero.IsAlive)
                 {
                     Hero.MainHero.ChangeState(Hero.CharacterStates.Active);
-                    // 1.4.2 
-                    // Hero.MainHero.DaysLeftToRespawn = 0;
                 }
 
                 if (captorParty.IsActive) captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject);

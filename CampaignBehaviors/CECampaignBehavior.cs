@@ -120,10 +120,7 @@ namespace CaptivityEvents.CampaignBehaviors
         /// <param name="hero"></param>
         private void ChangeWeight(Hero hero, int stage, float weight = 0.3f)
         {
-            // 1.4.2
-            // if (stage != 0) weight = hero.DynamicBodyProperties.Weight;
 
-            // 1.4.3
             if (stage != 0) weight = hero.Weight;
 
             switch (stage)
@@ -141,10 +138,6 @@ namespace CaptivityEvents.CampaignBehaviors
                     break;
             }
 
-            // 1.4.2 version
-            // hero.DynamicBodyProperties = new DynamicBodyProperties(hero.DynamicBodyProperties.Age, weight, hero.DynamicBodyProperties.Build);
-
-            // 1.4.3 version
             hero.Weight = weight;
         }
 

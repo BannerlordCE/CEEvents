@@ -619,7 +619,9 @@ namespace CaptivityEvents.Events
                     }
 
                     if (issueOwner == null) continue;
-                    PotentialIssueData potentialIssueData = new PotentialIssueData(CEWhereAreMyThingsIssueBehavior.OnStartIssue, typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), 0.25f);
+
+                    // 1.5.0 and 1.4.3 difference
+                    PotentialIssueData potentialIssueData = new PotentialIssueData(CEWhereAreMyThingsIssueBehavior.OnStartIssue, typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), IssueBase.IssueFrequency.Rare);
 
                     Campaign.Current.IssueManager.CreateNewIssue(potentialIssueData, issueOwner);
                     Campaign.Current.IssueManager.StartIssueQuest(issueOwner);

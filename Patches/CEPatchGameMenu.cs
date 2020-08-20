@@ -15,7 +15,6 @@ namespace CaptivityEvents.Patches
         [HarmonyPostfix]
         private static void ActivateGameMenu(string menuId)
         {
-            // 1.4.3 Doesn't call this (wait for hotfix)
             switch (menuId)
             {
                 case "defeated_and_taken_prisoner":

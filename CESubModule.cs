@@ -121,6 +121,13 @@ namespace CaptivityEvents
         private static readonly float brothelSoundMin = 1f;
         private static readonly float brothelSoundMax = 3f;
 
+        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml
+        // Index has been changed in 1.4.3 to 1.5.0
+        private static readonly int female_regular = 13; //12
+        private static readonly int male_regular = 18; //13
+        private static readonly int female_prison = 29; //28
+        private static readonly int male_prison = 30; //34
+
         // Sounds for Brothel
         private static readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
 
@@ -133,38 +140,38 @@ namespace CaptivityEvents
             {
                 if (!swap)
                 {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[34] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_female_prison"]
-                        : CEPersistence.CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[13] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_female"]
-                        : CEPersistence.CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[28] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[male_prison] = name == "default"
                         ? CEPersistence.CEEventImageList["default_male_prison"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[12] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[male_regular] = name == "default"
                         ? CEPersistence.CEEventImageList["default_male"]
+                        : CEPersistence.CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[female_prison] = name == "default"
+                        ? CEPersistence.CEEventImageList["default_female_prison"]
+                        : CEPersistence.CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[female_regular] = name == "default"
+                        ? CEPersistence.CEEventImageList["default_female"]
                         : CEPersistence.CEEventImageList[name];
                 }
                 else
                 {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[34] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[male_prison] = name == "default"
+                        ? CEPersistence.CEEventImageList["default_female_prison"]
+                        : CEPersistence.CEEventImageList[name];
+                        
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[male_regular] = name == "default"
+                        ? CEPersistence.CEEventImageList["default_female"]
+                        : CEPersistence.CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[female_prison] = name == "default"
                         ? CEPersistence.CEEventImageList["default_male_prison"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[13] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[female_regular] = name == "default"
                         ? CEPersistence.CEEventImageList["default_male"]
-                        : CEPersistence.CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[28] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_female_prison"]
-                        : CEPersistence.CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[12] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_female"]
                         : CEPersistence.CEEventImageList[name];
                 }
             }
@@ -357,7 +364,7 @@ namespace CaptivityEvents
 
             try
             {
-                // Load the Notifications Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.4.3)
+                // Load the MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.4.3)
                 SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
@@ -490,7 +497,8 @@ namespace CaptivityEvents
             }
         }
 
-        public override void OnNewGameCreated(Game game, object initializerObject) {
+        public override void OnNewGameCreated(Game game, object initializerObject)
+        {
             CEConsole.CleanSave(new List<string>());
             base.OnNewGameCreated(game, initializerObject);
         }
@@ -558,7 +566,7 @@ namespace CaptivityEvents
         }
 
         private void InitalizeAttributes(Game game) => CESkills.RegisterAll(game);
-        
+
         private void AddBehaviours(CampaignGameStarter campaignStarter)
         {
             if (CESettings.Instance == null) return;
@@ -581,7 +589,7 @@ namespace CaptivityEvents
             if (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue) new CEPrisonerDialogue().AddPrisonerLines(campaignStarter);
             //if (CESettings.Instance.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
 
-            if (_isLoadedInGame) CEConsole.ReloadEvents(new List<string>()); 
+            if (_isLoadedInGame) CEConsole.ReloadEvents(new List<string>());
             else AddCustomEvents(campaignStarter);
 
             if (_isLoadedInGame) return;

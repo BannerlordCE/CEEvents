@@ -40,7 +40,9 @@ namespace CaptivityEvents.Models
             };
 
             ExplainedNumber explainedNumber = new ExplainedNumber(1f);
-            PerkHelper.AddPerkBonusForCharacter(DefaultPerks.Medicine.PerfectHealth, hero.Clan.Leader.CharacterObject, ref explainedNumber);
+
+            // 1.4.3 - 1.5.0 Difference true
+            PerkHelper.AddPerkBonusForCharacter(DefaultPerks.Medicine.PerfectHealth, hero.Clan.Leader.CharacterObject, true, ref explainedNumber);
             float perkBonus = explainedNumber.ResultNumber;
 
             float result = CEGetDailyChanceOfPregnancyForHero(h, perkBonus);
