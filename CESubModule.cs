@@ -122,11 +122,17 @@ namespace CaptivityEvents
         private static readonly float brothelSoundMax = 3f;
 
         // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml
-        // Index has been changed in 1.4.3 to 1.5.0
-        private static readonly int female_regular = 13; //12
-        private static readonly int male_regular = 18; //13
-        private static readonly int female_prison = 29; //28
-        private static readonly int male_prison = 30; //34
+        // 1.5.0
+        private static readonly int female_regular = 13;
+        private static readonly int male_regular = 18;
+        private static readonly int female_prison = 29;
+        private static readonly int male_prison = 30;
+
+        // 1.4.3
+        //private static readonly int female_regular = 13;
+        //private static readonly int male_regular = 12;
+        //private static readonly int female_prison = 34;
+        //private static readonly int male_prison = 28;
 
         // Sounds for Brothel
         private static readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
@@ -364,7 +370,7 @@ namespace CaptivityEvents
 
             try
             {
-                // Load the MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.4.3)
+                // Load the MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.0)
                 SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
