@@ -615,7 +615,7 @@ namespace CaptivityEvents.Events
                     PotentialIssueData potentialIssueData = new PotentialIssueData(CEWhereAreMyThingsIssueBehavior.OnStartIssue, typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), IssueBase.IssueFrequency.Rare);
 
                     // 1.4.3
-                    // PotentialIssueData potentialIssueData = new PotentialIssueData(CEWhereAreMyThingsIssueBehavior.OnStartIssue, typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), 0.25f);
+                    //PotentialIssueData potentialIssueData = new PotentialIssueData(CEWhereAreMyThingsIssueBehavior.OnStartIssue, typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), 0.25f);
 
                     Campaign.Current.IssueManager.CreateNewIssue(potentialIssueData, issueOwner);
                     Campaign.Current.IssueManager.StartIssueQuest(issueOwner);

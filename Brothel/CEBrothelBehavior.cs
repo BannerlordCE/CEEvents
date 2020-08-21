@@ -135,8 +135,7 @@ namespace CaptivityEvents.Brothel
 
                 PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
                 partyState.InitializeLogic(_partyScreenLogic);
-
-                // Reflection 1.4.3          
+   
                 fi = PartyScreenManager.Instance.GetType().GetField("_partyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (fi != null) fi.SetValue(PartyScreenManager.Instance, _partyScreenLogic);             
 

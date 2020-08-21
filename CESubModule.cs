@@ -123,16 +123,10 @@ namespace CaptivityEvents
 
         // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml
         // 1.5.0
-        private static readonly int female_regular = 13;
-        private static readonly int male_regular = 18;
-        private static readonly int female_prison = 29;
-        private static readonly int male_prison = 30;
+        private static readonly int[] sprite_index = new int[] { 13, 18, 29, 30 };
 
         // 1.4.3
-        //private static readonly int female_regular = 13;
-        //private static readonly int male_regular = 12;
-        //private static readonly int female_prison = 34;
-        //private static readonly int male_prison = 28;
+        // private static readonly int[] sprite_index = new int[] { 13, 12, 34, 28 };
 
         // Sounds for Brothel
         private static readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
@@ -146,37 +140,37 @@ namespace CaptivityEvents
             {
                 if (!swap)
                 {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[male_prison] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_male_prison"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[male_regular] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_male"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[female_prison] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_female_prison"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[female_regular] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_female"]
                         : CEPersistence.CEEventImageList[name];
                 }
                 else
                 {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[male_prison] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_female_prison"]
                         : CEPersistence.CEEventImageList[name];
                         
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[male_regular] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_female"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[female_prison] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_male_prison"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[female_regular] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_male"]
                         : CEPersistence.CEEventImageList[name];
                 }
