@@ -95,8 +95,7 @@ namespace CaptivityEvents.Helper
                     }
                 }
 
-                CEEvent ceEvent = null;
-                result = CEEventManager.FireSpecificEventRandom(eventName, out ceEvent, true);
+                result = CEEventManager.FireSpecificEventRandom(eventName, out CEEvent ceEvent, true);
 
                 switch (result)
                 {
@@ -297,9 +296,8 @@ namespace CaptivityEvents.Helper
                     }
                 }
 
-                CEEvent returnedEvent = null;
 
-                result = CEEventManager.FireSpecificEventRandom(eventName, out returnedEvent);
+                result = CEEventManager.FireSpecificEventRandom(eventName, out CEEvent returnedEvent);
 
                 switch (result)
                 {
@@ -693,7 +691,10 @@ namespace CaptivityEvents.Helper
                                             CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                         }
                                     }
-                                    else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                                    else
+                                    {
+                                        CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                                    }
                                 }
                             }
                             catch (Exception) { }
@@ -722,7 +723,10 @@ namespace CaptivityEvents.Helper
                                     CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                 }
                             }
-                            else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            else
+                            {
+                                CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            }
                         }
 
                         foreach (string file in requiredImages)
@@ -888,7 +892,10 @@ namespace CaptivityEvents.Helper
                                             CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                         }
                                     }
-                                    else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                                    else
+                                    {
+                                        CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                                    }
                                 }
                             }
                             catch (Exception) { }
@@ -917,7 +924,10 @@ namespace CaptivityEvents.Helper
                                     CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                 }
                             }
-                            else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            else
+                            {
+                                CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            }
                         }
 
                         foreach (string file in requiredImages)

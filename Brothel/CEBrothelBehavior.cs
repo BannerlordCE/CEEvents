@@ -135,9 +135,9 @@ namespace CaptivityEvents.Brothel
 
                 PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
                 partyState.InitializeLogic(_partyScreenLogic);
-   
+
                 fi = PartyScreenManager.Instance.GetType().GetField("_partyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (fi != null) fi.SetValue(PartyScreenManager.Instance, _partyScreenLogic);             
+                if (fi != null) fi.SetValue(PartyScreenManager.Instance, _partyScreenLogic);
 
                 Game.Current.GameStateManager.PushState(partyState, 0);
             }
@@ -182,7 +182,8 @@ namespace CaptivityEvents.Brothel
                 Campaign.Current.GameMenuManager.NextLocation = null;
                 Campaign.Current.GameMenuManager.PreviousLocation = null;
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 args.IsEnabled = false;
             }
             return true;
@@ -335,10 +336,7 @@ namespace CaptivityEvents.Brothel
             _isBrothelInitialized = true;
         }
 
-        public static CharacterObject HelperCreateFrom(CharacterObject character, bool traitsAndSkills)
-        {
-            return CharacterObject.CreateFrom(character, traitsAndSkills);
-        }
+        public static CharacterObject HelperCreateFrom(CharacterObject character, bool traitsAndSkills) => CharacterObject.CreateFrom(character, traitsAndSkills);
 
         private static LocationCharacter CreateTavernkeeper(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
@@ -1239,7 +1237,7 @@ namespace CaptivityEvents.Brothel
                                 EquipmentHelper.AssignHeroEquipmentFromEquipment(troopElement.Character.HeroObject, randomCivilian);
                                 EquipmentHelper.AssignHeroEquipmentFromEquipment(troopElement.Character.HeroObject, randomBattle);
                             }
-                        } 
+                        }
                     }
 
                     for (int i = 0; i < troopElement.Number; i++)

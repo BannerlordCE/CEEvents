@@ -340,7 +340,10 @@ namespace CaptivityEvents.Events
                                 return LogError("Failed to get Lord Party");
                             }
                         }
-                        else eventMatchingCondition = true;
+                        else
+                        {
+                            eventMatchingCondition = true;
+                        }
                     }
 
                     if (hasVillageFlag && captorParty.Settlement.IsVillage) eventMatchingCondition = true;
@@ -361,7 +364,10 @@ namespace CaptivityEvents.Events
                                 return LogError("Failed to get Lord Party");
                             }
                         }
-                        else eventMatchingCondition = true;
+                        else
+                        {
+                            eventMatchingCondition = true;
+                        }
                     }
 
                     if (duringSiegeFlag != captorParty.Settlement.IsUnderSiege) eventMatchingCondition = false;
@@ -396,7 +402,10 @@ namespace CaptivityEvents.Events
                                 return LogError("Failed to get Lord Party");
                             }
                         }
-                        else eventMatchingCondition = true;
+                        else
+                        {
+                            eventMatchingCondition = true;
+                        }
                     }
 
                     if (hasPartyInVillageFlag && captorParty.MobileParty.CurrentSettlement.IsVillage) eventMatchingCondition = true;
@@ -415,7 +424,10 @@ namespace CaptivityEvents.Events
                                 return LogError("Failed to get Lord Party");
                             }
                         }
-                        else eventMatchingCondition = true;
+                        else
+                        {
+                            eventMatchingCondition = true;
+                        }
                     }
 
                     if (duringSiegeFlag != captorParty.MobileParty.CurrentSettlement.IsUnderSiege) eventMatchingCondition = false;

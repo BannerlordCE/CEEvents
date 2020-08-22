@@ -704,7 +704,7 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min, "str_CE_skill_level" )) break;
+                    if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min, "str_CE_skill_level")) break;
                 }
                 catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredAbove"); }
 

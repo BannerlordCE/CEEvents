@@ -76,7 +76,10 @@ namespace CaptivityEvents.Events
                         flag = foundevent.Name;
                         ceEvent = foundevent;
                     }
-                    else flag = "$" + result;
+                    else
+                    {
+                        flag = "$" + result;
+                    }
                 }
                 else
                 {

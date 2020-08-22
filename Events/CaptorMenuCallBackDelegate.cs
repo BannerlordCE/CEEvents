@@ -451,7 +451,7 @@ namespace CaptivityEvents.Events
             bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
             bool NoMessages = _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoMessages);
 
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag)) new Dynamics().VictimProstitutionModifier(1, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages );
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag)) new Dynamics().VictimProstitutionModifier(1, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) new Dynamics().VictimProstitutionModifier(0, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
         }
 
@@ -596,7 +596,7 @@ namespace CaptivityEvents.Events
                     if (!_option.SkillToLevel.IsStringNoneOrEmpty()) new Dynamics().SkillModifier(Hero.MainHero, _option.SkillToLevel, level, xp);
                     else if (!_listedEvent.SkillToLevel.IsStringNoneOrEmpty()) new Dynamics().SkillModifier(Hero.MainHero, _listedEvent.SkillToLevel, level, xp);
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
-                }  
+                }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }
@@ -721,7 +721,7 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_captive_level" )) break;
+                    if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_captive_level")) break;
                 }
                 catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
 

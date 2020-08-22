@@ -161,7 +161,7 @@ namespace CaptivityEvents
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_female_prison"]
                         : CEPersistence.CEEventImageList[name];
-                        
+
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_female"]
                         : CEPersistence.CEEventImageList[name];
@@ -304,7 +304,10 @@ namespace CaptivityEvents
                                     CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                 }
                             }
-                            else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            else
+                            {
+                                CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            }
                         }
                     }
                     catch (Exception) { }
@@ -333,7 +336,10 @@ namespace CaptivityEvents
                             CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                         }
                     }
-                    else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                    else
+                    {
+                        CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                    }
                 }
 
                 foreach (string file in requiredImages)
