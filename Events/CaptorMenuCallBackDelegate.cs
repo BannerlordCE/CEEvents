@@ -98,6 +98,9 @@ namespace CaptivityEvents.Events
                 Strip(captiveHero);
             }
 
+            ConsequenceSpawnTroop();
+            ConsequenceSpawnHero();
+
             Escape();
             GainRandomPrisoners();
             KillPrisoner(ref args);
@@ -252,28 +255,28 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    new ImpregnationSystem().CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
+                    new CEImpregnationSystem().CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
                                                       ? new CEVariablesLoader().GetIntFromXML(_option.PregnancyRiskModifier)
                                                       : new CEVariablesLoader().GetIntFromXML(_listedEvent.PregnancyRiskModifier));
                 }
                 catch (Exception)
                 {
                     CECustomHandler.LogToFile("Missing PregnancyRiskModifier");
-                    new ImpregnationSystem().CaptivityImpregnationChance(captiveHero, 30);
+                    new CEImpregnationSystem().CaptivityImpregnationChance(captiveHero, 30);
                 }
             }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationRisk))
             {
                 try
                 {
-                    new ImpregnationSystem().CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
+                    new CEImpregnationSystem().CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
                                                       ? new CEVariablesLoader().GetIntFromXML(_option.PregnancyRiskModifier)
                                                       : new CEVariablesLoader().GetIntFromXML(_listedEvent.PregnancyRiskModifier), false, false);
                 }
                 catch (Exception)
                 {
                     CECustomHandler.LogToFile("Missing PregnancyRiskModifier");
-                    new ImpregnationSystem().CaptivityImpregnationChance(captiveHero, 30, false, false);
+                    new CEImpregnationSystem().CaptivityImpregnationChance(captiveHero, 30, false, false);
                 }
             }
         }
@@ -480,6 +483,22 @@ namespace CaptivityEvents.Events
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddSlaveryFlag)) new Dynamics().VictimSlaveryModifier(1, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveSlaveryFlag)) new Dynamics().VictimSlaveryModifier(0, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
+        }
+
+        private void ConsequenceSpawnTroop()
+        {
+            if (_option.SpawnTroops != null)
+            {
+                new CESpawnSystem().SpawnTheTroops(_option.SpawnTroops, PartyBase.MainParty);
+            }
+        }
+
+        private void ConsequenceSpawnHero()
+        {
+            if (_option.SpawnHeroes != null)
+            {
+                new CESpawnSystem().SpawnTheHero(_option.SpawnHeroes, PartyBase.MainParty);
+            }
         }
 
         private void ChangeClan(Hero captiveHero)

@@ -207,6 +207,22 @@ namespace CaptivityEvents.Events
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) _dynamics.VictimProstitutionModifier(0, Hero.MainHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
         }
 
+        internal void ConsequenceSpawnTroop()
+        {
+            if (_option.SpawnTroops != null)
+            {
+                new CESpawnSystem().SpawnTheTroops(_option.SpawnTroops, PartyBase.MainParty);
+            }
+        }
+
+        internal void ConsequenceSpawnHero()
+        {
+            if (_option.SpawnHeroes != null)
+            {
+                new CESpawnSystem().SpawnTheHero(_option.SpawnHeroes, PartyBase.MainParty);
+            }
+        }
+
         internal void ConsequenceRenown()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRenown)) return;

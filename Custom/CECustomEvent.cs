@@ -66,16 +66,6 @@ namespace CaptivityEvents.Custom
         NoMessages
     }
 
-    [DebuggerStepThrough]
-    [XmlType(AnonymousType = true)]
-    [XmlRoot(Namespace = "", IsNullable = false)]
-    [Serializable]
-    public class MultipleRestrictedListOfConsequences
-    {
-        [XmlElement("RestrictedListOfConsequences")]
-        public RestrictedListOfConsequences[] RestrictedListOfConsequences { get; set; }
-    }
-
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = "", IsNullable = false)]
     [Serializable]
@@ -157,16 +147,6 @@ namespace CaptivityEvents.Custom
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = "", IsNullable = true)]
     [Serializable]
-    public class MultipleRestrictedListOfFlags
-    {
-        [XmlElement("RestrictedListOfFlags")]
-        public RestrictedListOfFlags[] RestrictedListOfFlags { get; set; }
-    }
-
-    [DebuggerStepThrough]
-    [XmlType(AnonymousType = true)]
-    [XmlRoot(Namespace = "", IsNullable = true)]
-    [Serializable]
     public class StripSettings
     {
         public bool Forced { get; set; }
@@ -220,6 +200,36 @@ namespace CaptivityEvents.Custom
 
         [XmlAttribute()]
         public string Id { get; set; }
+    }
+
+    public class SpawnTroop
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Id { get; set; }
+
+        [XmlAttribute()]
+        public string Number { get; set; }
+
+        [XmlAttribute()]
+        public string WoundedNumber { get; set; }
+    }
+
+    public class SpawnHero
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Culture { get; set; }
+
+        [XmlAttribute()]
+        public string Gender { get; set; }
+
+        [XmlAttribute()]
+        public string Clan { get; set; }
     }
 
 
@@ -360,16 +370,12 @@ namespace CaptivityEvents.Custom
 
         [XmlElement("StripSettings", IsNullable = true)]
         public StripSettings StripSettings { get; set; }
-    }
 
-    [DebuggerStepThrough]
-    [XmlType(AnonymousType = true)]
-    [XmlRoot(Namespace = "", IsNullable = true)]
-    [Serializable]
-    public class Options
-    {
-        [XmlElement("Option")]
-        public Option[] Option { get; set; }
+        [XmlArrayItem("SpawnTroop", IsNullable = true)]
+        public SpawnTroop[] SpawnTroops { get; set; }
+
+        [XmlArrayItem("SpawnHero", IsNullable = true)]
+        public SpawnHero[] SpawnHeroes { get; set; }
     }
 
     [DebuggerStepThrough]

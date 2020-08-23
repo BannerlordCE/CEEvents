@@ -21,7 +21,7 @@ namespace CaptivityEvents.Events
 
         private readonly Dynamics _dynamics = new Dynamics();
         private readonly ScoresCalculation _score = new ScoresCalculation();
-        private readonly ImpregnationSystem _impregnation = new ImpregnationSystem();
+        private readonly CEImpregnationSystem _impregnation = new CEImpregnationSystem();
         private readonly CaptiveSpecifics _captive = new CaptiveSpecifics();
 
         internal CaptiveMenuCallBackDelegate(CEEvent listedEvent) => _listedEvent = listedEvent;
@@ -187,6 +187,9 @@ namespace CaptivityEvents.Events
             h.ConsequenceChangeMorale();
             h.ConsequenceStripPlayer();
 
+
+            ConsequenceSpawnTroop();
+            ConsequenceSpawnHero();
             ConsequenceForceMarry();
             ConsequenceChangeClan();
             ConsequenceImpregnationByLeader();
@@ -561,6 +564,22 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.LogToFile("Missing RelationTotal");
                 _dynamics.RelationsModifier(hero, MBRandom.RandomInt(-5, 5), null, InformationMessage && !NoMessages, !InformationMessage && !NoMessages);
+            }
+        }
+
+        private void ConsequenceSpawnTroop()
+        {
+            if (_option.SpawnTroops != null)
+            {
+                new CESpawnSystem().SpawnTheTroops(_option.SpawnTroops, PlayerCaptivity.CaptorParty);
+            }
+        }
+
+        private void ConsequenceSpawnHero()
+        {
+            if (_option.SpawnHeroes != null)
+            {
+                new CESpawnSystem().SpawnTheHero(_option.SpawnHeroes, PlayerCaptivity.CaptorParty);
             }
         }
 

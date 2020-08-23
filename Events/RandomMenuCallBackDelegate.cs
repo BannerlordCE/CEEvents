@@ -94,6 +94,8 @@ namespace CaptivityEvents.Events
             sharedCallBackHelper.ConsequenceRenown();
             sharedCallBackHelper.ConsequenceChangeHealth();
             sharedCallBackHelper.ConsequenceChangeMorale();
+            sharedCallBackHelper.ConsequenceSpawnTroop();
+            sharedCallBackHelper.ConsequenceSpawnHero();
 
             ConsequenceImpregnation();
             ConsequenceGainRandomPrisoners();
@@ -290,7 +292,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-                ImpregnationSystem impregnationSystem = new ImpregnationSystem();
+                CEImpregnationSystem impregnationSystem = new CEImpregnationSystem();
 
                 if (!string.IsNullOrEmpty(_option.PregnancyRiskModifier)) { impregnationSystem.ImpregnationChance(Hero.MainHero, new CEVariablesLoader().GetIntFromXML(_option.PregnancyRiskModifier)); }
                 else if (!string.IsNullOrEmpty(_listedEvent.PregnancyRiskModifier)) { impregnationSystem.ImpregnationChance(Hero.MainHero, new CEVariablesLoader().GetIntFromXML(_listedEvent.PregnancyRiskModifier)); }

@@ -11,7 +11,7 @@ using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Events
 {
-    public class ImpregnationSystem
+    public class CEImpregnationSystem
     {
         public void ImpregnationChance(Hero targetHero, int modifier = 0, bool forcePreg = false, Hero senderHero = null)
         {
