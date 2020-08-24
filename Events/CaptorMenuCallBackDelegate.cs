@@ -36,6 +36,7 @@ namespace CaptivityEvents.Events
         internal bool CaptorEventOptionGameMenu(MenuCallbackArgs args)
         {
             PlayerIsNotBusy(ref args);
+            PlayerHasOpenSpaceForCompanions(ref args);
             GiveCaptorGold();
             CaptorGoldTotal();
             LeaveTypes(ref args);
@@ -1315,6 +1316,15 @@ namespace CaptivityEvents.Events
             if (PlayerEncounter.Current == null) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_busy_right_now");
+            args.IsEnabled = false;
+        }
+
+        private void PlayerHasOpenSpaceForCompanions(ref MenuCallbackArgs args)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerAllowedCompanion)) return;
+            if (!(Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_companions_too_many");
             args.IsEnabled = false;
         }
 

@@ -45,6 +45,7 @@ namespace CaptivityEvents.Custom
         SoldToLordParty,
         SoldToNotable,
         PlayerIsNotBusy,
+        PlayerAllowedCompanion,
         HuntPrisoners,
         KillPrisoner,
         KillCaptor,
@@ -139,6 +140,7 @@ namespace CaptivityEvents.Custom
         CaptivesOutNumber,
         HeroIsFactionLeader,
         PlayerIsNotBusy,
+        PlayerAllowedCompanion,
         StripEnabled,
         StripDisabled,
     }

@@ -199,6 +199,10 @@ namespace CaptivityEvents.Events
             returnString += "\nTotal Males : " + captorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
             returnString += "\nTotal : " + captorParty.PrisonRoster.Count();
 
+
+            returnString += "\n\n--- Other Settings ---";
+            returnString += "\nToo Many Companions : " + (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit);
+
             returnString += "\nWork in progress\n";
 
             return returnString;
@@ -1424,8 +1428,9 @@ namespace CaptivityEvents.Events
 
             // Custom Flags
             if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) return Error("Skipping event " + _listEvent.Name + " Player is busy.");
+            if (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerAllowedCompanion)) return Error("Skipping event " + _listEvent.Name + " Player has too many companions.");
 
-            return true;
+                return true;
         }
 
         private bool CustomFlagCheck()
