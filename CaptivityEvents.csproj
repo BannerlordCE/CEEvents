@@ -53,7 +53,8 @@
     <Compile Include="Events\CaptorMenuCallBackDelegate.cs" />
     <Compile Include="Events\CaptorSpecifics.cs" />
     <Compile Include="Events\Dynamics.cs" />
-    <Compile Include="Events\ImpregnationSystem.cs" />
+    <Compile Include="Events\CESpawnSystem.cs" />
+    <Compile Include="Events\CEImpregnationSystem.cs" />
     <Compile Include="Events\RandomMenuCallBackDelegate.cs" />
     <Compile Include="Events\ScoresCalculation.cs" />
     <Compile Include="Events\SharedCallBackHelper.cs" />

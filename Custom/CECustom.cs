@@ -14,10 +14,10 @@ namespace CaptivityEvents
     {
         public CESkillNode()
         {
-            this.MinLevel = null;
-            this.MaxLevel = null;
-            this.Name = null;
-            this.Id = null;
+            MinLevel = null;
+            MaxLevel = null;
+            Name = null;
+            Id = null;
         }
 
         public CESkillNode(string Id, string Name, string MinLevel = null, string MaxLevel = null)

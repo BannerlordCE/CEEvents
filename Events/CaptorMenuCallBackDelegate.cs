@@ -36,6 +36,7 @@ namespace CaptivityEvents.Events
         internal bool CaptorEventOptionGameMenu(MenuCallbackArgs args)
         {
             PlayerIsNotBusy(ref args);
+            PlayerHasOpenSpaceForCompanions(ref args);
             GiveCaptorGold();
             CaptorGoldTotal();
             LeaveTypes(ref args);
@@ -97,6 +98,9 @@ namespace CaptivityEvents.Events
                 Impregnation(captiveHero);
                 Strip(captiveHero);
             }
+
+            ConsequenceSpawnTroop();
+            ConsequenceSpawnHero();
 
             Escape();
             GainRandomPrisoners();
@@ -252,28 +256,28 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    new ImpregnationSystem().CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
+                    new CEImpregnationSystem().CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
                                                       ? new CEVariablesLoader().GetIntFromXML(_option.PregnancyRiskModifier)
                                                       : new CEVariablesLoader().GetIntFromXML(_listedEvent.PregnancyRiskModifier));
                 }
                 catch (Exception)
                 {
                     CECustomHandler.LogToFile("Missing PregnancyRiskModifier");
-                    new ImpregnationSystem().CaptivityImpregnationChance(captiveHero, 30);
+                    new CEImpregnationSystem().CaptivityImpregnationChance(captiveHero, 30);
                 }
             }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationRisk))
             {
                 try
                 {
-                    new ImpregnationSystem().CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
+                    new CEImpregnationSystem().CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
                                                       ? new CEVariablesLoader().GetIntFromXML(_option.PregnancyRiskModifier)
                                                       : new CEVariablesLoader().GetIntFromXML(_listedEvent.PregnancyRiskModifier), false, false);
                 }
                 catch (Exception)
                 {
                     CECustomHandler.LogToFile("Missing PregnancyRiskModifier");
-                    new ImpregnationSystem().CaptivityImpregnationChance(captiveHero, 30, false, false);
+                    new CEImpregnationSystem().CaptivityImpregnationChance(captiveHero, 30, false, false);
                 }
             }
         }
@@ -451,7 +455,7 @@ namespace CaptivityEvents.Events
             bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
             bool NoMessages = _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoMessages);
 
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag)) new Dynamics().VictimProstitutionModifier(1, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages );
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag)) new Dynamics().VictimProstitutionModifier(1, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) new Dynamics().VictimProstitutionModifier(0, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
         }
 
@@ -480,6 +484,22 @@ namespace CaptivityEvents.Events
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddSlaveryFlag)) new Dynamics().VictimSlaveryModifier(1, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveSlaveryFlag)) new Dynamics().VictimSlaveryModifier(0, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
+        }
+
+        private void ConsequenceSpawnTroop()
+        {
+            if (_option.SpawnTroops != null)
+            {
+                new CESpawnSystem().SpawnTheTroops(_option.SpawnTroops, PartyBase.MainParty);
+            }
+        }
+
+        private void ConsequenceSpawnHero()
+        {
+            if (_option.SpawnHeroes != null)
+            {
+                new CESpawnSystem().SpawnTheHero(_option.SpawnHeroes, PartyBase.MainParty);
+            }
         }
 
         private void ChangeClan(Hero captiveHero)
@@ -596,7 +616,7 @@ namespace CaptivityEvents.Events
                     if (!_option.SkillToLevel.IsStringNoneOrEmpty()) new Dynamics().SkillModifier(Hero.MainHero, _option.SkillToLevel, level, xp);
                     else if (!_listedEvent.SkillToLevel.IsStringNoneOrEmpty()) new Dynamics().SkillModifier(Hero.MainHero, _listedEvent.SkillToLevel, level, xp);
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
-                }  
+                }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }
@@ -721,7 +741,7 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_captive_level" )) break;
+                    if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_captive_level")) break;
                 }
                 catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
 
@@ -1296,6 +1316,15 @@ namespace CaptivityEvents.Events
             if (PlayerEncounter.Current == null) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_busy_right_now");
+            args.IsEnabled = false;
+        }
+
+        private void PlayerHasOpenSpaceForCompanions(ref MenuCallbackArgs args)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerAllowedCompanion)) return;
+            if (!(Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_companions_too_many");
             args.IsEnabled = false;
         }
 

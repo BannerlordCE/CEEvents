@@ -69,7 +69,7 @@ namespace CaptivityEvents.Events
             MarriageAction.Apply(hero, spouseHero);
         }
 
-        void TraitObjectModifier(TraitObject traitObject, Color color, Hero hero, string trait, int amount, int xp)
+        private void TraitObjectModifier(TraitObject traitObject, Color color, Hero hero, string trait, int amount, int xp)
         {
 
             if (xp == 0)
@@ -138,7 +138,7 @@ namespace CaptivityEvents.Events
             }
         }
 
-        void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp)
+        private void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp)
         {
             if (xp == 0)
             {

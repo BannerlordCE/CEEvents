@@ -199,6 +199,10 @@ namespace CaptivityEvents.Events
             returnString += "\nTotal Males : " + captorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
             returnString += "\nTotal : " + captorParty.PrisonRoster.Count();
 
+
+            returnString += "\n\n--- Other Settings ---";
+            returnString += "\nToo Many Companions : " + (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit);
+
             returnString += "\nWork in progress\n";
 
             return returnString;
@@ -340,7 +344,10 @@ namespace CaptivityEvents.Events
                                 return LogError("Failed to get Lord Party");
                             }
                         }
-                        else eventMatchingCondition = true;
+                        else
+                        {
+                            eventMatchingCondition = true;
+                        }
                     }
 
                     if (hasVillageFlag && captorParty.Settlement.IsVillage) eventMatchingCondition = true;
@@ -361,7 +368,10 @@ namespace CaptivityEvents.Events
                                 return LogError("Failed to get Lord Party");
                             }
                         }
-                        else eventMatchingCondition = true;
+                        else
+                        {
+                            eventMatchingCondition = true;
+                        }
                     }
 
                     if (duringSiegeFlag != captorParty.Settlement.IsUnderSiege) eventMatchingCondition = false;
@@ -396,7 +406,10 @@ namespace CaptivityEvents.Events
                                 return LogError("Failed to get Lord Party");
                             }
                         }
-                        else eventMatchingCondition = true;
+                        else
+                        {
+                            eventMatchingCondition = true;
+                        }
                     }
 
                     if (hasPartyInVillageFlag && captorParty.MobileParty.CurrentSettlement.IsVillage) eventMatchingCondition = true;
@@ -415,7 +428,10 @@ namespace CaptivityEvents.Events
                                 return LogError("Failed to get Lord Party");
                             }
                         }
-                        else eventMatchingCondition = true;
+                        else
+                        {
+                            eventMatchingCondition = true;
+                        }
                     }
 
                     if (duringSiegeFlag != captorParty.MobileParty.CurrentSettlement.IsUnderSiege) eventMatchingCondition = false;
@@ -1407,15 +1423,14 @@ namespace CaptivityEvents.Events
             if (!CESettings.Instance.ProstitutionControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution)) return Error("Skipping event " + _listEvent.Name + " Prostitution events disabled.");
             if (!CESettings.Instance.RomanceControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Romance)) return Error("Skipping event " + _listEvent.Name + " Romance events disabled.");
 
-            if (!CESettings.Instance.StolenGear && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripEnabled))
-            {
-                return Error("Skipping event " + _listEvent.Name + " StolenGear disabled.");
-            }
+            if (!CESettings.Instance.StolenGear && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripEnabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear disabled.");
+            if (CESettings.Instance.StolenGear && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripDisabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear enabled.");
 
             // Custom Flags
             if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) return Error("Skipping event " + _listEvent.Name + " Player is busy.");
+            if (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerAllowedCompanion)) return Error("Skipping event " + _listEvent.Name + " Player has too many companions.");
 
-            return true;
+                return true;
         }
 
         private bool CustomFlagCheck()

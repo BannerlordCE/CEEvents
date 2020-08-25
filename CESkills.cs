@@ -23,15 +23,12 @@ namespace CaptivityEvents
 
         private static int _StartDefaultSkillNode = 0;
 
-        private static List<CESkillNode> _Skills = new List<CESkillNode>();
+        private static readonly List<CESkillNode> _Skills = new List<CESkillNode>();
 
         private static bool _Initialized;
 
 
-        public static void AddCustomSkill(CESkillNode skillNode)
-        {
-            _Skills.Add(skillNode);
-        }
+        public static void AddCustomSkill(CESkillNode skillNode) => _Skills.Add(skillNode);
 
         public static SkillObject FindSkill(string skill)
         {

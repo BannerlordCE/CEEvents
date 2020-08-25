@@ -207,6 +207,22 @@ namespace CaptivityEvents.Events
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) _dynamics.VictimProstitutionModifier(0, Hero.MainHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
         }
 
+        internal void ConsequenceSpawnTroop()
+        {
+            if (_option.SpawnTroops != null)
+            {
+                new CESpawnSystem().SpawnTheTroops(_option.SpawnTroops, PartyBase.MainParty);
+            }
+        }
+
+        internal void ConsequenceSpawnHero()
+        {
+            if (_option.SpawnHeroes != null)
+            {
+                new CESpawnSystem().SpawnTheHero(_option.SpawnHeroes, PartyBase.MainParty);
+            }
+        }
+
         internal void ConsequenceRenown()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRenown)) return;
@@ -462,24 +478,16 @@ namespace CaptivityEvents.Events
                         {
                             case CultureCode.Sturgia:
                                 item = "sturgia_axe_3_t3";
-
                                 break;
-
                             case CultureCode.Aserai:
                                 item = "eastern_spear_1_t2";
-
                                 break;
-
                             case CultureCode.Empire:
                                 item = "northern_spear_1_t2";
-
                                 break;
-
                             case CultureCode.Battania:
                                 item = "aserai_sword_1_t2";
-
                                 break;
-
                             case CultureCode.Invalid:
                             case CultureCode.Vlandia:
                             case CultureCode.Khuzait:
@@ -489,7 +497,6 @@ namespace CaptivityEvents.Events
                             case CultureCode.AnyOtherCulture:
                             default:
                                 item = "vlandia_sword_1_t2";
-
                                 break;
                         }
                     }
@@ -619,7 +626,12 @@ namespace CaptivityEvents.Events
                     }
 
                     if (issueOwner == null) continue;
-                    PotentialIssueData potentialIssueData = new PotentialIssueData(CEWhereAreMyThingsIssueBehavior.OnStartIssue, typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), 0.25f);
+
+                    // 1.5.0
+                    PotentialIssueData potentialIssueData = new PotentialIssueData(CEWhereAreMyThingsIssueBehavior.OnStartIssue, typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), IssueBase.IssueFrequency.Rare);
+
+                    // 1.4.3
+                    //PotentialIssueData potentialIssueData = new PotentialIssueData(CEWhereAreMyThingsIssueBehavior.OnStartIssue, typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), 0.25f);
 
                     Campaign.Current.IssueManager.CreateNewIssue(potentialIssueData, issueOwner);
                     Campaign.Current.IssueManager.StartIssueQuest(issueOwner);

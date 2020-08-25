@@ -136,15 +136,8 @@ namespace CaptivityEvents.Brothel
                 PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
                 partyState.InitializeLogic(_partyScreenLogic);
 
-                // Reflection 1.4.2
-                /*
-                fi = PartyScreenManager.Instance.GetType().GetField("_serverPartyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (fi != null) fi.SetValue(PartyScreenManager.Instance, _partyScreenLogic);
-                */
-
-                // Reflection 1.4.3          
                 fi = PartyScreenManager.Instance.GetType().GetField("_partyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (fi != null) fi.SetValue(PartyScreenManager.Instance, _partyScreenLogic);             
+                if (fi != null) fi.SetValue(PartyScreenManager.Instance, _partyScreenLogic);
 
                 Game.Current.GameStateManager.PushState(partyState, 0);
             }
@@ -189,7 +182,8 @@ namespace CaptivityEvents.Brothel
                 Campaign.Current.GameMenuManager.NextLocation = null;
                 Campaign.Current.GameMenuManager.PreviousLocation = null;
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 args.IsEnabled = false;
             }
             return true;
@@ -342,13 +336,7 @@ namespace CaptivityEvents.Brothel
             _isBrothelInitialized = true;
         }
 
-        public static CharacterObject HelperCreateFrom(CharacterObject character, bool traitsAndSkills)
-        {
-            // 1.4.3 
-            return CharacterObject.CreateFrom(character, traitsAndSkills);
-            // 1.4.2
-            // return CharacterObject.CreateFrom(character);
-        }
+        public static CharacterObject HelperCreateFrom(CharacterObject character, bool traitsAndSkills) => CharacterObject.CreateFrom(character, traitsAndSkills);
 
         private static LocationCharacter CreateTavernkeeper(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
@@ -710,14 +698,19 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddDialogLine("ce_assistant_talk_01", "start", "close_window", "{=CEBROTHEL1064}The new owner will arrive here shortly, I will just clean up things for now.", ConversationWithBrothelAssistantAfterSelling, null);
 
             // Owner Dialogue Captives
-            campaignGameStarter.AddDialogLine("captive_requirements_owner", "start", "ccaptive_owner_00", "{=CEBROTHEL1067}This is no place for me, {?PLAYER.GENDER}milady{?}my lord{\\?}! What do you want?[ib:closed][rb:unsure]", () => ConversationWithCaptive(), null);
-            campaignGameStarter.AddDialogLine("captive_requirements_owner", "lord_introduction", "ccaptive_owner_00", "{=CEBROTHEL1067}This is no place for me, {?PLAYER.GENDER}milady{?}my lord{\\?}! What do you want?[ib:closed][rb:unsure]", () => ConversationWithCaptive(), null);
+            campaignGameStarter.AddDialogLine("captive_requirements_owner_positive", "start", "ccaptive_owner_00", "{=CEBROTHEL1008}Do you need something {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", () => ConversationWithPositiveCaptive(), null);
+            campaignGameStarter.AddDialogLine("captive_requirements_owner_positive", "lord_introduction", "ccaptive_owner_00", "{=CEBROTHEL1008}Do you need something {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", () => ConversationWithPositiveCaptive(), null);
+
+            campaignGameStarter.AddDialogLine("captive_requirements_owner", "start", "ccaptive_owner_00", "{=CEBROTHEL1067}This is no place for me, {?PLAYER.GENDER}milady{?}my lord{\\?}! What do you want?[ib:closed][rb:negative]", () => ConversationWithCaptive(), null);
+            campaignGameStarter.AddDialogLine("captive_requirements_owner", "lord_introduction", "ccaptive_owner_00", "{=CEBROTHEL1067}This is no place for me, {?PLAYER.GENDER}milady{?}my lord{\\?}! What do you want?[ib:closed][rb:negative]", () => ConversationWithCaptive(), null);
 
             campaignGameStarter.AddPlayerLine("ccaptive_owner_00_yes", "ccaptive_owner_00", "ccaptive_service_00_yes_response", "{=CEBROTHEL1007}I will like to have some fun.", null, null);
 
             campaignGameStarter.AddPlayerLine("ccaptive_owner_00_nevermind", "ccaptive_owner_00", "ccaptive_service_00_nevermind_response", "{=CEBROTHEL1011}Uh, nevermind.", null, null);
 
             campaignGameStarter.AddDialogLine("ccaptive_service_00_yes_response_id", "ccaptive_service_00_yes_response", "close_window", "{=CEBROTHEL1043}Right this way...[ib:closed][rb:unsure]", null, ConversationProstituteConsequenceSex);
+
+            campaignGameStarter.AddDialogLine("ccaptive_service_00_nevermind_response_id_positive", "ccaptive_service_00_nevermind_response", "close_window", "{=CEBROTHEL1037}See ya around.[ib:confident][rb:very_positive]", () => ConversationWithPositiveCaptive(), null);
 
             campaignGameStarter.AddDialogLine("ccaptive_service_00_nevermind_response_id", "ccaptive_service_00_nevermind_response", "close_window", "{=CEBROTHEL1044}Thank goodness...[ib:closed][rb:unsure]", null, null);
 
@@ -776,6 +769,8 @@ namespace CaptivityEvents.Brothel
         private static readonly string[] prostituteStrings = { "prostitute_confident", "prostitute_confident", "prostitute_tired" };
 
         private bool ConversationWithCaptive() => Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.HeroState == Hero.CharacterStates.Prisoner && ContainsPrisoner(Hero.OneToOneConversationHero.CharacterObject);
+
+        private bool ConversationWithPositiveCaptive() => Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.HeroState == Hero.CharacterStates.Prisoner && ContainsPrisoner(Hero.OneToOneConversationHero.CharacterObject) && (Hero.OneToOneConversationHero.GetSkillValue(CESkills.Slavery) > 50 || Hero.OneToOneConversationHero.GetSkillValue(CESkills.Prostitution) > 70);
 
         private bool ConversationWithProstitute() => CharacterObject.OneToOneConversationCharacter.StringId == "prostitute_regular";
 
@@ -1097,9 +1092,38 @@ namespace CaptivityEvents.Brothel
             catch (Exception) { }
         }
 
+        private void OnHeroDeath(Hero victim, Hero killer, KillCharacterAction.KillCharacterActionDetail detail, bool showNotification)
+        {
+            try
+            {
+                if (victim.IsPrisoner)
+                {
+                    for (int i = 0; i < _brothelList.Count; i++)
+                    {
+                        for (int y = 0; y < _brothelList[i].CaptiveProstitutes.Count; y++)
+                        {
+                            if (_brothelList[i].CaptiveProstitutes[y].IsHero)
+                            {
+                                if (victim == _brothelList[i].CaptiveProstitutes[y].HeroObject)
+                                {
+                                    _brothelList[i].CaptiveProstitutes[y].HeroObject.IsNoble = true;
+                                    _brothelList[i].CaptiveProstitutes.RemoveAt(y);
+                                    return;
+                                }
+                            }
+
+                        }
+                    }
+                }
+            } catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed at OnHeroDeath CEBrothel : " + e);
+            }
+        }
 
         public override void RegisterEvents()
         {
+            CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, new Action<Hero, Hero, KillCharacterAction.KillCharacterActionDetail, bool>(OnHeroDeath));
             CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, DailyTick);
             CampaignEvents.WeeklyTickEvent.AddNonSerializedListener(this, WeeklyTick);
             CampaignEvents.OnNewGameCreatedEvent.AddNonSerializedListener(this, AddGameMenus);
@@ -1159,6 +1183,10 @@ namespace CaptivityEvents.Brothel
                     {
                         if (!releasePrisoners)
                         {
+                            if (captive.IsHero)
+                            {
+                                captive.HeroObject.IsNoble = true;
+                            }
                             MobileParty.MainParty.PrisonRoster.AddToCounts(captive, 1, captive.IsHero);
                         }
                         else
@@ -1173,6 +1201,7 @@ namespace CaptivityEvents.Brothel
                                         continue;
                                     }
                                 }
+                                captive.HeroObject.IsNoble = true;
                                 MobileParty.MainParty.PrisonRoster.AddToCounts(captive, 1, true);
                                 EndCaptivityAction.ApplyByReleasing(captive.HeroObject, heroReleased);
                             }
@@ -1212,6 +1241,7 @@ namespace CaptivityEvents.Brothel
                 {
                     if (captive.IsHero)
                     {
+                        captive.HeroObject.IsNoble = true;
                         captivesFreed.Add(captive.HeroObject.StringId);
                     }
                 }
@@ -1220,28 +1250,36 @@ namespace CaptivityEvents.Brothel
 
                 foreach (TroopRosterElement troopElement in prisoners)
                 {
-                    if (troopElement.Character.IsHero && !captivesFreed.Contains(troopElement.Character.HeroObject.StringId))
+                    if (troopElement.Character.IsHero)
                     {
-                        if (troopElement.Character.HeroObject.GetSkillValue(CESkills.Slavery) < 50)
+                        troopElement.Character.HeroObject.IsNoble = false;
+                        if (!captivesFreed.Contains(troopElement.Character.HeroObject.StringId))
                         {
-                            new Dynamics().RelationsModifier(troopElement.Character.HeroObject, MBRandom.RandomInt(-10, -1), Hero.MainHero, false, true);
-                        }
+                            if (troopElement.Character.HeroObject.GetSkillValue(CESkills.Slavery) < 50)
+                            {
+                                new Dynamics().RelationsModifier(troopElement.Character.HeroObject, MBRandom.RandomInt(-10, -1), Hero.MainHero, false, true);
+                            }
 
-                        if (CESettings.Instance.EventProstituteGear)
-                        {
-                            CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
+                            if (CESettings.Instance.EventProstituteGear)
+                            {
+                                CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
 
-                            if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
+                                if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
 
-                            Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElement();
-                            Equipment randomBattle = new Equipment(false);
-                            randomBattle.FillFrom(randomCivilian, false);
+                                Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElement();
+                                Equipment randomBattle = new Equipment(false);
+                                randomBattle.FillFrom(randomCivilian, false);
 
-                            EquipmentHelper.AssignHeroEquipmentFromEquipment(troopElement.Character.HeroObject, randomCivilian);
-                            EquipmentHelper.AssignHeroEquipmentFromEquipment(troopElement.Character.HeroObject, randomBattle);
+                                EquipmentHelper.AssignHeroEquipmentFromEquipment(troopElement.Character.HeroObject, randomCivilian);
+                                EquipmentHelper.AssignHeroEquipmentFromEquipment(troopElement.Character.HeroObject, randomBattle);
+                            }
                         }
                     }
-                    _brothelList[index].CaptiveProstitutes.Add(troopElement.Character);
+
+                    for (int i = 0; i < troopElement.Number; i++)
+                    {
+                        _brothelList[index].CaptiveProstitutes.Add(troopElement.Character);
+                    }
                 }
             }
             catch (Exception)
@@ -1259,6 +1297,12 @@ namespace CaptivityEvents.Brothel
 
                 int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == settlement.StringId);
                 _brothelList[index].CaptiveProstitutes.Remove(prisoner);
+
+                if (prisoner.IsHero)
+                {
+                    prisoner.HeroObject.IsNoble = true;
+                }
+
                 MobileParty.MainParty.PrisonRoster.AddToCounts(prisoner, 1, prisoner.IsHero);
             }
             catch (Exception)
@@ -1277,19 +1321,24 @@ namespace CaptivityEvents.Brothel
 
                 int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == settlement.StringId);
 
-                if (prisoner.IsHero && CESettings.Instance.EventProstituteGear)
+                if (prisoner.IsHero)
                 {
-                    CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
+                    prisoner.HeroObject.IsNoble = false;
+                    if (CESettings.Instance.EventProstituteGear)
+                    {
+                        CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
 
-                    if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(prisoner.HeroObject, prisoner.HeroObject.BattleEquipment, prisoner.HeroObject.CivilianEquipment);
+                        if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(prisoner.HeroObject, prisoner.HeroObject.BattleEquipment, prisoner.HeroObject.CivilianEquipment);
 
-                    Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElement();
-                    Equipment randomBattle = new Equipment(false);
-                    randomBattle.FillFrom(randomCivilian, false);
+                        Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElement();
+                        Equipment randomBattle = new Equipment(false);
+                        randomBattle.FillFrom(randomCivilian, false);
 
-                    EquipmentHelper.AssignHeroEquipmentFromEquipment(prisoner.HeroObject, randomCivilian);
-                    EquipmentHelper.AssignHeroEquipmentFromEquipment(prisoner.HeroObject, randomBattle);
+                        EquipmentHelper.AssignHeroEquipmentFromEquipment(prisoner.HeroObject, randomCivilian);
+                        EquipmentHelper.AssignHeroEquipmentFromEquipment(prisoner.HeroObject, randomBattle);
+                    }
                 }
+
                 _brothelList[index].CaptiveProstitutes.Add(prisoner);
                 MobileParty.MainParty.PrisonRoster.AddToCounts(prisoner, -1);
             }
