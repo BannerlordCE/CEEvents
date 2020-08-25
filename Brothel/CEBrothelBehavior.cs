@@ -1092,9 +1092,38 @@ namespace CaptivityEvents.Brothel
             catch (Exception) { }
         }
 
+        private void OnHeroDeath(Hero victim, Hero killer, KillCharacterAction.KillCharacterActionDetail detail, bool showNotification)
+        {
+            try
+            {
+                if (victim.IsPrisoner)
+                {
+                    for (int i = 0; i < _brothelList.Count; i++)
+                    {
+                        for (int y = 0; y < _brothelList[i].CaptiveProstitutes.Count; y++)
+                        {
+                            if (_brothelList[i].CaptiveProstitutes[y].IsHero)
+                            {
+                                if (victim == _brothelList[i].CaptiveProstitutes[y].HeroObject)
+                                {
+                                    _brothelList[i].CaptiveProstitutes[y].HeroObject.IsNoble = true;
+                                    _brothelList[i].CaptiveProstitutes.RemoveAt(y);
+                                    return;
+                                }
+                            }
+
+                        }
+                    }
+                }
+            } catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed at OnHeroDeath CEBrothel : " + e);
+            }
+        }
 
         public override void RegisterEvents()
         {
+            CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, new Action<Hero, Hero, KillCharacterAction.KillCharacterActionDetail, bool>(OnHeroDeath));
             CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, DailyTick);
             CampaignEvents.WeeklyTickEvent.AddNonSerializedListener(this, WeeklyTick);
             CampaignEvents.OnNewGameCreatedEvent.AddNonSerializedListener(this, AddGameMenus);
