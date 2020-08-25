@@ -167,7 +167,10 @@ namespace CaptivityEvents.Events
                     CECaptorContinue(args);
                 }
             }
-            else CECaptorContinue(args);
+            else
+            {
+                CECaptorContinue(args);
+            }
         }
 
         internal void CEHuntPrisoners(MenuCallbackArgs args, int amount = 20)

@@ -95,8 +95,7 @@ namespace CaptivityEvents.Helper
                     }
                 }
 
-                CEEvent ceEvent = null;
-                result = CEEventManager.FireSpecificEventRandom(eventName, out ceEvent, true);
+                result = CEEventManager.FireSpecificEventRandom(eventName, out CEEvent ceEvent, true);
 
                 switch (result)
                 {
@@ -297,9 +296,8 @@ namespace CaptivityEvents.Helper
                     }
                 }
 
-                CEEvent returnedEvent = null;
 
-                result = CEEventManager.FireSpecificEventRandom(eventName, out returnedEvent);
+                result = CEEventManager.FireSpecificEventRandom(eventName, out CEEvent returnedEvent);
 
                 switch (result)
                 {
@@ -693,7 +691,10 @@ namespace CaptivityEvents.Helper
                                             CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                         }
                                     }
-                                    else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                                    else
+                                    {
+                                        CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                                    }
                                 }
                             }
                             catch (Exception) { }
@@ -722,7 +723,10 @@ namespace CaptivityEvents.Helper
                                     CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                 }
                             }
-                            else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            else
+                            {
+                                CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            }
                         }
 
                         foreach (string file in requiredImages)
@@ -888,7 +892,10 @@ namespace CaptivityEvents.Helper
                                             CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                         }
                                     }
-                                    else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                                    else
+                                    {
+                                        CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                                    }
                                 }
                             }
                             catch (Exception) { }
@@ -917,7 +924,10 @@ namespace CaptivityEvents.Helper
                                     CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                 }
                             }
-                            else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            else
+                            {
+                                CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            }
                         }
 
                         foreach (string file in requiredImages)
@@ -971,13 +981,13 @@ namespace CaptivityEvents.Helper
                 if (CampaignCheats.CheckHelp(strings) && CampaignCheats.CheckParameters(strings, 1)) return "Format is \"captivity.play_sound [SOUND_ID]\".";
 
                 string searchTerm = strings[0];
-                int id = 0;
+                int id = -1;
 
                 try
                 {
                     if (!searchTerm.IsStringNoneOrEmpty()) id = SoundEvent.GetEventIdFromString(searchTerm);
 
-                    if (id == 0) return "Sound not found.";
+                    if (id == -1) return "Sound not found.";
                 }
                 catch
                 {
@@ -1018,6 +1028,29 @@ namespace CaptivityEvents.Helper
             }
         }
 
+        [CommandLineFunctionality.CommandLineArgumentFunction("create_new_prisoner", "captivity")]
+        public static string CreateNewPrisoner(List<string> strings)
+        {
 
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.reload_events \".";
+
+                try
+                {
+                    return "Success";
+                }
+                catch (Exception e)
+                {
+                    return "Failed : " + e;
+                }
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
     }
 }

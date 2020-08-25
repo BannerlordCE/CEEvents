@@ -43,6 +43,8 @@ namespace CaptivityEvents.Events
 
         internal bool RandomEventConditionMenuOption(MenuCallbackArgs args)
         {
+            PlayerIsNotBusy(ref args);
+            PlayerHasOpenSpaceForCompanions(ref args);
             Escaping(ref args);
             Leave(ref args);
             SoldToSettlement();
@@ -94,6 +96,8 @@ namespace CaptivityEvents.Events
             sharedCallBackHelper.ConsequenceRenown();
             sharedCallBackHelper.ConsequenceChangeHealth();
             sharedCallBackHelper.ConsequenceChangeMorale();
+            sharedCallBackHelper.ConsequenceSpawnTroop();
+            sharedCallBackHelper.ConsequenceSpawnHero();
 
             ConsequenceImpregnation();
             ConsequenceGainRandomPrisoners();
@@ -290,7 +294,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-                ImpregnationSystem impregnationSystem = new ImpregnationSystem();
+                CEImpregnationSystem impregnationSystem = new CEImpregnationSystem();
 
                 if (!string.IsNullOrEmpty(_option.PregnancyRiskModifier)) { impregnationSystem.ImpregnationChance(Hero.MainHero, new CEVariablesLoader().GetIntFromXML(_option.PregnancyRiskModifier)); }
                 else if (!string.IsNullOrEmpty(_listedEvent.PregnancyRiskModifier)) { impregnationSystem.ImpregnationChance(Hero.MainHero, new CEVariablesLoader().GetIntFromXML(_listedEvent.PregnancyRiskModifier)); }
@@ -883,6 +887,24 @@ namespace CaptivityEvents.Events
         private void Escaping(ref MenuCallbackArgs args)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape) || _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) args.optionLeaveType = GameMenuOption.LeaveType.Escape;
+        }
+
+        private void PlayerHasOpenSpaceForCompanions(ref MenuCallbackArgs args)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerAllowedCompanion)) return;
+            if (!(Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_companions_too_many");
+            args.IsEnabled = false;
+        }
+
+        private void PlayerIsNotBusy(ref MenuCallbackArgs args)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerIsNotBusy)) return;
+            if (PlayerEncounter.Current == null) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_busy_right_now");
+            args.IsEnabled = false;
         }
 
         /*private void LoadBackgroundImage()

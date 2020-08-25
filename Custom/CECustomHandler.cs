@@ -36,6 +36,8 @@ namespace CaptivityEvents.Custom
 
                         foreach (string text in files)
                         {
+                            if (Path.GetDirectoryName(text).Contains("ModuleData")) continue;
+
                             if (Path.GetFileNameWithoutExtension(text) == "SubModule") continue;
 
                             if (Path.GetFileNameWithoutExtension(text).StartsWith("CEModuleCustom"))
@@ -48,7 +50,7 @@ namespace CaptivityEvents.Custom
                                     ForceLogToFile("Custom Settings Added: " + text);
                                 }
 
-                                ForceLogToFile("Custom Skills Added: " + AllCustom.Sum((CECustom ce) =>
+                                ForceLogToFile("Total Custom Skills: " + AllCustom.Sum((CECustom ce) =>
                                 {
                                     if (ce.CESkills != null) return ce.CESkills.Count;
                                     return 0;

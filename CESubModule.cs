@@ -121,6 +121,13 @@ namespace CaptivityEvents
         private static readonly float brothelSoundMin = 1f;
         private static readonly float brothelSoundMax = 3f;
 
+        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml
+        // 1.5.0
+        private static readonly int[] sprite_index = new int[] { 13, 18, 29, 30 };
+
+        // 1.4.3
+        // private static readonly int[] sprite_index = new int[] { 13, 12, 34, 28 };
+
         // Sounds for Brothel
         private static readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
 
@@ -133,38 +140,38 @@ namespace CaptivityEvents
             {
                 if (!swap)
                 {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[34] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_female_prison"]
-                        : CEPersistence.CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[13] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_female"]
-                        : CEPersistence.CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[28] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_male_prison"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[12] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_male"]
+                        : CEPersistence.CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
+                        ? CEPersistence.CEEventImageList["default_female_prison"]
+                        : CEPersistence.CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
+                        ? CEPersistence.CEEventImageList["default_female"]
                         : CEPersistence.CEEventImageList[name];
                 }
                 else
                 {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[34] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_male_prison"]
-                        : CEPersistence.CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[13] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_male"]
-                        : CEPersistence.CEEventImageList[name];
-
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[28] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_female_prison"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[12] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
                         ? CEPersistence.CEEventImageList["default_female"]
+                        : CEPersistence.CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
+                        ? CEPersistence.CEEventImageList["default_male_prison"]
+                        : CEPersistence.CEEventImageList[name];
+
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
+                        ? CEPersistence.CEEventImageList["default_male"]
                         : CEPersistence.CEEventImageList[name];
                 }
             }
@@ -217,6 +224,10 @@ namespace CaptivityEvents
             {
                 CECustomHandler.ForceLogToFile("Captivity Events " + modversion + " has the detected the wrong version " + gameversion);
                 MessageBox.Show("Warning:\n Captivity Events " + modversion + " has the detected the wrong game version. Please download the correct version for " + gameversion + ". Or continue at your own risk.", "Captivity Events has the detected the wrong version");
+            }
+            else
+            {
+                CECustomHandler.ForceLogToFile("Captivity Events " + modversion + " has the detected the version " + gameversion);
             }
 
             try
@@ -297,7 +308,10 @@ namespace CaptivityEvents
                                     CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                                 }
                             }
-                            else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            else
+                            {
+                                CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                            }
                         }
                     }
                     catch (Exception) { }
@@ -326,7 +340,10 @@ namespace CaptivityEvents
                             CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                         }
                     }
-                    else CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                    else
+                    {
+                        CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
+                    }
                 }
 
                 foreach (string file in requiredImages)
@@ -357,7 +374,7 @@ namespace CaptivityEvents
 
             try
             {
-                // Load the Notifications Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.4.3)
+                // Load the MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.0)
                 SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
@@ -490,7 +507,8 @@ namespace CaptivityEvents
             }
         }
 
-        public override void OnNewGameCreated(Game game, object initializerObject) {
+        public override void OnNewGameCreated(Game game, object initializerObject)
+        {
             CEConsole.CleanSave(new List<string>());
             base.OnNewGameCreated(game, initializerObject);
         }
@@ -558,7 +576,7 @@ namespace CaptivityEvents
         }
 
         private void InitalizeAttributes(Game game) => CESkills.RegisterAll(game);
-        
+
         private void AddBehaviours(CampaignGameStarter campaignStarter)
         {
             if (CESettings.Instance == null) return;
@@ -581,7 +599,7 @@ namespace CaptivityEvents
             if (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue) new CEPrisonerDialogue().AddPrisonerLines(campaignStarter);
             //if (CESettings.Instance.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
 
-            if (_isLoadedInGame) CEConsole.ReloadEvents(new List<string>()); 
+            if (_isLoadedInGame) CEConsole.ReloadEvents(new List<string>());
             else AddCustomEvents(campaignStarter);
 
             if (_isLoadedInGame) return;
