@@ -4,13 +4,11 @@ using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
-using TaleWorlds.Library;
-using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events
 {
-    class CESpawnSystem
+    internal class CESpawnSystem
     {
         public void SpawnTheTroops(SpawnTroop[] variables, PartyBase party)
         {
@@ -18,9 +16,6 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    TextObject textObject = new TextObject("Variables: " + troop.Id + " " + troop.Number + " " + troop.Ref);
-                    InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
-
                     int num = new CEVariablesLoader().GetIntFromXML(troop.Number);
                     int numWounded = new CEVariablesLoader().GetIntFromXML(troop.WoundedNumber);
                     CharacterObject characterObject = MBObjectManager.Instance.GetObject<CharacterObject>(troop.Id);
@@ -43,15 +38,15 @@ namespace CaptivityEvents.Events
                         {
                             if (troop.Ref == "Troop")
                             {
-                                party.AddMember(characterObject, num, numWounded);
+                                party.MemberRoster.AddToCounts(characterObject, num, false, numWounded, 0, true, -1);
                             }
                             else
                             {
-                                party.AddPrisoner(characterObject, num, numWounded);
+                                party.PrisonRoster.AddToCounts(characterObject, num, false, numWounded, 0, true, -1);
                             }
                         }
                     }
-                } 
+                }
                 catch (Exception e)
                 {
                     CECustomHandler.ForceLogToFile("Failed to SpawnTheTroops : " + e);
@@ -66,9 +61,6 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    TextObject textObject = new TextObject("Variables: " + heroVariables.Culture + " " + heroVariables.Gender + " " + heroVariables.Ref);
-                    InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
-
                     bool isFemale = heroVariables.Gender == "Female";
 
                     string culture = null;

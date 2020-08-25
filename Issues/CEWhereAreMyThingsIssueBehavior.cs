@@ -44,7 +44,7 @@ namespace CaptivityEvents.Issues
             }
 
             // 1.4.3
-            // protected override float GetFrequency() => 0.01f;
+            //protected override float GetFrequency() => 0.01f;
 
             // 1.5.0
             public override IssueBase.IssueFrequency GetFrequency() => IssueBase.IssueFrequency.Rare;

@@ -126,7 +126,7 @@ namespace CaptivityEvents
         private static readonly int[] sprite_index = new int[] { 13, 18, 29, 30 };
 
         // 1.4.3
-        // private static readonly int[] sprite_index = new int[] { 13, 12, 34, 28 };
+        //private static readonly int[] sprite_index = new int[] { 13, 12, 34, 28 };
 
         // Sounds for Brothel
         private static readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
