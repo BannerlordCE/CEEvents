@@ -1007,7 +1007,11 @@ namespace CaptivityEvents
                                     ForceAgentDropEquipment(agent2);
                                 }
 
-                                missionState.CurrentMission.ClearCorpses();
+                                // 1.5.0
+                                //missionState.CurrentMission.ClearCorpses();
+
+                                // 1.5.1
+                                missionState.CurrentMission.ClearCorpses(false);
 
                                 InformationManager.AddQuickInformation(new TextObject("{=CEEVENTS1069}Let's give them a headstart."), 100, CharacterObject.PlayerCharacter);
                                 CEPersistence.huntState = CEPersistence.HuntState.HeadStart;
