@@ -953,18 +953,25 @@ namespace CaptivityEvents.Brothel
 
         private void OnSettlementOwnerChanged(Settlement settlement, bool openToClaim, Hero newSettlementOwner, Hero oldSettlementOwner, Hero capturerHero, ChangeOwnerOfSettlementAction.ChangeOwnerOfSettlementDetail detail)
         {
-            if (!settlement.IsTown) return;
-            if (!DoesOwnBrothelInSettlement(settlement)) return;
-            if (!Hero.MainHero.MapFaction.IsAtWarWith(newSettlementOwner.MapFaction)) return;
-
-            if (Hero.MainHero.GetPerkValue(DefaultPerks.Trade.RapidDevelopment))
+            try
             {
-                GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, MathF.Round(DefaultPerks.Trade.RapidDevelopment.PrimaryBonus), false);
+                if (!settlement.IsTown) return;
+                if (!DoesOwnBrothelInSettlement(settlement)) return;
+                if (!Hero.MainHero.MapFaction.IsAtWarWith(newSettlementOwner.MapFaction)) return;
+
+                if (Hero.MainHero.GetPerkValue(DefaultPerks.Trade.RapidDevelopment))
+                {
+                    GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, MathF.Round(DefaultPerks.Trade.RapidDevelopment.PrimaryBonus), false);
+                }
+                TextObject textObject3 = new TextObject("{CEBROTHEL0983}The brothel of {SETTLEMENT} has been captured by the enemy, and has been requisitioned.");
+                textObject3.SetTextVariable("SETTLEMENT", settlement.Name);
+                InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Yellow));
+                BrothelInteraction(settlement, false, true, capturerHero);
             }
-            TextObject textObject3 = new TextObject("{CEBROTHEL0983}The brothel of {SETTLEMENT} has been captured by the enemy, and has been requisitioned.");
-            textObject3.SetTextVariable("SETTLEMENT", settlement.Name);
-            InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Yellow));
-            BrothelInteraction(settlement, false, true, capturerHero);
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("OnSettlementOwnerChanged : " + e);
+            }
         }
 
         private void OnWarDeclared(IFaction faction1, IFaction faction2)
