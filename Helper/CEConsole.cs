@@ -329,7 +329,7 @@ namespace CaptivityEvents.Helper
 
                                     if (Game.Current.GameStateManager.ActiveState is MapState mapStateCaptor)
                                     {
-                                        if (CESettings.Instance.EventCaptorNotifications)
+                                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
                                         {
                                             LaunchCaptorEvent(returnedEvent);
                                         }
@@ -358,7 +358,7 @@ namespace CaptivityEvents.Helper
 
                         if (Game.Current.GameStateManager.ActiveState is MapState mapStateRandom)
                         {
-                            if (CESettings.Instance.EventCaptorNotifications)
+                            if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
                             {
                                 LaunchRandomEvent(returnedEvent);
                             }
@@ -590,17 +590,23 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
-                    Hero.MainHero.Children.ForEach(child =>
-                    {
-                        child.Clan = Hero.MainHero.Clan;
-                        if (child.CharacterObject.Occupation != Occupation.Lord)
-                        {
-                            PropertyInfo fi = child.CharacterObject.GetType().GetProperty("Occupation", BindingFlags.Instance | BindingFlags.Public);
-                            if (fi != null) fi.SetValue(child.CharacterObject, Occupation.Lord);
-                        }
-                    });
+                    //Hero.MainHero.Children.ForEach(child =>
+                    //{
+                    //    child.Clan = Hero.MainHero.Clan;
+                    //    if (child.CharacterObject.Occupation != Occupation.Lord)
+                    //    {
+                    //        PropertyInfo fi = child.CharacterObject.GetType().GetProperty("Occupation", BindingFlags.Instance | BindingFlags.Public);
+                    //        if (fi != null) fi.SetValue(child.CharacterObject, Occupation.Lord);
+                    //    }
+                    //});\
 
-                    return "Successfully fixed";
+                    string test = "INVALID FIX";
+
+                    //test += PlayerEncounter.LocationEncounter.IsInsideOfASettlement ? "Is In Settlement\n" : "Not in Settlement\n";
+
+                    //PlayerEncounter.LocationEncounter.Settlement.LocationComplex.GetLocationCharacterOfHero(Hero.MainHero);
+
+                    return test;
                 }
                 catch (Exception e)
                 {
@@ -1031,7 +1037,6 @@ namespace CaptivityEvents.Helper
         [CommandLineFunctionality.CommandLineArgumentFunction("create_new_prisoner", "captivity")]
         public static string CreateNewPrisoner(List<string> strings)
         {
-
             try
             {
                 Thread.Sleep(500);
@@ -1040,7 +1045,7 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
-                    return "Success";
+                    return "Unimplemented";
                 }
                 catch (Exception e)
                 {

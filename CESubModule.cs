@@ -121,12 +121,8 @@ namespace CaptivityEvents
         private static readonly float brothelSoundMin = 1f;
         private static readonly float brothelSoundMax = 3f;
 
-        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml
-        // 1.5.0
+        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml  (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.3)
         private static readonly int[] sprite_index = new int[] { 13, 18, 29, 30 };
-
-        // 1.4.3
-        //private static readonly int[] sprite_index = new int[] { 13, 12, 34, 28 };
 
         // Sounds for Brothel
         private static readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
@@ -374,7 +370,7 @@ namespace CaptivityEvents
 
             try
             {
-                // Load the MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.0)
+                // Load the MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.3)
                 SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
@@ -1006,9 +1002,6 @@ namespace CaptivityEvents
                                 {
                                     ForceAgentDropEquipment(agent2);
                                 }
-
-                                // 1.5.0
-                                //missionState.CurrentMission.ClearCorpses();
 
                                 // 1.5.1
                                 missionState.CurrentMission.ClearCorpses(false);

@@ -49,13 +49,13 @@ namespace CaptivityEvents.CampaignBehaviors
             }
 
             Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new CECaptorMapNotification(returnedEvent, new TextObject("{=CEEVENTS1090}Captor event is ready")));
+
         }
 
         private void LaunchRandomEvent()
         {
             if (CEHelper.notificationEventExists) return;
             CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
-
             if (returnedEvent == null) return;
             CEHelper.notificationEventExists = true;
 
@@ -496,7 +496,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 {
                     if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
                     {
-                        if (CESettings.Instance.EventCaptorNotifications)
+                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
                         {
                             if (CESettings.Instance.EventRandomEnabled && (!CEHelper.notificationEventExists || !CEHelper.notificationCaptorExists))
                             {
@@ -562,7 +562,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     }
                     else if (CESettings.Instance.EventRandomEnabled)
                     {
-                        if (CESettings.Instance.EventCaptorNotifications)
+                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
                         {
                             LaunchRandomEvent();
                         }

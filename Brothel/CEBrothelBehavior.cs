@@ -116,7 +116,7 @@ namespace CaptivityEvents.Brothel
                 FieldInfo fi = PartyScreenManager.Instance.GetType().GetField("_currentMode", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (fi != null) fi.SetValue(PartyScreenManager.Instance, PartyScreenMode.PrisonerManage);
 
-                TroopRoster prisonRoster = new TroopRoster();
+                TroopRoster prisonRoster = TroopRoster.CreateDummyTroopRoster();
                 List<CharacterObject> prisoners = FetchBrothelPrisoners(Hero.MainHero.CurrentSettlement);
                 foreach (CharacterObject prisoner in prisoners)
                 {
@@ -127,7 +127,7 @@ namespace CaptivityEvents.Brothel
                 TextObject textObject = new TextObject("{=CEBROTHEL0984}The brothel of {SETTLEMENT}", null);
                 textObject.SetTextVariable("SETTLEMENT", Hero.MainHero.CurrentSettlement.Name);
 
-                _partyScreenLogic.Initialize(new TroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
+                _partyScreenLogic.Initialize(TroopRoster.CreateDummyTroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
                 _partyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
 
                 _partyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
@@ -1030,7 +1030,10 @@ namespace CaptivityEvents.Brothel
                     }
                 }
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed on BrothelDailyTick1: " + e);
+            }
 
             try
             {
@@ -1067,7 +1070,10 @@ namespace CaptivityEvents.Brothel
                     }
                 }
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed on BrothelDailyTick2: " + e);
+            }
         }
 
         public void WeeklyTick()
@@ -1096,7 +1102,10 @@ namespace CaptivityEvents.Brothel
                     }
                 }
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed on BrothelWeeklyTick: " + e);
+            }
         }
 
         private void OnHeroDeath(Hero victim, Hero killer, KillCharacterAction.KillCharacterActionDetail detail, bool showNotification)
@@ -1122,7 +1131,8 @@ namespace CaptivityEvents.Brothel
                         }
                     }
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("Failed at OnHeroDeath CEBrothel : " + e);
             }
@@ -1217,7 +1227,10 @@ namespace CaptivityEvents.Brothel
                     _brothelList[i].CaptiveProstitutes = new List<CharacterObject>();
                 }
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed on Brothel Interaction: " + e);
+            }
         }
 
         public static List<CharacterObject> FetchBrothelPrisoners(Settlement settlement)
@@ -1227,7 +1240,10 @@ namespace CaptivityEvents.Brothel
                 CEBrothel testLocation = _brothelList.FirstOrDefault(brothel => { return brothel.Settlement.StringId == settlement.StringId; });
                 if (testLocation != null) return testLocation.CaptiveProstitutes;
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed on FetchBrothelPrisoners: " + e);
+            }
 
             return new List<CharacterObject>();
         }
