@@ -60,6 +60,7 @@
     <Compile Include="Events\SharedCallBackHelper.cs" />
     <Compile Include="Events\CEVariablesLoader.cs" />
     <Compile Include="Events\WaitingList.cs" />
+    <Compile Include="Helper\CETests.cs" />
     <Compile Include="Notifications\CECaptorMapNotification.cs" />
     <Compile Include="Notifications\CECaptorMapNotificationItemVM.cs" />
     <Compile Include="Helper\CEConsole.cs" />

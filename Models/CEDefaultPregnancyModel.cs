@@ -20,8 +20,7 @@ namespace CaptivityEvents.Models
 
         private bool IsHeroAgeSuitableForPregnancy(Hero hero) => hero.Age >= 18f && hero.Age <= 45f;
 
-        private bool IsHeroAgeSuitableForPregnancy(CEHero hero) //I created this overload for the unit test example.
-=> hero.Age >= 18f && hero.Age <= 45f;
+        private bool IsHeroAgeSuitableForPregnancy(CEHero hero) => hero.Age >= 18f && hero.Age <= 45f; //I created this overload for the unit test example.
 
 
         private float GeneratePregnancyFactorNumber(float age, float explainedNumber) => (6.5f - (age - 18f) * 0.23f) * 0.02f * explainedNumber;

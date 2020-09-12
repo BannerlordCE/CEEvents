@@ -579,6 +579,38 @@ namespace CaptivityEvents.Helper
             }
         }
 
+#if DEBUG
+        [CommandLineFunctionality.CommandLineArgumentFunction("run_CETests", "debug")]
+        public static string RunTests(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"debug.run_CETests \".";
+
+                string test = "--- CE Test ---";
+
+                try
+                {
+
+                    test += "\n" + CETests.RunTestOne();
+                    test += "\n" + CETests.RunTestTwo();
+
+                    return test;
+                }
+                catch (Exception e)
+                {
+                    return "Failed : " + e;
+                }
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+#endif
+
         [CommandLineFunctionality.CommandLineArgumentFunction("fire_fix", "captivity")]
         public static string FireFix(List<string> strings)
         {
@@ -600,10 +632,15 @@ namespace CaptivityEvents.Helper
                     //    }
                     //});\
 
-                    string test = "INVALID FIX";
+                    string test = "";
+
+                    List<CEBrothel> list = CEBrothelBehavior.GetPlayerBrothels();
+                    foreach (CEBrothel brothel in list)
+                    {
+                        test += "\n" + brothel.Name;
+                    }        
 
                     //test += PlayerEncounter.LocationEncounter.IsInsideOfASettlement ? "Is In Settlement\n" : "Not in Settlement\n";
-
                     //PlayerEncounter.LocationEncounter.Settlement.LocationComplex.GetLocationCharacterOfHero(Hero.MainHero);
 
                     return test;
