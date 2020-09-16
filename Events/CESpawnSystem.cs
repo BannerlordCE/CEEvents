@@ -78,11 +78,11 @@ namespace CaptivityEvents.Events
                     }
 
                     CharacterObject wanderer = (from x in CharacterObject.Templates
-                                                where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture.StringId == culture) && (heroVariables.Gender == null || x.IsFemale == isFemale)
-                                                select x).GetRandomElement<CharacterObject>();
+                                                where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture != null && x.Culture.StringId == culture.ToLower()) && (heroVariables.Gender == null || x.IsFemale == isFemale)
+                                                select x).GetRandomElement();
                     Settlement randomElement = (from settlement in Settlement.All
                                                 where settlement.Culture == wanderer.Culture && settlement.IsTown
-                                                select settlement).GetRandomElement<Settlement>();
+                                                select settlement).GetRandomElement();
 
                     Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, null, null, -1);
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);

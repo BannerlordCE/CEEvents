@@ -1,5 +1,6 @@
 ﻿using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
+using MCM.Abstractions.Data;
 using MCM.Abstractions.Settings.Base;
 using MCM.Abstractions.Settings.Base.Global;
 using System;
@@ -116,9 +117,14 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
         public int PrisonerNonHeroEscapeChanceOther { get; set; } = -1;
 
-        [SettingPropertyBool("{=CESETTINGS1026}Games Default Auto Ransom System", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behaviour regarding auto-ransom")]
+        [SettingPropertyDropdown("{=CESETTINGS1026}Games Default Auto Ransom Behavior", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behaviour regarding auto-ransom")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
-        public bool PrisonerAutoRansom { get; set; } = false;
+        public DefaultDropdown<string> EscapeAutoRansom { get; set; } = new DefaultDropdown<string>(new string[]
+    {
+        "{=CESETTINGS1115}Off",
+        "{=CESETTINGS1114}Disabled For Player",
+        "{=CESETTINGS1116}On"
+    }, 0);
 
         [SettingPropertyBool("{=CESETTINGS1110}Games Default Exceeded Prisoners System", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1111}Allows the games default behaviour regarding exceeded prisoner system, Hourly escape chance based on default 10% or above chances")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
