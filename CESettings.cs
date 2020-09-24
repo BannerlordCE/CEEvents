@@ -30,15 +30,15 @@ namespace CaptivityEvents
 
         [SettingPropertyFloatingInteger("{=CESETTINGS1002}Event wait between occurances in Traveling Party", 1f, 24f, "#0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1003}How often should an event occur while in a regular party. (Gametime in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0098}Captive")]
-        public float EventOccuranceOther { get; set; } = 6f;
+        public float EventOccurrenceOther { get; set; } = 6f;
 
         [SettingPropertyFloatingInteger("{=CESETTINGS1004}Event wait between occurances in Settlement", 1f, 24f, "#0", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1005}How should an event occur in settlements. (Prostitution affected too) (Gametime in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0098}Captive")]
-        public float EventOccuranceSettlement { get; set; } = 6f;
+        public float EventOccurrenceSettlement { get; set; } = 6f;
 
         [SettingPropertyFloatingInteger("{=CESETTINGS1006}Event wait between occurances in Lord's Party", 1f, 24f, "#0", Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1007}How often should an event occur in a lord's party. (Gametime in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0098}Captive")]
-        public float EventOccuranceLord { get; set; } = 6f;
+        public float EventOccurrenceLord { get; set; } = 6f;
 
         [SettingPropertyBool("{=CESETTINGS1000}Turn on Captor Events", Order = 1, RequireRestart = true)]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
@@ -46,7 +46,7 @@ namespace CaptivityEvents
 
         [SettingPropertyFloatingInteger("{=CESETTINGS1008}Event wait between occurances while Captor", 1f, 100f, "#0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1009}How often should an event occur while Captor. (Gametime in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
-        public float EventOccuranceCaptor { get; set; } = 12f;
+        public float EventOccurrenceCaptor { get; set; } = 12f;
 
 
         [SettingPropertyBool("{=CESETTINGS1096}Prisoner Dialogue", Order = 3, RequireRestart = true, HintText = "{=CESETTINGS1097}Overwrites the default prisoner conversation menu.")]

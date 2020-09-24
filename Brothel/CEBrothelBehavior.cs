@@ -661,6 +661,7 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddDialogLine("ce_owner_talk_00", "start", "ce_owner_response_00", "{=CEBROTHEL1053}Oh, a valued customer, how can I help you today?[ib:confident][rb:very_positive]", ConversationWithBrothelOwnerBeforeSelling, null);
 
             campaignGameStarter.AddPlayerLine("ce_op_response_01", "ce_owner_response_00", "ce_owner_buy_00", "{=CEBROTHEL1054}I would like to buy your establishment.", ConversationWithBrothelOwnerShowBuy, null);
+            campaignGameStarter.AddPlayerLine("ce_op_response_02", "ce_owner_response_00", "ce_owner_party_00", "{=CEBROTHEL1068}I would like to purchase some services for my party.", ConversationWithBrothelOwnerShowPartyBuy, null);
             campaignGameStarter.AddPlayerLine("ce_op_response_04", "ce_owner_response_00", "ce_owner_exit_00", "{=CEBROTHEL1055}I don't need anything at the moment.", null, null);
 
             campaignGameStarter.AddDialogLine("ce_owner_buy_00_r", "ce_owner_buy_00", "ce_owner_buy_response", "{=CEBROTHEL1056}I am selling this establishment for {AMOUNT} denars.", PriceWithBrothel, null);
@@ -668,21 +669,37 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddPlayerLine("ce_owner_buy_yes", "ce_owner_buy_response", "ce_owner_business_complete", "{=CEBROTHEL1049}Alright, here you go.", null, ConversationBoughtBrothel, 100, ConversationHasEnoughMoneyForBrothel);
             campaignGameStarter.AddPlayerLine("ce_owner_buy_no", "ce_owner_buy_response", "ce_owner_exit_00", "{=CEBROTHEL1050}Nevermind.", null, null);
 
-            campaignGameStarter.AddDialogLine("ce_owner_business_complete_response", "ce_owner_business_complete", "close_window", "{=CEBROTHEL1057}A pleasure doing business. [ib:confident][rb:very_positive]", null, null);
+            campaignGameStarter.AddDialogLine("ce_owner_party_00_r", "ce_owner_party_00", "ce_owner_party_response", "{=CEBROTHEL1072}I can bring some ladies but that will be {AMOUNT} denars.", PriceWithParty, null);
 
+            campaignGameStarter.AddPlayerLine("ce_party_buy_yes", "ce_owner_party_response", "ce_owner_business_complete", "{=CEBROTHEL1049}Alright, here you go.", null, ConversationBoughtParty, 100, ConversationHasEnoughForPartyService);
+            campaignGameStarter.AddPlayerLine("ce_party_buy_no", "ce_owner_party_response", "ce_owner_exit_00", "{=CEBROTHEL1050}Nevermind.", null, null);
+
+            campaignGameStarter.AddDialogLine("ce_owner_business_complete_response", "ce_owner_business_complete", "close_window", "{=CEBROTHEL1057}A pleasure doing business. [ib:confident][rb:very_positive]", null, null);
             campaignGameStarter.AddDialogLine("ce_owner_exit_response", "ce_owner_exit_00", "close_window", "{=CEBROTHEL1058}Very well, I'll be here if you need anything. [ib:confident][rb:very_positive]", null, null);
 
             // Dialogue With Brothel Owner 01
             campaignGameStarter.AddDialogLine("ce_owner_talk_01", "start", "close_window", "{=CEBROTHEL1059}Let me prepare the establishment, it will be ready for you soon.", ConversationWithBrothelOwnerAfterSelling, null);
+
 
             // Dialogue With Assistant 00
             campaignGameStarter.AddDialogLine("ce_assistant_talk_00", "start", "ce_assistant_response_00", "{=CEBROTHEL1060}Hello boss, how can I help you today?[ib:confident][rb:very_positive]", ConversationWithBrothelAssistantBeforeSelling, null);
 
             campaignGameStarter.AddPlayerLine("ce_ap_response_01", "ce_assistant_response_00", "ce_assistant_sell_00", "{=CEBROTHEL1061}I would like to sell our establishment.", null, null);
             campaignGameStarter.AddPlayerLine("ce_ap_response_02", "ce_assistant_response_00", "ce_assistant_manage_00", "{=CEBROTHEL0982}I would like to manage our establishment.", null, null);
+            campaignGameStarter.AddPlayerLine("ce_ap_response_03", "ce_assistant_response_00", "ce_assistant_party_00", "{=CEBROTHEL1069}Send some ladies to boost the morale of my party.", ConversationWithBrothelAssistantShowPartyBuy, null);
             campaignGameStarter.AddPlayerLine("ce_ap_response_04", "ce_assistant_response_00", "ce_assistant_exit_00", "{=CEBROTHEL1055}I don't need anything at the moment.", null, null);
 
             campaignGameStarter.AddDialogLine("ce_assistant_sell_00_r", "ce_assistant_sell_00", "ce_assistant_sell_response", "{=CEBROTHEL1062}We can sell this establishment for {AMOUNT} denars.", PriceWithBrothel, null);
+
+            campaignGameStarter.AddDialogLine("ce_assistant_party_00_n", "ce_assistant_party_00", "ce_assistant_response_00", "{=CEBROTHEL1071}Sorry, {?PLAYER.GENDER}milady{?}my lord{\\?} everyone are currently busy.", () => _hasBoughtProstituteToParty, null);
+
+            campaignGameStarter.AddDialogLine("ce_assistant_choice_00_r", "ce_assistant_party_00", "ce_assistant_choice_00", "{=CEBROTHEL1073}Who would you like to send first?", () => !_hasBoughtProstituteToParty, CheckInBrothelCaptives);
+
+            campaignGameStarter.AddRepeatablePlayerLine("ce_assistant_choice_01_r", "ce_assistant_choice_00", "ce_assistant_choice_01", "{=CEBROTHEL1075}Send {HERO.LINK}.", ConditionalSendBrothelCaptive, SendBrothelCaptive);
+
+            campaignGameStarter.AddPlayerLine("ce_assistant_choice_02_r", "ce_assistant_choice_00", "ce_assistant_choice_01", "{=CEBROTHEL1074}Send {NAME} the regular.", ConditionalRandomName, null);
+
+            campaignGameStarter.AddDialogLine("ce_assistant_party_00_r", "ce_assistant_choice_01", "ce_assistant_manage_00_response", "{=CEBROTHEL1070}Yes, {?PLAYER.GENDER}milady{?}my lord{\\?} I will send her first.", null, ConversationBoughtParty);
 
             campaignGameStarter.AddDialogLine("ce_assistant_manage_00_r", "ce_assistant_manage_00", "ce_assistant_manage_00_response", "{=CEBROTHEL0980}Of course {?PLAYER.GENDER}milady{?}my lord{\\?}.", null, ManageProstitutes);
             campaignGameStarter.AddDialogLine("ce_assistant_manage_00_response_r", "ce_assistant_manage_00_response", "ce_assistant_response_00", "{=CEBROTHEL0981}Anything else {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", null, null);
@@ -729,6 +746,18 @@ namespace CaptivityEvents.Brothel
         private bool ConversationWithBrothelOwnerBeforeSelling() => CharacterObject.OneToOneConversationCharacter.StringId == "brothel_owner" && !DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
 
         private bool ConversationWithBrothelOwnerShowBuy() => CharacterObject.OneToOneConversationCharacter.StringId == "brothel_owner" && !Campaign.Current.IsMainHeroDisguised;
+
+        private bool ConversationWithBrothelOwnerShowPartyBuy()
+        {
+            int numberOfMen = PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
+            return CharacterObject.OneToOneConversationCharacter.StringId == "brothel_owner" && !Campaign.Current.IsMainHeroDisguised && !_hasBoughtProstituteToParty && numberOfMen > 1;
+        }
+
+        private bool ConversationWithBrothelAssistantShowPartyBuy()
+        {
+            int numberOfMen = PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
+            return !Campaign.Current.IsMainHeroDisguised && numberOfMen > 1;
+        }
 
         private void ConversationBoughtBrothel()
         {
@@ -792,11 +821,101 @@ namespace CaptivityEvents.Brothel
             return false;
         }
 
+        private bool PriceWithParty()
+        {
+            int numberOfMen = PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
+            int totalCost = numberOfMen * prostitutionCostPerParty;
+            MBTextManager.SetTextVariable("AMOUNT", new TextObject(totalCost.ToString()));
+
+            return true;
+        }
+
+        private bool ConversationHasEnoughForPartyService(out TextObject text)
+        {
+            text = TextObject.Empty;
+            int numberOfMen = PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
+            int totalCost = numberOfMen * prostitutionCostPerParty;
+
+            if (Hero.MainHero.Gold >= totalCost) return true;
+            text = new TextObject("{=CEEVENTS1138}You don't have enough gold");
+
+            return false;
+        }
+
         private bool PriceWithProstitute()
         {
             MBTextManager.SetTextVariable("AMOUNT", new TextObject(prostitutionCost.ToString()));
 
             return true;
+        }
+
+        private bool ConditionalRandomName()
+        {
+            
+            MBTextManager.SetTextVariable("NAME", new TextObject(Settlement.CurrentSettlement.Culture.FemaleNameList.GetRandomElement()));
+
+            return true;
+        }
+
+        // conversation_town_or_village_player_ask_location_of_hero_2_on_condition
+        private bool ConditionalSendBrothelCaptive()
+        {
+            CharacterObject characterObject = ConversationSentence.SelectedRepeatObject as CharacterObject;
+            if (characterObject != null)
+            {
+                StringHelpers.SetCharacterProperties("HERO", characterObject, null, ConversationSentence.SelectedRepeatLine, true);
+                return true;
+            }
+            return false;
+        }
+        private void CheckInBrothelCaptives()
+        {
+            List<CharacterObject> brothelPrisoners = FetchBrothelPrisoners(Settlement.CurrentSettlement);
+            ConversationSentence.ObjectsToRepeatOver = brothelPrisoners;
+        }
+
+        private void SendBrothelCaptive()
+        {
+            CharacterObject captive = ((CharacterObject)ConversationSentence.LastSelectedRepeatObject);
+            if (captive.HeroObject.GetSkillValue(CESkills.Prostitution) < 50)
+            {
+                new Dynamics().RenownModifier(MBRandom.RandomInt(-20, -5), captive.HeroObject);
+            } 
+            else
+            {
+                captive.HeroObject.SetSkillValue(CESkills.Slavery, MBRandom.RandomInt(10, 20));
+            }
+
+            if (captive.HeroObject.GetSkillValue(CESkills.Slavery) < 50 || captive.HeroObject.GetSkillValue(CESkills.Prostitution) < 50)
+            {
+                new Dynamics().RelationsModifier(captive.HeroObject, MBRandom.RandomInt(-10, -1), Hero.MainHero, false, true);
+            }
+
+            captive.HeroObject.SetSkillValue(CESkills.Prostitution, MBRandom.RandomInt(10, 20));
+
+        }
+
+        private void ConversationBoughtParty()
+        {
+            int numberOfMen = PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
+
+            if (!DoesOwnBrothelInSettlement(Settlement.CurrentSettlement))
+            {
+                int totalCost = numberOfMen * prostitutionCostPerParty;
+                GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, totalCost);
+            }
+
+            float ratio = numberOfMen / PartyBase.MainParty.NumberOfAllMembers;
+
+            PartyBase.MainParty.MobileParty.RecentEventsMorale += ratio * 60f;
+
+            TextObject textObject = GameTexts.FindText("str_CE_morale_level");
+            textObject.SetTextVariable("PARTY", PartyBase.MainParty.Name);
+
+            textObject.SetTextVariable("POSITIVE", 1);
+            InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
+
+            _hasBoughtProstituteToParty = true;
         }
 
         private void ConversationProstituteConsequenceSex()
@@ -1080,6 +1199,7 @@ namespace CaptivityEvents.Brothel
         {
             SkillObject prostitutionSkill = CESkills.Prostitution;
             _hasBoughtTunToParty = false;
+            _hasBoughtProstituteToParty = false;
 
             if (Hero.MainHero.GetSkillValue(prostitutionSkill) > 500) new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(-300, -200), Hero.MainHero, false, false);
             else if (Hero.MainHero.GetSkillValue(prostitutionSkill) > 100) new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(-40, -10), Hero.MainHero, false, false);
@@ -1093,7 +1213,7 @@ namespace CaptivityEvents.Brothel
                     {
                         if (_brothelList[i].CaptiveProstitutes[y].IsHero)
                         {
-                            if (_brothelList[i].CaptiveProstitutes[y].HeroObject.GetSkillValue(prostitutionSkill) > 50)
+                            if (_brothelList[i].CaptiveProstitutes[y].HeroObject.GetSkillValue(prostitutionSkill) < 50)
                                 new Dynamics().RenownModifier(MBRandom.RandomInt(-20, -5), _brothelList[i].CaptiveProstitutes[y].HeroObject);
 
                             _brothelList[i].CaptiveProstitutes[y].HeroObject.SetSkillValue(prostitutionSkill, MBRandom.RandomInt(10, 20));
@@ -1168,7 +1288,18 @@ namespace CaptivityEvents.Brothel
             }
         }
 
-        public static bool DoesOwnBrothelInSettlement(Settlement settlement) => _brothelList.Exists(brothelData => brothelData.Settlement.StringId == settlement.StringId && brothelData.Owner == Hero.MainHero);
+        public static bool DoesOwnBrothelInSettlement(Settlement settlement)
+        {
+            try
+            {
+                return _brothelList.Exists(brothelData => brothelData.Settlement.StringId == settlement.StringId && brothelData.Owner == Hero.MainHero);
+            }
+            catch (Exception)
+            {
+                _brothelList = new List<CEBrothel>();
+                return false;
+            }
+        }
 
         public static void AddBrothelData(Settlement settlement) => _brothelList.Add(new CEBrothel(settlement));
 
@@ -1397,6 +1528,7 @@ namespace CaptivityEvents.Brothel
             dataStore.SyncData("_orderedDrinkThisVisit", ref _orderedDrinkThisVisit);
             dataStore.SyncData("_hasMetWithRansomBroker", ref _hasMetWithRansomBroker);
             dataStore.SyncData("_hasBoughtTunToParty", ref _hasBoughtTunToParty);
+            dataStore.SyncData("_hasBoughtProstituteToParty", ref _hasBoughtProstituteToParty);
             dataStore.SyncData("_CEbrothelList", ref _brothelList);
         }
 
@@ -1419,6 +1551,8 @@ namespace CaptivityEvents.Brothel
 
         private const int prostitutionCost = 60;
 
+        private const int prostitutionCostPerParty = 40;
+
         private const int brothelCost = 5000;
 
         private Settlement _orderedDrinkThisDayInSettlement;
@@ -1428,5 +1562,7 @@ namespace CaptivityEvents.Brothel
         private bool _hasMetWithRansomBroker;
 
         private bool _hasBoughtTunToParty;
+
+        private bool _hasBoughtProstituteToParty;
     }
 }

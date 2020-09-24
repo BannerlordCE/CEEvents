@@ -81,7 +81,7 @@ namespace CaptivityEvents.CampaignBehaviors
             _hoursPassed++;
 
             if (CESettings.Instance == null) return false;
-            if (!(_hoursPassed > CESettings.Instance.EventOccuranceCaptor)) return false;
+            if (!(_hoursPassed > CESettings.Instance.EventOccurrenceCaptor)) return false;
             CEHelper.notificationEventCheck = true;
             CEHelper.notificationCaptorCheck = true;
             _hoursPassed = 0;
@@ -295,7 +295,6 @@ namespace CaptivityEvents.CampaignBehaviors
                 hero.Clan = father.Clan;
             }
             CampaignEventDispatcher.Instance.OnHeroCreated(hero, true);
-            int heroComesOfAge = Campaign.Current.Models.AgeModel.HeroComesOfAge;
             return hero;
         }
 
@@ -659,6 +658,14 @@ namespace CaptivityEvents.CampaignBehaviors
             dataStore.SyncData("_CEheroPregnancies", ref _heroPregnancies);
             dataStore.SyncData("_CEreturnEquipment", ref _returnEquipment);
             dataStore.SyncData("_CEextraVariables", ref _extraVariables);
+        }
+
+        public static void ResetFullData()
+        {
+            _extraVariables = new ExtraVariables();
+            _extraVariables.ResetVariables();
+            _returnEquipment = new List<ReturnEquipment>();
+            _heroPregnancies = new List<Pregnancy>();
         }
 
         private int _hoursPassed;

@@ -503,7 +503,7 @@ namespace CaptivityEvents.Helper
                     d.VictimProstitutionModifier(0, hero, false, false);
                     d.VictimSlaveryModifier(0, hero, true);
                     d.VictimSlaveryModifier(0, hero, false, false);
-                    CECampaignBehavior.ExtraProps.ResetVariables();
+                    CECampaignBehavior.ResetFullData();
 
                     return "Successfully reset status";
                 }
