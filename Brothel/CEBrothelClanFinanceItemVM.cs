@@ -15,7 +15,7 @@ namespace CaptivityEvents.Brothel
         {
             _brothel = brothel;
 
-            IncomeTypeAsEnum = IncomeTypes.Workshop;
+            IncomeTypeAsEnum = IncomeTypes.None;
             SettlementComponent component = _brothel.Settlement.GetComponent<SettlementComponent>();
             ImageName = component != null ? component.WaitMeshName : "";
             RefreshValues();

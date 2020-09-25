@@ -803,6 +803,8 @@ namespace CaptivityEvents.Brothel
 
         private bool ConversationWithProstitute() => CharacterObject.OneToOneConversationCharacter.StringId == "prostitute_regular";
 
+        private bool ConversationWithMaid() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid";
+
         private bool ConversationWithProstituteIsOwner() => CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("prostitute") && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
 
         private bool ConversationWithProstituteNotMetRequirements() => CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("prostitute") && Campaign.Current.IsMainHeroDisguised;
