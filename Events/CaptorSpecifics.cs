@@ -90,7 +90,7 @@ namespace CaptivityEvents.Events
         {
             CEPersistence.animationPlayEvent = false;
 
-            TroopRoster releasedPrisoners = new TroopRoster();
+            TroopRoster releasedPrisoners = TroopRoster.CreateDummyTroopRoster();
 
             try
             {
@@ -177,7 +177,7 @@ namespace CaptivityEvents.Events
         {
             CEPersistence.animationPlayEvent = false;
 
-            TroopRoster releasedPrisoners = new TroopRoster();
+            TroopRoster releasedPrisoners = TroopRoster.CreateDummyTroopRoster();
 
             if (CESettings.Instance != null) amount = CESettings.Instance.AmountOfTroopsForHunt;
 

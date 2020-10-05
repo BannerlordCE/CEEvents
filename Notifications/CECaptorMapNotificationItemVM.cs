@@ -33,7 +33,7 @@ namespace CaptivityEvents.Notifications
         {
             base.ManualRefreshRelevantStatus();
 
-            if (MobileParty.MainParty.Party.PrisonRoster.Count == 0 || PlayerCaptivity.IsCaptive || !CEHelper.notificationCaptorExists)
+            if (MobileParty.MainParty.Party.PrisonRoster.Count == 0 || PlayerCaptivity.IsCaptive || !CEHelper.notificationCaptorExists || !CESettings.Instance.EventCaptorNotifications)
             {
                 CEHelper.notificationCaptorExists = false;
                 ExecuteRemove();

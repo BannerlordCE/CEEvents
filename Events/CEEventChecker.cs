@@ -884,6 +884,8 @@ namespace CaptivityEvents.Events
 
             if (!isOwnedFlag && !isNotOwnedFlag) return true;
 
+            if (CECampaignBehavior.ExtraProps == null) CECampaignBehavior.ResetFullData();
+
             if (isOwnedFlag && CECampaignBehavior.ExtraProps.Owner == null)
                 return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. isOwnedFlag.");
 
@@ -1430,7 +1432,7 @@ namespace CaptivityEvents.Events
             if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) return Error("Skipping event " + _listEvent.Name + " Player is busy.");
             if (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerAllowedCompanion)) return Error("Skipping event " + _listEvent.Name + " Player has too many companions.");
 
-                return true;
+            return true;
         }
 
         private bool CustomFlagCheck()

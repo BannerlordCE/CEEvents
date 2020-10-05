@@ -121,12 +121,8 @@ namespace CaptivityEvents
         private static readonly float brothelSoundMin = 1f;
         private static readonly float brothelSoundMax = 3f;
 
-        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml
-        // 1.5.0
+        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml  (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.3)
         private static readonly int[] sprite_index = new int[] { 13, 18, 29, 30 };
-
-        // 1.4.3
-        //private static readonly int[] sprite_index = new int[] { 13, 12, 34, 28 };
 
         // Sounds for Brothel
         private static readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
@@ -220,7 +216,7 @@ namespace CaptivityEvents
             ModuleInfo nativeModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
             ApplicationVersion gameversion = nativeModule.Version;
 
-            if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor || gameversion.Revision != modversion.Revision)
+            if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor || !(gameversion.Revision == 2 || gameversion.Revision == 3))
             {
                 CECustomHandler.ForceLogToFile("Captivity Events " + modversion + " has the detected the wrong version " + gameversion);
                 MessageBox.Show("Warning:\n Captivity Events " + modversion + " has the detected the wrong game version. Please download the correct version for " + gameversion + ". Or continue at your own risk.", "Captivity Events has the detected the wrong version");
@@ -374,7 +370,7 @@ namespace CaptivityEvents
 
             try
             {
-                // Load the MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.0)
+                // Load the MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.3)
                 SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
@@ -563,7 +559,7 @@ namespace CaptivityEvents
             if (dailyTickHeroEvent != null)
             {
                 dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerEscapeCampaignBehavior>());
-                if (CESettings.Instance != null && !CESettings.Instance.PrisonerAutoRansom) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
+                if (CESettings.Instance != null && CESettings.Instance.EscapeAutoRansom.SelectedIndex != 2) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
             }
 
             IMbEvent<MobileParty> hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
@@ -1007,7 +1003,8 @@ namespace CaptivityEvents
                                     ForceAgentDropEquipment(agent2);
                                 }
 
-                                missionState.CurrentMission.ClearCorpses();
+                                // 1.5.1
+                                missionState.CurrentMission.ClearCorpses(false);
 
                                 InformationManager.AddQuickInformation(new TextObject("{=CEEVENTS1069}Let's give them a headstart."), 100, CharacterObject.PlayerCharacter);
                                 CEPersistence.huntState = CEPersistence.HuntState.HeadStart;

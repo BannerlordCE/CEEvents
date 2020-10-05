@@ -30,7 +30,7 @@ namespace CaptivityEvents.Notifications
         {
             base.ManualRefreshRelevantStatus();
 
-            if (PlayerCaptivity.IsCaptive || !CEHelper.notificationEventExists)
+            if (PlayerCaptivity.IsCaptive || !CEHelper.notificationEventExists || !CESettings.Instance.EventCaptorNotifications)
             {
                 CEHelper.notificationEventExists = false;
                 ExecuteRemove();

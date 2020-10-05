@@ -329,7 +329,7 @@ namespace CaptivityEvents.Helper
 
                                     if (Game.Current.GameStateManager.ActiveState is MapState mapStateCaptor)
                                     {
-                                        if (CESettings.Instance.EventCaptorNotifications)
+                                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
                                         {
                                             LaunchCaptorEvent(returnedEvent);
                                         }
@@ -358,7 +358,7 @@ namespace CaptivityEvents.Helper
 
                         if (Game.Current.GameStateManager.ActiveState is MapState mapStateRandom)
                         {
-                            if (CESettings.Instance.EventCaptorNotifications)
+                            if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
                             {
                                 LaunchRandomEvent(returnedEvent);
                             }
@@ -503,7 +503,7 @@ namespace CaptivityEvents.Helper
                     d.VictimProstitutionModifier(0, hero, false, false);
                     d.VictimSlaveryModifier(0, hero, true);
                     d.VictimSlaveryModifier(0, hero, false, false);
-                    CECampaignBehavior.ExtraProps.ResetVariables();
+                    CECampaignBehavior.ResetFullData();
 
                     return "Successfully reset status";
                 }
@@ -579,6 +579,38 @@ namespace CaptivityEvents.Helper
             }
         }
 
+#if DEBUG
+        [CommandLineFunctionality.CommandLineArgumentFunction("run_CETests", "debug")]
+        public static string RunTests(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"debug.run_CETests \".";
+
+                string test = "--- CE Test ---";
+
+                try
+                {
+
+                    test += "\n" + CETests.RunTestOne();
+                    test += "\n" + CETests.RunTestTwo();
+
+                    return test;
+                }
+                catch (Exception e)
+                {
+                    return "Failed : " + e;
+                }
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+#endif
+
         [CommandLineFunctionality.CommandLineArgumentFunction("fire_fix", "captivity")]
         public static string FireFix(List<string> strings)
         {
@@ -590,17 +622,28 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
-                    Hero.MainHero.Children.ForEach(child =>
-                    {
-                        child.Clan = Hero.MainHero.Clan;
-                        if (child.CharacterObject.Occupation != Occupation.Lord)
-                        {
-                            PropertyInfo fi = child.CharacterObject.GetType().GetProperty("Occupation", BindingFlags.Instance | BindingFlags.Public);
-                            if (fi != null) fi.SetValue(child.CharacterObject, Occupation.Lord);
-                        }
-                    });
+                    //Hero.MainHero.Children.ForEach(child =>
+                    //{
+                    //    child.Clan = Hero.MainHero.Clan;
+                    //    if (child.CharacterObject.Occupation != Occupation.Lord)
+                    //    {
+                    //        PropertyInfo fi = child.CharacterObject.GetType().GetProperty("Occupation", BindingFlags.Instance | BindingFlags.Public);
+                    //        if (fi != null) fi.SetValue(child.CharacterObject, Occupation.Lord);
+                    //    }
+                    //});\
 
-                    return "Successfully fixed";
+                    string test = "";
+
+                    List<CEBrothel> list = CEBrothelBehavior.GetPlayerBrothels();
+                    foreach (CEBrothel brothel in list)
+                    {
+                        test += "\n" + brothel.Name;
+                    }
+
+                    //test += PlayerEncounter.LocationEncounter.IsInsideOfASettlement ? "Is In Settlement\n" : "Not in Settlement\n";
+                    //PlayerEncounter.LocationEncounter.Settlement.LocationComplex.GetLocationCharacterOfHero(Hero.MainHero);
+
+                    return test;
                 }
                 catch (Exception e)
                 {
@@ -1031,7 +1074,6 @@ namespace CaptivityEvents.Helper
         [CommandLineFunctionality.CommandLineArgumentFunction("create_new_prisoner", "captivity")]
         public static string CreateNewPrisoner(List<string> strings)
         {
-
             try
             {
                 Thread.Sleep(500);
@@ -1040,7 +1082,7 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
-                    return "Success";
+                    return "Unimplemented";
                 }
                 catch (Exception e)
                 {

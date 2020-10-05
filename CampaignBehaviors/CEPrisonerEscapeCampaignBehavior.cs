@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.Barterables;
 using TaleWorlds.Core;
 
 namespace CaptivityEvents.CampaignBehaviors
@@ -18,7 +20,29 @@ namespace CaptivityEvents.CampaignBehaviors
 
         public void DailyHeroTick(Hero hero)
         {
+
             if (!hero.IsPrisoner || hero.PartyBelongedToAsPrisoner == null || hero == Hero.MainHero) return;
+
+            if (CESettings.Instance.EscapeAutoRansom.SelectedIndex == 1 && hero.Clan != null && hero.PartyBelongedToAsPrisoner.MapFaction != null && MBRandom.RandomFloat < 0.1f)
+            {
+                // DiplomaticBartersBehavior
+                IFaction mapFaction = hero.PartyBelongedToAsPrisoner.MapFaction;
+                SetPrisonerFreeBarterable setPrisonerFreeBarterable = new SetPrisonerFreeBarterable(hero, mapFaction.Leader, hero.PartyBelongedToAsPrisoner, hero.Clan.Leader);
+                if (setPrisonerFreeBarterable.GetValueForFaction(mapFaction) + setPrisonerFreeBarterable.GetValueForFaction(hero.Clan) > 0)
+                {
+                    IEnumerable<Barterable> baseBarterables = new Barterable[] { setPrisonerFreeBarterable };
+
+                    BarterData barterData = new BarterData(mapFaction.Leader, hero.Clan.Leader, null, null, null, 0, true);
+                    barterData.AddBarterGroup(new DefaultsBarterGroup());
+                    foreach (Barterable barterable in baseBarterables)
+                    {
+                        barterable.SetIsOffered(true);
+                        barterData.AddBarterable<DefaultsBarterGroup>(barterable, true);
+                    }
+                    Campaign.Current.BarterManager.ExecuteAIBarter(barterData, mapFaction, hero.Clan, mapFaction.Leader, hero.Clan.Leader);
+                    return;
+                }
+            }
 
             if (CEApplyHeroChanceToEscape(hero)) return;
 
@@ -32,8 +56,13 @@ namespace CaptivityEvents.CampaignBehaviors
                     : 0.33f;
             }
 
-            if (MBRandom.RandomFloat < num) EndCaptivityAction.ApplyByEscape(hero);
+            if (MBRandom.RandomFloat < num)
+            {
+                EndCaptivityAction.ApplyByEscape(hero);
+                return;
+            }
         }
+
 
         private bool CEApplyHeroChanceToEscape(Hero hero)
         {
