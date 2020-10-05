@@ -428,7 +428,7 @@ namespace CaptivityEvents.Brothel
             townswoman.IsFemale = templateToCopy.IsFemale;
             townswoman.Level = templateToCopy.Level;
             townswoman.Name = new TextObject("{=CEEVENTS1093}Server");
-            townswoman.StringId = "brothel_server";
+            townswoman.StringId = "bar_maid";
 
             townswoman.HairTags = templateToCopy.HairTags;
             townswoman.BeardTags = templateToCopy.BeardTags;
@@ -657,6 +657,9 @@ namespace CaptivityEvents.Brothel
 
             campaignGameStarter.AddDialogLine("tprostitute_service_01_no_response_id", "tprostitute_service_01_no_response", "close_window", "{=CEBROTHEL1052}Ugh...[ib:closed][rb:unsure]", null, null);
 
+            // Maid Dialogue 00
+            // TODO WRITEUP DIALOGUES HERE
+
             // Dialogue With Owner 00
             campaignGameStarter.AddDialogLine("ce_owner_talk_00", "start", "ce_owner_response_00", "{=CEBROTHEL1053}Oh, a valued customer, how can I help you today?[ib:confident][rb:very_positive]", ConversationWithBrothelOwnerBeforeSelling, null);
 
@@ -714,22 +717,39 @@ namespace CaptivityEvents.Brothel
             // Dialogue With Assistance 01
             campaignGameStarter.AddDialogLine("ce_assistant_talk_01", "start", "close_window", "{=CEBROTHEL1064}The new owner will arrive here shortly, I will just clean up things for now.", ConversationWithBrothelAssistantAfterSelling, null);
 
-            // Owner Dialogue Captives
-            campaignGameStarter.AddDialogLine("captive_requirements_owner_positive", "start", "ccaptive_owner_00", "{=CEBROTHEL1008}Do you need something {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", () => ConversationWithPositiveCaptive(), null);
-            campaignGameStarter.AddDialogLine("captive_requirements_owner_positive", "lord_introduction", "ccaptive_owner_00", "{=CEBROTHEL1008}Do you need something {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", () => ConversationWithPositiveCaptive(), null);
+            // Owner Dialogue Captives 
 
-            campaignGameStarter.AddDialogLine("captive_requirements_owner", "start", "ccaptive_owner_00", "{=CEBROTHEL1067}This is no place for me, {?PLAYER.GENDER}milady{?}my lord{\\?}! What do you want?[ib:closed][rb:negative]", () => ConversationWithCaptive(), null);
-            campaignGameStarter.AddDialogLine("captive_requirements_owner", "lord_introduction", "ccaptive_owner_00", "{=CEBROTHEL1067}This is no place for me, {?PLAYER.GENDER}milady{?}my lord{\\?}! What do you want?[ib:closed][rb:negative]", () => ConversationWithCaptive(), null);
+            // Positive Intro
+            campaignGameStarter.AddDialogLine("captive_requirements_owner_positive_00", "start", "ccaptive_owner_00", "{=CEBROTHEL1008}Do you need something {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", () => RandomizeConversation(2) && ConversationWithPositiveCaptive(), null);
+            campaignGameStarter.AddDialogLine("captive_requirements_owner_positive_00", "lord_introduction", "ccaptive_owner_00", "{=CEBROTHEL1008}Do you need something {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", () => RandomizeConversation(2) && ConversationWithPositiveCaptive(), null);
 
+            campaignGameStarter.AddDialogLine("captive_requirements_owner_positive_01", "start", "ccaptive_owner_00", "{=CEBROTHEL1008}Do you need something {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", () => ConversationWithPositiveCaptive(), null);
+            campaignGameStarter.AddDialogLine("captive_requirements_owner_positive_01", "lord_introduction", "ccaptive_owner_00", "{=CEBROTHEL1008}Do you need something {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", () => ConversationWithPositiveCaptive(), null);
+
+            // Negative Intro
+            campaignGameStarter.AddDialogLine("captive_requirements_owner_00", "start", "ccaptive_owner_00", "{=CEBROTHEL1067}This is no place for me, {?PLAYER.GENDER}milady{?}my lord{\\?}! What do you want?[ib:closed][rb:negative]", () => RandomizeConversation(2) && ConversationWithCaptive(), null);
+            campaignGameStarter.AddDialogLine("captive_requirements_owner_00", "lord_introduction", "ccaptive_owner_00", "{=CEBROTHEL1067}This is no place for me, {?PLAYER.GENDER}milady{?}my lord{\\?}! What do you want?[ib:closed][rb:negative]", () => RandomizeConversation(2) && ConversationWithCaptive(), null);
+
+            campaignGameStarter.AddDialogLine("captive_requirements_owner_01", "start", "ccaptive_owner_00", "{=CEBROTHEL1067}This is no place for me, {?PLAYER.GENDER}milady{?}my lord{\\?}! What do you want?[ib:closed][rb:negative]", () => ConversationWithCaptive(), null);
+            campaignGameStarter.AddDialogLine("captive_requirements_owner_01", "lord_introduction", "ccaptive_owner_00", "{=CEBROTHEL1067}This is no place for me, {?PLAYER.GENDER}milady{?}my lord{\\?}! What do you want?[ib:closed][rb:negative]", () => ConversationWithCaptive(), null);
+
+            // Player Choices 
             campaignGameStarter.AddPlayerLine("ccaptive_owner_00_yes", "ccaptive_owner_00", "ccaptive_service_00_yes_response", "{=CEBROTHEL1007}I will like to have some fun.", null, null);
-
+            //campaignGameStarter.AddPlayerLine("ccaptive_owner_00_free", "ccaptive_owner_00", "ccaptive_service_00_free_response", "{=CEEVENTS1177}You are free to go.", null, null);
             campaignGameStarter.AddPlayerLine("ccaptive_owner_00_nevermind", "ccaptive_owner_00", "ccaptive_service_00_nevermind_response", "{=CEBROTHEL1011}Uh, nevermind.", null, null);
 
-            campaignGameStarter.AddDialogLine("ccaptive_service_00_yes_response_id", "ccaptive_service_00_yes_response", "close_window", "{=CEBROTHEL1043}Right this way...[ib:closed][rb:unsure]", null, ConversationProstituteConsequenceSex);
+
+            // Positive
+            campaignGameStarter.AddDialogLine("ccaptive_service_00_yes_response_id_positive", "ccaptive_service_00_yes_response", "close_window", "{=CEBROTHEL1020}Follow me sweetie. [ib:normal][rb:positive]", () => ConversationWithPositiveCaptive(), ConversationProstituteConsequenceSex);
 
             campaignGameStarter.AddDialogLine("ccaptive_service_00_nevermind_response_id_positive", "ccaptive_service_00_nevermind_response", "close_window", "{=CEBROTHEL1037}See ya around.[ib:confident][rb:very_positive]", () => ConversationWithPositiveCaptive(), null);
 
+            // Negative
+            campaignGameStarter.AddDialogLine("ccaptive_service_00_yes_response_id", "ccaptive_service_00_yes_response", "close_window", "{=CEBROTHEL1043}Right this way...[ib:closed][rb:unsure]", null, ConversationProstituteConsequenceSex);
+
             campaignGameStarter.AddDialogLine("ccaptive_service_00_nevermind_response_id", "ccaptive_service_00_nevermind_response", "close_window", "{=CEBROTHEL1044}Thank goodness...[ib:closed][rb:unsure]", null, null);
+
+            campaignGameStarter.AddDialogLine("ccaptive_service_00_free_response_id", "ccaptive_service_00_free_response", "close_window", "{=CEBROTHEL1077}Thank you {?PLAYER.GENDER}milady{?}my lord{\\?}!", null, null);
 
         }
 
