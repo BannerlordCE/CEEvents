@@ -27,7 +27,7 @@ namespace CaptivityEvents.Patches
                                                                                    OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome });
                                                                                }, __instance.OnRefresh));
             }
-
+          
             // For Nice Purposes of Workshop Number being 1 don't really care about the limit
             int count = CEBrothelBehavior.GetPlayerBrothels().Count;
             GameTexts.SetVariable("STR1", GameTexts.FindText("str_CE_properties", null));
@@ -35,7 +35,6 @@ namespace CaptivityEvents.Patches
             GameTexts.SetVariable("RIGHT", Campaign.Current.Models.WorkshopModel.GetMaxWorkshopCountForPlayer() + count);
             GameTexts.SetVariable("STR2", GameTexts.FindText("str_LEFT_over_RIGHT_in_paranthesis", null));
             __instance.WorkshopText = GameTexts.FindText("str_STR1_space_STR2", null).ToString();
-
 
             __instance.RefreshTotalIncome();
             OnIncomeSelection.Invoke(__instance, new[] { GetDefaultIncome.Invoke(__instance, null) });
