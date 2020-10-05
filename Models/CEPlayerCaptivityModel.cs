@@ -23,7 +23,7 @@ namespace CaptivityEvents.Models
         {
             if (PlayerCaptivity.CaptorParty == null) return false;
             float gameProcess = MiscHelper.GetGameProcess();
-            float num = (1f + gameProcess * 1f) * (PlayerCaptivity.CaptorParty.IsSettlement ? CESettings.Instance.EventOccuranceSettlement : PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.Leader != null && PlayerCaptivity.CaptorParty.Leader.IsHero ? CESettings.Instance.EventOccuranceLord : CESettings.Instance.EventOccuranceOther);
+            float num = (1f + gameProcess * 1f) * (PlayerCaptivity.CaptorParty.IsSettlement ? CESettings.Instance.EventOccurrenceSettlement : PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.Leader != null && PlayerCaptivity.CaptorParty.Leader.IsHero ? CESettings.Instance.EventOccurrenceLord : CESettings.Instance.EventOccurrenceOther);
 
             return CheckTimeElapsedMoreThanHours(PlayerCaptivity.LastCheckTime, num);
 

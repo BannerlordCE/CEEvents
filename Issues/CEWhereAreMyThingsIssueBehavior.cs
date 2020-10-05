@@ -43,10 +43,6 @@ namespace CaptivityEvents.Issues
                 return new CEWhereAreMyThingsIssueQuest(questId, IssueOwner, CampaignTime.DaysFromNow(stolenGearDuration), RewardGold, new Equipment(Hero.MainHero.BattleEquipment), new Equipment(Hero.MainHero.CivilianEquipment));
             }
 
-            // 1.4.3
-            // protected override float GetFrequency() => 0.01f;
-
-            // 1.5.0
             public override IssueBase.IssueFrequency GetFrequency() => IssueBase.IssueFrequency.Rare;
 
             public override bool IssueStayAliveConditions() => true;

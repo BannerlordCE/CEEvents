@@ -49,13 +49,13 @@ namespace CaptivityEvents.CampaignBehaviors
             }
 
             Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new CECaptorMapNotification(returnedEvent, new TextObject("{=CEEVENTS1090}Captor event is ready")));
+
         }
 
         private void LaunchRandomEvent()
         {
             if (CEHelper.notificationEventExists) return;
             CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
-
             if (returnedEvent == null) return;
             CEHelper.notificationEventExists = true;
 
@@ -81,7 +81,7 @@ namespace CaptivityEvents.CampaignBehaviors
             _hoursPassed++;
 
             if (CESettings.Instance == null) return false;
-            if (!(_hoursPassed > CESettings.Instance.EventOccuranceCaptor)) return false;
+            if (!(_hoursPassed > CESettings.Instance.EventOccurrenceCaptor)) return false;
             CEHelper.notificationEventCheck = true;
             CEHelper.notificationCaptorCheck = true;
             _hoursPassed = 0;
@@ -159,6 +159,11 @@ namespace CaptivityEvents.CampaignBehaviors
                 {
                     ChangeWeight(pregnancy.Mother, 1);
                 }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed to handle alerts. CalculatePregnancyWeight");
+                CECustomHandler.ForceLogToFile(e.Message + " : " + e);
             }
             catch (Exception e)
             {
@@ -295,7 +300,6 @@ namespace CaptivityEvents.CampaignBehaviors
                 hero.Clan = father.Clan;
             }
             CampaignEventDispatcher.Instance.OnHeroCreated(hero, true);
-            int heroComesOfAge = Campaign.Current.Models.AgeModel.HeroComesOfAge;
             return hero;
         }
 
@@ -496,7 +500,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 {
                     if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
                     {
-                        if (CESettings.Instance.EventCaptorNotifications)
+                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
                         {
                             if (CESettings.Instance.EventRandomEnabled && (!CEHelper.notificationEventExists || !CEHelper.notificationCaptorExists))
                             {
@@ -562,7 +566,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     }
                     else if (CESettings.Instance.EventRandomEnabled)
                     {
-                        if (CESettings.Instance.EventCaptorNotifications)
+                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
                         {
                             LaunchRandomEvent();
                         }
@@ -659,6 +663,14 @@ namespace CaptivityEvents.CampaignBehaviors
             dataStore.SyncData("_CEheroPregnancies", ref _heroPregnancies);
             dataStore.SyncData("_CEreturnEquipment", ref _returnEquipment);
             dataStore.SyncData("_CEextraVariables", ref _extraVariables);
+        }
+
+        public static void ResetFullData()
+        {
+            _extraVariables = new ExtraVariables();
+            _extraVariables.ResetVariables();
+            _returnEquipment = new List<ReturnEquipment>();
+            _heroPregnancies = new List<Pregnancy>();
         }
 
         private int _hoursPassed;

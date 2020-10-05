@@ -7,7 +7,6 @@ namespace CaptivityEvents.Models
 {
     public class CEDefaultPregnancyModel : PregnancyModel
     {
-        public override float CharacterFertilityProbability => 0.95f;
 
         public override float PregnancyDurationInDays => 3f;
 
@@ -21,9 +20,7 @@ namespace CaptivityEvents.Models
 
         private bool IsHeroAgeSuitableForPregnancy(Hero hero) => hero.Age >= 18f && hero.Age <= 45f;
 
-        private bool IsHeroAgeSuitableForPregnancy(CEHero hero) //I created this overload for the unit test example.
-=> hero.Age >= 18f && hero.Age <= 45f;
-
+        private bool IsHeroAgeSuitableForPregnancy(CEHero hero) => hero.Age >= 18f && hero.Age <= 45f; //I created this overload for the unit test example.
 
         private float GeneratePregnancyFactorNumber(float age, float explainedNumber) => (6.5f - (age - 18f) * 0.23f) * 0.02f * explainedNumber;
 
@@ -41,12 +38,7 @@ namespace CaptivityEvents.Models
 
             ExplainedNumber explainedNumber = new ExplainedNumber(1f);
 
-            // 1.5.0
             PerkHelper.AddPerkBonusForCharacter(DefaultPerks.Medicine.PerfectHealth, hero.Clan.Leader.CharacterObject, true, ref explainedNumber);
-
-            // 1.4.3
-            // PerkHelper.AddPerkBonusForCharacter(DefaultPerks.Medicine.PerfectHealth, hero.Clan.Leader.CharacterObject, ref explainedNumber);
-
 
             float perkBonus = explainedNumber.ResultNumber;
 

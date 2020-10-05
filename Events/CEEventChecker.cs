@@ -884,6 +884,8 @@ namespace CaptivityEvents.Events
 
             if (!isOwnedFlag && !isNotOwnedFlag) return true;
 
+            if (CECampaignBehavior.ExtraProps == null) CECampaignBehavior.ResetFullData();
+
             if (isOwnedFlag && CECampaignBehavior.ExtraProps.Owner == null)
                 return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. isOwnedFlag.");
 

@@ -1,5 +1,6 @@
 ﻿using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
+using MCM.Abstractions.Data;
 using MCM.Abstractions.Settings.Base;
 using MCM.Abstractions.Settings.Base.Global;
 using System;
@@ -29,15 +30,15 @@ namespace CaptivityEvents
 
         [SettingPropertyFloatingInteger("{=CESETTINGS1002}Event wait between occurances in Traveling Party", 1f, 24f, "#0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1003}How often should an event occur while in a regular party. (Gametime in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0098}Captive")]
-        public float EventOccuranceOther { get; set; } = 6f;
+        public float EventOccurrenceOther { get; set; } = 6f;
 
         [SettingPropertyFloatingInteger("{=CESETTINGS1004}Event wait between occurances in Settlement", 1f, 24f, "#0", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1005}How should an event occur in settlements. (Prostitution affected too) (Gametime in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0098}Captive")]
-        public float EventOccuranceSettlement { get; set; } = 6f;
+        public float EventOccurrenceSettlement { get; set; } = 6f;
 
         [SettingPropertyFloatingInteger("{=CESETTINGS1006}Event wait between occurances in Lord's Party", 1f, 24f, "#0", Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1007}How often should an event occur in a lord's party. (Gametime in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0098}Captive")]
-        public float EventOccuranceLord { get; set; } = 6f;
+        public float EventOccurrenceLord { get; set; } = 6f;
 
         [SettingPropertyBool("{=CESETTINGS1000}Turn on Captor Events", Order = 1, RequireRestart = true)]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
@@ -45,7 +46,7 @@ namespace CaptivityEvents
 
         [SettingPropertyFloatingInteger("{=CESETTINGS1008}Event wait between occurances while Captor", 1f, 100f, "#0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1009}How often should an event occur while Captor. (Gametime in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
-        public float EventOccuranceCaptor { get; set; } = 12f;
+        public float EventOccurrenceCaptor { get; set; } = 12f;
 
 
         [SettingPropertyBool("{=CESETTINGS1096}Prisoner Dialogue", Order = 3, RequireRestart = true, HintText = "{=CESETTINGS1097}Overwrites the default prisoner conversation menu.")]
@@ -116,9 +117,14 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
         public int PrisonerNonHeroEscapeChanceOther { get; set; } = -1;
 
-        [SettingPropertyBool("{=CESETTINGS1026}Games Default Auto Ransom System", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behaviour regarding auto-ransom")]
+        [SettingPropertyDropdown("{=CESETTINGS1026}Games Default Auto Ransom Behavior", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behaviour regarding auto-ransom")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
-        public bool PrisonerAutoRansom { get; set; } = false;
+        public DefaultDropdown<string> EscapeAutoRansom { get; set; } = new DefaultDropdown<string>(new string[]
+    {
+        "{=CESETTINGS1115}Off",
+        "{=CESETTINGS1114}Disabled For Player",
+        "{=CESETTINGS1116}On"
+    }, 0);
 
         [SettingPropertyBool("{=CESETTINGS1110}Games Default Exceeded Prisoners System", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1111}Allows the games default behaviour regarding exceeded prisoner system, Hourly escape chance based on default 10% or above chances")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
