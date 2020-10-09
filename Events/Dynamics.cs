@@ -144,7 +144,28 @@ namespace CaptivityEvents.Events
             {
                 int currentSkillLevel = hero.GetSkillValue(skillObject);
                 int newNumber = currentSkillLevel + amount;
-                if (newNumber < 0) newNumber = 0;
+
+                CESkillNode skillNode = CESkills.FindSkillNode(skill);
+                if (skillNode != null)
+                {
+                    int maxLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MaxLevel);
+                    int minLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MinLevel);
+                    if (newNumber > maxLevel)
+                    {
+                        newNumber = maxLevel;
+                        amount = maxLevel - currentSkillLevel; 
+                    }
+                    else if (newNumber < minLevel)
+                    {
+                        newNumber = minLevel;
+                        amount = minLevel - currentSkillLevel;
+                    }
+                }
+                else if (newNumber < 0)
+                {
+                   newNumber = 0;
+                   amount = newNumber - currentSkillLevel;
+                }
 
                 float xpToSet = Campaign.Current.Models.CharacterDevelopmentModel.GetXpRequiredForSkillLevel(newNumber);
                 Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet, out int levels);

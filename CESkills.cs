@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using CaptivityEvents.Custom;
 
 namespace CaptivityEvents
 {
@@ -29,6 +30,20 @@ namespace CaptivityEvents
 
 
         public static void AddCustomSkill(CESkillNode skillNode) => _Skills.Add(skillNode);
+
+
+        public static CESkillNode FindSkillNode(string skill)
+        {
+            try
+            {
+                return _Skills.Find(skillNode => skillNode.Id == skill);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile(skill + " : " + e);
+                return null;
+            }
+        }
 
         public static SkillObject FindSkill(string skill)
         {
