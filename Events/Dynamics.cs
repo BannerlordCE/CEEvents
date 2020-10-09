@@ -149,8 +149,9 @@ namespace CaptivityEvents.Events
                 if (skillNode != null)
                 {
                     int maxLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MaxLevel);
+
                     int minLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MinLevel);
-                    if (newNumber > maxLevel)
+                    if (maxLevel != 0 && newNumber > maxLevel)
                     {
                         newNumber = maxLevel;
                         amount = maxLevel - currentSkillLevel; 
@@ -234,6 +235,48 @@ namespace CaptivityEvents.Events
         }
 
 
+        private void SetModifier(int amount, Hero hero, SkillObject skill, SkillObject flag, bool displayMessage = true, bool quickInformation = false) //Warning: SkillObject flag never used.
+        {
+            if (amount == 0)
+            {
+                if ((displayMessage || quickInformation) && hero.GetSkillValue(skill) > 0)
+                {
+                    TextObject textObject = GameTexts.FindText("str_CE_level_start");
+                    textObject.SetTextVariable("SKILL", skill.Name);
+                    textObject.SetTextVariable("HERO", hero.Name);
+
+                    if (hero.GetSkillValue(skill) > 1)
+                    {
+                        if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+                        if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
+                    }
+                }
+
+                hero.SetSkillValue(skill, 0);
+            }
+            else
+            {
+                int currentValue = hero.GetSkillValue(skill);
+                int valueToSet = currentValue + amount;
+                if (valueToSet < 1) valueToSet = 1;
+                hero.SetSkillValue(skill, valueToSet);
+
+                if (!displayMessage && !quickInformation) return;
+                TextObject textObject = GameTexts.FindText("str_CE_level_skill");
+                textObject.SetTextVariable("HERO", hero.Name);
+                textObject.SetTextVariable("SKILL", skill.Name);
+
+                textObject.SetTextVariable("NEGATIVE", amount >= 0 ? 0 : 1);
+                textObject.SetTextVariable("PLURAL", amount >= 2 ? 1 : 0);
+
+                textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
+                textObject.SetTextVariable("TOTAL_AMOUNT", valueToSet);
+                if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+
+                if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
+            }
+        }
+
         internal void VictimSlaveryModifier(int amount, Hero hero, bool updateFlag = false, bool displayMessage = true, bool quickInformation = false)
         {
             if (hero == null) return;
@@ -277,72 +320,6 @@ namespace CaptivityEvents.Events
             }
         }
 
-        private void SetModifier(int amount, Hero hero, SkillObject skill, SkillObject flag, bool displayMessage = true, bool quickInformation = false) //Warning: SkillObject flag never used.
-        {
-            if (amount == 0)
-            {
-                if ((displayMessage || quickInformation) && hero.GetSkillValue(skill) > 0)
-                {
-                    TextObject textObject = GameTexts.FindText("str_CE_level_start");
-                    textObject.SetTextVariable("SKILL", skill.Name);
-                    textObject.SetTextVariable("HERO", hero.Name);
-
-                    if (hero.GetSkillValue(skill) > 1)
-                    {
-                        if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
-                        if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
-                    }
-                }
-
-                hero.SetSkillValue(skill, 0);
-            }
-            else
-            {
-                int currentValue = hero.GetSkillValue(skill);
-                int valueToSet = currentValue + amount;
-                if (valueToSet < 1) valueToSet = 1;
-                hero.SetSkillValue(skill, valueToSet);
-
-                if (!displayMessage && !quickInformation) return;
-                TextObject textObject = GameTexts.FindText("str_CE_level_skill");
-                textObject.SetTextVariable("HERO", hero.Name);
-                textObject.SetTextVariable("SKILL", skill.Name);
-
-                textObject.SetTextVariable("NEGATIVE", amount >= 0 ? 0 : 1);
-                textObject.SetTextVariable("PLURAL", amount >= 2 ? 1 : 0);
-
-                textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
-                textObject.SetTextVariable("TOTAL_AMOUNT", valueToSet);
-                if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
-
-                if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
-            }
-        }
-
-        internal void CEKillPlayer(Hero killer)
-        {
-            GameMenu.ExitToLast();
-
-            try
-            {
-                if (killer != null) KillCharacterAction.ApplyByMurder(Hero.MainHero, killer);
-                else KillCharacterAction.ApplyByMurder(Hero.MainHero);
-            }
-            catch (Exception e)
-            {
-                CECustomHandler.ForceLogToFile("Failed CEKillPlayer " + e);
-            }
-        }
-
-        internal void CEGainRandomPrisoners(PartyBase party)
-        {
-            Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.IsVillage);
-            //PartyTemplateObject villagerPartyTemplate = nearest.Culture.VillagerPartyTemplate; Will be used in figuring out on what to give
-            MBRandom.RandomInt(1, 10);
-            party.AddPrisoner(nearest.Culture.VillageWoman, 10, 7);
-            party.AddPrisoner(nearest.Culture.Villager, 10, 7);
-        }
-
         internal void VictimProstitutionModifier(int amount, Hero hero, bool updateFlag = false, bool displayMessage = true, bool quickInformation = false)
         {
             if (hero == null) return;
@@ -384,6 +361,30 @@ namespace CaptivityEvents.Events
             {
                 SetModifier(amount, hero, prostitutionSkill, prostitutionFlag, displayMessage, quickInformation);
             }
+        }
+
+        internal void CEKillPlayer(Hero killer)
+        {
+            GameMenu.ExitToLast();
+
+            try
+            {
+                if (killer != null) KillCharacterAction.ApplyByMurder(Hero.MainHero, killer);
+                else KillCharacterAction.ApplyByMurder(Hero.MainHero);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed CEKillPlayer " + e);
+            }
+        }
+
+        internal void CEGainRandomPrisoners(PartyBase party)
+        {
+            Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.IsVillage);
+            //PartyTemplateObject villagerPartyTemplate = nearest.Culture.VillagerPartyTemplate; Will be used in figuring out on what to give
+            MBRandom.RandomInt(1, 10);
+            party.AddPrisoner(nearest.Culture.VillageWoman, 10, 7);
+            party.AddPrisoner(nearest.Culture.Villager, 10, 7);
         }
 
         internal void MoraleChange(int amount, PartyBase partyBase)

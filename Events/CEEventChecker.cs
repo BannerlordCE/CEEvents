@@ -42,25 +42,17 @@ namespace CaptivityEvents.Events
                                : "Male")
                            + "\n";
 
-            int slaveSkillFlag = captive.GetSkillValue(CESkills.IsSlave);
-            returnString += "Is Slave: "
-                           + (slaveSkillFlag != 0
-                               ? "True"
-                               : "False")
-                           + "\n";
+            foreach(SkillObject skill in CESkills.CustomSkills)
+            {
+                int value = captive.GetSkillValue(skill);
+                CESkillNode skillNode = CESkills.FindSkillNode(skill.StringId);
+                bool isTrueFalse = (skillNode.MaxLevel == "1" && skillNode.MinLevel == "0");
+                
 
-            int slaveSkillLevel = captive.GetSkillValue(CESkills.Slavery);
-            returnString += "Slavery Level: " + slaveSkillLevel + "\n";
-
-            int prostituteSkillFlag = captive.GetSkillValue(CESkills.IsProstitute);
-            returnString += "Is Prostitute: "
-                           + (prostituteSkillFlag != 0
-                               ? "True"
-                               : "False")
-                           + "\n";
-
-            int prostituteSkillLevel = captive.GetSkillValue(CESkills.Prostitution);
-            returnString += "Prostitution Level: " + prostituteSkillLevel + "\n";
+                returnString += skill.StringId + " : "
+                         + (isTrueFalse ? (value != 0 ? "True" : "False") : value.ToString())
+                         + "\n";
+            }
 
             returnString += "Owner: "
                             + (CECampaignBehavior.ExtraProps.Owner == null
