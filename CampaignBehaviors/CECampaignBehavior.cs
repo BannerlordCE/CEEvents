@@ -217,6 +217,7 @@ namespace CaptivityEvents.CampaignBehaviors
         private Hero DeliverOffSpring(Hero mother, Hero father, bool isOffspringFemale, int age = 1)
         {
             CharacterObject characterObject = isOffspringFemale ? mother.CharacterObject : father.CharacterObject;
+            characterObject.Culture = Hero.MainHero.Culture;
 
             // Reflection One
             MethodInfo mi = typeof(HeroCreator).GetMethod("CreateNewHero", BindingFlags.NonPublic | BindingFlags.Static);
@@ -270,21 +271,14 @@ namespace CaptivityEvents.CampaignBehaviors
             hero.CharacterObject.StaticBodyPropertiesMin = BodyProperties.GetRandomBodyProperties(isOffspringFemale, bodyPropertiesMin, bodyPropertiesMin2, 1, seed, hairTags, father.CharacterObject.BeardTags, tattooTags).StaticProperties;
             hero.Mother = mother;
             hero.Father = father;
-            Settlement settlement;
-            if (hero.Mother == Hero.MainHero || hero.Father == Hero.MainHero)
-            {
-                settlement = (hero.Mother.CurrentSettlement ?? Hero.MainHero.HomeSettlement);
-            }
-            else
-            {
-                settlement = hero.Mother.HomeSettlement;
-            }
-            if (settlement == null && hero.Clan.Settlements.Any<Settlement>())
-            {
-                settlement = hero.Clan.Settlements.GetRandomElement<Settlement>();
-            }
-            hero.BornSettlement = settlement;
-            hero.IsNoble = father.IsNoble;
+
+            // Reflection Two
+            MethodInfo mi2 = typeof(HeroCreator).GetMethod("DecideBornSettlement", BindingFlags.NonPublic | BindingFlags.Static);
+            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, 0);
+            hero.BornSettlement = (Settlement)mi2.Invoke(null, new object[] { hero });
+
+            hero.IsNoble = true;
+
             if (mother == Hero.MainHero || father == Hero.MainHero)
             {
                 hero.HasMet = true;
