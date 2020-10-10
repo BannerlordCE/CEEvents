@@ -31,8 +31,6 @@ namespace CaptivityEvents.Helper
             {
                 Thread.Sleep(500);
 
-                if (!CampaignCheats.CheckCheatUsage(ref CampaignCheats.ErrorType)) return CampaignCheats.ErrorType;
-
                 if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.force_fire_event [EventName] [CaptiveName]\".";
                 bool flag = false;
 
@@ -223,8 +221,6 @@ namespace CaptivityEvents.Helper
             {
                 Thread.Sleep(500);
 
-                if (!CampaignCheats.CheckCheatUsage(ref CampaignCheats.ErrorType)) return CampaignCheats.ErrorType;
-
                 if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.fire_ceevent [EventName] [CaptiveName]\".";
 
                 bool flag = false;
@@ -392,8 +388,6 @@ namespace CaptivityEvents.Helper
             try
             {
                 Thread.Sleep(500);
-
-                if (!CampaignCheats.CheckCheatUsage(ref CampaignCheats.ErrorType)) return CampaignCheats.ErrorType;
 
                 if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.list_events [SEARCH_TERM]\".";
 
@@ -1018,8 +1012,6 @@ namespace CaptivityEvents.Helper
             try
             {
                 Thread.Sleep(500);
-
-                if (!CampaignCheats.CheckCheatUsage(ref CampaignCheats.ErrorType)) return CampaignCheats.ErrorType;
 
                 if (CampaignCheats.CheckHelp(strings) && CampaignCheats.CheckParameters(strings, 1)) return "Format is \"captivity.play_sound [SOUND_ID]\".";
 

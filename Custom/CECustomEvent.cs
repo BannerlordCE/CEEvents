@@ -64,7 +64,8 @@ namespace CaptivityEvents.Custom
         GainRandomPrisoners,
         StripPlayer,
         NoInformationMessage,
-        NoMessages
+        NoMessages,
+        JoinCaptor
     }
 
     [XmlType(AnonymousType = true)]
@@ -143,6 +144,7 @@ namespace CaptivityEvents.Custom
         PlayerAllowedCompanion,
         StripEnabled,
         StripDisabled,
+        IgnoreAllOther,
     }
 
     [DebuggerStepThrough]
@@ -318,6 +320,30 @@ namespace CaptivityEvents.Custom
 
         public string ReqMaleCaptivesBelow { get; set; }
 
+        public string ReqHeroTroopsAbove { get; set; }
+
+        public string ReqHeroTroopsBelow { get; set; }
+
+        public string ReqHeroMaleTroopsAbove { get; set; }
+
+        public string ReqHeroMaleTroopsBelow { get; set; }
+
+        public string ReqHeroFemaleTroopsAbove { get; set; }
+
+        public string ReqHeroFemaleTroopsBelow { get; set; }
+
+        public string ReqHeroCaptivesAbove { get; set; }
+
+        public string ReqHeroCaptivesBelow { get; set; }
+
+        public string ReqHeroFemaleCaptivesAbove { get; set; }
+
+        public string ReqHeroFemaleCaptivesBelow { get; set; }
+
+        public string ReqHeroMaleCaptivesAbove { get; set; }
+
+        public string ReqHeroMaleCaptivesBelow { get; set; }
+
         public string ReqGoldAbove { get; set; }
 
         public string ReqGoldBelow { get; set; }
@@ -488,6 +514,30 @@ namespace CaptivityEvents.Custom
         public string ReqMaleCaptivesAbove { get; set; }
 
         public string ReqMaleCaptivesBelow { get; set; }
+
+        public string ReqHeroTroopsAbove { get; set; }
+
+        public string ReqHeroTroopsBelow { get; set; }
+
+        public string ReqHeroMaleTroopsAbove { get; set; }
+
+        public string ReqHeroMaleTroopsBelow { get; set; }
+
+        public string ReqHeroFemaleTroopsAbove { get; set; }
+
+        public string ReqHeroFemaleTroopsBelow { get; set; }
+
+        public string ReqHeroCaptivesAbove { get; set; }
+
+        public string ReqHeroCaptivesBelow { get; set; }
+
+        public string ReqHeroFemaleCaptivesAbove { get; set; }
+
+        public string ReqHeroFemaleCaptivesBelow { get; set; }
+
+        public string ReqHeroMaleCaptivesAbove { get; set; }
+
+        public string ReqHeroMaleCaptivesBelow { get; set; }
 
         public string ReqGoldAbove { get; set; }
 

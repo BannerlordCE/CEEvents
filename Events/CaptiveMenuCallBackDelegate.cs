@@ -1154,9 +1154,21 @@ namespace CaptivityEvents.Events
 
             try
             {
+                if (!_option.ReqHeroFemaleCaptivesAbove.IsStringNoneOrEmpty()) SetReqHeroFemaleCaptivesAbove(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroFemaleCaptivesAbove / Failed "); }
+
+            try
+            {
                 if (!_option.ReqFemaleCaptivesBelow.IsStringNoneOrEmpty()) SetReqFemaleCaptivesBelow(ref args);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqFemaleCaptivesBelow / Failed "); }
+
+            try
+            {
+                if (!_option.ReqHeroFemaleCaptivesBelow.IsStringNoneOrEmpty()) SetReqHeroFemaleCaptivesBelow(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroFemaleCaptivesBelow / Failed "); }
         }
 
         private void ReqMaleCaptives(ref MenuCallbackArgs args)
@@ -1169,9 +1181,21 @@ namespace CaptivityEvents.Events
 
             try
             {
+                if (!_option.ReqHeroMaleCaptivesAbove.IsStringNoneOrEmpty()) SetReqHeroMaleCaptivesAbove(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroMaleCaptivesAbove / Failed "); }
+
+            try
+            {
                 if (!_option.ReqMaleCaptivesBelow.IsStringNoneOrEmpty()) SetReqMaleCaptivesBelow(ref args);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqMaleCaptivesBelow / Failed "); }
+
+            try
+            {
+                if (!_option.ReqHeroMaleCaptivesBelow.IsStringNoneOrEmpty()) SetReqHeroMaleCaptivesBelow(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroMaleCaptivesBelow / Failed "); }
         }
 
         private void ReqCaptives(ref MenuCallbackArgs args)
@@ -1184,9 +1208,21 @@ namespace CaptivityEvents.Events
 
             try
             {
+                if (!_option.ReqHeroCaptivesAbove.IsStringNoneOrEmpty()) SetReqHeroCaptivesAbove(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptivesAbove / Failed "); }
+
+            try
+            {
                 if (!_option.ReqCaptivesBelow.IsStringNoneOrEmpty()) SetReqCaptivesBelow(ref args);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqCaptivesBelow / Failed "); }
+
+            try
+            {
+                if (!_option.ReqHeroCaptivesBelow.IsStringNoneOrEmpty()) SetReqHeroCaptivesBelow(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptivesBelow / Failed "); }
         }
 
         private void ReqFemaleTroops(ref MenuCallbackArgs args)
@@ -1199,9 +1235,21 @@ namespace CaptivityEvents.Events
 
             try
             {
+                if (!_option.ReqHeroFemaleTroopsAbove.IsStringNoneOrEmpty()) SetReqHeroFemaleTroopsAbove(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroFemaleTroopsAbove / Failed "); }
+
+            try
+            {
                 if (!_option.ReqFemaleTroopsBelow.IsStringNoneOrEmpty()) SetReqFemaleTroopsBelow(ref args);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqFemaleTroopsBelow / Failed "); }
+
+            try
+            {
+                if (!_option.ReqHeroFemaleTroopsBelow.IsStringNoneOrEmpty()) SetReqHeroFemaleTroopsBelow(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroFemaleTroopsBelow / Failed "); }
         }
 
         private void ReqMaleTroops(ref MenuCallbackArgs args)
@@ -1214,9 +1262,21 @@ namespace CaptivityEvents.Events
 
             try
             {
+                if (!_option.ReqHeroMaleTroopsAbove.IsStringNoneOrEmpty()) SetReqHeroMaleTroopsAbove(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroMaleTroopsAbove / Failed "); }
+
+            try
+            {
                 if (!_option.ReqMaleTroopsBelow.IsStringNoneOrEmpty()) SetReqMaleTroopsBelow(ref args);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqMaleTroopsBelow / Failed "); }
+
+            try
+            {
+                if (!_option.ReqHeroMaleTroopsBelow.IsStringNoneOrEmpty()) SetReqHeroMaleTroopsBelow(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroMaleTroopsBelow / Failed "); }
         }
 
         private void ReqTroops(ref MenuCallbackArgs args)
@@ -1229,7 +1289,19 @@ namespace CaptivityEvents.Events
 
             try
             {
+                if (!_option.ReqHeroTroopsAbove.IsStringNoneOrEmpty()) SetReqHeroTroopsAbove(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqTroopsAbove / Failed "); }
+
+            try
+            {
                 if (!_option.ReqTroopsBelow.IsStringNoneOrEmpty()) SetReqTroopsBelow(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqTroopsBelow / Failed "); }
+
+            try
+            {
+                if (!_option.ReqHeroTroopsBelow.IsStringNoneOrEmpty()) SetReqHeroTroopsBelow(ref args);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqTroopsBelow / Failed "); }
         }
@@ -1285,9 +1357,19 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
+        #region ReqFemaleCaptives
+
         private void SetReqFemaleCaptivesBelow(ref MenuCallbackArgs args)
         {
             if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleCaptivesBelow)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
+            args.IsEnabled = false;
+        }
+
+        private void SetReqHeroFemaleCaptivesBelow(ref MenuCallbackArgs args)
+        {
+            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroFemaleCaptivesBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
             args.IsEnabled = false;
@@ -1301,9 +1383,29 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
+        private void SetReqHeroFemaleCaptivesAbove(ref MenuCallbackArgs args)
+        {
+            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroFemaleCaptivesAbove)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
+            args.IsEnabled = false;
+        }
+
+        #endregion
+
+        #region ReqMaleCaptives
+
         private void SetReqMaleCaptivesBelow(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleCaptivesBelow)) return;
+            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleCaptivesBelow)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
+            args.IsEnabled = false;
+        }
+
+        private void SetReqHeroMaleCaptivesBelow(ref MenuCallbackArgs args)
+        {
+            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroMaleCaptivesBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
             args.IsEnabled = false;
@@ -1317,9 +1419,30 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
+        private void SetReqHeroMaleCaptivesAbove(ref MenuCallbackArgs args)
+        {
+            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroMaleCaptivesAbove)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
+            args.IsEnabled = false;
+        }
+
+
+        #endregion
+
+        #region ReqCaptives
+
         private void SetReqCaptivesBelow(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.NumberOfPrisoners <= new CEVariablesLoader().GetIntFromXML(_option.ReqCaptivesBelow)) return;
+            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return troopRosterElement.Number; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqCaptivesBelow)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
+            args.IsEnabled = false;
+        }
+
+        private void SetReqHeroCaptivesBelow(ref MenuCallbackArgs args)
+        {
+            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroCaptivesBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
             args.IsEnabled = false;
@@ -1327,15 +1450,35 @@ namespace CaptivityEvents.Events
 
         private void SetReqCaptivesAbove(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.NumberOfPrisoners >= new CEVariablesLoader().GetIntFromXML(_option.ReqCaptivesAbove)) return;
+            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return troopRosterElement.Number; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqCaptivesAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
             args.IsEnabled = false;
         }
 
+        private void SetReqHeroCaptivesAbove(ref MenuCallbackArgs args)
+        {
+            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroCaptivesAbove)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
+            args.IsEnabled = false;
+        }
+
+        #endregion
+
+        #region ReqFemaleTroops
+
         private void SetReqFemaleTroopsBelow(ref MenuCallbackArgs args)
         {
             if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleTroopsBelow)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
+            args.IsEnabled = false;
+        }
+
+        private void SetReqHeroFemaleTroopsBelow(ref MenuCallbackArgs args)
+        {
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroFemaleTroopsBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
             args.IsEnabled = false;
@@ -1349,9 +1492,28 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
+        private void SetReqHeroFemaleTroopsAbove(ref MenuCallbackArgs args)
+        {
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroFemaleTroopsAbove)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
+            args.IsEnabled = false;
+        }
+
+        #endregion
+
+        #region ReqMaleTroops
+
         private void SetReqMaleTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleTroopsBelow)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleTroopsBelow)) return;
+            args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
+            args.IsEnabled = false;
+        }
+
+        private void SetReqHeroMaleTroopsBelow(ref MenuCallbackArgs args)
+        {
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroMaleTroopsBelow)) return;
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
             args.IsEnabled = false;
         }
@@ -1364,10 +1526,29 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
+        private void SetReqHeroMaleTroopsAbove(ref MenuCallbackArgs args)
+        {
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroMaleTroopsAbove)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
+            args.IsEnabled = false;
+        }
+
+        #endregion
+
+        #region ReqTroops
 
         private void SetReqTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.NumberOfHealthyMembers <= new CEVariablesLoader().GetIntFromXML(_option.ReqTroopsBelow)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return troopRosterElement.Number; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqTroopsBelow)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
+            args.IsEnabled = false;
+        }
+
+        private void SetReqHeroTroopsBelow(ref MenuCallbackArgs args)
+        {
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroTroopsBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
             args.IsEnabled = false;
@@ -1375,11 +1556,21 @@ namespace CaptivityEvents.Events
 
         private void SetReqTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.NumberOfHealthyMembers >= new CEVariablesLoader().GetIntFromXML(_option.ReqTroopsAbove)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return troopRosterElement.Number; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqTroopsAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
         }
+
+        private void SetReqHeroTroopsAbove(ref MenuCallbackArgs args)
+        {
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroTroopsAbove)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
+            args.IsEnabled = false;
+        }
+
+        #endregion
 
         private void SetReqMoraleBelow(ref MenuCallbackArgs args)
         {

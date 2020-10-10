@@ -688,6 +688,19 @@ namespace CaptivityEvents.Events
 
             try
             {
+                if (!_listEvent.ReqHeroFemaleCaptivesAbove.IsStringNoneOrEmpty())
+                {
+                    if (captorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroFemaleCaptivesAbove))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroFemaleCaptivesAbove.");
+                }
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect ReqHeroFemaleCaptivesAbove / Failed ");
+            }
+
+            try
+            {
                 if (_listEvent.ReqFemaleCaptivesBelow.IsStringNoneOrEmpty()) return true;
 
                 if (captorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleCaptivesBelow))
@@ -696,6 +709,18 @@ namespace CaptivityEvents.Events
             catch (Exception)
             {
                 return LogError("Incorrect ReqFemaleCaptivesAbove / Failed ");
+            }
+
+            try
+            {
+                if (_listEvent.ReqHeroFemaleCaptivesBelow.IsStringNoneOrEmpty()) return true;
+
+                if (captorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroFemaleCaptivesBelow))
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroFemaleCaptivesBelow.");
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect ReqHeroFemaleCaptivesBelow / Failed ");
             }
 
             return true;
@@ -718,6 +743,19 @@ namespace CaptivityEvents.Events
 
             try
             {
+                if (!_listEvent.ReqHeroMaleCaptivesAbove.IsStringNoneOrEmpty())
+                {
+                    if (captorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroMaleCaptivesAbove))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroMaleCaptivesAbove.");
+                }
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect ReqHeroMaleCaptivesAbove / Failed ");
+            }
+
+            try
+            {
                 if (_listEvent.ReqMaleCaptivesBelow.IsStringNoneOrEmpty()) return true;
 
                 if (captorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqMaleCaptivesBelow))
@@ -726,6 +764,18 @@ namespace CaptivityEvents.Events
             catch (Exception)
             {
                 return LogError("Incorrect ReqMaleCaptivesBelow / Failed ");
+            }
+
+            try
+            {
+                if (_listEvent.ReqHeroMaleCaptivesBelow.IsStringNoneOrEmpty()) return true;
+
+                if (captorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroMaleCaptivesBelow))
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroMaleCaptivesBelow.");
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect ReqHeroMaleCaptivesBelow / Failed ");
             }
 
             return true;
@@ -748,6 +798,18 @@ namespace CaptivityEvents.Events
 
             try
             {
+                if (_listEvent.ReqHeroCaptivesAbove.IsStringNoneOrEmpty()) return true;
+
+                if (captorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroCaptivesAbove))
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroCaptivesAbove.");
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect ReqHeroCaptivesAbove / Failed ");
+            }
+
+            try
+            {
                 if (_listEvent.ReqCaptivesBelow.IsStringNoneOrEmpty()) return true;
 
                 if (captorParty.NumberOfPrisoners > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptivesBelow))
@@ -756,6 +818,18 @@ namespace CaptivityEvents.Events
             catch (Exception)
             {
                 return LogError("Incorrect ReqCaptivesBelow / Failed ");
+            }
+
+            try
+            {
+                if (_listEvent.ReqHeroCaptivesBelow.IsStringNoneOrEmpty()) return true;
+
+                if (captorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroCaptivesBelow))
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroCaptivesBelow.");
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect ReqHeroCaptivesBelow / Failed ");
             }
 
             return true;
@@ -778,6 +852,19 @@ namespace CaptivityEvents.Events
 
             try
             {
+                if (!_listEvent.ReqHeroFemaleTroopsAbove.IsStringNoneOrEmpty())
+                {
+                    if (captorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroFemaleTroopsAbove))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroFemaleTroopsAbove.");
+                }
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect ReqHeroFemaleTroopsAbove / Failed ");
+            }
+
+            try
+            {
                 if (!_listEvent.ReqFemaleTroopsBelow.IsStringNoneOrEmpty())
                 {
                     if (captorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqFemaleTroopsBelow))
@@ -787,6 +874,19 @@ namespace CaptivityEvents.Events
             catch (Exception)
             {
                 return LogError("Incorrect ReqFemaleTroopsBelow / Failed ");
+            }
+
+            try
+            {
+                if (!_listEvent.ReqHeroFemaleTroopsBelow.IsStringNoneOrEmpty())
+                {
+                    if (captorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroFemaleTroopsBelow))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroFemaleTroopsBelow.");
+                }
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect ReqHeroFemaleTroopsBelow / Failed ");
             }
 
             return true;
@@ -804,7 +904,20 @@ namespace CaptivityEvents.Events
             }
             catch (Exception)
             {
-                return LogError("Incorrect ReqTroopsAbove / Failed ");
+                return LogError("Incorrect ReqMaleTroopsAbove / Failed ");
+            }
+
+            try
+            {
+                if (!_listEvent.ReqHeroMaleTroopsAbove.IsStringNoneOrEmpty())
+                {
+                    if (captorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroMaleTroopsAbove))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroMaleTroopsAbove.");
+                }
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect ReqHeroMaleTroopsAbove / Failed ");
             }
 
             try
@@ -817,6 +930,18 @@ namespace CaptivityEvents.Events
             catch (Exception)
             {
                 return LogError("Incorrect ReqMaleTroopsBelow / Failed ");
+            }
+
+            try
+            {
+                if (_listEvent.ReqHeroMaleTroopsBelow.IsStringNoneOrEmpty()) return true;
+
+                if (captorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroMaleTroopsBelow))
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroMaleTroopsBelow.");
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect ReqHeroMaleTroopsBelow / Failed ");
             }
 
             return true;
@@ -839,6 +964,19 @@ namespace CaptivityEvents.Events
 
             try
             {
+                if (!_listEvent.ReqHeroTroopsAbove.IsStringNoneOrEmpty())
+                {
+                    if (captorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroTroopsAbove))
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroTroopsAbove.");
+                }
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect ReqHeroTroopsAbove / Failed ");
+            }
+
+            try
+            {
                 if (_listEvent.ReqTroopsBelow.IsStringNoneOrEmpty()) return true;
 
                 if (captorParty.MemberRoster.Sum(troopRosterElement => { return troopRosterElement.Number; }) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqTroopsBelow))
@@ -849,8 +987,21 @@ namespace CaptivityEvents.Events
                 return LogError("Incorrect ReqTroopsBelow / Failed ");
             }
 
+            try
+            {
+                if (_listEvent.ReqHeroTroopsBelow.IsStringNoneOrEmpty()) return true;
+
+                if (captorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroTroopsBelow))
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroTroopsBelow.");
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect ReqHeroTroopsBelow / Failed ");
+            }
+
             return true;
         }
+
 
         private bool CaptivesOutNumberCheck(PartyBase captorParty)
         {
