@@ -9,6 +9,7 @@ using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+using TaleWorlds.TwoDimension;
 
 namespace CaptivityEvents.Events
 {
@@ -19,7 +20,9 @@ namespace CaptivityEvents.Events
         private readonly Option _option;
         private readonly ScoresCalculation _score = new ScoresCalculation();
         private readonly Dynamics _dynamics = new Dynamics();
-        private readonly CEVariablesLoader variableLoader = new CEVariablesLoader();
+        private readonly CEVariablesLoader _variableLoader = new CEVariablesLoader();
+
+        private float _timer = 0;
 
         internal RandomMenuCallBackDelegate(CEEvent listedEvent) => _listedEvent = listedEvent;
 
@@ -45,7 +48,7 @@ namespace CaptivityEvents.Events
             if (_listedEvent.ProgressEvent != null)
             {
                 args.MenuContext.GameMenu.AllowWaitingAutomatically();
-                args.MenuContext.GameMenu.SetTargetedWaitingTimeAndInitialProgress(variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake), 0.0f);
+                _timer = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake) * 1000f;
             }
             else
             {
@@ -62,14 +65,20 @@ namespace CaptivityEvents.Events
 
         internal void RandomConsequenceWaitGameMenu(MenuCallbackArgs args)
         {
-
+            if (_listedEvent.ProgressEvent.TriggerEvents != null && _listedEvent.ProgressEvent.TriggerEvents.Length > 0)
+            {
+                ConsequenceRandomEventTriggerProgress(ref args);
+            }
+            else if (!string.IsNullOrEmpty(_listedEvent.ProgressEvent.TriggerEventName))
+            {
+                ConsequenceSingleEventTriggerProgress(ref args);
+            }
         }
 
         internal void RandomTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt)
         {
-            // TODO Check progress
-            float hour = dt.RemainingHoursFromNow;
-            args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(0.1f);
+            _timer -= 1f;
+            args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake) - Mathf.Ceil(_timer / 1000f));
         }
 
         internal void RandomEventGameMenu(MenuCallbackArgs menuCallbackArgs)
@@ -156,6 +165,96 @@ namespace CaptivityEvents.Events
 
         #region private
 
+        private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
+        {
+            CaptorSpecifics captorSpecifics = new CaptorSpecifics();
+            List<CEEvent> eventNames = new List<CEEvent>();
+
+            try
+            {
+                foreach (TriggerEvent triggerEvent in _listedEvent.ProgressEvent.TriggerEvents)
+                {
+                    CEEvent triggeredEvent = _eventList.Find(item => item.Name == triggerEvent.EventName);
+
+                    if (triggeredEvent == null)
+                    {
+                        CECustomHandler.ForceLogToFile("Couldn't find " + triggerEvent.EventName + " in events.");
+                        continue;
+                    }
+
+                    if (!triggerEvent.EventUseConditions.IsStringNoneOrEmpty() && triggerEvent.EventUseConditions == "True")
+                    {
+                        string conditionMatched = null;
+                        if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                        {
+                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                        }
+                        else if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                        {
+                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                        }
+
+                        if (conditionMatched != null)
+                        {
+                            CECustomHandler.LogToFile(conditionMatched);
+                            continue;
+                        }
+                    }
+
+                    int weightedChance = 0;
+
+                    try
+                    {
+                        weightedChance = new CEVariablesLoader().GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
+                                                                      ? triggerEvent.EventWeight
+                                                                      : triggeredEvent.WeightedChanceOfOccuring);
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
+
+                    if (weightedChance == 0) weightedChance = 1;
+
+                    for (int a = weightedChance; a > 0; a--) eventNames.Add(triggeredEvent);
+                }
+
+                if (eventNames.Count > 0)
+                {
+                    int number = MBRandom.Random.Next(0, eventNames.Count - 1);
+
+                    try
+                    {
+                        CEEvent triggeredEvent = eventNames[number];
+                        triggeredEvent.Captive = CharacterObject.PlayerCharacter;
+                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
+                    }
+                    catch (Exception)
+                    {
+                        CECustomHandler.ForceLogToFile("Couldn't find " + eventNames[number] + " in events.");
+                        captorSpecifics.CECaptorContinue(args);
+                    }
+                }
+                else { captorSpecifics.CECaptorContinue(args); }
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("MBRandom.Random in events Failed.");
+                captorSpecifics.CECaptorContinue(args);
+            }
+        }
+
+        private void ConsequenceSingleEventTriggerProgress(ref MenuCallbackArgs args)
+        {
+
+            try
+            {
+                CEEvent triggeredEvent = _eventList.Find(item => item.Name == _listedEvent.ProgressEvent.TriggerEventName);
+                GameMenu.SwitchToMenu(triggeredEvent.Name);
+            }
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Couldn't find " + _listedEvent.ProgressEvent.TriggerEventName + " in events.");
+                new CaptorSpecifics().CECaptorContinue(args);
+            }
+        }
         private void ConsequenceSingleEventTrigger(ref MenuCallbackArgs args)
         {
             try

@@ -12,11 +12,25 @@ namespace CaptivityEvents.Events
         // Waiting Menus
         public static string CEWaitingList() => new WaitingList().CEWaitingList();
 
+        // 
+        private static GameMenu.MenuAndOptionType CEProgressMode(int state)
+        {
+            switch (state)
+            {
+                case 1:
+                    return GameMenu.MenuAndOptionType.WaitMenuShowProgressAndHoursOption;
+                case 2:
+                    return GameMenu.MenuAndOptionType.WaitMenuHideProgressAndHoursOption;
+                default:
+                    return GameMenu.MenuAndOptionType.WaitMenuShowOnlyProgressOption;
+            }
+        }
+
         // Event Loaders
         public static void CELoadRandomEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
-            RandomMenuCallBackDelegate rcb = new RandomMenuCallBackDelegate(listedEvent);
+            RandomMenuCallBackDelegate rcb = new RandomMenuCallBackDelegate(listedEvent, null, eventList);
 
             if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
             {
@@ -26,9 +40,9 @@ namespace CaptivityEvents.Events
                     rcb.RandomConditionWaitGameMenu,
                     rcb.RandomConsequenceWaitGameMenu,
                     rcb.RandomTickWaitGameMenu,
-                    GameMenu.MenuAndOptionType.WaitMenuShowProgressAndHoursOption,
+                    CEProgressMode(variablesLoader.GetIntFromXML(listedEvent.ProgressEvent.DisplayProgressMode)),
                     TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
-                    0,
+                    variablesLoader.GetFloatFromXML(listedEvent.ProgressEvent.TimeToTake),
                     GameMenu.MenuFlags.none,
                     "CEEVENTS");
             }

@@ -156,6 +156,8 @@ namespace CaptivityEvents.Custom
     {
         public bool ShouldStopMoving { get; set; }
 
+        public string DisplayProgressMode { get; set; }
+
         public string TimeToTake { get; set; }
 
         public string TriggerEventName { get; set; }
