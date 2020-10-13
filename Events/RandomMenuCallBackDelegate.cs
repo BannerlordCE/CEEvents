@@ -1,5 +1,6 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
+using CaptivityEvents.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace CaptivityEvents.Events
         private readonly Option _option;
         private readonly ScoresCalculation _score = new ScoresCalculation();
         private readonly Dynamics _dynamics = new Dynamics();
+        private readonly CEVariablesLoader variableLoader = new CEVariablesLoader();
 
         internal RandomMenuCallBackDelegate(CEEvent listedEvent) => _listedEvent = listedEvent;
 
@@ -26,6 +28,48 @@ namespace CaptivityEvents.Events
             _listedEvent = listedEvent;
             _option = option;
             _eventList = eventList;
+        }
+
+        internal void RandomInitWaitGameMenu(MenuCallbackArgs args)
+        {
+            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                       ? "wait_captive_female"
+                                       : "wait_captive_male");
+
+            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default_random");
+
+            MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
+                                            ? 1
+                                            : 0);
+
+            if (_listedEvent.ProgressEvent != null)
+            {
+                args.MenuContext.GameMenu.AllowWaitingAutomatically();
+                args.MenuContext.GameMenu.SetTargetedWaitingTimeAndInitialProgress(variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake), 0.0f);
+            }
+            else
+            {
+                CECustomHandler.ForceLogToFile("Missing Progress Event Settings in " + _listedEvent.Name);
+            }
+
+        }
+        internal bool RandomConditionWaitGameMenu(MenuCallbackArgs args)
+        {
+            args.MenuContext.GameMenu.AllowWaitingAutomatically();
+            args.optionLeaveType = GameMenuOption.LeaveType.Wait;
+            return true;
+        }
+
+        internal void RandomConsequenceWaitGameMenu(MenuCallbackArgs args)
+        {
+
+        }
+
+        internal void RandomTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt)
+        {
+            // TODO Check progress
+            float hour = dt.RemainingHoursFromNow;
+            args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(0.1f);
         }
 
         internal void RandomEventGameMenu(MenuCallbackArgs menuCallbackArgs)

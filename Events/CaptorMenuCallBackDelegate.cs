@@ -219,6 +219,7 @@ namespace CaptivityEvents.Events
                 if (_listedEvent.Captive.IsHero)
                 {
                     EndCaptivityAction.ApplyByReleasing(_listedEvent.Captive.HeroObject);
+                    AddCompanionAction.Apply(Clan.PlayerClan, _listedEvent.Captive.HeroObject);
                     AddHeroToPartyAction.Apply(_listedEvent.Captive.HeroObject, PartyBase.MainParty.MobileParty, true);
                 }
                 else

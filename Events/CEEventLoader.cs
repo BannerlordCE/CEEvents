@@ -16,14 +16,32 @@ namespace CaptivityEvents.Events
         public static void CELoadRandomEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
+            RandomMenuCallBackDelegate rcb = new RandomMenuCallBackDelegate(listedEvent);
 
-            gameStarter.AddGameMenu(
-                listedEvent.Name,
-                listedEvent.Text,
-                new RandomMenuCallBackDelegate(listedEvent).RandomEventGameMenu,
-                TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
-                GameMenu.MenuFlags.none,
-                "CEEVENTS");
+            if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
+            {
+                gameStarter.AddWaitGameMenu(listedEvent.Name,
+                    listedEvent.Text,
+                    rcb.RandomInitWaitGameMenu,
+                    rcb.RandomConditionWaitGameMenu,
+                    rcb.RandomConsequenceWaitGameMenu,
+                    rcb.RandomTickWaitGameMenu,
+                    GameMenu.MenuAndOptionType.WaitMenuShowProgressAndHoursOption,
+                    TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
+                    0,
+                    GameMenu.MenuFlags.none,
+                    "CEEVENTS");
+            }
+            else
+            {
+                gameStarter.AddGameMenu(
+                    listedEvent.Name,
+                    listedEvent.Text,
+                    rcb.RandomEventGameMenu,
+                    TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
+                    GameMenu.MenuFlags.none,
+                    "CEEVENTS");
+            }
 
             if (listedEvent.Options == null) return; // Leave if no Options
 

@@ -74,6 +74,7 @@ namespace CaptivityEvents.Custom
     public enum RestrictedListOfFlags
     {
         WaitingMenu,
+        ProgressMenu,
         CanOnlyBeTriggeredByOtherEvent,
         Common,
         Femdom,
@@ -145,6 +146,22 @@ namespace CaptivityEvents.Custom
         StripEnabled,
         StripDisabled,
         IgnoreAllOther,
+    }
+
+    [DebuggerStepThrough]
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = true)]
+    [Serializable]
+    public class ProgressEvent
+    {
+        public bool ShouldStopMoving { get; set; }
+
+        public string TimeToTake { get; set; }
+
+        public string TriggerEventName { get; set; }
+
+        [XmlArrayItem("TriggerEvent", IsNullable = true)]
+        public TriggerEvent[] TriggerEvents { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -434,6 +451,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("Option", IsNullable = true)]
         public Option[] Options { get; set; }
+
+        [XmlElement("ProgressEvent", IsNullable = true)]
+        public ProgressEvent ProgressEvent { get; set; }
 
         public bool ReqCustomCode { get; set; }
 

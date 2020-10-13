@@ -438,7 +438,10 @@ namespace CaptivityEvents.Events
         {
             if (hero == null) return;
 
-            if (owner != null) hero.Clan = owner.Clan;
+            if (owner != null)
+            {
+                hero.Clan = owner.Clan;
+            }
         }
 
     }

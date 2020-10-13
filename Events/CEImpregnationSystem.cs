@@ -47,7 +47,6 @@ namespace CaptivityEvents.Events
 
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, settlementCurrent, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
-                        randomSoldier.IsNoble = true;
                     }
                     else if (targetHero.PartyBelongedTo != null)
                     {
@@ -58,13 +57,11 @@ namespace CaptivityEvents.Events
 
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.PartyBelongedTo.HomeSettlement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
-                        randomSoldier.IsNoble = true;
                     }
                     else
                     {
                         CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Outlaw).GetRandomElement();
                         randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
-                        randomSoldier.IsNoble = true;
                     }
 
                     TextObject textObject3 = GameTexts.FindText("str_CE_impregnated");
@@ -125,8 +122,6 @@ namespace CaptivityEvents.Events
                     {
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, settlementCurrent, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(15) + 18);
-
-                        randomSoldier.IsNoble = true;
                     } while (!IsHeroAgeSuitableForPregnancy(randomSoldier));
                 }
                 else if (targetHero.PartyBelongedTo != null)
@@ -140,14 +135,12 @@ namespace CaptivityEvents.Events
                     {
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.PartyBelongedTo.HomeSettlement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(15) + 18);
-                        randomSoldier.IsNoble = true;
                     } while (!IsHeroAgeSuitableForPregnancy(randomSoldier));
                 }
                 else
                 {
                     CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale && characterObject.Occupation == Occupation.Outlaw).GetRandomElement();
                     randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(15) + 18);
-                    randomSoldier.IsNoble = true;
                 }
 
                 TextObject textObject3 = GameTexts.FindText("str_CE_impregnated");
@@ -206,7 +199,6 @@ namespace CaptivityEvents.Events
 
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.PartyBelongedToAsPrisoner.MobileParty.HomeSettlement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
-                        randomSoldier.IsNoble = true;
                     }
                     else if (targetHero.PartyBelongedToAsPrisoner.IsSettlement && targetHero.PartyBelongedToAsPrisoner.Settlement.MilitaParty != null && !targetHero.PartyBelongedToAsPrisoner.Settlement.MilitaParty.MemberRoster.IsEmpty())
                     {
@@ -218,13 +210,11 @@ namespace CaptivityEvents.Events
 
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, playerCaptor, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
-                        randomSoldier.IsNoble = true;
                     }
                     else
                     {
                         CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Outlaw).GetRandomElement();
                         randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
-                        randomSoldier.IsNoble = true;
                     }
 
                     TextObject textObject3 = GameTexts.FindText("str_CE_impregnated");
@@ -288,7 +278,6 @@ namespace CaptivityEvents.Events
                     {
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.PartyBelongedToAsPrisoner.MobileParty.HomeSettlement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(15) + 18);
-                        randomSoldier.IsNoble = true;
                     } while (!IsHeroAgeSuitableForPregnancy(randomSoldier));
                 }
                 else if (targetHero.PartyBelongedToAsPrisoner.IsSettlement && targetHero.PartyBelongedToAsPrisoner.Settlement.MilitaParty != null && !targetHero.PartyBelongedToAsPrisoner.Settlement.MilitaParty.MemberRoster.IsEmpty())
@@ -303,14 +292,12 @@ namespace CaptivityEvents.Events
                     {
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         if (targetHero.PartyBelongedToAsPrisoner.MobileParty != null) randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.PartyBelongedToAsPrisoner.MobileParty.HomeSettlement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(15) + 18);
-                        if (randomSoldier != null) randomSoldier.IsNoble = true;
                     } while (!IsHeroAgeSuitableForPregnancy(randomSoldier));
                 }
                 else
                 {
                     CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale && characterObject.Occupation == Occupation.Outlaw).GetRandomElement();
                     randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(15) + 18);
-                    randomSoldier.IsNoble = true;
                 }
 
                 TextObject textObject3 = GameTexts.FindText("str_CE_impregnated");
