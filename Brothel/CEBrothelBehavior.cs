@@ -1117,22 +1117,29 @@ namespace CaptivityEvents.Brothel
 
         private void OnWarDeclared(IFaction faction1, IFaction faction2)
         {
-            IFaction faction3 = (faction1 == Hero.MainHero.MapFaction) ? faction1 : ((faction2 == Hero.MainHero.MapFaction) ? faction2 : null);
-            if (faction3 != null)
+            try
             {
-                IFaction faction4 = (faction3 != faction1) ? faction1 : faction2;
-                int count = _brothelList.Count;
-                for (int i = 0; i < count; i++)
+                IFaction faction3 = (faction1 == Hero.MainHero.MapFaction) ? faction1 : ((faction2 == Hero.MainHero.MapFaction) ? faction2 : null);
+                if (faction3 != null)
                 {
-                    CEBrothel brothel = _brothelList[i];
-                    if (brothel != null && brothel.Settlement.MapFaction == faction4)
+                    IFaction faction4 = (faction3 != faction1) ? faction1 : faction2;
+                    int count = _brothelList.Count;
+                    for (int i = 0; i < count; i++)
                     {
-                        TextObject textObject3 = new TextObject("{CEBROTHEL0983}The brothel of {SETTLEMENT} has been captured by the enemy, and has been requisitioned.");
-                        textObject3.SetTextVariable("SETTLEMENT", brothel.Settlement.Name);
-                        InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Yellow));
-                        BrothelInteraction(brothel.Settlement, false, true, brothel.Settlement.OwnerClan.Leader);
+                        CEBrothel brothel = _brothelList[i];
+                        if (brothel != null && brothel.Settlement.MapFaction == faction4)
+                        {
+                            TextObject textObject3 = new TextObject("{CEBROTHEL0983}The brothel of {SETTLEMENT} has been captured by the enemy, and has been requisitioned.");
+                            textObject3.SetTextVariable("SETTLEMENT", brothel.Settlement.Name);
+                            InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Yellow));
+                            BrothelInteraction(brothel.Settlement, false, true, brothel.Settlement.OwnerClan.Leader);
+                        }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("OnWarDeclared : " + e);
             }
         }
 

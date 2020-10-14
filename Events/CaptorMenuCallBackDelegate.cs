@@ -1563,7 +1563,7 @@ namespace CaptivityEvents.Events
             int content = new ScoresCalculation().AttractivenessScore(_listedEvent.Captive.HeroObject);
             if (_listedEvent.Captive.HeroObject != null) content += _listedEvent.Captive.HeroObject.GetSkillValue(CESkills.Prostitution) / 2;
             content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveCaptorGold);
-            MBTextManager.SetTextVariable("MONEY_AMOUNT", content);
+            MBTextManager.SetTextVariable("CAPTOR_MONEY_AMOUNT", content);
         }
 
         private void PlayerIsNotBusy(ref MenuCallbackArgs args)

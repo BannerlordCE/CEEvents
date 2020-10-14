@@ -216,7 +216,7 @@ namespace CaptivityEvents
             ModuleInfo nativeModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
             ApplicationVersion gameversion = nativeModule.Version;
 
-            if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor || !(gameversion.Revision == 2 || gameversion.Revision == 3))
+            if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor || !(gameversion.Revision == 1 || gameversion.Revision == 2 || gameversion.Revision == 3))
             {
                 CECustomHandler.ForceLogToFile("Captivity Events " + modversion + " has the detected the wrong version " + gameversion);
                 MessageBox.Show("Warning:\n Captivity Events " + modversion + " has the detected the wrong game version. Please download the correct version for " + gameversion + ". Or continue at your own risk.", "Captivity Events has the detected the wrong version");
