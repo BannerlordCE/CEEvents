@@ -138,7 +138,7 @@ namespace CaptivityEvents.Events
             }
         }
 
-        private void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp)
+        private void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp, bool display = true)
         {
             if (xp == 0)
             {
@@ -182,6 +182,8 @@ namespace CaptivityEvents.Events
                     hero.SetSkillValue(skillObject, newNumber);
                 }
 
+                if (!display) return;
+
                 TextObject textObject = GameTexts.FindText("str_CE_level_skill");
                 textObject.SetTextVariable("HERO", hero.Name);
 
@@ -199,22 +201,54 @@ namespace CaptivityEvents.Events
             }
             else
             {
-                hero.HeroDeveloper.AddSkillXp(skillObject, xp, true, true);
+                hero.HeroDeveloper.AddSkillXp(skillObject, xp, true, display);
             }
 
 
         }
 
-        internal void SkillModifier(Hero hero, string skill, int amount, int xp)
+        internal Color PickColor(string color)
+        {
+            switch (color)
+            {
+                case "Black":
+                case "black":
+                    return Colors.Black;
+                case "White":
+                case "white":
+                    return Colors.White;
+                case "Yellow":
+                case "yellow":
+                    return Colors.Yellow;
+                case "Red":
+                case "red":
+                    return Colors.Red;
+                case "Magenta":
+                case "magenta":
+                    return Colors.Magenta;
+                case "Green":
+                case "green":
+                    return Colors.Green;
+                case "Cyan":
+                case "cyan":
+                    return Colors.Cyan;
+                default:
+                    return Colors.Gray;
+
+            }
+        }
+
+        internal void SkillModifier(Hero hero, string skill, int amount, int xp, bool display = true, string color = "gray")
         {
             bool found = false;
+
 
             foreach (SkillObject skillObjectCustom in CESkills.CustomSkills)
             {
                 if (skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill)
                 {
                     found = true;
-                    SkillObjectModifier(skillObjectCustom, Colors.Gray, hero, skill, amount, xp);
+                    SkillObjectModifier(skillObjectCustom, PickColor(color), hero, skill, amount, xp, display);
                     break;
                 }
             }
@@ -226,7 +260,7 @@ namespace CaptivityEvents.Events
                 if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
                 {
                     found = true;
-                    SkillObjectModifier(skillObject, Colors.Magenta, hero, skill, amount, xp);
+                    SkillObjectModifier(skillObject, PickColor(color), hero, skill, amount, xp, display);
                     break;
                 }
             }

@@ -1195,7 +1195,7 @@ namespace CaptivityEvents.Brothel
                             new Dynamics().RenownModifier(MBRandom.RandomInt(-10, -1), _brothelList[i].CaptiveProstitutes[y].HeroObject);
 
                             int numEscapeChance = CESettings.Instance.PrisonerHeroEscapeChanceSettlement;
-                            if (numEscapeChance == -1) continue;
+                            if (numEscapeChance == -1) numEscapeChance = 25;
 
                             if (MBRandom.RandomInt(100) < numEscapeChance)
                             {
@@ -1207,7 +1207,7 @@ namespace CaptivityEvents.Brothel
                         else
                         {
                             int numEscapeChance = CESettings.Instance.PrisonerNonHeroEscapeChanceSettlement;
-                            if (numEscapeChance == -1) continue;
+                            if (numEscapeChance == -1) numEscapeChance = 25;
 
                             if (MBRandom.RandomInt(100) < numEscapeChance)
                             {

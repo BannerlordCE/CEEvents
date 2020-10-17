@@ -208,6 +208,12 @@ namespace CaptivityEvents.Custom
 
         [XmlAttribute()]
         public string Id { get; set; }
+
+        [XmlAttribute()]
+        public string Color { get; set; }
+
+        [XmlAttribute()]
+        public bool HideNotification { get; set; }
     }
 
     public class SkillRequired
@@ -253,6 +259,9 @@ namespace CaptivityEvents.Custom
 
         [XmlAttribute()]
         public string Clan { get; set; }
+
+        [XmlArrayItem("Skill", IsNullable = true)]
+        public SkillToLevel[] SkillsToLevel { get; set; }
     }
 
 
