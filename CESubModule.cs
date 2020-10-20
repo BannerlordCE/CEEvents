@@ -379,11 +379,14 @@ namespace CaptivityEvents
                 string partNameEvent = "CEEventNotification\\notification_event";
 
                 SpriteData spriteData = UIResourceManager.SpriteData;
+                // 1.5.3
+                /*
                 spriteData.SpriteCategories.Add(categoryName, loadedData.SpriteCategories[categoryName]);
                 spriteData.SpritePartNames.Add(partNameCaptor, loadedData.SpritePartNames[partNameCaptor]);
                 spriteData.SpritePartNames.Add(partNameEvent, loadedData.SpritePartNames[partNameEvent]);
                 spriteData.SpriteNames.Add(partNameCaptor, new SpriteGeneric(partNameCaptor, loadedData.SpritePartNames[partNameCaptor]));
                 spriteData.SpriteNames.Add(partNameEvent, new SpriteGeneric(partNameEvent, loadedData.SpritePartNames[partNameEvent]));
+                */
 
                 SpriteCategory spriteCategory = spriteData.SpriteCategories[categoryName];
                 spriteCategory.SpriteSheets.Add(CEPersistence.CEEventImageList["CE_default_notification"]);

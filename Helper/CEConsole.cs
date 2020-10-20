@@ -24,6 +24,24 @@ namespace CaptivityEvents.Helper
 {
     internal class CEConsole
     {
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("reload_settings", "captivity")]
+        public static string ChangeSettings(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.reload_settings\".\n\n";
+
+                return "Unimplemented";
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
         [CommandLineFunctionality.CommandLineArgumentFunction("force_fire_event", "captivity")]
         public static string ForceFireEvent(List<string> strings)
         {

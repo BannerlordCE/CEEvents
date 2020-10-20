@@ -16,6 +16,8 @@ namespace CaptivityEvents
 
         private static bool _failed = false;
 
+        private static CESettings _instance = null;
+
         public static CESettings InstanceToCheck 
         {
             get
@@ -27,12 +29,20 @@ namespace CaptivityEvents
                     }
                     else
                     {
-                        return new CESettings();
+                        if (_instance == null)
+                        {
+                            _instance = new CESettings();
+                        }
+                        return _instance;
                     }
                 } catch (Exception)
                 {
+                    if (_instance == null)
+                    {
+                        _instance = new CESettings();
+                    }
                     _failed = true;
-                    return new CESettings();
+                    return _instance;
                 }
             }
         }
