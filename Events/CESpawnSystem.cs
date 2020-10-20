@@ -62,7 +62,7 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    bool isFemale = heroVariables.Gender == "Female";
+                    bool isFemale = (heroVariables.Gender == "Female" || heroVariables.Gender == "female");
 
                     string culture = null;
                     switch (heroVariables.Culture)

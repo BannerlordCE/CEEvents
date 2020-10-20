@@ -14,6 +14,29 @@ namespace CaptivityEvents
         public override string DisplayName => "Captivity Events";
         public override string FolderName => "zCaptivityEvents";
 
+        private static bool _failed = false;
+
+        public static CESettings InstanceToCheck 
+        {
+            get
+            {
+                try
+                {
+                    if (!_failed) {
+                        return Instance ?? new CESettings();
+                    }
+                    else
+                    {
+                        return new CESettings();
+                    }
+                } catch (Exception)
+                {
+                    _failed = true;
+                    return new CESettings();
+                }
+            }
+        }
+
         public override IDictionary<string, Func<BaseSettings>> GetAvailablePresets()
         {
             IDictionary<string, Func<BaseSettings>> basePresets = base.GetAvailablePresets(); // include the 'Default' preset that MCM provides

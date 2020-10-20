@@ -50,7 +50,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception)
             {
-                CECustomHandler.ForceLogToFile("Failed to parse " + numpassed);
+                CECustomHandler.ForceLogToFile("Failed to parse int " + numpassed);
 
                 return 0;
             }
@@ -100,7 +100,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception)
             {
-                CECustomHandler.LogToFile("Failed to parse " + numpassed);
+                CECustomHandler.LogToFile("Failed to parse float " + numpassed);
 
                 return 0f;
             }

@@ -275,8 +275,8 @@ namespace CaptivityEvents.Custom
         {
             try
             {
-                if (CESettings.Instance == null) return;
-                if (!CESettings.Instance.LogToggle) return;
+                if (CESettings.InstanceToCheck == null) return;
+                if (!CESettings.InstanceToCheck.LogToggle) return;
 
                 ForceLogToFile(msg);
             }

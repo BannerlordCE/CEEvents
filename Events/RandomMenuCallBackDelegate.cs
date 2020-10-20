@@ -23,6 +23,8 @@ namespace CaptivityEvents.Events
         private readonly CEVariablesLoader _variableLoader = new CEVariablesLoader();
 
         private float _timer = 0;
+        private float _max = 0;
+        private float _currentProgress = 0;
 
         internal RandomMenuCallBackDelegate(CEEvent listedEvent) => _listedEvent = listedEvent;
 
@@ -48,13 +50,14 @@ namespace CaptivityEvents.Events
             if (_listedEvent.ProgressEvent != null)
             {
                 args.MenuContext.GameMenu.AllowWaitingAutomatically();
-                _timer = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake) * 1000f;
+                _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);
+                _timer = 0f;
+                _currentProgress = 0f;
             }
             else
             {
                 CECustomHandler.ForceLogToFile("Missing Progress Event Settings in " + _listedEvent.Name);
             }
-
         }
         internal bool RandomConditionWaitGameMenu(MenuCallbackArgs args)
         {
@@ -77,8 +80,8 @@ namespace CaptivityEvents.Events
 
         internal void RandomTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt)
         {
-            _timer -= 1f;
-            args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake) - Mathf.Ceil(_timer / 1000f));
+            _timer += dt.CurrentHourInDay;
+            args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
         }
 
         internal void RandomEventGameMenu(MenuCallbackArgs menuCallbackArgs)

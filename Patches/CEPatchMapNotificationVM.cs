@@ -14,7 +14,7 @@ namespace CaptivityEvents.Patches
         public static readonly MethodInfo RemoveNotificationItem = AccessTools.Method(typeof(MapNotificationVM), "RemoveNotificationItem");
 
         [HarmonyPrepare]
-        private static bool ShouldPatch() => CESettings.Instance != null && CESettings.Instance.EventCaptorNotifications;
+        private static bool ShouldPatch() => CESettings.InstanceToCheck != null && CESettings.InstanceToCheck.EventCaptorNotifications;
 
         [HarmonyPostfix]
         private static void DetermineNotificationType(MapNotificationVM __instance, ref MapNotificationItemBaseVM __result, InformationData data)

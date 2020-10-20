@@ -195,7 +195,7 @@ namespace CaptivityEvents.Events
                 textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
 
                 textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
-                textObject.SetTextVariable("SKILL", skill.ToLower());
+                textObject.SetTextVariable("SKILL", skillObject.Name.ToLower());
                 textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
             }
@@ -437,7 +437,7 @@ namespace CaptivityEvents.Events
             if (hero == null || amount == 0) return;
 
             hero.Clan.Renown += amount;
-            if (CESettings.Instance != null && hero.Clan.Renown < CESettings.Instance.RenownMin) hero.Clan.Renown = CESettings.Instance.RenownMin;
+            if (CESettings.InstanceToCheck != null && hero.Clan.Renown < CESettings.InstanceToCheck.RenownMin) hero.Clan.Renown = CESettings.InstanceToCheck.RenownMin;
 
             TextObject textObject = GameTexts.FindText("str_CE_renown_level");
             textObject.SetTextVariable("HERO", hero.Name);

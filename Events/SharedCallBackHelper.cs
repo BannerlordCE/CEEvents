@@ -313,13 +313,13 @@ namespace CaptivityEvents.Events
                 mountLevel = _option.StripSettings.Mount.IsStringNoneOrEmpty() ? "Default" : _option.StripSettings.Clothing;
             }
 
-            if (CESettings.Instance != null && !CESettings.Instance.StolenGear && !forced) return;
+            if (CESettings.InstanceToCheck != null && !CESettings.InstanceToCheck.StolenGear && !forced) return;
             Equipment randomElement = new Equipment(false);
 
             if (clothingLevel != "Nude")
             {
 
-                if (CESettings.Instance != null && MBRandom.Random.Next(100) < CESettings.Instance.BetterOutFitChance && clothingLevel != "Basic" || clothingLevel == "Advanced")
+                if (CESettings.InstanceToCheck != null && MBRandom.Random.Next(100) < CESettings.InstanceToCheck.BetterOutFitChance && clothingLevel != "Basic" || clothingLevel == "Advanced")
                 {
                     string bodyString = "";
                     string legString = "";
@@ -465,14 +465,14 @@ namespace CaptivityEvents.Events
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
                 }
 
-                if (CESettings.Instance != null && MBRandom.Random.Next(100) < CESettings.Instance.WeaponChance)
+                if (CESettings.InstanceToCheck != null && MBRandom.Random.Next(100) < CESettings.InstanceToCheck.WeaponChance)
                 {
                     string item;
 
                     if (MBRandom.Random.Next(100)
-                        < (CESettings.Instance.WeaponSkill
+                        < (CESettings.InstanceToCheck.WeaponSkill
                             ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.OneHanded) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.TwoHanded) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Polearm) / 275 * 100))
-                            : CESettings.Instance.WeaponChance))
+                            : CESettings.InstanceToCheck.WeaponChance))
                     {
                         switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
                         {
@@ -533,11 +533,11 @@ namespace CaptivityEvents.Events
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Weapon0, new EquipmentElement(itemObjectWeapon0));
                 }
 
-                if (CESettings.Instance != null && (MBRandom.Random.Next(100) < CESettings.Instance.WeaponChance
+                if (CESettings.InstanceToCheck != null && (MBRandom.Random.Next(100) < CESettings.InstanceToCheck.WeaponChance
                                                     && MBRandom.Random.Next(100)
-                                                    < (CESettings.Instance.RangedSkill
+                                                    < (CESettings.InstanceToCheck.RangedSkill
                                                         ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.Bow) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.Crossbow) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Throwing) / 275 * 100))
-                                                        : CESettings.Instance.RangedBetterChance)))
+                                                        : CESettings.InstanceToCheck.RangedBetterChance)))
                 {
                     string rangedItem;
                     string rangedAmmo = null;
@@ -595,10 +595,10 @@ namespace CaptivityEvents.Events
             randomElement2.FillFrom(randomElement, false);
 
 
-            if (CESettings.Instance != null && MBRandom.Random.Next(100)
-                < (CESettings.Instance.HorseSkill
+            if (CESettings.InstanceToCheck != null && MBRandom.Random.Next(100)
+                < (CESettings.InstanceToCheck.HorseSkill
                     ? Hero.MainHero.GetSkillValue(DefaultSkills.Riding) / 275 * 100
-                    : CESettings.Instance.HorseChance) && mountLevel != "None" || mountLevel == "Basic")
+                    : CESettings.InstanceToCheck.HorseChance) && mountLevel != "None" || mountLevel == "Basic")
             {
                 ItemObject poorHorse = MBObjectManager.Instance.GetObject<ItemObject>("sumpter_horse");
                 EquipmentElement horseEquipment = new EquipmentElement(poorHorse);
@@ -607,7 +607,7 @@ namespace CaptivityEvents.Events
             }
 
 
-            if (CESettings.Instance != null && (CESettings.Instance.StolenGearQuest && MBRandom.Random.Next(100) < CESettings.Instance.StolenGearChance) && questEnabled)
+            if (CESettings.InstanceToCheck != null && (CESettings.InstanceToCheck.StolenGearQuest && MBRandom.Random.Next(100) < CESettings.InstanceToCheck.StolenGearChance) && questEnabled)
             {
                 Hero issueOwner = null;
                 List<TextObject> listOfSettlements = new List<TextObject>();

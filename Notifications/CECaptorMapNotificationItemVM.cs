@@ -18,7 +18,7 @@ namespace CaptivityEvents.Notifications
 
         public CECaptorMapNotificationItemVM(CEEvent captorEvent, InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
         {
-            NotificationIdentifier = CESettings.Instance != null && CESettings.Instance.EventCaptorCustomTextureNotifications
+            NotificationIdentifier = CESettings.InstanceToCheck != null && CESettings.InstanceToCheck.EventCaptorCustomTextureNotifications
                 ? "cecaptor"
                 : "death";
             _captorEvent = captorEvent;
@@ -33,7 +33,7 @@ namespace CaptivityEvents.Notifications
         {
             base.ManualRefreshRelevantStatus();
 
-            if (MobileParty.MainParty.Party.PrisonRoster.Count == 0 || PlayerCaptivity.IsCaptive || !CEHelper.notificationCaptorExists || !CESettings.Instance.EventCaptorNotifications)
+            if (MobileParty.MainParty.Party.PrisonRoster.Count == 0 || PlayerCaptivity.IsCaptive || !CEHelper.notificationCaptorExists || !CESettings.InstanceToCheck.EventCaptorNotifications)
             {
                 CEHelper.notificationCaptorExists = false;
                 ExecuteRemove();

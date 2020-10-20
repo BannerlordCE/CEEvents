@@ -27,7 +27,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private void LaunchCaptorEvent()
         {
-            if (CEHelper.notificationCaptorExists) return;
+            if (CEHelper.notificationCaptorExists || CEHelper.progressEventExists) return;
             CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
             CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
 
@@ -80,8 +80,8 @@ namespace CaptivityEvents.CampaignBehaviors
         {
             _hoursPassed++;
 
-            if (CESettings.Instance == null) return false;
-            if (!(_hoursPassed > CESettings.Instance.EventOccurrenceCaptor)) return false;
+            if (CESettings.InstanceToCheck == null) return false;
+            if (!(_hoursPassed > CESettings.InstanceToCheck.EventOccurrenceCaptor)) return false;
             CEHelper.notificationEventCheck = true;
             CEHelper.notificationCaptorCheck = true;
             _hoursPassed = 0;
@@ -104,7 +104,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     ? CEHelper.spouseTwo
                     : CEHelper.spouseOne;
                 CECustomHandler.LogToFile("Added " + hero.Name + "'s Pregenancy");
-                if (CESettings.Instance != null) _heroPregnancies.Add(new Pregnancy(hero, father, CampaignTime.DaysFromNow(CESettings.Instance.PregnancyDurationInDays)));
+                if (CESettings.InstanceToCheck != null) _heroPregnancies.Add(new Pregnancy(hero, father, CampaignTime.DaysFromNow(CESettings.InstanceToCheck.PregnancyDurationInDays)));
             }
             catch (Exception e)
             {
@@ -197,7 +197,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancydue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
                 }
 
-                if (CESettings.Instance != null && CESettings.Instance.PregnancyMessages) InformationManager.DisplayMessage(new InformationMessage(textObject40.ToString(), Colors.Gray));
+                if (CESettings.InstanceToCheck != null && CESettings.InstanceToCheck.PregnancyMessages) InformationManager.DisplayMessage(new InformationMessage(textObject40.ToString(), Colors.Gray));
             }
             catch (Exception e)
             {
@@ -481,7 +481,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private void OnHourlyTick()
         {
-            if (CESettings.Instance.EventCaptorOn && Hero.MainHero.IsPartyLeader && CheckEventHourly())
+            if (CESettings.InstanceToCheck.EventCaptorOn && Hero.MainHero.IsPartyLeader && CheckEventHourly())
             {
                 CECustomHandler.LogToFile("Checking Campaign Events");
 
@@ -489,14 +489,14 @@ namespace CaptivityEvents.CampaignBehaviors
                 {
                     if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
                     {
-                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
+                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.InstanceToCheck.EventCaptorNotifications)
                         {
-                            if (CESettings.Instance.EventRandomEnabled && (!CEHelper.notificationEventExists || !CEHelper.notificationCaptorExists))
+                            if (CESettings.InstanceToCheck.EventRandomEnabled && (!CEHelper.notificationEventExists || !CEHelper.notificationCaptorExists))
                             {
                                 int randomNumber = MBRandom.RandomInt(100);
 
-                                if (!CEHelper.notificationEventExists && randomNumber < CESettings.Instance.EventRandomFireChance) LaunchRandomEvent();
-                                else if (!CEHelper.notificationCaptorExists && randomNumber > CESettings.Instance.EventRandomFireChance) LaunchCaptorEvent();
+                                if (!CEHelper.notificationEventExists && randomNumber < CESettings.InstanceToCheck.EventRandomFireChance) LaunchRandomEvent();
+                                else if (!CEHelper.notificationCaptorExists && randomNumber > CESettings.InstanceToCheck.EventRandomFireChance) LaunchCaptorEvent();
                             }
                             else
                             {
@@ -509,9 +509,9 @@ namespace CaptivityEvents.CampaignBehaviors
                             {
                                 CEEvent returnedEvent;
 
-                                if (CESettings.Instance.EventRandomEnabled)
+                                if (CESettings.InstanceToCheck.EventRandomEnabled)
                                 {
-                                    if (MBRandom.RandomInt(100) < CESettings.Instance.EventRandomFireChance)
+                                    if (MBRandom.RandomInt(100) < CESettings.InstanceToCheck.EventRandomFireChance)
                                     {
                                         returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
 
@@ -553,9 +553,9 @@ namespace CaptivityEvents.CampaignBehaviors
                             }
                         }
                     }
-                    else if (CESettings.Instance.EventRandomEnabled)
+                    else if (CESettings.InstanceToCheck.EventRandomEnabled)
                     {
-                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
+                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.InstanceToCheck.EventCaptorNotifications)
                         {
                             LaunchRandomEvent();
                         }
@@ -618,7 +618,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 CECustomHandler.ForceLogToFile(e.Message + " : " + e);
             }
 
-            if (CESettings.Instance.EventCaptorGearCaptives)
+            if (CESettings.InstanceToCheck.EventCaptorGearCaptives)
             {
                 try
                 {

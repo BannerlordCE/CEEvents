@@ -38,7 +38,7 @@ namespace CaptivityEvents.Issues
             protected override QuestBase GenerateIssueQuest(string questId)
             {
                 float stolenGearDuration = 0.0f; //Set default duration here if needed.
-                if (CESettings.Instance != null) stolenGearDuration = CESettings.Instance.StolenGearDuration;
+                if (CESettings.InstanceToCheck != null) stolenGearDuration = CESettings.InstanceToCheck.StolenGearDuration;
 
                 return new CEWhereAreMyThingsIssueQuest(questId, IssueOwner, CampaignTime.DaysFromNow(stolenGearDuration), RewardGold, new Equipment(Hero.MainHero.BattleEquipment), new Equipment(Hero.MainHero.CivilianEquipment));
             }

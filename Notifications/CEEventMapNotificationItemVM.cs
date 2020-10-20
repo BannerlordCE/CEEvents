@@ -18,7 +18,7 @@ namespace CaptivityEvents.Notifications
 
         public CEEventMapNotificationItemVM(CEEvent randomEvent, InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
         {
-            NotificationIdentifier = CESettings.Instance != null && CESettings.Instance.EventCaptorCustomTextureNotifications
+            NotificationIdentifier = CESettings.InstanceToCheck != null && CESettings.InstanceToCheck.EventCaptorCustomTextureNotifications
                 ? "ceevent"
                 : "vote";
             _randomEvent = randomEvent;
@@ -30,7 +30,7 @@ namespace CaptivityEvents.Notifications
         {
             base.ManualRefreshRelevantStatus();
 
-            if (PlayerCaptivity.IsCaptive || !CEHelper.notificationEventExists || !CESettings.Instance.EventCaptorNotifications)
+            if (PlayerCaptivity.IsCaptive || !CEHelper.notificationEventExists || !CESettings.InstanceToCheck.EventCaptorNotifications)
             {
                 CEHelper.notificationEventExists = false;
                 ExecuteRemove();
