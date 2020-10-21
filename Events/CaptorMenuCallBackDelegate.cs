@@ -104,6 +104,7 @@ namespace CaptivityEvents.Events
 
             Escape();
             GainRandomPrisoners();
+            WoundPrisoner(ref args);
             KillPrisoner(ref args);
 
             JoinParty();
@@ -232,6 +233,26 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.ForceLogToFile("Failure of JoinParty: " + e.ToString());
             }
+        }
+
+        private void WoundPrisoner(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundPrisoner))
+            {
+                if (_listedEvent.Captive.IsHero) _listedEvent.Captive.HeroObject.MakeWounded(Hero.MainHero);
+                else
+                {
+                    PartyBase.MainParty.PrisonRoster.AddToCounts(_listedEvent.Captive, -1);
+                    PartyBase.MainParty.PrisonRoster.AddToCounts(_listedEvent.Captive, 1, false, 1);
+                }
+            }
+
+            // Kill Player
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundCaptor)) Hero.MainHero.MakeWounded(_listedEvent.Captive.HeroObject);
+            // Kill All
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundAllPrisoners)) new CaptorSpecifics().CEWoundPrisoners(args, PartyBase.MainParty.PrisonRoster.Count());
+            // Kill Random
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomPrisoners)) new CaptorSpecifics().CEWoundPrisoners(args);
         }
 
         private void KillPrisoner(ref MenuCallbackArgs args)

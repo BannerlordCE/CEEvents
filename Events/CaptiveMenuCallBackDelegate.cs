@@ -67,7 +67,7 @@ namespace CaptivityEvents.Events
 
         internal void CaptiveConsequenceWaitGameMenu(MenuCallbackArgs args) { }
 
-        internal void CaptiveTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt) //Warning: dt unused.
+        internal void CaptiveTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt)
         {
             int captiveTimeInDays = PlayerCaptivity.CaptiveTimeInDays;
             TextObject text = args.MenuContext.GameMenu.GetText();

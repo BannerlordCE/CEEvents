@@ -451,7 +451,7 @@ namespace CaptivityEvents.Helper
 
                 string searchTerm = null;
 
-                if (CampaignCheats.CheckParameters(strings, 1)) searchTerm = strings[0];
+                if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
                 Hero hero = searchTerm.IsStringNoneOrEmpty()
                     ? Hero.MainHero
@@ -500,7 +500,7 @@ namespace CaptivityEvents.Helper
 
                 string searchTerm = null;
 
-                if (CampaignCheats.CheckParameters(strings, 1)) searchTerm = strings[0];
+                if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
                 Hero hero = searchTerm.IsStringNoneOrEmpty()
                     ? Hero.MainHero
@@ -511,11 +511,12 @@ namespace CaptivityEvents.Helper
                 try
                 {
                     Dynamics d = new Dynamics();
+                    d.ResetCustomSkills(hero);
                     d.VictimProstitutionModifier(0, hero, true);
                     d.VictimProstitutionModifier(0, hero, false, false);
                     d.VictimSlaveryModifier(0, hero, true);
                     d.VictimSlaveryModifier(0, hero, false, false);
-                    CECampaignBehavior.ResetFullData();
+                    if (hero == Hero.MainHero) CECampaignBehavior.ResetFullData();
 
                     return "Successfully reset status";
                 }

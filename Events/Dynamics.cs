@@ -138,12 +138,12 @@ namespace CaptivityEvents.Events
             }
         }
 
-        private void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp, bool display = true)
+        private void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp, bool display = true, bool resetSkill = false)
         {
             if (xp == 0)
             {
                 int currentSkillLevel = hero.GetSkillValue(skillObject);
-                int newNumber = currentSkillLevel + amount;
+                int newNumber = resetSkill ? 0 : currentSkillLevel + amount;
 
                 CESkillNode skillNode = CESkills.FindSkillNode(skill);
                 if (skillNode != null)
@@ -235,6 +235,14 @@ namespace CaptivityEvents.Events
                 default:
                     return Colors.Gray;
 
+            }
+        }
+
+        internal void ResetCustomSkills(Hero hero)
+        {
+            foreach (SkillObject skillObjectCustom in CESkills.CustomSkills)
+            {
+                SkillObjectModifier(skillObjectCustom, PickColor("gray"), hero, skillObjectCustom.StringId, 0, 0, false, true);
             }
         }
 

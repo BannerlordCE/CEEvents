@@ -65,7 +65,11 @@ namespace CaptivityEvents.Custom
         StripPlayer,
         NoInformationMessage,
         NoMessages,
-        JoinCaptor
+        JoinCaptor,
+        WoundPrisoner,
+        WoundCaptor,
+        WoundAllPrisoners,
+        WoundRandomPrisoners
     }
 
     [XmlType(AnonymousType = true)]

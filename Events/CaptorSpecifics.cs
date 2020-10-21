@@ -68,6 +68,24 @@ namespace CaptivityEvents.Events
             }
         }
 
+        internal void CEWoundPrisoners(MenuCallbackArgs args, int amount = 10)
+        {
+            try
+            {
+                int prisonerCount = MobileParty.MainParty.PrisonRoster.Count;
+                if (prisonerCount < amount) amount = prisonerCount;
+                MobileParty.MainParty.PrisonRoster.WoundNumberOfTroopsRandomly(amount);
+                TextObject textObject = GameTexts.FindText("str_CE_wound_prisoners");
+                textObject.SetTextVariable("HERO", Hero.MainHero.Name);
+                textObject.SetTextVariable("AMOUNT", amount);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Couldn't wound any prisoners.");
+            }
+        }
+
         internal void CEKillPrisoners(MenuCallbackArgs args, int amount = 10, bool killHeroes = false)
         {
             try

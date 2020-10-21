@@ -907,8 +907,7 @@ namespace CaptivityEvents.Brothel
         // conversation_town_or_village_player_ask_location_of_hero_2_on_condition
         private bool ConditionalSendBrothelCaptive()
         {
-            CharacterObject characterObject = ConversationSentence.SelectedRepeatObject as CharacterObject;
-            if (characterObject != null)
+            if (ConversationSentence.SelectedRepeatObject is CharacterObject characterObject)
             {
                 StringHelpers.SetCharacterProperties("HERO", characterObject, null, ConversationSentence.SelectedRepeatLine, true);
                 return true;
