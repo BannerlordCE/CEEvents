@@ -192,6 +192,7 @@ namespace CaptivityEvents.Events
             ConsequenceSpawnHero();
             ConsequenceForceMarry();
             ConsequenceChangeClan();
+            ConsequenceChangeKingdom();
             ConsequenceImpregnationByLeader();
             ConsequenceImpregnation();
 
@@ -451,8 +452,6 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceSpecificCaptorSkill(Hero hero)
         {
-            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorSkill)) return;
-
             try
             {
                 int level = 0;
@@ -483,6 +482,8 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
+                    if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorSkill)) return;
+
                     if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(_option.SkillTotal);
                     else if (!_option.SkillXPTotal.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(_option.SkillXPTotal);
                     else if (!_listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.SkillTotal);
@@ -623,7 +624,16 @@ namespace CaptivityEvents.Events
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeClan)) return;
 
             if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.LeaderHero != null) _dynamics.ChangeClan(Hero.MainHero, PlayerCaptivity.CaptorParty.LeaderHero);
-            else if (PlayerCaptivity.CaptorParty != null && CECampaignBehavior.ExtraProps.Owner != null) _dynamics.ChangeClan(CECampaignBehavior.ExtraProps.Owner, Hero.MainHero);
+            else if (PlayerCaptivity.CaptorParty != null && CECampaignBehavior.ExtraProps.Owner != null) _dynamics.ChangeClan(Hero.MainHero, CECampaignBehavior.ExtraProps.Owner);
+        }
+
+        private void ConsequenceChangeKingdom()
+        {
+            if (_option.KingdomOptions == null) return;
+
+            if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.LeaderHero != null) _dynamics.KingdomChange(_option.KingdomOptions, Hero.MainHero, PlayerCaptivity.CaptorParty.LeaderHero);
+            else if (CECampaignBehavior.ExtraProps.Owner != null) _dynamics.KingdomChange(_option.KingdomOptions, Hero.MainHero, CECampaignBehavior.ExtraProps.Owner);
+            else _dynamics.KingdomChange(_option.KingdomOptions, Hero.MainHero, null);
         }
 
         private void ConsequenceForceMarry()

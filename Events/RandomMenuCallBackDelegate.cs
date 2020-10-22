@@ -138,7 +138,6 @@ namespace CaptivityEvents.Events
             SharedCallBackHelper sharedCallBackHelper = new SharedCallBackHelper(_listedEvent, _option);
             CaptorSpecifics captorSpecifics = new CaptorSpecifics();
 
-            //h.ProceedToSharedCallBacks();
             sharedCallBackHelper.ConsequenceXP();
             sharedCallBackHelper.ConsequenceLeaveSpouse();
             sharedCallBackHelper.ConsequenceGold();
@@ -155,6 +154,7 @@ namespace CaptivityEvents.Events
             sharedCallBackHelper.ConsequenceSpawnTroop();
             sharedCallBackHelper.ConsequenceSpawnHero();
 
+            ConsequenceChangeKingdom();
             ConsequenceImpregnation();
             ConsequenceGainRandomPrisoners();
             ConsequenceSoldEvents(ref args);
@@ -432,6 +432,11 @@ namespace CaptivityEvents.Events
         private void ConsequenceGainRandomPrisoners()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GainRandomPrisoners)) _dynamics.CEGainRandomPrisoners(PartyBase.MainParty);
+        }
+
+        private void ConsequenceChangeKingdom()
+        {
+            if (_option.KingdomOptions != null) _dynamics.KingdomChange(_option.KingdomOptions, Hero.MainHero, null);
         }
 
         private void ConsequenceImpregnation()

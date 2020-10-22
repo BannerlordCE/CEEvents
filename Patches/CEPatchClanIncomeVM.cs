@@ -12,7 +12,7 @@ namespace CaptivityEvents.Patches
     {
         public static MethodInfo GetDefaultIncome = AccessTools.Method(typeof(ClanIncomeVM), "GetDefaultIncome");
         public static MethodInfo OnIncomeSelection = AccessTools.Method(typeof(ClanIncomeVM), "OnIncomeSelection");
-
+       
         [HarmonyPrepare]
         private static bool ShouldPatch() => CESettings.InstanceToCheck != null && CESettings.InstanceToCheck.ProstitutionControl;
 

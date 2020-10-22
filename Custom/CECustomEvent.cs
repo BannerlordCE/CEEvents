@@ -235,6 +235,21 @@ namespace CaptivityEvents.Custom
         public string Id { get; set; }
     }
 
+    public class KingdomOption
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Action { get; set; }
+
+        [XmlAttribute()]
+        public string Kingdom { get; set; }
+
+        [XmlAttribute()]
+        public bool HideNotification { get; set; }
+    }
+
     public class SpawnTroop
     {
         [XmlAttribute()]
@@ -436,6 +451,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("SpawnHero", IsNullable = true)]
         public SpawnHero[] SpawnHeroes { get; set; }
+
+        [XmlArrayItem("KingdomOption", IsNullable = true)]
+        public KingdomOption[] KingdomOptions { get; set; }
     }
 
     [DebuggerStepThrough]

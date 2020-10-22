@@ -83,7 +83,7 @@ namespace CaptivityEvents.Events
             {
                 LeaveSpouse(captiveHero);
                 ForceMarry(captiveHero);
-                ChangeClan(captiveHero);
+                ConsequenceChangeClan(captiveHero);
                 SlaveryFlags(captiveHero);
                 SlaveryLevel(captiveHero);
                 ProstitutionFlags(captiveHero);
@@ -99,6 +99,7 @@ namespace CaptivityEvents.Events
                 Strip(captiveHero);
             }
 
+            ConsequenceChangeKingdom(captiveHero);
             ConsequenceSpawnTroop();
             ConsequenceSpawnHero();
 
@@ -364,8 +365,6 @@ namespace CaptivityEvents.Events
 
         private void Skill(Hero captiveHero)
         {
-            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSkill)) return;
-
             try
             {
                 int level = 0;
@@ -395,6 +394,8 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
+                    if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSkill)) return;
+
                     if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(_option.SkillTotal);
                     else if (!_option.SkillXPTotal.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(_option.SkillXPTotal);
                     else if (!_listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.SkillTotal);
@@ -547,8 +548,12 @@ namespace CaptivityEvents.Events
                 new CESpawnSystem().SpawnTheHero(_option.SpawnHeroes, PartyBase.MainParty);
             }
         }
+        private void ConsequenceChangeKingdom(Hero captiveHero)
+        {
+            if (_option.KingdomOptions != null) new Dynamics().KingdomChange(_option.KingdomOptions, captiveHero, Hero.MainHero);
+        }
 
-        private void ChangeClan(Hero captiveHero)
+        private void ConsequenceChangeClan(Hero captiveHero)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeClan)) new Dynamics().ChangeClan(captiveHero, Hero.MainHero);
         }
@@ -622,8 +627,6 @@ namespace CaptivityEvents.Events
 
         private void CaptorSkill()
         {
-            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorSkill)) return;
-
             try
             {
                 int level = 0;
@@ -653,6 +656,8 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
+                    if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorSkill)) return;
+
                     if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(_option.SkillTotal);
                     else if (!_option.SkillXPTotal.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(_option.SkillXPTotal);
                     else if (!_listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.SkillTotal);

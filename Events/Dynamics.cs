@@ -154,7 +154,7 @@ namespace CaptivityEvents.Events
                     if (maxLevel != 0 && newNumber > maxLevel)
                     {
                         newNumber = maxLevel;
-                        amount = maxLevel - currentSkillLevel; 
+                        amount = maxLevel - currentSkillLevel;
                     }
                     else if (newNumber < minLevel)
                     {
@@ -164,8 +164,8 @@ namespace CaptivityEvents.Events
                 }
                 else if (newNumber < 0)
                 {
-                   newNumber = 0;
-                   amount = newNumber - currentSkillLevel;
+                    newNumber = 0;
+                    amount = newNumber - currentSkillLevel;
                 }
 
                 float xpToSet = Campaign.Current.Models.CharacterDevelopmentModel.GetXpRequiredForSkillLevel(newNumber);
@@ -417,6 +417,53 @@ namespace CaptivityEvents.Events
             catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("Failed CEKillPlayer " + e);
+            }
+        }
+
+        internal void KingdomChange(KingdomOption[] kingdomOptions, Hero hero = null, Hero captor = null)
+        {
+            foreach (KingdomOption kingdomOption in kingdomOptions)
+            {
+                try
+                {
+                    Kingdom kingdom = null;
+
+                    if (kingdomOption.Kingdom != null)
+                    {
+                        switch (kingdomOption.Kingdom.ToLower())
+                        {
+                            case "random":
+                                kingdom = Kingdom.All.GetRandomElement();
+                                break;
+                            case "hero":
+                                kingdom = hero.Clan.Kingdom;
+                                break;
+                            case "captor":
+                                kingdom = captor.Clan.Kingdom;
+                                break;
+                            case "settlement":
+                                kingdom = kingdomOption.Ref.ToLower() == "captor" ? captor.CurrentSettlement.OwnerClan.Kingdom : hero.CurrentSettlement.OwnerClan.Kingdom;
+                                break;
+                        }
+                    }
+
+                    switch (kingdomOption.Action.ToLower())
+                    {
+                        case "leave":
+                            ChangeKingdomAction.ApplyByLeaveKingdom(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, !kingdomOption.HideNotification);
+                            break;
+                        case "join":
+                            ChangeKingdomAction.ApplyByJoinToKingdom(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, kingdom, !kingdomOption.HideNotification);
+                            break;
+                        case "joinasmercenary":
+                            ChangeKingdomAction.ApplyByJoinFactionAsMercenary(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, kingdom, 50, !kingdomOption.HideNotification);
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    CECustomHandler.ForceLogToFile("Failed KingdomChange " + e);
+                }
             }
         }
 
