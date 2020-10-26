@@ -49,7 +49,7 @@ namespace CaptivityEvents.Events
         {
             if (MBRandom.Random.Next(100) > escapeChance + new ScoresCalculation().EscapeProwessScore(Hero.MainHero))
             {
-                if (CESettings.InstanceToCheck != null && !CESettings.InstanceToCheck.SexualContent)
+                if (CESettings.Instance != null && !CESettings.Instance.SexualContent)
                 {
                     GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
                                               ? "CE_captivity_escape_failure"
@@ -65,7 +65,7 @@ namespace CaptivityEvents.Events
                 return;
             }
 
-            if (CESettings.InstanceToCheck != null && !CESettings.InstanceToCheck.SexualContent)
+            if (CESettings.Instance != null && !CESettings.Instance.SexualContent)
             {
                 GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
                                           ? "CE_captivity_escape_success"

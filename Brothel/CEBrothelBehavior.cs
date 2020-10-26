@@ -29,8 +29,8 @@ namespace CaptivityEvents.Brothel
         #region GameMenu
         private void AddGameMenus(CampaignGameStarter campaignGameStarter)
         {
-            if (CESettings.InstanceToCheck == null) return;
-            if (!CESettings.InstanceToCheck.ProstitutionControl) return;
+            if (CESettings.Instance == null) return;
+            if (!CESettings.Instance.ProstitutionControl) return;
 
             // Option Added To Town
             campaignGameStarter.AddGameMenuOption("town", "town_brothel", "{=CEEVENTS1100}Go to the brothel district", CanGoToBrothelDistrictOnCondition, delegate { try { GameMenu.SwitchToMenu("town_brothel"); } catch (Exception) { GameMenu.SwitchToMenu("town"); } }, false, 1);
@@ -1217,7 +1217,7 @@ namespace CaptivityEvents.Brothel
                         {
                             new Dynamics().RenownModifier(MBRandom.RandomInt(-10, -1), _brothelList[i].CaptiveProstitutes[y].HeroObject);
 
-                            int numEscapeChance = CESettings.InstanceToCheck.PrisonerHeroEscapeChanceSettlement;
+                            int numEscapeChance = CESettings.Instance.PrisonerHeroEscapeChanceSettlement;
                             if (numEscapeChance == -1) numEscapeChance = 25;
 
                             if (MBRandom.RandomInt(100) < numEscapeChance)
@@ -1229,7 +1229,7 @@ namespace CaptivityEvents.Brothel
                         }
                         else
                         {
-                            int numEscapeChance = CESettings.InstanceToCheck.PrisonerNonHeroEscapeChanceSettlement;
+                            int numEscapeChance = CESettings.Instance.PrisonerNonHeroEscapeChanceSettlement;
                             if (numEscapeChance == -1) numEscapeChance = 25;
 
                             if (MBRandom.RandomInt(100) < numEscapeChance)
@@ -1466,11 +1466,11 @@ namespace CaptivityEvents.Brothel
                                 new Dynamics().RelationsModifier(troopElement.Character.HeroObject, MBRandom.RandomInt(-10, -1), Hero.MainHero, false, true);
                             }
 
-                            if (CESettings.InstanceToCheck.EventProstituteGear)
+                            if (CESettings.Instance.EventProstituteGear)
                             {
                                 CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
 
-                                if (CESettings.InstanceToCheck != null && CESettings.InstanceToCheck.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
+                                if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
 
                                 Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElement();
                                 Equipment randomBattle = new Equipment(false);
@@ -1530,11 +1530,11 @@ namespace CaptivityEvents.Brothel
                 if (prisoner.IsHero)
                 {
                     prisoner.HeroObject.IsNoble = false;
-                    if (CESettings.InstanceToCheck.EventProstituteGear)
+                    if (CESettings.Instance.EventProstituteGear)
                     {
                         CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
 
-                        if (CESettings.InstanceToCheck != null && CESettings.InstanceToCheck.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(prisoner.HeroObject, prisoner.HeroObject.BattleEquipment, prisoner.HeroObject.CivilianEquipment);
+                        if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(prisoner.HeroObject, prisoner.HeroObject.BattleEquipment, prisoner.HeroObject.CivilianEquipment);
 
                         Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElement();
                         Equipment randomBattle = new Equipment(false);

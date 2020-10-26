@@ -1,5 +1,4 @@
 ﻿using MCM.Abstractions.FluentBuilder;
-using MCM.Abstractions.FluentBuilder.Implementation;
 using MCM.Abstractions.Ref;
 using MCM.Abstractions.Settings.Base.Global;
 using System.Collections.Generic;
@@ -11,7 +10,7 @@ namespace CaptivityEvents
 
         private FluentGlobalSettings _settings;
 
-        private static CESettingsFlags _instance;
+        private static CESettingsFlags _instance = null;
 
         public static CESettingsFlags Instance
         {
@@ -27,36 +26,52 @@ namespace CaptivityEvents
 
         public Dictionary<string, bool> CustomFlags { get; set; } = new Dictionary<string, bool>();
 
-
         public void InitializeSettings(List<CECustom> moduleCustoms)
         {
-            ISettingsBuilder builder = new DefaultSettingsBuilder("CaptivityEventsFlags", "Captivity Events Custom Flags")
-                .SetFormat("json")
-                .SetFolderName("zCaptivityEvents")
-                .SetSubFolder("FlagSettings");
+            ISettingsBuilder builder = BaseSettingsBuilder.Create("CaptivityEventsFlags", "Captivity Events Custom Flags");
 
-            foreach (CECustom module in moduleCustoms)
+            if (builder != null)
             {
-                builder.CreateGroup("{=CESETTINGS0090}Custom Flags of " + module.CEModuleName, groupBuilder =>
+                builder.SetFormat("json").SetFolderName("zCaptivityEvents").SetSubFolder("FlagSettings");
+                foreach (CECustom module in moduleCustoms)
+                {
+
+                    builder.CreateGroup("{=CESETTINGS0090}Custom Flags of " + module.CEModuleName, groupBuilder =>
+                    {
+                        foreach (CEFlagNode flag in module.CEFlags)
+                        {
+                            if (!CustomFlags.ContainsKey(flag.Id))
+                            {
+                                CustomFlags.Add(flag.Id, true);
+                                groupBuilder.AddBool(flag.Id, flag.Name, new ProxyRef<bool>(() => CustomFlags[flag.Id], o => CustomFlags[flag.Id] = o), boolBuilder => boolBuilder.SetHintText(flag.HintText));
+                            }
+                        }
+                        foreach (CESkillNode skillNode in module.CESkills)
+                        {
+                            CESkills.AddCustomSkill(skillNode);
+                        }
+                    });
+                }
+                _settings = builder.BuildAsGlobal();
+                _settings.Register();
+            }
+            else
+            {
+                foreach (CECustom module in moduleCustoms)
                 {
                     foreach (CEFlagNode flag in module.CEFlags)
                     {
                         if (!CustomFlags.ContainsKey(flag.Id))
                         {
                             CustomFlags.Add(flag.Id, true);
-                            groupBuilder.AddBool(flag.Id, flag.Name, new ProxyRef<bool>(() => CustomFlags[flag.Id], o => CustomFlags[flag.Id] = o), boolBuilder => boolBuilder.SetHintText(flag.HintText));
                         }
                     }
                     foreach (CESkillNode skillNode in module.CESkills)
                     {
                         CESkills.AddCustomSkill(skillNode);
                     }
-                });
+                }
             }
-
-            _settings = builder.BuildAsGlobal();
-            _settings.Register();
         }
-
     }
 }

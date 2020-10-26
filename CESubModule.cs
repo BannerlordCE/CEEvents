@@ -405,11 +405,19 @@ namespace CaptivityEvents
         {
             base.OnBeforeInitialModuleScreenSetAsRoot();
 
+
             try
             {
-                CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomModule);
+                if (CESettingsFlags.Instance == null)
+                {
+                    CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsFlags missing MCMv4");
+                }
+                else
+                {
+                    CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomModule);
+                }
                 CECustomHandler.ForceLogToFile("Loaded CESettings: "
-                                               + (CESettings.InstanceToCheck != null && CESettings.InstanceToCheck.LogToggle
+                                               + (CESettings.Instance != null && CESettings.Instance.LogToggle
                                                    ? "Logs are enabled."
                                                    : "Extra Event Logs are disabled enable them through settings."));
             }
@@ -430,7 +438,7 @@ namespace CaptivityEvents
                     CECustomHandler.ForceLogToFile("Mod " + id + " uses Harmony version " + version);
                 }
 
-                CECustomHandler.ForceLogToFile(CESettings.InstanceToCheck != null && CESettings.InstanceToCheck.EventCaptorNotifications
+                CECustomHandler.ForceLogToFile(CESettings.Instance != null && CESettings.Instance.EventCaptorNotifications
                                                    ? "Patching Map Notifications: No Conflicts Detected : Enabled."
                                                    : "EventCaptorNotifications: Disabled.");
 
@@ -554,13 +562,13 @@ namespace CaptivityEvents
         {
             if (Campaign.Current == null) return true;
 
-            if (CESettings.InstanceToCheck != null && !CESettings.InstanceToCheck.PrisonerEscapeBehavior) return base.DoLoading(game);
+            if (CESettings.Instance != null && !CESettings.Instance.PrisonerEscapeBehavior) return base.DoLoading(game);
             IMbEvent<Hero> dailyTickHeroEvent = CampaignEvents.DailyTickHeroEvent;
 
             if (dailyTickHeroEvent != null)
             {
                 dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerEscapeCampaignBehavior>());
-                if (CESettings.InstanceToCheck != null && CESettings.InstanceToCheck.EscapeAutoRansom.SelectedIndex != 2) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
+                if (CESettings.Instance != null && CESettings.Instance.EscapeAutoRansom.SelectedIndex != 2) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
             }
 
             IMbEvent<MobileParty> hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
@@ -576,25 +584,25 @@ namespace CaptivityEvents
 
         private void AddBehaviours(CampaignGameStarter campaignStarter)
         {
-            if (CESettings.InstanceToCheck == null) return;
+            if (CESettings.Instance == null) return;
 
             LoadTexture("default", false, true);
 
             campaignStarter.AddBehavior(new CECampaignBehavior());
-            if (CESettings.InstanceToCheck.ProstitutionControl)
+            if (CESettings.Instance.ProstitutionControl)
             {
                 CEBrothelBehavior brothelBehavior = new CEBrothelBehavior();
                 brothelBehavior.OnSessionLaunched(campaignStarter);
                 campaignStarter.AddBehavior(brothelBehavior);
             }
-            if (CESettings.InstanceToCheck.PrisonerEscapeBehavior)
+            if (CESettings.Instance.PrisonerEscapeBehavior)
             {
                 campaignStarter.AddBehavior(new CEPrisonerEscapeCampaignBehavior());
                 campaignStarter.AddBehavior(new CESetPrisonerFreeBarterBehavior());
             }
-            if (CESettings.InstanceToCheck.EventCaptiveOn) ReplaceModel<PlayerCaptivityModel, CEPlayerCaptivityModel>(campaignStarter);
-            if (CESettings.InstanceToCheck.EventCaptorOn && CESettings.InstanceToCheck.EventCaptorDialogue) new CEPrisonerDialogue().AddPrisonerLines(campaignStarter);
-            //if (CESettings.InstanceToCheck.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
+            if (CESettings.Instance.EventCaptiveOn) ReplaceModel<PlayerCaptivityModel, CEPlayerCaptivityModel>(campaignStarter);
+            if (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue) new CEPrisonerDialogue().AddPrisonerLines(campaignStarter);
+            //if (CESettings.Instance.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
 
             if (_isLoadedInGame) CEConsole.ReloadEvents(new List<string>());
             else AddCustomEvents(campaignStarter);
@@ -1014,7 +1022,7 @@ namespace CaptivityEvents
                             break;
 
                         case CEPersistence.HuntState.HeadStart:
-                            if (Mission.Current != null && Mission.Current.Time > CESettings.InstanceToCheck.HuntBegins && Mission.Current.Agents != null)
+                            if (Mission.Current != null && Mission.Current.Time > CESettings.Instance.HuntBegins && Mission.Current.Agents != null)
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
@@ -1049,7 +1057,7 @@ namespace CaptivityEvents
             {
                 CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
                 PlayerEncounter.SetPlayerVictorious();
-                if (CESettings.InstanceToCheck.HuntLetPrisonersEscape) PlayerEncounter.EnemySurrender = true;
+                if (CESettings.Instance.HuntLetPrisonersEscape) PlayerEncounter.EnemySurrender = true;
                 PlayerEncounter.Update();
             }
             else if (CEPersistence.huntState == CEPersistence.HuntState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState)

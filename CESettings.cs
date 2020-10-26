@@ -1,58 +1,143 @@
-﻿using MCM.Abstractions.Attributes;
+﻿using System;
+using System.Collections.Generic;
+using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
-using MCM.Abstractions.Data;
+using MCM.Abstractions.Dropdown;
 using MCM.Abstractions.Settings.Base;
 using MCM.Abstractions.Settings.Base.Global;
-using System;
-using System.Collections.Generic;
 
 namespace CaptivityEvents
 {
-    public class CESettings : AttributeGlobalSettings<CESettings>
+    public interface ICustomSettingsProvider
+    {
+        bool EventCaptiveOn { get; set; }
+        float EventOccurrenceOther { get; set; }
+        float EventOccurrenceSettlement { get; set; }
+        float EventOccurrenceLord { get; set; }
+        bool EventCaptorOn { get; set; }
+        float EventOccurrenceCaptor { get; set; }
+        bool EventCaptorDialogue { get; set; }
+        bool EventCaptorNotifications { get; set; }
+        bool EventCaptorCustomTextureNotifications { get; set; }
+        bool EventRandomEnabled { get; set; }
+        float EventRandomFireChance { get; set; }
+        bool EventCaptorGearCaptives { get; set; }
+        bool EventProstituteGear { get; set; }
+        bool HuntLetPrisonersEscape { get; set; }
+        float HuntBegins { get; set; }
+        int AmountOfTroopsForHunt { get; set; }
+        bool PrisonerEscapeBehavior { get; set; }
+        int PrisonerHeroEscapeChanceParty { get; set; }
+        int PrisonerHeroEscapeChanceSettlement { get; set; }
+        int PrisonerHeroEscapeChanceOther { get; set; }
+        int PrisonerNonHeroEscapeChanceParty { get; set; }
+        int PrisonerNonHeroEscapeChanceSettlement { get; set; }
+        int PrisonerNonHeroEscapeChanceOther { get; set; }
+        DropdownDefault<string> EscapeAutoRansom { get; set; }
+        bool PrisonerExceeded { get; set; }
+        bool NonSexualContent { get; set; }
+        bool SexualContent { get; set; }
+        bool CommonControl { get; set; }
+        bool ProstitutionControl { get; set; }
+        bool SlaveryToggle { get; set; }
+        bool FemdomControl { get; set; }
+        bool BestialityControl { get; set; }
+        bool RomanceControl { get; set; }
+        bool StolenGear { get; set; }
+        bool StolenGearQuest { get; set; }
+        float StolenGearDuration { get; set; }
+        float StolenGearChance { get; set; }
+        int BetterOutFitChance { get; set; }
+        int WeaponChance { get; set; }
+        int WeaponBetterChance { get; set; }
+        bool WeaponSkill { get; set; }
+        int RangedBetterChance { get; set; }
+        bool RangedSkill { get; set; }
+        int HorseChance { get; set; }
+        bool HorseSkill { get; set; }
+        bool PregnancyToggle { get; set; }
+        bool AttractivenessSkill { get; set; }
+        int PregnancyChance { get; set; }
+        bool UsePregnancyModifiers { get; set; }
+        float PregnancyDurationInDays { get; set; }
+        bool PregnancyMessages { get; set; }
+        float RenownMin { get; set; }
+        bool LogToggle { get; set; }
+    }
+
+    public class HardcodedCustomSettings : ICustomSettingsProvider
+    {
+        public bool EventCaptiveOn { get; set; } = true;
+        public float EventOccurrenceOther { get; set; } = 6f;
+        public float EventOccurrenceSettlement { get; set; } = 6f;
+        public float EventOccurrenceLord { get; set; } = 6f;
+        public bool EventCaptorOn { get; set; } = true;
+        public float EventOccurrenceCaptor { get; set; } = 12f;
+        public bool EventCaptorDialogue { get; set; } = true;
+        public bool EventCaptorNotifications { get; set; } = true;
+        public bool EventCaptorCustomTextureNotifications { get; set; } = true;
+        public bool EventRandomEnabled { get; set; } = true;
+        public float EventRandomFireChance { get; set; } = 20f;
+        public bool EventCaptorGearCaptives { get; set; } = true;
+        public bool EventProstituteGear { get; set; } = true;
+        public bool HuntLetPrisonersEscape { get; set; } = false;
+        public float HuntBegins { get; set; } = 7f;
+        public int AmountOfTroopsForHunt { get; set; } = 15;
+        public bool PrisonerEscapeBehavior { get; set; } = true;
+        public int PrisonerHeroEscapeChanceParty { get; set; } = 0;
+        public int PrisonerHeroEscapeChanceSettlement { get; set; } = 0;
+        public int PrisonerHeroEscapeChanceOther { get; set; } = -1;
+        public int PrisonerNonHeroEscapeChanceParty { get; set; } = 0;
+        public int PrisonerNonHeroEscapeChanceSettlement { get; set; } = 0;
+        public int PrisonerNonHeroEscapeChanceOther { get; set; } = -1;
+        public DropdownDefault<string> EscapeAutoRansom { get; set; } = new DropdownDefault<string>(new string[] {
+            "{=CESETTINGS1115}Off",
+            "{=CESETTINGS1114}Disabled For Player",
+            "{=CESETTINGS1116}On"
+        }, 0);
+        public bool PrisonerExceeded { get; set; } = false;
+        public bool NonSexualContent { get; set; } = true;
+        public bool SexualContent { get; set; } = true;
+        public bool CommonControl { get; set; } = true;
+        public bool ProstitutionControl { get; set; } = true;
+        public bool SlaveryToggle { get; set; } = true;
+        public bool FemdomControl { get; set; } = true;
+        public bool BestialityControl { get; set; } = true;
+        public bool RomanceControl { get; set; } = true;
+        public bool StolenGear { get; set; } = true;
+        public bool StolenGearQuest { get; set; } = true;
+        public float StolenGearDuration { get; set; } = 10f;
+        public float StolenGearChance { get; set; } = 99.9f;
+        public int BetterOutFitChance { get; set; } = 25;
+        public int WeaponChance { get; set; } = 75;
+        public int WeaponBetterChance { get; set; } = 20;
+        public bool WeaponSkill { get; set; } = true;
+        public int RangedBetterChance { get; set; } = 5;
+        public bool RangedSkill { get; set; } = true;
+        public int HorseChance { get; set; } = 10;
+        public bool HorseSkill { get; set; } = true;
+        public bool PregnancyToggle { get; set; } = true;
+        public bool AttractivenessSkill { get; set; } = true;
+        public int PregnancyChance { get; set; } = 20;
+        public bool UsePregnancyModifiers { get; set; } = true;
+        public float PregnancyDurationInDays { get; set; } = 14f;
+        public bool PregnancyMessages { get; set; } = true;
+        public float RenownMin { get; set; } = -150f;
+        public bool LogToggle { get; set; } = false;
+    }
+
+    public class CESettingsCustom : AttributeGlobalSettings<CESettingsCustom>, ICustomSettingsProvider
     {
         public override string Id => "CaptivityEventsSettings";
         public override string DisplayName => "Captivity Events";
         public override string FolderName => "zCaptivityEvents";
 
-        private static bool _failed = false;
-
-        private static CESettings _instance = null;
-
-        public static CESettings InstanceToCheck 
-        {
-            get
-            {
-                try
-                {
-                    if (!_failed) {
-                        return Instance ?? new CESettings();
-                    }
-                    else
-                    {
-                        if (_instance == null)
-                        {
-                            _instance = new CESettings();
-                        }
-                        return _instance;
-                    }
-                } catch (Exception)
-                {
-                    if (_instance == null)
-                    {
-                        _instance = new CESettings();
-                    }
-                    _failed = true;
-                    return _instance;
-                }
-            }
-        }
-
         public override IDictionary<string, Func<BaseSettings>> GetAvailablePresets()
         {
             IDictionary<string, Func<BaseSettings>> basePresets = base.GetAvailablePresets(); // include the 'Default' preset that MCM provides
-            basePresets.Add("Developer Mode", () => new CESettings { LogToggle = true });
-            basePresets.Add("Hard Mode", () => new CESettings { StolenGear = true, StolenGearChance = 30f, BetterOutFitChance = 10, RenownMin = -300f });
-            basePresets.Add("Easy Mode", () => new CESettings { StolenGear = false, RenownMin = 0f });
+            basePresets.Add("Developer Mode", () => new CESettingsCustom { LogToggle = true });
+            basePresets.Add("Hard Mode", () => new CESettingsCustom { StolenGear = true, StolenGearChance = 30f, BetterOutFitChance = 10, RenownMin = -300f });
+            basePresets.Add("Easy Mode", () => new CESettingsCustom { StolenGear = false, RenownMin = 0f });
 
             return basePresets;
         }
@@ -80,7 +165,6 @@ namespace CaptivityEvents
         [SettingPropertyFloatingInteger("{=CESETTINGS1008}Event wait between occurances while Captor", 1f, 100f, "#0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1009}How often should an event occur while Captor. (Gametime in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public float EventOccurrenceCaptor { get; set; } = 12f;
-
 
         [SettingPropertyBool("{=CESETTINGS1096}Prisoner Dialogue", Order = 3, RequireRestart = true, HintText = "{=CESETTINGS1097}Overwrites the default prisoner conversation menu.")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
@@ -152,12 +236,11 @@ namespace CaptivityEvents
 
         [SettingPropertyDropdown("{=CESETTINGS1026}Games Default Auto Ransom Behavior", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behaviour regarding auto-ransom")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
-        public DefaultDropdown<string> EscapeAutoRansom { get; set; } = new DefaultDropdown<string>(new string[]
-    {
-        "{=CESETTINGS1115}Off",
-        "{=CESETTINGS1114}Disabled For Player",
-        "{=CESETTINGS1116}On"
-    }, 0);
+        public DropdownDefault<string> EscapeAutoRansom { get; set; } = new DropdownDefault<string>(new string[] {
+            "{=CESETTINGS1115}Off",
+            "{=CESETTINGS1114}Disabled For Player",
+            "{=CESETTINGS1116}On"
+        }, 0);
 
         [SettingPropertyBool("{=CESETTINGS1110}Games Default Exceeded Prisoners System", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1111}Allows the games default behaviour regarding exceeded prisoner system, Hourly escape chance based on default 10% or above chances")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
@@ -277,6 +360,29 @@ namespace CaptivityEvents
 
         [SettingPropertyBool("{=CESETTINGS1088}Logging Toggle (Slows Down The Game)", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1089}Log the events (Debug Mode)")]
         [SettingPropertyGroup("{=CESETTINGS0095}Other")]
-        public bool LogToggle { get; set; }
+        public bool LogToggle { get; set; } = false;
+    }
+
+    public class CESettings
+    {
+        private static ICustomSettingsProvider _provider = null;
+
+        public static ICustomSettingsProvider Instance
+        {
+            get
+            {
+                if (_provider != null) return _provider;
+                if (CESettingsCustom.Instance != null)
+                {
+                    _provider = CESettingsCustom.Instance;
+                }
+                else
+                {
+                    _provider = new HardcodedCustomSettings();
+                }
+                return _provider;
+
+            }
+        }
     }
 }

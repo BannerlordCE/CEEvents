@@ -19,7 +19,7 @@ namespace CaptivityEvents.Patches
             switch (menuId)
             {
                 case "defeated_and_taken_prisoner":
-                    if (CESettings.InstanceToCheck.SexualContent)
+                    if (CESettings.Instance.SexualContent)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner_sexual" : "CE_defeated_and_taken_prisoner_sexual_male");
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner" : "CE_defeated_and_taken_prisoner_male");
@@ -28,7 +28,7 @@ namespace CaptivityEvents.Patches
                         ms1.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
                     break;
                 case "taken_prisoner":
-                    if (CESettings.InstanceToCheck.SexualContent)
+                    if (CESettings.Instance.SexualContent)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner_sexual" : "CE_taken_prisoner_sexual_male");
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner" : "CE_taken_prisoner_male");
@@ -37,7 +37,7 @@ namespace CaptivityEvents.Patches
                         ms2.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
                     break;
                 case "menu_captivity_castle_taken_prisoner":
-                    if (CESettings.InstanceToCheck.SexualContent)
+                    if (CESettings.Instance.SexualContent)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner_sexual" : "CE_menu_captivity_castle_taken_prisoner_sexual_male");
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner" : "CE_menu_captivity_castle_taken_prisoner_male");
@@ -67,7 +67,7 @@ namespace CaptivityEvents.Patches
             switch (menuId)
             {
                 case "defeated_and_taken_prisoner":
-                    if (CESettings.InstanceToCheck.SexualContent)
+                    if (CESettings.Instance.SexualContent)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner_sexual" : "CE_defeated_and_taken_prisoner_sexual_male");
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner" : "CE_defeated_and_taken_prisoner_male");
@@ -76,7 +76,7 @@ namespace CaptivityEvents.Patches
                         ms1.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
                     break;
                 case "taken_prisoner":
-                    if (CESettings.InstanceToCheck.SexualContent)
+                    if (CESettings.Instance.SexualContent)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner_sexual" : "CE_taken_prisoner_sexual_male");
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner" : "CE_taken_prisoner_male");
@@ -85,7 +85,7 @@ namespace CaptivityEvents.Patches
                         ms2.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
                     break;
                 case "menu_captivity_castle_taken_prisoner":
-                    if (CESettings.InstanceToCheck.SexualContent)
+                    if (CESettings.Instance.SexualContent)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner_sexual" : "CE_menu_captivity_castle_taken_prisoner_sexual_male");
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner" : "CE_menu_captivity_castle_taken_prisoner_male");

@@ -492,7 +492,7 @@ namespace CaptivityEvents.Events
             if (hero == null || amount == 0) return;
 
             hero.Clan.Renown += amount;
-            if (CESettings.InstanceToCheck != null && hero.Clan.Renown < CESettings.InstanceToCheck.RenownMin) hero.Clan.Renown = CESettings.InstanceToCheck.RenownMin;
+            if (CESettings.Instance != null && hero.Clan.Renown < CESettings.Instance.RenownMin) hero.Clan.Renown = CESettings.Instance.RenownMin;
 
             TextObject textObject = GameTexts.FindText("str_CE_renown_level");
             textObject.SetTextVariable("HERO", hero.Name);

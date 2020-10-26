@@ -11,7 +11,7 @@ namespace CaptivityEvents.Patches
     internal class CEPatchDefaultClanFinanceModel
     {
         [HarmonyPrepare]
-        private static bool ShouldPatch() => CESettings.InstanceToCheck != null && CESettings.InstanceToCheck.ProstitutionControl;
+        private static bool ShouldPatch() => CESettings.Instance != null && CESettings.Instance.ProstitutionControl;
 
         [HarmonyPostfix]
         private static void CalculateClanIncome(Clan clan, ref ExplainedNumber goldChange, bool applyWithdrawals = false)

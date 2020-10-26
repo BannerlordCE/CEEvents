@@ -343,7 +343,7 @@ namespace CaptivityEvents.Helper
 
                                     if (Game.Current.GameStateManager.ActiveState is MapState mapStateCaptor)
                                     {
-                                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.InstanceToCheck.EventCaptorNotifications)
+                                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
                                         {
                                             LaunchCaptorEvent(returnedEvent);
                                         }
@@ -372,7 +372,7 @@ namespace CaptivityEvents.Helper
 
                         if (Game.Current.GameStateManager.ActiveState is MapState mapStateRandom)
                         {
-                            if (CampaignOptions.IsMapNotificationsEnabled && CESettings.InstanceToCheck.EventCaptorNotifications)
+                            if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
                             {
                                 LaunchRandomEvent(returnedEvent);
                             }

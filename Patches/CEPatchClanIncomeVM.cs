@@ -14,7 +14,7 @@ namespace CaptivityEvents.Patches
         public static MethodInfo OnIncomeSelection = AccessTools.Method(typeof(ClanIncomeVM), "OnIncomeSelection");
        
         [HarmonyPrepare]
-        private static bool ShouldPatch() => CESettings.InstanceToCheck != null && CESettings.InstanceToCheck.ProstitutionControl;
+        private static bool ShouldPatch() => CESettings.Instance != null && CESettings.Instance.ProstitutionControl;
 
         [HarmonyPostfix]
         public static void RefreshList(ClanIncomeVM __instance)
