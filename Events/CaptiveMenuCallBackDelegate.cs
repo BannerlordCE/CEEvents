@@ -90,14 +90,19 @@ namespace CaptivityEvents.Events
         {
             _timer += dt.CurrentHourInDay;
 
+            if (PlayerCaptivity.CaptorParty.IsMobile)
+            {
+                PlayerCaptivity.CaptorParty.MobileParty.SetMoveModeHold();
+            }
+
             if (_timer / _max == 1)
             {
                 CEHelper.progressEventExists = false;
+                PlayerCaptivity.CaptorParty.MobileParty.RecalculateShortTermAi();
             }
 
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
 
-            PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
 
         internal void CaptiveInitWaitGameMenu(MenuCallbackArgs args)
