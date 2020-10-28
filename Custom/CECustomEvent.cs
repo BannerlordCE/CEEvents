@@ -69,7 +69,8 @@ namespace CaptivityEvents.Custom
         WoundPrisoner,
         WoundCaptor,
         WoundAllPrisoners,
-        WoundRandomPrisoners
+        WoundRandomPrisoners,
+        MakeHeroCompanion
     }
 
     [XmlType(AnonymousType = true)]

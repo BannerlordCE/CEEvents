@@ -268,6 +268,13 @@ namespace CaptivityEvents.Events
             }
         }
 
+        internal void CEMakeHeroCompanion(Hero captive)
+        {
+            if (captive == null) return;
+            AddCompanionAction.Apply(Clan.PlayerClan, captive);
+        }
+
+
         public void CEStripVictim(Hero captive)
         {
             if (captive == null) return;

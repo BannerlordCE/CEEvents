@@ -37,7 +37,7 @@ namespace CaptivityEvents.Events
                     {
                         if (num > 0)
                         {
-                            if (troop.Ref == "Troop" || troop.Ref == "troop")
+                            if (troop.Ref != null && troop.Ref.ToLower() == "troop")
                             {
                                 party.MemberRoster.AddToCounts(characterObject, num, false, numWounded, 0, true, -1);
                             }
@@ -62,22 +62,27 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    bool isFemale = (heroVariables.Gender == "Female" || heroVariables.Gender == "female");
+                    bool isFemale = heroVariables.Gender != null && heroVariables.Gender.ToLower() == "female";
 
                     string culture = null;
-                    switch (heroVariables.Culture)
+                    if (heroVariables.Culture != null)
                     {
-                        case "Player":
-                        case "player":
-                            culture = Hero.MainHero.Culture.StringId;
-                            break;
-                        case "Captor":
-                        case "captor":
-                            culture = party.Culture.StringId;
-                            break;
-                        default:
-                            culture = heroVariables.Culture;
-                            break;
+                        switch (heroVariables.Culture.ToLower())
+                        {
+                            case "player":
+                                culture = Hero.MainHero.Culture.StringId;
+                                break;
+                            case "captor":
+                                culture = party.Culture.StringId;
+                                break;
+                            default:
+                                culture = heroVariables.Culture;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        culture = heroVariables.Culture;
                     }
 
                     CharacterObject wanderer = (from x in CharacterObject.Templates
@@ -92,19 +97,21 @@ namespace CaptivityEvents.Events
                     hero.HasMet = true;
                     hero.Clan = randomElement.OwnerClan;
                     hero.ChangeState(Hero.CharacterStates.Active);
-                    switch (heroVariables.Clan)
+                    if (heroVariables.Clan != null)
                     {
-                        case "Captor":
-                        case "captor":
-                            AddCompanionAction.Apply(party.Owner.Clan, hero);
-                            break;
-                        case "Player":
-                        case "player":
-                            AddCompanionAction.Apply(Clan.PlayerClan, hero);
-                            break;
-                        default:
-                            break;
+                        switch (heroVariables.Clan.ToLower())
+                        {
+                            case "captor":
+                                AddCompanionAction.Apply(party.Owner.Clan, hero);
+                                break;
+                            case "player":
+                                AddCompanionAction.Apply(Clan.PlayerClan, hero);
+                                break;
+                            default:
+                                break;
+                        }
                     }
+
                     CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
 
                     try
@@ -122,7 +129,8 @@ namespace CaptivityEvents.Events
                                 new Dynamics().SkillModifier(hero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                             }
                         }
-                    } catch (Exception e)
+                    }
+                    catch (Exception e)
                     {
                         CECustomHandler.ForceLogToFile("Failed to level spawning Hero" + e);
                     }
