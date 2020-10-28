@@ -1,5 +1,6 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
+using CaptivityEvents.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,13 @@ namespace CaptivityEvents.Events
         private readonly CEEvent _listedEvent;
         private readonly List<CEEvent> _eventList;
         private readonly Option _option;
+        private readonly CaptorSpecifics _captor = new CaptorSpecifics();
+
+        private readonly CEVariablesLoader _variableLoader = new CEVariablesLoader();
+
+        private float _timer = 0;
+        private float _max = 0;
+        private float _currentProgress = 0;
 
         internal CaptorMenuCallBackDelegate(CEEvent listedEvent) => _listedEvent = listedEvent;
 
@@ -26,6 +34,70 @@ namespace CaptivityEvents.Events
             _option = option;
             _eventList = eventList;
         }
+
+
+        internal void CaptorProgressInitWaitGameMenu(MenuCallbackArgs args)
+        {
+            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                       ? "wait_captive_female"
+                                       : "wait_captive_male");
+
+            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default_random");
+
+            MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
+                                            ? 1
+                                            : 0);
+
+            if (_listedEvent.ProgressEvent != null)
+            {
+                args.MenuContext.GameMenu.AllowWaitingAutomatically();
+                _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);
+                _timer = 0f;
+                _currentProgress = 0f;
+
+                CEHelper.progressEventExists = true;
+                CEHelper.notificationCaptorExists = false;
+                CEHelper.notificationEventExists = false;
+            }
+            else
+            {
+                CECustomHandler.ForceLogToFile("Missing Progress Event Settings in " + _listedEvent.Name);
+            }
+        }
+
+        internal bool CaptorProgressConditionWaitGameMenu(MenuCallbackArgs args)
+        {
+            args.MenuContext.GameMenu.AllowWaitingAutomatically();
+            args.optionLeaveType = GameMenuOption.LeaveType.Wait;
+            return true;
+        }
+
+        internal void CaptorProgressConsequenceWaitGameMenu(MenuCallbackArgs args)
+        {
+            if (_listedEvent.ProgressEvent.TriggerEvents != null && _listedEvent.ProgressEvent.TriggerEvents.Length > 0)
+            {
+                ConsequenceRandomEventTriggerProgress(ref args);
+            }
+            else if (!string.IsNullOrEmpty(_listedEvent.ProgressEvent.TriggerEventName))
+            {
+                ConsequenceSingleEventTriggerProgress(ref args);
+            }
+        }
+
+        internal void CaptorProgressTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt)
+        {
+            _timer += dt.CurrentHourInDay;
+
+            if (_timer / _max == 1)
+            {
+                CEHelper.progressEventExists = false;
+            }
+
+            args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
+
+            PartyBase.MainParty.MobileParty.SetMoveModeHold();
+        }
+
 
         internal void CaptorEventWaitGameMenu(MenuCallbackArgs args)
         {
@@ -115,102 +187,199 @@ namespace CaptivityEvents.Events
                 if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
                 InventoryManager.OpenScreenAsInventoryOf(Hero.MainHero.PartyBelongedTo.Party.MobileParty, captiveHero.CharacterObject);
             }
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners)) { new CaptorSpecifics().CEPrisonerRebel(args); }
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.HuntPrisoners)) { new CaptorSpecifics().CEHuntPrisoners(args); }
-            else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0)
-            {
-                List<CEEvent> eventNames = new List<CEEvent>();
-
-                try
-                {
-                    foreach (TriggerEvent triggerEvent in _option.TriggerEvents)
-                    {
-                        CEEvent triggeredEvent = _eventList.Find(item => item.Name == triggerEvent.EventName);
-
-                        if (triggeredEvent == null)
-                        {
-                            CECustomHandler.ForceLogToFile("Couldn't find " + triggerEvent.EventName + " in events.");
-                            InformationManager.DisplayMessage(new InformationMessage("Couldn't find " + triggerEvent.EventName + " in events.", Colors.Red));
-                            continue;
-                        }
-
-                        if (!triggerEvent.EventUseConditions.IsStringNoneOrEmpty() && triggerEvent.EventUseConditions.ToLower() == "true")
-                        {
-                            string conditionMatched = null;
-                            if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
-                            {
-                                conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(_listedEvent.Captive, PartyBase.MainParty);
-                            }
-                            else if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
-                            {
-                                conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
-                            }
-
-                            if (conditionMatched != null)
-                            {
-                                CECustomHandler.LogToFile(conditionMatched);
-                                continue;
-                            }
-                        }
-
-                        int weightedChance = 1;
-
-                        try
-                        {
-                            weightedChance = new CEVariablesLoader().GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
-                                                                         ? triggerEvent.EventWeight
-                                                                         : triggeredEvent.WeightedChanceOfOccuring);
-                        }
-                        catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
-
-                        for (int a = weightedChance; a > 0; a--) eventNames.Add(triggeredEvent);
-                    }
-
-                    if (eventNames.Count > 0)
-                    {
-                        int number = MBRandom.Random.Next(0, eventNames.Count - 1);
-
-                        try
-                        {
-                            CEEvent triggeredEvent = eventNames[number];
-                            triggeredEvent.Captive = _listedEvent.Captive;
-                            GameMenu.ActivateGameMenu(triggeredEvent.Name);
-                        }
-                        catch (Exception)
-                        {
-                            CECustomHandler.ForceLogToFile("Couldn't find " + eventNames[number] + " in events.");
-                            InformationManager.DisplayMessage(new InformationMessage("Couldn't find " + eventNames[number] + " in events.", Colors.Red));
-                            new CaptorSpecifics().CECaptorContinue(args);
-                        }
-                    }
-                    else { new CaptorSpecifics().CECaptorContinue(args); }
-                }
-                catch (Exception)
-                {
-                    CECustomHandler.LogToFile("MBRandom.Random in events Failed.");
-                    new CaptorSpecifics().CECaptorContinue(args);
-                }
-            }
-            else if (!string.IsNullOrEmpty(_option.TriggerEventName))
-            {
-                try
-                {
-                    CEEvent triggeredEvent = _eventList.Find(item => item.Name == _option.TriggerEventName);
-                    triggeredEvent.Captive = _listedEvent.Captive;
-                    GameMenu.SwitchToMenu(triggeredEvent.Name);
-                }
-                catch (Exception)
-                {
-                    CECustomHandler.ForceLogToFile("Couldn't find " + _option.TriggerEventName + " in events.");
-                    InformationManager.DisplayMessage(new InformationMessage("Couldn't find " + _option.TriggerEventName + " in events.", Colors.Red));
-                    new CaptorSpecifics().CECaptorContinue(args);
-                }
-            }
-            else { new CaptorSpecifics().CECaptorContinue(args); }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners)) { _captor.CEPrisonerRebel(args); }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.HuntPrisoners)) { _captor.CEHuntPrisoners(args); }
+            else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0) ConsequenceRandomEventTrigger(ref args);
+            else if (!string.IsNullOrEmpty(_option.TriggerEventName)) ConsequenceSingleEventTrigger(ref args);
+            else { _captor.CECaptorContinue(args); }
         }
 
 
         #region private
+
+
+        private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
+        {
+            List<CEEvent> eventNames = new List<CEEvent>();
+
+            try
+            {
+                foreach (TriggerEvent triggerEvent in _listedEvent.ProgressEvent.TriggerEvents)
+                {
+                    CEEvent triggeredEvent = _eventList.Find(item => item.Name == triggerEvent.EventName);
+
+                    if (triggeredEvent == null)
+                    {
+                        CECustomHandler.ForceLogToFile("Couldn't find " + triggerEvent.EventName + " in events.");
+                        InformationManager.DisplayMessage(new InformationMessage("Couldn't find " + triggerEvent.EventName + " in events.", Colors.Red));
+                        continue;
+                    }
+
+                    if (!triggerEvent.EventUseConditions.IsStringNoneOrEmpty() && triggerEvent.EventUseConditions.ToLower() == "true")
+                    {
+                        string conditionMatched = null;
+                        if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                        {
+                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(_listedEvent.Captive, PartyBase.MainParty);
+                        }
+                        else if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                        {
+                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                        }
+
+                        if (conditionMatched != null)
+                        {
+                            CECustomHandler.LogToFile(conditionMatched);
+                            continue;
+                        }
+                    }
+
+                    int weightedChance = 1;
+
+                    try
+                    {
+                        weightedChance = _variableLoader.GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
+                                                                     ? triggerEvent.EventWeight
+                                                                     : triggeredEvent.WeightedChanceOfOccuring);
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
+
+                    for (int a = weightedChance; a > 0; a--) eventNames.Add(triggeredEvent);
+                }
+
+                if (eventNames.Count > 0)
+                {
+                    int number = MBRandom.Random.Next(0, eventNames.Count - 1);
+
+                    try
+                    {
+                        CEEvent triggeredEvent = eventNames[number];
+                        triggeredEvent.Captive = _listedEvent.Captive;
+                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
+                    }
+                    catch (Exception)
+                    {
+                        CECustomHandler.ForceLogToFile("Couldn't find " + eventNames[number] + " in events.");
+                        InformationManager.DisplayMessage(new InformationMessage("Couldn't find " + eventNames[number] + " in events.", Colors.Red));
+                        _captor.CECaptorContinue(args);
+                    }
+                }
+                else { _captor.CECaptorContinue(args); }
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("MBRandom.Random in events Failed.");
+                _captor.CECaptorContinue(args);
+            }
+        }
+
+        private void ConsequenceSingleEventTriggerProgress(ref MenuCallbackArgs args)
+        {
+            try
+            {
+                CEEvent triggeredEvent = _eventList.Find(item => item.Name == _listedEvent.ProgressEvent.TriggerEventName);
+                triggeredEvent.Captive = _listedEvent.Captive;
+                GameMenu.SwitchToMenu(triggeredEvent.Name);
+            }
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Couldn't find " + _listedEvent.ProgressEvent.TriggerEventName + " in events.");
+                InformationManager.DisplayMessage(new InformationMessage("Couldn't find " + _option.TriggerEventName + " in events.", Colors.Red));
+                _captor.CECaptorContinue(args);
+            }
+        }
+
+
+        private void ConsequenceRandomEventTrigger(ref MenuCallbackArgs args)
+        {
+            List<CEEvent> eventNames = new List<CEEvent>();
+
+            try
+            {
+                foreach (TriggerEvent triggerEvent in _option.TriggerEvents)
+                {
+                    CEEvent triggeredEvent = _eventList.Find(item => item.Name == triggerEvent.EventName);
+
+                    if (triggeredEvent == null)
+                    {
+                        CECustomHandler.ForceLogToFile("Couldn't find " + triggerEvent.EventName + " in events.");
+                        InformationManager.DisplayMessage(new InformationMessage("Couldn't find " + triggerEvent.EventName + " in events.", Colors.Red));
+                        continue;
+                    }
+
+                    if (!triggerEvent.EventUseConditions.IsStringNoneOrEmpty() && triggerEvent.EventUseConditions.ToLower() == "true")
+                    {
+                        string conditionMatched = null;
+                        if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                        {
+                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(_listedEvent.Captive, PartyBase.MainParty);
+                        }
+                        else if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                        {
+                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                        }
+
+                        if (conditionMatched != null)
+                        {
+                            CECustomHandler.LogToFile(conditionMatched);
+                            continue;
+                        }
+                    }
+
+                    int weightedChance = 1;
+
+                    try
+                    {
+                        weightedChance = _variableLoader.GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
+                                                                     ? triggerEvent.EventWeight
+                                                                     : triggeredEvent.WeightedChanceOfOccuring);
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
+
+                    for (int a = weightedChance; a > 0; a--) eventNames.Add(triggeredEvent);
+                }
+
+                if (eventNames.Count > 0)
+                {
+                    int number = MBRandom.Random.Next(0, eventNames.Count - 1);
+
+                    try
+                    {
+                        CEEvent triggeredEvent = eventNames[number];
+                        triggeredEvent.Captive = _listedEvent.Captive;
+                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
+                    }
+                    catch (Exception)
+                    {
+                        CECustomHandler.ForceLogToFile("Couldn't find " + eventNames[number] + " in events.");
+                        InformationManager.DisplayMessage(new InformationMessage("Couldn't find " + eventNames[number] + " in events.", Colors.Red));
+                        _captor.CECaptorContinue(args);
+                    }
+                }
+                else { _captor.CECaptorContinue(args); }
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("MBRandom.Random in events Failed.");
+                _captor.CECaptorContinue(args);
+            }
+        }
+
+        private void ConsequenceSingleEventTrigger(ref MenuCallbackArgs args)
+        {
+            try
+            {
+                CEEvent triggeredEvent = _eventList.Find(item => item.Name == _option.TriggerEventName);
+                triggeredEvent.Captive = _listedEvent.Captive;
+                GameMenu.SwitchToMenu(triggeredEvent.Name);
+            }
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Couldn't find " + _option.TriggerEventName + " in events.");
+                InformationManager.DisplayMessage(new InformationMessage("Couldn't find " + _option.TriggerEventName + " in events.", Colors.Red));
+                _captor.CECaptorContinue(args);
+            }
+        }
 
         private void JoinParty()
         {

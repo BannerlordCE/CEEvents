@@ -35,7 +35,7 @@ namespace CaptivityEvents.Events
             _eventList = eventList;
         }
 
-        internal void RandomInitWaitGameMenu(MenuCallbackArgs args)
+        internal void RandomProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
             args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                        ? "wait_captive_female"
@@ -53,20 +53,24 @@ namespace CaptivityEvents.Events
                 _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);
                 _timer = 0f;
                 _currentProgress = 0f;
+
+                CEHelper.progressEventExists = true;
+                CEHelper.notificationCaptorExists = false;
+                CEHelper.notificationEventExists = false;
             }
             else
             {
                 CECustomHandler.ForceLogToFile("Missing Progress Event Settings in " + _listedEvent.Name);
             }
         }
-        internal bool RandomConditionWaitGameMenu(MenuCallbackArgs args)
+        internal bool RandomProgressConditionWaitGameMenu(MenuCallbackArgs args)
         {
             args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
 
-        internal void RandomConsequenceWaitGameMenu(MenuCallbackArgs args)
+        internal void RandomProgressConsequenceWaitGameMenu(MenuCallbackArgs args)
         {
             if (_listedEvent.ProgressEvent.TriggerEvents != null && _listedEvent.ProgressEvent.TriggerEvents.Length > 0)
             {
@@ -78,10 +82,18 @@ namespace CaptivityEvents.Events
             }
         }
 
-        internal void RandomTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt)
+        internal void RandomProgressTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt)
         {
             _timer += dt.CurrentHourInDay;
+
+            if (_timer / _max == 1)
+            {
+                CEHelper.progressEventExists = false;
+            }
+
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
+
+            PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
 
         internal void RandomEventGameMenu(MenuCallbackArgs menuCallbackArgs)
@@ -258,6 +270,7 @@ namespace CaptivityEvents.Events
                 new CaptorSpecifics().CECaptorContinue(args);
             }
         }
+       
         private void ConsequenceSingleEventTrigger(ref MenuCallbackArgs args)
         {
             try

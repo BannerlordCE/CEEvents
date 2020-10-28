@@ -54,7 +54,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private void LaunchRandomEvent()
         {
-            if (CEHelper.notificationEventExists) return;
+            if (CEHelper.notificationEventExists || CEHelper.progressEventExists) return;
             CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
             if (returnedEvent == null) return;
             CEHelper.notificationEventExists = true;
@@ -78,6 +78,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private bool CheckEventHourly()
         {
+            if (CEHelper.progressEventExists) return false;
             _hoursPassed++;
 
             if (CESettings.Instance == null) return false;
@@ -85,7 +86,6 @@ namespace CaptivityEvents.CampaignBehaviors
             CEHelper.notificationEventCheck = true;
             CEHelper.notificationCaptorCheck = true;
             _hoursPassed = 0;
-
             return true;
         }
 
@@ -734,6 +734,8 @@ namespace CaptivityEvents.CampaignBehaviors
                 CEHelper.notificationEventCheck = false;
                 CEHelper.notificationCaptorExists = false;
                 CEHelper.notificationEventExists = false;
+
+                CEHelper.progressEventExists = false;
             }
 
             [SaveableField(1)]

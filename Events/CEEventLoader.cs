@@ -12,7 +12,7 @@ namespace CaptivityEvents.Events
         // Waiting Menus
         public static string CEWaitingList() => new WaitingList().CEWaitingList();
 
-        // 
+        // CEProgressMode
         private static GameMenu.MenuAndOptionType CEProgressMode(int state)
         {
             switch (state)
@@ -36,10 +36,10 @@ namespace CaptivityEvents.Events
             {
                 gameStarter.AddWaitGameMenu(listedEvent.Name,
                     listedEvent.Text,
-                    rcb.RandomInitWaitGameMenu,
-                    rcb.RandomConditionWaitGameMenu,
-                    rcb.RandomConsequenceWaitGameMenu,
-                    rcb.RandomTickWaitGameMenu,
+                    rcb.RandomProgressInitWaitGameMenu,
+                    rcb.RandomProgressConditionWaitGameMenu,
+                    rcb.RandomProgressConsequenceWaitGameMenu,
+                    rcb.RandomProgressTickWaitGameMenu,
                     CEProgressMode(variablesLoader.GetIntFromXML(listedEvent.ProgressEvent.DisplayProgressMode)),
                     TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
                     variablesLoader.GetFloatFromXML(listedEvent.ProgressEvent.TimeToTake),
@@ -79,7 +79,21 @@ namespace CaptivityEvents.Events
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
             CaptiveMenuCallBackDelegate cb = new CaptiveMenuCallBackDelegate(listedEvent);
 
-            if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
+            if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
+            {
+                gameStarter.AddWaitGameMenu(listedEvent.Name,
+                    listedEvent.Text,
+                    cb.CaptiveProgressInitWaitGameMenu,
+                    cb.CaptiveProgressConditionWaitGameMenu,
+                    cb.CaptiveProgressConsequenceWaitGameMenu,
+                    cb.CaptiveProgressTickWaitGameMenu,
+                    CEProgressMode(variablesLoader.GetIntFromXML(listedEvent.ProgressEvent.DisplayProgressMode)),
+                    TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
+                    variablesLoader.GetFloatFromXML(listedEvent.ProgressEvent.TimeToTake),
+                    GameMenu.MenuFlags.none,
+                    "CEEVENTS");
+            }
+            else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
             {
                 gameStarter.AddWaitGameMenu(
                     listedEvent.Name,
@@ -126,14 +140,32 @@ namespace CaptivityEvents.Events
         public static void CELoadCaptorEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
+            CaptorMenuCallBackDelegate cb = new CaptorMenuCallBackDelegate(listedEvent);
 
-            gameStarter.AddGameMenu(
+            if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
+            {
+                gameStarter.AddWaitGameMenu(listedEvent.Name,
+                    listedEvent.Text,
+                    cb.CaptorProgressInitWaitGameMenu,
+                    cb.CaptorProgressConditionWaitGameMenu,
+                    cb.CaptorProgressConsequenceWaitGameMenu,
+                    cb.CaptorProgressTickWaitGameMenu,
+                    CEProgressMode(variablesLoader.GetIntFromXML(listedEvent.ProgressEvent.DisplayProgressMode)),
+                    TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
+                    variablesLoader.GetFloatFromXML(listedEvent.ProgressEvent.TimeToTake),
+                    GameMenu.MenuFlags.none,
+                    "CEEVENTS");
+            }
+            else
+            {
+                gameStarter.AddGameMenu(
                 listedEvent.Name,
                 listedEvent.Text,
-                new CaptorMenuCallBackDelegate(listedEvent).CaptorEventWaitGameMenu,
+                cb.CaptorEventWaitGameMenu,
                 TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
                 GameMenu.MenuFlags.none,
                 "CEEVENTS");
+            }
 
             List<Option> sorted = listedEvent.Options.OrderBy(item => variablesLoader.GetIntFromXML(item.Order)).ToList(); // Sort Options
 
