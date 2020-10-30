@@ -704,15 +704,15 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddDialogLine("ce_drink_menu_00_01", "ce_drink_menu_00", "ce_drink_menu_01", "{=CEBROTHEL1080}I recommend the wine, {?PLAYER.GENDER}milady{?}my lord{\\?}. These last few bottles've been quite popular among the other patrons. We also have ale and mead.", () => { return RandomizeConversation(3); }, null);
             campaignGameStarter.AddDialogLine("ce_drink_menu_00_02", "ce_drink_menu_00", "ce_drink_menu_01", "{=CEBROTHEL1089}Care for a mug of fresh ale, {?PLAYER.GENDER}milady{?}my lord{\\?}? We also have mead and wine.", null, null);
 
-            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_00", "ce_drink_menu_01", "ce_response_drink", "{=CEBROTHEL1087}I will have the mead.", () => { return !ConversationWithMaidIsOwner(); }, null);
-            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_01", "ce_drink_menu_01", "ce_response_drink", "{=CEBROTHEL1088}I will have the wine.", () => { return !ConversationWithMaidIsOwner(); }, null);
-            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_02", "ce_drink_menu_01", "ce_response_drink", "{=CEBROTHEL1090}I will have the ale.", () => { return !ConversationWithMaidIsOwner(); }, null);
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_00", "ce_drink_menu_01", "ce_maid_business_drink", "{=CEBROTHEL1087}I will have the mead.", () => { return !ConversationWithMaidIsOwner(); }, null);
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_01", "ce_drink_menu_01", "ce_maid_business_drink", "{=CEBROTHEL1088}I will have the wine.", () => { return !ConversationWithMaidIsOwner(); }, null);
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_02", "ce_drink_menu_01", "ce_maid_business_drink", "{=CEBROTHEL1090}I will have the ale.", () => { return !ConversationWithMaidIsOwner(); }, null);
 
             campaignGameStarter.AddPlayerLine("ce_drink_menu_01_00", "ce_drink_menu_01", "ce_maid_business_complete_owner", "{=CEBROTHEL1087}I will have the mead.", () => { return ConversationWithMaidIsOwner(); }, ConversationBoughtDrink);
             campaignGameStarter.AddPlayerLine("ce_drink_menu_01_01", "ce_drink_menu_01", "ce_maid_business_complete_owner", "{=CEBROTHEL1088}I will have the wine.", () => { return ConversationWithMaidIsOwner(); }, ConversationBoughtDrink);
             campaignGameStarter.AddPlayerLine("ce_drink_menu_01_02", "ce_drink_menu_01", "ce_maid_business_complete_owner", "{=CEBROTHEL1090}I will have the ale.", () => { return ConversationWithMaidIsOwner(); }, ConversationBoughtDrink);
 
-            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_03", "ce_drink_menu_02", "ce_repeat_maid", "{=CEBROTHEL1011}Uh, nevermind.", null, null);
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_03", "ce_drink_menu_01", "ce_repeat_maid", "{=CEBROTHEL1011}Uh, nevermind.", null, null);
 
             // Specific
             campaignGameStarter.AddDialogLine("ce_specific_00_00", "ce_specific_00", "ce_repeat_maid", "{=CEBROTHEL1084}Looking for someone specific? I'm sure your assistant will be happy to direct you, {?PLAYER.GENDER}milady{?}my lord{\\?}.", ConversationWithMaidIsOwner, null);
