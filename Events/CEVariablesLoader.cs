@@ -27,17 +27,14 @@ namespace CaptivityEvents.Events
                             number = numberOne < numberTwo
                                 ? MBRandom.RandomInt(numberOne, numberTwo)
                                 : MBRandom.RandomInt(numberTwo, numberOne);
-
                             break;
 
                         case 2:
                             number = MBRandom.RandomInt(int.Parse(splitPass[1]));
-
                             break;
 
                         default:
                             number = MBRandom.RandomInt();
-
                             break;
                     }
                 }

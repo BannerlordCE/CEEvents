@@ -421,11 +421,11 @@ namespace CaptivityEvents.Events
                 }
             }
 
-            // Kill Player
+            // Wound Player
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundCaptor)) Hero.MainHero.MakeWounded(_listedEvent.Captive.HeroObject);
-            // Kill All
+            // Wound All
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundAllPrisoners)) _captor.CEWoundPrisoners(args, PartyBase.MainParty.PrisonRoster.Count());
-            // Kill Random
+            // Wound Random
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomPrisoners)) _captor.CEWoundPrisoners(args);
         }
 

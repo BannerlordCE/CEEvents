@@ -682,7 +682,51 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddDialogLine("tprostitute_service_01_no_response_id", "tprostitute_service_01_no_response", "close_window", "{=CEBROTHEL1052}Ugh...[ib:closed][rb:unsure]", null, null);
 
             // Maid Dialogue 00
-            // TODO WRITEUP DIALOGUES HERE
+            campaignGameStarter.AddDialogLine("ce_maid_talk_00", "start", "ce_maid_response_00", "{=CEBROTHEL1097}Hello {?PLAYER.GENDER}milady{?}my lord{\\?}, what can I get for you?", () => { return RandomizeConversation(2) && ConversationWithMaid(); }, null);
+
+            campaignGameStarter.AddPlayerLine("ce_maid_response_00_00", "ce_maid_response_00", "ce_drink_menu_00", "{=CEBROTHEL1086}I am looking for something to drink. What do you have?", null, null);
+            campaignGameStarter.AddPlayerLine("ce_maid_response_00_01", "ce_maid_response_00", "ce_specific_00", "{=CEBROTHEL1083}I'm looking for someone specific.", null, null);
+
+            campaignGameStarter.AddPlayerLine("ce_maid_response_00_02", "ce_maid_response_00", "ce_maid_exit_00", "{=CEBROTHEL1055}I don't need anything at the moment.", null, null);
+
+            // Maid Dialogue 01
+            campaignGameStarter.AddDialogLine("ce_maid_talk_01", "start", "ce_maid_response_01", "{=CEBROTHEL1078}Would you like something to drink, {?PLAYER.GENDER}milady{?}my lord{\\?}?", ConversationWithMaid, null);
+
+            campaignGameStarter.AddPlayerLine("ce_maid_response_01_00", "ce_maid_response_01", "ce_drink_menu_00", "{=CEBROTHEL1086}Yes, what would you recommend?", null, null);
+            campaignGameStarter.AddPlayerLine("ce_maid_response_01_01", "ce_maid_response_01", "ce_specific_00", "{=CEBROTHEL1083}I'm looking for someone specific.", null, null);
+            campaignGameStarter.AddPlayerLine("ce_maid_response_01_02", "ce_maid_response_01", "ce_maid_exit_00", "{=CEBROTHEL1028}No thanks.", null, null);
+
+            // Maid Dialogue 02
+            campaignGameStarter.AddDialogLine("ce_maid_talk_02", "ce_repeat_maid", "ce_maid_response_00", "{=CEBROTHEL0981}Anything else {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", null, null);
+
+            // Drink
+            campaignGameStarter.AddDialogLine("ce_drink_menu_00_00", "ce_drink_menu_00", "ce_drink_menu_01", "{=CEBROTHEL1079}I recommend the mead, {?PLAYER.GENDER}milady{?}my lord{\\?}. Finished brewing just this morning. We also have ale and wine.", () => { return RandomizeConversation(3);  }, null);
+            campaignGameStarter.AddDialogLine("ce_drink_menu_00_01", "ce_drink_menu_00", "ce_drink_menu_01", "{=CEBROTHEL1080}I recommend the wine, {?PLAYER.GENDER}milady{?}my lord{\\?}. These last few bottles've been quite popular among the other patrons. We also have ale and mead.", () => { return RandomizeConversation(3); }, null);
+            campaignGameStarter.AddDialogLine("ce_drink_menu_00_02", "ce_drink_menu_00", "ce_drink_menu_01", "{=CEBROTHEL1089}Care for a mug of fresh ale, {?PLAYER.GENDER}milady{?}my lord{\\?}? We also have mead and wine.", null, null);
+
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_00", "ce_drink_menu_01", "ce_response_drink", "{=CEBROTHEL1087}I will have the mead.", () => { return !ConversationWithMaidIsOwner(); }, null);
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_01", "ce_drink_menu_01", "ce_response_drink", "{=CEBROTHEL1088}I will have the wine.", () => { return !ConversationWithMaidIsOwner(); }, null);
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_02", "ce_drink_menu_01", "ce_response_drink", "{=CEBROTHEL1090}I will have the ale.", () => { return !ConversationWithMaidIsOwner(); }, null);
+
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_00", "ce_drink_menu_01", "ce_maid_business_complete_owner", "{=CEBROTHEL1087}I will have the mead.", () => { return ConversationWithMaidIsOwner(); }, ConversationBoughtDrink);
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_01", "ce_drink_menu_01", "ce_maid_business_complete_owner", "{=CEBROTHEL1088}I will have the wine.", () => { return ConversationWithMaidIsOwner(); }, ConversationBoughtDrink);
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_02", "ce_drink_menu_01", "ce_maid_business_complete_owner", "{=CEBROTHEL1090}I will have the ale.", () => { return ConversationWithMaidIsOwner(); }, ConversationBoughtDrink);
+
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_03", "ce_drink_menu_02", "ce_repeat_maid", "{=CEBROTHEL1011}Uh, nevermind.", null, null);
+
+            // Specific
+            campaignGameStarter.AddDialogLine("ce_specific_00_00", "ce_specific_00", "ce_repeat_maid", "{=CEBROTHEL1084}Looking for someone specific? I'm sure your assistant will be happy to direct you, {?PLAYER.GENDER}milady{?}my lord{\\?}.", ConversationWithMaidIsOwner, null);
+            campaignGameStarter.AddDialogLine("ce_specific_00_01", "ce_specific_00", "ce_repeat_maid", "{=CEBROTHEL1085}Looking for someone specific? I'm sure the owner will be happy to direct you, {?PLAYER.GENDER}milady{?}my lord{\\?}.", null, null);
+
+            // Response Drink 
+            campaignGameStarter.AddDialogLine("ce_maid_business_drink_response", "ce_maid_business_drink", "ce_maid_business_drink_00", "{=CEBROTHEL1091}That will be {AMOUNT} denars. [ib: confident][rb: very_positive]", PriceWithMaid, null);
+
+            campaignGameStarter.AddPlayerLine("ce_maid_business_drink_00_yes", "ce_maid_business_drink_00", "ce_maid_business_complete", "{=CEBROTHEL1049}Alright, here you go.", null, ConversationBoughtDrink, 100, ConversationHasEnoughForDrinks);
+            campaignGameStarter.AddPlayerLine("ce_maid_business_drink_00_no", "ce_maid_business_drink_00", "ce_maid_exit_00", "{=CEBROTHEL1050}Nevermind.", null, null);
+
+            campaignGameStarter.AddDialogLine("ce_maid_business_complete_response_owner", "ce_maid_business_complete_owner", "close_window", "{=CEBROTHEL0980}Of course {?PLAYER.GENDER}milady{?}my lord{\\?}.", null, null);
+            campaignGameStarter.AddDialogLine("ce_maid_business_complete_response", "ce_maid_business_complete", "close_window", "{=CEBROTHEL1057}A pleasure doing business. [ib:confident][rb:very_positive]", null, null);
+            campaignGameStarter.AddDialogLine("ce_maid_exit_response", "ce_maid_exit_00", "close_window", "{=CEBROTHEL1058}Very well, I'll be here if you need anything. [ib:confident][rb:very_positive]", null, null);
 
             // Dialogue With Owner 00
             campaignGameStarter.AddDialogLine("ce_owner_talk_00", "start", "ce_owner_response_00", "{=CEBROTHEL1053}Oh, a valued customer, how can I help you today?[ib:confident][rb:very_positive]", ConversationWithBrothelOwnerBeforeSelling, null);
@@ -846,7 +890,8 @@ namespace CaptivityEvents.Brothel
         private bool ConversationWithPositiveCaptive() => Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.HeroState == Hero.CharacterStates.Prisoner && ContainsPrisoner(Hero.OneToOneConversationHero.CharacterObject) && (Hero.OneToOneConversationHero.GetSkillValue(CESkills.Slavery) > 50 || Hero.OneToOneConversationHero.GetSkillValue(CESkills.Prostitution) > 70);
 
         private bool ConversationWithProstitute() => CharacterObject.OneToOneConversationCharacter.StringId == "prostitute_regular";
-
+        
+        private bool ConversationWithMaidIsOwner() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid" && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
         private bool ConversationWithMaid() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid";
 
         private bool ConversationWithProstituteIsOwner() => CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("prostitute") && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
@@ -862,6 +907,16 @@ namespace CaptivityEvents.Brothel
             text = TextObject.Empty;
 
             if (Hero.MainHero.Gold >= prostitutionCost) return true;
+            text = new TextObject("{=CEEVENTS1138}You don't have enough gold");
+
+            return false;
+        }
+
+        private bool ConversationHasEnoughForDrinks(out TextObject text)
+        {
+            text = TextObject.Empty;
+
+            if (Hero.MainHero.Gold >= drinkCost) return true;
             text = new TextObject("{=CEEVENTS1138}You don't have enough gold");
 
             return false;
@@ -891,6 +946,13 @@ namespace CaptivityEvents.Brothel
         private bool PriceWithProstitute()
         {
             MBTextManager.SetTextVariable("AMOUNT", new TextObject(prostitutionCost.ToString()));
+
+            return true;
+        }
+
+        private bool PriceWithMaid()
+        {
+            MBTextManager.SetTextVariable("AMOUNT", new TextObject(drinkCost.ToString()));
 
             return true;
         }
@@ -937,6 +999,17 @@ namespace CaptivityEvents.Brothel
             }
 
             captive.HeroObject.SetSkillValue(CESkills.Prostitution, MBRandom.RandomInt(10, 20));
+
+        }
+
+        private void ConversationBoughtDrink()
+        {
+            if (!DoesOwnBrothelInSettlement(Settlement.CurrentSettlement))
+            {
+                GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, drinkCost);
+            }
+
+            Hero.MainHero.HitPoints += 10;
 
         }
 
@@ -1602,6 +1675,8 @@ namespace CaptivityEvents.Brothel
         private List<Settlement> SettlementsThatPlayerHasSpy = new List<Settlement>();
 
         private const int prostitutionCost = 60;
+
+        private const int drinkCost = 30;
 
         private const int prostitutionCostPerParty = 40;
 
