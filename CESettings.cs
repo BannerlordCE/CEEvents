@@ -131,6 +131,7 @@ namespace CaptivityEvents
         public override string Id => "CaptivityEventsSettings";
         public override string DisplayName => "Captivity Events";
         public override string FolderName => "zCaptivityEvents";
+        public override string FormatType => "json2";
 
         public override IDictionary<string, Func<BaseSettings>> GetAvailablePresets()
         {

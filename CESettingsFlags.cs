@@ -32,7 +32,8 @@ namespace CaptivityEvents
 
             if (builder != null)
             {
-                builder.SetFormat("json").SetFolderName("zCaptivityEvents").SetSubFolder("FlagSettings");
+                builder.SetFormat("json2").SetFolderName("zCaptivityEvents").SetSubFolder("FlagSettings");
+
                 foreach (CECustom module in moduleCustoms)
                 {
 
@@ -54,6 +55,7 @@ namespace CaptivityEvents
                 }
                 _settings = builder.BuildAsGlobal();
                 _settings.Register();
+
             }
             else
             {
