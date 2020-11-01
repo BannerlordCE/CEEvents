@@ -55,6 +55,9 @@ namespace CaptivityEvents
 
         [XmlAttribute()]
         public string Id { get; set; }
+
+        [XmlAttribute()]
+        public bool DefaultValue { get; set; }
     }
 
     [DebuggerStepThrough]

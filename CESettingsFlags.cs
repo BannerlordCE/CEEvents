@@ -43,8 +43,8 @@ namespace CaptivityEvents
                         {
                             if (!CustomFlags.ContainsKey(flag.Id))
                             {
-                                CustomFlags.Add(flag.Id, true);
-                                groupBuilder.AddBool(flag.Id, flag.Name, new ProxyRef<bool>(() => CustomFlags[flag.Id], o => CustomFlags[flag.Id] = o), boolBuilder => boolBuilder.SetHintText(flag.HintText));
+                                CustomFlags.Add(flag.Id, flag.DefaultValue);
+                                groupBuilder.AddBool(flag.Id, flag.Name, new ProxyRef<bool>(() => CustomFlags[flag.Id], o => CustomFlags[flag.Id] = o), boolBuilder => boolBuilder.SetHintText(flag.HintText).SetRequireRestart(false));
                             }
                         }
                         foreach (CESkillNode skillNode in module.CESkills)
@@ -65,7 +65,7 @@ namespace CaptivityEvents
                     {
                         if (!CustomFlags.ContainsKey(flag.Id))
                         {
-                            CustomFlags.Add(flag.Id, true);
+                            CustomFlags.Add(flag.Id, flag.DefaultValue);
                         }
                     }
                     foreach (CESkillNode skillNode in module.CESkills)
