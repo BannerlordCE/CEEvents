@@ -24,7 +24,6 @@ namespace CaptivityEvents.Events
 
         private float _timer = 0;
         private float _max = 0;
-        private float _currentProgress = 0;
 
         internal RandomMenuCallBackDelegate(CEEvent listedEvent) => _listedEvent = listedEvent;
 
@@ -52,7 +51,6 @@ namespace CaptivityEvents.Events
                 args.MenuContext.GameMenu.AllowWaitingAutomatically();
                 _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);
                 _timer = 0f;
-                _currentProgress = 0f;
 
                 CEHelper.progressEventExists = true;
                 CEHelper.notificationCaptorExists = false;

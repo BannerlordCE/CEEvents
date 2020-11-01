@@ -13,10 +13,10 @@ namespace CaptivityEvents.Events
             if (targetHero.GetPerkValue(DefaultPerks.Medicine.PerfectHealth)) num += 10;
 
             // 1.5.3
-            if (targetHero.GetPerkValue(DefaultPerks.Steward.Prominence)) num += 15;
+            //if (targetHero.GetPerkValue(DefaultPerks.Steward.Prominence)) num += 15;
 
             // 1.5.4
-            //if (targetHero.GetPerkValue(DefaultPerks.Steward.Gourmet)) num += 15;
+            if (targetHero.GetPerkValue(DefaultPerks.Steward.Gourmet)) num += 15;
 
             if (targetHero.GetPerkValue(DefaultPerks.Charm.InBloom)) num += 10;
 

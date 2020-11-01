@@ -373,14 +373,8 @@ namespace CaptivityEvents
             get
             {
                 if (_provider != null) return _provider;
-                if (CESettingsCustom.Instance != null)
-                {
-                    _provider = CESettingsCustom.Instance;
-                }
-                else
-                {
-                    _provider = new HardcodedCustomSettings();
-                }
+                _provider = (ICustomSettingsProvider) CESettingsCustom.Instance ?? new HardcodedCustomSettings();
+
                 return _provider;
 
             }
