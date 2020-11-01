@@ -142,6 +142,7 @@ namespace CaptivityEvents.Brothel
                 */
                 // 1.5.4         
                 _partyScreenLogic.Initialize(TroopRoster.CreateDummyTroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler), new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
+                
                 _partyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
 
                 _partyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
@@ -741,7 +742,7 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddPlayerLine("ce_owner_buy_no", "ce_owner_buy_response", "ce_owner_exit_00", "{=CEBROTHEL1050}Nevermind.", null, null);
 
             campaignGameStarter.AddDialogLine("ce_owner_party_00_r", "ce_owner_party_00", "ce_owner_party_response", "{=CEBROTHEL1072}I can bring some ladies but that will be {AMOUNT} denars.", PriceWithParty, null);
-
+            
             campaignGameStarter.AddPlayerLine("ce_party_buy_yes", "ce_owner_party_response", "ce_owner_business_complete", "{=CEBROTHEL1049}Alright, here you go.", null, ConversationBoughtParty, 100, ConversationHasEnoughForPartyService);
             campaignGameStarter.AddPlayerLine("ce_party_buy_no", "ce_owner_party_response", "ce_owner_exit_00", "{=CEBROTHEL1050}Nevermind.", null, null);
 
@@ -895,6 +896,8 @@ namespace CaptivityEvents.Brothel
         private bool ConversationWithMaidIsOwner() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid" && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
         private bool ConversationWithMaid() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid";
 
+        private bool ConversationWithMaid() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid";
+
         private bool ConversationWithProstituteIsOwner() => CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("prostitute") && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
 
         private bool ConversationWithProstituteNotMetRequirements() => CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("prostitute") && Campaign.Current.IsMainHeroDisguised;
@@ -960,7 +963,6 @@ namespace CaptivityEvents.Brothel
 
         private bool ConditionalRandomName()
         {
-
             MBTextManager.SetTextVariable("NAME", new TextObject(Settlement.CurrentSettlement.Culture.FemaleNameList.GetRandomElement()));
 
             return true;
@@ -969,6 +971,7 @@ namespace CaptivityEvents.Brothel
         // conversation_town_or_village_player_ask_location_of_hero_2_on_condition
         private bool ConditionalSendBrothelCaptive()
         {
+
             if (ConversationSentence.SelectedRepeatObject is CharacterObject characterObject)
             {
                 StringHelpers.SetCharacterProperties("HERO", characterObject, null, ConversationSentence.SelectedRepeatLine, true);
@@ -1013,7 +1016,7 @@ namespace CaptivityEvents.Brothel
             Hero.MainHero.HitPoints += 10;
 
         }
-
+        
         private void ConversationBoughtParty()
         {
             int numberOfMen = PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
@@ -1676,7 +1679,7 @@ namespace CaptivityEvents.Brothel
         private List<Settlement> SettlementsThatPlayerHasSpy = new List<Settlement>();
 
         private const int prostitutionCost = 60;
-
+        
         private const int drinkCost = 30;
 
         private const int prostitutionCostPerParty = 40;
