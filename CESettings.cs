@@ -372,9 +372,9 @@ namespace CaptivityEvents
         {
             get
             {
+                if (CESettingsCustom.Instance != null) return CESettingsCustom.Instance;
                 if (_provider != null) return _provider;
-                _provider = (ICustomSettingsProvider) CESettingsCustom.Instance ?? new HardcodedCustomSettings();
-
+                _provider =  new HardcodedCustomSettings();
                 return _provider;
 
             }
