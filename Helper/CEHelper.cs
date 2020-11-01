@@ -14,5 +14,8 @@ namespace CaptivityEvents.Helper
         public static bool notificationCaptorCheck = false;
         public static bool notificationEventExists = false;
         public static bool notificationEventCheck = false;
+
+        public static bool progressEventExists = false;
+        public static bool progressEventCheck = false;
     }
 }

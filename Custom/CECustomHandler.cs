@@ -14,6 +14,7 @@ namespace CaptivityEvents.Custom
 {
     public class CECustomHandler
     {
+        public static int ErrorLines;
         public static int Lines;
         public static string TestLog = "FC";
 
@@ -24,6 +25,12 @@ namespace CaptivityEvents.Custom
 
         public static List<CEEvent> GetAllVerifiedXSEFSEvents(List<string> modules)
         {
+            string errorPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedFlagXML.txt";
+            FileInfo file = new FileInfo(errorPath);
+            if (file.Exists) file.Delete();
+            ErrorLines = 0;
+            Lines = 0;
+
             if (modules.Count != 0)
             {
                 foreach (string fullPath in modules)
@@ -203,7 +210,8 @@ namespace CaptivityEvents.Custom
             try
             {
                 xmlSchemaSet.Add(null, fullPath);
-                XDocument source = XDocument.Load(file);
+                var opts = LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo;
+                XDocument source = XDocument.Load(file, opts);
 
                 source.Validate(xmlSchemaSet, delegate (object o, ValidationEventArgs e)
                                               {
@@ -263,10 +271,10 @@ namespace CaptivityEvents.Custom
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedXML.txt";
             FileInfo file = new FileInfo(fullPath);
             file.Directory?.Create();
-            if (Lines == 0) File.WriteAllText(BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedXML.txt", "");
-            string contents = xmlFile + " does not comply to CEEventsModal format described in CEEventsModal.xsd " + msg + Environment.NewLine;
-            File.AppendAllText(fullPath, contents);
-            Lines++;
+            string contents = xmlFile + " does not comply to CEEventsModal format described in CEEventsModal.xsd : " + msg + Environment.NewLine;
+            if (ErrorLines == 0) File.WriteAllText(BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedXML.txt", contents);
+            else File.AppendAllText(fullPath, contents);
+            ErrorLines++;
         }
 
 

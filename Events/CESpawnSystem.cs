@@ -4,6 +4,7 @@ using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events
@@ -36,7 +37,7 @@ namespace CaptivityEvents.Events
                     {
                         if (num > 0)
                         {
-                            if (troop.Ref == "Troop")
+                            if (troop.Ref != null && troop.Ref.ToLower() == "troop")
                             {
                                 party.MemberRoster.AddToCounts(characterObject, num, false, numWounded, 0, true, -1);
                             }
@@ -61,20 +62,27 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    bool isFemale = heroVariables.Gender == "Female";
+                    bool isFemale = heroVariables.Gender != null && heroVariables.Gender.ToLower() == "female";
 
                     string culture = null;
-                    switch (heroVariables.Culture)
+                    if (heroVariables.Culture != null)
                     {
-                        case "Player":
-                            culture = Hero.MainHero.Culture.StringId;
-                            break;
-                        case "Captor":
-                            culture = party.Culture.StringId;
-                            break;
-                        default:
-                            culture = heroVariables.Culture;
-                            break;
+                        switch (heroVariables.Culture.ToLower())
+                        {
+                            case "player":
+                                culture = Hero.MainHero.Culture.StringId;
+                                break;
+                            case "captor":
+                                culture = party.Culture.StringId;
+                                break;
+                            default:
+                                culture = heroVariables.Culture;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        culture = heroVariables.Culture;
                     }
 
                     CharacterObject wanderer = (from x in CharacterObject.Templates
@@ -89,20 +97,45 @@ namespace CaptivityEvents.Events
                     hero.HasMet = true;
                     hero.Clan = randomElement.OwnerClan;
                     hero.ChangeState(Hero.CharacterStates.Active);
-                    switch (heroVariables.Clan)
+                    if (heroVariables.Clan != null)
                     {
-                        case "Captor":
-                            AddCompanionAction.Apply(party.Owner.Clan, hero);
-                            break;
-                        case "Player":
-                            AddCompanionAction.Apply(Clan.PlayerClan, hero);
-                            break;
-                        default:
-                            break;
+                        switch (heroVariables.Clan.ToLower())
+                        {
+                            case "captor":
+                                AddCompanionAction.Apply(party.Owner.Clan, hero);
+                                break;
+                            case "player":
+                                AddCompanionAction.Apply(Clan.PlayerClan, hero);
+                                break;
+                            default:
+                                break;
+                        }
                     }
+
                     CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
 
-                    if (heroVariables.Ref == "Prisoner")
+                    try
+                    {
+                        int level = 0;
+                        int xp = 0;
+
+                        if (heroVariables.SkillsToLevel != null)
+                        {
+                            foreach (SkillToLevel skillToLevel in heroVariables.SkillsToLevel)
+                            {
+                                if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
+                                else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+
+                                new Dynamics().SkillModifier(hero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        CECustomHandler.ForceLogToFile("Failed to level spawning Hero" + e);
+                    }
+
+                    if (heroVariables.Ref == "Prisoner" || heroVariables.Ref == "prisoner")
                     {
                         TakePrisonerAction.Apply(party, hero);
                     }

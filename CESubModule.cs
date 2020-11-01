@@ -145,21 +145,22 @@ namespace CaptivityEvents
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_female_prison"]
+                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_female"]
+                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
                         : CEPersistence.CEEventImageList[name];
+
                 }
                 else
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_female_prison"]
+                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_female"]
+                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
@@ -216,10 +217,10 @@ namespace CaptivityEvents
             ModuleInfo nativeModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
             ApplicationVersion gameversion = nativeModule.Version;
 
-            if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor || !(gameversion.Revision == 2 || gameversion.Revision == 3))
+            if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor || modversion.Revision != gameversion.Revision)
             {
                 CECustomHandler.ForceLogToFile("Captivity Events " + modversion + " has the detected the wrong version " + gameversion);
-                MessageBox.Show("Warning:\n Captivity Events " + modversion + " has the detected the wrong game version. Please download the correct version for " + gameversion + ". Or continue at your own risk.", "Captivity Events has the detected the wrong version");
+                DialogResult a = MessageBox.Show("Warning:\n Captivity Events " + modversion + " has the detected the wrong game version. Please download the correct version for " + gameversion + ". Or continue at your own risk.", "Captivity Events has the detected the wrong version");
             }
             else
             {
@@ -375,15 +376,19 @@ namespace CaptivityEvents
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
                 string categoryName = "ce_notification_icons";
+                /*
                 string partNameCaptor = "CEEventNotification\\notification_captor";
                 string partNameEvent = "CEEventNotification\\notification_event";
-
+                */
                 SpriteData spriteData = UIResourceManager.SpriteData;
+                // 1.5.3 
+                /*
                 spriteData.SpriteCategories.Add(categoryName, loadedData.SpriteCategories[categoryName]);
                 spriteData.SpritePartNames.Add(partNameCaptor, loadedData.SpritePartNames[partNameCaptor]);
                 spriteData.SpritePartNames.Add(partNameEvent, loadedData.SpritePartNames[partNameEvent]);
                 spriteData.SpriteNames.Add(partNameCaptor, new SpriteGeneric(partNameCaptor, loadedData.SpritePartNames[partNameCaptor]));
-                spriteData.SpriteNames.Add(partNameEvent, new SpriteGeneric(partNameEvent, loadedData.SpritePartNames[partNameEvent]));
+                spriteData.SpriteNames.Add(partNameEvent, new SpriteGeneric(partNameEvent, loadedData.SpritePartNames[partNameEvent]));    
+                */
 
                 SpriteCategory spriteCategory = spriteData.SpriteCategories[categoryName];
                 spriteCategory.SpriteSheets.Add(CEPersistence.CEEventImageList["CE_default_notification"]);
@@ -406,7 +411,14 @@ namespace CaptivityEvents
 
             try
             {
-                CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomModule);
+                if (CESettingsFlags.Instance == null)
+                {
+                    CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsFlags missing MCMv4");
+                }
+                else
+                {
+                    CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomModule);
+                }
                 CECustomHandler.ForceLogToFile("Loaded CESettings: "
                                                + (CESettings.Instance != null && CESettings.Instance.LogToggle
                                                    ? "Logs are enabled."
@@ -515,7 +527,7 @@ namespace CaptivityEvents
             CheckBugIssue();
             ResetHelper();
             if (!_isLoaded) return;
-            game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings_xml.xml");
+            game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings.xml");
             InitalizeAttributes(game);
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
             AddBehaviours(campaignStarter);

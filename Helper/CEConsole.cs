@@ -24,14 +24,30 @@ namespace CaptivityEvents.Helper
 {
     internal class CEConsole
     {
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("reload_settings", "captivity")]
+        public static string ChangeSettings(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.reload_settings\".\n\n";
+
+                return "Unimplemented";
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
         [CommandLineFunctionality.CommandLineArgumentFunction("force_fire_event", "captivity")]
         public static string ForceFireEvent(List<string> strings)
         {
             try
             {
                 Thread.Sleep(500);
-
-                if (!CampaignCheats.CheckCheatUsage(ref CampaignCheats.ErrorType)) return CampaignCheats.ErrorType;
 
                 if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.force_fire_event [EventName] [CaptiveName]\".";
                 bool flag = false;
@@ -223,8 +239,6 @@ namespace CaptivityEvents.Helper
             {
                 Thread.Sleep(500);
 
-                if (!CampaignCheats.CheckCheatUsage(ref CampaignCheats.ErrorType)) return CampaignCheats.ErrorType;
-
                 if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.fire_ceevent [EventName] [CaptiveName]\".";
 
                 bool flag = false;
@@ -393,8 +407,6 @@ namespace CaptivityEvents.Helper
             {
                 Thread.Sleep(500);
 
-                if (!CampaignCheats.CheckCheatUsage(ref CampaignCheats.ErrorType)) return CampaignCheats.ErrorType;
-
                 if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.list_events [SEARCH_TERM]\".";
 
                 string searchTerm = null;
@@ -439,7 +451,7 @@ namespace CaptivityEvents.Helper
 
                 string searchTerm = null;
 
-                if (CampaignCheats.CheckParameters(strings, 1)) searchTerm = strings[0];
+                if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
                 Hero hero = searchTerm.IsStringNoneOrEmpty()
                     ? Hero.MainHero
@@ -488,7 +500,7 @@ namespace CaptivityEvents.Helper
 
                 string searchTerm = null;
 
-                if (CampaignCheats.CheckParameters(strings, 1)) searchTerm = strings[0];
+                if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
                 Hero hero = searchTerm.IsStringNoneOrEmpty()
                     ? Hero.MainHero
@@ -499,11 +511,12 @@ namespace CaptivityEvents.Helper
                 try
                 {
                     Dynamics d = new Dynamics();
+                    d.ResetCustomSkills(hero);
                     d.VictimProstitutionModifier(0, hero, true);
                     d.VictimProstitutionModifier(0, hero, false, false);
                     d.VictimSlaveryModifier(0, hero, true);
                     d.VictimSlaveryModifier(0, hero, false, false);
-                    CECampaignBehavior.ResetFullData();
+                    if (hero == Hero.MainHero) CECampaignBehavior.ResetFullData();
 
                     return "Successfully reset status";
                 }
@@ -1018,8 +1031,6 @@ namespace CaptivityEvents.Helper
             try
             {
                 Thread.Sleep(500);
-
-                if (!CampaignCheats.CheckCheatUsage(ref CampaignCheats.ErrorType)) return CampaignCheats.ErrorType;
 
                 if (CampaignCheats.CheckHelp(strings) && CampaignCheats.CheckParameters(strings, 1)) return "Format is \"captivity.play_sound [SOUND_ID]\".";
 

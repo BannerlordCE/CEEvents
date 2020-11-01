@@ -138,13 +138,35 @@ namespace CaptivityEvents.Events
             }
         }
 
-        private void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp)
+        private void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp, bool display = true, bool resetSkill = false)
         {
             if (xp == 0)
             {
                 int currentSkillLevel = hero.GetSkillValue(skillObject);
-                int newNumber = currentSkillLevel + amount;
-                if (newNumber < 0) newNumber = 0;
+                int newNumber = resetSkill ? 0 : currentSkillLevel + amount;
+
+                CESkillNode skillNode = CESkills.FindSkillNode(skill);
+                if (skillNode != null)
+                {
+                    int maxLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MaxLevel);
+
+                    int minLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MinLevel);
+                    if (maxLevel != 0 && newNumber > maxLevel)
+                    {
+                        newNumber = maxLevel;
+                        amount = maxLevel - currentSkillLevel;
+                    }
+                    else if (newNumber < minLevel)
+                    {
+                        newNumber = minLevel;
+                        amount = minLevel - currentSkillLevel;
+                    }
+                }
+                else if (newNumber < 0)
+                {
+                    newNumber = 0;
+                    amount = newNumber - currentSkillLevel;
+                }
 
                 float xpToSet = Campaign.Current.Models.CharacterDevelopmentModel.GetXpRequiredForSkillLevel(newNumber);
                 Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet, out int levels);
@@ -160,6 +182,8 @@ namespace CaptivityEvents.Events
                     hero.SetSkillValue(skillObject, newNumber);
                 }
 
+                if (!display) return;
+
                 TextObject textObject = GameTexts.FindText("str_CE_level_skill");
                 textObject.SetTextVariable("HERO", hero.Name);
 
@@ -171,28 +195,68 @@ namespace CaptivityEvents.Events
                 textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
 
                 textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
-                textObject.SetTextVariable("SKILL", skill.ToLower());
+                textObject.SetTextVariable("SKILL", skillObject.Name.ToLower());
                 textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
             }
             else
             {
-                hero.HeroDeveloper.AddSkillXp(skillObject, xp, true, true);
+                hero.HeroDeveloper.AddSkillXp(skillObject, xp, true, display);
             }
 
 
         }
 
-        internal void SkillModifier(Hero hero, string skill, int amount, int xp)
+        internal Color PickColor(string color)
+        {
+            switch (color)
+            {
+                case "Black":
+                case "black":
+                    return Colors.Black;
+                case "White":
+                case "white":
+                    return Colors.White;
+                case "Yellow":
+                case "yellow":
+                    return Colors.Yellow;
+                case "Red":
+                case "red":
+                    return Colors.Red;
+                case "Magenta":
+                case "magenta":
+                    return Colors.Magenta;
+                case "Green":
+                case "green":
+                    return Colors.Green;
+                case "Cyan":
+                case "cyan":
+                    return Colors.Cyan;
+                default:
+                    return Colors.Gray;
+
+            }
+        }
+
+        internal void ResetCustomSkills(Hero hero)
+        {
+            foreach (SkillObject skillObjectCustom in CESkills.CustomSkills)
+            {
+                SkillObjectModifier(skillObjectCustom, PickColor("gray"), hero, skillObjectCustom.StringId, 0, 0, false, true);
+            }
+        }
+
+        internal void SkillModifier(Hero hero, string skill, int amount, int xp, bool display = true, string color = "gray")
         {
             bool found = false;
+
 
             foreach (SkillObject skillObjectCustom in CESkills.CustomSkills)
             {
                 if (skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill)
                 {
                     found = true;
-                    SkillObjectModifier(skillObjectCustom, Colors.Gray, hero, skill, amount, xp);
+                    SkillObjectModifier(skillObjectCustom, PickColor(color), hero, skill, amount, xp, display);
                     break;
                 }
             }
@@ -204,7 +268,7 @@ namespace CaptivityEvents.Events
                 if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
                 {
                     found = true;
-                    SkillObjectModifier(skillObject, Colors.Magenta, hero, skill, amount, xp);
+                    SkillObjectModifier(skillObject, PickColor(color), hero, skill, amount, xp, display);
                     break;
                 }
             }
@@ -212,6 +276,48 @@ namespace CaptivityEvents.Events
             if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + skill);
         }
 
+
+        private void SetModifier(int amount, Hero hero, SkillObject skill, SkillObject flag, bool displayMessage = true, bool quickInformation = false) //Warning: SkillObject flag never used.
+        {
+            if (amount == 0)
+            {
+                if ((displayMessage || quickInformation) && hero.GetSkillValue(skill) > 0)
+                {
+                    TextObject textObject = GameTexts.FindText("str_CE_level_start");
+                    textObject.SetTextVariable("SKILL", skill.Name);
+                    textObject.SetTextVariable("HERO", hero.Name);
+
+                    if (hero.GetSkillValue(skill) > 1)
+                    {
+                        if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+                        if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
+                    }
+                }
+
+                hero.SetSkillValue(skill, 0);
+            }
+            else
+            {
+                int currentValue = hero.GetSkillValue(skill);
+                int valueToSet = currentValue + amount;
+                if (valueToSet < 1) valueToSet = 1;
+                hero.SetSkillValue(skill, valueToSet);
+
+                if (!displayMessage && !quickInformation) return;
+                TextObject textObject = GameTexts.FindText("str_CE_level_skill");
+                textObject.SetTextVariable("HERO", hero.Name);
+                textObject.SetTextVariable("SKILL", skill.Name);
+
+                textObject.SetTextVariable("NEGATIVE", amount >= 0 ? 0 : 1);
+                textObject.SetTextVariable("PLURAL", amount >= 2 ? 1 : 0);
+
+                textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
+                textObject.SetTextVariable("TOTAL_AMOUNT", valueToSet);
+                if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+
+                if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
+            }
+        }
 
         internal void VictimSlaveryModifier(int amount, Hero hero, bool updateFlag = false, bool displayMessage = true, bool quickInformation = false)
         {
@@ -256,72 +362,6 @@ namespace CaptivityEvents.Events
             }
         }
 
-        private void SetModifier(int amount, Hero hero, SkillObject skill, SkillObject flag, bool displayMessage = true, bool quickInformation = false) //Warning: SkillObject flag never used.
-        {
-            if (amount == 0)
-            {
-                if ((displayMessage || quickInformation) && hero.GetSkillValue(skill) > 0)
-                {
-                    TextObject textObject = GameTexts.FindText("str_CE_level_start");
-                    textObject.SetTextVariable("SKILL", skill.Name);
-                    textObject.SetTextVariable("HERO", hero.Name);
-
-                    if (hero.GetSkillValue(skill) > 1)
-                    {
-                        if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
-                        if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
-                    }
-                }
-
-                hero.SetSkillValue(skill, 0);
-            }
-            else
-            {
-                int currentValue = hero.GetSkillValue(skill);
-                int valueToSet = currentValue + amount;
-                if (valueToSet < 1) valueToSet = 1;
-                hero.SetSkillValue(skill, valueToSet);
-
-                if (!displayMessage && !quickInformation) return;
-                TextObject textObject = GameTexts.FindText("str_CE_level_skill");
-                textObject.SetTextVariable("HERO", hero.Name);
-                textObject.SetTextVariable("SKILL", skill.Name);
-
-                textObject.SetTextVariable("NEGATIVE", amount >= 0 ? 0 : 1);
-                textObject.SetTextVariable("PLURAL", amount >= 2 ? 1 : 0);
-
-                textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
-                textObject.SetTextVariable("TOTAL_AMOUNT", valueToSet);
-                if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
-
-                if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
-            }
-        }
-
-        internal void CEKillPlayer(Hero killer)
-        {
-            GameMenu.ExitToLast();
-
-            try
-            {
-                if (killer != null) KillCharacterAction.ApplyByMurder(Hero.MainHero, killer);
-                else KillCharacterAction.ApplyByMurder(Hero.MainHero);
-            }
-            catch (Exception e)
-            {
-                CECustomHandler.ForceLogToFile("Failed CEKillPlayer " + e);
-            }
-        }
-
-        internal void CEGainRandomPrisoners(PartyBase party)
-        {
-            Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.IsVillage);
-            //PartyTemplateObject villagerPartyTemplate = nearest.Culture.VillagerPartyTemplate; Will be used in figuring out on what to give
-            MBRandom.RandomInt(1, 10);
-            party.AddPrisoner(nearest.Culture.VillageWoman, 10, 7);
-            party.AddPrisoner(nearest.Culture.Villager, 10, 7);
-        }
-
         internal void VictimProstitutionModifier(int amount, Hero hero, bool updateFlag = false, bool displayMessage = true, bool quickInformation = false)
         {
             if (hero == null) return;
@@ -363,6 +403,77 @@ namespace CaptivityEvents.Events
             {
                 SetModifier(amount, hero, prostitutionSkill, prostitutionFlag, displayMessage, quickInformation);
             }
+        }
+
+        internal void CEKillPlayer(Hero killer)
+        {
+            GameMenu.ExitToLast();
+
+            try
+            {
+                if (killer != null) KillCharacterAction.ApplyByMurder(Hero.MainHero, killer);
+                else KillCharacterAction.ApplyByMurder(Hero.MainHero);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed CEKillPlayer " + e);
+            }
+        }
+
+        internal void KingdomChange(KingdomOption[] kingdomOptions, Hero hero = null, Hero captor = null)
+        {
+            foreach (KingdomOption kingdomOption in kingdomOptions)
+            {
+                try
+                {
+                    Kingdom kingdom = null;
+
+                    if (kingdomOption.Kingdom != null)
+                    {
+                        switch (kingdomOption.Kingdom.ToLower())
+                        {
+                            case "random":
+                                kingdom = Kingdom.All.GetRandomElement();
+                                break;
+                            case "hero":
+                                kingdom = hero.Clan.Kingdom;
+                                break;
+                            case "captor":
+                                kingdom = captor.Clan.Kingdom;
+                                break;
+                            case "settlement":
+                                kingdom = kingdomOption.Ref.ToLower() == "captor" ? captor.CurrentSettlement.OwnerClan.Kingdom : hero.CurrentSettlement.OwnerClan.Kingdom;
+                                break;
+                        }
+                    }
+
+                    switch (kingdomOption.Action.ToLower())
+                    {
+                        case "leave":
+                            ChangeKingdomAction.ApplyByLeaveKingdom(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, !kingdomOption.HideNotification);
+                            break;
+                        case "join":
+                            ChangeKingdomAction.ApplyByJoinToKingdom(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, kingdom, !kingdomOption.HideNotification);
+                            break;
+                        case "joinasmercenary":
+                            ChangeKingdomAction.ApplyByJoinFactionAsMercenary(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, kingdom, 50, !kingdomOption.HideNotification);
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    CECustomHandler.ForceLogToFile("Failed KingdomChange " + e);
+                }
+            }
+        }
+
+        internal void CEGainRandomPrisoners(PartyBase party)
+        {
+            Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.IsVillage);
+            //PartyTemplateObject villagerPartyTemplate = nearest.Culture.VillagerPartyTemplate; Will be used in figuring out on what to give
+            MBRandom.RandomInt(1, 10);
+            party.AddPrisoner(nearest.Culture.VillageWoman, 10, 7);
+            party.AddPrisoner(nearest.Culture.Villager, 10, 7);
         }
 
         internal void MoraleChange(int amount, PartyBase partyBase)
@@ -416,7 +527,10 @@ namespace CaptivityEvents.Events
         {
             if (hero == null) return;
 
-            if (owner != null) hero.Clan = owner.Clan;
+            if (owner != null)
+            {
+                hero.Clan = owner.Clan;
+            }
         }
 
     }

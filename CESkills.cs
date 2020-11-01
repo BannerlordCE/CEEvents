@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using CaptivityEvents.Custom;
 
 namespace CaptivityEvents
 {
@@ -9,9 +10,9 @@ namespace CaptivityEvents
     {
         public static SkillObject Prostitution => CustomSkills[_StartDefaultSkillNode];
 
-        public static SkillObject Slavery => CustomSkills[_StartDefaultSkillNode + 1];
+        public static SkillObject IsProstitute => CustomSkills[_StartDefaultSkillNode + 1];
 
-        public static SkillObject IsProstitute => CustomSkills[_StartDefaultSkillNode + 2];
+        public static SkillObject Slavery => CustomSkills[_StartDefaultSkillNode + 2];
 
         public static SkillObject IsSlave => CustomSkills[_StartDefaultSkillNode + 3];
 
@@ -29,6 +30,20 @@ namespace CaptivityEvents
 
 
         public static void AddCustomSkill(CESkillNode skillNode) => _Skills.Add(skillNode);
+
+
+        public static CESkillNode FindSkillNode(string skill)
+        {
+            try
+            {
+                return _Skills.Find(skillNode => skillNode.Id == skill);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile(skill + " : " + e);
+                return null;
+            }
+        }
 
         public static SkillObject FindSkill(string skill)
         {
@@ -61,10 +76,10 @@ namespace CaptivityEvents
 
             _StartDefaultSkillNode = _Skills.Count;
 
-            _Skills.Add(new CESkillNode("Prostitution", "{=CEEVENTS1106}Prostitution"));
-            _Skills.Add(new CESkillNode("Slavery", "{=CEEVENTS1105}Slavery"));
-            _Skills.Add(new CESkillNode("IsProstitute", "{=CEEVENTS1104}prostitute"));
-            _Skills.Add(new CESkillNode("IsSlave", "{=CEEVENTS1103}slave"));
+            _Skills.Add(new CESkillNode("Prostitution", "{=CEEVENTS1106}Prostitution", "0"));
+            _Skills.Add(new CESkillNode("IsProstitute", "{=CEEVENTS1104}prostitute", "0", "1"));
+            _Skills.Add(new CESkillNode("Slavery", "{=CEEVENTS1105}Slavery", "0"));
+            _Skills.Add(new CESkillNode("IsSlave", "{=CEEVENTS1103}slave", "0", "1"));
 
             foreach (CESkillNode skill in _Skills)
             {
