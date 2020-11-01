@@ -27,17 +27,14 @@ namespace CaptivityEvents.Events
                             number = numberOne < numberTwo
                                 ? MBRandom.RandomInt(numberOne, numberTwo)
                                 : MBRandom.RandomInt(numberTwo, numberOne);
-
                             break;
 
                         case 2:
                             number = MBRandom.RandomInt(int.Parse(splitPass[1]));
-
                             break;
 
                         default:
                             number = MBRandom.RandomInt();
-
                             break;
                     }
                 }
@@ -50,7 +47,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception)
             {
-                CECustomHandler.ForceLogToFile("Failed to parse " + numpassed);
+                CECustomHandler.ForceLogToFile("Failed to parse int " + numpassed);
 
                 return 0;
             }
@@ -100,7 +97,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception)
             {
-                CECustomHandler.LogToFile("Failed to parse " + numpassed);
+                CECustomHandler.LogToFile("Failed to parse float " + numpassed);
 
                 return 0f;
             }

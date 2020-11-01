@@ -27,7 +27,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private void LaunchCaptorEvent()
         {
-            if (CEHelper.notificationCaptorExists) return;
+            if (CEHelper.notificationCaptorExists || CEHelper.progressEventExists) return;
             CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
             CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
 
@@ -54,7 +54,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private void LaunchRandomEvent()
         {
-            if (CEHelper.notificationEventExists) return;
+            if (CEHelper.notificationEventExists || CEHelper.progressEventExists) return;
             CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
             if (returnedEvent == null) return;
             CEHelper.notificationEventExists = true;
@@ -78,6 +78,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private bool CheckEventHourly()
         {
+            if (CEHelper.progressEventExists) return false;
             _hoursPassed++;
 
             if (CESettings.Instance == null) return false;
@@ -85,7 +86,6 @@ namespace CaptivityEvents.CampaignBehaviors
             CEHelper.notificationEventCheck = true;
             CEHelper.notificationCaptorCheck = true;
             _hoursPassed = 0;
-
             return true;
         }
 
@@ -222,6 +222,7 @@ namespace CaptivityEvents.CampaignBehaviors
         private Hero DeliverOffSpring(Hero mother, Hero father, bool isOffspringFemale, int age = 1)
         {
             CharacterObject characterObject = isOffspringFemale ? mother.CharacterObject : father.CharacterObject;
+            characterObject.Culture = Hero.MainHero.Culture;
 
             // Reflection One
             MethodInfo mi = typeof(HeroCreator).GetMethod("CreateNewHero", BindingFlags.NonPublic | BindingFlags.Static);
@@ -275,21 +276,14 @@ namespace CaptivityEvents.CampaignBehaviors
             hero.CharacterObject.StaticBodyPropertiesMin = BodyProperties.GetRandomBodyProperties(isOffspringFemale, bodyPropertiesMin, bodyPropertiesMin2, 1, seed, hairTags, father.CharacterObject.BeardTags, tattooTags).StaticProperties;
             hero.Mother = mother;
             hero.Father = father;
-            Settlement settlement;
-            if (hero.Mother == Hero.MainHero || hero.Father == Hero.MainHero)
-            {
-                settlement = (hero.Mother.CurrentSettlement ?? Hero.MainHero.HomeSettlement);
-            }
-            else
-            {
-                settlement = hero.Mother.HomeSettlement;
-            }
-            if (settlement == null && hero.Clan.Settlements.Any<Settlement>())
-            {
-                settlement = hero.Clan.Settlements.GetRandomElement<Settlement>();
-            }
-            hero.BornSettlement = settlement;
-            hero.IsNoble = father.IsNoble;
+
+            // Reflection Two
+            MethodInfo mi2 = typeof(HeroCreator).GetMethod("DecideBornSettlement", BindingFlags.NonPublic | BindingFlags.Static);
+            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, 0);
+            hero.BornSettlement = (Settlement)mi2.Invoke(null, new object[] { hero });
+
+            hero.IsNoble = true;
+
             if (mother == Hero.MainHero || father == Hero.MainHero)
             {
                 hero.HasMet = true;
@@ -745,6 +739,8 @@ namespace CaptivityEvents.CampaignBehaviors
                 CEHelper.notificationEventCheck = false;
                 CEHelper.notificationCaptorExists = false;
                 CEHelper.notificationEventExists = false;
+
+                CEHelper.progressEventExists = false;
             }
 
             [SaveableField(1)]

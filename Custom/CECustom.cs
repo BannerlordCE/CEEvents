@@ -20,7 +20,7 @@ namespace CaptivityEvents
             Id = null;
         }
 
-        public CESkillNode(string Id, string Name, string MinLevel = null, string MaxLevel = null)
+        public CESkillNode(string Id, string Name, string MinLevel = "0", string MaxLevel = null)
         {
             this.MinLevel = MinLevel;
             this.MaxLevel = MaxLevel;
@@ -55,6 +55,9 @@ namespace CaptivityEvents
 
         [XmlAttribute()]
         public string Id { get; set; }
+
+        [XmlAttribute()]
+        public bool DefaultValue { get; set; }
     }
 
     [DebuggerStepThrough]

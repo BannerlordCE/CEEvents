@@ -54,7 +54,12 @@ namespace CaptivityEvents.Brothel
         private static int GetRansomValueOfAllPrisoners()
         {
             int num = 0;
-            foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster) num += troopRosterElement.Character.PrisonerRansomValue(Hero.MainHero) * troopRosterElement.Number;
+
+            // 1.5.3
+            // foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster) num += troopRosterElement.Character.PrisonerRansomValue(Hero.MainHero) * troopRosterElement.Number;
+
+            // 1.5.4
+            foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster) num += Campaign.Current.Models.RansomValueCalculationModel.PrisonerRansomValue(troopRosterElement.Character, Hero.MainHero) * troopRosterElement.Number;
 
             return num;
         }
@@ -127,11 +132,21 @@ namespace CaptivityEvents.Brothel
                 TextObject textObject = new TextObject("{=CEBROTHEL0984}The brothel of {SETTLEMENT}", null);
                 textObject.SetTextVariable("SETTLEMENT", Hero.MainHero.CurrentSettlement.Name);
 
+                // 1.5.3 
+                /*
                 _partyScreenLogic.Initialize(TroopRoster.CreateDummyTroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
                 _partyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
 
                 _partyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
-                _partyScreenLogic.SetDoneHandler(new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler));
+                _partyScreenLogic.SetDoneHandler(new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler153));
+                */
+                // 1.5.4         
+                _partyScreenLogic.Initialize(TroopRoster.CreateDummyTroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler), new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
+                
+                _partyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
+
+                _partyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
+                
 
                 PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
                 partyState.InitializeLogic(_partyScreenLogic);
@@ -149,12 +164,22 @@ namespace CaptivityEvents.Brothel
         
         private static bool BrothelTroopTransferableDelegate(CharacterObject character, PartyScreenLogic.TroopType type, PartyScreenLogic.PartyRosterSide side, PartyBase LeftOwnerParty) => character.IsFemale;
 
-        private static bool ManageBrothelDoneHandler(TroopRoster leftMemberRoster, TroopRoster leftPrisonRoster, TroopRoster rightMemberRoster, TroopRoster rightPrisonRoster, bool isForced, List<MobileParty> leftParties = null, List<MobileParty> rightParties = null)
+        // 1.5.3
+        private static bool ManageBrothelDoneHandler153(TroopRoster leftMemberRoster, TroopRoster leftPrisonRoster, TroopRoster rightMemberRoster, TroopRoster rightPrisonRoster, bool isForced, List<MobileParty> leftParties = null, List<MobileParty> rightParties = null)
         {
 
             SetBrothelPrisoners(Hero.MainHero.CurrentSettlement, leftPrisonRoster);
             return true;
         }
+
+        // 1.5.4
+        private static bool ManageBrothelDoneHandler(TroopRoster leftMemberRoster, TroopRoster leftPrisonRoster, TroopRoster rightMemberRoster, TroopRoster rightPrisonRoster, FlattenedTroopRoster takenPrisonerRoster, FlattenedTroopRoster releasedPrisonerRoster, bool isForced, List<MobileParty> leftParties = null, List<MobileParty> rightParties = null)
+        {
+            SetBrothelPrisoners(Hero.MainHero.CurrentSettlement, leftPrisonRoster);
+            return true;
+        }
+
+
         // Ends Here
 
         private static void ChooseRansomPrisoners()
@@ -658,7 +683,51 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddDialogLine("tprostitute_service_01_no_response_id", "tprostitute_service_01_no_response", "close_window", "{=CEBROTHEL1052}Ugh...[ib:closed][rb:unsure]", null, null);
 
             // Maid Dialogue 00
-            // TODO WRITEUP DIALOGUES HERE
+            campaignGameStarter.AddDialogLine("ce_maid_talk_00", "start", "ce_maid_response_00", "{=CEBROTHEL1097}Hello {?PLAYER.GENDER}milady{?}my lord{\\?}, what can I get for you?", () => { return RandomizeConversation(2) && ConversationWithMaid(); }, null);
+
+            campaignGameStarter.AddPlayerLine("ce_maid_response_00_00", "ce_maid_response_00", "ce_drink_menu_00", "{=CEBROTHEL1086}I am looking for something to drink. What do you have?", null, null);
+            campaignGameStarter.AddPlayerLine("ce_maid_response_00_01", "ce_maid_response_00", "ce_specific_00", "{=CEBROTHEL1083}I'm looking for someone specific.", null, null);
+
+            campaignGameStarter.AddPlayerLine("ce_maid_response_00_02", "ce_maid_response_00", "ce_maid_exit_00", "{=CEBROTHEL1055}I don't need anything at the moment.", null, null);
+
+            // Maid Dialogue 01
+            campaignGameStarter.AddDialogLine("ce_maid_talk_01", "start", "ce_maid_response_01", "{=CEBROTHEL1078}Would you like something to drink, {?PLAYER.GENDER}milady{?}my lord{\\?}?", ConversationWithMaid, null);
+
+            campaignGameStarter.AddPlayerLine("ce_maid_response_01_00", "ce_maid_response_01", "ce_drink_menu_00", "{=CEBROTHEL1086}Yes, what would you recommend?", null, null);
+            campaignGameStarter.AddPlayerLine("ce_maid_response_01_01", "ce_maid_response_01", "ce_specific_00", "{=CEBROTHEL1083}I'm looking for someone specific.", null, null);
+            campaignGameStarter.AddPlayerLine("ce_maid_response_01_02", "ce_maid_response_01", "ce_maid_exit_00", "{=CEBROTHEL1028}No thanks.", null, null);
+
+            // Maid Dialogue 02
+            campaignGameStarter.AddDialogLine("ce_maid_talk_02", "ce_repeat_maid", "ce_maid_response_00", "{=CEBROTHEL0981}Anything else {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", null, null);
+
+            // Drink
+            campaignGameStarter.AddDialogLine("ce_drink_menu_00_00", "ce_drink_menu_00", "ce_drink_menu_01", "{=CEBROTHEL1079}I recommend the mead, {?PLAYER.GENDER}milady{?}my lord{\\?}. Finished brewing just this morning. We also have ale and wine.", () => { return RandomizeConversation(3);  }, null);
+            campaignGameStarter.AddDialogLine("ce_drink_menu_00_01", "ce_drink_menu_00", "ce_drink_menu_01", "{=CEBROTHEL1080}I recommend the wine, {?PLAYER.GENDER}milady{?}my lord{\\?}. These last few bottles've been quite popular among the other patrons. We also have ale and mead.", () => { return RandomizeConversation(3); }, null);
+            campaignGameStarter.AddDialogLine("ce_drink_menu_00_02", "ce_drink_menu_00", "ce_drink_menu_01", "{=CEBROTHEL1089}Care for a mug of fresh ale, {?PLAYER.GENDER}milady{?}my lord{\\?}? We also have mead and wine.", null, null);
+
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_00", "ce_drink_menu_01", "ce_maid_business_drink", "{=CEBROTHEL1087}I will have the mead.", () => { return !ConversationWithMaidIsOwner(); }, null);
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_01", "ce_drink_menu_01", "ce_maid_business_drink", "{=CEBROTHEL1088}I will have the wine.", () => { return !ConversationWithMaidIsOwner(); }, null);
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_02", "ce_drink_menu_01", "ce_maid_business_drink", "{=CEBROTHEL1090}I will have the ale.", () => { return !ConversationWithMaidIsOwner(); }, null);
+
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_00", "ce_drink_menu_01", "ce_maid_business_complete_owner", "{=CEBROTHEL1087}I will have the mead.", () => { return ConversationWithMaidIsOwner(); }, ConversationBoughtDrink);
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_01", "ce_drink_menu_01", "ce_maid_business_complete_owner", "{=CEBROTHEL1088}I will have the wine.", () => { return ConversationWithMaidIsOwner(); }, ConversationBoughtDrink);
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_02", "ce_drink_menu_01", "ce_maid_business_complete_owner", "{=CEBROTHEL1090}I will have the ale.", () => { return ConversationWithMaidIsOwner(); }, ConversationBoughtDrink);
+
+            campaignGameStarter.AddPlayerLine("ce_drink_menu_01_03", "ce_drink_menu_01", "ce_repeat_maid", "{=CEBROTHEL1011}Uh, nevermind.", null, null);
+
+            // Specific
+            campaignGameStarter.AddDialogLine("ce_specific_00_00", "ce_specific_00", "ce_repeat_maid", "{=CEBROTHEL1084}Looking for someone specific? I'm sure your assistant will be happy to direct you, {?PLAYER.GENDER}milady{?}my lord{\\?}.", ConversationWithMaidIsOwner, null);
+            campaignGameStarter.AddDialogLine("ce_specific_00_01", "ce_specific_00", "ce_repeat_maid", "{=CEBROTHEL1085}Looking for someone specific? I'm sure the owner will be happy to direct you, {?PLAYER.GENDER}milady{?}my lord{\\?}.", null, null);
+
+            // Response Drink 
+            campaignGameStarter.AddDialogLine("ce_maid_business_drink_response", "ce_maid_business_drink", "ce_maid_business_drink_00", "{=CEBROTHEL1091}That will be {AMOUNT} denars. [ib: confident][rb: very_positive]", PriceWithMaid, null);
+
+            campaignGameStarter.AddPlayerLine("ce_maid_business_drink_00_yes", "ce_maid_business_drink_00", "ce_maid_business_complete", "{=CEBROTHEL1049}Alright, here you go.", null, ConversationBoughtDrink, 100, ConversationHasEnoughForDrinks);
+            campaignGameStarter.AddPlayerLine("ce_maid_business_drink_00_no", "ce_maid_business_drink_00", "ce_maid_exit_00", "{=CEBROTHEL1050}Nevermind.", null, null);
+
+            campaignGameStarter.AddDialogLine("ce_maid_business_complete_response_owner", "ce_maid_business_complete_owner", "close_window", "{=CEBROTHEL0980}Of course {?PLAYER.GENDER}milady{?}my lord{\\?}.", null, null);
+            campaignGameStarter.AddDialogLine("ce_maid_business_complete_response", "ce_maid_business_complete", "close_window", "{=CEBROTHEL1057}A pleasure doing business. [ib:confident][rb:very_positive]", null, null);
+            campaignGameStarter.AddDialogLine("ce_maid_exit_response", "ce_maid_exit_00", "close_window", "{=CEBROTHEL1058}Very well, I'll be here if you need anything. [ib:confident][rb:very_positive]", null, null);
 
             // Dialogue With Owner 00
             campaignGameStarter.AddDialogLine("ce_owner_talk_00", "start", "ce_owner_response_00", "{=CEBROTHEL1053}Oh, a valued customer, how can I help you today?[ib:confident][rb:very_positive]", ConversationWithBrothelOwnerBeforeSelling, null);
@@ -673,7 +742,7 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddPlayerLine("ce_owner_buy_no", "ce_owner_buy_response", "ce_owner_exit_00", "{=CEBROTHEL1050}Nevermind.", null, null);
 
             campaignGameStarter.AddDialogLine("ce_owner_party_00_r", "ce_owner_party_00", "ce_owner_party_response", "{=CEBROTHEL1072}I can bring some ladies but that will be {AMOUNT} denars.", PriceWithParty, null);
-
+            
             campaignGameStarter.AddPlayerLine("ce_party_buy_yes", "ce_owner_party_response", "ce_owner_business_complete", "{=CEBROTHEL1049}Alright, here you go.", null, ConversationBoughtParty, 100, ConversationHasEnoughForPartyService);
             campaignGameStarter.AddPlayerLine("ce_party_buy_no", "ce_owner_party_response", "ce_owner_exit_00", "{=CEBROTHEL1050}Nevermind.", null, null);
 
@@ -823,6 +892,9 @@ namespace CaptivityEvents.Brothel
         private bool ConversationWithPositiveCaptive() => Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.HeroState == Hero.CharacterStates.Prisoner && ContainsPrisoner(Hero.OneToOneConversationHero.CharacterObject) && (Hero.OneToOneConversationHero.GetSkillValue(CESkills.Slavery) > 50 || Hero.OneToOneConversationHero.GetSkillValue(CESkills.Prostitution) > 70);
 
         private bool ConversationWithProstitute() => CharacterObject.OneToOneConversationCharacter.StringId == "prostitute_regular";
+        
+        private bool ConversationWithMaidIsOwner() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid" && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
+        private bool ConversationWithMaid() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid";
 
         private bool ConversationWithMaid() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid";
 
@@ -839,6 +911,16 @@ namespace CaptivityEvents.Brothel
             text = TextObject.Empty;
 
             if (Hero.MainHero.Gold >= prostitutionCost) return true;
+            text = new TextObject("{=CEEVENTS1138}You don't have enough gold");
+
+            return false;
+        }
+
+        private bool ConversationHasEnoughForDrinks(out TextObject text)
+        {
+            text = TextObject.Empty;
+
+            if (Hero.MainHero.Gold >= drinkCost) return true;
             text = new TextObject("{=CEEVENTS1138}You don't have enough gold");
 
             return false;
@@ -872,9 +954,15 @@ namespace CaptivityEvents.Brothel
             return true;
         }
 
+        private bool PriceWithMaid()
+        {
+            MBTextManager.SetTextVariable("AMOUNT", new TextObject(drinkCost.ToString()));
+
+            return true;
+        }
+
         private bool ConditionalRandomName()
         {
-            
             MBTextManager.SetTextVariable("NAME", new TextObject(Settlement.CurrentSettlement.Culture.FemaleNameList.GetRandomElement()));
 
             return true;
@@ -883,8 +971,8 @@ namespace CaptivityEvents.Brothel
         // conversation_town_or_village_player_ask_location_of_hero_2_on_condition
         private bool ConditionalSendBrothelCaptive()
         {
-            CharacterObject characterObject = ConversationSentence.SelectedRepeatObject as CharacterObject;
-            if (characterObject != null)
+
+            if (ConversationSentence.SelectedRepeatObject is CharacterObject characterObject)
             {
                 StringHelpers.SetCharacterProperties("HERO", characterObject, null, ConversationSentence.SelectedRepeatLine, true);
                 return true;
@@ -903,7 +991,7 @@ namespace CaptivityEvents.Brothel
             if (captive.HeroObject.GetSkillValue(CESkills.Prostitution) < 50)
             {
                 new Dynamics().RenownModifier(MBRandom.RandomInt(-20, -5), captive.HeroObject);
-            } 
+            }
             else
             {
                 captive.HeroObject.SetSkillValue(CESkills.Slavery, MBRandom.RandomInt(10, 20));
@@ -918,6 +1006,17 @@ namespace CaptivityEvents.Brothel
 
         }
 
+        private void ConversationBoughtDrink()
+        {
+            if (!DoesOwnBrothelInSettlement(Settlement.CurrentSettlement))
+            {
+                GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, drinkCost);
+            }
+
+            Hero.MainHero.HitPoints += 10;
+
+        }
+        
         private void ConversationBoughtParty()
         {
             int numberOfMen = PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
@@ -1118,22 +1217,29 @@ namespace CaptivityEvents.Brothel
 
         private void OnWarDeclared(IFaction faction1, IFaction faction2)
         {
-            IFaction faction3 = (faction1 == Hero.MainHero.MapFaction) ? faction1 : ((faction2 == Hero.MainHero.MapFaction) ? faction2 : null);
-            if (faction3 != null)
+            try
             {
-                IFaction faction4 = (faction3 != faction1) ? faction1 : faction2;
-                int count = _brothelList.Count;
-                for (int i = 0; i < count; i++)
+                IFaction faction3 = (faction1 == Hero.MainHero.MapFaction) ? faction1 : ((faction2 == Hero.MainHero.MapFaction) ? faction2 : null);
+                if (faction3 != null)
                 {
-                    CEBrothel brothel = _brothelList[i];
-                    if (brothel != null && brothel.Settlement.MapFaction == faction4)
+                    IFaction faction4 = (faction3 != faction1) ? faction1 : faction2;
+                    int count = _brothelList.Count;
+                    for (int i = 0; i < count; i++)
                     {
-                        TextObject textObject3 = new TextObject("{CEBROTHEL0983}The brothel of {SETTLEMENT} has been captured by the enemy, and has been requisitioned.");
-                        textObject3.SetTextVariable("SETTLEMENT", brothel.Settlement.Name);
-                        InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Yellow));
-                        BrothelInteraction(brothel.Settlement, false, true, brothel.Settlement.OwnerClan.Leader);
+                        CEBrothel brothel = _brothelList[i];
+                        if (brothel != null && brothel.Settlement.MapFaction == faction4)
+                        {
+                            TextObject textObject3 = new TextObject("{CEBROTHEL0983}The brothel of {SETTLEMENT} has been captured by the enemy, and has been requisitioned.");
+                            textObject3.SetTextVariable("SETTLEMENT", brothel.Settlement.Name);
+                            InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Yellow));
+                            BrothelInteraction(brothel.Settlement, false, true, brothel.Settlement.OwnerClan.Leader);
+                        }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("OnWarDeclared : " + e);
             }
         }
 
@@ -1189,7 +1295,7 @@ namespace CaptivityEvents.Brothel
                             new Dynamics().RenownModifier(MBRandom.RandomInt(-10, -1), _brothelList[i].CaptiveProstitutes[y].HeroObject);
 
                             int numEscapeChance = CESettings.Instance.PrisonerHeroEscapeChanceSettlement;
-                            if (numEscapeChance == -1) continue;
+                            if (numEscapeChance == -1) numEscapeChance = 25;
 
                             if (MBRandom.RandomInt(100) < numEscapeChance)
                             {
@@ -1201,7 +1307,7 @@ namespace CaptivityEvents.Brothel
                         else
                         {
                             int numEscapeChance = CESettings.Instance.PrisonerNonHeroEscapeChanceSettlement;
-                            if (numEscapeChance == -1) continue;
+                            if (numEscapeChance == -1) numEscapeChance = 25;
 
                             if (MBRandom.RandomInt(100) < numEscapeChance)
                             {
@@ -1573,6 +1679,8 @@ namespace CaptivityEvents.Brothel
         private List<Settlement> SettlementsThatPlayerHasSpy = new List<Settlement>();
 
         private const int prostitutionCost = 60;
+        
+        private const int drinkCost = 30;
 
         private const int prostitutionCostPerParty = 40;
 

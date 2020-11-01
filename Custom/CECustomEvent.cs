@@ -64,7 +64,13 @@ namespace CaptivityEvents.Custom
         GainRandomPrisoners,
         StripPlayer,
         NoInformationMessage,
-        NoMessages
+        NoMessages,
+        JoinCaptor,
+        WoundPrisoner,
+        WoundCaptor,
+        WoundAllPrisoners,
+        WoundRandomPrisoners,
+        MakeHeroCompanion
     }
 
     [XmlType(AnonymousType = true)]
@@ -73,6 +79,7 @@ namespace CaptivityEvents.Custom
     public enum RestrictedListOfFlags
     {
         WaitingMenu,
+        ProgressMenu,
         CanOnlyBeTriggeredByOtherEvent,
         Common,
         Femdom,
@@ -143,6 +150,25 @@ namespace CaptivityEvents.Custom
         PlayerAllowedCompanion,
         StripEnabled,
         StripDisabled,
+        IgnoreAllOther,
+    }
+
+    [DebuggerStepThrough]
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = true)]
+    [Serializable]
+    public class ProgressEvent
+    {
+        public bool ShouldStopMoving { get; set; }
+
+        public string DisplayProgressMode { get; set; }
+
+        public string TimeToTake { get; set; }
+
+        public string TriggerEventName { get; set; }
+
+        [XmlArrayItem("TriggerEvent", IsNullable = true)]
+        public TriggerEvent[] TriggerEvents { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -187,6 +213,12 @@ namespace CaptivityEvents.Custom
 
         [XmlAttribute()]
         public string Id { get; set; }
+
+        [XmlAttribute()]
+        public string Color { get; set; }
+
+        [XmlAttribute()]
+        public bool HideNotification { get; set; }
     }
 
     public class SkillRequired
@@ -202,6 +234,21 @@ namespace CaptivityEvents.Custom
 
         [XmlAttribute()]
         public string Id { get; set; }
+    }
+
+    public class KingdomOption
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Action { get; set; }
+
+        [XmlAttribute()]
+        public string Kingdom { get; set; }
+
+        [XmlAttribute()]
+        public bool HideNotification { get; set; }
     }
 
     public class SpawnTroop
@@ -232,6 +279,9 @@ namespace CaptivityEvents.Custom
 
         [XmlAttribute()]
         public string Clan { get; set; }
+
+        [XmlArrayItem("Skill", IsNullable = true)]
+        public SkillToLevel[] SkillsToLevel { get; set; }
     }
 
 
@@ -318,6 +368,30 @@ namespace CaptivityEvents.Custom
 
         public string ReqMaleCaptivesBelow { get; set; }
 
+        public string ReqHeroTroopsAbove { get; set; }
+
+        public string ReqHeroTroopsBelow { get; set; }
+
+        public string ReqHeroMaleTroopsAbove { get; set; }
+
+        public string ReqHeroMaleTroopsBelow { get; set; }
+
+        public string ReqHeroFemaleTroopsAbove { get; set; }
+
+        public string ReqHeroFemaleTroopsBelow { get; set; }
+
+        public string ReqHeroCaptivesAbove { get; set; }
+
+        public string ReqHeroCaptivesBelow { get; set; }
+
+        public string ReqHeroFemaleCaptivesAbove { get; set; }
+
+        public string ReqHeroFemaleCaptivesBelow { get; set; }
+
+        public string ReqHeroMaleCaptivesAbove { get; set; }
+
+        public string ReqHeroMaleCaptivesBelow { get; set; }
+
         public string ReqGoldAbove { get; set; }
 
         public string ReqGoldBelow { get; set; }
@@ -378,6 +452,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("SpawnHero", IsNullable = true)]
         public SpawnHero[] SpawnHeroes { get; set; }
+
+        [XmlArrayItem("KingdomOption", IsNullable = true)]
+        public KingdomOption[] KingdomOptions { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -408,6 +485,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("Option", IsNullable = true)]
         public Option[] Options { get; set; }
+
+        [XmlElement("ProgressEvent", IsNullable = true)]
+        public ProgressEvent ProgressEvent { get; set; }
 
         public bool ReqCustomCode { get; set; }
 
@@ -488,6 +568,30 @@ namespace CaptivityEvents.Custom
         public string ReqMaleCaptivesAbove { get; set; }
 
         public string ReqMaleCaptivesBelow { get; set; }
+
+        public string ReqHeroTroopsAbove { get; set; }
+
+        public string ReqHeroTroopsBelow { get; set; }
+
+        public string ReqHeroMaleTroopsAbove { get; set; }
+
+        public string ReqHeroMaleTroopsBelow { get; set; }
+
+        public string ReqHeroFemaleTroopsAbove { get; set; }
+
+        public string ReqHeroFemaleTroopsBelow { get; set; }
+
+        public string ReqHeroCaptivesAbove { get; set; }
+
+        public string ReqHeroCaptivesBelow { get; set; }
+
+        public string ReqHeroFemaleCaptivesAbove { get; set; }
+
+        public string ReqHeroFemaleCaptivesBelow { get; set; }
+
+        public string ReqHeroMaleCaptivesAbove { get; set; }
+
+        public string ReqHeroMaleCaptivesBelow { get; set; }
 
         public string ReqGoldAbove { get; set; }
 

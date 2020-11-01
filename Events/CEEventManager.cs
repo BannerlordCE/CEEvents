@@ -171,6 +171,12 @@ namespace CaptivityEvents.Events
                         {
                             int weightedChance = 10;
 
+                            if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
+                            {
+                                CECustomHandler.LogToFile("IgnoreAllOther detected - autofire " + listEvent.Name);
+                                return listEvent;
+                            }
+
                             try
                             {
                                 weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
@@ -224,6 +230,12 @@ namespace CaptivityEvents.Events
                         if (result == null)
                         {
                             int weightedChance = 10;
+
+                            if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
+                            {
+                                CECustomHandler.LogToFile("IgnoreAllOther detected - autofire " + listEvent.Name);
+                                return listEvent;
+                            }
 
                             try
                             {
@@ -279,6 +291,12 @@ namespace CaptivityEvents.Events
                     if (result == null)
                     {
                         int weightedChance = 10;
+
+                        if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
+                        {
+                            CECustomHandler.LogToFile("IgnoreAllOther detected - autofire " + listEvent.Name);
+                            return listEvent;
+                        }
 
                         try
                         {
