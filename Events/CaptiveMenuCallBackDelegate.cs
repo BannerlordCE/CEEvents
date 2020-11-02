@@ -45,9 +45,7 @@ namespace CaptivityEvents.Events
 
             new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default_random");
 
-            MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
-                                            ? 1
-                                            : 0);
+            SetCaptiveTextVariables(ref args);
 
             if (_listedEvent.ProgressEvent != null)
             {

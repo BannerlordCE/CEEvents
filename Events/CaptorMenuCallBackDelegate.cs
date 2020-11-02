@@ -50,6 +50,12 @@ namespace CaptivityEvents.Events
                                             ? 1
                                             : 0);
 
+            if (_listedEvent.Captive != null)
+            {
+                MBTextManager.SetTextVariable("CAPTIVE_NAME", _listedEvent.Captive.Name);
+                MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive.IsFemale);
+            }
+
             if (_listedEvent.ProgressEvent != null)
             {
                 args.MenuContext.GameMenu.AllowWaitingAutomatically();
@@ -141,6 +147,7 @@ namespace CaptivityEvents.Events
                 {
                     if (_listedEvent.Captive.IsHero) captiveHero = _listedEvent.Captive.HeroObject;
                     MBTextManager.SetTextVariable("CAPTIVE_NAME", _listedEvent.Captive.Name);
+                    MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive.IsFemale);
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
