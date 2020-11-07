@@ -47,8 +47,6 @@ namespace CaptivityEvents.Custom
 
                             if (Path.GetFileNameWithoutExtension(text) == "SubModule") continue;
 
-                            if (Path.GetFileNameWithoutExtension(text).StartsWith("CESettings")) continue;
-
                             if (Path.GetFileNameWithoutExtension(text).StartsWith("CEModuleCustom"))
                             {
                                 ForceLogToFile("Custom Settings Found: " + text);
@@ -92,6 +90,8 @@ namespace CaptivityEvents.Custom
 
                 foreach (string text in files)
                 {
+                    if (Path.GetFileNameWithoutExtension(text).StartsWith("CESettings")) continue;
+
                     if (Path.GetFileNameWithoutExtension(text).StartsWith("CEModuleCustom"))
                     {
                         ForceLogToFile("Custom Flags Found: " + text);
