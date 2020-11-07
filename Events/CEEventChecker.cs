@@ -42,12 +42,12 @@ namespace CaptivityEvents.Events
                                : "Male")
                            + "\n";
 
-            foreach(SkillObject skill in CESkills.CustomSkills)
+            foreach (SkillObject skill in CESkills.CustomSkills)
             {
                 int value = captive.GetSkillValue(skill);
                 CESkillNode skillNode = CESkills.FindSkillNode(skill.StringId);
                 bool isTrueFalse = (skillNode.MaxLevel == "1" && skillNode.MinLevel == "0");
-                
+
 
                 returnString += skill.StringId + " : "
                          + (isTrueFalse ? (value != 0 ? "True" : "False") : value.ToString())
@@ -1577,7 +1577,7 @@ namespace CaptivityEvents.Events
             if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) return Error("Skipping event " + _listEvent.Name + " Player is busy.");
             if (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerAllowedCompanion)) return Error("Skipping event " + _listEvent.Name + " Player has too many companions.");
 
-                return true;
+            return true;
         }
 
         private bool CustomFlagCheck()

@@ -70,7 +70,8 @@ namespace CaptivityEvents.Custom
         WoundCaptor,
         WoundAllPrisoners,
         WoundRandomPrisoners,
-        MakeHeroCompanion
+        MakeHeroCompanion,
+        CaptorLeaveSpouse
     }
 
     [XmlType(AnonymousType = true)]
@@ -284,6 +285,18 @@ namespace CaptivityEvents.Custom
         public SkillToLevel[] SkillsToLevel { get; set; }
     }
 
+    public class Background
+    {
+        [XmlAttribute()]
+        public string Name { get; set; }
+
+        [XmlAttribute()]
+        public string Weight { get; set; }
+
+        [XmlAttribute()]
+        public string UseConditions { get; set; }
+    }
+
 
     [DebuggerStepThrough]
     [XmlType(AnonymousType = true)]
@@ -468,6 +481,9 @@ namespace CaptivityEvents.Custom
         public string Text { get; set; }
 
         public string BackgroundName { get; set; }
+
+        [XmlArrayItem("Background", IsNullable = true)]
+        public Background[] Backgrounds { get; set; }
 
         public string NotificationName { get; set; }
 

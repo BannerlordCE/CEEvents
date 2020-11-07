@@ -1,8 +1,8 @@
-﻿using System;
+﻿using CaptivityEvents.Custom;
+using System;
 using System.Collections.Generic;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
-using CaptivityEvents.Custom;
 
 namespace CaptivityEvents
 {

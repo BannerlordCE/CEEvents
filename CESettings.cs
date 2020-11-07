@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using MCM.Abstractions.Attributes;
+﻿using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Dropdown;
 using MCM.Abstractions.Settings.Base;
 using MCM.Abstractions.Settings.Base.Global;
+using System;
+using System.Collections.Generic;
 
 namespace CaptivityEvents
 {
@@ -34,6 +34,7 @@ namespace CaptivityEvents
         int PrisonerNonHeroEscapeChanceSettlement { get; set; }
         int PrisonerNonHeroEscapeChanceOther { get; set; }
         DropdownDefault<string> EscapeAutoRansom { get; set; }
+        DropdownDefault<string> BrothelOption { get; set; }
         bool PrisonerExceeded { get; set; }
         bool NonSexualContent { get; set; }
         bool SexualContent { get; set; }
@@ -95,6 +96,12 @@ namespace CaptivityEvents
             "{=CESETTINGS1114}Disabled For Player",
             "{=CESETTINGS1116}On"
         }, 0);
+        public DropdownDefault<string> BrothelOption { get; set; } = new DropdownDefault<string>(new string[]
+        {
+            "{=CESETTINGS1117}Any",
+            "{=CESETTINGS1118}Female",
+            "{=CESETTINGS1119}Male"
+        }, 1);
         public bool PrisonerExceeded { get; set; } = false;
         public bool NonSexualContent { get; set; } = true;
         public bool SexualContent { get; set; } = true;
@@ -206,6 +213,15 @@ namespace CaptivityEvents
         [SettingPropertyInteger("{=CESETTINGS1082}Max amount of prisoners to spawn for hunt", 1, 100, Order = 12, RequireRestart = false, HintText = "{=CESETTINGS1083}Amount of prisoners that will spawn for hunt")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public int AmountOfTroopsForHunt { get; set; } = 15;
+
+        [SettingPropertyDropdown("{=CESETTINGS1120}Brothel Prisoners Allowed", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1121}Allows the gender to be prisoners in the brothel")]
+        [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
+        public DropdownDefault<string> BrothelOption { get; set; } = new DropdownDefault<string>(new string[]
+        {
+            "{=CESETTINGS1117}Any",
+            "{=CESETTINGS1118}Female",
+            "{=CESETTINGS1119}Male"
+        }, 1);
 
         [SettingPropertyBool("{=CESETTINGS1020}Modified Prisoner Escape Behavior", Order = 1, RequireRestart = true, HintText = "{=CESETTINGS1021}Use modified behaviour in game for prisoner escape, Turn off for compatability with mods that effect prisoner behavior.")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
@@ -374,7 +390,7 @@ namespace CaptivityEvents
             {
                 if (CESettingsCustom.Instance != null) return CESettingsCustom.Instance;
                 if (_provider != null) return _provider;
-                _provider =  new HardcodedCustomSettings();
+                _provider = new HardcodedCustomSettings();
                 return _provider;
 
             }

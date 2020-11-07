@@ -18,6 +18,7 @@ namespace CaptivityEvents.Events
         private readonly CEEvent _listedEvent;
         private readonly List<CEEvent> _eventList;
         private readonly Option _option;
+        private readonly SharedCallBackHelper _sharedCallBackHelper;
         private readonly CaptorSpecifics _captor = new CaptorSpecifics();
 
         private readonly Dynamics _dynamics = new Dynamics();
@@ -35,6 +36,7 @@ namespace CaptivityEvents.Events
             _listedEvent = listedEvent;
             _option = option;
             _eventList = eventList;
+            _sharedCallBackHelper = new SharedCallBackHelper(_listedEvent, _option, _eventList);
         }
 
 
@@ -44,7 +46,7 @@ namespace CaptivityEvents.Events
                                        ? "wait_captive_female"
                                        : "wait_captive_male");
 
-            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default_random");
+            _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
 
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                             ? 1
@@ -109,7 +111,7 @@ namespace CaptivityEvents.Events
         internal void CaptorEventWaitGameMenu(MenuCallbackArgs args)
         {
             SetNames(ref args);
-            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("captor_default");
+            _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
         }
 
         internal bool CaptorEventOptionGameMenu(MenuCallbackArgs args)
@@ -152,6 +154,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
 
+            CaptorLeaveSpouse();
             CaptorGold(captiveHero);
             CaptorChangeGold();
             CaptorSkill();
@@ -198,8 +201,14 @@ namespace CaptivityEvents.Events
             }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners)) { _captor.CEPrisonerRebel(args); }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.HuntPrisoners)) { _captor.CEHuntPrisoners(args); }
-            else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0) ConsequenceRandomEventTrigger(ref args);
-            else if (!string.IsNullOrEmpty(_option.TriggerEventName)) ConsequenceSingleEventTrigger(ref args);
+            else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0)
+            {
+                ConsequenceRandomEventTrigger(ref args);
+            }
+            else if (!string.IsNullOrEmpty(_option.TriggerEventName))
+            {
+                ConsequenceSingleEventTrigger(ref args);
+            }
             else { _captor.CECaptorContinue(args); }
         }
 
@@ -258,7 +267,7 @@ namespace CaptivityEvents.Events
 
                 if (eventNames.Count > 0)
                 {
-                    int number = MBRandom.Random.Next(0, eventNames.Count - 1);
+                    int number = MBRandom.Random.Next(0, eventNames.Count);
 
                     try
                     {
@@ -350,7 +359,7 @@ namespace CaptivityEvents.Events
 
                 if (eventNames.Count > 0)
                 {
-                    int number = MBRandom.Random.Next(0, eventNames.Count - 1);
+                    int number = MBRandom.Random.Next(0, eventNames.Count);
 
                     try
                     {
@@ -418,7 +427,10 @@ namespace CaptivityEvents.Events
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundPrisoner))
             {
-                if (_listedEvent.Captive.IsHero) _listedEvent.Captive.HeroObject.MakeWounded(Hero.MainHero);
+                if (_listedEvent.Captive.IsHero)
+                {
+                    _listedEvent.Captive.HeroObject.MakeWounded(Hero.MainHero);
+                }
                 else
                 {
                     PartyBase.MainParty.PrisonRoster.AddToCounts(_listedEvent.Captive, -1);
@@ -880,6 +892,12 @@ namespace CaptivityEvents.Events
             content += currentValue / 2;
             content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveCaptorGold);
             GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, content);
+        }
+
+        private void CaptorLeaveSpouse()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptorLeaveSpouse)) return;
+            _dynamics.ChangeSpouse(Hero.MainHero, null);
         }
 
         #region ReqGold

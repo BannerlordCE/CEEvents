@@ -210,7 +210,7 @@ namespace CaptivityEvents.Custom
             try
             {
                 xmlSchemaSet.Add(null, fullPath);
-                var opts = LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo;
+                LoadOptions opts = LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo;
                 XDocument source = XDocument.Load(file, opts);
 
                 source.Validate(xmlSchemaSet, delegate (object o, ValidationEventArgs e)
@@ -303,17 +303,12 @@ namespace CaptivityEvents.Custom
                 {
                     case "FC":
                         TestLog = "RT";
-
                         break;
-
                     case "RT":
                         TestLog = "LT";
-
                         break;
-
                     default:
                         TestLog = "FC";
-
                         break;
                 }
 
