@@ -58,6 +58,7 @@
     <Compile Include="Brothel\CEBrothelToolTip.cs" />
     <Compile Include="CampaignBehaviors\CECampaignBehavior.cs" />
     <Compile Include="CESettingsFlags.cs" />
+    <Compile Include="Custom\CECustomSettings.cs" />
     <Compile Include="Events\CaptiveMenuCallBackDelegate.cs" />
     <Compile Include="Events\CaptiveSpecifics.cs" />
     <Compile Include="Events\CaptorMenuCallBackDelegate.cs" />

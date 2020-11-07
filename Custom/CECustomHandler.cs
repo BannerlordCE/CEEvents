@@ -47,6 +47,8 @@ namespace CaptivityEvents.Custom
 
                             if (Path.GetFileNameWithoutExtension(text) == "SubModule") continue;
 
+                            if (Path.GetFileNameWithoutExtension(text).StartsWith("CESettings")) continue;
+
                             if (Path.GetFileNameWithoutExtension(text).StartsWith("CEModuleCustom"))
                             {
                                 ForceLogToFile("Custom Settings Found: " + text);
@@ -122,6 +124,44 @@ namespace CaptivityEvents.Custom
 
                 return new List<CEEvent>();
             }
+        }
+         
+        public static CECustomSettings LoadCustomSettings()
+        {
+            string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CESettings.xml";
+            try
+            {
+                return DeserializeXMLFileToSettings(fullPath);
+            }
+            catch (Exception e)
+            {
+                ForceLogToFile(e.ToString());
+                return null;
+            }
+        }
+        // Settings
+        public static CECustomSettings DeserializeXMLFileToSettings(string XmlFilename)
+        {
+            CECustomSettings _CESettings;
+
+            try
+            {
+                if (string.IsNullOrEmpty(XmlFilename)) return null;
+                StreamReader textReader = new StreamReader(XmlFilename);
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(CECustomSettings));
+                CECustomSettings xsefsevents = (CECustomSettings)xmlSerializer.Deserialize(textReader);
+                _CESettings = xsefsevents;
+            }
+            catch (Exception innerException)
+            {
+                TextObject textObject = new TextObject("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
+                textObject.SetTextVariable("FILE", XmlFilename);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
+
+                throw new Exception("ERROR DeserializeXMLFileToSettings:  -- filename: " + XmlFilename, innerException);
+            }
+
+            return _CESettings;
         }
 
         // Custom
