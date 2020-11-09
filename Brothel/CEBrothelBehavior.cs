@@ -906,9 +906,6 @@ namespace CaptivityEvents.Brothel
         private bool ConversationWithMaidIsOwner() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid" && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
         private bool ConversationWithMaid() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid";
 
-        private bool ConversationWithMaidIsOwner() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid" && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
-        private bool ConversationWithMaid() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid";
-
         private bool ConversationWithProstituteIsOwner() => CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("prostitute") && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
 
         private bool ConversationWithProstituteNotMetRequirements() => CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("prostitute") && Campaign.Current.IsMainHeroDisguised;
@@ -1690,8 +1687,6 @@ namespace CaptivityEvents.Brothel
 
         private const int prostitutionCost = 60;
         
-        private const int drinkCost = 30;
-
         private const int drinkCost = 30;
 
         private const int prostitutionCostPerParty = 40;

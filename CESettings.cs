@@ -4,6 +4,8 @@ using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Dropdown;
 using MCM.Abstractions.Settings.Base;
 using MCM.Abstractions.Settings.Base.Global;
+using System;
+using System.Collections.Generic;
 
 namespace CaptivityEvents
 {
