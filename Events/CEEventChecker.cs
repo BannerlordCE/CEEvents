@@ -47,8 +47,6 @@ namespace CaptivityEvents.Events
                 int value = captive.GetSkillValue(skill);
                 CESkillNode skillNode = CESkills.FindSkillNode(skill.StringId);
                 bool isTrueFalse = (skillNode.MaxLevel == "1" && skillNode.MinLevel == "0");
-
-
                 returnString += skill.StringId + " : "
                          + (isTrueFalse ? (value != 0 ? "True" : "False") : value.ToString())
                          + "\n";

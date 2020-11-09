@@ -715,10 +715,8 @@ namespace CaptivityEvents.Helper
                     {
                         test += "\n" + brothel.Name;
                     }
-
                     //test += PlayerEncounter.LocationEncounter.IsInsideOfASettlement ? "Is In Settlement\n" : "Not in Settlement\n";
                     //PlayerEncounter.LocationEncounter.Settlement.LocationComplex.GetLocationCharacterOfHero(Hero.MainHero);
-
                     return test;
                 }
                 catch (Exception e)

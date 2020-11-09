@@ -1,4 +1,4 @@
-﻿using CaptivityEvents.Brothel;
+using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -376,7 +376,6 @@ namespace CaptivityEvents
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
                 string categoryName = "ce_notification_icons";
-
                 SpriteData spriteData = UIResourceManager.SpriteData;
 
                 // 1.5.3 

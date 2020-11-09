@@ -111,8 +111,7 @@ namespace CaptivityEvents.Events
 
             PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
-
-
+      
         internal void CaptorEventWaitGameMenu(MenuCallbackArgs args)
         {
             SetNames(ref args);
@@ -1340,7 +1339,6 @@ namespace CaptivityEvents.Events
         {
             if (_option.ReqFemaleCaptivesAbove.IsStringNoneOrEmpty()) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqFemaleCaptivesAbove)) return;
-
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
             args.IsEnabled = false;
         }
@@ -1353,7 +1351,6 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
             args.IsEnabled = false;
         }
-
         #endregion
 
         #region ReqMaleCaptives
@@ -1407,7 +1404,6 @@ namespace CaptivityEvents.Events
         {
             if (_option.ReqMaleCaptivesAbove.IsStringNoneOrEmpty()) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqMaleCaptivesAbove)) return;
-
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
             args.IsEnabled = false;
         }
@@ -1676,6 +1672,7 @@ namespace CaptivityEvents.Events
             if (_option.ReqTroopsAbove.IsStringNoneOrEmpty()) return;
             if ((PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return troopRosterElement.Number; })) >= _variableLoader.GetIntFromXML(_option.ReqTroopsAbove)) return;
 
+
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
         }
@@ -1688,7 +1685,6 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
         }
-
         #endregion
 
         #region ReqMorale
