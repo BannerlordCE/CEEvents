@@ -29,14 +29,19 @@ namespace CaptivityEvents.Events
         private float _timer = 0;
         private float _max = 0;
 
-        internal CaptorMenuCallBackDelegate(CEEvent listedEvent) => _listedEvent = listedEvent;
+        internal CaptorMenuCallBackDelegate(CEEvent listedEvent, List<CEEvent> eventList)
+        {
+            _listedEvent = listedEvent;
+            _eventList = eventList;
+            _sharedCallBackHelper = new SharedCallBackHelper(listedEvent, null, eventList);
+        }
 
         internal CaptorMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
             _listedEvent = listedEvent;
             _option = option;
             _eventList = eventList;
-            _sharedCallBackHelper = new SharedCallBackHelper(_listedEvent, _option, _eventList);
+            _sharedCallBackHelper = new SharedCallBackHelper(listedEvent, option, eventList);
         }
 
 
@@ -55,7 +60,7 @@ namespace CaptivityEvents.Events
             if (_listedEvent.Captive != null)
             {
                 MBTextManager.SetTextVariable("CAPTIVE_NAME", _listedEvent.Captive.Name);
-                MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive.IsFemale);
+                MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive.IsFemale ? 1 : 0);
             }
 
             if (_listedEvent.ProgressEvent != null)
@@ -149,7 +154,7 @@ namespace CaptivityEvents.Events
                 {
                     if (_listedEvent.Captive.IsHero) captiveHero = _listedEvent.Captive.HeroObject;
                     MBTextManager.SetTextVariable("CAPTIVE_NAME", _listedEvent.Captive.Name);
-                    MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive.IsFemale);
+                    MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive.IsFemale ? 1 : 0);
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
@@ -1816,9 +1821,13 @@ namespace CaptivityEvents.Events
             try
             {
                 if (_listedEvent.Captive != null)
+                {
                     //Hero captiveHero = null;
                     //if (_listedEvent.Captive.IsHero) captiveHero = _listedEvent.Captive.HeroObject; //WARNING: captiveHero never used
                     MBTextManager.SetTextVariable("CAPTIVE_NAME", _listedEvent.Captive.Name);
+                    MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive.IsFemale ? 1 : 0);
+                }
+                    
             }
             catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
 

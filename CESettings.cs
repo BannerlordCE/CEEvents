@@ -383,7 +383,7 @@ namespace CaptivityEvents
 
     public class CESettings
     {
-        private static ICustomSettingsProvider _provider = null;
+        internal static ICustomSettingsProvider _provider = null;
 
         public static ICustomSettingsProvider Instance
         {

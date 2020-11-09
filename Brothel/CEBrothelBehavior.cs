@@ -56,10 +56,10 @@ namespace CaptivityEvents.Brothel
             int num = 0;
 
             // 1.5.3
-            foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster) num += troopRosterElement.Character.PrisonerRansomValue(Hero.MainHero) * troopRosterElement.Number;
+            // foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster) num += troopRosterElement.Character.PrisonerRansomValue(Hero.MainHero) * troopRosterElement.Number;
 
             // 1.5.4
-            //foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster) num += Campaign.Current.Models.RansomValueCalculationModel.PrisonerRansomValue(troopRosterElement.Character, Hero.MainHero) * troopRosterElement.Number;
+            foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster) num += Campaign.Current.Models.RansomValueCalculationModel.PrisonerRansomValue(troopRosterElement.Character, Hero.MainHero) * troopRosterElement.Number;
 
             return num;
         }
@@ -131,19 +131,21 @@ namespace CaptivityEvents.Brothel
                 textObject.SetTextVariable("SETTLEMENT", Hero.MainHero.CurrentSettlement.Name);
 
                 // 1.5.3 
+                /*
                 _partyScreenLogic.Initialize(TroopRoster.CreateDummyTroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
                 _partyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
 
                 _partyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
                 _partyScreenLogic.SetDoneHandler(new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler153));
+                */
 
                 // 1.5.4         
-                /*
+                
                 _partyScreenLogic.Initialize(TroopRoster.CreateDummyTroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler), new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
                 _partyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
 
                 _partyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
-                */
+                
 
                 PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
                 partyState.InitializeLogic(_partyScreenLogic);
