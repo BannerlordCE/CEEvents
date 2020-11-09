@@ -30,7 +30,7 @@ namespace CaptivityEvents.Events
         public static void CELoadRandomEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
-            RandomMenuCallBackDelegate rcb = new RandomMenuCallBackDelegate(listedEvent, null, eventList);
+            RandomMenuCallBackDelegate rcb = new RandomMenuCallBackDelegate(listedEvent, eventList);
 
             if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
             {
@@ -77,7 +77,7 @@ namespace CaptivityEvents.Events
         public static void CELoadCaptiveEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
-            CaptiveMenuCallBackDelegate cb = new CaptiveMenuCallBackDelegate(listedEvent);
+            CaptiveMenuCallBackDelegate cb = new CaptiveMenuCallBackDelegate(listedEvent, eventList);
 
             if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
             {
@@ -140,7 +140,7 @@ namespace CaptivityEvents.Events
         public static void CELoadCaptorEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
-            CaptorMenuCallBackDelegate cb = new CaptorMenuCallBackDelegate(listedEvent);
+            CaptorMenuCallBackDelegate cb = new CaptorMenuCallBackDelegate(listedEvent, eventList);
 
             if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
             {

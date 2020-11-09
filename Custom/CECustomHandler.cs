@@ -90,6 +90,8 @@ namespace CaptivityEvents.Custom
 
                 foreach (string text in files)
                 {
+                    if (Path.GetFileNameWithoutExtension(text).StartsWith("CESettings")) continue;
+
                     if (Path.GetFileNameWithoutExtension(text).StartsWith("CEModuleCustom"))
                     {
                         ForceLogToFile("Custom Flags Found: " + text);
@@ -122,6 +124,44 @@ namespace CaptivityEvents.Custom
 
                 return new List<CEEvent>();
             }
+        }
+         
+        public static CECustomSettings LoadCustomSettings()
+        {
+            string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CESettings.xml";
+            try
+            {
+                return DeserializeXMLFileToSettings(fullPath);
+            }
+            catch (Exception e)
+            {
+                ForceLogToFile(e.ToString());
+                return null;
+            }
+        }
+        // Settings
+        public static CECustomSettings DeserializeXMLFileToSettings(string XmlFilename)
+        {
+            CECustomSettings _CESettings;
+
+            try
+            {
+                if (string.IsNullOrEmpty(XmlFilename)) return null;
+                StreamReader textReader = new StreamReader(XmlFilename);
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(CECustomSettings));
+                CECustomSettings xsefsevents = (CECustomSettings)xmlSerializer.Deserialize(textReader);
+                _CESettings = xsefsevents;
+            }
+            catch (Exception innerException)
+            {
+                TextObject textObject = new TextObject("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
+                textObject.SetTextVariable("FILE", XmlFilename);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
+
+                throw new Exception("ERROR DeserializeXMLFileToSettings:  -- filename: " + XmlFilename, innerException);
+            }
+
+            return _CESettings;
         }
 
         // Custom
@@ -210,7 +250,7 @@ namespace CaptivityEvents.Custom
             try
             {
                 xmlSchemaSet.Add(null, fullPath);
-                var opts = LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo;
+                LoadOptions opts = LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo;
                 XDocument source = XDocument.Load(file, opts);
 
                 source.Validate(xmlSchemaSet, delegate (object o, ValidationEventArgs e)
@@ -303,17 +343,12 @@ namespace CaptivityEvents.Custom
                 {
                     case "FC":
                         TestLog = "RT";
-
                         break;
-
                     case "RT":
                         TestLog = "LT";
-
                         break;
-
                     default:
                         TestLog = "FC";
-
                         break;
                 }
 

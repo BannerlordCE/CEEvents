@@ -165,11 +165,6 @@ namespace CaptivityEvents.CampaignBehaviors
                 CECustomHandler.ForceLogToFile("Failed to handle alerts. CalculatePregnancyWeight");
                 CECustomHandler.ForceLogToFile(e.Message + " : " + e);
             }
-            catch (Exception e)
-            {
-                CECustomHandler.ForceLogToFile("Failed to handle alerts. CalculatePregnancyWeight");
-                CECustomHandler.ForceLogToFile(e.Message + " : " + e);
-            }
         }
 
         public void OnDailyTick()
