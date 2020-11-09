@@ -16,15 +16,17 @@ namespace CaptivityEvents.Events
     public class SharedCallBackHelper
     {
         private readonly CEEvent _listedEvent;
+        private readonly List<CEEvent> _eventList;
         private readonly Option _option;
 
         private readonly Dynamics _dynamics = new Dynamics();
         private readonly ScoresCalculation _score = new ScoresCalculation();
 
-        public SharedCallBackHelper(CEEvent listedEvent, Option option)
+        public SharedCallBackHelper(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
             _listedEvent = listedEvent;
             _option = option;
+            _eventList = eventList;
         }
 
 
@@ -640,40 +642,132 @@ namespace CaptivityEvents.Events
         }
 
 
-        internal void LoadBackgroundImage(string textureFlag = "")
+        internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {
             try
             {
-                string backgroundName = _listedEvent.BackgroundName;
-
-                if (!backgroundName.IsStringNoneOrEmpty())
+                if (_listedEvent.Backgrounds != null)
                 {
+                    List<string> backgroundNames = new List<string>();
+                    foreach (Background background in _listedEvent.Backgrounds)
+                    {
+                        try
+                        {
+                            int weightedChance = 0;
+
+                            if (background.UseConditions != null && background.UseConditions.ToLower() != "false")
+                            {
+                                CEEvent triggeredEvent = _eventList.Find(item => item.Name == background.UseConditions);
+
+                                if (triggeredEvent == null)
+                                {
+                                    CECustomHandler.ForceLogToFile("Couldn't find " + background.UseConditions + " in events.");
+                                    continue;
+                                }
+
+
+                                string conditionMatched = null;
+                                if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                                {
+                                    conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(specificCaptive, PartyBase.MainParty);
+                                }
+                                else if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                                {
+                                    conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                                }
+                                else if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                                {
+                                    conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                                }
+
+                                if (conditionMatched != null)
+                                {
+                                    CECustomHandler.LogToFile(conditionMatched);
+                                    continue;
+                                }
+
+                                try
+                                {
+                                    weightedChance = new CEVariablesLoader().GetIntFromXML(!background.Weight.IsStringNoneOrEmpty()
+                                                                                  ? background.Weight
+                                                                                  : triggeredEvent.WeightedChanceOfOccuring);
+                                }
+                                catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    weightedChance = new CEVariablesLoader().GetIntFromXML(background.Weight);
+                                }
+                                catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
+                            }
+
+                            if (weightedChance == 0) weightedChance = 1;
+
+                            for (int a = weightedChance; a > 0; a--) backgroundNames.Add(background.Name);
+                        }
+                        catch (Exception e)
+                        {
+                            CECustomHandler.ForceLogToFile("Failed to generate a background for " + _listedEvent.Name + " " + e);
+                            continue;
+                        }
+                    }
+
                     CEPersistence.animationPlayEvent = false;
-                    new CESubModule().LoadTexture(backgroundName);
-                }
-                else if (_listedEvent.BackgroundAnimation != null && _listedEvent.BackgroundAnimation.Count > 0)
-                {
-                    CEPersistence.animationImageList = _listedEvent.BackgroundAnimation;
-                    CEPersistence.animationIndex = 0;
-                    CEPersistence.animationPlayEvent = true;
-                    float speed = 0.03f;
-
-                    try
+                    if (backgroundNames.Count > 0)
                     {
-                        if (!_listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = new CEVariablesLoader().GetFloatFromXML(_listedEvent.BackgroundAnimationSpeed);
-                    }
-                    catch (Exception e)
-                    {
-                        // Will force log if cannot load animation speed
-                        CECustomHandler.ForceLogToFile("Failed to load BackgroundAnimationSpeed for " + _listedEvent.Name + " : Exception: " + e);
-                    }
+                        int number = MBRandom.Random.Next(0, backgroundNames.Count);
 
-                    CEPersistence.animationSpeed = speed;
+                        try
+                        {
+                            new CESubModule().LoadTexture(backgroundNames[number]);
+                        }
+                        catch (Exception)
+                        {
+                            CECustomHandler.ForceLogToFile("Failed to load background for " + _listedEvent.Name);
+                            new CESubModule().LoadTexture(textureFlag);
+                        }
+                    }
+                    else
+                    {
+                        CECustomHandler.ForceLogToFile("Failed to find valid events for " + _listedEvent.Name);
+                        new CESubModule().LoadTexture(textureFlag);
+                    }
                 }
                 else
                 {
-                    CEPersistence.animationPlayEvent = false;
-                    new CESubModule().LoadTexture(textureFlag);
+                    string backgroundName = _listedEvent.BackgroundName;
+
+                    if (!backgroundName.IsStringNoneOrEmpty())
+                    {
+                        CEPersistence.animationPlayEvent = false;
+                        new CESubModule().LoadTexture(backgroundName);
+                    }
+                    else if (_listedEvent.BackgroundAnimation != null && _listedEvent.BackgroundAnimation.Count > 0)
+                    {
+                        CEPersistence.animationImageList = _listedEvent.BackgroundAnimation;
+                        CEPersistence.animationIndex = 0;
+                        CEPersistence.animationPlayEvent = true;
+                        float speed = 0.03f;
+
+                        try
+                        {
+                            if (!_listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = new CEVariablesLoader().GetFloatFromXML(_listedEvent.BackgroundAnimationSpeed);
+                        }
+                        catch (Exception e)
+                        {
+                            // Will force log if cannot load animation speed
+                            CECustomHandler.ForceLogToFile("Failed to load BackgroundAnimationSpeed for " + _listedEvent.Name + " : Exception: " + e);
+                        }
+
+                        CEPersistence.animationSpeed = speed;
+                    }
+                    else
+                    {
+                        CEPersistence.animationPlayEvent = false;
+                        new CESubModule().LoadTexture(textureFlag);
+                    }
                 }
             }
             catch (Exception)

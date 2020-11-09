@@ -1,4 +1,4 @@
-﻿using CaptivityEvents.Brothel;
+using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -137,11 +137,11 @@ namespace CaptivityEvents
                 if (!swap)
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_male_prison"]
+                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_male"]
+                          ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
@@ -164,11 +164,11 @@ namespace CaptivityEvents
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_male_prison"]
+                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
-                        ? CEPersistence.CEEventImageList["default_male"]
+                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
                         : CEPersistence.CEEventImageList[name];
                 }
             }
@@ -376,19 +376,20 @@ namespace CaptivityEvents
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
                 string categoryName = "ce_notification_icons";
-                /*
-                string partNameCaptor = "CEEventNotification\\notification_captor";
-                string partNameEvent = "CEEventNotification\\notification_event";
-                */
                 SpriteData spriteData = UIResourceManager.SpriteData;
+
                 // 1.5.3 
-                /*
-                spriteData.SpriteCategories.Add(categoryName, loadedData.SpriteCategories[categoryName]);
-                spriteData.SpritePartNames.Add(partNameCaptor, loadedData.SpritePartNames[partNameCaptor]);
-                spriteData.SpritePartNames.Add(partNameEvent, loadedData.SpritePartNames[partNameEvent]);
-                spriteData.SpriteNames.Add(partNameCaptor, new SpriteGeneric(partNameCaptor, loadedData.SpritePartNames[partNameCaptor]));
-                spriteData.SpriteNames.Add(partNameEvent, new SpriteGeneric(partNameEvent, loadedData.SpritePartNames[partNameEvent]));    
-                */
+                //string partNameCaptor = "CEEventNotification\\notification_captor";
+                //string partNameEvent = "CEEventNotification\\notification_event";
+
+                //spriteData.SpriteCategories.Add(categoryName, loadedData.SpriteCategories[categoryName]);
+                //spriteData.SpritePartNames.Add(partNameCaptor, loadedData.SpritePartNames[partNameCaptor]);
+                //spriteData.SpritePartNames.Add(partNameEvent, loadedData.SpritePartNames[partNameEvent]);
+                //spriteData.SpriteNames.Add(partNameCaptor, new SpriteGeneric(partNameCaptor, loadedData.SpritePartNames[partNameCaptor]));
+                //spriteData.SpriteNames.Add(partNameEvent, new SpriteGeneric(partNameEvent, loadedData.SpritePartNames[partNameEvent]));
+
+                // 1.5.4
+                // Nothing
 
                 SpriteCategory spriteCategory = spriteData.SpriteCategories[categoryName];
                 spriteCategory.SpriteSheets.Add(CEPersistence.CEEventImageList["CE_default_notification"]);

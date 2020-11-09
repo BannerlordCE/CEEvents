@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+using CaptivityEvents.Custom;
 using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Dropdown;
 using MCM.Abstractions.Settings.Base;
 using MCM.Abstractions.Settings.Base.Global;
+using System;
+using System.Collections.Generic;
 
 namespace CaptivityEvents
 {
@@ -34,6 +35,7 @@ namespace CaptivityEvents
         int PrisonerNonHeroEscapeChanceSettlement { get; set; }
         int PrisonerNonHeroEscapeChanceOther { get; set; }
         DropdownDefault<string> EscapeAutoRansom { get; set; }
+        DropdownDefault<string> BrothelOption { get; set; }
         bool PrisonerExceeded { get; set; }
         bool NonSexualContent { get; set; }
         bool SexualContent { get; set; }
@@ -95,6 +97,12 @@ namespace CaptivityEvents
             "{=CESETTINGS1114}Disabled For Player",
             "{=CESETTINGS1116}On"
         }, 0);
+        public DropdownDefault<string> BrothelOption { get; set; } = new DropdownDefault<string>(new string[]
+        {
+            "{=CESETTINGS1117}Any",
+            "{=CESETTINGS1118}Female",
+            "{=CESETTINGS1119}Male"
+        }, 1);
         public bool PrisonerExceeded { get; set; } = false;
         public bool NonSexualContent { get; set; } = true;
         public bool SexualContent { get; set; } = true;
@@ -206,6 +214,15 @@ namespace CaptivityEvents
         [SettingPropertyInteger("{=CESETTINGS1082}Max amount of prisoners to spawn for hunt", 1, 100, Order = 12, RequireRestart = false, HintText = "{=CESETTINGS1083}Amount of prisoners that will spawn for hunt")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public int AmountOfTroopsForHunt { get; set; } = 15;
+
+        [SettingPropertyDropdown("{=CESETTINGS1120}Brothel Prisoners Allowed", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1121}Allows the gender to be prisoners in the brothel")]
+        [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
+        public DropdownDefault<string> BrothelOption { get; set; } = new DropdownDefault<string>(new string[]
+        {
+            "{=CESETTINGS1117}Any",
+            "{=CESETTINGS1118}Female",
+            "{=CESETTINGS1119}Male"
+        }, 1);
 
         [SettingPropertyBool("{=CESETTINGS1020}Modified Prisoner Escape Behavior", Order = 1, RequireRestart = true, HintText = "{=CESETTINGS1021}Use modified behaviour in game for prisoner escape, Turn off for compatability with mods that effect prisoner behavior.")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
@@ -366,7 +383,7 @@ namespace CaptivityEvents
 
     public class CESettings
     {
-        private static ICustomSettingsProvider _provider = null;
+        internal static ICustomSettingsProvider _provider = null;
 
         public static ICustomSettingsProvider Instance
         {
@@ -374,9 +391,67 @@ namespace CaptivityEvents
             {
                 if (CESettingsCustom.Instance != null) return CESettingsCustom.Instance;
                 if (_provider != null) return _provider;
-                _provider =  new HardcodedCustomSettings();
-                return _provider;
+                _provider = new HardcodedCustomSettings();
 
+                CECustomSettings customSettings = CECustomHandler.LoadCustomSettings();
+                if (customSettings != null)
+                {
+                    _provider.EventCaptiveOn = customSettings.EventCaptiveOn;
+                    _provider.EventOccurrenceOther = customSettings.EventOccurrenceOther;
+                    _provider.EventOccurrenceSettlement = customSettings.EventOccurrenceSettlement;
+                    _provider.EventOccurrenceLord = customSettings.EventOccurrenceLord;
+                    _provider.EventCaptorOn = customSettings.EventCaptorOn;
+                    _provider.EventOccurrenceCaptor = customSettings.EventOccurrenceCaptor;
+                    _provider.EventCaptorDialogue = customSettings.EventCaptorDialogue;
+                    _provider.EventCaptorNotifications = customSettings.EventCaptorNotifications;
+                    _provider.EventCaptorCustomTextureNotifications = customSettings.EventCaptorCustomTextureNotifications;
+                    _provider.EventRandomEnabled = customSettings.EventRandomEnabled;
+                    _provider.EventRandomFireChance = customSettings.EventRandomFireChance;
+                    _provider.EventCaptorGearCaptives = customSettings.EventCaptorGearCaptives;
+                    _provider.EventProstituteGear = customSettings.EventProstituteGear;
+                    _provider.HuntLetPrisonersEscape = customSettings.HuntLetPrisonersEscape;
+                    _provider.HuntBegins = customSettings.HuntBegins;
+                    _provider.AmountOfTroopsForHunt = customSettings.AmountOfTroopsForHunt;
+                    _provider.PrisonerEscapeBehavior = customSettings.PrisonerEscapeBehavior;
+                    _provider.PrisonerHeroEscapeChanceParty = customSettings.PrisonerHeroEscapeChanceParty;
+                    _provider.PrisonerHeroEscapeChanceSettlement = customSettings.PrisonerHeroEscapeChanceSettlement;
+                    _provider.PrisonerHeroEscapeChanceOther = customSettings.PrisonerHeroEscapeChanceOther;
+                    _provider.PrisonerNonHeroEscapeChanceParty = customSettings.PrisonerNonHeroEscapeChanceParty;
+                    _provider.PrisonerNonHeroEscapeChanceSettlement = customSettings.PrisonerNonHeroEscapeChanceSettlement;
+                    _provider.PrisonerNonHeroEscapeChanceOther = customSettings.PrisonerNonHeroEscapeChanceOther;
+                    _provider.EscapeAutoRansom.SelectedIndex = customSettings.EscapeAutoRansom;
+                    _provider.BrothelOption.SelectedIndex = customSettings.BrothelOption;
+                    _provider.PrisonerExceeded = customSettings.PrisonerExceeded;
+                    _provider.NonSexualContent = customSettings.NonSexualContent;
+                    _provider.SexualContent = customSettings.SexualContent;
+                    _provider.CommonControl = customSettings.CommonControl;
+                    _provider.ProstitutionControl = customSettings.ProstitutionControl;
+                    _provider.SlaveryToggle = customSettings.SlaveryToggle;
+                    _provider.FemdomControl = customSettings.FemdomControl;
+                    _provider.BestialityControl = customSettings.BestialityControl;
+                    _provider.RomanceControl = customSettings.RomanceControl;
+                    _provider.StolenGear = customSettings.StolenGear;
+                    _provider.StolenGearQuest = customSettings.StolenGearQuest;
+                    _provider.StolenGearDuration = customSettings.StolenGearDuration;
+                    _provider.StolenGearChance = customSettings.StolenGearChance;
+                    _provider.BetterOutFitChance = customSettings.BetterOutFitChance;
+                    _provider.WeaponChance = customSettings.WeaponChance;
+                    _provider.WeaponBetterChance = customSettings.WeaponBetterChance;
+                    _provider.WeaponSkill = customSettings.WeaponSkill;
+                    _provider.RangedBetterChance = customSettings.RangedBetterChance;
+                    _provider.RangedSkill = customSettings.RangedSkill;
+                    _provider.HorseChance = customSettings.HorseChance;
+                    _provider.HorseSkill = customSettings.HorseSkill;
+                    _provider.PregnancyToggle = customSettings.PregnancyToggle;
+                    _provider.AttractivenessSkill = customSettings.AttractivenessSkill;
+                    _provider.PregnancyChance = customSettings.PregnancyChance;
+                    _provider.UsePregnancyModifiers = customSettings.UsePregnancyModifiers;
+                    _provider.PregnancyDurationInDays = customSettings.PregnancyDurationInDays;
+                    _provider.PregnancyMessages = customSettings.PregnancyMessages;
+                    _provider.RenownMin = customSettings.RenownMin;
+                    _provider.LogToggle = customSettings.LogToggle;
+                }
+                return _provider;
             }
         }
     }

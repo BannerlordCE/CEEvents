@@ -18,6 +18,8 @@ namespace CaptivityEvents.Events
         private readonly CEEvent _listedEvent;
         private readonly List<CEEvent> _eventList;
         private readonly Option _option;
+        private readonly SharedCallBackHelper _sharedCallBackHelper;
+
         private readonly ScoresCalculation _score = new ScoresCalculation();
         private readonly Dynamics _dynamics = new Dynamics();
         private readonly CEVariablesLoader _variableLoader = new CEVariablesLoader();
@@ -25,13 +27,19 @@ namespace CaptivityEvents.Events
         private float _timer = 0;
         private float _max = 0;
 
-        internal RandomMenuCallBackDelegate(CEEvent listedEvent) => _listedEvent = listedEvent;
+        internal RandomMenuCallBackDelegate(CEEvent listedEvent, List<CEEvent> eventList)
+        {
+            _listedEvent = listedEvent;
+            _eventList = eventList;
+            _sharedCallBackHelper = new SharedCallBackHelper(listedEvent, null, eventList);
+        }
 
         internal RandomMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
             _listedEvent = listedEvent;
             _option = option;
             _eventList = eventList;
+            _sharedCallBackHelper = new SharedCallBackHelper(listedEvent, option, eventList);
         }
 
         internal void RandomProgressInitWaitGameMenu(MenuCallbackArgs args)
@@ -40,7 +48,7 @@ namespace CaptivityEvents.Events
                                        ? "wait_captive_female"
                                        : "wait_captive_male");
 
-            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default_random");
+            _sharedCallBackHelper.LoadBackgroundImage("default_random");
 
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                             ? 1
@@ -100,7 +108,7 @@ namespace CaptivityEvents.Events
                                                                    ? "wait_prisoner_female"
                                                                    : "wait_prisoner_male");
 
-            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default_random");
+            _sharedCallBackHelper.LoadBackgroundImage("default_random");
 
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                               ? 1
@@ -145,24 +153,22 @@ namespace CaptivityEvents.Events
 
         internal void RandomEventConsequenceMenuOption(MenuCallbackArgs args)
         {
-            SharedCallBackHelper sharedCallBackHelper = new SharedCallBackHelper(_listedEvent, _option);
             CaptorSpecifics captorSpecifics = new CaptorSpecifics();
-
-            sharedCallBackHelper.ConsequenceXP();
-            sharedCallBackHelper.ConsequenceLeaveSpouse();
-            sharedCallBackHelper.ConsequenceGold();
-            sharedCallBackHelper.ConsequenceChangeGold();
-            sharedCallBackHelper.ConsequenceChangeTrait();
-            sharedCallBackHelper.ConsequenceChangeSkill();
-            sharedCallBackHelper.ConsequenceSlaveryLevel();
-            sharedCallBackHelper.ConsequenceSlaveryFlags();
-            sharedCallBackHelper.ConsequenceProstitutionLevel();
-            sharedCallBackHelper.ConsequenceProstitutionFlags();
-            sharedCallBackHelper.ConsequenceRenown();
-            sharedCallBackHelper.ConsequenceChangeHealth();
-            sharedCallBackHelper.ConsequenceChangeMorale();
-            sharedCallBackHelper.ConsequenceSpawnTroop();
-            sharedCallBackHelper.ConsequenceSpawnHero();
+            _sharedCallBackHelper.ConsequenceXP();
+            _sharedCallBackHelper.ConsequenceLeaveSpouse();
+            _sharedCallBackHelper.ConsequenceGold();
+            _sharedCallBackHelper.ConsequenceChangeGold();
+            _sharedCallBackHelper.ConsequenceChangeTrait();
+            _sharedCallBackHelper.ConsequenceChangeSkill();
+            _sharedCallBackHelper.ConsequenceSlaveryLevel();
+            _sharedCallBackHelper.ConsequenceSlaveryFlags();
+            _sharedCallBackHelper.ConsequenceProstitutionLevel();
+            _sharedCallBackHelper.ConsequenceProstitutionFlags();
+            _sharedCallBackHelper.ConsequenceRenown();
+            _sharedCallBackHelper.ConsequenceChangeHealth();
+            _sharedCallBackHelper.ConsequenceChangeMorale();
+            _sharedCallBackHelper.ConsequenceSpawnTroop();
+            _sharedCallBackHelper.ConsequenceSpawnHero();
 
             ConsequenceChangeKingdom();
             ConsequenceImpregnation();
@@ -231,7 +237,7 @@ namespace CaptivityEvents.Events
 
                 if (eventNames.Count > 0)
                 {
-                    int number = MBRandom.Random.Next(0, eventNames.Count - 1);
+                    int number = MBRandom.Random.Next(0, eventNames.Count);
 
                     try
                     {
@@ -268,7 +274,7 @@ namespace CaptivityEvents.Events
                 new CaptorSpecifics().CECaptorContinue(args);
             }
         }
-       
+
         private void ConsequenceSingleEventTrigger(ref MenuCallbackArgs args)
         {
             try
@@ -338,7 +344,7 @@ namespace CaptivityEvents.Events
 
                 if (eventNames.Count > 0)
                 {
-                    int number = MBRandom.Random.Next(0, eventNames.Count - 1);
+                    int number = MBRandom.Random.Next(0, eventNames.Count);
 
                     try
                     {
@@ -1066,7 +1072,7 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
         }
-
+      
         private void ReqHeroMaleTroopsAbove(ref MenuCallbackArgs args)
         {
             if (_option.ReqHeroMaleTroopsAbove.IsStringNoneOrEmpty()) return;

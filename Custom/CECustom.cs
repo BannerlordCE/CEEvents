@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 namespace CaptivityEvents
 {
 
+
     [DebuggerStepThrough]
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = null, IsNullable = true)]

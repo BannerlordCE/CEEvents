@@ -78,9 +78,7 @@ namespace CaptivityEvents.Brothel
         private static bool SellPrisonerOneStackOnCondition(MenuCallbackArgs args)
         {
             if (PartyBase.MainParty.PrisonRoster.Count <= 0) return false;
-
             args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
-
             return true;
         }
 
@@ -114,7 +112,7 @@ namespace CaptivityEvents.Brothel
         private static void ManageProstitutes()
         {
             PartyScreenLogic _partyScreenLogic = new PartyScreenLogic();
-            
+
             try
             {
                 // Reflection
@@ -140,9 +138,11 @@ namespace CaptivityEvents.Brothel
                 _partyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
                 _partyScreenLogic.SetDoneHandler(new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler153));
                 */
+
                 // 1.5.4         
-                _partyScreenLogic.Initialize(TroopRoster.CreateDummyTroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler), new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
                 
+                _partyScreenLogic.Initialize(TroopRoster.CreateDummyTroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler), new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
+
                 _partyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
 
                 _partyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
@@ -161,13 +161,23 @@ namespace CaptivityEvents.Brothel
                 CECustomHandler.ForceLogToFile("Failed to launch ManageProstitutes : " + e);
             }
         }
-        
-        private static bool BrothelTroopTransferableDelegate(CharacterObject character, PartyScreenLogic.TroopType type, PartyScreenLogic.PartyRosterSide side, PartyBase LeftOwnerParty) => character.IsFemale;
+
+        private static bool BrothelTroopTransferableDelegate(CharacterObject character, PartyScreenLogic.TroopType type, PartyScreenLogic.PartyRosterSide side, PartyBase LeftOwnerParty)
+        {
+            switch (CESettings.Instance.BrothelOption.SelectedIndex)
+            {
+                case 0:
+                    return true;
+                case 2:
+                    return !character.IsFemale;
+                default:
+                    return character.IsFemale;
+            }
+        }
 
         // 1.5.3
         private static bool ManageBrothelDoneHandler153(TroopRoster leftMemberRoster, TroopRoster leftPrisonRoster, TroopRoster rightMemberRoster, TroopRoster rightPrisonRoster, bool isForced, List<MobileParty> leftParties = null, List<MobileParty> rightParties = null)
         {
-
             SetBrothelPrisoners(Hero.MainHero.CurrentSettlement, leftPrisonRoster);
             return true;
         }
@@ -701,7 +711,7 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddDialogLine("ce_maid_talk_02", "ce_repeat_maid", "ce_maid_response_00", "{=CEBROTHEL0981}Anything else {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", null, null);
 
             // Drink
-            campaignGameStarter.AddDialogLine("ce_drink_menu_00_00", "ce_drink_menu_00", "ce_drink_menu_01", "{=CEBROTHEL1079}I recommend the mead, {?PLAYER.GENDER}milady{?}my lord{\\?}. Finished brewing just this morning. We also have ale and wine.", () => { return RandomizeConversation(3);  }, null);
+            campaignGameStarter.AddDialogLine("ce_drink_menu_00_00", "ce_drink_menu_00", "ce_drink_menu_01", "{=CEBROTHEL1079}I recommend the mead, {?PLAYER.GENDER}milady{?}my lord{\\?}. Finished brewing just this morning. We also have ale and wine.", () => { return RandomizeConversation(3); }, null);
             campaignGameStarter.AddDialogLine("ce_drink_menu_00_01", "ce_drink_menu_00", "ce_drink_menu_01", "{=CEBROTHEL1080}I recommend the wine, {?PLAYER.GENDER}milady{?}my lord{\\?}. These last few bottles've been quite popular among the other patrons. We also have ale and mead.", () => { return RandomizeConversation(3); }, null);
             campaignGameStarter.AddDialogLine("ce_drink_menu_00_02", "ce_drink_menu_00", "ce_drink_menu_01", "{=CEBROTHEL1089}Care for a mug of fresh ale, {?PLAYER.GENDER}milady{?}my lord{\\?}? We also have mead and wine.", null, null);
 
@@ -785,7 +795,7 @@ namespace CaptivityEvents.Brothel
 
             // Dialogue With Assistance 01
             campaignGameStarter.AddDialogLine("ce_assistant_talk_01", "start", "close_window", "{=CEBROTHEL1064}The new owner will arrive here shortly, I will just clean up things for now.", ConversationWithBrothelAssistantAfterSelling, null);
-            
+
             // Owner Dialogue Captives 
             // Positive Intro
             campaignGameStarter.AddDialogLine("captive_requirements_owner_positive_00", "start", "ccaptive_owner_00", "{=CEBROTHEL1008}Do you need something {?PLAYER.GENDER}milady{?}my lord{\\?}? [ib:confident][rb:very_positive]", () => RandomizeConversation(2) && ConversationWithPositiveCaptive(), null);
@@ -896,8 +906,6 @@ namespace CaptivityEvents.Brothel
         private bool ConversationWithMaidIsOwner() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid" && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
         private bool ConversationWithMaid() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid";
 
-        private bool ConversationWithMaid() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid";
-
         private bool ConversationWithProstituteIsOwner() => CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("prostitute") && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
 
         private bool ConversationWithProstituteNotMetRequirements() => CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("prostitute") && Campaign.Current.IsMainHeroDisguised;
@@ -971,7 +979,6 @@ namespace CaptivityEvents.Brothel
         // conversation_town_or_village_player_ask_location_of_hero_2_on_condition
         private bool ConditionalSendBrothelCaptive()
         {
-
             if (ConversationSentence.SelectedRepeatObject is CharacterObject characterObject)
             {
                 StringHelpers.SetCharacterProperties("HERO", characterObject, null, ConversationSentence.SelectedRepeatLine, true);
@@ -1016,7 +1023,7 @@ namespace CaptivityEvents.Brothel
             Hero.MainHero.HitPoints += 10;
 
         }
-        
+
         private void ConversationBoughtParty()
         {
             int numberOfMen = PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
