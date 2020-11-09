@@ -102,66 +102,6 @@ namespace CaptivityEvents.Events
             PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
 
-        internal void RandomProgressInitWaitGameMenu(MenuCallbackArgs args)
-        {
-            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                       ? "wait_captive_female"
-                                       : "wait_captive_male");
-
-            new SharedCallBackHelper(_listedEvent, _option).LoadBackgroundImage("default_random");
-
-            MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
-                                            ? 1
-                                            : 0);
-
-            if (_listedEvent.ProgressEvent != null)
-            {
-                args.MenuContext.GameMenu.AllowWaitingAutomatically();
-                _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);
-                _timer = 0f;
-
-                CEHelper.progressEventExists = true;
-                CEHelper.notificationCaptorExists = false;
-                CEHelper.notificationEventExists = false;
-            }
-            else
-            {
-                CECustomHandler.ForceLogToFile("Missing Progress Event Settings in " + _listedEvent.Name);
-            }
-        }
-        internal bool RandomProgressConditionWaitGameMenu(MenuCallbackArgs args)
-        {
-            args.MenuContext.GameMenu.AllowWaitingAutomatically();
-            args.optionLeaveType = GameMenuOption.LeaveType.Wait;
-            return true;
-        }
-
-        internal void RandomProgressConsequenceWaitGameMenu(MenuCallbackArgs args)
-        {
-            if (_listedEvent.ProgressEvent.TriggerEvents != null && _listedEvent.ProgressEvent.TriggerEvents.Length > 0)
-            {
-                ConsequenceRandomEventTriggerProgress(ref args);
-            }
-            else if (!string.IsNullOrEmpty(_listedEvent.ProgressEvent.TriggerEventName))
-            {
-                ConsequenceSingleEventTriggerProgress(ref args);
-            }
-        }
-
-        internal void RandomProgressTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt)
-        {
-            _timer += dt.CurrentHourInDay;
-
-            if (_timer / _max == 1)
-            {
-                CEHelper.progressEventExists = false;
-            }
-
-            args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
-
-            PartyBase.MainParty.MobileParty.SetMoveModeHold();
-        }
-
         internal void RandomEventGameMenu(MenuCallbackArgs menuCallbackArgs)
         {
             menuCallbackArgs.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
