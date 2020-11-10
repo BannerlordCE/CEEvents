@@ -1014,6 +1014,9 @@ namespace CaptivityEvents.Events
             if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorIsHero) && captorParty.LeaderHero == null)
                 return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorIsHero.");
 
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorIsNonHero) && captorParty.LeaderHero != null)
+                return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorIsNonHero.");
+
             return true;
         }
 

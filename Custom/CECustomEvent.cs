@@ -152,6 +152,7 @@ namespace CaptivityEvents.Custom
         StripEnabled,
         StripDisabled,
         IgnoreAllOther,
+        CaptorIsNonHero,
     }
 
     [DebuggerStepThrough]
