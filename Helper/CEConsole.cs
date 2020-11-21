@@ -512,6 +512,15 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.current_status [SEARCH_HERO]\".";
 
+                //try
+                //{
+                //    CommandLineFunctionality.CallFunction("console.clear", "", out bool found);
+
+                //} catch (Exception e)
+                //{
+                //    string et = e.ToString();
+                //}
+
                 string searchTerm = null;
 
                 if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);

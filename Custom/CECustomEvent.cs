@@ -202,6 +202,12 @@ namespace CaptivityEvents.Custom
         public string EventUseConditions { get; set; }
     }
 
+    public class TerrianTypes
+    {
+        [XmlArrayItem("TerrianType", IsNullable = false)]
+        public string[] TerrianType { get; set; }
+    }
+
     public class SkillToLevel
     {
         [XmlAttribute()]
@@ -655,6 +661,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("Skill", IsNullable = true)]
         public SkillToLevel[] SkillsToLevel { get; set; }
+
+        [XmlArray("TerrianTypes")]
+        public TerrianTypes[] TerrianTypesRequirements { get; set; }
 
         [XmlIgnore]
         public CharacterObject Captive { get; set; }

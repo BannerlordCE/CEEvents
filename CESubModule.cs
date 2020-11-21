@@ -121,7 +121,7 @@ namespace CaptivityEvents
         private static readonly float brothelSoundMin = 1f;
         private static readonly float brothelSoundMax = 3f;
 
-        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml  (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.3)
+        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml  (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.5)
         private static readonly int[] sprite_index = new int[] { 13, 18, 29, 30 };
 
         // Sounds for Brothel
