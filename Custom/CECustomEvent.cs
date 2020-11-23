@@ -208,6 +208,43 @@ namespace CaptivityEvents.Custom
         public string[] TerrianType { get; set; }
     }
 
+    public class TraitToLevel
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string ByXP { get; set; }
+
+        [XmlAttribute()]
+        public string ByLevel { get; set; }
+
+        [XmlAttribute()]
+        public string Id { get; set; }
+
+        [XmlAttribute()]
+        public string Color { get; set; }
+
+        [XmlAttribute()]
+        public bool HideNotification { get; set; }
+    }
+
+    public class TraitRequired
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Max { get; set; }
+
+        [XmlAttribute()]
+        public string Min { get; set; }
+
+        [XmlAttribute()]
+        public string Id { get; set; }
+    }
+
+
     public class SkillToLevel
     {
         [XmlAttribute()]
@@ -458,6 +495,12 @@ namespace CaptivityEvents.Custom
         [XmlArrayItem("TriggerEvent", IsNullable = true)]
         public TriggerEvent[] TriggerEvents { get; set; }
 
+        [XmlArrayItem("TraitRequired", IsNullable = true)]
+        public TraitRequired[] TraitsRequired { get; set; }
+
+        [XmlArrayItem("Trait", IsNullable = true)]
+        public TraitToLevel[] TraitsToLevel { get; set; }
+
         [XmlArrayItem("Skill", IsNullable = true)]
         public SkillToLevel[] SkillsToLevel { get; set; }
 
@@ -661,6 +704,12 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("Skill", IsNullable = true)]
         public SkillToLevel[] SkillsToLevel { get; set; }
+
+        [XmlArrayItem("TraitRequired", IsNullable = true)]
+        public TraitRequired[] TraitsRequired { get; set; }
+
+        [XmlArrayItem("Trait", IsNullable = true)]
+        public TraitToLevel[] TraitsToLevel { get; set; }
 
         [XmlArray("TerrianTypes")]
         public TerrianTypes[] TerrianTypesRequirements { get; set; }

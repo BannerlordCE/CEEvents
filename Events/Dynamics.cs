@@ -69,7 +69,7 @@ namespace CaptivityEvents.Events
             MarriageAction.Apply(hero, spouseHero);
         }
 
-        private void TraitObjectModifier(TraitObject traitObject, Color color, Hero hero, string trait, int amount, int xp)
+        private void TraitObjectModifier(TraitObject traitObject, Color color, Hero hero, string trait, int amount, int xp, bool display)
         {
 
             if (xp == 0)
@@ -81,10 +81,9 @@ namespace CaptivityEvents.Events
 
                 hero.SetTraitLevel(traitObject, newNumber);
 
+                if (!display) return;
                 TextObject textObject = GameTexts.FindText("str_CE_trait_level");
-
                 textObject.SetTextVariable("POSITIVE", newNumber >= 0 ? 1 : 0);
-
                 textObject.SetTextVariable("TRAIT", CEStrings.FetchTraitString(trait));
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
 
@@ -97,7 +96,7 @@ namespace CaptivityEvents.Events
 
         }
 
-        internal void TraitModifier(Hero hero, string trait, int amount, int xp)
+        internal void TraitModifier(Hero hero, string trait, int amount, int xp, bool display = true, string color = "gray")
         {
             bool found = false;
 
@@ -106,7 +105,7 @@ namespace CaptivityEvents.Events
                 if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                 {
                     found = true;
-                    TraitObjectModifier(traitObject, Colors.Magenta, hero, trait, amount, xp);
+                    TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
                 }
             }
 
@@ -117,7 +116,7 @@ namespace CaptivityEvents.Events
                     if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                     {
                         found = true;
-                        TraitObjectModifier(traitObject, Colors.Gray, hero, trait, amount, xp);
+                        TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
                     }
                 }
             }
@@ -130,7 +129,7 @@ namespace CaptivityEvents.Events
                     if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                     {
                         found = true;
-                        TraitObjectModifier(traitObject, Colors.Blue, hero, trait, amount, xp);
+                        TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
                     }
                 }
 
