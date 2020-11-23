@@ -68,6 +68,33 @@ namespace CaptivityEvents.Events
             }
         }
 
+        internal void CEReleasePrisoners(MenuCallbackArgs args, int amount = 10, bool releaseHeroes = false)
+        {
+            try
+            {
+                int prisonerCount = MobileParty.MainParty.PrisonRoster.Count;
+                if (prisonerCount < amount) amount = prisonerCount;
+                MobileParty.MainParty.PrisonRoster.KillNumberOfMenRandomly(amount, false);
+                if (releaseHeroes)
+                {
+                    foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster)
+                    {
+                        if (element.Character.IsHero) element.Character.HeroObject.ChangeState(Hero.CharacterStates.Active);
+                    }
+                    MobileParty.MainParty.PrisonRoster.Clear();
+                }
+
+                TextObject textObject = GameTexts.FindText("str_CE_release_prisoners");
+                textObject.SetTextVariable("HERO", Hero.MainHero.Name);
+                textObject.SetTextVariable("AMOUNT", amount);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Couldn't release any prisoners.");
+            }
+        }
+
         internal void CEWoundPrisoners(MenuCallbackArgs args, int amount = 10)
         {
             try

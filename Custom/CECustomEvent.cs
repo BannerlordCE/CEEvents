@@ -47,6 +47,8 @@ namespace CaptivityEvents.Custom
         PlayerIsNotBusy,
         PlayerAllowedCompanion,
         HuntPrisoners,
+        ReleaseRandomPrisoners,
+        ReleaseAllPrisoners,
         KillPrisoner,
         KillCaptor,
         KillRandomPrisoners,

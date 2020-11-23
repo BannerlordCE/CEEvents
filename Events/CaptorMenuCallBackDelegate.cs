@@ -191,8 +191,9 @@ namespace CaptivityEvents.Events
             ConsequenceSpawnTroop();
             ConsequenceSpawnHero();
 
-            Escape();
             GainRandomPrisoners();
+            Escape();
+            Release(ref args);
             WoundPrisoner(ref args);
             KillPrisoner(ref args);
 
@@ -469,6 +470,12 @@ namespace CaptivityEvents.Events
         private void GainRandomPrisoners()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GainRandomPrisoners)) _dynamics.CEGainRandomPrisoners(PartyBase.MainParty);
+        }
+
+        private void Release(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseRandomPrisoners))  _captor.CEReleasePrisoners(args);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseAllPrisoners)) _captor.CEReleasePrisoners(args, PartyBase.MainParty.PrisonRoster.Count(), true);
         }
 
         private void Escape()
