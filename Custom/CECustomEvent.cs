@@ -15,7 +15,6 @@ namespace CaptivityEvents.Custom
         GiveXP,
         GiveGold,
         GiveCaptorGold,
-        ChangeClan,
         CaptiveMarryCaptor,
         ChangeGold,
         ChangeCaptorGold,
@@ -314,6 +313,21 @@ namespace CaptivityEvents.Custom
         public string Id { get; set; }
     }
 
+    public class ClanOption
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Action { get; set; }
+
+        [XmlAttribute()]
+        public string Clan { get; set; }
+
+        [XmlAttribute()]
+        public bool HideNotification { get; set; }
+    }
+
     public class KingdomOption
     {
         [XmlAttribute()]
@@ -551,6 +565,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("KingdomOption", IsNullable = true)]
         public KingdomOption[] KingdomOptions { get; set; }
+
+        [XmlArrayItem("ClanOption", IsNullable = true)]
+        public ClanOption[] ClanOptions { get; set; }
     }
 
     [DebuggerStepThrough]

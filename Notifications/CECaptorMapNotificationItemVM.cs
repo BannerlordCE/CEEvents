@@ -76,6 +76,8 @@ namespace CaptivityEvents.Notifications
                     {
                         if (CECampaignBehavior.ExtraProps != null)
                         {
+                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
+                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
                             CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
                             CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                         }

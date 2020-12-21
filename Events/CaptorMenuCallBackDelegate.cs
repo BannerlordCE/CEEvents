@@ -166,11 +166,13 @@ namespace CaptivityEvents.Events
             CaptorRenown();
             ChangeMorale();
 
+            ConsequenceChangeClan(captiveHero);
+            ConsequenceChangeKingdom(captiveHero);
+
             if (captiveHero != null)
             {
                 LeaveSpouse(captiveHero);
                 ForceMarry(captiveHero);
-                ConsequenceChangeClan(captiveHero);
                 SlaveryFlags(captiveHero);
                 SlaveryLevel(captiveHero);
                 ProstitutionFlags(captiveHero);
@@ -187,7 +189,6 @@ namespace CaptivityEvents.Events
                 MakeHeroCompanion(captiveHero);
             }
 
-            ConsequenceChangeKingdom(captiveHero);
             ConsequenceSpawnTroop();
             ConsequenceSpawnHero();
 
@@ -786,7 +787,7 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceChangeClan(Hero captiveHero)
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeClan)) _dynamics.ChangeClan(captiveHero, Hero.MainHero);
+            if (_option.ClanOptions != null) _dynamics.ClanChange(_option.ClanOptions, captiveHero, Hero.MainHero);
         }
 
         private void ForceMarry(Hero captiveHero)

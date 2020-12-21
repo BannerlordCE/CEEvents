@@ -170,6 +170,7 @@ namespace CaptivityEvents.Events
             _sharedCallBackHelper.ConsequenceSpawnTroop();
             _sharedCallBackHelper.ConsequenceSpawnHero();
 
+            ConsequenceChangeClan();
             ConsequenceChangeKingdom();
             ConsequenceImpregnation();
             ConsequenceGainRandomPrisoners();
@@ -449,6 +450,12 @@ namespace CaptivityEvents.Events
         private void ConsequenceGainRandomPrisoners()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GainRandomPrisoners)) _dynamics.CEGainRandomPrisoners(PartyBase.MainParty);
+        }
+
+
+        private void ConsequenceChangeClan()
+        {
+            if (_option.ClanOptions != null) _dynamics.ClanChange(_option.ClanOptions, Hero.MainHero, null);
         }
 
         private void ConsequenceChangeKingdom()

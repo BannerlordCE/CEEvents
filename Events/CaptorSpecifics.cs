@@ -44,7 +44,18 @@ namespace CaptivityEvents.Events
                 {
                     if (CECampaignBehavior.ExtraProps.menuToSwitchBackTo != null)
                     {
-                        GameMenu.SwitchToMenu(CECampaignBehavior.ExtraProps.menuToSwitchBackTo);
+                        if (CECampaignBehavior.ExtraProps.menuToSwitchBackTo != "prisoner_wait")
+                        {
+                            GameMenu.SwitchToMenu(CECampaignBehavior.ExtraProps.menuToSwitchBackTo);
+                        } 
+                        else
+                        {
+                            CECustomHandler.ForceLogToFile("General Error: CECaptorContinue : menuToSwitchBackTo : prisoner_wait");
+                            GameMenu.ExitToLast();
+                            Campaign.Current.TimeControlMode = Campaign.Current.LastTimeControlMode;
+                            new CESubModule().LoadTexture("default");
+                            return;
+                        }
                         CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
 
                         if (CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo != null)
