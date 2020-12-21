@@ -86,18 +86,25 @@ namespace CaptivityEvents
 
         private bool ConversationCEEventResponseInPartyOnCondition()
         {
-            CharacterObject captive = CharacterObject.OneToOneConversationCharacter;
+            try
+            {
+                CharacterObject captive = CharacterObject.OneToOneConversationCharacter;
 
-            if (captive != null && captive.IsHero && captive.HeroObject.GetSkillValue(CESkills.IsSlave) == 1)
-            {
-                if (captive.HeroObject.GetSkillValue(CESkills.Slavery) > 250) MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1073}Finally![ib:confident][rb:very_positive]");
-                else if (captive.HeroObject.GetSkillValue(CESkills.Slavery) > 100) MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1071}Yes {?PLAYER.GENDER}mistress{?}master{\\?} [ib:confident2][rb:positive]");
-                else if (captive.HeroObject.GetSkillValue(CESkills.Slavery) > 50) MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1070}Alright.[ib:weary][rb:unsure]");
-                else MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1072}What?! [ib:aggressive][rb:very_negative]");
+                if (captive != null && captive.IsHero && captive.HeroObject.GetSkillValue(CESkills.IsSlave) == 1)
+                {
+                    if (captive.HeroObject.GetSkillValue(CESkills.Slavery) > 250) MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1073}Finally![ib:confident][rb:very_positive]");
+                    else if (captive.HeroObject.GetSkillValue(CESkills.Slavery) > 100) MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1071}Yes {?PLAYER.GENDER}mistress{?}master{\\?} [ib:confident2][rb:positive]");
+                    else if (captive.HeroObject.GetSkillValue(CESkills.Slavery) > 50) MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1070}Alright.[ib:weary][rb:unsure]");
+                    else MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1072}What?! [ib:aggressive][rb:very_negative]");
+                }
+                else
+                {
+                    MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1109}Wait what?[ib:nervous][rb:very_negative]");
+                }
             }
-            else
+            catch (Exception e)
             {
-                MBTextManager.SetTextVariable("RESPONSE_STRING", "{=CEEVENTS1109}Wait what?[ib:nervous][rb:very_negative]");
+                CECustomHandler.ForceLogToFile("Failed to launch ConversationCEEventResponseInPartyOnCondition : " + e);
             }
 
             return true;
@@ -122,7 +129,7 @@ namespace CaptivityEvents
             }
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("Failed to launch ConversationCEEventConsequenceGoToChambers : " + Hero.MainHero.CurrentSettlement.Culture + " : " + e);
+                CECustomHandler.ForceLogToFile("Failed to launch ConversationCEEventInCellOnConsequence : " + e);
             }
         }
     }
