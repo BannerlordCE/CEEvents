@@ -527,13 +527,22 @@ namespace CaptivityEvents.Events
                                 break;
                             case "hero":
                                 clan = hero.Clan;
+                                if (clan == null)
+                                {
+                                    clan = new Clan();
+                                    TextObject clanName = new TextObject(hero.Culture.ClanNameList.GetRandomElement());
+                                    clan.InitializeClan(clanName, clanName, hero.Culture, Banner.CreateRandomClanBanner());
+                                    ClanOption(hero, clan, !clanOption.HideNotification, true);
+                                    clan = hero.Clan;
+                                }
                                 break;
                             case "captor":
                                 clan = captor.Clan;
                                 if (clan == null)
                                 {
                                     clan = new Clan();
-                                    clan.Name = new TextObject(captor.Culture.ClanNameList.GetRandomElement());
+                                    TextObject clanName = new TextObject(captor.Culture.ClanNameList.GetRandomElement());
+                                    clan.InitializeClan(clanName, clanName, captor.Culture, Banner.CreateRandomClanBanner());
                                     ClanOption(captor, clan, !clanOption.HideNotification, true);
                                     clan = captor.Clan;
                                 }
@@ -542,6 +551,12 @@ namespace CaptivityEvents.Events
                                 clan = clanOption.Ref.ToLower() == "captor" ? captor.CurrentSettlement.OwnerClan : hero.CurrentSettlement.OwnerClan;
                                 break;
                         }
+                    }
+
+                    if (clan == null)
+                    {
+                        CECustomHandler.ForceLogToFile("Failed ClanChange : clan is null ");
+                        return;
                     }
 
                     switch (clanOption.Action.ToLower())

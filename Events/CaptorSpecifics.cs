@@ -166,7 +166,7 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives");
+                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Rebel_Captives_" + MBRandom.RandomFloatRanged(float.MaxValue));
 
                     TroopRosterElement leader = releasedPrisoners.FirstOrDefault(hasHero => hasHero.Character.IsHero);
 
@@ -176,6 +176,7 @@ namespace CaptivityEvents.Events
                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                         Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlement(settlement => true);
                         prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Lord);
+                        prisonerParty.ActualClan = clan;
                         prisonerParty.MemberRoster.Clear();
                         prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
                         prisonerParty.IsActive = true;
@@ -190,10 +191,13 @@ namespace CaptivityEvents.Events
                     else
                     {
                         Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
+                        clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
+
                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                         Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => true);
                         prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Bandit);
                         prisonerParty.MemberRoster.Clear();
+                        prisonerParty.ActualClan = clan;
                         prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
                         prisonerParty.IsActive = true;
                         prisonerParty.Party.Owner = clan.Leader;
@@ -260,9 +264,10 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives");
+                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives_" + MBRandom.RandomFloatRanged(float.MaxValue));
 
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
+                    clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                     Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
@@ -273,6 +278,7 @@ namespace CaptivityEvents.Events
 
                     prisonerParty.RecentEventsMorale = -100;
                     prisonerParty.IsActive = true;
+                    prisonerParty.ActualClan = clan;
                     prisonerParty.Party.Owner = clan.Leader;
                     prisonerParty.Aggressiveness = 0.2f;
 
