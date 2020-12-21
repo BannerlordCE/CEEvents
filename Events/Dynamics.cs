@@ -517,11 +517,20 @@ namespace CaptivityEvents.Events
                 try
                 {
                     Clan clan = null;
+                    TextObject clanName = null;
+                    Banner banner = null;
+                    Hero leader = null;
+
 
                     if (clanOption.Clan != null)
                     {
                         switch (clanOption.Clan.ToLower())
                         {
+                            case "new":
+                                clanName = new TextObject(clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement());
+                                banner = Banner.CreateRandomClanBanner();
+                                leader = clanOption.Ref.ToLower() == "captor" ? captor : hero;
+                                break;
                             case "random":
                                 clan = Clan.All.GetRandomElement();
                                 break;
@@ -529,22 +538,18 @@ namespace CaptivityEvents.Events
                                 clan = hero.Clan;
                                 if (clan == null)
                                 {
-                                    clan = new Clan();
-                                    TextObject clanName = new TextObject(hero.Culture.ClanNameList.GetRandomElement());
-                                    clan.InitializeClan(clanName, clanName, hero.Culture, Banner.CreateRandomClanBanner());
-                                    ClanOption(hero, clan, !clanOption.HideNotification, true);
-                                    clan = hero.Clan;
+                                    clanName = new TextObject(hero.Name + "'s Slaves");
+                                    banner = Banner.CreateRandomClanBanner();
+                                    leader = hero;
                                 }
                                 break;
                             case "captor":
                                 clan = captor.Clan;
                                 if (clan == null)
                                 {
-                                    clan = new Clan();
-                                    TextObject clanName = new TextObject(captor.Culture.ClanNameList.GetRandomElement());
-                                    clan.InitializeClan(clanName, clanName, captor.Culture, Banner.CreateRandomClanBanner());
-                                    ClanOption(captor, clan, !clanOption.HideNotification, true);
-                                    clan = captor.Clan;
+                                    clanName = new TextObject(captor.Name + "'s Slaves");
+                                    banner = Banner.CreateRandomClanBanner();
+                                    leader = captor;
                                 }
                                 break;
                             case "settlement":
@@ -555,6 +560,28 @@ namespace CaptivityEvents.Events
 
                     if (clan == null)
                     {
+                       
+
+                        if (clanOption.Ref.ToLower() == "captor")
+                        {
+                            if (captor.Clan != null)
+                            {
+                                PropertyInfo pi = captor.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                captor.Clan.Name = clanName;
+                                captor.Clan.InformalName = clanName;
+                                if (pi != null) pi.SetValue(captor.Clan, banner);
+                                captor.Clan.SetLeader(leader);
+                            }
+                        }
+                        else if (hero.Clan != null)
+                        {
+                            PropertyInfo pi = hero.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                            hero.Clan.Name = clanName;
+                            hero.Clan.InformalName = clanName;
+                            if (pi != null) pi.SetValue(hero.Clan, banner);
+                            hero.Clan.SetLeader(leader);
+
+                        }
                         CECustomHandler.ForceLogToFile("Failed ClanChange : clan is null ");
                         return;
                     }
