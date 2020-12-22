@@ -18,10 +18,13 @@ namespace CaptivityEvents.Custom
         public static int Lines;
         public static string TestLog = "FC";
 
+        private static readonly List<CECustomModule> AllModules = new List<CECustomModule>();
         private static readonly List<CEEvent> AllEvents = new List<CEEvent>();
         private static readonly List<CECustom> AllCustom = new List<CECustom>();
 
         public static List<CECustom> GetCustom() => AllCustom;
+
+        public static List<CECustomModule> GetModules() => AllModules;
 
         public static List<CEEvent> GetAllVerifiedXSEFSEvents(List<string> modules)
         {
@@ -36,6 +39,8 @@ namespace CaptivityEvents.Custom
                 foreach (string fullPath in modules)
                 {
                     ForceLogToFile("Found new module path to be checked " + fullPath);
+
+                    List<CEEvent> TempEvents = new List<CEEvent>();
 
                     try
                     {
@@ -71,8 +76,12 @@ namespace CaptivityEvents.Custom
                             if (!XMLFileCompliesWithStandardXSD(text)) continue;
 
                             AllEvents.AddRange(DeserializeXMLFileToObject(text));
+                            TempEvents.AddRange(DeserializeXMLFileToObject(text));
                             ForceLogToFile("Added: " + text);
                         }
+
+                        CECustomModule item = new CECustomModule(Path.GetFileNameWithoutExtension(fullPath), TempEvents);
+                        AllModules.Add(item);
                     }
                     catch (Exception e)
                     {
@@ -87,6 +96,8 @@ namespace CaptivityEvents.Custom
                 string fullPath = BasePath.Name + "Modules\\zCaptivityEvents\\ModuleLoader";
                 ForceLogToFile("Found new module path to be checked " + fullPath);
                 string[] files = Directory.GetFiles(fullPath, "*.xml", SearchOption.AllDirectories);
+
+                List<CEEvent> TempEvents = new List<CEEvent>();
 
                 foreach (string text in files)
                 {
@@ -112,8 +123,12 @@ namespace CaptivityEvents.Custom
                     if (!XMLFileCompliesWithStandardXSD(text)) continue;
 
                     AllEvents.AddRange(DeserializeXMLFileToObject(text));
+                    TempEvents.AddRange(DeserializeXMLFileToObject(text));
                     ForceLogToFile("Added: " + text);
                 }
+
+                CECustomModule item = new CECustomModule(Path.GetFileNameWithoutExtension(fullPath), TempEvents);
+                AllModules.Add(item);
 
                 return AllEvents;
             }

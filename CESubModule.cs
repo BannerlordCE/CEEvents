@@ -88,7 +88,9 @@ namespace CaptivityEvents
         public static float brothelBlack = 10f;
         public static float brothelFadeOut = 2f;
 
-        public static List<CECustom> CECustomModule = new List<CECustom>();
+        public static List<CECustom> CECustomFlags = new List<CECustom>();
+
+        public static List<CECustomModule> CECustomModules = new List<CECustomModule>();
 
         // Images
         public static Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
@@ -268,7 +270,8 @@ namespace CaptivityEvents
 
             // Load Events
             CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
-            CEPersistence.CECustomModule = CECustomHandler.GetCustom();
+            CEPersistence.CECustomFlags = CECustomHandler.GetCustom();
+            CEPersistence.CECustomModules = CECustomHandler.GetModules();
 
             // Load Images
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
@@ -418,7 +421,7 @@ namespace CaptivityEvents
                 }
                 else
                 {
-                    CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomModule);
+                    CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomFlags);
                 }
                 CECustomHandler.ForceLogToFile("Loaded CESettings: "
                                                + (CESettings.Instance != null && CESettings.Instance.LogToggle
@@ -444,7 +447,7 @@ namespace CaptivityEvents
 
                 CECustomHandler.ForceLogToFile(CESettings.Instance != null && CESettings.Instance.EventCaptorNotifications
                                                    ? "Patching Map Notifications: No Conflicts Detected : Enabled."
-                                                   : "EventCaptorNotifications: Disabled.");
+                                                                   : "EventCaptorNotifications: Disabled.");
 
                 _harmony.PatchAll();
             }
@@ -489,6 +492,22 @@ namespace CaptivityEvents
 
             if (CEPersistence.CEEvents.Count > 0)
             {
+                try
+                {
+                    if (CESettingsEvents.Instance == null)
+                    {
+                        CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsEvents missing MCMv4");
+                    }
+                    else
+                    {
+                        CESettingsEvents.Instance.InitializeSettings(CEPersistence.CECustomModules, CEPersistence.CECallableEvents);
+                    }
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettings is being accessed improperly.");
+                }
+
                 try
                 {
                     TextObject textObject = new TextObject("{=CEEVENTS1000}Captivity Events Loaded with {EVENT_COUNT} Events and {IMAGE_COUNT} Images.\n^o^ Enjoy your events. Remember to endorse!");

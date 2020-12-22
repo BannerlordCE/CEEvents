@@ -218,6 +218,7 @@ namespace CaptivityEvents.Events
             }
 
             if (!ValidateEvent()) return LatestMessage;
+            if (!CustomEventCheck()) return LatestMessage;
             if (!SettingsCheck()) return LatestMessage;
             if (!CustomFlagCheck()) return LatestMessage;
             if (!GenderCheck(captive)) return LatestMessage;
@@ -1811,6 +1812,31 @@ namespace CaptivityEvents.Events
             // Custom Flags
             if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) return Error("Skipping event " + _listEvent.Name + " Player is busy.");
             if (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerAllowedCompanion)) return Error("Skipping event " + _listEvent.Name + " Player has too many companions.");
+
+            return true;
+        }
+
+        private bool CustomEventCheck()
+        {
+            if (!_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent) && !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
+            {
+                try
+                {
+                    if (CESettingsEvents.Instance != null)
+                    {
+                        KeyValuePair<string, bool> eventFound = CESettingsEvents.Instance.EventToggle.First((eventToggle) => { return eventToggle.Key == _listEvent.Name; });
+
+                        if (!eventFound.Value)
+                        {
+                            return Error("Skipping event " + _listEvent.Name + " Toggle is Off");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    return ForceLogError("Failure in CustomEventCheck: " + _listEvent.Name + " " + e);
+                }
+            }
 
             return true;
         }
