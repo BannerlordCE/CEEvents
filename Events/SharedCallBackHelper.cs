@@ -670,6 +670,13 @@ namespace CaptivityEvents.Events
         {
             try
             {
+                if (!CESettings.Instance.CustomBackgrounds)
+                {
+                    CEPersistence.animationPlayEvent = false;
+                    new CESubModule().LoadTexture(textureFlag);
+                    return;
+                }
+
                 if (_listedEvent.Backgrounds != null)
                 {
                     List<string> backgroundNames = new List<string>();

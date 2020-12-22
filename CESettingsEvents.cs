@@ -3,6 +3,7 @@ using MCM.Abstractions.FluentBuilder;
 using MCM.Abstractions.Ref;
 using MCM.Abstractions.Settings.Base.Global;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CaptivityEvents
 {
@@ -37,24 +38,46 @@ namespace CaptivityEvents
 
                 foreach (CECustomModule module in moduleCustoms)
                 {
-
-                    builder.CreateGroup("{=CESETTINGS0089}Events of " + module.CEModuleName, groupBuilder =>
+                    foreach (CEEvent currentEvent in module.CEEvents)
                     {
-                        foreach (CEEvent currentEvent in module.CEEvents)
+                        if (callableEvents.Exists((item) => item.Name == currentEvent.Name) && !EventToggle.ContainsKey(currentEvent.Name))
                         {
-                            if (callableEvents.Exists((item) => item.Name == currentEvent.Name) && !EventToggle.ContainsKey(currentEvent.Name))
+                            if (currentEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                             {
-                                EventToggle.Add(currentEvent.Name, true);
-                                groupBuilder.AddBool(currentEvent.Name, currentEvent.Name, new ProxyRef<bool>(() => EventToggle[currentEvent.Name], o => EventToggle[currentEvent.Name] = o), boolBuilder => boolBuilder.SetHintText(currentEvent.Text).SetRequireRestart(false));
+                                builder.CreateGroup("{=CESETTINGS0089}Events of " + module.CEModuleName + "/{=CESETTINGS0098}Captive", groupBuilder =>
+                                {
+
+                                    EventToggle.Add(currentEvent.Name, true);
+                                    groupBuilder.AddBool(currentEvent.Name, currentEvent.Name, new ProxyRef<bool>(() => EventToggle[currentEvent.Name], o => EventToggle[currentEvent.Name] = o), boolBuilder => boolBuilder.SetHintText(currentEvent.Text).SetRequireRestart(false));
+
+                                });
+                            }
+                            else if (currentEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                            {
+                                builder.CreateGroup("{=CESETTINGS0089}Events of " + module.CEModuleName + "/{=CESETTINGS0099}Captor", groupBuilder =>
+                                {
+
+                                    EventToggle.Add(currentEvent.Name, true);
+                                    groupBuilder.AddBool(currentEvent.Name, currentEvent.Name, new ProxyRef<bool>(() => EventToggle[currentEvent.Name], o => EventToggle[currentEvent.Name] = o), boolBuilder => boolBuilder.SetHintText(currentEvent.Text).SetRequireRestart(false));
+
+                                });
+                            }
+                            else if (currentEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                            {
+                                builder.CreateGroup("{=CESETTINGS0089}Events of " + module.CEModuleName + "/{=CESETTINGS0088}Random", groupBuilder =>
+                                {
+
+                                    EventToggle.Add(currentEvent.Name, true);
+                                    groupBuilder.AddBool(currentEvent.Name, currentEvent.Name, new ProxyRef<bool>(() => EventToggle[currentEvent.Name], o => EventToggle[currentEvent.Name] = o), boolBuilder => boolBuilder.SetHintText(currentEvent.Text).SetRequireRestart(false));
+
+                                });
                             }
                         }
-                    });
+                    }
                 }
-
                 _settings = builder.BuildAsGlobal();
                 _settings.Register();
             }
-
         }
     }
 }

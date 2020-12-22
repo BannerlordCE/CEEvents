@@ -67,6 +67,7 @@ namespace CaptivityEvents.Helper
                     _provider.PrisonerExceeded = customSettings.PrisonerExceeded;
                     _provider.NonSexualContent = customSettings.NonSexualContent;
                     _provider.SexualContent = customSettings.SexualContent;
+                    _provider.CustomBackgrounds = customSettings.CustomBackgrounds;
                     _provider.CommonControl = customSettings.CommonControl;
                     _provider.ProstitutionControl = customSettings.ProstitutionControl;
                     _provider.SlaveryToggle = customSettings.SlaveryToggle;

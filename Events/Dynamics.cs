@@ -461,7 +461,7 @@ namespace CaptivityEvents.Events
                         MobileParty partyBelongedTo = firstHero.PartyBelongedTo;
                         if (partyBelongedTo != null)
                         {
-                            partyBelongedTo.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                            partyBelongedTo.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default, 0);
                         }
                     }
                     firstHero.Clan = newClan;
