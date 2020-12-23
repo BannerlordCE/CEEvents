@@ -245,6 +245,7 @@ namespace CaptivityEvents.Events
             if (!MaleCaptivesCheck(captorParty)) return LatestMessage;
             if (!FemaleCaptivesCheck(captorParty)) return LatestMessage;
             if (!MoraleCheck(captorParty)) return LatestMessage;
+            if (!CompanionsCheck(captorParty)) return LatestMessage;
 
             if (nonRandomBehaviour)
             {
@@ -268,6 +269,28 @@ namespace CaptivityEvents.Events
         }
 
         #region private
+
+        private bool CompanionsCheck(PartyBase party)
+        {
+            try
+            {
+                if (_listEvent.Companions != null)
+                {
+                    foreach (Companion companion in _listEvent.Companions)
+                    {
+                        if (companion != null)
+                        {
+
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return LogError("Incorrect CompanionsCheck / Failed ");
+            }
+            return true;
+        }
 
         private bool WorldMapCheck(PartyBase party, ref bool eventMatchingCondition)
         {
@@ -1824,9 +1847,9 @@ namespace CaptivityEvents.Events
                 {
                     if (CESettingsEvents.Instance != null)
                     {
-                        KeyValuePair<string, bool> eventFound = CESettingsEvents.Instance.EventToggle.First((eventToggle) => { return eventToggle.Key == _listEvent.Name; });
+                        KeyValuePair<string, bool> eventFound = CESettingsEvents.Instance.EventToggle.FirstOrDefault((eventToggle) => { return eventToggle.Key == _listEvent.Name; });
 
-                        if (!eventFound.Value)
+                        if (eventFound.Key != null && !eventFound.Value)
                         {
                             return Error("Skipping event " + _listEvent.Name + " Toggle is Off");
                         }

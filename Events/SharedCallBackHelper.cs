@@ -197,7 +197,6 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid SlaveryTotal"); }
         }
 
-
         internal void ConsequenceSlaveryFlags()
         {
             bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
@@ -283,7 +282,6 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Missing HealthTotal"); }
         }
 
-
         internal void ConsequenceChangeMorale()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
@@ -291,24 +289,6 @@ namespace CaptivityEvents.Events
             PartyBase party = PlayerCaptivity.IsCaptive
                 ? PlayerCaptivity.CaptorParty //captive         
                 : PartyBase.MainParty; //random, captor
-
-            try
-            {
-                if (!string.IsNullOrEmpty(_option.MoraleTotal)) { _dynamics.MoraleChange(new CEVariablesLoader().GetIntFromXML(_option.MoraleTotal), party); }
-                else if (!string.IsNullOrEmpty(_listedEvent.MoraleTotal)) { _dynamics.MoraleChange(new CEVariablesLoader().GetIntFromXML(_listedEvent.MoraleTotal), party); }
-                else
-                {
-                    CECustomHandler.LogToFile("Missing MoralTotal");
-                    _dynamics.MoraleChange(MBRandom.RandomInt(-5, 5), party);
-                }
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid MoralTotal"); }
-        }
-
-        // TODO: Not being used anywhere
-        internal void ConsequenceChangeMorale(PartyBase party)
-        {
-            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
 
             try
             {
@@ -665,6 +645,20 @@ namespace CaptivityEvents.Events
 
         }
 
+        internal void CheckCompanions(Hero hero)
+        {
+            try
+            {
+                if (_listedEvent.Companions != null)
+                {
+
+                }
+             }
+             catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed CheckCompanions for " + _listedEvent.Name + " " + e);
+            }
+        }
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {

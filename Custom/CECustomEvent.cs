@@ -240,6 +240,54 @@ namespace CaptivityEvents.Custom
         public string[] TerrianType { get; set; }
     }
 
+    public class Companion
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Type { get; set; }
+
+        [XmlAttribute()]
+        public string Location { get; set; }
+
+        [XmlAttribute()]
+        public string UseConditions { get; set; }
+
+        [XmlArrayItem("RestrictedListOfConsequences", IsNullable =  false)]
+        public RestrictedListOfConsequences[] MultipleRestrictedListOfConsequences { get; set; }
+
+        [XmlElement(Form = XmlSchemaForm.Unqualified)]
+        public string PregnancyRiskModifier { get; set; }
+
+        public string EscapeChance { get; set; }
+
+        public string GoldTotal { get; set; }
+
+        public string CaptorGoldTotal { get; set; }
+
+        public string MoraleTotal { get; set; }
+
+        public string RelationTotal { get; set; }
+
+        public string HealthTotal { get; set; }
+
+        public string RenownTotal { get; set; }
+
+        [XmlArrayItem("Trait", IsNullable = true)]
+        public TraitToLevel[] TraitsToLevel { get; set; }
+
+        [XmlArrayItem("Skill", IsNullable = true)]
+        public SkillToLevel[] SkillsToLevel { get; set; }
+
+        [XmlArrayItem("KingdomOption", IsNullable = true)]
+        public KingdomOption[] KingdomOptions { get; set; }
+
+        [XmlArrayItem("ClanOption", IsNullable = true)]
+        public ClanOption[] ClanOptions { get; set; }
+
+    }
+
     public class TraitToLevel
     {
         [XmlAttribute()]
@@ -545,6 +593,9 @@ namespace CaptivityEvents.Custom
         [XmlArrayItem("TraitRequired", IsNullable = true)]
         public TraitRequired[] TraitsRequired { get; set; }
 
+        [XmlArrayItem("Companion", IsNullable = true)]
+        public Companion[] Companions { get; set; }
+
         [XmlArrayItem("Trait", IsNullable = true)]
         public TraitToLevel[] TraitsToLevel { get; set; }
 
@@ -760,6 +811,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("Trait", IsNullable = true)]
         public TraitToLevel[] TraitsToLevel { get; set; }
+
+        [XmlArrayItem("Companion", IsNullable = true)]
+        public Companion[] Companions { get; set; }
 
         [XmlArray("TerrianTypes")]
         public TerrianTypes[] TerrianTypesRequirements { get; set; }
