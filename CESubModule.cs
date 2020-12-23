@@ -139,38 +139,38 @@ namespace CaptivityEvents
                 if (!swap)
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
-                          ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
+                          ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                 }
                 else
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
                         : CEPersistence.CEEventImageList[name];
                 }
             }
@@ -479,7 +479,22 @@ namespace CaptivityEvents
                 }
                 else
                 {
-                    if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent)) CEPersistence.CECallableEvents.Add(_listedEvent);
+                    if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
+                    {
+                        int weightedChance = 1;
+                        try
+                        {
+                            if (_listedEvent.WeightedChanceOfOccuring != null) weightedChance = new CEVariablesLoader().GetIntFromXML(_listedEvent.WeightedChanceOfOccuring);
+                        }
+                        catch (Exception)
+                        {
+                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring on " + _listedEvent.Name);
+                        }
+                        if (weightedChance > 0)
+                        {
+                            CEPersistence.CECallableEvents.Add(_listedEvent);
+                        }
+                    }
 
                     CEPersistence.CEEventList.Add(_listedEvent);
                 }

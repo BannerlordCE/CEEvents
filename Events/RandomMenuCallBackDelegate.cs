@@ -1340,7 +1340,8 @@ namespace CaptivityEvents.Events
                 else
                 {
                     CESubModule.animationPlayEvent = false;
-                    CESubModule.LoadTexture("default_random");
+                    CESubModule.LoadTexture("
+        ");
                 }
             }
             catch (Exception)

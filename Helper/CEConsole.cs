@@ -974,10 +974,41 @@ namespace CaptivityEvents.Helper
                         }
                         else
                         {
-                            if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent)) CEPersistence.CECallableEvents.Add(_listedEvent);
+                            if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
+                            {
+                                int weightedChance = 1;
+                                try
+                                {
+                                    if (_listedEvent.WeightedChanceOfOccuring != null) weightedChance = new CEVariablesLoader().GetIntFromXML(_listedEvent.WeightedChanceOfOccuring);
+                                }
+                                catch (Exception)
+                                {
+                                    CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring on " + _listedEvent.Name);
+                                }
+                                if (weightedChance > 0)
+                                {
+                                    CEPersistence.CECallableEvents.Add(_listedEvent);
+                                }
+                            }
 
                             CEPersistence.CEEventList.Add(_listedEvent);
                         }
+                    }
+
+                    try
+                    {
+                        if (CESettingsEvents.Instance == null)
+                        {
+                            CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsEvents missing MCMv4");
+                        }
+                        else
+                        {
+                            CESettingsEvents.Instance.InitializeSettings(CEPersistence.CECustomModules, CEPersistence.CECallableEvents);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettings is being accessed improperly.");
                     }
 
                     new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager, Campaign.Current.CampaignGameLoadingType == Campaign.GameLoadingType.Tutorial));

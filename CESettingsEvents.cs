@@ -75,6 +75,7 @@ namespace CaptivityEvents
                         }
                     }
                 }
+                if (_settings != null) _settings.Unregister();
                 _settings = builder.BuildAsGlobal();
                 _settings.Register();
             }
