@@ -245,7 +245,7 @@ namespace CaptivityEvents.Events
             if (!MaleCaptivesCheck(captorParty)) return LatestMessage;
             if (!FemaleCaptivesCheck(captorParty)) return LatestMessage;
             if (!MoraleCheck(captorParty)) return LatestMessage;
-            if (!CompanionsCheck(captorParty)) return LatestMessage;
+            if (!CompanionsCheck(captive, captorParty)) return LatestMessage;
 
             if (nonRandomBehaviour)
             {
@@ -270,17 +270,138 @@ namespace CaptivityEvents.Events
 
         #region private
 
-        private bool CompanionsCheck(PartyBase party)
+        private bool CompanionsCheck(CharacterObject hero, PartyBase party)
         {
             try
             {
                 if (_listEvent.Companions != null)
                 {
+                    _listEvent.SavedCompanions = new Dictionary<string, Hero>();
                     foreach (Companion companion in _listEvent.Companions)
                     {
-                        if (companion != null)
+                        Hero referenceHero;
+                        if (companion.Ref != null)
+                        {
+                            switch (companion.Ref.ToLower())
+                            {
+                                case "hero":
+                                    if (!hero.IsHero) { return LogError("Skipping event " + _listEvent.Name + " it does not match the hero conditions."); }
+                                    referenceHero = hero.HeroObject;
+                                    break;
+                                case "captor":
+                                    if (!party.Leader.IsHero) { return LogError("Skipping event " + _listEvent.Name + " it does not match the captor conditions."); }
+                                    referenceHero = party.Leader.HeroObject;
+                                    break;
+                                default:
+                                    referenceHero = Hero.MainHero;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            referenceHero = Hero.MainHero;
+                        }
+                        List<Hero> heroes = new List<Hero>();
+
+                        if (companion.Type != null)
                         {
 
+                            switch (companion.Type.ToLower())
+                            {
+                                case "spouse":
+                                    if (referenceHero.Spouse == null) return LogError("Skipping event " + _listEvent.Name + " it does not match the spouse conditions.");
+                                    heroes.Add(referenceHero.Spouse);
+                                    break;
+                                case "companion":
+                                    if (referenceHero.Clan == null) return LogError("Skipping event " + _listEvent.Name + " it does not match the companion conditions.");
+                                    foreach (Hero companionHero in referenceHero.Clan.Companions)
+                                    {
+                                        heroes.Add(companionHero);
+                                    }
+                                    break;
+                                default:
+                                    if (referenceHero.Spouse != null)
+                                    {
+                                        heroes.Add(referenceHero.Spouse);
+                                    }
+                                    if (referenceHero.Clan != null)
+                                    {
+                                        foreach (Hero companionHero in referenceHero.Clan.Companions)
+                                        {
+                                            heroes.Add(companionHero);
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            if (referenceHero.Spouse != null)
+                            {
+                                heroes.Add(referenceHero.Spouse);
+                            }
+                            if (referenceHero.Clan != null)
+                            {
+                                foreach (Hero companionHero in referenceHero.Clan.Companions)
+                                {
+                                    heroes.Add(companionHero);
+                                }
+                            }
+                        }
+
+                        if (heroes.Count == 0) return LogError("Skipping event " + _listEvent.Name + " it does not match the CompanionsCheck conditions.");
+
+                        if (companion.Location != null)
+                        {
+                            switch (companion.Location.ToLower())
+                            {
+                                case "prisoner":
+                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.PartyBelongedToAsPrisoner != party && companionHero.IsPrisoner; });
+                                    break;
+                                case "party":
+                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.PartyBelongedTo.Party != party && !companionHero.PartyBelongedTo.IsGarrison; });
+                                    break;
+                                case "settlement":
+                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.CurrentSettlement != null; });
+                                    break;
+                                case "current prisoner":
+                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.PartyBelongedToAsPrisoner == party; });
+                                    break;
+                                case "current":
+                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.PartyBelongedTo.Party == party; });
+                                    break;
+                                default:
+                                    break;
+                            }
+                            if (heroes.Count == 0) return LogError("Skipping event " + _listEvent.Name + " it does not match the Location conditions.");
+                        }
+
+                        if (companion.UseOtherConditions != null && companion.UseOtherConditions.ToLower() != "false")
+                        {
+                            CEEvent triggeredEvent = CEPersistence.CEEventList.Find(item => item.Name == companion.UseOtherConditions);
+
+                            if (triggeredEvent == null) return ForceLogError("Couldn't find " + companion.UseOtherConditions + " in events. CompanionsCheck.");
+
+                            heroes = (List<Hero>)heroes.Where((companionHero) =>
+                            {
+                                string conditionals = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(companionHero.CharacterObject, party);
+                                if (conditionals != null)
+                                {
+                                    CECustomHandler.LogToFile(conditionals);
+                                    return false;
+                                }
+                                else
+                                {
+                                    return true;
+                                }
+                            });
+                        }
+
+                        if (heroes.Count == 0) return LogError("Skipping event " + _listEvent.Name + " it does not match the FlagsDoMatchEventConditions conditions.");
+
+                        if (companion.Id != null)
+                        {
+                            _listEvent.SavedCompanions.Add(companion.Id, heroes.GetRandomElement());
                         }
                     }
                 }

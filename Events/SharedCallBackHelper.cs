@@ -653,8 +653,8 @@ namespace CaptivityEvents.Events
                 {
 
                 }
-             }
-             catch (Exception e)
+            }
+            catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("Failed CheckCompanions for " + _listedEvent.Name + " " + e);
             }

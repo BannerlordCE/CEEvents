@@ -35,6 +35,7 @@ namespace CaptivityEvents.Custom
         ChangeCaptorSkill,
         ImpregnationRisk,
         ImpregnationHero,
+        ImpregnationByPlayer,
         AttemptEscape,
         Escape,
         Leave,
@@ -243,6 +244,9 @@ namespace CaptivityEvents.Custom
     public class Companion
     {
         [XmlAttribute()]
+        public string Id { get; set; }
+
+        [XmlAttribute()]
         public string Ref { get; set; }
 
         [XmlAttribute()]
@@ -252,15 +256,13 @@ namespace CaptivityEvents.Custom
         public string Location { get; set; }
 
         [XmlAttribute()]
-        public string UseConditions { get; set; }
+        public string UseOtherConditions { get; set; }
 
-        [XmlArrayItem("RestrictedListOfConsequences", IsNullable =  false)]
+        [XmlArrayItem("RestrictedListOfConsequences", IsNullable = false)]
         public RestrictedListOfConsequences[] MultipleRestrictedListOfConsequences { get; set; }
 
         [XmlElement(Form = XmlSchemaForm.Unqualified)]
         public string PregnancyRiskModifier { get; set; }
-
-        public string EscapeChance { get; set; }
 
         public string GoldTotal { get; set; }
 
@@ -820,6 +822,9 @@ namespace CaptivityEvents.Custom
 
         [XmlIgnore]
         public CharacterObject Captive { get; set; }
+
+        [XmlIgnore]
+        public Dictionary<string, Hero> SavedCompanions { get; set; }
     }
 
     [DebuggerStepThrough]

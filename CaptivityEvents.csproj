@@ -65,6 +65,7 @@
     <Compile Include="Events\CaptiveSpecifics.cs" />
     <Compile Include="Events\CaptorMenuCallBackDelegate.cs" />
     <Compile Include="Events\CaptorSpecifics.cs" />
+    <Compile Include="Events\CECompanionSystem.cs" />
     <Compile Include="Events\Dynamics.cs" />
     <Compile Include="Events\CESpawnSystem.cs" />
     <Compile Include="Events\CEImpregnationSystem.cs" />

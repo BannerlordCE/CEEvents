@@ -266,6 +266,9 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
         public bool PrisonerExceeded { get; set; } = false;
 
+        [SettingPropertyBool("{=CESETTINGS0086}Custom Backgrounds", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS0087}Should custom backgrounds be disabled.")]
+        [SettingPropertyGroup("{=CESETTINGS0085}Pictures")]
+        public bool CustomBackgrounds { get; set; } = true;
         // WILL BE REMOVED STARTS
 
         [SettingPropertyBool("{=CESETTINGS1030}Non Sexual Content", Order = 1, RequireRestart = false, HintText = "{=CESETTINGS1031}Should non sexual content events be enabled.")]
@@ -275,10 +278,6 @@ namespace CaptivityEvents
         [SettingPropertyBool("{=CESETTINGS1032}Sexual Content", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1033}Should sexual content events be enabled.")]
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool SexualContent { get; set; } = true;
-
-        [SettingPropertyBool("{=CESETTINGS0086}Custom Backgrounds", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS0087}Should custom backgrounds be disabled. (Will not help if default backgrounds are overwritten)")]
-        [SettingPropertyGroup("{=CESETTINGS0096}Events")]
-        public bool CustomBackgrounds { get; set; } = true;
 
         [SettingPropertyBool("{=CESETTINGS1028}Common Events", Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1029}Should events tagged with common be enabled.")]
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]

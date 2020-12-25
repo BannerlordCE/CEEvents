@@ -19,6 +19,7 @@ namespace CaptivityEvents.Events
         private readonly List<CEEvent> _eventList;
         private readonly Option _option;
         private readonly SharedCallBackHelper _sharedCallBackHelper;
+        private readonly CECompanionSystem _companionSystem;
         private readonly CaptorSpecifics _captor = new CaptorSpecifics();
 
         private readonly Dynamics _dynamics = new Dynamics();
@@ -34,6 +35,7 @@ namespace CaptivityEvents.Events
             _listedEvent = listedEvent;
             _eventList = eventList;
             _sharedCallBackHelper = new SharedCallBackHelper(listedEvent, null, eventList);
+            _companionSystem = new CECompanionSystem(listedEvent, null, eventList);
         }
 
         internal CaptorMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
@@ -42,6 +44,7 @@ namespace CaptivityEvents.Events
             _option = option;
             _eventList = eventList;
             _sharedCallBackHelper = new SharedCallBackHelper(listedEvent, option, eventList);
+            _companionSystem = new CECompanionSystem(listedEvent, option, eventList);
         }
 
 
@@ -111,7 +114,7 @@ namespace CaptivityEvents.Events
 
             PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
-      
+
         internal void CaptorEventWaitGameMenu(MenuCallbackArgs args)
         {
             SetNames(ref args);
@@ -189,6 +192,7 @@ namespace CaptivityEvents.Events
                 MakeHeroCompanion(captiveHero);
             }
 
+            ConsequenceCompanions();
             ConsequenceSpawnTroop();
             ConsequenceSpawnHero();
 
@@ -221,6 +225,17 @@ namespace CaptivityEvents.Events
 
         #region private
 
+        private void ConsequenceCompanions()
+        {
+            try
+            {
+                _companionSystem.ConsequenceCompanions(CharacterObject.PlayerCharacter, PartyBase.MainParty);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.LogToFile("ConsequenceCompanions. Failed" + e.ToString());
+            }
+        }
 
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
         {
@@ -475,7 +490,7 @@ namespace CaptivityEvents.Events
 
         private void Release(ref MenuCallbackArgs args)
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseRandomPrisoners))  _captor.CEReleasePrisoners(args);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseRandomPrisoners)) _captor.CEReleasePrisoners(args);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseAllPrisoners)) _captor.CEReleasePrisoners(args, PartyBase.MainParty.PrisonRoster.Count(), true);
         }
 
@@ -527,6 +542,20 @@ namespace CaptivityEvents.Events
                     _impregnation.CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
                                                       ? _variableLoader.GetIntFromXML(_option.PregnancyRiskModifier)
                                                       : _variableLoader.GetIntFromXML(_listedEvent.PregnancyRiskModifier), false, false);
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Missing PregnancyRiskModifier");
+                    _impregnation.CaptivityImpregnationChance(captiveHero, 30, false, false);
+                }
+            }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationByPlayer))
+            {
+                try
+                {
+                    _impregnation.CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
+                                                      ? _variableLoader.GetIntFromXML(_option.PregnancyRiskModifier)
+                                                      : _variableLoader.GetIntFromXML(_listedEvent.PregnancyRiskModifier), false, false, Hero.MainHero);
                 }
                 catch (Exception)
                 {
@@ -1883,7 +1912,7 @@ namespace CaptivityEvents.Events
                     MBTextManager.SetTextVariable("CAPTIVE_NAME", _listedEvent.Captive.Name);
                     MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive.IsFemale ? 1 : 0);
                 }
-                    
+
             }
             catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
 

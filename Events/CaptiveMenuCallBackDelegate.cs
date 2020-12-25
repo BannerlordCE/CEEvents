@@ -19,6 +19,7 @@ namespace CaptivityEvents.Events
         private readonly List<CEEvent> _eventList;
         private readonly Option _option;
         private readonly SharedCallBackHelper _sharedCallBackHelper;
+        private readonly CECompanionSystem _companionSystem;
 
         private readonly Dynamics _dynamics = new Dynamics();
         private readonly ScoresCalculation _score = new ScoresCalculation();
@@ -34,6 +35,7 @@ namespace CaptivityEvents.Events
             _listedEvent = listedEvent;
             _eventList = eventList;
             _sharedCallBackHelper = new SharedCallBackHelper(listedEvent, null, eventList);
+            _companionSystem = new CECompanionSystem(listedEvent, null, eventList);
         }
 
         internal CaptiveMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
@@ -42,6 +44,7 @@ namespace CaptivityEvents.Events
             _option = option;
             _eventList = eventList;
             _sharedCallBackHelper = new SharedCallBackHelper(listedEvent, option, eventList);
+            _companionSystem = new CECompanionSystem(listedEvent, option, eventList);
         }
 
         internal void CaptiveProgressInitWaitGameMenu(MenuCallbackArgs args)
@@ -260,6 +263,7 @@ namespace CaptivityEvents.Events
             _sharedCallBackHelper.ConsequenceChangeMorale();
             _sharedCallBackHelper.ConsequenceStripPlayer();
 
+            ConsequenceCompanions();
             ConsequenceSpawnTroop();
             ConsequenceSpawnHero();
             ConsequenceForceMarry();
@@ -284,6 +288,17 @@ namespace CaptivityEvents.Events
 
 
         #region private
+        private void ConsequenceCompanions()
+        {
+            try
+            {
+                _companionSystem.ConsequenceCompanions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.LogToFile("ConsequenceCaptiveCompanions. Failed" + e.ToString());
+            }
+        }
 
         private void ConsequenceKillCaptor()
         {

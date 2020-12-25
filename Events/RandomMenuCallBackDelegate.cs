@@ -19,6 +19,7 @@ namespace CaptivityEvents.Events
         private readonly List<CEEvent> _eventList;
         private readonly Option _option;
         private readonly SharedCallBackHelper _sharedCallBackHelper;
+        private readonly CECompanionSystem _companionSystem;
 
         private readonly ScoresCalculation _score = new ScoresCalculation();
         private readonly Dynamics _dynamics = new Dynamics();
@@ -32,6 +33,7 @@ namespace CaptivityEvents.Events
             _listedEvent = listedEvent;
             _eventList = eventList;
             _sharedCallBackHelper = new SharedCallBackHelper(listedEvent, null, eventList);
+            _companionSystem = new CECompanionSystem(listedEvent, null, eventList);
         }
 
         internal RandomMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
@@ -40,6 +42,7 @@ namespace CaptivityEvents.Events
             _option = option;
             _eventList = eventList;
             _sharedCallBackHelper = new SharedCallBackHelper(listedEvent, option, eventList);
+            _companionSystem = new CECompanionSystem(listedEvent, option, eventList);
         }
 
         internal void RandomProgressInitWaitGameMenu(MenuCallbackArgs args)
@@ -170,6 +173,7 @@ namespace CaptivityEvents.Events
             _sharedCallBackHelper.ConsequenceSpawnTroop();
             _sharedCallBackHelper.ConsequenceSpawnHero();
 
+            ConsequenceCompanions();
             ConsequenceChangeClan();
             ConsequenceChangeKingdom();
             ConsequenceImpregnation();
@@ -184,6 +188,17 @@ namespace CaptivityEvents.Events
 
 
         #region private
+        private void ConsequenceCompanions()
+        {
+            try
+            {
+                _companionSystem.ConsequenceCompanions(CharacterObject.PlayerCharacter, PartyBase.MainParty);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.LogToFile("ConsequenceRandomCompanions. Failed" + e.ToString());
+            }
+        }
 
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
         {
