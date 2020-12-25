@@ -52,6 +52,7 @@ namespace CaptivityEvents.Events
                                        : "wait_captive_male");
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
+            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
 
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                             ? 1
@@ -112,6 +113,7 @@ namespace CaptivityEvents.Events
                                                                    : "wait_prisoner_male");
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
+            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
 
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                               ? 1
@@ -172,6 +174,7 @@ namespace CaptivityEvents.Events
             _sharedCallBackHelper.ConsequenceChangeMorale();
             _sharedCallBackHelper.ConsequenceSpawnTroop();
             _sharedCallBackHelper.ConsequenceSpawnHero();
+            _sharedCallBackHelper.ConsequencePlaySound();
 
             ConsequenceCompanions();
             ConsequenceChangeClan();

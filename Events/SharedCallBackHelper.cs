@@ -1,12 +1,14 @@
 ﻿using CaptivityEvents.Custom;
 using CaptivityEvents.Issues;
 using Helpers;
+using SandBox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
+using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
@@ -645,18 +647,55 @@ namespace CaptivityEvents.Events
 
         }
 
-        internal void CheckCompanions(Hero hero)
+        internal void ConsequencePlaySound()
         {
             try
             {
-                if (_listedEvent.Companions != null)
+                if (CEPersistence.soundEvent != null)
                 {
-
+                    CEPersistence.soundEvent.Stop();
+                    CEPersistence.soundLoop = false;
                 }
+                if (_option.SoundName == null) return;
+                int soundIndex = SoundEvent.GetEventIdFromString(_option.SoundName);
+                if (soundIndex != -1) PlayMapSound(soundIndex);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                CECustomHandler.ForceLogToFile("Failed CheckCompanions for " + _listedEvent.Name + " " + e);
+                CECustomHandler.LogToFile("Missing ConsequencePlaySound");
+            }
+        }
+
+        internal void PlayMapSound(int soundIndex)
+        {
+            Campaign campaign = Campaign.Current;
+            Scene _mapScene = null;
+            if (((campaign != null) ? campaign.MapSceneWrapper : null) != null)
+            {
+                _mapScene = ((MapScene)Campaign.Current.MapSceneWrapper).Scene;
+            }
+
+            CEPersistence.soundEvent = SoundEvent.CreateEvent(soundIndex, _mapScene);
+            CEPersistence.soundEvent.Play();
+        }
+
+        internal void ConsequencePlayEventSound(string SoundName)
+        {
+            try
+            {
+                if (CEPersistence.soundEvent != null)
+                {
+                    CEPersistence.soundEvent.Stop();
+                    CEPersistence.soundLoop = false;
+                }
+                if (SoundName == null) return;
+                int soundIndex = SoundEvent.GetEventIdFromString(SoundName);
+                if (soundIndex != -1) PlayMapSound(soundIndex);
+                     
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Missing ConsequencePlayEventSound");
             }
         }
 

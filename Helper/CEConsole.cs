@@ -3,6 +3,7 @@ using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Notifications;
+using SandBox;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +25,6 @@ namespace CaptivityEvents.Helper
 {
     internal class CEConsole
     {
-
         [CommandLineFunctionality.CommandLineArgumentFunction("reload_settings", "captivity")]
         public static string ChangeSettings(List<string> strings)
         {
@@ -1134,6 +1134,12 @@ namespace CaptivityEvents.Helper
             {
                 Thread.Sleep(500);
 
+                if (CEPersistence.soundEvent != null)
+                {
+                    CEPersistence.soundEvent.Stop();
+                    CEPersistence.soundEvent = null;
+                }
+
                 if (CampaignCheats.CheckHelp(strings) && CampaignCheats.CheckParameters(strings, 1)) return "Format is \"captivity.play_sound [SOUND_ID]\".";
 
                 string searchTerm = strings[0];
@@ -1169,7 +1175,15 @@ namespace CaptivityEvents.Helper
                         return string.Empty;
                     }
 
-                    SoundEvent.PlaySound2D(id);
+                    Campaign campaign = Campaign.Current;
+                    Scene _mapScene = null;
+                    if (((campaign != null) ? campaign.MapSceneWrapper : null) != null)
+                    {
+                        _mapScene = ((MapScene)Campaign.Current.MapSceneWrapper).Scene;
+                    }
+
+                    CEPersistence.soundEvent = SoundEvent.CreateEvent(id, _mapScene);
+                    CEPersistence.soundEvent.Play();
 
                     return string.Empty;
                 }

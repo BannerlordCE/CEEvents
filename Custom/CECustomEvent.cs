@@ -451,6 +451,8 @@ namespace CaptivityEvents.Custom
         [XmlArrayItem("RestrictedListOfConsequences", IsNullable = false)]
         public RestrictedListOfConsequences[] MultipleRestrictedListOfConsequences { get; set; }
 
+        public string SoundName { get; set; }
+
         [XmlElement(Form = XmlSchemaForm.Unqualified)]
         public string OptionText { get; set; }
 
@@ -639,6 +641,8 @@ namespace CaptivityEvents.Custom
         public Background[] Backgrounds { get; set; }
 
         public string NotificationName { get; set; }
+
+        public string SoundName { get; set; }
 
         [XmlArrayItem("BackgroundName")]
         public List<string> BackgroundAnimation { get; set; }

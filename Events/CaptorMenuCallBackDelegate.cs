@@ -55,6 +55,7 @@ namespace CaptivityEvents.Events
                                        : "wait_captive_male");
 
             _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
+            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
 
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                             ? 1
@@ -119,6 +120,7 @@ namespace CaptivityEvents.Events
         {
             SetNames(ref args);
             _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
+            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
         }
 
         internal bool CaptorEventOptionGameMenu(MenuCallbackArgs args)
@@ -146,7 +148,7 @@ namespace CaptivityEvents.Events
             return true;
         }
 
-        internal void CaptorConsequenceWaitGameMenu(MenuCallbackArgs args)
+        internal void CaptorConsequenceGameMenu(MenuCallbackArgs args)
         {
             Hero captiveHero = null;
 
@@ -161,6 +163,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
 
+            _sharedCallBackHelper.ConsequencePlaySound();
             CaptorLeaveSpouse();
             CaptorGold(captiveHero);
             CaptorChangeGold();
@@ -191,7 +194,7 @@ namespace CaptivityEvents.Events
                 Strip(captiveHero);
                 MakeHeroCompanion(captiveHero);
             }
-
+            
             ConsequenceCompanions();
             ConsequenceSpawnTroop();
             ConsequenceSpawnHero();

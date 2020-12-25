@@ -94,9 +94,11 @@ namespace CaptivityEvents
 
         // Images
         public static Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
+
+        // Sound
+        public static SoundEvent soundEvent = null;
+        public static bool soundLoop = false;
     }
-
-
 
     public class CESubModule : MBSubModuleBase
     {
@@ -759,6 +761,9 @@ namespace CaptivityEvents
             // CaptiveState
             CaptiveStateCheck();
 
+            // SoundState
+            SoundStateCheck();
+
             // Animated Background Menus
             AnimationStateCheck();
 
@@ -767,6 +772,25 @@ namespace CaptivityEvents
 
             // Hunt Event To Play
             HuntStateCheck();
+        }
+
+
+        private void SoundStateCheck()
+        {
+            if (CEPersistence.soundLoop && CEPersistence.soundEvent != null && Game.Current.GameStateManager.ActiveState is MapState)
+            {
+                try
+                {
+                    if (!CEPersistence.soundEvent.IsPlaying())
+                    {
+                        CEPersistence.soundEvent.Play();
+                    }
+                }
+                catch (Exception)
+                {
+                    CEPersistence.soundEvent = null;
+                }
+            }
         }
 
         // TODO MOVE TO PROPER LISTENERS AND AWAY FROM ONAPPLICATIONTICK
