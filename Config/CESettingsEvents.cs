@@ -32,6 +32,8 @@ namespace CaptivityEvents.Config
         {
             ISettingsBuilder builder = BaseSettingsBuilder.Create("CaptivityEventsCustomEvents", "Captivity Events Optional Events");
 
+            EventToggle = new Dictionary<string, bool>();
+
             if (builder != null)
             {
                 builder.SetFormat("json2").SetFolderName("zCaptivityEvents").SetSubFolder("EventSettings");
@@ -44,7 +46,7 @@ namespace CaptivityEvents.Config
                         {
                             if (currentEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                             {
-                                builder.CreateGroup("{=CESETTINGS0089}Events of " + module.CEModuleName + "/{=CESETTINGS0098}Captive", groupBuilder =>
+                                builder.CreateGroup(module.CEModuleName + "/{=CESETTINGS0098}Captive", groupBuilder =>
                                 {
 
                                     EventToggle.Add(currentEvent.Name, true);
@@ -54,7 +56,7 @@ namespace CaptivityEvents.Config
                             }
                             else if (currentEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                             {
-                                builder.CreateGroup("{=CESETTINGS0089}Events of " + module.CEModuleName + "/{=CESETTINGS0099}Captor", groupBuilder =>
+                                builder.CreateGroup(module.CEModuleName + "/{=CESETTINGS0099}Captor", groupBuilder =>
                                 {
 
                                     EventToggle.Add(currentEvent.Name, true);
@@ -64,7 +66,7 @@ namespace CaptivityEvents.Config
                             }
                             else if (currentEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                             {
-                                builder.CreateGroup("{=CESETTINGS0089}Events of " + module.CEModuleName + "/{=CESETTINGS0088}Random", groupBuilder =>
+                                builder.CreateGroup(module.CEModuleName + "/{=CESETTINGS0088}Random", groupBuilder =>
                                 {
 
                                     EventToggle.Add(currentEvent.Name, true);

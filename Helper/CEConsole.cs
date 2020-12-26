@@ -927,6 +927,11 @@ namespace CaptivityEvents.Helper
                     CEPersistence.CEWaitingList.Clear();
                     CEPersistence.CECallableEvents.Clear();
 
+                    // Load Events
+                    CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
+                    CEPersistence.CECustomFlags = CECustomHandler.GetCustom();
+                    CEPersistence.CECustomModules = CECustomHandler.GetModules();
+
                     try
                     {
                         CEPersistence.CECustomModules.ForEach(item =>
@@ -938,10 +943,6 @@ namespace CaptivityEvents.Helper
                     {
                         CECustomHandler.ForceLogToFile("Failed to name CECustomModules");
                     }
-                    // Load Events
-                    CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
-                    CEPersistence.CECustomFlags = CECustomHandler.GetCustom();
-                    CEPersistence.CECustomModules = CECustomHandler.GetModules();
 
                     CEHelper.brothelFlagFemale = false;
                     CEHelper.brothelFlagMale = false;
