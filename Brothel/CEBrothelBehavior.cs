@@ -23,9 +23,9 @@ namespace CaptivityEvents.Brothel
 {
     internal class CEBrothelBehavior : CampaignBehaviorBase
     {
-        private static readonly Location _brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanAlways", "CanAlways", "CanNever", "CanNever", new[] { "empire_house_c_tavern_a", "", "", "" }, null);
+        public static Location _brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanAlways", "CanAlways", "CanNever", "CanNever", new[] { "empire_house_c_tavern_a", "", "", "" }, null);
 
-        private bool _isBrothelInitialized;
+        public static bool _isBrothelInitialized;
 
         #region GameMenu
         private void AddGameMenus(CampaignGameStarter campaignGameStarter)
@@ -266,7 +266,7 @@ namespace CaptivityEvents.Brothel
             }
             catch (Exception)
             {
-                CECustomHandler.ForceLogToFile("Failed to load LocationComplex Brothel Statue ");
+                CECustomHandler.ForceLogToFile("Failed to load LocationComplex Brothel Statue (Corrupt Save)");
             }
 
             if (CheckAndOpenNextLocation(args)) return;

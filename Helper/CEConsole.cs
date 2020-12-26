@@ -748,13 +748,15 @@ namespace CaptivityEvents.Helper
 
                     string test = "";
 
+                    CEBrothelBehavior._brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanAlways", "CanAlways", "CanNever", "CanNever", new[] { "empire_house_c_tavern_a", "", "", "" }, null);
+                    CEBrothelBehavior._isBrothelInitialized = true;
+
                     List<CEBrothel> list = CEBrothelBehavior.GetPlayerBrothels();
                     foreach (CEBrothel brothel in list)
                     {
                         test += "\n" + brothel.Name;
                     }
-                    //test += PlayerEncounter.LocationEncounter.IsInsideOfASettlement ? "Is In Settlement\n" : "Not in Settlement\n";
-                    //PlayerEncounter.LocationEncounter.Settlement.LocationComplex.GetLocationCharacterOfHero(Hero.MainHero);
+
                     return test;
                 }
                 catch (Exception e)
@@ -917,9 +919,16 @@ namespace CaptivityEvents.Helper
 
                     List<string> modulePaths = CEHelper.GetModulePaths(modulesFound, out List<ModuleInfo> modules);
 
-                    // Events Removing
-                    MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
-                    if (mi != null) mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
+                    if (Campaign.Current?.GameManager != null)
+                    {
+                        // Events Removing
+                        MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
+                        if (mi != null) mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
+                    } 
+                    else
+                    {
+                        return "Cannot reload in the current campaign.";
+                    }
 
                     // Unload 
                     CEPersistence.CEEvents.Clear();
