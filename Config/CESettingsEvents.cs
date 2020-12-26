@@ -5,7 +5,7 @@ using MCM.Abstractions.Settings.Base.Global;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CaptivityEvents
+namespace CaptivityEvents.Config
 {
     public class CESettingsEvents
     {

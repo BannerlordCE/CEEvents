@@ -1,8 +1,8 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
-using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
@@ -12,21 +12,22 @@ using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Notifications
 {
+    // ArmyDispersionItemVM
     internal class CECaptorMapNotificationItemVM : MapNotificationItemBaseVM
     {
         private readonly CEEvent _captorEvent;
 
-        public CECaptorMapNotificationItemVM(CEEvent captorEvent, InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
+        // 1.5.5
+        // public CECaptorMapNotificationItemVM(CEEvent captorEvent, InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
+
+        // 1.5.6
+        public CECaptorMapNotificationItemVM(InformationData data) : base(data)
         {
             NotificationIdentifier = CESettings.Instance != null && CESettings.Instance.EventCaptorCustomTextureNotifications
-                ? "cecaptor"
-                : "death";
-            _captorEvent = captorEvent;
-
-            _onInspect = delegate
-                         {
-                             OnCaptorNotificationInspect();
-                         };
+             ? "cecaptor"
+             : "death";
+            _captorEvent = ((CECaptorMapNotification)data).CaptorEvent;
+            _onInspect = OnCaptorNotificationInspect;
         }
 
         public override void ManualRefreshRelevantStatus()

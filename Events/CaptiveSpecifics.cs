@@ -1,4 +1,5 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using System;
 using TaleWorlds.CampaignSystem;

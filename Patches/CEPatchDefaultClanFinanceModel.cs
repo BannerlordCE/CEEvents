@@ -1,4 +1,5 @@
 ﻿using CaptivityEvents.Brothel;
+using CaptivityEvents.Config;
 using HarmonyLib;
 using System;
 using TaleWorlds.CampaignSystem;

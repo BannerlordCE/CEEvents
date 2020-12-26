@@ -7,10 +7,11 @@ using MCM.Abstractions.Settings.Base.Global;
 using System;
 using System.Collections.Generic;
 
-namespace CaptivityEvents
+namespace CaptivityEvents.Config
 {
     public interface ICustomSettingsProvider
     {
+        bool IsHardCoded { get; }
         bool EventCaptiveOn { get; set; }
         float EventOccurrenceOther { get; set; }
         float EventOccurrenceSettlement { get; set; }
@@ -70,6 +71,7 @@ namespace CaptivityEvents
 
     public class HardcodedCustomSettings : ICustomSettingsProvider
     {
+        public bool IsHardCoded { get; } = true;
         public bool EventCaptiveOn { get; set; } = true;
         public float EventOccurrenceOther { get; set; } = 6f;
         public float EventOccurrenceSettlement { get; set; } = 6f;
@@ -152,6 +154,8 @@ namespace CaptivityEvents
 
             return basePresets;
         }
+
+        public bool IsHardCoded { get; } = false;
 
         [SettingPropertyBool("{=CESETTINGS1000}Turn on Captive Events", Order = 1, RequireRestart = true)]
         [SettingPropertyGroup("{=CESETTINGS0098}Captive")]

@@ -9,7 +9,6 @@ using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-using TaleWorlds.TwoDimension;
 
 namespace CaptivityEvents.Events
 {
@@ -1097,7 +1096,7 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
         }
-      
+
         private void ReqHeroMaleTroopsAbove(ref MenuCallbackArgs args)
         {
             if (_option.ReqHeroMaleTroopsAbove.IsStringNoneOrEmpty()) return;

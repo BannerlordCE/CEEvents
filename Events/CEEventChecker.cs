@@ -1,14 +1,14 @@
-﻿using System;
+﻿using CaptivityEvents.Brothel;
+using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
+using CaptivityEvents.Custom;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using CaptivityEvents.Brothel;
-using CaptivityEvents.CampaignBehaviors;
-using CaptivityEvents.Custom;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
-using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Events
 {

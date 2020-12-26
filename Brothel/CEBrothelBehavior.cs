@@ -1,4 +1,5 @@
 using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
@@ -130,23 +131,12 @@ namespace CaptivityEvents.Brothel
                 TextObject textObject = new TextObject("{=CEBROTHEL0984}The brothel of {SETTLEMENT}", null);
                 textObject.SetTextVariable("SETTLEMENT", Hero.MainHero.CurrentSettlement.Name);
 
-                // 1.5.3 
-                /*
-                _partyScreenLogic.Initialize(TroopRoster.CreateDummyTroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
-                _partyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
-
-                _partyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
-                _partyScreenLogic.SetDoneHandler(new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler153));
-                */
-
-                // 1.5.4         
-                
                 _partyScreenLogic.Initialize(TroopRoster.CreateDummyTroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, lefPartySizeLimit, new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler), new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
 
                 _partyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
 
                 _partyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
-                
+
 
                 PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
                 partyState.InitializeLogic(_partyScreenLogic);
@@ -175,14 +165,6 @@ namespace CaptivityEvents.Brothel
             }
         }
 
-        // 1.5.3
-        private static bool ManageBrothelDoneHandler153(TroopRoster leftMemberRoster, TroopRoster leftPrisonRoster, TroopRoster rightMemberRoster, TroopRoster rightPrisonRoster, bool isForced, List<MobileParty> leftParties = null, List<MobileParty> rightParties = null)
-        {
-            SetBrothelPrisoners(Hero.MainHero.CurrentSettlement, leftPrisonRoster);
-            return true;
-        }
-
-        // 1.5.4
         private static bool ManageBrothelDoneHandler(TroopRoster leftMemberRoster, TroopRoster leftPrisonRoster, TroopRoster rightMemberRoster, TroopRoster rightPrisonRoster, FlattenedTroopRoster takenPrisonerRoster, FlattenedTroopRoster releasedPrisonerRoster, bool isForced, List<MobileParty> leftParties = null, List<MobileParty> rightParties = null)
         {
             SetBrothelPrisoners(Hero.MainHero.CurrentSettlement, leftPrisonRoster);
@@ -752,7 +734,7 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddPlayerLine("ce_owner_buy_no", "ce_owner_buy_response", "ce_owner_exit_00", "{=CEBROTHEL1050}Nevermind.", null, null);
 
             campaignGameStarter.AddDialogLine("ce_owner_party_00_r", "ce_owner_party_00", "ce_owner_party_response", "{=CEBROTHEL1072}I can bring some ladies but that will be {AMOUNT} denars.", PriceWithParty, null);
-            
+
             campaignGameStarter.AddPlayerLine("ce_party_buy_yes", "ce_owner_party_response", "ce_owner_business_complete", "{=CEBROTHEL1049}Alright, here you go.", null, ConversationBoughtParty, 100, ConversationHasEnoughForPartyService);
             campaignGameStarter.AddPlayerLine("ce_party_buy_no", "ce_owner_party_response", "ce_owner_exit_00", "{=CEBROTHEL1050}Nevermind.", null, null);
 
@@ -902,7 +884,7 @@ namespace CaptivityEvents.Brothel
         private bool ConversationWithPositiveCaptive() => Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.HeroState == Hero.CharacterStates.Prisoner && ContainsPrisoner(Hero.OneToOneConversationHero.CharacterObject) && (Hero.OneToOneConversationHero.GetSkillValue(CESkills.Slavery) > 50 || Hero.OneToOneConversationHero.GetSkillValue(CESkills.Prostitution) > 70);
 
         private bool ConversationWithProstitute() => CharacterObject.OneToOneConversationCharacter.StringId == "prostitute_regular";
-        
+
         private bool ConversationWithMaidIsOwner() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid" && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
         private bool ConversationWithMaid() => CharacterObject.OneToOneConversationCharacter.StringId == "bar_maid";
 
@@ -971,7 +953,11 @@ namespace CaptivityEvents.Brothel
 
         private bool ConditionalRandomName()
         {
-            MBTextManager.SetTextVariable("NAME", new TextObject(Settlement.CurrentSettlement.Culture.FemaleNameList.GetRandomElement()));
+            // 1.5.5
+            // MBTextManager.SetTextVariable("NAME", new TextObject(Settlement.CurrentSettlement.Culture.FemaleNameList.GetRandomElement()));
+
+            // 1.5.6
+            MBTextManager.SetTextVariable("NAME", Settlement.CurrentSettlement.Culture.FemaleNameList.GetRandomElement());
 
             return true;
         }
@@ -1258,7 +1244,7 @@ namespace CaptivityEvents.Brothel
             {
                 foreach (CEBrothel brothel in from brothel in GetPlayerBrothels()
                                               let town = brothel.Settlement.Town
-                                              where !town.IsRebeling
+                                              where !town.InRebelliousState
                                               where brothel.IsRunning
                                               select brothel)
                 {
@@ -1686,7 +1672,7 @@ namespace CaptivityEvents.Brothel
         private List<Settlement> SettlementsThatPlayerHasSpy = new List<Settlement>();
 
         private const int prostitutionCost = 60;
-        
+
         private const int drinkCost = 30;
 
         private const int prostitutionCostPerParty = 40;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CaptivityEvents.Config;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -140,7 +141,7 @@ namespace CaptivityEvents.Custom
                 return new List<CEEvent>();
             }
         }
-         
+
         public static CECustomSettings LoadCustomSettings()
         {
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CESettings.xml";

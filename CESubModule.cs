@@ -1,5 +1,6 @@
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
@@ -18,6 +19,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Core.ViewModelCollection;
 using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
+using TaleWorlds.Engine.Screens;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
@@ -251,7 +253,11 @@ namespace CaptivityEvents
                 {
                     ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
 
-                    if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
+                    // 1.5.5
+                    // if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
+
+                    // 1.5.6
+                    if (moduleInfo != null && !moduleInfo.DependedModules.Exists(item => item.ModuleId == "zCaptivityEvents")) continue;
 
                     try
                     {
@@ -376,7 +382,8 @@ namespace CaptivityEvents
 
             try
             {
-                // Load the MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.3)
+                // Load theMount & Blade II Bannerlord\Modules\SandBox\GUI\Brushes
+                // MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.6)
                 SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
@@ -417,6 +424,19 @@ namespace CaptivityEvents
 
             try
             {
+                if (CESettings.Instance != null && CESettings.Instance.IsHardCoded)
+                {
+                    Module.CurrentModule.AddInitialStateOption(
+                        new InitialStateOption(
+                            "Captivity Mod Settings",
+                            new TextObject("Captivity Mod Settings", null),
+                            9990,
+                            () => { ScreenManager.PushScreen(new CESettingsScreen()); },
+                            false
+                        )
+                      );
+                }
+
                 if (CESettingsFlags.Instance == null)
                 {
                     CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsFlags missing MCMv4");
@@ -598,6 +618,8 @@ namespace CaptivityEvents
         }
 
 
+        // 1.5.5
+        /*
         public override bool DoLoading(Game game)
         {
             if (Campaign.Current == null) return true;
@@ -613,6 +635,30 @@ namespace CaptivityEvents
 
             IMbEvent<MobileParty> hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
             hourlyPartyTick?.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerEscapeCampaignBehavior>());
+
+            IMbEvent<BarterData> barterablesRequested = CampaignEvents.BarterablesRequested;
+            barterablesRequested?.ClearListeners(Campaign.Current.GetCampaignBehavior<SetPrisonerFreeBarterBehavior>());
+
+            return base.DoLoading(game);
+        }
+        */
+
+        // 1.5.6
+        public override bool DoLoading(Game game)
+        {
+            if (Campaign.Current == null) return true;
+
+            if (CESettings.Instance != null && !CESettings.Instance.PrisonerEscapeBehavior) return base.DoLoading(game);
+            IMbEvent<Hero> dailyTickHeroEvent = CampaignEvents.DailyTickHeroEvent;
+
+            if (dailyTickHeroEvent != null)
+            {
+                dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerReleaseCampaignBehavior>());
+                if (CESettings.Instance != null && CESettings.Instance.EscapeAutoRansom.SelectedIndex != 2) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
+            }
+
+            IMbEvent<MobileParty> hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
+            hourlyPartyTick?.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerReleaseCampaignBehavior>());
 
             IMbEvent<BarterData> barterablesRequested = CampaignEvents.BarterablesRequested;
             barterablesRequested?.ClearListeners(Campaign.Current.GetCampaignBehavior<SetPrisonerFreeBarterBehavior>());

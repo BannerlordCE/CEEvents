@@ -57,8 +57,14 @@
     <Compile Include="Brothel\CEBrothelClanFinanceItemVM.cs" />
     <Compile Include="Brothel\CEBrothelToolTip.cs" />
     <Compile Include="CampaignBehaviors\CECampaignBehavior.cs" />
-    <Compile Include="CESettingsEvents.cs" />
-    <Compile Include="CESettingsFlags.cs" />
+    <Compile Include="Config\CEManagedOptionTypesVM.cs" />
+    <Compile Include="Config\CESettingsEvents.cs" />
+    <Compile Include="Config\CESettingsEventsVM.cs" />
+    <Compile Include="Config\CESettingsFlags.cs" />
+    <Compile Include="Config\CESettingsScreen.cs" />
+    <Compile Include="Config\CESettingsVM.cs" />
+    <Compile Include="Config\CESettingsVMCategory.cs" />
+    <Compile Include="Config\CEManagedOptionTypes.cs" />
     <Compile Include="Custom\CECustomModule.cs" />
     <Compile Include="Custom\CECustomSettings.cs" />
     <Compile Include="Events\CaptiveMenuCallBackDelegate.cs" />
@@ -98,7 +104,7 @@
     <Compile Include="CampaignBehaviors\CEPrisonerEscapeCampaignBehavior.cs" />
     <Compile Include="CESaveable.cs" />
     <Compile Include="CampaignBehaviors\CESetPrisonerFreeBarterBehavior.cs" />
-    <Compile Include="CESettings.cs" />
+    <Compile Include="Config\CESettings.cs" />
     <Compile Include="CESkills.cs" />
     <Compile Include="CEStrings.cs" />
     <Compile Include="CESubModule.cs" />
@@ -218,7 +224,6 @@
     </Reference>
     <Reference Include="TaleWorlds.CampaignSystem">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.CampaignSystem.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="TaleWorlds.CampaignSystem.ViewModelCollection">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.CampaignSystem.ViewModelCollection.dll</HintPath>
@@ -226,7 +231,6 @@
     </Reference>
     <Reference Include="TaleWorlds.Core">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Core.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="TaleWorlds.Core.ViewModelCollection">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Core.ViewModelCollection.dll</HintPath>
@@ -240,6 +244,12 @@
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Diamond.AccessProvider.Epic.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="TaleWorlds.Diamond.AccessProvider.GDK">
+      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Diamond.AccessProvider.GDK.dll</HintPath>
+    </Reference>
+    <Reference Include="TaleWorlds.Diamond.AccessProvider.GOG">
+      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Diamond.AccessProvider.GOG.dll</HintPath>
+    </Reference>
     <Reference Include="TaleWorlds.Diamond.AccessProvider.Steam">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Diamond.AccessProvider.Steam.dll</HintPath>
       <Private>False</Private>
@@ -247,6 +257,12 @@
     <Reference Include="TaleWorlds.Diamond.AccessProvider.Test">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Diamond.AccessProvider.Test.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Diamond.ChatSystem">
+      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Diamond.ChatSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="TaleWorlds.Diamond.ChatSystem.Library">
+      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Diamond.ChatSystem.Library.dll</HintPath>
     </Reference>
     <Reference Include="TaleWorlds.DotNet">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.DotNet.dll</HintPath>
@@ -355,6 +371,9 @@
     <Reference Include="TaleWorlds.PlatformService.Epic">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlatformService.Epic.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.PlatformService.GOG">
+      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlatformService.GOG.dll</HintPath>
     </Reference>
     <Reference Include="TaleWorlds.PlatformService.Steam">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlatformService.Steam.dll</HintPath>

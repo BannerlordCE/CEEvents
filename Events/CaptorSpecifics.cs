@@ -1,4 +1,5 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using HarmonyLib;
 using Helpers;
@@ -47,7 +48,7 @@ namespace CaptivityEvents.Events
                         if (CECampaignBehavior.ExtraProps.menuToSwitchBackTo != "prisoner_wait")
                         {
                             GameMenu.SwitchToMenu(CECampaignBehavior.ExtraProps.menuToSwitchBackTo);
-                        } 
+                        }
                         else
                         {
                             CECustomHandler.ForceLogToFile("General Error: CECaptorContinue : menuToSwitchBackTo : prisoner_wait");
@@ -175,7 +176,11 @@ namespace CaptivityEvents.Events
                         Clan clan = leader.Character.HeroObject.Clan;
                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                         Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlement(settlement => true);
-                        prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Lord);
+                        // 1.5.5
+                        // prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Lord);
+
+                        // 1.5.6
+                        prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
                         prisonerParty.ActualClan = clan;
                         prisonerParty.MemberRoster.Clear();
                         prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
@@ -195,7 +200,11 @@ namespace CaptivityEvents.Events
 
                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                         Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => true);
-                        prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Bandit);
+                        // 1.5.5
+                        // prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Bandit);
+
+                        // 1.5.6
+                        prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
                         prisonerParty.MemberRoster.Clear();
                         prisonerParty.ActualClan = clan;
                         prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
@@ -272,7 +281,11 @@ namespace CaptivityEvents.Events
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                     Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
-                    prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0f, 0f, MobileParty.PartyTypeEnum.Bandit);
+                    // 1.5.5
+                    // prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Bandit);
+
+                    // 1.5.6
+                    prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
                     prisonerParty.MemberRoster.Clear();
                     prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
 

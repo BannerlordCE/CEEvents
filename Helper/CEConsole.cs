@@ -1,5 +1,6 @@
 ﻿using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Notifications;
@@ -675,13 +676,40 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckHelp(strings)) return "Format is \"debug.run_CETests \".";
 
-                string test = "--- CE Test ---";
+                string specificTest = null;
+                if (CampaignCheats.CheckParameters(strings, 1)) specificTest = strings[0];
 
+                string test = "--- CE Test ---";
                 try
                 {
+                    if (specificTest != null)
+                    {
 
-                    test += "\n" + CETests.RunTestOne();
-                    test += "\n" + CETests.RunTestTwo();
+                        switch (specificTest)
+                        {
+                            case "1":
+                                test += "\n" + CETests.RunTestOne();
+                                break;
+                            case "2":
+                                test += "\n" + CETests.RunTestTwo();
+                                break;
+                            case "3":
+                                test += "\n" + CETests.RunTestThree();
+                                break;
+                            default:
+                                test += "\nNot Found";
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // Notifications
+                        test += "\n" + CETests.RunTestOne();
+                        // All Event Pictures as Captive/Random/Captor
+                        test += "\n" + CETests.RunTestTwo();
+                        // Prisoners
+                        test += "\n" + CETests.RunTestThree();
+                    }
 
                     return test;
                 }
@@ -762,7 +790,11 @@ namespace CaptivityEvents.Helper
                         {
                             ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
 
-                            if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
+                            // 1.5.5
+                            // if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
+
+                            // 1.5.6
+                            if (moduleInfo != null && !moduleInfo.DependedModules.Exists(item => item.ModuleId == "zCaptivityEvents")) continue;
 
                             try
                             {
@@ -917,7 +949,11 @@ namespace CaptivityEvents.Helper
                         {
                             ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
 
-                            if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
+                            // 1.5.5
+                            // if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
+
+                            // 1.5.6
+                            if (moduleInfo != null && !moduleInfo.DependedModules.Exists(item => item.ModuleId == "zCaptivityEvents")) continue;
 
                             try
                             {
@@ -1177,7 +1213,7 @@ namespace CaptivityEvents.Helper
 
                     Campaign campaign = Campaign.Current;
                     Scene _mapScene = null;
-                    if (((campaign != null) ? campaign.MapSceneWrapper : null) != null)
+                    if ((campaign?.MapSceneWrapper) != null)
                     {
                         _mapScene = ((MapScene)Campaign.Current.MapSceneWrapper).Scene;
                     }

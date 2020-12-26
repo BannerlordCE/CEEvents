@@ -3,7 +3,7 @@ using MCM.Abstractions.Ref;
 using MCM.Abstractions.Settings.Base.Global;
 using System.Collections.Generic;
 
-namespace CaptivityEvents
+namespace CaptivityEvents.Config
 {
     public class CESettingsFlags
     {

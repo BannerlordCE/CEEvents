@@ -1,4 +1,5 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
 using System;
@@ -194,7 +195,7 @@ namespace CaptivityEvents.Events
                 Strip(captiveHero);
                 MakeHeroCompanion(captiveHero);
             }
-            
+
             ConsequenceCompanions();
             ConsequenceSpawnTroop();
             ConsequenceSpawnHero();

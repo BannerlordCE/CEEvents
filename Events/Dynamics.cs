@@ -1,7 +1,7 @@
-﻿using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Config;
+using CaptivityEvents.Custom;
 using Helpers;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
@@ -527,7 +527,12 @@ namespace CaptivityEvents.Events
                         switch (clanOption.Clan.ToLower())
                         {
                             case "new":
-                                clanName = new TextObject(clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement());
+                                // 1.5.5
+                                // clanName = new TextObject(clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement());
+
+                                // 1.5.6
+                                clanName = clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement();
+
                                 banner = Banner.CreateRandomClanBanner();
                                 leader = clanOption.Ref.ToLower() == "captor" ? captor : hero;
                                 break;
@@ -560,7 +565,7 @@ namespace CaptivityEvents.Events
 
                     if (clan == null)
                     {
-                       
+
 
                         if (clanOption.Ref.ToLower() == "captor")
                         {

@@ -1,3 +1,4 @@
+using CaptivityEvents.Config;
 using System;
 using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
@@ -7,6 +8,7 @@ using TaleWorlds.Core;
 
 namespace CaptivityEvents.CampaignBehaviors
 {
+    // 1.5.6 PrisonerReleaseCampaignBehavior ?
     public class CEPrisonerEscapeCampaignBehavior : CampaignBehaviorBase
     {
 

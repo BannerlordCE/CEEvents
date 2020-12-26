@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Config;
+using CaptivityEvents.Custom;
 using CaptivityEvents.Issues;
 using Helpers;
 using SandBox;
@@ -670,7 +671,7 @@ namespace CaptivityEvents.Events
         {
             Campaign campaign = Campaign.Current;
             Scene _mapScene = null;
-            if (((campaign != null) ? campaign.MapSceneWrapper : null) != null)
+            if ((campaign?.MapSceneWrapper) != null)
             {
                 _mapScene = ((MapScene)Campaign.Current.MapSceneWrapper).Scene;
             }
@@ -691,7 +692,7 @@ namespace CaptivityEvents.Events
                 if (SoundName == null) return;
                 int soundIndex = SoundEvent.GetEventIdFromString(SoundName);
                 if (soundIndex != -1) PlayMapSound(soundIndex);
-                     
+
             }
             catch (Exception)
             {

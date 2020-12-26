@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Config;
+using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using Helpers;
 using TaleWorlds.CampaignSystem;
@@ -43,7 +44,7 @@ namespace CaptivityEvents.Models
             {
                 EndCaptivityAction.ApplyByReleasing(Hero.MainHero);
                 InformationManager.DisplayMessage(new InformationMessage(("Invalid Age: " + Hero.MainHero.Age), Colors.Gray));
-                CECustomHandler.ForceLogToFile("Underaged Player Detected. Age: " + Hero.MainHero.Age );
+                CECustomHandler.ForceLogToFile("Underaged Player Detected. Age: " + Hero.MainHero.Age);
                 return "menu_captivity_end_by_party_removed";
             }
 
