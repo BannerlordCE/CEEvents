@@ -428,8 +428,8 @@ namespace CaptivityEvents
                 {
                     Module.CurrentModule.AddInitialStateOption(
                         new InitialStateOption(
-                            "Captivity Mod Settings",
-                            new TextObject("Captivity Mod Settings", null),
+                            "CaptivityEventsSettings",
+                            new TextObject("Captivity Events Settings", null),
                             9990,
                             () => { ScreenManager.PushScreen(new CESettingsScreen()); },
                             false
