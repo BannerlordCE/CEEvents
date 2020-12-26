@@ -780,37 +780,10 @@ namespace CaptivityEvents.Helper
                 try
                 {
                     string[] modulesFound = Utilities.GetModulesNames();
-                    List<string> modulePaths = new List<string>();
 
                     CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
 
-                    foreach (string moduleID in modulesFound)
-                    {
-                        try
-                        {
-                            ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
-
-                            // 1.5.5
-                            // if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
-
-                            // 1.5.6
-                            if (moduleInfo != null && !moduleInfo.DependedModules.Exists(item => item.ModuleId == "zCaptivityEvents")) continue;
-
-                            try
-                            {
-                                if (moduleInfo == null) continue;
-                                modulePaths.Insert(0, Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Id)));
-                            }
-                            catch (Exception)
-                            {
-                                if (moduleInfo != null) CECustomHandler.ForceLogToFile("Failed to Load " + moduleInfo.Name + " Events");
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            CECustomHandler.ForceLogToFile("Failed to fetch DependedModuleIds from " + moduleID);
-                        }
-                    }
+                    List<string> modulePaths = CEHelper.GetModulePaths(modulesFound, out List<ModuleInfo> modules);
 
                     // Load Images
                     string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
@@ -939,37 +912,10 @@ namespace CaptivityEvents.Helper
                 try
                 {
                     string[] modulesFound = Utilities.GetModulesNames();
-                    List<string> modulePaths = new List<string>();
 
                     CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
 
-                    foreach (string moduleID in modulesFound)
-                    {
-                        try
-                        {
-                            ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
-
-                            // 1.5.5
-                            // if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
-
-                            // 1.5.6
-                            if (moduleInfo != null && !moduleInfo.DependedModules.Exists(item => item.ModuleId == "zCaptivityEvents")) continue;
-
-                            try
-                            {
-                                if (moduleInfo == null) continue;
-                                modulePaths.Insert(0, Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Id)));
-                            }
-                            catch (Exception)
-                            {
-                                if (moduleInfo != null) CECustomHandler.ForceLogToFile("Failed to Load " + moduleInfo.Name + " Events");
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            CECustomHandler.ForceLogToFile("Failed to fetch DependedModuleIds from " + moduleID);
-                        }
-                    }
+                    List<string> modulePaths = CEHelper.GetModulePaths(modulesFound, out List<ModuleInfo> modules);
 
                     // Events Removing
                     MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -981,8 +927,21 @@ namespace CaptivityEvents.Helper
                     CEPersistence.CEWaitingList.Clear();
                     CEPersistence.CECallableEvents.Clear();
 
+                    try
+                    {
+                        CEPersistence.CECustomModules.ForEach(item =>
+                        {
+                            item.CEModuleName = modules.FirstOrDefault(moduleInfo => { return moduleInfo.Id == item.CEModuleName; })?.Name ?? item.CEModuleName;
+                        });
+                    }
+                    catch (Exception)
+                    {
+                        CECustomHandler.ForceLogToFile("Failed to name CECustomModules");
+                    }
                     // Load Events
                     CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
+                    CEPersistence.CECustomFlags = CECustomHandler.GetCustom();
+                    CEPersistence.CECustomModules = CECustomHandler.GetModules();
 
                     CEHelper.brothelFlagFemale = false;
                     CEHelper.brothelFlagMale = false;
@@ -1031,8 +990,23 @@ namespace CaptivityEvents.Helper
                         }
                     }
 
+                    new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager, Campaign.Current.CampaignGameLoadingType == Campaign.GameLoadingType.Tutorial));
+
                     try
                     {
+                        if (CESettingsFlags.Instance == null)
+                        {
+                            CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsFlags missing MCMv4");
+                        }
+                        else
+                        {
+                            CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomFlags);
+                        }
+                        CECustomHandler.ForceLogToFile("Loaded CESettings: "
+                                                       + (CESettings.Instance != null && CESettings.Instance.LogToggle
+                                                           ? "Logs are enabled."
+                                                           : "Extra Event Logs are disabled enable them through settings."));
+
                         if (CESettingsEvents.Instance == null)
                         {
                             CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsEvents missing MCMv4");
@@ -1046,8 +1020,6 @@ namespace CaptivityEvents.Helper
                     {
                         CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettings is being accessed improperly.");
                     }
-
-                    new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager, Campaign.Current.CampaignGameLoadingType == Campaign.GameLoadingType.Tutorial));
 
                     // Load Images
                     string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";

@@ -3,6 +3,7 @@ using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
+using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
@@ -18,10 +19,10 @@ namespace CaptivityEvents.Notifications
         private readonly CEEvent _randomEvent;
 
         // 1.5.5
-        // public CEEventMapNotificationItemVM(CEEvent randomEvent, InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
+        public CEEventMapNotificationItemVM(InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
 
         // 1.5.6
-        public CEEventMapNotificationItemVM(InformationData data) : base(data)
+        // public CEEventMapNotificationItemVM(InformationData data) : base(data)
         {
             NotificationIdentifier = CESettings.Instance != null && CESettings.Instance.EventCaptorCustomTextureNotifications
                 ? "ceevent"

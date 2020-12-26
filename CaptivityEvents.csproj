@@ -59,7 +59,6 @@
     <Compile Include="CampaignBehaviors\CECampaignBehavior.cs" />
     <Compile Include="Config\CEManagedOptionTypesVM.cs" />
     <Compile Include="Config\CESettingsEvents.cs" />
-    <Compile Include="Config\CESettingsEventsVM.cs" />
     <Compile Include="Config\CESettingsFlags.cs" />
     <Compile Include="Config\CESettingsScreen.cs" />
     <Compile Include="Config\CESettingsVM.cs" />

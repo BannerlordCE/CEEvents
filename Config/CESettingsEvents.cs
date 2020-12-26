@@ -40,7 +40,7 @@ namespace CaptivityEvents.Config
                 {
                     foreach (CEEvent currentEvent in module.CEEvents)
                     {
-                        if (callableEvents.Exists((item) => item.Name == currentEvent.Name) && !EventToggle.ContainsKey(currentEvent.Name))
+                        if (!EventToggle.ContainsKey(currentEvent.Name) && callableEvents.Exists((item) => item.Name == currentEvent.Name))
                         {
                             if (currentEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                             {

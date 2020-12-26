@@ -243,43 +243,27 @@ namespace CaptivityEvents
             }
 
             string[] modulesFound = Utilities.GetModulesNames();
-            List<string> modulePaths = new List<string>();
 
             CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
 
-            foreach (string moduleID in modulesFound)
-            {
-                try
-                {
-                    ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
-
-                    // 1.5.5
-                    // if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
-
-                    // 1.5.6
-                    if (moduleInfo != null && !moduleInfo.DependedModules.Exists(item => item.ModuleId == "zCaptivityEvents")) continue;
-
-                    try
-                    {
-                        if (moduleInfo == null) continue;
-                        CECustomHandler.ForceLogToFile("Added to ModuleLoader: " + moduleInfo.Name);
-                        modulePaths.Insert(0, Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Id)));
-                    }
-                    catch (Exception)
-                    {
-                        if (moduleInfo != null) CECustomHandler.ForceLogToFile("Failed to Load " + moduleInfo.Name + " Events");
-                    }
-                }
-                catch (Exception)
-                {
-                    CECustomHandler.ForceLogToFile("Failed to fetch DependedModuleIds from " + moduleID);
-                }
-            }
+            List<string> modulePaths = CEHelper.GetModulePaths(modulesFound, out List<ModuleInfo> modules);
 
             // Load Events
             CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
             CEPersistence.CECustomFlags = CECustomHandler.GetCustom();
             CEPersistence.CECustomModules = CECustomHandler.GetModules();
+
+            try
+            {
+                CEPersistence.CECustomModules.ForEach(item =>
+                {
+                    item.CEModuleName = modules.FirstOrDefault(moduleInfo => { return moduleInfo.Id == item.CEModuleName; })?.Name ?? item.CEModuleName;
+                });
+            }
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Failed to name CECustomModules");
+            }
 
             // Load Images
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
@@ -424,7 +408,7 @@ namespace CaptivityEvents
 
             try
             {
-                if (CESettings.Instance != null && CESettings.Instance.IsHardCoded)
+                if (CESettings.Instance != null && CESettings.Instance.IsHardCoded && !_isLoaded)
                 {
                     Module.CurrentModule.AddInitialStateOption(
                         new InitialStateOption(
@@ -619,7 +603,6 @@ namespace CaptivityEvents
 
 
         // 1.5.5
-        /*
         public override bool DoLoading(Game game)
         {
             if (Campaign.Current == null) return true;
@@ -641,9 +624,10 @@ namespace CaptivityEvents
 
             return base.DoLoading(game);
         }
-        */
 
-        // 1.5.6
+
+        // 1.5.6 INVESTIGATE
+        /*
         public override bool DoLoading(Game game)
         {
             if (Campaign.Current == null) return true;
@@ -665,6 +649,7 @@ namespace CaptivityEvents
 
             return base.DoLoading(game);
         }
+        */
 
         private void InitalizeAttributes(Game game) => CESkills.RegisterAll(game);
 

@@ -954,10 +954,10 @@ namespace CaptivityEvents.Brothel
         private bool ConditionalRandomName()
         {
             // 1.5.5
-            // MBTextManager.SetTextVariable("NAME", new TextObject(Settlement.CurrentSettlement.Culture.FemaleNameList.GetRandomElement()));
+            MBTextManager.SetTextVariable("NAME", new TextObject(Settlement.CurrentSettlement.Culture.FemaleNameList.GetRandomElement()));
 
             // 1.5.6
-            MBTextManager.SetTextVariable("NAME", Settlement.CurrentSettlement.Culture.FemaleNameList.GetRandomElement());
+            // MBTextManager.SetTextVariable("NAME", Settlement.CurrentSettlement.Culture.FemaleNameList.GetRandomElement());
 
             return true;
         }
@@ -1244,7 +1244,7 @@ namespace CaptivityEvents.Brothel
             {
                 foreach (CEBrothel brothel in from brothel in GetPlayerBrothels()
                                               let town = brothel.Settlement.Town
-                                              where !town.InRebelliousState
+                                              where !town.IsRebeling
                                               where brothel.IsRunning
                                               select brothel)
                 {

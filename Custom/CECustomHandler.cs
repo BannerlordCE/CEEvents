@@ -81,6 +81,7 @@ namespace CaptivityEvents.Custom
                             ForceLogToFile("Added: " + text);
                         }
 
+                        
                         CECustomModule item = new CECustomModule(Path.GetFileNameWithoutExtension(fullPath), TempEvents);
                         AllModules.Add(item);
                     }
