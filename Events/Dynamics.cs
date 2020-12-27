@@ -528,10 +528,10 @@ namespace CaptivityEvents.Events
                         {
                             case "new":
                                 // 1.5.5
-                                clanName = new TextObject(clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement());
+                                //clanName = new TextObject(clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement());
 
                                 // 1.5.6
-                                // clanName = clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement();
+                                clanName = clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement();
 
                                 banner = Banner.CreateRandomClanBanner();
                                 leader = clanOption.Ref.ToLower() == "captor" ? captor : hero;

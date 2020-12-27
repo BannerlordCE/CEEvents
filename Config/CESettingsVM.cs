@@ -21,7 +21,10 @@ namespace CaptivityEvents.Config
         public CESettingsVM()
         {
             GeneralOptions = new CESettingsVMCategory(this, new TextObject("General", null), GeneralList, false);
-            EventsOptions = new CESettingsVMCategory(this, new TextObject("Events", null), EventsList, false);
+            CaptiveOptions = new CESettingsVMCategory(this, new TextObject("Captive", null), CaptiveList, false);
+            CaptorOptions = new CESettingsVMCategory(this, new TextObject("Captor", null), CaptorList, false);
+            RandomOptions = new CESettingsVMCategory(this, new TextObject("Random", null), RandomList, false);
+            EventsListOptions = new CESettingsVMCategory(this, new TextObject("Event List", null), EventsList, false);
             CustomFlagsOptions = new CESettingsVMCategory(this, new TextObject("Custom Flags", null), CustomFlagList, false);
         }
 
@@ -29,6 +32,34 @@ namespace CaptivityEvents.Config
         {
             get
             {
+              
+                yield break;
+            }
+        }
+
+        private IEnumerable<ICEOptionData> CaptiveList
+        {
+            get
+            {
+                //yield return new CEManagedBooleanOptionData("captiveToggle", "Captive Events", "", 1f);
+                yield break;
+            }
+        }
+
+        private IEnumerable<ICEOptionData> CaptorList
+        {
+            get
+            {
+                //yield return new CEManagedBooleanOptionData("captorToggle", "Captor Events", "", 1f);
+                yield break;
+            }
+        }
+
+        private IEnumerable<ICEOptionData> RandomList
+        {
+            get
+            {
+                //yield return new CEManagedBooleanOptionData("randomToggle", "Random Events", "", 1f);
                 yield break;
             }
         }
@@ -63,7 +94,13 @@ namespace CaptivityEvents.Config
 
         public CESettingsVMCategory GeneralOptions { get; }
 
-        public CESettingsVMCategory EventsOptions { get; }
+        public CESettingsVMCategory CaptiveOptions { get; }
+
+        public CESettingsVMCategory CaptorOptions { get; }
+
+        public CESettingsVMCategory RandomOptions { get; }
+
+        public CESettingsVMCategory EventsListOptions { get; }
 
         public CESettingsVMCategory CustomFlagsOptions { get; }
 

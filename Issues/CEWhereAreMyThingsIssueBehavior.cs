@@ -32,10 +32,10 @@ namespace CaptivityEvents.Issues
             protected override TextObject IssueQuestSolutionAcceptByPlayer => new TextObject("{=CEEVENTS1084}Are you serious?");
 
             // 1.5.5
-            public CEWhereAreMyThingsIssue(Hero issueOwner) : base(issueOwner, new Dictionary<IssueEffect, float>(), CampaignTime.DaysFromNow(25f)) { }
+            //public CEWhereAreMyThingsIssue(Hero issueOwner) : base(issueOwner, new Dictionary<IssueEffect, float>(), CampaignTime.DaysFromNow(25f)) { }
 
             // 1.5.6
-            //public CEWhereAreMyThingsIssue(Hero issueOwner) : base(issueOwner, CampaignTime.DaysFromNow(25f)) { }
+            public CEWhereAreMyThingsIssue(Hero issueOwner) : base(issueOwner, CampaignTime.DaysFromNow(25f)) { }
 
             protected override void AfterIssueCreation() { }
 

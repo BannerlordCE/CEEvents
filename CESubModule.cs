@@ -603,6 +603,7 @@ namespace CaptivityEvents
 
 
         // 1.5.5
+        /*
         public override bool DoLoading(Game game)
         {
             if (Campaign.Current == null) return true;
@@ -624,10 +625,11 @@ namespace CaptivityEvents
 
             return base.DoLoading(game);
         }
+        */
 
 
         // 1.5.6 INVESTIGATE
-        /*
+        
         public override bool DoLoading(Game game)
         {
             if (Campaign.Current == null) return true;
@@ -649,7 +651,7 @@ namespace CaptivityEvents
 
             return base.DoLoading(game);
         }
-        */
+        
 
         private void InitalizeAttributes(Game game) => CESkills.RegisterAll(game);
 

@@ -9,7 +9,7 @@ using TaleWorlds.Core;
 
 namespace CaptivityEvents.Patches
 {
-    [HarmonyPatch(typeof(MapNotificationVM), "DetermineNotificationType")]
+    [HarmonyPatch(typeof(MapNotificationVM), "GetNotificationFromData")]
     internal class CEMapNotificationVM
     {
         public static readonly MethodInfo RemoveNotificationItem = AccessTools.Method(typeof(MapNotificationVM), "RemoveNotificationItem");
@@ -20,7 +20,7 @@ namespace CaptivityEvents.Patches
         // 1.5.5 DetermineNotificationType
         // 1.5.6 GetNotificationFromData
         [HarmonyPostfix]
-        private static void DetermineNotificationType(MapNotificationVM __instance, ref MapNotificationItemBaseVM __result, InformationData data)
+        private static void GetNotificationFromData(MapNotificationVM __instance, ref MapNotificationItemBaseVM __result, InformationData data)
         {
             Type type = data.GetType();
             MapNotificationItemBaseVM mapNotification = null;
@@ -35,15 +35,15 @@ namespace CaptivityEvents.Patches
                 };
 
                 // 1.5.5
-                mapNotification = new CECaptorMapNotificationItemVM(data, null, onRemove);
+                //mapNotification = new CECaptorMapNotificationItemVM(data, null, onRemove);
 
                 // 1.5.6
-                /*
+                
                 mapNotification = new CECaptorMapNotificationItemVM(data);
 
                 FieldInfo fi = mapNotification.GetType().BaseType.GetField("OnRemove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
                 if (fi != null) fi.SetValue(mapNotification, onRemove);
-                */
+                
 
                 __result = mapNotification;
 
@@ -58,15 +58,15 @@ namespace CaptivityEvents.Patches
                 };
 
                 // 1.5.5
-                mapNotification = new CEEventMapNotificationItemVM(data, null, onRemove);
+                // mapNotification = new CEEventMapNotificationItemVM(data, null, onRemove);
 
                 // 1.5.6
-                /*
+                
                 mapNotification = new CEEventMapNotificationItemVM(data);
 
                 FieldInfo fi = mapNotification.GetType().BaseType.GetField("OnRemove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
                 if (fi != null) fi.SetValue(mapNotification, onRemove);
-                */
+                
 
                 __result = mapNotification;
             }
