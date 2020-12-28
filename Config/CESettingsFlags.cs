@@ -3,7 +3,7 @@ using MCM.Abstractions.Ref;
 using MCM.Abstractions.Settings.Base.Global;
 using System.Collections.Generic;
 
-namespace CaptivityEvents
+namespace CaptivityEvents.Config
 {
     public class CESettingsFlags
     {
@@ -28,6 +28,7 @@ namespace CaptivityEvents
 
         public void InitializeSettings(List<CECustom> moduleCustoms)
         {
+            CustomFlags = new Dictionary<string, bool>();
             ISettingsBuilder builder = BaseSettingsBuilder.Create("CaptivityEventsFlags", "Captivity Events Custom Flags");
 
             if (builder != null)

@@ -1,8 +1,10 @@
 ﻿using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Notifications;
+using SandBox;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +26,6 @@ namespace CaptivityEvents.Helper
 {
     internal class CEConsole
     {
-
         [CommandLineFunctionality.CommandLineArgumentFunction("reload_settings", "captivity")]
         public static string ChangeSettings(List<string> strings)
         {
@@ -67,6 +68,7 @@ namespace CaptivityEvents.Helper
                     _provider.PrisonerExceeded = customSettings.PrisonerExceeded;
                     _provider.NonSexualContent = customSettings.NonSexualContent;
                     _provider.SexualContent = customSettings.SexualContent;
+                    _provider.CustomBackgrounds = customSettings.CustomBackgrounds;
                     _provider.CommonControl = customSettings.CommonControl;
                     _provider.ProstitutionControl = customSettings.ProstitutionControl;
                     _provider.SlaveryToggle = customSettings.SlaveryToggle;
@@ -512,6 +514,15 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.current_status [SEARCH_HERO]\".";
 
+                //try
+                //{
+                //    CommandLineFunctionality.CallFunction("console.clear", "", out bool found);
+
+                //} catch (Exception e)
+                //{
+                //    string et = e.ToString();
+                //}
+
                 string searchTerm = null;
 
                 if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
@@ -665,13 +676,40 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckHelp(strings)) return "Format is \"debug.run_CETests \".";
 
-                string test = "--- CE Test ---";
+                string specificTest = null;
+                if (CampaignCheats.CheckParameters(strings, 1)) specificTest = strings[0];
 
+                string test = "--- CE Test ---";
                 try
                 {
+                    if (specificTest != null)
+                    {
 
-                    test += "\n" + CETests.RunTestOne();
-                    test += "\n" + CETests.RunTestTwo();
+                        switch (specificTest)
+                        {
+                            case "1":
+                                test += "\n" + CETests.RunTestOne();
+                                break;
+                            case "2":
+                                test += "\n" + CETests.RunTestTwo();
+                                break;
+                            case "3":
+                                test += "\n" + CETests.RunTestThree();
+                                break;
+                            default:
+                                test += "\nNot Found";
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // Notifications
+                        test += "\n" + CETests.RunTestOne();
+                        // All Event Pictures as Captive/Random/Captor
+                        test += "\n" + CETests.RunTestTwo();
+                        // Prisoners
+                        test += "\n" + CETests.RunTestThree();
+                    }
 
                     return test;
                 }
@@ -710,13 +748,15 @@ namespace CaptivityEvents.Helper
 
                     string test = "";
 
+                    CEBrothelBehavior._brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanAlways", "CanAlways", "CanNever", "CanNever", new[] { "empire_house_c_tavern_a", "", "", "" }, null);
+                    CEBrothelBehavior._isBrothelInitialized = true;
+
                     List<CEBrothel> list = CEBrothelBehavior.GetPlayerBrothels();
                     foreach (CEBrothel brothel in list)
                     {
                         test += "\n" + brothel.Name;
                     }
-                    //test += PlayerEncounter.LocationEncounter.IsInsideOfASettlement ? "Is In Settlement\n" : "Not in Settlement\n";
-                    //PlayerEncounter.LocationEncounter.Settlement.LocationComplex.GetLocationCharacterOfHero(Hero.MainHero);
+
                     return test;
                 }
                 catch (Exception e)
@@ -742,33 +782,10 @@ namespace CaptivityEvents.Helper
                 try
                 {
                     string[] modulesFound = Utilities.GetModulesNames();
-                    List<string> modulePaths = new List<string>();
 
                     CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
 
-                    foreach (string moduleID in modulesFound)
-                    {
-                        try
-                        {
-                            ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
-
-                            if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
-
-                            try
-                            {
-                                if (moduleInfo == null) continue;
-                                modulePaths.Insert(0, Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Id)));
-                            }
-                            catch (Exception)
-                            {
-                                if (moduleInfo != null) CECustomHandler.ForceLogToFile("Failed to Load " + moduleInfo.Name + " Events");
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            CECustomHandler.ForceLogToFile("Failed to fetch DependedModuleIds from " + moduleID);
-                        }
-                    }
+                    List<string> modulePaths = CEHelper.GetModulePaths(modulesFound, out List<ModuleInfo> modules);
 
                     // Load Images
                     string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
@@ -897,37 +914,21 @@ namespace CaptivityEvents.Helper
                 try
                 {
                     string[] modulesFound = Utilities.GetModulesNames();
-                    List<string> modulePaths = new List<string>();
 
                     CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
 
-                    foreach (string moduleID in modulesFound)
+                    List<string> modulePaths = CEHelper.GetModulePaths(modulesFound, out List<ModuleInfo> modules);
+
+                    if (Campaign.Current?.GameManager != null)
                     {
-                        try
-                        {
-                            ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
-
-                            if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
-
-                            try
-                            {
-                                if (moduleInfo == null) continue;
-                                modulePaths.Insert(0, Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Id)));
-                            }
-                            catch (Exception)
-                            {
-                                if (moduleInfo != null) CECustomHandler.ForceLogToFile("Failed to Load " + moduleInfo.Name + " Events");
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            CECustomHandler.ForceLogToFile("Failed to fetch DependedModuleIds from " + moduleID);
-                        }
+                        // Events Removing
+                        MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
+                        if (mi != null) mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
+                    } 
+                    else
+                    {
+                        return "Cannot reload in the current campaign.";
                     }
-
-                    // Events Removing
-                    MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
-                    if (mi != null) mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
 
                     // Unload 
                     CEPersistence.CEEvents.Clear();
@@ -937,6 +938,20 @@ namespace CaptivityEvents.Helper
 
                     // Load Events
                     CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
+                    CEPersistence.CECustomFlags = CECustomHandler.GetCustom();
+                    CEPersistence.CECustomModules = CECustomHandler.GetModules();
+
+                    try
+                    {
+                        CEPersistence.CECustomModules.ForEach(item =>
+                        {
+                            item.CEModuleName = modules.FirstOrDefault(moduleInfo => { return moduleInfo.Id == item.CEModuleName; })?.Name ?? item.CEModuleName;
+                        });
+                    }
+                    catch (Exception)
+                    {
+                        CECustomHandler.ForceLogToFile("Failed to name CECustomModules");
+                    }
 
                     CEHelper.brothelFlagFemale = false;
                     CEHelper.brothelFlagMale = false;
@@ -964,13 +979,57 @@ namespace CaptivityEvents.Helper
                         }
                         else
                         {
-                            if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent)) CEPersistence.CECallableEvents.Add(_listedEvent);
+                            if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
+                            {
+                                int weightedChance = 1;
+                                try
+                                {
+                                    if (_listedEvent.WeightedChanceOfOccuring != null) weightedChance = new CEVariablesLoader().GetIntFromXML(_listedEvent.WeightedChanceOfOccuring);
+                                }
+                                catch (Exception)
+                                {
+                                    CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring on " + _listedEvent.Name);
+                                }
+                                if (weightedChance > 0)
+                                {
+                                    CEPersistence.CECallableEvents.Add(_listedEvent);
+                                }
+                            }
 
                             CEPersistence.CEEventList.Add(_listedEvent);
                         }
                     }
 
                     new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager, Campaign.Current.CampaignGameLoadingType == Campaign.GameLoadingType.Tutorial));
+
+                    try
+                    {
+                        if (CESettingsFlags.Instance == null)
+                        {
+                            CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsFlags missing MCMv4");
+                        }
+                        else
+                        {
+                            CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomFlags);
+                        }
+                        CECustomHandler.ForceLogToFile("Loaded CESettings: "
+                                                       + (CESettings.Instance != null && CESettings.Instance.LogToggle
+                                                           ? "Logs are enabled."
+                                                           : "Extra Event Logs are disabled enable them through settings."));
+
+                        if (CESettingsEvents.Instance == null)
+                        {
+                            CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsEvents missing MCMv4");
+                        }
+                        else
+                        {
+                            CESettingsEvents.Instance.InitializeSettings(CEPersistence.CECustomModules, CEPersistence.CECallableEvents);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettings is being accessed improperly.");
+                    }
 
                     // Load Images
                     string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
@@ -1093,6 +1152,12 @@ namespace CaptivityEvents.Helper
             {
                 Thread.Sleep(500);
 
+                if (CEPersistence.soundEvent != null)
+                {
+                    CEPersistence.soundEvent.Stop();
+                    CEPersistence.soundEvent = null;
+                }
+
                 if (CampaignCheats.CheckHelp(strings) && CampaignCheats.CheckParameters(strings, 1)) return "Format is \"captivity.play_sound [SOUND_ID]\".";
 
                 string searchTerm = strings[0];
@@ -1128,7 +1193,15 @@ namespace CaptivityEvents.Helper
                         return string.Empty;
                     }
 
-                    SoundEvent.PlaySound2D(id);
+                    Campaign campaign = Campaign.Current;
+                    Scene _mapScene = null;
+                    if ((campaign?.MapSceneWrapper) != null)
+                    {
+                        _mapScene = ((MapScene)Campaign.Current.MapSceneWrapper).Scene;
+                    }
+
+                    CEPersistence.soundEvent = SoundEvent.CreateEvent(id, _mapScene);
+                    CEPersistence.soundEvent.Play();
 
                     return string.Empty;
                 }

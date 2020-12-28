@@ -1,4 +1,5 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Helper;
 using Helpers;
 using System.Collections.Generic;
@@ -262,10 +263,12 @@ namespace CaptivityEvents.Events
                 if (captorHero != null)
                 {
                     randomSoldier = captorHero;
+                    if (!(randomSoldier.IsFemale && !randomSoldier.IsPregnant)) return;
                 }
-                else if (lord && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty?.LeaderHero != null && targetHero.PartyBelongedToAsPrisoner.MobileParty.LeaderHero.IsFemale)
+                else if (lord && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty?.LeaderHero != null)
                 {
                     randomSoldier = targetHero.PartyBelongedToAsPrisoner.MobileParty.LeaderHero;
+                    if (!(randomSoldier.IsFemale && !randomSoldier.IsPregnant)) return;
                 }
                 else if (targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty != null)
                 {
@@ -312,7 +315,7 @@ namespace CaptivityEvents.Events
                 }
 
                 CEHelper.spouseTwo = targetHero;
-                MakePregnantAction.Apply(targetHero);
+                MakePregnantAction.Apply(randomSoldier);
                 CEHelper.spouseOne = CEHelper.spouseTwo = null;
 
                 //RelationsModifier(randomSoldier, 50, targetHero);

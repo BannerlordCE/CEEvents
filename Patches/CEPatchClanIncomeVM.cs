@@ -1,4 +1,5 @@
 ﻿using CaptivityEvents.Brothel;
+using CaptivityEvents.Config;
 using HarmonyLib;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
@@ -12,7 +13,7 @@ namespace CaptivityEvents.Patches
     {
         public static MethodInfo GetDefaultIncome = AccessTools.Method(typeof(ClanIncomeVM), "GetDefaultIncome");
         public static MethodInfo OnIncomeSelection = AccessTools.Method(typeof(ClanIncomeVM), "OnIncomeSelection");
-       
+
         [HarmonyPrepare]
         private static bool ShouldPatch() => CESettings.Instance != null && CESettings.Instance.ProstitutionControl;
 

@@ -49,7 +49,7 @@ namespace CaptivityEvents.Events
                     {
                         int test = MBRandom.Random.Next(0, eventNames.Count);
                         string randomWeightedChoice = eventNames[test];
-
+                        CECustomHandler.LogToFile("CEWaitingList Choice is " + randomWeightedChoice);
                         return randomWeightedChoice;
                     }
                 }

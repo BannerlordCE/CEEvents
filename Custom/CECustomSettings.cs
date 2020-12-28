@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Xml.Serialization;
 
@@ -36,10 +35,11 @@ namespace CaptivityEvents
         public int PrisonerNonHeroEscapeChanceSettlement { get; set; } = 0;
         public int PrisonerNonHeroEscapeChanceOther { get; set; } = -1;
         public int EscapeAutoRansom { get; set; } = 0;
-        public int BrothelOption { get; set; } =  1;
+        public int BrothelOption { get; set; } = 1;
         public bool PrisonerExceeded { get; set; } = false;
         public bool NonSexualContent { get; set; } = true;
         public bool SexualContent { get; set; } = true;
+        public bool CustomBackgrounds { get; set; } = true;
         public bool CommonControl { get; set; } = true;
         public bool ProstitutionControl { get; set; } = true;
         public bool SlaveryToggle { get; set; } = true;

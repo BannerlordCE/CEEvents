@@ -1,4 +1,5 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using HarmonyLib;
 using Helpers;
@@ -44,7 +45,18 @@ namespace CaptivityEvents.Events
                 {
                     if (CECampaignBehavior.ExtraProps.menuToSwitchBackTo != null)
                     {
-                        GameMenu.SwitchToMenu(CECampaignBehavior.ExtraProps.menuToSwitchBackTo);
+                        if (CECampaignBehavior.ExtraProps.menuToSwitchBackTo != "prisoner_wait")
+                        {
+                            GameMenu.SwitchToMenu(CECampaignBehavior.ExtraProps.menuToSwitchBackTo);
+                        }
+                        else
+                        {
+                            CECustomHandler.ForceLogToFile("General Error: CECaptorContinue : menuToSwitchBackTo : prisoner_wait");
+                            GameMenu.ExitToLast();
+                            Campaign.Current.TimeControlMode = Campaign.Current.LastTimeControlMode;
+                            new CESubModule().LoadTexture("default");
+                            return;
+                        }
                         CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
 
                         if (CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo != null)
@@ -65,6 +77,33 @@ namespace CaptivityEvents.Events
             catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("Critical Error: CECaptorContinue : " + e);
+            }
+        }
+
+        internal void CEReleasePrisoners(MenuCallbackArgs args, int amount = 10, bool releaseHeroes = false)
+        {
+            try
+            {
+                int prisonerCount = MobileParty.MainParty.PrisonRoster.Count;
+                if (prisonerCount < amount) amount = prisonerCount;
+                MobileParty.MainParty.PrisonRoster.KillNumberOfMenRandomly(amount, false);
+                if (releaseHeroes)
+                {
+                    foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster)
+                    {
+                        if (element.Character.IsHero) element.Character.HeroObject.ChangeState(Hero.CharacterStates.Active);
+                    }
+                    MobileParty.MainParty.PrisonRoster.Clear();
+                }
+
+                TextObject textObject = GameTexts.FindText("str_CE_release_prisoners");
+                textObject.SetTextVariable("HERO", Hero.MainHero.Name);
+                textObject.SetTextVariable("AMOUNT", amount);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Couldn't release any prisoners.");
             }
         }
 
@@ -128,7 +167,7 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives");
+                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Rebel_Captives_" + MBRandom.RandomFloatRanged(float.MaxValue));
 
                     TroopRosterElement leader = releasedPrisoners.FirstOrDefault(hasHero => hasHero.Character.IsHero);
 
@@ -137,7 +176,13 @@ namespace CaptivityEvents.Events
                         Clan clan = leader.Character.HeroObject.Clan;
                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                         Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlement(settlement => true);
-                        prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Lord);
+                        // 1.5.5
+                        //prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Lord);
+
+                        // 1.5.6
+                        prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+
+                        prisonerParty.ActualClan = clan;
                         prisonerParty.MemberRoster.Clear();
                         prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
                         prisonerParty.IsActive = true;
@@ -152,10 +197,17 @@ namespace CaptivityEvents.Events
                     else
                     {
                         Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
+                        clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
+
                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                         Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => true);
-                        prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Bandit);
+                        // 1.5.5
+                        //prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Bandit);
+
+                        // 1.5.6
+                        prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
                         prisonerParty.MemberRoster.Clear();
+                        prisonerParty.ActualClan = clan;
                         prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
                         prisonerParty.IsActive = true;
                         prisonerParty.Party.Owner = clan.Leader;
@@ -222,19 +274,25 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives");
+                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives_" + MBRandom.RandomFloatRanged(float.MaxValue));
 
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
+                    clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                     Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
-                    prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0f, 0f, MobileParty.PartyTypeEnum.Bandit);
+                    // 1.5.5
+                    //prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Bandit);
+
+                    // 1.5.6
+                    prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
                     prisonerParty.MemberRoster.Clear();
                     prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
 
                     prisonerParty.RecentEventsMorale = -100;
                     prisonerParty.IsActive = true;
+                    prisonerParty.ActualClan = clan;
                     prisonerParty.Party.Owner = clan.Leader;
                     prisonerParty.Aggressiveness = 0.2f;
 

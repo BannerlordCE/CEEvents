@@ -1,4 +1,5 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
@@ -12,17 +13,21 @@ using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Notifications
 {
+    // ArmyDispersionItemVM
     internal class CEEventMapNotificationItemVM : MapNotificationItemBaseVM
     {
         private readonly CEEvent _randomEvent;
 
-        public CEEventMapNotificationItemVM(CEEvent randomEvent, InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
+        // 1.5.5
+        // public CEEventMapNotificationItemVM(InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
+
+        // 1.5.6
+        public CEEventMapNotificationItemVM(InformationData data) : base(data)
         {
             NotificationIdentifier = CESettings.Instance != null && CESettings.Instance.EventCaptorCustomTextureNotifications
                 ? "ceevent"
                 : "vote";
-            _randomEvent = randomEvent;
-
+            _randomEvent = ((CEEventMapNotification)data).RandomEvent;
             _onInspect = OnRandomNotificationInspect;
         }
 

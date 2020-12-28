@@ -1,5 +1,6 @@
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
@@ -18,6 +19,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Core.ViewModelCollection;
 using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
+using TaleWorlds.Engine.Screens;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
@@ -88,13 +90,17 @@ namespace CaptivityEvents
         public static float brothelBlack = 10f;
         public static float brothelFadeOut = 2f;
 
-        public static List<CECustom> CECustomModule = new List<CECustom>();
+        public static List<CECustom> CECustomFlags = new List<CECustom>();
+
+        public static List<CECustomModule> CECustomModules = new List<CECustomModule>();
 
         // Images
         public static Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
+
+        // Sound
+        public static SoundEvent soundEvent = null;
+        public static bool soundLoop = false;
     }
-
-
 
     public class CESubModule : MBSubModuleBase
     {
@@ -121,7 +127,7 @@ namespace CaptivityEvents
         private static readonly float brothelSoundMin = 1f;
         private static readonly float brothelSoundMax = 3f;
 
-        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml  (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.3)
+        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml  (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.5)
         private static readonly int[] sprite_index = new int[] { 13, 18, 29, 30 };
 
         // Sounds for Brothel
@@ -137,38 +143,38 @@ namespace CaptivityEvents
                 if (!swap)
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
-                          ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
+                          ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                 }
                 else
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
-                        ? CESettings.Instance.SexualContent ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
+                        ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
                         : CEPersistence.CEEventImageList[name];
                 }
             }
@@ -237,38 +243,27 @@ namespace CaptivityEvents
             }
 
             string[] modulesFound = Utilities.GetModulesNames();
-            List<string> modulePaths = new List<string>();
 
             CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
 
-            foreach (string moduleID in modulesFound)
-            {
-                try
-                {
-                    ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
-
-                    if (moduleInfo != null && !moduleInfo.DependedModuleIds.Contains("zCaptivityEvents")) continue;
-
-                    try
-                    {
-                        if (moduleInfo == null) continue;
-                        CECustomHandler.ForceLogToFile("Added to ModuleLoader: " + moduleInfo.Name);
-                        modulePaths.Insert(0, Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Id)));
-                    }
-                    catch (Exception)
-                    {
-                        if (moduleInfo != null) CECustomHandler.ForceLogToFile("Failed to Load " + moduleInfo.Name + " Events");
-                    }
-                }
-                catch (Exception)
-                {
-                    CECustomHandler.ForceLogToFile("Failed to fetch DependedModuleIds from " + moduleID);
-                }
-            }
+            List<string> modulePaths = CEHelper.GetModulePaths(modulesFound, out List<ModuleInfo> modules);
 
             // Load Events
             CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
-            CEPersistence.CECustomModule = CECustomHandler.GetCustom();
+            CEPersistence.CECustomFlags = CECustomHandler.GetCustom();
+            CEPersistence.CECustomModules = CECustomHandler.GetModules();
+
+            try
+            {
+                CEPersistence.CECustomModules.ForEach(item =>
+                {
+                    item.CEModuleName = modules.FirstOrDefault(moduleInfo => { return moduleInfo.Id == item.CEModuleName; })?.Name ?? item.CEModuleName;
+                });
+            }
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Failed to name CECustomModules");
+            }
 
             // Load Images
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
@@ -371,7 +366,8 @@ namespace CaptivityEvents
 
             try
             {
-                // Load the MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.3)
+                // Load theMount & Blade II Bannerlord\Modules\SandBox\GUI\Brushes
+                // MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.6)
                 SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
@@ -412,13 +408,26 @@ namespace CaptivityEvents
 
             try
             {
+                if (CESettings.Instance != null && CESettings.Instance.IsHardCoded && !_isLoaded)
+                {
+                    Module.CurrentModule.AddInitialStateOption(
+                        new InitialStateOption(
+                            "CaptivityEventsSettings",
+                            new TextObject("Captivity Events Settings", null),
+                            9990,
+                            () => { ScreenManager.PushScreen(new CESettingsScreen()); },
+                            false
+                        )
+                      );
+                }
+
                 if (CESettingsFlags.Instance == null)
                 {
                     CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsFlags missing MCMv4");
                 }
                 else
                 {
-                    CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomModule);
+                    CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomFlags);
                 }
                 CECustomHandler.ForceLogToFile("Loaded CESettings: "
                                                + (CESettings.Instance != null && CESettings.Instance.LogToggle
@@ -444,7 +453,7 @@ namespace CaptivityEvents
 
                 CECustomHandler.ForceLogToFile(CESettings.Instance != null && CESettings.Instance.EventCaptorNotifications
                                                    ? "Patching Map Notifications: No Conflicts Detected : Enabled."
-                                                   : "EventCaptorNotifications: Disabled.");
+                                                                   : "EventCaptorNotifications: Disabled.");
 
                 _harmony.PatchAll();
             }
@@ -476,7 +485,22 @@ namespace CaptivityEvents
                 }
                 else
                 {
-                    if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent)) CEPersistence.CECallableEvents.Add(_listedEvent);
+                    if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
+                    {
+                        int weightedChance = 1;
+                        try
+                        {
+                            if (_listedEvent.WeightedChanceOfOccuring != null) weightedChance = new CEVariablesLoader().GetIntFromXML(_listedEvent.WeightedChanceOfOccuring);
+                        }
+                        catch (Exception)
+                        {
+                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring on " + _listedEvent.Name);
+                        }
+                        if (weightedChance > 0)
+                        {
+                            CEPersistence.CECallableEvents.Add(_listedEvent);
+                        }
+                    }
 
                     CEPersistence.CEEventList.Add(_listedEvent);
                 }
@@ -489,6 +513,22 @@ namespace CaptivityEvents
 
             if (CEPersistence.CEEvents.Count > 0)
             {
+                try
+                {
+                    if (CESettingsEvents.Instance == null)
+                    {
+                        CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsEvents missing MCMv4");
+                    }
+                    else
+                    {
+                        CESettingsEvents.Instance.InitializeSettings(CEPersistence.CECustomModules, CEPersistence.CECallableEvents);
+                    }
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettings is being accessed improperly.");
+                }
+
                 try
                 {
                     TextObject textObject = new TextObject("{=CEEVENTS1000}Captivity Events Loaded with {EVENT_COUNT} Events and {IMAGE_COUNT} Images.\n^o^ Enjoy your events. Remember to endorse!");
@@ -562,6 +602,8 @@ namespace CaptivityEvents
         }
 
 
+        // 1.5.5
+        /*
         public override bool DoLoading(Game game)
         {
             if (Campaign.Current == null) return true;
@@ -583,6 +625,33 @@ namespace CaptivityEvents
 
             return base.DoLoading(game);
         }
+        */
+
+
+        // 1.5.6 INVESTIGATE
+        
+        public override bool DoLoading(Game game)
+        {
+            if (Campaign.Current == null) return true;
+
+            if (CESettings.Instance != null && !CESettings.Instance.PrisonerEscapeBehavior) return base.DoLoading(game);
+            IMbEvent<Hero> dailyTickHeroEvent = CampaignEvents.DailyTickHeroEvent;
+
+            if (dailyTickHeroEvent != null)
+            {
+                dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerReleaseCampaignBehavior>());
+                if (CESettings.Instance != null && CESettings.Instance.EscapeAutoRansom.SelectedIndex != 2) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
+            }
+
+            IMbEvent<MobileParty> hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
+            hourlyPartyTick?.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerReleaseCampaignBehavior>());
+
+            IMbEvent<BarterData> barterablesRequested = CampaignEvents.BarterablesRequested;
+            barterablesRequested?.ClearListeners(Campaign.Current.GetCampaignBehavior<SetPrisonerFreeBarterBehavior>());
+
+            return base.DoLoading(game);
+        }
+        
 
         private void InitalizeAttributes(Game game) => CESkills.RegisterAll(game);
 
@@ -725,6 +794,9 @@ namespace CaptivityEvents
             // CaptiveState
             CaptiveStateCheck();
 
+            // SoundState
+            SoundStateCheck();
+
             // Animated Background Menus
             AnimationStateCheck();
 
@@ -733,6 +805,25 @@ namespace CaptivityEvents
 
             // Hunt Event To Play
             HuntStateCheck();
+        }
+
+
+        private void SoundStateCheck()
+        {
+            if (CEPersistence.soundLoop && CEPersistence.soundEvent != null && Game.Current.GameStateManager.ActiveState is MapState)
+            {
+                try
+                {
+                    if (!CEPersistence.soundEvent.IsPlaying())
+                    {
+                        CEPersistence.soundEvent.Play();
+                    }
+                }
+                catch (Exception)
+                {
+                    CEPersistence.soundEvent = null;
+                }
+            }
         }
 
         // TODO MOVE TO PROPER LISTENERS AND AWAY FROM ONAPPLICATIONTICK

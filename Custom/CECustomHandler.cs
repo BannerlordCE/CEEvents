@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CaptivityEvents.Config;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -18,10 +19,13 @@ namespace CaptivityEvents.Custom
         public static int Lines;
         public static string TestLog = "FC";
 
+        private static readonly List<CECustomModule> AllModules = new List<CECustomModule>();
         private static readonly List<CEEvent> AllEvents = new List<CEEvent>();
         private static readonly List<CECustom> AllCustom = new List<CECustom>();
 
         public static List<CECustom> GetCustom() => AllCustom;
+
+        public static List<CECustomModule> GetModules() => AllModules;
 
         public static List<CEEvent> GetAllVerifiedXSEFSEvents(List<string> modules)
         {
@@ -36,6 +40,8 @@ namespace CaptivityEvents.Custom
                 foreach (string fullPath in modules)
                 {
                     ForceLogToFile("Found new module path to be checked " + fullPath);
+
+                    List<CEEvent> TempEvents = new List<CEEvent>();
 
                     try
                     {
@@ -71,8 +77,13 @@ namespace CaptivityEvents.Custom
                             if (!XMLFileCompliesWithStandardXSD(text)) continue;
 
                             AllEvents.AddRange(DeserializeXMLFileToObject(text));
+                            TempEvents.AddRange(DeserializeXMLFileToObject(text));
                             ForceLogToFile("Added: " + text);
                         }
+
+                        
+                        CECustomModule item = new CECustomModule(Path.GetFileNameWithoutExtension(fullPath), TempEvents);
+                        AllModules.Add(item);
                     }
                     catch (Exception e)
                     {
@@ -87,6 +98,8 @@ namespace CaptivityEvents.Custom
                 string fullPath = BasePath.Name + "Modules\\zCaptivityEvents\\ModuleLoader";
                 ForceLogToFile("Found new module path to be checked " + fullPath);
                 string[] files = Directory.GetFiles(fullPath, "*.xml", SearchOption.AllDirectories);
+
+                List<CEEvent> TempEvents = new List<CEEvent>();
 
                 foreach (string text in files)
                 {
@@ -112,8 +125,12 @@ namespace CaptivityEvents.Custom
                     if (!XMLFileCompliesWithStandardXSD(text)) continue;
 
                     AllEvents.AddRange(DeserializeXMLFileToObject(text));
+                    TempEvents.AddRange(DeserializeXMLFileToObject(text));
                     ForceLogToFile("Added: " + text);
                 }
+
+                CECustomModule item = new CECustomModule(Path.GetFileNameWithoutExtension(fullPath), TempEvents);
+                AllModules.Add(item);
 
                 return AllEvents;
             }
@@ -126,6 +143,44 @@ namespace CaptivityEvents.Custom
             }
         }
          
+        public static CECustomSettings LoadCustomSettings()
+        {
+            string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CESettings.xml";
+            try
+            {
+                return DeserializeXMLFileToSettings(fullPath);
+            }
+            catch (Exception e)
+            {
+                ForceLogToFile(e.ToString());
+                return null;
+            }
+        }
+        // Settings
+        public static CECustomSettings DeserializeXMLFileToSettings(string XmlFilename)
+        {
+            CECustomSettings _CESettings;
+
+            try
+            {
+                if (string.IsNullOrEmpty(XmlFilename)) return null;
+                StreamReader textReader = new StreamReader(XmlFilename);
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(CECustomSettings));
+                CECustomSettings xsefsevents = (CECustomSettings)xmlSerializer.Deserialize(textReader);
+                _CESettings = xsefsevents;
+            }
+            catch (Exception innerException)
+            {
+                TextObject textObject = new TextObject("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
+                textObject.SetTextVariable("FILE", XmlFilename);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
+
+                throw new Exception("ERROR DeserializeXMLFileToSettings:  -- filename: " + XmlFilename, innerException);
+            }
+
+            return _CESettings;
+        }
+
         public static CECustomSettings LoadCustomSettings()
         {
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CESettings.xml";
