@@ -1,3 +1,4 @@
+//#define BETA
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -25,7 +26,9 @@ using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.View.Missions;
 using TaleWorlds.TwoDimension;
+#if BETA
 using TaleWorlds.ModuleManager;
+#endif
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
 
@@ -219,13 +222,13 @@ namespace CaptivityEvents
         {
             base.OnSubModuleLoad();
 
-            // 1.5.6
-            // ModuleInfo ceModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
-            // ModuleInfo nativeModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
-
-            // 1.5.7
+#if BETA
             ModuleInfo ceModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
             ModuleInfo nativeModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
+#else
+            ModuleInfo ceModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
+            ModuleInfo nativeModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
+#endif
 
             ApplicationVersion modversion = ceModule.Version;
             ApplicationVersion gameversion = nativeModule.Version;
@@ -376,7 +379,7 @@ namespace CaptivityEvents
             try
             {
                 // Load theMount & Blade II Bannerlord\Modules\SandBox\GUI\Brushes
-                // MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.6)
+                // MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.7)
                 SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
@@ -610,7 +613,7 @@ namespace CaptivityEvents
             CEHelper.notificationEventCheck = false;
         }
 
-        // 1.5.6 INVESTIGATE  
+        // Do Loading Investigate
         public override bool DoLoading(Game game)
         {
             if (Campaign.Current == null) return true;

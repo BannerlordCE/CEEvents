@@ -1,0 +1,28 @@
+{
+	"folders": [
+		{
+			"path": "..\\..\\zCEAnimations"
+		},
+		{
+			"path": "..\\..\\zCEDefaults"
+		},
+		{
+			"path": "..\\..\\zModules"
+		},
+		{
+			"path": "..\\..\\zTBCaptivityEvents"
+		},
+		{
+			"path": "..\\GUI"
+		},
+		{
+			"path": "..\\ModuleData"
+		},
+		{
+			"path": "..\\ModuleLoader"
+		},
+		{
+			"path": "..\\ModuleLogs"
+		}
+	]
+}

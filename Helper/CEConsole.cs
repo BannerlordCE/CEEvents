@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Brothel;
+﻿//#define BETA
+using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -18,7 +19,9 @@ using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+#if BETA
 using TaleWorlds.ModuleManager;
+#endif
 using TaleWorlds.MountAndBlade;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;

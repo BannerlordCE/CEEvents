@@ -190,12 +190,12 @@ namespace CaptivityEvents.Events
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
-                    // 1.5.6
-                    // prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-
-                    // 1.5.7
+#if BETA
                     prisonerParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
                     prisonerParty.SetCustomName(new TextObject("{=CEEVENTS1107}Escaped Captives"));
+#else
+                    prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#endif
 
                     prisonerParty.MemberRoster.Clear();
                     prisonerParty.ActualClan = clan;
@@ -283,13 +283,12 @@ namespace CaptivityEvents.Events
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                     Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
-                    // 1.5.6
-                    // prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-
-                    // 1.5.7
+#if BETA
                     prisonerParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
                     prisonerParty.SetCustomName(new TextObject("{=CEEVENTS1107}Escaped Captives"));
-
+#else
+                    prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#endif
                     prisonerParty.MemberRoster.Clear();
                     prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
 
