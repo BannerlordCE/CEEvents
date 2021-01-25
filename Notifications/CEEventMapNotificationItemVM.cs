@@ -18,10 +18,6 @@ namespace CaptivityEvents.Notifications
     {
         private readonly CEEvent _randomEvent;
 
-        // 1.5.5
-        // public CEEventMapNotificationItemVM(InformationData data, Action onInspect, Action<MapNotificationItemBaseVM> onRemove) : base(data, onInspect, onRemove)
-
-        // 1.5.6
         public CEEventMapNotificationItemVM(InformationData data) : base(data)
         {
             NotificationIdentifier = CESettings.Instance != null && CESettings.Instance.EventCaptorCustomTextureNotifications
@@ -63,12 +59,23 @@ namespace CaptivityEvents.Notifications
 
             if (result == null)
             {
-                if (!(Game.Current.GameStateManager.ActiveState is MapState mapState)) return;
+                if (!(Game.Current.GameStateManager.ActiveState is MapState mapState))
+                {
+                    TextObject textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
+                    InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
+                    return;
+                }
+
                 Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
 
                 if (!mapState.AtMenu)
                 {
-                    GameMenu.ActivateGameMenu("prisoner_wait");
+                    if (CECampaignBehavior.ExtraProps != null)
+                    {
+                        CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
+                        CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
+                    }
+                    GameMenu.ActivateGameMenu(_randomEvent.Name);
                 }
                 else
                 {
@@ -77,9 +84,8 @@ namespace CaptivityEvents.Notifications
                         CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
                         CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                     }
+                    GameMenu.SwitchToMenu(_randomEvent.Name);
                 }
-
-                GameMenu.SwitchToMenu(_randomEvent.Name);
             }
             else
             {

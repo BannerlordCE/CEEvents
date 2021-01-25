@@ -56,10 +56,6 @@ namespace CaptivityEvents.Brothel
         {
             int num = 0;
 
-            // 1.5.3
-            // foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster) num += troopRosterElement.Character.PrisonerRansomValue(Hero.MainHero) * troopRosterElement.Number;
-
-            // 1.5.4
             foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster) num += Campaign.Current.Models.RansomValueCalculationModel.PrisonerRansomValue(troopRosterElement.Character, Hero.MainHero) * troopRosterElement.Number;
 
             return num;
@@ -218,8 +214,10 @@ namespace CaptivityEvents.Brothel
                 FieldInfo fi = LocationComplex.Current.GetType().GetField("_locations", BindingFlags.Instance | BindingFlags.NonPublic);
                 Dictionary<string, Location> _locations = (Dictionary<string, Location>)fi.GetValue(LocationComplex.Current);
 
-                if (_locations.ContainsKey("brothel")) _locations.Remove("brothel");
-                //else LocationComplex.Current.AddPassage(LocationComplex.Current.GetLocationWithId("center"), _brothel);
+                if (_locations.ContainsKey("brothel"))
+                {
+                   _locations.Remove("brothel");
+                }
 
                 _brothel.SetOwnerComplex(settlement.LocationComplex);
 
@@ -259,6 +257,7 @@ namespace CaptivityEvents.Brothel
                     if (!brothelPrisoner.IsHero) continue;
                     _brothel.AddCharacter(CreateBrothelPrisoner(brothelPrisoner, Settlement.CurrentSettlement.Culture, LocationCharacter.CharacterRelations.Neutral));
                 }
+
                 _locations.Add("brothel", _brothel);
                 if (fi != null) fi.SetValue(LocationComplex.Current, _locations);
 
@@ -361,38 +360,22 @@ namespace CaptivityEvents.Brothel
 
             if (DoesOwnBrothelInSettlement(Settlement.CurrentSettlement))
             {
-                CharacterObject templateToCopy = HelperCreateFrom(culture.TavernWench, true);
-                owner.Culture = templateToCopy.Culture;
+                owner = HelperCreateFrom(culture.TavernWench, true);
+
                 owner.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-                owner.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
-                owner.StaticBodyPropertiesMin = templateToCopy.StaticBodyPropertiesMin;
-                owner.StaticBodyPropertiesMax = templateToCopy.StaticBodyPropertiesMax;
                 owner.IsFemale = true;
-                owner.Level = templateToCopy.Level;
-                owner.HairTags = templateToCopy.HairTags;
-                owner.BeardTags = templateToCopy.BeardTags;
-                owner.InitializeEquipmentsOnLoad(templateToCopy.AllEquipments.ToList());
                 owner.Name = new TextObject("{=CEEVENTS1050}Brothel Assistant");
                 owner.StringId = "brothel_assistant";
             }
             else
             {
-                // 142 CharacterObject templateToCopy = CharacterObject.CreateFrom(culture.Tavernkeeper);
-                CharacterObject templateToCopy2 = HelperCreateFrom(culture.Tavernkeeper, true);
-                owner.Culture = templateToCopy2.Culture;
+                owner = HelperCreateFrom(culture.Tavernkeeper, true);
+
                 owner.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge);
-                owner.DefaultFormationGroup = templateToCopy2.DefaultFormationGroup;
-                owner.StaticBodyPropertiesMin = templateToCopy2.StaticBodyPropertiesMin;
-                owner.StaticBodyPropertiesMax = templateToCopy2.StaticBodyPropertiesMax;
                 owner.IsFemale = true;
-                owner.Level = templateToCopy2.Level;
-                owner.HairTags = templateToCopy2.HairTags;
-                owner.BeardTags = templateToCopy2.BeardTags;
-                owner.InitializeEquipmentsOnLoad(templateToCopy2.AllEquipments.ToList());
                 owner.Name = new TextObject("{=CEEVENTS1066}Brothel Owner");
                 owner.StringId = "brothel_owner";
             }
-
 
             return new LocationCharacter(new AgentData(new SimpleAgentOrigin(owner)).Monster(Campaign.Current.HumanMonsterSettlement).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge)).Equipment(culture.FemaleDancer.AllEquipments.GetRandomElement()), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "spawnpoint_tavernkeeper", true, relation, "as_human_tavern_keeper", true);
         }
@@ -410,21 +393,10 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateTownsManForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            CharacterObject templateToCopy = HelperCreateFrom(culture.Townsman, true);
-            CharacterObject townsman = MBObjectManager.Instance.CreateObject<CharacterObject>();
-            townsman.Culture = templateToCopy.Culture;
+            CharacterObject townsman = HelperCreateFrom(culture.Townsman, true);
             townsman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-            townsman.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
-            townsman.StaticBodyPropertiesMin = templateToCopy.StaticBodyPropertiesMin;
-            townsman.StaticBodyPropertiesMax = templateToCopy.StaticBodyPropertiesMax;
-            townsman.IsFemale = templateToCopy.IsFemale;
-            townsman.Level = templateToCopy.Level;
-            townsman.Name = templateToCopy.Name;
             townsman.StringId = CustomerStrings.GetRandomElement();
-            townsman.HairTags = templateToCopy.HairTags;
-            townsman.BeardTags = templateToCopy.BeardTags;
-            townsman.InitializeEquipmentsOnLoad(templateToCopy.AllEquipments.ToList());
-
+           
             string actionSetCode;
 
             if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
@@ -435,22 +407,11 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateTavernWench(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            CharacterObject templateToCopy = HelperCreateFrom(culture.TavernWench, true);
-            CharacterObject townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
-            townswoman.Culture = templateToCopy.Culture;
+            CharacterObject townswoman = HelperCreateFrom(culture.TavernWench, true);
+
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-            townswoman.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
-            townswoman.StaticBodyPropertiesMin = templateToCopy.StaticBodyPropertiesMin;
-            townswoman.StaticBodyPropertiesMax = templateToCopy.StaticBodyPropertiesMax;
-            townswoman.IsFemale = templateToCopy.IsFemale;
-            townswoman.Level = templateToCopy.Level;
             townswoman.Name = new TextObject("{=CEEVENTS1093}Server");
             townswoman.StringId = "bar_maid";
-
-            townswoman.HairTags = templateToCopy.HairTags;
-            townswoman.BeardTags = templateToCopy.BeardTags;
-            townswoman.InitializeEquipmentsOnLoad(templateToCopy.AllEquipments.ToList());
-
 
             AgentData agentData = new AgentData(new SimpleAgentOrigin(townswoman)).Monster(Campaign.Current.HumanMonsterSettlement).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge));
 
@@ -459,40 +420,22 @@ namespace CaptivityEvents.Brothel
 
         private static LocationCharacter CreateDancer(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            CharacterObject templateToCopy = HelperCreateFrom(culture.FemaleDancer, true);
-            CharacterObject townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
-            townswoman.Culture = templateToCopy.Culture;
+            CharacterObject townswoman = HelperCreateFrom(culture.FemaleDancer, true);
+
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-            townswoman.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
-            townswoman.StaticBodyPropertiesMin = templateToCopy.StaticBodyPropertiesMin;
-            townswoman.StaticBodyPropertiesMax = templateToCopy.StaticBodyPropertiesMax;
-            townswoman.IsFemale = templateToCopy.IsFemale;
-            townswoman.Level = templateToCopy.Level;
             townswoman.Name = new TextObject("{=CEEVENTS1095}Prostitute");
             townswoman.StringId = prostituteStrings.GetRandomElement();
-            townswoman.HairTags = templateToCopy.HairTags;
-            townswoman.BeardTags = templateToCopy.BeardTags;
-            townswoman.InitializeEquipmentsOnLoad(templateToCopy.AllEquipments.ToList());
 
             return new LocationCharacter(new AgentData(new SimpleAgentOrigin(townswoman)).Monster(Campaign.Current.HumanMonsterSettlement).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge)), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_dancer", true, relation, "as_human_female_dancer", true);
         }
 
         private static LocationCharacter CreateTownsWomanForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            CharacterObject templateToCopy = HelperCreateFrom(culture.FemaleDancer, true);
-            CharacterObject townswoman = MBObjectManager.Instance.CreateObject<CharacterObject>();
-            townswoman.Culture = templateToCopy.Culture;
+            CharacterObject townswoman = HelperCreateFrom(culture.FemaleDancer, true);
+
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-            townswoman.DefaultFormationGroup = templateToCopy.DefaultFormationGroup;
-            townswoman.StaticBodyPropertiesMin = templateToCopy.StaticBodyPropertiesMin;
-            townswoman.StaticBodyPropertiesMax = templateToCopy.StaticBodyPropertiesMax;
-            townswoman.IsFemale = templateToCopy.IsFemale;
-            townswoman.Level = templateToCopy.Level;
             townswoman.Name = new TextObject("{=CEEVENTS1095}Prostitute");
             townswoman.StringId = prostituteStrings.GetRandomElement();
-            townswoman.HairTags = templateToCopy.HairTags;
-            townswoman.BeardTags = templateToCopy.BeardTags;
-            townswoman.InitializeEquipmentsOnLoad(templateToCopy.AllEquipments.ToList());
 
             string actionSetCode;
 
@@ -940,25 +883,18 @@ namespace CaptivityEvents.Brothel
         private bool PriceWithProstitute()
         {
             MBTextManager.SetTextVariable("AMOUNT", new TextObject(prostitutionCost.ToString()));
-
             return true;
         }
 
         private bool PriceWithMaid()
         {
             MBTextManager.SetTextVariable("AMOUNT", new TextObject(drinkCost.ToString()));
-
             return true;
         }
 
         private bool ConditionalRandomName()
         {
-            // 1.5.5
-            // MBTextManager.SetTextVariable("NAME", new TextObject(Settlement.CurrentSettlement.Culture.FemaleNameList.GetRandomElement()));
-
-            // 1.5.6
             MBTextManager.SetTextVariable("NAME", Settlement.CurrentSettlement.Culture.FemaleNameList.GetRandomElement());
-
             return true;
         }
 
@@ -981,22 +917,11 @@ namespace CaptivityEvents.Brothel
         private void SendBrothelCaptive()
         {
             CharacterObject captive = ((CharacterObject)ConversationSentence.LastSelectedRepeatObject);
-            if (captive.HeroObject.GetSkillValue(CESkills.Prostitution) < 50)
-            {
-                new Dynamics().RenownModifier(MBRandom.RandomInt(-20, -5), captive.HeroObject);
-            }
-            else
-            {
-                captive.HeroObject.SetSkillValue(CESkills.Slavery, MBRandom.RandomInt(10, 20));
-            }
 
             if (captive.HeroObject.GetSkillValue(CESkills.Slavery) < 50 || captive.HeroObject.GetSkillValue(CESkills.Prostitution) < 50)
             {
                 new Dynamics().RelationsModifier(captive.HeroObject, MBRandom.RandomInt(-10, -1), Hero.MainHero, false, true);
             }
-
-            captive.HeroObject.SetSkillValue(CESkills.Prostitution, MBRandom.RandomInt(10, 20));
-
         }
 
         private void ConversationBoughtDrink()
@@ -1170,6 +1095,72 @@ namespace CaptivityEvents.Brothel
 
         public void OnMissionEnded(IMission mission) => CleanUpBrothel();
 
+        private void OnSettlementEntered(MobileParty party, Settlement settlement, Hero hero)
+        {
+            if (party != MobileParty.MainParty) return;
+            if (LocationComplex.Current == null || LocationComplex.Current.GetLocationWithId("brothel") == null) return;
+            if (LocationComplex.Current.GetLocationWithId("brothel").Name == null)
+            {
+                try
+                {
+                    // Location Complex need to add to to prevent crashing // TODO do at campaign start on every location
+                    FieldInfo fi = LocationComplex.Current.GetType().GetField("_locations", BindingFlags.Instance | BindingFlags.NonPublic);
+                    Dictionary<string, Location> _locations = (Dictionary<string, Location>)fi.GetValue(LocationComplex.Current);
+
+                    if (_locations.ContainsKey("brothel")) _locations.Remove("brothel");
+                    //else LocationComplex.Current.AddPassage(LocationComplex.Current.GetLocationWithId("center"), _brothel);
+
+                    _brothel.SetOwnerComplex(settlement.LocationComplex);
+
+                    switch (settlement.Culture.GetCultureCode())
+                    {
+                        case CultureCode.Sturgia:
+                            _brothel.SetSceneName(0, "sturgia_house_a_interior_tavern");
+                            break;
+                        case CultureCode.Vlandia:
+                            _brothel.SetSceneName(0, "vlandia_tavern_interior_a");
+                            break;
+                        case CultureCode.Aserai:
+                            _brothel.SetSceneName(0, "arabian_house_new_c_interior_b_tavern");
+                            break;
+                        case CultureCode.Empire:
+                            _brothel.SetSceneName(0, "empire_house_c_tavern_a");
+                            break;
+                        case CultureCode.Battania:
+                            _brothel.SetSceneName(0, "battania_tavern_interior_b");
+                            break;
+                        case CultureCode.Khuzait:
+                            _brothel.SetSceneName(0, "khuzait_tavern_a");
+                            break;
+                        case CultureCode.Nord:
+                        case CultureCode.Darshi:
+                        case CultureCode.Vakken:
+                        case CultureCode.AnyOtherCulture:
+                        case CultureCode.Invalid:
+                        default:
+                            _brothel.SetSceneName(0, "empire_house_c_tavern_a");
+                            break;
+                    }
+                    List<CharacterObject> brothelPrisoners = FetchBrothelPrisoners(Settlement.CurrentSettlement);
+                    _brothel.RemoveAllCharacters();
+                    foreach (CharacterObject brothelPrisoner in brothelPrisoners)
+                    {
+                        if (!brothelPrisoner.IsHero) continue;
+                        _brothel.AddCharacter(CreateBrothelPrisoner(brothelPrisoner, Settlement.CurrentSettlement.Culture, LocationCharacter.CharacterRelations.Neutral));
+                    }
+
+                    _locations.Add("brothel", _brothel);
+                    if (fi != null) fi.SetValue(LocationComplex.Current, _locations);
+
+                    Campaign.Current.GameMenuManager.MenuLocations.Add(LocationComplex.Current.GetLocationWithId("brothel"));
+                }
+                catch (Exception e)
+                {
+                    CECustomHandler.ForceLogToFile("Failed to load LocationComplex Brothel Statue (Corrupt Save)" + e);
+                }
+            }
+        }
+
         private void OnSettlementLeft(MobileParty party, Settlement settlement)
         {
             if (party != MobileParty.MainParty) return;
@@ -1285,7 +1276,10 @@ namespace CaptivityEvents.Brothel
                     {
                         if (_brothelList[i].CaptiveProstitutes[y].IsHero)
                         {
-                            new Dynamics().RenownModifier(MBRandom.RandomInt(-10, -1), _brothelList[i].CaptiveProstitutes[y].HeroObject);
+                            new Dynamics().RenownModifier(MBRandom.RandomInt(-3, -1), _brothelList[i].CaptiveProstitutes[y].HeroObject, false);
+
+                            // Workaround for Missing Bug By Bannerlord Tweaks.
+                            _brothelList[i].CaptiveProstitutes[y].HeroObject.CaptivityStartTime = CampaignTime.Now;
 
                             int numEscapeChance = CESettings.Instance.PrisonerHeroEscapeChanceSettlement;
                             if (numEscapeChance == -1) numEscapeChance = 25;
@@ -1336,9 +1330,9 @@ namespace CaptivityEvents.Brothel
                         if (_brothelList[i].CaptiveProstitutes[y].IsHero)
                         {
                             if (_brothelList[i].CaptiveProstitutes[y].HeroObject.GetSkillValue(prostitutionSkill) < 50)
-                                new Dynamics().RenownModifier(MBRandom.RandomInt(-20, -5), _brothelList[i].CaptiveProstitutes[y].HeroObject);
+                                new Dynamics().RenownModifier(MBRandom.RandomInt(-20, -5), _brothelList[i].CaptiveProstitutes[y].HeroObject, false);
 
-                            _brothelList[i].CaptiveProstitutes[y].HeroObject.SetSkillValue(prostitutionSkill, MBRandom.RandomInt(10, 20));
+                            new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(10, 20), _brothelList[i].CaptiveProstitutes[y].HeroObject);
                         }
 
                     }
@@ -1390,6 +1384,7 @@ namespace CaptivityEvents.Brothel
             CampaignEvents.OnMissionEndedEvent.AddNonSerializedListener(this, OnMissionEnded);
             CampaignEvents.OnSettlementLeftEvent.AddNonSerializedListener(this, OnSettlementLeft);
             CampaignEvents.OnSettlementOwnerChangedEvent.AddNonSerializedListener(this, OnSettlementOwnerChanged);
+            CampaignEvents.SettlementEntered.AddNonSerializedListener(this, OnSettlementEntered);
             CampaignEvents.WarDeclared.AddNonSerializedListener(this, OnWarDeclared);
             CampaignEvents.LocationCharactersAreReadyToSpawnEvent.AddNonSerializedListener(this, LocationCharactersAreReadyToSpawn);
         }

@@ -65,6 +65,7 @@ namespace CaptivityEvents.Config
         bool UsePregnancyModifiers { get; set; }
         float PregnancyDurationInDays { get; set; }
         bool PregnancyMessages { get; set; }
+        DropdownDefault<string> RenownChoice { get; set; }
         float RenownMin { get; set; }
         bool LogToggle { get; set; }
     }
@@ -134,6 +135,12 @@ namespace CaptivityEvents.Config
         public bool UsePregnancyModifiers { get; set; } = true;
         public float PregnancyDurationInDays { get; set; } = 14f;
         public bool PregnancyMessages { get; set; } = true;
+        public DropdownDefault<string> RenownChoice { get; set; } = new DropdownDefault<string>(new string[]
+        {
+            "{=CESETTINGS1115}Off",
+            "{=CESETTINGS1022}Decrease/Increase Clan Level",
+            "{=CESETTINGS1023}Keep/Increase Clan Level"
+        }, 1);
         public float RenownMin { get; set; } = -150f;
         public bool LogToggle { get; set; } = false;
     }
@@ -270,7 +277,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
         public bool PrisonerExceeded { get; set; } = false;
 
-        [SettingPropertyBool("{=CESETTINGS0086}Custom Backgrounds", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS0087}Should custom backgrounds be disabled.")]
+        [SettingPropertyBool("{=CESETTINGS0086}Custom Backgrounds", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS0087}Custom backgrounds toggle. (Will not help if default backgrounds are overwritten)")]
         [SettingPropertyGroup("{=CESETTINGS0085}Pictures")]
         public bool CustomBackgrounds { get; set; } = true;
         // WILL BE REMOVED STARTS
@@ -361,7 +368,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
         public bool PregnancyToggle { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1070}Attractiveness Calculation (Ignores Chance)", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1071}Perks (Perfect Health, Prominence, InBloom) and Charm level calculates impregnation chance, ignores chance.")]
+        [SettingPropertyBool("{=CESETTINGS1070}Attractiveness Calculation (Ignores Chance)", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1071}Perks (Perfect Health, Gourmet, InBloom) and Charm level calculates impregnation chance, ignores chance.")]
         [SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
         public bool AttractivenessSkill { get; set; } = true;
 
@@ -381,7 +388,15 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
         public bool PregnancyMessages { get; set; } = true;
 
-        [SettingPropertyFloatingInteger("{=CESETTINGS1084}Renown Min", -1000f, 1000f, "0", Order = 1, RequireRestart = false, HintText = "{=CESETTINGS1085}Renown can only drop to this point.")]
+        [SettingPropertyDropdown("{=CESETTINGS1024}Renown Choice", Order = 1, RequireRestart = false, HintText = "{=CESETTINGS1025}Keeps minimum at current clan level or allows to decrease or disables renown changes.")]
+        [SettingPropertyGroup("{=CESETTINGS0095}Other")]
+        public DropdownDefault<string> RenownChoice { get; set; } = new DropdownDefault<string>(new string[] {
+            "{=CESETTINGS1115}Off",
+            "{=CESETTINGS1022}Decrease/Increase Clan Level",
+            "{=CESETTINGS1023}Keep/Increase Clan Level"
+        }, 1);
+
+        [SettingPropertyFloatingInteger("{=CESETTINGS1084}Renown Min (Enabled On Decrease/Increase Clan Level)", -1000f, 1000f, "0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1085}Renown can only drop to this point. Enabled if Clan Choice is Decrease/Increase Clan Level.")]
         [SettingPropertyGroup("{=CESETTINGS0095}Other")]
         public float RenownMin { get; set; } = -150f;
 
@@ -398,7 +413,13 @@ namespace CaptivityEvents.Config
         {
             get
             {
-                if (CESettingsCustom.Instance != null) return CESettingsCustom.Instance;
+                try
+                {
+                    if (CESettingsCustom.Instance != null) return CESettingsCustom.Instance;
+                }
+                catch (Exception)
+                {
+                }
                 if (_provider != null) return _provider;
                 _provider = new HardcodedCustomSettings();
 
@@ -459,6 +480,7 @@ namespace CaptivityEvents.Config
                     _provider.PregnancyDurationInDays = customSettings.PregnancyDurationInDays;
                     _provider.PregnancyMessages = customSettings.PregnancyMessages;
                     _provider.RenownMin = customSettings.RenownMin;
+                    _provider.RenownChoice.SelectedIndex = customSettings.RenownChoice;
                     _provider.LogToggle = customSettings.LogToggle;
                 }
                 return _provider;

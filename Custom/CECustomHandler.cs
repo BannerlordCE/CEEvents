@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -29,6 +30,9 @@ namespace CaptivityEvents.Custom
 
         public static List<CEEvent> GetAllVerifiedXSEFSEvents(List<string> modules)
         {
+            #if DEBUG 
+                TestWrite(); 
+            #endif
             string errorPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedFlagXML.txt";
             FileInfo file = new FileInfo(errorPath);
             if (file.Exists) file.Delete();
@@ -81,7 +85,7 @@ namespace CaptivityEvents.Custom
                             ForceLogToFile("Added: " + text);
                         }
 
-                        
+
                         CECustomModule item = new CECustomModule(Path.GetFileNameWithoutExtension(fullPath), TempEvents);
                         AllModules.Add(item);
                     }
@@ -142,7 +146,7 @@ namespace CaptivityEvents.Custom
                 return new List<CEEvent>();
             }
         }
-         
+
         public static CECustomSettings LoadCustomSettings()
         {
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CESettings.xml";
@@ -156,7 +160,6 @@ namespace CaptivityEvents.Custom
                 return null;
             }
         }
-
         // Settings
         public static CECustomSettings DeserializeXMLFileToSettings(string XmlFilename)
         {
@@ -322,6 +325,51 @@ namespace CaptivityEvents.Custom
 
             return list;
         }
+
+#if DEBUG
+        public static string GetEventXml(CEEvents obj, XmlSerializer serializer = null, bool omitStandardNamespaces = false)
+        {
+            XmlSerializerNamespaces ns = null;
+            if (omitStandardNamespaces)
+            {
+                ns = new XmlSerializerNamespaces();
+                ns.Add("", ""); // Disable the xmlns:xsi and xmlns:xsd lines.
+            }
+            using (var textWriter = new System.IO.StringWriter())
+            {
+                var settings = new XmlWriterSettings() { Indent = true }; // For cosmetic purposes.
+                using (var xmlWriter = XmlWriter.Create(textWriter, settings))
+                    (serializer ?? new XmlSerializer(obj.GetType())).Serialize(xmlWriter, obj, ns);
+                return textWriter.ToString();
+            }
+        }
+
+        public static void TestWrite()
+        {
+            CEEvents ceEvents = new CEEvents
+            {
+                CEEvent = new CEEvent[]
+                {
+                    new CEEvent {
+                        TerrainTypesRequirements = new TerrainType[][]
+                        {
+                            new TerrainType[] {
+                                TerrainType.Water,
+                                TerrainType.Steppe
+                            }
+                        }
+                    }
+                }
+            };
+
+            string xml = GetEventXml(ceEvents, omitStandardNamespaces: true);
+            string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/TESTXML.xml";
+            FileInfo file = new FileInfo(fullPath);
+            file.Directory?.Create();
+            File.WriteAllText(BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/TESTXML.xml", xml);
+        }
+#endif
+
 
         [DebuggerStepThroughAttribute]
         private static void LogXMLIssueToFile(string msg, string xmlFile = "")

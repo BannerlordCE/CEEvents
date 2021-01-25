@@ -18,6 +18,7 @@ using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+//using TaleWorlds.ModuleManager;
 using TaleWorlds.MountAndBlade;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
@@ -93,6 +94,7 @@ namespace CaptivityEvents.Helper
                     _provider.UsePregnancyModifiers = customSettings.UsePregnancyModifiers;
                     _provider.PregnancyDurationInDays = customSettings.PregnancyDurationInDays;
                     _provider.PregnancyMessages = customSettings.PregnancyMessages;
+                    _provider.RenownChoice.SelectedIndex = customSettings.RenownChoice;
                     _provider.RenownMin = customSettings.RenownMin;
                     _provider.LogToggle = customSettings.LogToggle;
                 }
@@ -736,15 +738,15 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
-                    //Hero.MainHero.Children.ForEach(child =>
-                    //{
-                    //    child.Clan = Hero.MainHero.Clan;
-                    //    if (child.CharacterObject.Occupation != Occupation.Lord)
-                    //    {
-                    //        PropertyInfo fi = child.CharacterObject.GetType().GetProperty("Occupation", BindingFlags.Instance | BindingFlags.Public);
-                    //        if (fi != null) fi.SetValue(child.CharacterObject, Occupation.Lord);
-                    //    }
-                    //});\
+                    Hero.MainHero.Children.ForEach(child =>
+                    {
+                        child.Clan = Hero.MainHero.Clan;
+                        if (child.CharacterObject.Occupation != Occupation.Lord)
+                        {
+                            PropertyInfo fi = child.CharacterObject.GetType().GetProperty("Occupation", BindingFlags.Instance | BindingFlags.Public);
+                            if (fi != null) fi.SetValue(child.CharacterObject, Occupation.Lord);
+                        }
+                    });
 
                     string test = "";
 

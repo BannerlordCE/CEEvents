@@ -76,6 +76,8 @@ namespace CaptivityEvents.Events
             }
             catch (Exception e)
             {
+                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
+                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
                 CECustomHandler.ForceLogToFile("Critical Error: CECaptorContinue : " + e);
             }
         }
@@ -171,52 +173,51 @@ namespace CaptivityEvents.Events
 
                     TroopRosterElement leader = releasedPrisoners.FirstOrDefault(hasHero => hasHero.Character.IsHero);
 
+                    Clan clan = null;
+                    Settlement nearest = null;
+
                     if (leader.Character != null)
                     {
-                        Clan clan = leader.Character.HeroObject.Clan;
-                        PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
-                        Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlement(settlement => true);
-                        // 1.5.5
-                        //prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Lord);
-
-                        // 1.5.6
-                        prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-
-                        prisonerParty.ActualClan = clan;
-                        prisonerParty.MemberRoster.Clear();
-                        prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
-                        prisonerParty.IsActive = true;
-                        prisonerParty.Party.Owner = leader.Character.HeroObject;
-                        prisonerParty.ChangePartyLeader(leader.Character, true);
-                        prisonerParty.HomeSettlement = nearest;
-
-                        prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
-                                                                   ? nearest.GatePosition
-                                                                   : nearest.Position2D);
+                        clan = leader.Character.HeroObject.Clan;
+                        nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlement(settlement => true);
                     }
                     else
                     {
-                        Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
+                        clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
-
-                        PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
-                        Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => true);
-                        // 1.5.5
-                        //prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Bandit);
-
-                        // 1.5.6
-                        prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-                        prisonerParty.MemberRoster.Clear();
-                        prisonerParty.ActualClan = clan;
-                        prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
-                        prisonerParty.IsActive = true;
-                        prisonerParty.Party.Owner = clan.Leader;
-                        prisonerParty.HomeSettlement = nearest;
-
-                        prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
-                                                                   ? nearest.GatePosition
-                                                                   : nearest.Position2D);
+                        nearest = SettlementHelper.FindNearestSettlement(settlement => true);
                     }
+
+                    PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
+
+                    // 1.5.6
+                    prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+
+                    // 1.5.7
+                    // prisonerParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+                    // prisonerParty.SetCustomName(new TextObject("{=CEEVENTS1107}Escaped Captives"));
+
+                    prisonerParty.MemberRoster.Clear();
+                    prisonerParty.ActualClan = clan;
+                    prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
+                    prisonerParty.IsActive = true;
+
+                    prisonerParty.HomeSettlement = nearest;
+                    prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
+                                       ? nearest.GatePosition
+                                       : nearest.Position2D);
+
+                    if (leader.Character != null)
+                    {
+                        prisonerParty.Party.Owner = leader.Character.HeroObject;
+                        prisonerParty.ChangePartyLeader(leader.Character, true);
+                    }
+                    else
+                    {
+                        prisonerParty.Party.Owner = clan.Leader;
+                    }
+
+
 
                     prisonerParty.RecentEventsMorale = -100;
                     prisonerParty.Aggressiveness = 0.2f;
@@ -282,11 +283,13 @@ namespace CaptivityEvents.Events
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                     Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
-                    // 1.5.5
-                    //prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, MobileParty.PartyTypeEnum.Bandit);
-
                     // 1.5.6
                     prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+
+                    // 1.5.7
+                    // prisonerParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+                    // prisonerParty.SetCustomName(new TextObject("{=CEEVENTS1107}Escaped Captives"));
+
                     prisonerParty.MemberRoster.Clear();
                     prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
 

@@ -62,6 +62,27 @@ namespace CaptivityEvents.Events
                                             ? 1
                                             : 0);
 
+            if (MobileParty.MainParty.CurrentSettlement != null)
+            {
+                MBTextManager.SetTextVariable("SETTLEMENT_NAME", MobileParty.MainParty.CurrentSettlement.Name);
+            }
+
+            try
+            {
+                if (_listedEvent.SavedCompanions != null)
+                {
+                    foreach (KeyValuePair<string, Hero> item in _listedEvent.SavedCompanions)
+                    {
+                        MBTextManager.SetTextVariable("COMPANION_NAME_" + item.Key, item.Value?.Name);
+                        MBTextManager.SetTextVariable("COMPANIONISFEMALE_" + item.Key, item.Value.IsFemale ? 1 : 0);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Failed to SetCaptiveTextVariables for " + _listedEvent.Name);
+            }
+
             if (_listedEvent.Captive != null)
             {
                 MBTextManager.SetTextVariable("CAPTIVE_NAME", _listedEvent.Captive.Name);
@@ -70,7 +91,7 @@ namespace CaptivityEvents.Events
 
             if (_listedEvent.ProgressEvent != null)
             {
-                args.MenuContext.GameMenu.AllowWaitingAutomatically();
+                //args.MenuContext.GameMenu.AllowWaitingAutomatically();
                 _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);
                 _timer = 0f;
 
@@ -86,7 +107,7 @@ namespace CaptivityEvents.Events
 
         internal bool CaptorProgressConditionWaitGameMenu(MenuCallbackArgs args)
         {
-            args.MenuContext.GameMenu.AllowWaitingAutomatically();
+            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
@@ -210,8 +231,15 @@ namespace CaptivityEvents.Events
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StripHero) && captiveHero != null)
             {
-                if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
-                InventoryManager.OpenScreenAsInventoryOf(Hero.MainHero.PartyBelongedTo.Party.MobileParty, captiveHero.CharacterObject);
+                try
+                {
+                    if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
+                    InventoryManager.OpenScreenAsInventoryOf(Hero.MainHero.PartyBelongedTo.Party.MobileParty, captiveHero.CharacterObject);
+                } 
+                catch (Exception e)
+                {
+                    CECustomHandler.ForceLogToFile("ConsequenceCompanions. Failed" + e.ToString());
+                }
             }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners)) { _captor.CEPrisonerRebel(args); }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.HuntPrisoners)) { _captor.CEHuntPrisoners(args); }
@@ -237,7 +265,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception e)
             {
-                CECustomHandler.LogToFile("ConsequenceCompanions. Failed" + e.ToString());
+                CECustomHandler.ForceLogToFile("ConsequenceCompanions. Failed" + e.ToString());
             }
         }
 
@@ -298,6 +326,7 @@ namespace CaptivityEvents.Events
                     {
                         CEEvent triggeredEvent = eventNames[number];
                         triggeredEvent.Captive = _listedEvent.Captive;
+                        triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
                     }
                     catch (Exception)
@@ -322,6 +351,7 @@ namespace CaptivityEvents.Events
             {
                 CEEvent triggeredEvent = _eventList.Find(item => item.Name == _listedEvent.ProgressEvent.TriggerEventName);
                 triggeredEvent.Captive = _listedEvent.Captive;
+                triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
                 GameMenu.SwitchToMenu(triggeredEvent.Name);
             }
             catch (Exception)
@@ -390,6 +420,7 @@ namespace CaptivityEvents.Events
                     {
                         CEEvent triggeredEvent = eventNames[number];
                         triggeredEvent.Captive = _listedEvent.Captive;
+                        triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
                     }
                     catch (Exception)
@@ -414,6 +445,7 @@ namespace CaptivityEvents.Events
             {
                 CEEvent triggeredEvent = _eventList.Find(item => item.Name == _option.TriggerEventName);
                 triggeredEvent.Captive = _listedEvent.Captive;
+                triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
                 GameMenu.SwitchToMenu(triggeredEvent.Name);
             }
             catch (Exception)
@@ -433,7 +465,6 @@ namespace CaptivityEvents.Events
                 if (_listedEvent.Captive.IsHero)
                 {
                     EndCaptivityAction.ApplyByReleasing(_listedEvent.Captive.HeroObject);
-                    AddCompanionAction.Apply(Clan.PlayerClan, _listedEvent.Captive.HeroObject);
                     AddHeroToPartyAction.Apply(_listedEvent.Captive.HeroObject, PartyBase.MainParty.MobileParty, true);
                 }
                 else
@@ -1924,6 +1955,22 @@ namespace CaptivityEvents.Events
             if (MobileParty.MainParty.CurrentSettlement != null) text.SetTextVariable("SETTLEMENT_NAME", MobileParty.MainParty.CurrentSettlement.Name);
             text.SetTextVariable("PARTY_NAME", MobileParty.MainParty.Name);
             text.SetTextVariable("CAPTOR_NAME", Hero.MainHero.Name);
+
+            try
+            {
+                if (_listedEvent.SavedCompanions != null)
+                {
+                    foreach (KeyValuePair<string, Hero> item in _listedEvent.SavedCompanions)
+                    {
+                        text.SetTextVariable("COMPANION_NAME_" + item.Key, item.Value?.Name);
+                        text.SetTextVariable("COMPANIONISFEMALE_" + item.Key, item.Value.IsFemale ? 1 : 0);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Failed to SetNames for " + _listedEvent.Name);
+            }
 
             args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                        ? "wait_prisoner_female"

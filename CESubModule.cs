@@ -25,6 +25,7 @@ using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.View.Missions;
 using TaleWorlds.TwoDimension;
+//using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
 
@@ -218,10 +219,18 @@ namespace CaptivityEvents
         {
             base.OnSubModuleLoad();
 
+            // 1.5.6
             ModuleInfo ceModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
-            ApplicationVersion modversion = ceModule.Version;
             ModuleInfo nativeModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
+
+            // 1.5.7
+            // ModuleInfo ceModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
+            // ModuleInfo nativeModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
+
+            ApplicationVersion modversion = ceModule.Version;
             ApplicationVersion gameversion = nativeModule.Version;
+
+
 
             if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor || modversion.Revision != gameversion.Revision)
             {
@@ -408,7 +417,33 @@ namespace CaptivityEvents
 
             try
             {
-                if (CESettings.Instance != null && CESettings.Instance.IsHardCoded && !_isLoaded)
+                Dictionary<string, Version> dict = Harmony.VersionInfo(out Version myVersion);
+                CECustomHandler.ForceLogToFile("My version: " + myVersion);
+
+                foreach (KeyValuePair<string, Version> entry in dict)
+                {
+                    string id = entry.Key;
+                    Version version = entry.Value;
+                    CECustomHandler.ForceLogToFile("Mod " + id + " uses Harmony version " + version);
+                }
+
+                CECustomHandler.ForceLogToFile(CESettings.Instance != null && CESettings.Instance.EventCaptorNotifications
+                                                   ? "Patching Map Notifications: No Conflicts Detected : Enabled."
+                                                                   : "EventCaptorNotifications: Disabled.");
+
+                _harmony.PatchAll();
+            }
+            catch (Exception ex)
+            {
+                CECustomHandler.ForceLogToFile("Failed to load: " + ex);
+                MessageBox.Show($"Error Initializing Captivity Events:\n\n{ex}");
+            }
+
+            if (_isLoaded) return;
+
+            try
+            {
+                if (CESettings.Instance != null && CESettings.Instance.IsHardCoded)
                 {
                     Module.CurrentModule.AddInitialStateOption(
                         new InitialStateOption(
@@ -437,30 +472,6 @@ namespace CaptivityEvents
             catch (Exception)
             {
                 CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettings is being accessed improperly.");
-            }
-
-            try
-            {
-                Dictionary<string, Version> dict = Harmony.VersionInfo(out Version myVersion);
-                CECustomHandler.ForceLogToFile("My version: " + myVersion);
-
-                foreach (KeyValuePair<string, Version> entry in dict)
-                {
-                    string id = entry.Key;
-                    Version version = entry.Value;
-                    CECustomHandler.ForceLogToFile("Mod " + id + " uses Harmony version " + version);
-                }
-
-                CECustomHandler.ForceLogToFile(CESettings.Instance != null && CESettings.Instance.EventCaptorNotifications
-                                                   ? "Patching Map Notifications: No Conflicts Detected : Enabled."
-                                                                   : "EventCaptorNotifications: Disabled.");
-
-                _harmony.PatchAll();
-            }
-            catch (Exception ex)
-            {
-                CECustomHandler.ForceLogToFile("Failed to load: " + ex);
-                MessageBox.Show($"Error Initializing Captivity Events:\n\n{ex}");
             }
 
             foreach (CEEvent _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !_listedEvent.Name.IsStringNoneOrEmpty()))
@@ -508,8 +519,6 @@ namespace CaptivityEvents
 
             CECustomHandler.ForceLogToFile("Loaded " + CEPersistence.CEWaitingList.Count + " waiting menus ");
             CECustomHandler.ForceLogToFile("Loaded " + CEPersistence.CECallableEvents.Count + " callable events ");
-
-            if (_isLoaded) return;
 
             if (CEPersistence.CEEvents.Count > 0)
             {
@@ -601,35 +610,7 @@ namespace CaptivityEvents
             CEHelper.notificationEventCheck = false;
         }
 
-
-        // 1.5.5
-        /*
-        public override bool DoLoading(Game game)
-        {
-            if (Campaign.Current == null) return true;
-
-            if (CESettings.Instance != null && !CESettings.Instance.PrisonerEscapeBehavior) return base.DoLoading(game);
-            IMbEvent<Hero> dailyTickHeroEvent = CampaignEvents.DailyTickHeroEvent;
-
-            if (dailyTickHeroEvent != null)
-            {
-                dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerEscapeCampaignBehavior>());
-                if (CESettings.Instance != null && CESettings.Instance.EscapeAutoRansom.SelectedIndex != 2) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
-            }
-
-            IMbEvent<MobileParty> hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
-            hourlyPartyTick?.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerEscapeCampaignBehavior>());
-
-            IMbEvent<BarterData> barterablesRequested = CampaignEvents.BarterablesRequested;
-            barterablesRequested?.ClearListeners(Campaign.Current.GetCampaignBehavior<SetPrisonerFreeBarterBehavior>());
-
-            return base.DoLoading(game);
-        }
-        */
-
-
-        // 1.5.6 INVESTIGATE
-        
+        // 1.5.6 INVESTIGATE  
         public override bool DoLoading(Game game)
         {
             if (Campaign.Current == null) return true;
@@ -651,7 +632,7 @@ namespace CaptivityEvents
 
             return base.DoLoading(game);
         }
-        
+
 
         private void InitalizeAttributes(Game game) => CESkills.RegisterAll(game);
 
@@ -880,6 +861,11 @@ namespace CaptivityEvents
                             CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
                             CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                         }
+                        else
+                        {
+                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
+                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
+                        }
 
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
                         mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
@@ -897,6 +883,11 @@ namespace CaptivityEvents
                         {
                             CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
                             CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                        }
+                        else
+                        {
+                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
+                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
                         }
 
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);

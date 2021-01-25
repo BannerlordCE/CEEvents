@@ -188,6 +188,28 @@ namespace CaptivityEvents.Custom
         CaptorIsNotFactionLeader,
     }
 
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = false)]
+    [Serializable]
+    public enum TerrainType
+    {
+        Water,
+        Mountain,
+        Snow,
+        Steppe,
+        Plain,
+        Desert,
+        Swamp,
+        Dune,
+        Bridge,
+        River,
+        Forest,
+        ShallowRiver,
+        Lake,
+        Canyon,
+        RuralArea
+    }
+
     [DebuggerStepThrough]
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = "", IsNullable = true)]
@@ -233,12 +255,6 @@ namespace CaptivityEvents.Custom
         public string EventWeight { get; set; }
 
         public string EventUseConditions { get; set; }
-    }
-
-    public class TerrianTypes
-    {
-        [XmlArrayItem("TerrianType", IsNullable = false)]
-        public string[] TerrianType { get; set; }
     }
 
     public class Companion
@@ -821,14 +837,20 @@ namespace CaptivityEvents.Custom
         [XmlArrayItem("Companion", IsNullable = true)]
         public Companion[] Companions { get; set; }
 
-        [XmlArray("TerrianTypes")]
-        public TerrianTypes[] TerrianTypesRequirements { get; set; }
+        [XmlArrayItem("TerrainTypes", IsNullable = true)]
+        public TerrainType[][] TerrainTypesRequirements { get; set; }
 
         [XmlIgnore]
         public CharacterObject Captive { get; set; }
 
         [XmlIgnore]
         public Dictionary<string, Hero> SavedCompanions { get; set; }
+
+        [XmlIgnore]
+        public string OldBackgroundName { get; set; }
+
+        [XmlIgnore]
+        public string OldWeightedChanceOfOccuring { get; set; }
     }
 
     [DebuggerStepThrough]

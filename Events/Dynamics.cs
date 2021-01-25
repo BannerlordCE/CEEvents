@@ -84,6 +84,7 @@ namespace CaptivityEvents.Events
 
                 if (!display) return;
                 TextObject textObject = GameTexts.FindText("str_CE_trait_level");
+                textObject.SetTextVariable("HERO", hero.Name);
                 textObject.SetTextVariable("POSITIVE", newNumber >= 0 ? 1 : 0);
                 textObject.SetTextVariable("TRAIT", CEStrings.FetchTraitString(trait));
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
@@ -420,7 +421,7 @@ namespace CaptivityEvents.Events
             }
         }
 
-        internal void ClanOption(Hero firstHero, Clan newClan, bool showNotification = false, bool setLeader = false, bool adopt = false)
+        internal void ClanOption(Hero firstHero, Clan newClan, bool setLeader = false, bool adopt = false)
         {
             if (firstHero.Clan != newClan)
             {
@@ -527,12 +528,7 @@ namespace CaptivityEvents.Events
                         switch (clanOption.Clan.ToLower())
                         {
                             case "new":
-                                // 1.5.5
-                                //clanName = new TextObject(clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement());
-
-                                // 1.5.6
                                 clanName = clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement();
-
                                 banner = Banner.CreateRandomClanBanner();
                                 leader = clanOption.Ref.ToLower() == "captor" ? captor : hero;
                                 break;
@@ -565,8 +561,6 @@ namespace CaptivityEvents.Events
 
                     if (clan == null)
                     {
-
-
                         if (clanOption.Ref.ToLower() == "captor")
                         {
                             if (captor.Clan != null)
@@ -585,28 +579,44 @@ namespace CaptivityEvents.Events
                             hero.Clan.InformalName = clanName;
                             if (pi != null) pi.SetValue(hero.Clan, banner);
                             hero.Clan.SetLeader(leader);
-
                         }
+
+                        TextObject text = GameTexts.FindText("str_CE_clan", clanOption.Action.ToLower());
+                        text.SetTextVariable("HERO", clanOption.Ref.ToLower() == "captor" ? captor.Name : hero.Name);
+                        text.SetTextVariable("CLAN", clanName);
+                        InformationManager.DisplayMessage(new InformationMessage(text.ToString(), Colors.Magenta));
+
+
                         CECustomHandler.ForceLogToFile("Failed ClanChange : clan is null ");
                         return;
+                    }
+
+                    if (!clanOption.HideNotification)
+                    {
+                        TextObject text = GameTexts.FindText("str_CE_clan", clanOption.Action.ToLower());
+                        text.SetTextVariable("HERO", clanOption.Ref.ToLower() == "captor" ? captor.Name : hero.Name);
+                        text.SetTextVariable("CLAN", clan.Name);
+                        InformationManager.DisplayMessage(new InformationMessage(text.ToString(), Colors.Magenta));
                     }
 
                     switch (clanOption.Action.ToLower())
                     {
                         case "join":
-                            ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, !clanOption.HideNotification);
+                            ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan);
                             break;
                         case "joinasleader":
-                            ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, !clanOption.HideNotification, true);
+                            ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, true);
                             break;
                         case "adopted":
-                            ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, !clanOption.HideNotification, false, true);
+                            ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, false, true);
                             break;
                         case "adoptedasleader":
-                            ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, !clanOption.HideNotification, false, true);
+                            ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, false, true);
                             break;
 
                     }
+
+
                 }
                 catch (Exception e)
                 {
@@ -682,19 +692,56 @@ namespace CaptivityEvents.Events
             partyBase.MobileParty.RecentEventsMorale += amount;
         }
 
-        internal void RenownModifier(int amount, Hero hero)
+        internal void RenownModifier(int amount, Hero hero, bool displayMessage = true)
         {
-            if (hero == null || amount == 0) return;
+            try
+            {
+                if (hero == null || amount == 0) return;
 
-            hero.Clan.Renown += amount;
-            if (CESettings.Instance != null && hero.Clan.Renown < CESettings.Instance.RenownMin) hero.Clan.Renown = CESettings.Instance.RenownMin;
+                if (CESettings.Instance == null || CESettings.Instance.RenownChoice.SelectedIndex == 0) return;
 
-            TextObject textObject = GameTexts.FindText("str_CE_renown_level");
-            textObject.SetTextVariable("HERO", hero.Name);
+                float renown = hero.Clan.Renown + amount;
+                float min = 0;
 
-            textObject.SetTextVariable("POSITIVE", amount >= 0 ? 1 : 0);
-            textObject.SetTextVariable("AMOUNT", Math.Abs(amount));
-            InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
+                switch (CESettings.Instance.RenownChoice.SelectedIndex)
+                {
+                    case 1:
+                        min = CESettings.Instance.RenownMin;
+                        break;
+                    case 2:
+                        min = Campaign.Current.Models.ClanTierModel.GetRequiredRenownForTier(hero.Clan.Tier);
+                        break;
+                    default:
+                        break;
+                }
+
+                if (renown < min) renown = min;
+
+
+                if (renown < 0)
+                {
+                    hero.Clan.Renown = renown;
+                }
+                else
+                {
+                    hero.Clan.ResetClanRenown();
+                    hero.Clan.AddRenown(renown, false);
+                }
+
+                if (!displayMessage) return;
+
+                TextObject textObject = GameTexts.FindText("str_CE_renown_level");
+
+                textObject.SetTextVariable("HERO", hero.Name);
+                textObject.SetTextVariable("POSITIVE", amount >= 0 ? 1 : 0);
+                textObject.SetTextVariable("AMOUNT", Math.Abs(amount));
+
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed RenownModifier " + e);
+            }
         }
 
         internal void RelationsModifier(Hero hero1, int relationChange, Hero hero2 = null, bool quickInformationMessage = true, bool regularMessage = false)

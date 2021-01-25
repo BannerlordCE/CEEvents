@@ -8,7 +8,7 @@ using TaleWorlds.Core;
 
 namespace CaptivityEvents.CampaignBehaviors
 {
-    // 1.5.6 PrisonerReleaseCampaignBehavior ?
+    // 1.5.6 PrisonerReleaseCampaignBehavior
     public class CEPrisonerEscapeCampaignBehavior : CampaignBehaviorBase
     {
 
