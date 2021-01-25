@@ -61,19 +61,19 @@ namespace CaptivityEvents.Brothel
         {
             // 1.5.7 SelectableItemPropertyVM
             // 1.5.6 ClanSelectableItemPropertyVM
-            ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0976}Level").ToString(), _brothel.Level.ToString()));
-            ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0988}State").ToString(), _brothel.IsRunning
+            ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0976}Level").ToString(), _brothel.Level.ToString()));
+            ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0988}State").ToString(), _brothel.IsRunning
                                                                     ? new TextObject("{=CEBROTHEL0992}Normal").ToString()
                                                                     : new TextObject("{=CEBROTHEL0991}Closed").ToString()));
-            ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0977}Initial Capital").ToString(), _brothel.InitialCapital.ToString()));
-            ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0990}Capital").ToString(), _brothel.Capital.ToString()));
-            ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0989}Daily Wages").ToString(), _brothel.Expense.ToString()));
+            ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0977}Initial Capital").ToString(), _brothel.InitialCapital.ToString()));
+            ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0990}Capital").ToString(), _brothel.Capital.ToString()));
+            ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0989}Daily Wages").ToString(), _brothel.Expense.ToString()));
 
             if (_brothel.NotRunnedDays > 0)
             {
                 TextObject textObject = new TextObject("{=*}{DAYS} days ago");
                 textObject.SetTextVariable("DAYS", _brothel.NotRunnedDays);
-                ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=*}Last Run").ToString(), textObject.ToString()));
+                ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=*}Last Run").ToString(), textObject.ToString()));
             }
 
             InputProducts = GameTexts.FindText("str_CE_brothel_description", _brothel.IsRunning

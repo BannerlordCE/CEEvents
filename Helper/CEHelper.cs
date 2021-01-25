@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
-//using TaleWorlds.ModuleManager;
+using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
 
 namespace CaptivityEvents.Helper
@@ -36,10 +36,10 @@ namespace CaptivityEvents.Helper
                 try
                 {
                     // 1.5.6
-                    ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
+                    // ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
 
                     // 1.5.7
-                    // ModuleInfo moduleInfo = ModuleHelper.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
+                    ModuleInfo moduleInfo = ModuleHelper.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
 
                     if (moduleInfo != null && !moduleInfo.DependedModules.Exists(item => item.ModuleId == "zCaptivityEvents")) continue;
 
@@ -49,9 +49,9 @@ namespace CaptivityEvents.Helper
                         CECustomHandler.ForceLogToFile("Added to ModuleLoader: " + moduleInfo.Name);
 
                         // 1.5.6
-                        modulePaths.Insert(0, Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Id)));
+                        // modulePaths.Insert(0, Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Id)));
                         // 1.5.7
-                        // modulePaths.Insert(0, Path.GetDirectoryName(ModuleHelper.GetPath(moduleInfo.Id)));
+                        modulePaths.Insert(0, Path.GetDirectoryName(ModuleHelper.GetPath(moduleInfo.Id)));
 
                         findingModules.Add(moduleInfo);
                     }

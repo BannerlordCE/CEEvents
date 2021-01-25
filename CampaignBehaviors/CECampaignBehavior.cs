@@ -223,7 +223,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
             // Reflection One
             MethodInfo mi = typeof(HeroCreator).GetMethod("CreateNewHero", BindingFlags.NonPublic | BindingFlags.Static);
-            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, 0);
+            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null, 0);
             Hero hero = (Hero)mi.Invoke(null, new object[] { characterObject, age });
 
             int becomeChildAge = Campaign.Current.Models.AgeModel.BecomeChildAge;
@@ -272,21 +272,21 @@ namespace CaptivityEvents.CampaignBehaviors
             string tattooTags = isOffspringFemale ? mother.CharacterObject.TattooTags : father.CharacterObject.TattooTags;
 
             // 1.5.6
-            hero.CharacterObject.StaticBodyPropertiesMin = BodyProperties.GetRandomBodyProperties(isOffspringFemale, bodyPropertiesMin, bodyPropertiesMin2, 1, seed, hairTags, father.CharacterObject.BeardTags, tattooTags).StaticProperties;
+            // hero.CharacterObject.StaticBodyPropertiesMin = BodyProperties.GetRandomBodyProperties(isOffspringFemale, bodyPropertiesMin, bodyPropertiesMin2, 1, seed, hairTags, father.CharacterObject.BeardTags, tattooTags).StaticProperties;
 
             // 1.5.7
-            /*
+            
             PropertyInfo pi = hero.GetType().GetProperty("StaticBodyProperties", BindingFlags.Instance | BindingFlags.NonPublic);
             StaticBodyProperties staticBody = BodyProperties.GetRandomBodyProperties(isOffspringFemale, bodyPropertiesMin, bodyPropertiesMin2, 1, seed, hairTags, father.CharacterObject.BeardTags, tattooTags).StaticProperties;
             if (pi != null) pi.SetValue(hero, staticBody);
-            */
+            
 
             hero.Mother = mother;
             hero.Father = father;
 
             // Reflection Two
             MethodInfo mi2 = typeof(HeroCreator).GetMethod("DecideBornSettlement", BindingFlags.NonPublic | BindingFlags.Static);
-            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, 0);
+            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null, 0);
             hero.BornSettlement = (Settlement)mi2.Invoke(null, new object[] { hero });
 
             hero.IsNoble = true;
@@ -345,7 +345,7 @@ namespace CaptivityEvents.CampaignBehaviors
                         {
                             CECustomHandler.ForceLogToFile("Bad pregnancy " + (isOffspringFemale ? "Female" : "Male"));
                             CECustomHandler.ForceLogToFile(e.Message + " : " + e);
-                            Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, !isOffspringFemale, 0);
+                            Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, !isOffspringFemale, null, 0);
                             aliveOffsprings.Add(item);
                         }
                     }
