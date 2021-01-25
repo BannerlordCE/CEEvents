@@ -1,39 +1,90 @@
-﻿using TaleWorlds.Core;
+﻿using CaptivityEvents.Custom;
+using System;
+using System.Collections.Generic;
+using TaleWorlds.Core;
 using TaleWorlds.Localization;
 
 namespace CaptivityEvents
 {
     internal static class CESkills
     {
-        public static SkillObject Prostitution => CESkills.SkillProstitution;
+        public static SkillObject Prostitution => CustomSkills[_StartDefaultSkillNode];
 
-        public static SkillObject Slavery => CESkills.SkillSlavery;
+        public static SkillObject IsProstitute => CustomSkills[_StartDefaultSkillNode + 1];
 
-        public static bool IsInitialized => CESkills._initialized;
+        public static SkillObject Slavery => CustomSkills[_StartDefaultSkillNode + 2];
 
-        internal static bool _initialized = false;
+        public static SkillObject IsSlave => CustomSkills[_StartDefaultSkillNode + 3];
+
+        public static bool IsInitialized => _Initialized;
+
+        internal static List<SkillObject> CustomSkills { get; private set; }
 
         internal static CharacterAttribute CEAttribute { get; private set; }
 
-        internal static SkillObject SkillProstitution { get; private set; }
+        private static int _StartDefaultSkillNode = 0;
 
-        internal static SkillObject SkillSlavery { get; private set; }
+        private static readonly List<CESkillNode> _Skills = new List<CESkillNode>();
 
-        internal static CharacterAttribute CEFlags { get; private set; }
+        private static bool _Initialized;
 
-        internal static SkillObject IsProstitute { get; private set; }
 
-        internal static SkillObject IsSlave { get; private set; }
+        public static void AddCustomSkill(CESkillNode skillNode) => _Skills.Add(skillNode);
+
+
+        public static CESkillNode FindSkillNode(string skill)
+        {
+            try
+            {
+                return _Skills.Find(skillNode => skillNode.Id == skill);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile(skill + " : " + e);
+                return null;
+            }
+        }
+
+        public static SkillObject FindSkill(string skill)
+        {
+
+            foreach (SkillObject skillObjectCustom in CustomSkills)
+            {
+                if (skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill)
+                {
+                    return skillObjectCustom;
+                }
+            }
+
+            foreach (SkillObject skillObject in SkillObject.All)
+            {
+                if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
+                {
+                    return skillObject;
+                }
+            }
+
+            return null;
+        }
+
 
         public static void RegisterAll(Game game)
         {
-            CEAttribute = game.ObjectManager.RegisterPresumedObject<CharacterAttribute>(new CharacterAttribute("CEAttribute"));
-            SkillProstitution = game.ObjectManager.RegisterPresumedObject<SkillObject>(new SkillObject("Prostitution"));
-            SkillSlavery = game.ObjectManager.RegisterPresumedObject<SkillObject>(new SkillObject("Slavery"));
+            CustomSkills = new List<SkillObject>();
 
-            CEFlags = game.ObjectManager.RegisterPresumedObject<CharacterAttribute>(new CharacterAttribute("CEFlags"));
-            IsProstitute = game.ObjectManager.RegisterPresumedObject<SkillObject>(new SkillObject("IsProstitute"));
-            IsSlave = game.ObjectManager.RegisterPresumedObject<SkillObject>(new SkillObject("IsSlave"));
+            CEAttribute = game.ObjectManager.RegisterPresumedObject(new CharacterAttribute("CEAttribute"));
+
+            _StartDefaultSkillNode = _Skills.Count;
+
+            _Skills.Add(new CESkillNode("Prostitution", "{=CEEVENTS1106}Prostitution", "0"));
+            _Skills.Add(new CESkillNode("IsProstitute", "{=CEEVENTS1104}prostitute", "0", "1"));
+            _Skills.Add(new CESkillNode("Slavery", "{=CEEVENTS1105}Slavery", "0"));
+            _Skills.Add(new CESkillNode("IsSlave", "{=CEEVENTS1103}slave", "0", "1"));
+
+            foreach (CESkillNode skill in _Skills)
+            {
+                CustomSkills.Add(game.ObjectManager.RegisterPresumedObject(new SkillObject(skill.Id)));
+            }
 
             InitializeAll();
         }
@@ -41,14 +92,13 @@ namespace CaptivityEvents
         public static void InitializeAll()
         {
             CEAttribute.Initialize(new TextObject("CE"), new TextObject("CE represents the ability to move with speed and force."), new TextObject("CE"), CharacterAttributesEnum.Social);
-            SkillProstitution.Initialize(new TextObject("{=CEEVENTS1106}Prostitution"), new TextObject("Prostitution Skill"), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEAttribute);
-            SkillSlavery.Initialize(new TextObject("{=CEEVENTS1105}Slavery"), new TextObject("Slave training"), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEAttribute);
 
-            CEFlags.Initialize(new TextObject("CEFlags"), new TextObject("CEFlags represents the ability to move with speed and force."), new TextObject("CEF"), CharacterAttributesEnum.Social);
-            IsProstitute.Initialize(new TextObject("{=CEEVENTS1104}prostitute"), new TextObject("IsProstitute Flag"), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEFlags);
-            IsSlave.Initialize(new TextObject("{=CEEVENTS1103}slave"), new TextObject("IsSlave Flag"), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEFlags);
+            for (int i = 0; i < CustomSkills.Count; i++)
+            {
+                CustomSkills[i].Initialize(new TextObject(_Skills[i].Name), new TextObject(_Skills[i].Name), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEAttribute);
+            }
 
-            _initialized = true;
+            _Initialized = true;
         }
     }
 }
