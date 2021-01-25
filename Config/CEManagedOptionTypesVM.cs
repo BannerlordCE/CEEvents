@@ -408,7 +408,7 @@ namespace CaptivityEvents.Config
             get
             {
                 SelectorVM<SelectorItemVM> selector = _selector;
-                return _selector;
+                return selector;
             }
             set
             {

@@ -17,7 +17,7 @@ namespace CaptivityEvents.Issues
 
         public override void SyncData(IDataStore dataStore) { }
 
-        public static IssueBase OnStartIssue(PotentialIssueData pid, Hero issueOwner) => new CEWhereAreMyThingsIssue(issueOwner);
+        public static IssueBase OnStartIssue(PotentialIssueData potentialIssueData, Hero issueOwner) => new CEWhereAreMyThingsIssue(issueOwner);
 
         internal class CEWhereAreMyThingsIssue : IssueBase
         {
@@ -31,10 +31,6 @@ namespace CaptivityEvents.Issues
             protected override TextObject IssueQuestSolutionExplanationByIssueGiver => new TextObject("{=CEEVENTS1085}Well you can pay for it.");
             protected override TextObject IssueQuestSolutionAcceptByPlayer => new TextObject("{=CEEVENTS1084}Are you serious?");
 
-            // 1.5.5
-            //public CEWhereAreMyThingsIssue(Hero issueOwner) : base(issueOwner, new Dictionary<IssueEffect, float>(), CampaignTime.DaysFromNow(25f)) { }
-
-            // 1.5.6
             public CEWhereAreMyThingsIssue(Hero issueOwner) : base(issueOwner, CampaignTime.DaysFromNow(25f)) { }
 
             protected override void AfterIssueCreation() { }
@@ -43,7 +39,7 @@ namespace CaptivityEvents.Issues
 
             protected override QuestBase GenerateIssueQuest(string questId)
             {
-                float stolenGearDuration = 0.0f; //Set default duration here if needed.
+                float stolenGearDuration = 3.0f; // Set default duration here if needed.
                 if (CESettings.Instance != null) stolenGearDuration = CESettings.Instance.StolenGearDuration;
 
                 return new CEWhereAreMyThingsIssueQuest(questId, IssueOwner, CampaignTime.DaysFromNow(stolenGearDuration), RewardGold, new Equipment(Hero.MainHero.BattleEquipment), new Equipment(Hero.MainHero.CivilianEquipment));

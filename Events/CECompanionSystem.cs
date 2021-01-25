@@ -119,19 +119,19 @@ namespace CaptivityEvents.Events
                             switch (companion.Location.ToLower())
                             {
                                 case "prisoner":
-                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.PartyBelongedToAsPrisoner != party && companionHero.IsPrisoner; });
+                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedToAsPrisoner != party && companionHero.IsPrisoner; });
                                     break;
                                 case "party":
-                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.PartyBelongedTo.Party != party && !companionHero.PartyBelongedTo.IsGarrison; });
+                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedTo?.Party != null && companionHero.PartyBelongedTo.Party != party && !companionHero.PartyBelongedTo.IsGarrison; });
                                     break;
                                 case "settlement":
-                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.CurrentSettlement != null; });
+                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.CurrentSettlement != null; });
                                     break;
                                 case "current prisoner":
-                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.PartyBelongedToAsPrisoner == party; });
+                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedToAsPrisoner == party; });
                                     break;
                                 case "current":
-                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.PartyBelongedTo.Party == party; });
+                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedTo?.Party == party; });
                                     break;
                                 default:
                                     break;
@@ -145,7 +145,7 @@ namespace CaptivityEvents.Events
 
                             if (triggeredEvent == null) continue;
 
-                            heroes = (List<Hero>)heroes.Where((companionHero) =>
+                            heroes = heroes.FindAll((companionHero) =>
                             {
                                 string conditionals = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(companionHero.CharacterObject, party);
                                 if (conditionals != null)
@@ -193,15 +193,15 @@ namespace CaptivityEvents.Events
                             ConsequenceGainRandomPrisoners(companion, heroSelected);
 
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
-                            CECustomHandler.ForceLogToFile("Incorrect CompanionsCheck heroSelected / Failed ");
+                            CECustomHandler.ForceLogToFile("Incorrect ConsequenceCompanions heroSelected: " + e.ToString());
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    CECustomHandler.ForceLogToFile("Incorrect CompanionsCheck / Failed ");
+                    CECustomHandler.ForceLogToFile("Incorrect ConsequenceCompanions: " + e.ToString());
                 }
             }
         }

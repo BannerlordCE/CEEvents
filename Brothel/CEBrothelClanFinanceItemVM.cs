@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement;
 using TaleWorlds.Core;
 using TaleWorlds.Core.ViewModelCollection;
@@ -58,6 +59,8 @@ namespace CaptivityEvents.Brothel
 
         protected override void PopulateStatsList()
         {
+            // 1.5.7 SelectableItemPropertyVM
+            // 1.5.6 ClanSelectableItemPropertyVM
             ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0976}Level").ToString(), _brothel.Level.ToString()));
             ItemProperties.Add(new ClanSelectableItemPropertyVM(new TextObject("{=CEBROTHEL0988}State").ToString(), _brothel.IsRunning
                                                                     ? new TextObject("{=CEBROTHEL0992}Normal").ToString()

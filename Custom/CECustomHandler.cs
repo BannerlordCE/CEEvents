@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -29,6 +30,9 @@ namespace CaptivityEvents.Custom
 
         public static List<CEEvent> GetAllVerifiedXSEFSEvents(List<string> modules)
         {
+            #if DEBUG 
+                TestWrite(); 
+            #endif
             string errorPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedFlagXML.txt";
             FileInfo file = new FileInfo(errorPath);
             if (file.Exists) file.Delete();
@@ -81,7 +85,7 @@ namespace CaptivityEvents.Custom
                             ForceLogToFile("Added: " + text);
                         }
 
-                        
+
                         CECustomModule item = new CECustomModule(Path.GetFileNameWithoutExtension(fullPath), TempEvents);
                         AllModules.Add(item);
                     }
@@ -141,44 +145,6 @@ namespace CaptivityEvents.Custom
 
                 return new List<CEEvent>();
             }
-        }
-         
-        public static CECustomSettings LoadCustomSettings()
-        {
-            string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CESettings.xml";
-            try
-            {
-                return DeserializeXMLFileToSettings(fullPath);
-            }
-            catch (Exception e)
-            {
-                ForceLogToFile(e.ToString());
-                return null;
-            }
-        }
-        // Settings
-        public static CECustomSettings DeserializeXMLFileToSettings(string XmlFilename)
-        {
-            CECustomSettings _CESettings;
-
-            try
-            {
-                if (string.IsNullOrEmpty(XmlFilename)) return null;
-                StreamReader textReader = new StreamReader(XmlFilename);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(CECustomSettings));
-                CECustomSettings xsefsevents = (CECustomSettings)xmlSerializer.Deserialize(textReader);
-                _CESettings = xsefsevents;
-            }
-            catch (Exception innerException)
-            {
-                TextObject textObject = new TextObject("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
-                textObject.SetTextVariable("FILE", XmlFilename);
-                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
-
-                throw new Exception("ERROR DeserializeXMLFileToSettings:  -- filename: " + XmlFilename, innerException);
-            }
-
-            return _CESettings;
         }
 
         public static CECustomSettings LoadCustomSettings()
@@ -359,6 +325,51 @@ namespace CaptivityEvents.Custom
 
             return list;
         }
+
+#if DEBUG
+        public static string GetEventXml(CEEvents obj, XmlSerializer serializer = null, bool omitStandardNamespaces = false)
+        {
+            XmlSerializerNamespaces ns = null;
+            if (omitStandardNamespaces)
+            {
+                ns = new XmlSerializerNamespaces();
+                ns.Add("", ""); // Disable the xmlns:xsi and xmlns:xsd lines.
+            }
+            using (var textWriter = new System.IO.StringWriter())
+            {
+                var settings = new XmlWriterSettings() { Indent = true }; // For cosmetic purposes.
+                using (var xmlWriter = XmlWriter.Create(textWriter, settings))
+                    (serializer ?? new XmlSerializer(obj.GetType())).Serialize(xmlWriter, obj, ns);
+                return textWriter.ToString();
+            }
+        }
+
+        public static void TestWrite()
+        {
+            CEEvents ceEvents = new CEEvents
+            {
+                CEEvent = new CEEvent[]
+                {
+                    new CEEvent {
+                        TerrainTypesRequirements = new TerrainType[][]
+                        {
+                            new TerrainType[] {
+                                TerrainType.Water,
+                                TerrainType.Steppe
+                            }
+                        }
+                    }
+                }
+            };
+
+            string xml = GetEventXml(ceEvents, omitStandardNamespaces: true);
+            string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/TESTXML.xml";
+            FileInfo file = new FileInfo(fullPath);
+            file.Directory?.Create();
+            File.WriteAllText(BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/TESTXML.xml", xml);
+        }
+#endif
+
 
         [DebuggerStepThroughAttribute]
         private static void LogXMLIssueToFile(string msg, string xmlFile = "")

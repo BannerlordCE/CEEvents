@@ -115,11 +115,11 @@
     <Reference Include="0Harmony, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Lib.Harmony.2.0.4\lib\net48\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Bannerlord.ButterLib, Version=1.0.18.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>packages\Bannerlord.ButterLib.1.0.18\lib\net472\Bannerlord.ButterLib.dll</HintPath>
+    <Reference Include="Bannerlord.ButterLib, Version=1.0.20.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>packages\Bannerlord.ButterLib.1.0.20\lib\net472\Bannerlord.ButterLib.dll</HintPath>
     </Reference>
-    <Reference Include="MCMv4, Version=4.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Bannerlord.MCM.4.1.2\lib\net472\MCMv4.dll</HintPath>
+    <Reference Include="MCMv4, Version=4.1.2.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Bannerlord.MCM.4.1.2.6\lib\net472\MCMv4.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Bcl.HashCode.1.1.0\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
@@ -326,6 +326,9 @@
     <Reference Include="TaleWorlds.Localization">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Localization.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.ModuleManager">
+      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.ModuleManager.dll</HintPath>
     </Reference>
     <Reference Include="TaleWorlds.MountAndBlade">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.dll</HintPath>

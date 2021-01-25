@@ -9,6 +9,8 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
+using TerrainType = TaleWorlds.Core.TerrainType;
+using CETerrainType = CaptivityEvents.Custom.TerrainType;
 
 namespace CaptivityEvents.Events
 {
@@ -170,7 +172,7 @@ namespace CaptivityEvents.Events
             }
 
             Vec3? position3D = (captorParty != null && captorParty.IsMobile) ? captorParty?.MobileParty?.GetPosition() : captorParty?.Settlement?.GetPosition();
-            List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
+            List<TaleWorlds.Core.TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
             AtmosphereInfo atmosphere = new DefaultMapWeatherModel().GetAtmosphereModel(CampaignTime.Now, (Vec3)position3D);
 
             string environmentTerrainTypes = "";
@@ -356,19 +358,19 @@ namespace CaptivityEvents.Events
                             switch (companion.Location.ToLower())
                             {
                                 case "prisoner":
-                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.PartyBelongedToAsPrisoner != party && companionHero.IsPrisoner; });
+                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedToAsPrisoner != party && companionHero.IsPrisoner; });
                                     break;
                                 case "party":
-                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.PartyBelongedTo.Party != party && !companionHero.PartyBelongedTo.IsGarrison; });
+                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedTo?.Party != null && companionHero.PartyBelongedTo.Party != party && !companionHero.PartyBelongedTo.IsGarrison; });
                                     break;
                                 case "settlement":
-                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.CurrentSettlement != null; });
+                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.CurrentSettlement != null; });
                                     break;
                                 case "current prisoner":
-                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.PartyBelongedToAsPrisoner == party; });
+                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedToAsPrisoner == party; });
                                     break;
                                 case "current":
-                                    heroes = (List<Hero>)heroes.Where((companionHero) => { return companionHero.PartyBelongedTo.Party == party; });
+                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedTo?.Party == party; });
                                     break;
                                 default:
                                     break;
@@ -382,11 +384,13 @@ namespace CaptivityEvents.Events
 
                             if (triggeredEvent == null) return ForceLogError("Couldn't find " + companion.UseOtherConditions + " in events. CompanionsCheck.");
 
-                            heroes = (List<Hero>)heroes.Where((companionHero) =>
+                            string lastConditional = null;
+                            heroes = heroes.FindAll((companionHero) =>
                             {
                                 string conditionals = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(companionHero.CharacterObject, party);
                                 if (conditionals != null)
                                 {
+                                    lastConditional = conditionals;
                                     CECustomHandler.LogToFile(conditionals);
                                     return false;
                                 }
@@ -395,9 +399,16 @@ namespace CaptivityEvents.Events
                                     return true;
                                 }
                             });
+
+                            heroes = heroes.FindAll(filterHero => !_listEvent.SavedCompanions.ContainsValue(filterHero));
+                            if (heroes.Count == 0) return LogError("Skipping event " + _listEvent.Name + " it does not match the CompanionsCheck condition: " + lastConditional);
+                        } 
+                        else
+                        {
+                            heroes = heroes.FindAll(filterHero => !_listEvent.SavedCompanions.ContainsValue(filterHero));
+                            if (heroes.Count == 0) return LogError("Skipping event " + _listEvent.Name + " it does not match the CompanionsCheck conditions.");
                         }
 
-                        if (heroes.Count == 0) return LogError("Skipping event " + _listEvent.Name + " it does not match the FlagsDoMatchEventConditions conditions.");
 
                         if (companion.Id != null)
                         {
@@ -406,9 +417,9 @@ namespace CaptivityEvents.Events
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return LogError("Incorrect CompanionsCheck / Failed ");
+                return LogError("Incorrect CompanionsCheck: " + e.ToString());
             }
             return true;
         }
@@ -416,25 +427,25 @@ namespace CaptivityEvents.Events
         private bool WorldMapCheck(PartyBase party, ref bool eventMatchingCondition)
         {
 
-            if (_listEvent.TerrianTypesRequirements == null) return true;
+            if (_listEvent.TerrainTypesRequirements == null) return true;
 
-            foreach (TerrianTypes terrianTypes in _listEvent.TerrianTypesRequirements)
+            foreach (CETerrainType[] terrainTypes in _listEvent.TerrainTypesRequirements)
             {
-                bool hasWorldMapWater = terrianTypes.TerrianType.Contains("Water");
-                bool hasWorldMapMountain = terrianTypes.TerrianType.Contains("Mountain");
-                bool hasWorldMapSnow = terrianTypes.TerrianType.Contains("Snow");
-                bool hasWorldMapSteppe = terrianTypes.TerrianType.Contains("Steppe");
-                bool hasWorldMapPlain = terrianTypes.TerrianType.Contains("Plain");
-                bool hasWorldMapDesert = terrianTypes.TerrianType.Contains("Desert");
-                bool hasWorldMapSwamp = terrianTypes.TerrianType.Contains("Swamp");
-                bool hasWorldMapDune = terrianTypes.TerrianType.Contains("Dune");
-                bool hasWorldMapBridge = terrianTypes.TerrianType.Contains("Bridge");
-                bool hasWorldMapRiver = terrianTypes.TerrianType.Contains("River");
-                bool hasWorldMapForest = terrianTypes.TerrianType.Contains("Forest");
-                bool hasWorldMapShallowRiver = terrianTypes.TerrianType.Contains("ShallowRiver");
-                bool hasWorldMapLake = terrianTypes.TerrianType.Contains("Lake");
-                bool hasWorldMapCanyon = terrianTypes.TerrianType.Contains("Canyon");
-                bool hasWorldMapRuralArea = terrianTypes.TerrianType.Contains("RuralArea");
+                bool hasWorldMapWater = terrainTypes.Contains(CETerrainType.Water);
+                bool hasWorldMapMountain = terrainTypes.Contains(CETerrainType.Mountain);
+                bool hasWorldMapSnow = terrainTypes.Contains(CETerrainType.Snow);
+                bool hasWorldMapSteppe = terrainTypes.Contains(CETerrainType.Steppe);
+                bool hasWorldMapPlain = terrainTypes.Contains(CETerrainType.Plain);
+                bool hasWorldMapDesert = terrainTypes.Contains(CETerrainType.Desert);
+                bool hasWorldMapSwamp = terrainTypes.Contains(CETerrainType.Swamp);
+                bool hasWorldMapDune = terrainTypes.Contains(CETerrainType.Dune);
+                bool hasWorldMapBridge = terrainTypes.Contains(CETerrainType.Bridge);
+                bool hasWorldMapRiver = terrainTypes.Contains(CETerrainType.River);
+                bool hasWorldMapForest = terrainTypes.Contains(CETerrainType.Forest);
+                bool hasWorldMapShallowRiver = terrainTypes.Contains(CETerrainType.ShallowRiver);
+                bool hasWorldMapLake = terrainTypes.Contains(CETerrainType.Lake);
+                bool hasWorldMapCanyon = terrainTypes.Contains(CETerrainType.Canyon);
+                bool hasWorldMapRuralArea = terrainTypes.Contains(CETerrainType.RuralArea);
 
                 if (
                     hasWorldMapWater || hasWorldMapMountain || hasWorldMapSnow || hasWorldMapSteppe || hasWorldMapPlain || hasWorldMapDesert || hasWorldMapSwamp || hasWorldMapDune || hasWorldMapBridge || hasWorldMapRiver || hasWorldMapForest || hasWorldMapShallowRiver || hasWorldMapLake || hasWorldMapCanyon || hasWorldMapRuralArea
@@ -469,7 +480,7 @@ namespace CaptivityEvents.Events
                 }
             }
 
-            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the TerrianType conditions.");
+            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the TerrainType conditions.");
 
             return true;
         }
@@ -1973,6 +1984,31 @@ namespace CaptivityEvents.Events
                         if (eventFound.Key != null && !eventFound.Value)
                         {
                             return Error("Skipping event " + _listEvent.Name + " Toggle is Off");
+                        }
+
+                        KeyValuePair<string, CESettingsEvent> eventSettingFound = CESettingsEvents.Instance.EventSettings.FirstOrDefault((eventSettings) => { return eventSettings.Key == _listEvent.Name; });
+
+                        if (eventSettingFound.Key != null)
+                        {
+                            if (!eventSettingFound.Value.WeightedChanceOfOccuring.Equals(""))
+                            {
+                                if (_listEvent.OldWeightedChanceOfOccuring != null) _listEvent.OldWeightedChanceOfOccuring = _listEvent.WeightedChanceOfOccuring;
+                                _listEvent.WeightedChanceOfOccuring = eventSettingFound.Value.WeightedChanceOfOccuring;
+                            }
+                            else
+                            {
+                                _listEvent.WeightedChanceOfOccuring = _listEvent.OldWeightedChanceOfOccuring;
+                            }
+
+                            if (!eventSettingFound.Value.BackgroundName.Equals(""))
+                            {
+                                if (_listEvent.OldBackgroundName != null) _listEvent.OldBackgroundName = _listEvent.BackgroundName;
+                                _listEvent.BackgroundName = eventSettingFound.Value.BackgroundName;
+                            }
+                            else
+                            {
+                                _listEvent.BackgroundName = _listEvent.OldBackgroundName;
+                            }
                         }
                     }
                 }

@@ -82,7 +82,7 @@ namespace CaptivityEvents.Config
 
         public float GetConfig(ICEOptionData data) => 0;
 
-        public void SetConfig(ICEOptionData data, float val)
+        public void SetConfig(ICEOptionData data, float value)
         {
 
         }

@@ -14,6 +14,9 @@ namespace CaptivityEvents.Patches
         [HarmonyPrepare]
         private static bool ShouldPatch() => CESettings.Instance != null && CESettings.Instance.ProstitutionControl;
 
+
+        // 1.5.6 CalculateClanIncome
+        // 1.5.7 CalculateClanIncomeInternal
         [HarmonyPostfix]
         private static void CalculateClanIncome(Clan clan, ref ExplainedNumber goldChange, bool applyWithdrawals = false)
         {

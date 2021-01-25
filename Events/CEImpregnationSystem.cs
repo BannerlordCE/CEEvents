@@ -187,11 +187,11 @@ namespace CaptivityEvents.Events
                     {
                         randomSoldier = CECampaignBehavior.ExtraProps.Owner;
                     }
-                    else if (lord && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty?.LeaderHero != null && !targetHero.PartyBelongedToAsPrisoner.MobileParty.LeaderHero.IsFemale)
+                    else if (lord && targetHero.PartyBelongedToAsPrisoner != null && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty?.LeaderHero != null && !targetHero.PartyBelongedToAsPrisoner.MobileParty.LeaderHero.IsFemale)
                     {
                         randomSoldier = targetHero.PartyBelongedToAsPrisoner.MobileParty.LeaderHero;
                     }
-                    else if (targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty != null)
+                    else if (targetHero.PartyBelongedToAsPrisoner != null && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty != null)
                     {
                         IEnumerable<TroopRosterElement> maleMembers = targetHero.PartyBelongedToAsPrisoner.MobileParty.MemberRoster.Where(characterObject => characterObject.Character.IsFemale == false);
                         List<TroopRosterElement> troopRosterElements = maleMembers.ToList();
@@ -201,7 +201,7 @@ namespace CaptivityEvents.Events
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.PartyBelongedToAsPrisoner.MobileParty.HomeSettlement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
                     }
-                    else if (targetHero.PartyBelongedToAsPrisoner.IsSettlement && targetHero.PartyBelongedToAsPrisoner.Settlement.MilitaParty != null && !targetHero.PartyBelongedToAsPrisoner.Settlement.MilitaParty.MemberRoster.IsEmpty())
+                    else if (targetHero.PartyBelongedToAsPrisoner != null && targetHero.PartyBelongedToAsPrisoner.IsSettlement && targetHero.PartyBelongedToAsPrisoner.Settlement.MilitaParty != null && !targetHero.PartyBelongedToAsPrisoner.Settlement.MilitaParty.MemberRoster.IsEmpty())
                     {
                         Settlement playerCaptor = targetHero.PartyBelongedToAsPrisoner.Settlement;
                         IEnumerable<TroopRosterElement> maleMembers = playerCaptor.MilitaParty.MemberRoster.Where(characterObject => characterObject.Character.IsFemale == false);
@@ -265,12 +265,12 @@ namespace CaptivityEvents.Events
                     randomSoldier = captorHero;
                     if (!(randomSoldier.IsFemale && !randomSoldier.IsPregnant)) return;
                 }
-                else if (lord && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty?.LeaderHero != null)
+                else if (lord && targetHero.PartyBelongedToAsPrisoner != null && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty?.LeaderHero != null)
                 {
                     randomSoldier = targetHero.PartyBelongedToAsPrisoner.MobileParty.LeaderHero;
                     if (!(randomSoldier.IsFemale && !randomSoldier.IsPregnant)) return;
                 }
-                else if (targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty != null)
+                else if (targetHero.PartyBelongedToAsPrisoner != null && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty != null)
                 {
                     IEnumerable<TroopRosterElement> femaleMembers = targetHero.PartyBelongedToAsPrisoner.MobileParty.MemberRoster.Where(characterObject => characterObject.Character.IsFemale);
                     List<TroopRosterElement> troopRosterElements = femaleMembers.ToList();
@@ -283,7 +283,7 @@ namespace CaptivityEvents.Events
                         randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.PartyBelongedToAsPrisoner.MobileParty.HomeSettlement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(15) + 18);
                     } while (!IsHeroAgeSuitableForPregnancy(randomSoldier));
                 }
-                else if (targetHero.PartyBelongedToAsPrisoner.IsSettlement && targetHero.PartyBelongedToAsPrisoner.Settlement.MilitaParty != null && !targetHero.PartyBelongedToAsPrisoner.Settlement.MilitaParty.MemberRoster.IsEmpty())
+                else if (targetHero.PartyBelongedToAsPrisoner != null && targetHero.PartyBelongedToAsPrisoner.IsSettlement && targetHero.PartyBelongedToAsPrisoner.Settlement.MilitaParty != null && !targetHero.PartyBelongedToAsPrisoner.Settlement.MilitaParty.MemberRoster.IsEmpty())
                 {
                     Settlement playerCaptor = targetHero.PartyBelongedToAsPrisoner.Settlement;
                     IEnumerable<TroopRosterElement> femaleMembers = playerCaptor.MilitaParty.MemberRoster.Where(characterObject => characterObject.Character.IsFemale);
@@ -299,7 +299,7 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
-                    CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale && characterObject.Occupation == Occupation.Outlaw).GetRandomElement();
+                    CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale && characterObject.IsRegular).GetRandomElement();
                     randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(15) + 18);
                 }
 

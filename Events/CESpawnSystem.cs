@@ -92,10 +92,9 @@ namespace CaptivityEvents.Events
                                                 where settlement.Culture == wanderer.Culture && settlement.IsTown
                                                 select settlement).GetRandomElement();
 
-                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, null, null, -1);
+                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElement(), null, -1);
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);
                     hero.HasMet = true;
-                    hero.Clan = randomElement.OwnerClan;
                     hero.ChangeState(Hero.CharacterStates.Active);
                     if (heroVariables.Clan != null)
                     {

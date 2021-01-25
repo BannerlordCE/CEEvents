@@ -33,6 +33,7 @@ namespace CaptivityEvents.CampaignBehaviors
             CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
 
             if (returnedEvent == null) return;
+            returnedEvent.Captive = captive;
             CEHelper.notificationCaptorExists = true;
 
             try
@@ -269,7 +270,17 @@ namespace CaptivityEvents.CampaignBehaviors
             int seed = isOffspringFemale ? mother.CharacterObject.GetDefaultFaceSeed(1) : father.CharacterObject.GetDefaultFaceSeed(1);
             string hairTags = isOffspringFemale ? mother.CharacterObject.HairTags : father.CharacterObject.HairTags;
             string tattooTags = isOffspringFemale ? mother.CharacterObject.TattooTags : father.CharacterObject.TattooTags;
+
+            // 1.5.6
             hero.CharacterObject.StaticBodyPropertiesMin = BodyProperties.GetRandomBodyProperties(isOffspringFemale, bodyPropertiesMin, bodyPropertiesMin2, 1, seed, hairTags, father.CharacterObject.BeardTags, tattooTags).StaticProperties;
+
+            // 1.5.7
+            /*
+            PropertyInfo pi = hero.GetType().GetProperty("StaticBodyProperties", BindingFlags.Instance | BindingFlags.NonPublic);
+            StaticBodyProperties staticBody = BodyProperties.GetRandomBodyProperties(isOffspringFemale, bodyPropertiesMin, bodyPropertiesMin2, 1, seed, hairTags, father.CharacterObject.BeardTags, tattooTags).StaticProperties;
+            if (pi != null) pi.SetValue(hero, staticBody);
+            */
+
             hero.Mother = mother;
             hero.Father = father;
 
@@ -541,6 +552,8 @@ namespace CaptivityEvents.CampaignBehaviors
 
                                     if (!mapState.AtMenu)
                                     {
+                                        _extraVariables.menuToSwitchBackTo = null;
+                                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
                                         GameMenu.ActivateGameMenu("prisoner_wait");
                                     }
                                     else
@@ -572,6 +585,8 @@ namespace CaptivityEvents.CampaignBehaviors
 
                                     if (!mapState.AtMenu)
                                     {
+                                        _extraVariables.menuToSwitchBackTo = null;
+                                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
                                         GameMenu.ActivateGameMenu("prisoner_wait");
                                     }
                                     else

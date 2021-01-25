@@ -57,9 +57,25 @@ namespace CaptivityEvents.Events
                                             ? 1
                                             : 0);
 
+            try
+            {
+                if (_listedEvent.SavedCompanions != null)
+                {
+                    foreach (KeyValuePair<string, Hero> item in _listedEvent.SavedCompanions)
+                    {
+                        MBTextManager.SetTextVariable("COMPANION_NAME_" + item.Key, item.Value?.Name);
+                        MBTextManager.SetTextVariable("COMPANIONISFEMALE_" + item.Key, item.Value.IsFemale ? 1 : 0);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Failed to RandomProgressInitWaitGameMenu for " + _listedEvent.Name);
+            }
+
             if (_listedEvent.ProgressEvent != null)
             {
-                args.MenuContext.GameMenu.AllowWaitingAutomatically();
+                //args.MenuContext.GameMenu.AllowWaitingAutomatically();
                 _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);
                 _timer = 0f;
 
@@ -74,7 +90,7 @@ namespace CaptivityEvents.Events
         }
         internal bool RandomProgressConditionWaitGameMenu(MenuCallbackArgs args)
         {
-            args.MenuContext.GameMenu.AllowWaitingAutomatically();
+            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
@@ -117,6 +133,28 @@ namespace CaptivityEvents.Events
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                               ? 1
                                               : 0);
+
+            if (MobileParty.MainParty.CurrentSettlement != null)
+            {
+                MBTextManager.SetTextVariable("SETTLEMENT_NAME", MobileParty.MainParty.CurrentSettlement.Name);
+            }
+            
+
+            try
+            {
+                if (_listedEvent.SavedCompanions != null)
+                {
+                    foreach (KeyValuePair<string, Hero> item in _listedEvent.SavedCompanions)
+                    {
+                        MBTextManager.SetTextVariable("COMPANION_NAME_" + item.Key, item.Value?.Name);
+                        MBTextManager.SetTextVariable("COMPANIONISFEMALE_" + item.Key, item.Value.IsFemale ? 1 : 0);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Failed to RandomEventGameMenu for " + _listedEvent.Name);
+            }
         }
 
         internal bool RandomEventConditionMenuOption(MenuCallbackArgs args)
@@ -198,7 +236,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception e)
             {
-                CECustomHandler.LogToFile("ConsequenceRandomCompanions. Failed" + e.ToString());
+                CECustomHandler.ForceLogToFile("ConsequenceRandomCompanions. Failed" + e.ToString());
             }
         }
 
@@ -261,6 +299,7 @@ namespace CaptivityEvents.Events
                     {
                         CEEvent triggeredEvent = eventNames[number];
                         triggeredEvent.Captive = CharacterObject.PlayerCharacter;
+                        triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
                     }
                     catch (Exception)
@@ -284,6 +323,8 @@ namespace CaptivityEvents.Events
             try
             {
                 CEEvent triggeredEvent = _eventList.Find(item => item.Name == _listedEvent.ProgressEvent.TriggerEventName);
+                triggeredEvent.Captive = CharacterObject.PlayerCharacter;
+                triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
                 GameMenu.SwitchToMenu(triggeredEvent.Name);
             }
             catch (Exception)
@@ -298,6 +339,8 @@ namespace CaptivityEvents.Events
             try
             {
                 CEEvent triggeredEvent = _eventList.Find(item => item.Name == _option.TriggerEventName);
+                triggeredEvent.Captive = CharacterObject.PlayerCharacter;
+                triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
                 GameMenu.SwitchToMenu(triggeredEvent.Name);
             }
             catch (Exception)
@@ -366,7 +409,10 @@ namespace CaptivityEvents.Events
 
                     try
                     {
-                        GameMenu.SwitchToMenu(eventNames[number].Name);
+                        CEEvent triggeredEvent = eventNames[number];
+                        triggeredEvent.Captive = CharacterObject.PlayerCharacter;
+                        triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
+                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
                     }
                     catch (Exception)
                     {

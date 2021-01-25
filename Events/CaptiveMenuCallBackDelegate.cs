@@ -60,7 +60,7 @@ namespace CaptivityEvents.Events
 
             if (_listedEvent.ProgressEvent != null)
             {
-                args.MenuContext.GameMenu.AllowWaitingAutomatically();
+                //args.MenuContext.GameMenu.AllowWaitingAutomatically();
                 _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);
                 _timer = 0f;
 
@@ -76,7 +76,7 @@ namespace CaptivityEvents.Events
 
         internal bool CaptiveProgressConditionWaitGameMenu(MenuCallbackArgs args)
         {
-            args.MenuContext.GameMenu.AllowWaitingAutomatically();
+            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
@@ -134,13 +134,13 @@ namespace CaptivityEvents.Events
 
             if (PlayerCaptivity.IsCaptive) SetCaptiveTextVariables(ref args);
 
-            args.MenuContext.GameMenu.AllowWaitingAutomatically();
+            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.MenuContext.GameMenu.SetMenuAsWaitMenuAndInitiateWaiting();
         }
 
         internal bool CaptiveConditionWaitGameMenu(MenuCallbackArgs args)
         {
-            args.MenuContext.GameMenu.AllowWaitingAutomatically();
+            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
@@ -195,6 +195,22 @@ namespace CaptivityEvents.Events
                 {
                     text.SetTextVariable("PARTY_NAME", PlayerCaptivity.CaptorParty.Name);
                 }
+            }
+
+            try
+            {
+                if (_listedEvent.SavedCompanions != null)
+                {
+                    foreach (KeyValuePair<string, Hero> item in _listedEvent.SavedCompanions)
+                    {
+                        text.SetTextVariable("COMPANION_NAME_" + item.Key, item.Value?.Name);
+                        text.SetTextVariable("COMPANIONISFEMALE_" + item.Key, item.Value.IsFemale ? 1 : 0);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Failed to CaptiveTickWaitGameMenu for " + _listedEvent.Name);
             }
 
             if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.IsActive) PartyBase.MainParty.MobileParty.Position2D = PlayerCaptivity.CaptorParty.MobileParty.Position2D;
@@ -270,8 +286,8 @@ namespace CaptivityEvents.Events
             ConsequenceCompanions();
             ConsequenceSpawnTroop();
             ConsequenceSpawnHero();
-            ConsequenceForceMarry();
             ConsequenceChangeClan();
+            ConsequenceForceMarry();
             ConsequenceChangeKingdom();
             ConsequenceImpregnationByLeader();
             ConsequenceImpregnation();
@@ -300,7 +316,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception e)
             {
-                CECustomHandler.LogToFile("ConsequenceCaptiveCompanions. Failed" + e.ToString());
+                CECustomHandler.ForceLogToFile("ConsequenceCaptiveCompanions. Failed" + e.ToString());
             }
         }
 
@@ -377,6 +393,7 @@ namespace CaptivityEvents.Events
                     {
                         CEEvent triggeredEvent = eventNames[number];
                         triggeredEvent.Captive = CharacterObject.PlayerCharacter;
+                        triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
                     }
                     catch (Exception)
@@ -400,6 +417,8 @@ namespace CaptivityEvents.Events
             try
             {
                 CEEvent triggeredEvent = _eventList.Find(item => item.Name == _listedEvent.ProgressEvent.TriggerEventName);
+                triggeredEvent.Captive = CharacterObject.PlayerCharacter;
+                triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
                 GameMenu.SwitchToMenu(triggeredEvent.Name);
             }
             catch (Exception)
@@ -467,6 +486,7 @@ namespace CaptivityEvents.Events
                     {
                         CEEvent triggeredEvent = eventNames[number];
                         triggeredEvent.Captive = CharacterObject.PlayerCharacter;
+                        triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
                     }
                     catch (Exception)
@@ -490,6 +510,8 @@ namespace CaptivityEvents.Events
             try
             {
                 CEEvent triggeredEvent = _eventList.Find(item => item.Name == _option.TriggerEventName);
+                triggeredEvent.Captive = CharacterObject.PlayerCharacter;
+                triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
                 GameMenu.SwitchToMenu(triggeredEvent.Name);
             }
             catch (Exception)
@@ -1846,6 +1868,22 @@ namespace CaptivityEvents.Events
             text.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                      ? 1
                                      : 0);
+
+            try
+            {
+                if (_listedEvent.SavedCompanions != null)
+                {
+                    foreach (KeyValuePair<string, Hero> item in _listedEvent.SavedCompanions)
+                    {
+                        text.SetTextVariable("COMPANION_NAME_" + item.Key, item.Value?.Name);
+                        text.SetTextVariable("COMPANIONISFEMALE_" + item.Key, item.Value.IsFemale ? 1 : 0);
+                    }
+                }
+            } 
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Failed to SetCaptiveTextVariables for " + _listedEvent.Name);
+            }
 
             if (CECampaignBehavior.ExtraProps.Owner != null) text.SetTextVariable("OWNER_NAME", CECampaignBehavior.ExtraProps.Owner.Name);
 
