@@ -1,4 +1,5 @@
-﻿using Helpers;
+﻿using CaptivityEvents.Config;
+using Helpers;
 using System;
 using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
@@ -9,6 +10,7 @@ using TaleWorlds.SaveSystem;
 
 namespace CaptivityEvents.Issues
 {
+    // Quest Reference
     public class CEWhereAreMyThingsIssueBehavior : CampaignBehaviorBase
     {
         public override void RegisterEvents() { }
@@ -29,7 +31,11 @@ namespace CaptivityEvents.Issues
             protected override TextObject IssueQuestSolutionExplanationByIssueGiver => new TextObject("{=CEEVENTS1085}Well you can pay for it.");
             protected override TextObject IssueQuestSolutionAcceptByPlayer => new TextObject("{=CEEVENTS1084}Are you serious?");
 
-            public CEWhereAreMyThingsIssue(Hero issueOwner) : base(issueOwner, new Dictionary<IssueEffect, float>(), CampaignTime.DaysFromNow(25f)) { }
+            // 1.5.5
+            //public CEWhereAreMyThingsIssue(Hero issueOwner) : base(issueOwner, new Dictionary<IssueEffect, float>(), CampaignTime.DaysFromNow(25f)) { }
+
+            // 1.5.6
+            public CEWhereAreMyThingsIssue(Hero issueOwner) : base(issueOwner, CampaignTime.DaysFromNow(25f)) { }
 
             protected override void AfterIssueCreation() { }
 

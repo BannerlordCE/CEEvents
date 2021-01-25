@@ -1,10 +1,12 @@
-﻿using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Config;
+using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using Helpers;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 
 namespace CaptivityEvents.Models
 {
@@ -41,6 +43,8 @@ namespace CaptivityEvents.Models
             if (Hero.MainHero.Age < 18f)
             {
                 EndCaptivityAction.ApplyByReleasing(Hero.MainHero);
+                InformationManager.DisplayMessage(new InformationMessage(("Invalid Age: " + Hero.MainHero.Age), Colors.Gray));
+                CECustomHandler.ForceLogToFile("Underaged Player Detected. Age: " + Hero.MainHero.Age);
                 return "menu_captivity_end_by_party_removed";
             }
 
@@ -61,7 +65,6 @@ namespace CaptivityEvents.Models
                 PlayerCaptivity.LastCheckTime = CampaignTime.Now;
 
                 CECustomHandler.LogToFile("About to choose a settlement event!");
-                //PrintDebugInGameTextMessage("About to choose a settlement event!");
                 CEEvent captiveEvent = CEEventManager.ReturnWeightedChoiceOfEvents();
 
                 if (captiveEvent != null) return captiveEvent.Name;

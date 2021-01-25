@@ -15,7 +15,6 @@ namespace CaptivityEvents.Custom
         GiveXP,
         GiveGold,
         GiveCaptorGold,
-        ChangeClan,
         CaptiveMarryCaptor,
         ChangeGold,
         ChangeCaptorGold,
@@ -36,6 +35,7 @@ namespace CaptivityEvents.Custom
         ChangeCaptorSkill,
         ImpregnationRisk,
         ImpregnationHero,
+        ImpregnationByPlayer,
         AttemptEscape,
         Escape,
         Leave,
@@ -47,6 +47,8 @@ namespace CaptivityEvents.Custom
         PlayerIsNotBusy,
         PlayerAllowedCompanion,
         HuntPrisoners,
+        ReleaseRandomPrisoners,
+        ReleaseAllPrisoners,
         KillPrisoner,
         KillCaptor,
         KillRandomPrisoners,
@@ -119,11 +121,19 @@ namespace CaptivityEvents.Custom
         CaptorIsHero,
         CaptorGenderIsFemale,
         CaptorGenderIsMale,
+        CaptorHaveOffspring,
+        CaptorNotHaveOffspring,
         CaptorHaveSpouse,
         CaptorNotHaveSpouse,
+        CaptorOwnsCurrentSettlement,
+        CaptorOwnsNotCurrentSettlement,
+        CaptorFactionOwnsSettlement,
+        CaptorNeutralFactionOwnsSettlement,
+        CaptorEnemyFactionOwnsSettlement,
         HeroOwnedByNotable,
         HeroNotOwnedByNotable,
         HeroHaveOffspring,
+        HeroNotHaveOffspring,
         HeroHaveSpouse,
         HeroNotHaveSpouse,
         HeroIsPregnant,
@@ -135,7 +145,21 @@ namespace CaptivityEvents.Custom
         HeroIsOwned,
         HeroIsNotOwned,
         HeroOwnsFief,
+        HeroOwnsNoFief,
         HeroIsClanLeader,
+        HeroIsNotClanLeader,
+        HeroIsFactionLeader,
+        HeroIsNotFactionLeader,
+        HeroOwnsCurrentParty,
+        HeroOwnsNotCurrentParty,
+        HeroFactionOwnsParty,
+        HeroNeutralFactionOwnsParty,
+        HeroEnemyFactionOwnsParty,
+        HeroOwnsCurrentSettlement,
+        HeroOwnsNotCurrentSettlement,
+        HeroFactionOwnsSettlement,
+        HeroNeutralFactionOwnsSettlement,
+        HeroEnemyFactionOwnsSettlement,
         DeathAlternative,
         CaptureAlternative,
         DesertionAlternative,
@@ -146,12 +170,22 @@ namespace CaptivityEvents.Custom
         SeasonSummer,
         SeasonFall,
         CaptivesOutNumber,
-        HeroIsFactionLeader,
         PlayerIsNotBusy,
         PlayerAllowedCompanion,
+        PlayerOwnsBrothelInSettlement,
+        PlayerOwnsNotBrothelInSettlement,
         StripEnabled,
         StripDisabled,
         IgnoreAllOther,
+        CaptorIsNonHero,
+        CaptorIsNotPregnant,
+        CaptorIsPregnant,
+        CaptorOwnsNoFief,
+        CaptorOwnsFief,
+        CaptorIsNotClanLeader,
+        CaptorIsClanLeader,
+        CaptorIsFactionLeader,
+        CaptorIsNotFactionLeader,
     }
 
     [DebuggerStepThrough]
@@ -201,6 +235,98 @@ namespace CaptivityEvents.Custom
         public string EventUseConditions { get; set; }
     }
 
+    public class TerrianTypes
+    {
+        [XmlArrayItem("TerrianType", IsNullable = false)]
+        public string[] TerrianType { get; set; }
+    }
+
+    public class Companion
+    {
+        [XmlAttribute()]
+        public string Id { get; set; }
+
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Type { get; set; }
+
+        [XmlAttribute()]
+        public string Location { get; set; }
+
+        [XmlAttribute()]
+        public string UseOtherConditions { get; set; }
+
+        [XmlArrayItem("RestrictedListOfConsequences", IsNullable = false)]
+        public RestrictedListOfConsequences[] MultipleRestrictedListOfConsequences { get; set; }
+
+        [XmlElement(Form = XmlSchemaForm.Unqualified)]
+        public string PregnancyRiskModifier { get; set; }
+
+        public string GoldTotal { get; set; }
+
+        public string CaptorGoldTotal { get; set; }
+
+        public string MoraleTotal { get; set; }
+
+        public string RelationTotal { get; set; }
+
+        public string HealthTotal { get; set; }
+
+        public string RenownTotal { get; set; }
+
+        [XmlArrayItem("Trait", IsNullable = true)]
+        public TraitToLevel[] TraitsToLevel { get; set; }
+
+        [XmlArrayItem("Skill", IsNullable = true)]
+        public SkillToLevel[] SkillsToLevel { get; set; }
+
+        [XmlArrayItem("KingdomOption", IsNullable = true)]
+        public KingdomOption[] KingdomOptions { get; set; }
+
+        [XmlArrayItem("ClanOption", IsNullable = true)]
+        public ClanOption[] ClanOptions { get; set; }
+
+    }
+
+    public class TraitToLevel
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string ByXP { get; set; }
+
+        [XmlAttribute()]
+        public string ByLevel { get; set; }
+
+        [XmlAttribute()]
+        public string Id { get; set; }
+
+        [XmlAttribute()]
+        public string Color { get; set; }
+
+        [XmlAttribute()]
+        public bool HideNotification { get; set; }
+    }
+
+    public class TraitRequired
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Max { get; set; }
+
+        [XmlAttribute()]
+        public string Min { get; set; }
+
+        [XmlAttribute()]
+        public string Id { get; set; }
+    }
+
+
     public class SkillToLevel
     {
         [XmlAttribute()]
@@ -235,6 +361,21 @@ namespace CaptivityEvents.Custom
 
         [XmlAttribute()]
         public string Id { get; set; }
+    }
+
+    public class ClanOption
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Action { get; set; }
+
+        [XmlAttribute()]
+        public string Clan { get; set; }
+
+        [XmlAttribute()]
+        public bool HideNotification { get; set; }
     }
 
     public class KingdomOption
@@ -309,6 +450,8 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("RestrictedListOfConsequences", IsNullable = false)]
         public RestrictedListOfConsequences[] MultipleRestrictedListOfConsequences { get; set; }
+
+        public string SoundName { get; set; }
 
         [XmlElement(Form = XmlSchemaForm.Unqualified)]
         public string OptionText { get; set; }
@@ -451,6 +594,15 @@ namespace CaptivityEvents.Custom
         [XmlArrayItem("TriggerEvent", IsNullable = true)]
         public TriggerEvent[] TriggerEvents { get; set; }
 
+        [XmlArrayItem("TraitRequired", IsNullable = true)]
+        public TraitRequired[] TraitsRequired { get; set; }
+
+        [XmlArrayItem("Companion", IsNullable = true)]
+        public Companion[] Companions { get; set; }
+
+        [XmlArrayItem("Trait", IsNullable = true)]
+        public TraitToLevel[] TraitsToLevel { get; set; }
+
         [XmlArrayItem("Skill", IsNullable = true)]
         public SkillToLevel[] SkillsToLevel { get; set; }
 
@@ -468,6 +620,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("KingdomOption", IsNullable = true)]
         public KingdomOption[] KingdomOptions { get; set; }
+
+        [XmlArrayItem("ClanOption", IsNullable = true)]
+        public ClanOption[] ClanOptions { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -486,6 +641,8 @@ namespace CaptivityEvents.Custom
         public Background[] Backgrounds { get; set; }
 
         public string NotificationName { get; set; }
+
+        public string SoundName { get; set; }
 
         [XmlArrayItem("BackgroundName")]
         public List<string> BackgroundAnimation { get; set; }
@@ -655,8 +812,23 @@ namespace CaptivityEvents.Custom
         [XmlArrayItem("Skill", IsNullable = true)]
         public SkillToLevel[] SkillsToLevel { get; set; }
 
+        [XmlArrayItem("TraitRequired", IsNullable = true)]
+        public TraitRequired[] TraitsRequired { get; set; }
+
+        [XmlArrayItem("Trait", IsNullable = true)]
+        public TraitToLevel[] TraitsToLevel { get; set; }
+
+        [XmlArrayItem("Companion", IsNullable = true)]
+        public Companion[] Companions { get; set; }
+
+        [XmlArray("TerrianTypes")]
+        public TerrianTypes[] TerrianTypesRequirements { get; set; }
+
         [XmlIgnore]
         public CharacterObject Captive { get; set; }
+
+        [XmlIgnore]
+        public Dictionary<string, Hero> SavedCompanions { get; set; }
     }
 
     [DebuggerStepThrough]

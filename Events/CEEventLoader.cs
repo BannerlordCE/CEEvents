@@ -177,7 +177,7 @@ namespace CaptivityEvents.Events
                     listedEvent.Name + op.Order,
                     op.OptionText,
                     mcb.CaptorEventOptionGameMenu,
-                    mcb.CaptorConsequenceWaitGameMenu,
+                    mcb.CaptorConsequenceGameMenu,
                     false,
                     variablesLoader.GetIntFromXML(op.Order),
                     false);

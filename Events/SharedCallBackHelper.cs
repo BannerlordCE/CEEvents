@@ -1,12 +1,15 @@
-﻿using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Config;
+using CaptivityEvents.Custom;
 using CaptivityEvents.Issues;
 using Helpers;
+using SandBox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
+using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
@@ -87,26 +90,50 @@ namespace CaptivityEvents.Events
 
         internal void ConsequenceChangeTrait()
         {
-            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeTrait)) return;
-
             try
             {
                 int level = 0;
                 int xp = 0;
 
-                if (!string.IsNullOrEmpty(_option.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.TraitTotal);
-                else if (!string.IsNullOrEmpty(_option.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.TraitXPTotal);
-                else if (!string.IsNullOrEmpty(_listedEvent.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitTotal);
-                else if (!string.IsNullOrEmpty(_listedEvent.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitXPTotal);
-                else CECustomHandler.LogToFile("Missing Trait TraitTotal");
+                if (_option.TraitsToLevel != null && _option.TraitsToLevel.Count(TraitToLevel => TraitToLevel.Ref.ToLower() == "hero") != 0)
+                {
+                    foreach (TraitToLevel traitToLevel in _option.TraitsToLevel)
+                    {
+                        if (traitToLevel.Ref.ToLower() != "hero") continue;
+                        if (!traitToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!traitToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
 
-                if (!string.IsNullOrEmpty(_option.TraitToLevel)) _dynamics.TraitModifier(Hero.MainHero, _option.TraitToLevel, level, xp);
-                else if (!string.IsNullOrEmpty(_listedEvent.TraitToLevel)) _dynamics.TraitModifier(Hero.MainHero, _listedEvent.TraitToLevel, level, xp);
-                else CECustomHandler.LogToFile("Missing TraitToLevel");
+                        _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
+                    }
+                }
+                else if (_listedEvent.TraitsToLevel != null && _listedEvent.TraitsToLevel.Count(TraitsToLevel => TraitsToLevel.Ref.ToLower() == "hero") != 0)
+                {
+                    foreach (TraitToLevel traitToLevel in _listedEvent.TraitsToLevel)
+                    {
+                        if (traitToLevel.Ref.ToLower() != "hero") continue;
+                        if (!traitToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!traitToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+
+                        _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
+                    }
+                }
+                else
+                {
+                    if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeTrait)) return;
+
+                    if (!string.IsNullOrEmpty(_option.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.TraitTotal);
+                    else if (!string.IsNullOrEmpty(_option.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.TraitXPTotal);
+                    else if (!string.IsNullOrEmpty(_listedEvent.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitTotal);
+                    else if (!string.IsNullOrEmpty(_listedEvent.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitXPTotal);
+                    else CECustomHandler.LogToFile("Missing Trait TraitTotal");
+
+                    if (!string.IsNullOrEmpty(_option.TraitToLevel)) _dynamics.TraitModifier(Hero.MainHero, _option.TraitToLevel, level, xp);
+                    else if (!string.IsNullOrEmpty(_listedEvent.TraitToLevel)) _dynamics.TraitModifier(Hero.MainHero, _listedEvent.TraitToLevel, level, xp);
+                    else CECustomHandler.LogToFile("Missing TraitToLevel");
+                }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
         }
-
 
         internal void ConsequenceChangeSkill()
         {
@@ -172,7 +199,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid SlaveryTotal"); }
         }
-
 
         internal void ConsequenceSlaveryFlags()
         {
@@ -259,7 +285,6 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Missing HealthTotal"); }
         }
 
-
         internal void ConsequenceChangeMorale()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
@@ -267,24 +292,6 @@ namespace CaptivityEvents.Events
             PartyBase party = PlayerCaptivity.IsCaptive
                 ? PlayerCaptivity.CaptorParty //captive         
                 : PartyBase.MainParty; //random, captor
-
-            try
-            {
-                if (!string.IsNullOrEmpty(_option.MoraleTotal)) { _dynamics.MoraleChange(new CEVariablesLoader().GetIntFromXML(_option.MoraleTotal), party); }
-                else if (!string.IsNullOrEmpty(_listedEvent.MoraleTotal)) { _dynamics.MoraleChange(new CEVariablesLoader().GetIntFromXML(_listedEvent.MoraleTotal), party); }
-                else
-                {
-                    CECustomHandler.LogToFile("Missing MoralTotal");
-                    _dynamics.MoraleChange(MBRandom.RandomInt(-5, 5), party);
-                }
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid MoralTotal"); }
-        }
-
-        // TODO: Not being used anywhere
-        internal void ConsequenceChangeMorale(PartyBase party)
-        {
-            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
 
             try
             {
@@ -641,11 +648,69 @@ namespace CaptivityEvents.Events
 
         }
 
+        internal void ConsequencePlaySound()
+        {
+            try
+            {
+                if (CEPersistence.soundEvent != null)
+                {
+                    CEPersistence.soundEvent.Stop();
+                    CEPersistence.soundLoop = false;
+                }
+                if (_option.SoundName == null) return;
+                int soundIndex = SoundEvent.GetEventIdFromString(_option.SoundName);
+                if (soundIndex != -1) PlayMapSound(soundIndex);
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Missing ConsequencePlaySound");
+            }
+        }
+
+        internal void PlayMapSound(int soundIndex)
+        {
+            Campaign campaign = Campaign.Current;
+            Scene _mapScene = null;
+            if ((campaign?.MapSceneWrapper) != null)
+            {
+                _mapScene = ((MapScene)Campaign.Current.MapSceneWrapper).Scene;
+            }
+
+            CEPersistence.soundEvent = SoundEvent.CreateEvent(soundIndex, _mapScene);
+            CEPersistence.soundEvent.Play();
+        }
+
+        internal void ConsequencePlayEventSound(string SoundName)
+        {
+            try
+            {
+                if (CEPersistence.soundEvent != null)
+                {
+                    CEPersistence.soundEvent.Stop();
+                    CEPersistence.soundLoop = false;
+                }
+                if (SoundName == null) return;
+                int soundIndex = SoundEvent.GetEventIdFromString(SoundName);
+                if (soundIndex != -1) PlayMapSound(soundIndex);
+
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Missing ConsequencePlayEventSound");
+            }
+        }
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {
             try
             {
+                if (!CESettings.Instance.CustomBackgrounds)
+                {
+                    CEPersistence.animationPlayEvent = false;
+                    new CESubModule().LoadTexture(textureFlag);
+                    return;
+                }
+
                 if (_listedEvent.Backgrounds != null)
                 {
                     List<string> backgroundNames = new List<string>();

@@ -7,10 +7,11 @@ using MCM.Abstractions.Settings.Base.Global;
 using System;
 using System.Collections.Generic;
 
-namespace CaptivityEvents
+namespace CaptivityEvents.Config
 {
     public interface ICustomSettingsProvider
     {
+        bool IsHardCoded { get; }
         bool EventCaptiveOn { get; set; }
         float EventOccurrenceOther { get; set; }
         float EventOccurrenceSettlement { get; set; }
@@ -39,6 +40,7 @@ namespace CaptivityEvents
         bool PrisonerExceeded { get; set; }
         bool NonSexualContent { get; set; }
         bool SexualContent { get; set; }
+        bool CustomBackgrounds { get; set; }
         bool CommonControl { get; set; }
         bool ProstitutionControl { get; set; }
         bool SlaveryToggle { get; set; }
@@ -69,6 +71,7 @@ namespace CaptivityEvents
 
     public class HardcodedCustomSettings : ICustomSettingsProvider
     {
+        public bool IsHardCoded { get; } = true;
         public bool EventCaptiveOn { get; set; } = true;
         public float EventOccurrenceOther { get; set; } = 6f;
         public float EventOccurrenceSettlement { get; set; } = 6f;
@@ -106,6 +109,7 @@ namespace CaptivityEvents
         public bool PrisonerExceeded { get; set; } = false;
         public bool NonSexualContent { get; set; } = true;
         public bool SexualContent { get; set; } = true;
+        public bool CustomBackgrounds { get; set; } = true;
         public bool CommonControl { get; set; } = true;
         public bool ProstitutionControl { get; set; } = true;
         public bool SlaveryToggle { get; set; } = true;
@@ -150,6 +154,8 @@ namespace CaptivityEvents
 
             return basePresets;
         }
+
+        public bool IsHardCoded { get; } = false;
 
         [SettingPropertyBool("{=CESETTINGS1000}Turn on Captive Events", Order = 1, RequireRestart = true)]
         [SettingPropertyGroup("{=CESETTINGS0098}Captive")]
@@ -264,6 +270,9 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
         public bool PrisonerExceeded { get; set; } = false;
 
+        [SettingPropertyBool("{=CESETTINGS0086}Custom Backgrounds", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS0087}Should custom backgrounds be disabled.")]
+        [SettingPropertyGroup("{=CESETTINGS0085}Pictures")]
+        public bool CustomBackgrounds { get; set; } = true;
         // WILL BE REMOVED STARTS
 
         [SettingPropertyBool("{=CESETTINGS1030}Non Sexual Content", Order = 1, RequireRestart = false, HintText = "{=CESETTINGS1031}Should non sexual content events be enabled.")]
@@ -274,27 +283,27 @@ namespace CaptivityEvents
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool SexualContent { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1028}Common Events", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1029}Should events tagged with common be enabled.")]
+        [SettingPropertyBool("{=CESETTINGS1028}Common Events", Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1029}Should events tagged with common be enabled.")]
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool CommonControl { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1034}Prostitution Events", Order = 4, RequireRestart = true, HintText = "{=CESETTINGS1035}Should Prostitution events be enabled. Enables Brothel.")]
+        [SettingPropertyBool("{=CESETTINGS1034}Prostitution Events", Order = 5, RequireRestart = true, HintText = "{=CESETTINGS1035}Should Prostitution events be enabled. Enables Brothel.")]
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool ProstitutionControl { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1042}Slavery Events", Order = 5, RequireRestart = false, HintText = "{=CESETTINGS1043}Should Slavery events be enabled.")]
+        [SettingPropertyBool("{=CESETTINGS1042}Slavery Events", Order = 6, RequireRestart = false, HintText = "{=CESETTINGS1043}Should Slavery events be enabled.")]
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool SlaveryToggle { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1036}Femdom Events", Order = 6, RequireRestart = false, HintText = "{=CESETTINGS1037}Should Female Domination events be enabled.")]
+        [SettingPropertyBool("{=CESETTINGS1036}Femdom Events", Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1037}Should Female Domination events be enabled.")]
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool FemdomControl { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1038}Bestiality Events", Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1039}Should Bestiality events be enabled.")]
+        [SettingPropertyBool("{=CESETTINGS1038}Bestiality Events", Order = 8, RequireRestart = false, HintText = "{=CESETTINGS1039}Should Bestiality events be enabled.")]
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool BestialityControl { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1040}Romance Events", Order = 8, RequireRestart = false, HintText = "{=CESETTINGS1041}Should Romance events be enabled.")]
+        [SettingPropertyBool("{=CESETTINGS1040}Romance Events", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1041}Should Romance events be enabled.")]
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool RomanceControl { get; set; } = true;
 
@@ -424,6 +433,7 @@ namespace CaptivityEvents
                     _provider.PrisonerExceeded = customSettings.PrisonerExceeded;
                     _provider.NonSexualContent = customSettings.NonSexualContent;
                     _provider.SexualContent = customSettings.SexualContent;
+                    _provider.CustomBackgrounds = customSettings.CustomBackgrounds;
                     _provider.CommonControl = customSettings.CommonControl;
                     _provider.ProstitutionControl = customSettings.ProstitutionControl;
                     _provider.SlaveryToggle = customSettings.SlaveryToggle;

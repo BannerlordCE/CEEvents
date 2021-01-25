@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Config;
+using CaptivityEvents.Custom;
 using Helpers;
 using System;
 using System.Reflection;
@@ -69,7 +70,7 @@ namespace CaptivityEvents.Events
             MarriageAction.Apply(hero, spouseHero);
         }
 
-        private void TraitObjectModifier(TraitObject traitObject, Color color, Hero hero, string trait, int amount, int xp)
+        private void TraitObjectModifier(TraitObject traitObject, Color color, Hero hero, string trait, int amount, int xp, bool display)
         {
 
             if (xp == 0)
@@ -81,10 +82,9 @@ namespace CaptivityEvents.Events
 
                 hero.SetTraitLevel(traitObject, newNumber);
 
+                if (!display) return;
                 TextObject textObject = GameTexts.FindText("str_CE_trait_level");
-
                 textObject.SetTextVariable("POSITIVE", newNumber >= 0 ? 1 : 0);
-
                 textObject.SetTextVariable("TRAIT", CEStrings.FetchTraitString(trait));
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
 
@@ -97,7 +97,7 @@ namespace CaptivityEvents.Events
 
         }
 
-        internal void TraitModifier(Hero hero, string trait, int amount, int xp)
+        internal void TraitModifier(Hero hero, string trait, int amount, int xp, bool display = true, string color = "gray")
         {
             bool found = false;
 
@@ -106,7 +106,7 @@ namespace CaptivityEvents.Events
                 if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                 {
                     found = true;
-                    TraitObjectModifier(traitObject, Colors.Magenta, hero, trait, amount, xp);
+                    TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
                 }
             }
 
@@ -117,7 +117,7 @@ namespace CaptivityEvents.Events
                     if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                     {
                         found = true;
-                        TraitObjectModifier(traitObject, Colors.Gray, hero, trait, amount, xp);
+                        TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
                     }
                 }
             }
@@ -130,7 +130,7 @@ namespace CaptivityEvents.Events
                     if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                     {
                         found = true;
-                        TraitObjectModifier(traitObject, Colors.Blue, hero, trait, amount, xp);
+                        TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
                     }
                 }
 
@@ -420,6 +420,201 @@ namespace CaptivityEvents.Events
             }
         }
 
+        internal void ClanOption(Hero firstHero, Clan newClan, bool showNotification = false, bool setLeader = false, bool adopt = false)
+        {
+            if (firstHero.Clan != newClan)
+            {
+                Clan clan = firstHero.Clan;
+                PropertyInfo pi = Campaign.Current.GetType().GetProperty("PlayerDefaultFaction", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                try
+                {
+                    if (firstHero.GovernorOf != null)
+                    {
+                        ChangeGovernorAction.ApplyByGiveUpCurrent(firstHero);
+                    }
+                    if (firstHero.PartyBelongedTo != null && clan != null && !firstHero.IsHumanPlayerCharacter)
+                    {
+
+                        if (clan.Kingdom != newClan.Kingdom)
+                        {
+                            if (firstHero.PartyBelongedTo.Army != null)
+                            {
+                                if (firstHero.PartyBelongedTo.Army.LeaderParty == firstHero.PartyBelongedTo)
+                                {
+                                    firstHero.PartyBelongedTo.Army.DisperseArmy(Army.ArmyDispersionReason.Unknown);
+                                }
+                                else
+                                {
+                                    firstHero.PartyBelongedTo.Army = null;
+                                }
+                            }
+                            IFaction kingdom = newClan.Kingdom;
+                            FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(firstHero, kingdom ?? newClan);
+                        }
+
+                        DisbandPartyAction.ApplyDisband(firstHero.PartyBelongedTo);
+                        if (firstHero.PartyBelongedTo != null)
+                        {
+                            firstHero.PartyBelongedTo.Party.Owner = null;
+                        }
+                        firstHero.ChangeState(Hero.CharacterStates.Fugitive);
+                        MobileParty partyBelongedTo = firstHero.PartyBelongedTo;
+                        if (partyBelongedTo != null)
+                        {
+                            partyBelongedTo.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default, 0);
+                        }
+                    }
+                    firstHero.Clan = newClan;
+                    if (pi != null && firstHero.IsHumanPlayerCharacter) pi.SetValue(Campaign.Current, newClan);
+                    if (clan != null)
+                    {
+                        foreach (Hero hero3 in clan.Heroes)
+                        {
+                            hero3.UpdateHomeSettlement();
+                        }
+                    }
+                    foreach (Hero hero4 in newClan.Heroes)
+                    {
+                        hero4.UpdateHomeSettlement();
+                    }
+                    if (adopt)
+                    {
+                        if (newClan.Leader.IsFemale)
+                        {
+                            firstHero.Mother = newClan.Leader;
+                            firstHero.Father = newClan.Leader.Spouse;
+                        }
+                        else
+                        {
+                            firstHero.Father = newClan.Leader;
+                            firstHero.Mother = newClan.Leader.Spouse;
+                        }
+                    }
+                    if (setLeader)
+                    {
+                        if (firstHero.IsHumanPlayerCharacter)
+                        {
+                            ChangeClanLeaderAction.ApplyWithSelectedNewLeader(newClan, firstHero);
+                        }
+                        else
+                        {
+                            newClan.SetLeader(firstHero);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    firstHero.Clan = clan;
+                    if (pi != null && firstHero.IsHumanPlayerCharacter) pi.SetValue(Campaign.Current, clan);
+                }
+            }
+        }
+
+        internal void ClanChange(ClanOption[] clanOptions, Hero hero = null, Hero captor = null)
+        {
+            foreach (ClanOption clanOption in clanOptions)
+            {
+                try
+                {
+                    Clan clan = null;
+                    TextObject clanName = null;
+                    Banner banner = null;
+                    Hero leader = null;
+
+
+                    if (clanOption.Clan != null)
+                    {
+                        switch (clanOption.Clan.ToLower())
+                        {
+                            case "new":
+                                // 1.5.5
+                                //clanName = new TextObject(clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement());
+
+                                // 1.5.6
+                                clanName = clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement();
+
+                                banner = Banner.CreateRandomClanBanner();
+                                leader = clanOption.Ref.ToLower() == "captor" ? captor : hero;
+                                break;
+                            case "random":
+                                clan = Clan.All.GetRandomElement();
+                                break;
+                            case "hero":
+                                clan = hero.Clan;
+                                if (clan == null)
+                                {
+                                    clanName = new TextObject(hero.Name + "'s Slaves");
+                                    banner = Banner.CreateRandomClanBanner();
+                                    leader = hero;
+                                }
+                                break;
+                            case "captor":
+                                clan = captor.Clan;
+                                if (clan == null)
+                                {
+                                    clanName = new TextObject(captor.Name + "'s Slaves");
+                                    banner = Banner.CreateRandomClanBanner();
+                                    leader = captor;
+                                }
+                                break;
+                            case "settlement":
+                                clan = clanOption.Ref.ToLower() == "captor" ? captor.CurrentSettlement.OwnerClan : hero.CurrentSettlement.OwnerClan;
+                                break;
+                        }
+                    }
+
+                    if (clan == null)
+                    {
+
+
+                        if (clanOption.Ref.ToLower() == "captor")
+                        {
+                            if (captor.Clan != null)
+                            {
+                                PropertyInfo pi = captor.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                                captor.Clan.Name = clanName;
+                                captor.Clan.InformalName = clanName;
+                                if (pi != null) pi.SetValue(captor.Clan, banner);
+                                captor.Clan.SetLeader(leader);
+                            }
+                        }
+                        else if (hero.Clan != null)
+                        {
+                            PropertyInfo pi = hero.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                            hero.Clan.Name = clanName;
+                            hero.Clan.InformalName = clanName;
+                            if (pi != null) pi.SetValue(hero.Clan, banner);
+                            hero.Clan.SetLeader(leader);
+
+                        }
+                        CECustomHandler.ForceLogToFile("Failed ClanChange : clan is null ");
+                        return;
+                    }
+
+                    switch (clanOption.Action.ToLower())
+                    {
+                        case "join":
+                            ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, !clanOption.HideNotification);
+                            break;
+                        case "joinasleader":
+                            ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, !clanOption.HideNotification, true);
+                            break;
+                        case "adopted":
+                            ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, !clanOption.HideNotification, false, true);
+                            break;
+                        case "adoptedasleader":
+                            ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, !clanOption.HideNotification, false, true);
+                            break;
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    CECustomHandler.ForceLogToFile("Failed ClanChange " + e);
+                }
+            }
+        }
+
         internal void KingdomChange(KingdomOption[] kingdomOptions, Hero hero = null, Hero captor = null)
         {
             foreach (KingdomOption kingdomOption in kingdomOptions)
@@ -522,16 +717,5 @@ namespace CaptivityEvents.Events
             if (quickInformationMessage) InformationManager.AddQuickInformation(textObject, 0, hero1.CharacterObject, "event:/ui/notification/relation");
             if (regularMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
         }
-
-        internal void ChangeClan(Hero hero, Hero owner)
-        {
-            if (hero == null) return;
-
-            if (owner != null)
-            {
-                hero.Clan = owner.Clan;
-            }
-        }
-
     }
 }

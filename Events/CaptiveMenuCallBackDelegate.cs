@@ -19,6 +19,7 @@ namespace CaptivityEvents.Events
         private readonly List<CEEvent> _eventList;
         private readonly Option _option;
         private readonly SharedCallBackHelper _sharedCallBackHelper;
+        private readonly CECompanionSystem _companionSystem;
 
         private readonly Dynamics _dynamics = new Dynamics();
         private readonly ScoresCalculation _score = new ScoresCalculation();
@@ -34,6 +35,7 @@ namespace CaptivityEvents.Events
             _listedEvent = listedEvent;
             _eventList = eventList;
             _sharedCallBackHelper = new SharedCallBackHelper(listedEvent, null, eventList);
+            _companionSystem = new CECompanionSystem(listedEvent, null, eventList);
         }
 
         internal CaptiveMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
@@ -42,6 +44,7 @@ namespace CaptivityEvents.Events
             _option = option;
             _eventList = eventList;
             _sharedCallBackHelper = new SharedCallBackHelper(listedEvent, option, eventList);
+            _companionSystem = new CECompanionSystem(listedEvent, option, eventList);
         }
 
         internal void CaptiveProgressInitWaitGameMenu(MenuCallbackArgs args)
@@ -51,6 +54,7 @@ namespace CaptivityEvents.Events
                                        : "wait_captive_male");
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
+            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
 
             SetCaptiveTextVariables(ref args);
 
@@ -126,6 +130,7 @@ namespace CaptivityEvents.Events
             }
 
             _sharedCallBackHelper.LoadBackgroundImage("default");
+            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
 
             if (PlayerCaptivity.IsCaptive) SetCaptiveTextVariables(ref args);
 
@@ -203,6 +208,7 @@ namespace CaptivityEvents.Events
         internal void CaptiveEventGameMenu(MenuCallbackArgs args)
         {
             _sharedCallBackHelper.LoadBackgroundImage();
+            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
             SetCaptiveTextVariables(ref args);
         }
 
@@ -259,7 +265,9 @@ namespace CaptivityEvents.Events
             _sharedCallBackHelper.ConsequenceChangeHealth();
             _sharedCallBackHelper.ConsequenceChangeMorale();
             _sharedCallBackHelper.ConsequenceStripPlayer();
+            _sharedCallBackHelper.ConsequencePlaySound();
 
+            ConsequenceCompanions();
             ConsequenceSpawnTroop();
             ConsequenceSpawnHero();
             ConsequenceForceMarry();
@@ -284,6 +292,17 @@ namespace CaptivityEvents.Events
 
 
         #region private
+        private void ConsequenceCompanions()
+        {
+            try
+            {
+                _companionSystem.ConsequenceCompanions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.LogToFile("ConsequenceCaptiveCompanions. Failed" + e.ToString());
+            }
+        }
 
         private void ConsequenceKillCaptor()
         {
@@ -666,22 +685,47 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceSpecificCaptorTrait(Hero hero)
         {
-            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorTrait)) return;
-
             try
             {
                 int level = 0;
                 int xp = 0;
 
-                if (!string.IsNullOrEmpty(_option.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.TraitTotal);
-                else if (!string.IsNullOrEmpty(_option.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.TraitXPTotal);
-                else if (!string.IsNullOrEmpty(_listedEvent.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitTotal);
-                else if (!string.IsNullOrEmpty(_listedEvent.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitXPTotal);
-                else CECustomHandler.LogToFile("Missing Trait TraitTotal");
+                if (_option.TraitsToLevel != null && _option.TraitsToLevel.Count(TraitToLevel => TraitToLevel.Ref.ToLower() == "captor") != 0)
+                {
+                    foreach (TraitToLevel traitToLevel in _option.TraitsToLevel)
+                    {
+                        if (traitToLevel.Ref.ToLower() != "captor") continue;
+                        if (!traitToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!traitToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
 
-                if (!string.IsNullOrEmpty(_option.TraitToLevel)) _dynamics.TraitModifier(hero, _option.TraitToLevel, level, xp);
-                else if (!string.IsNullOrEmpty(_listedEvent.TraitToLevel)) _dynamics.TraitModifier(hero, _listedEvent.TraitToLevel, level, xp);
-                else CECustomHandler.LogToFile("Missing TraitToLevel");
+                        _dynamics.TraitModifier(hero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
+                    }
+                }
+                else if (_listedEvent.TraitsToLevel != null && _listedEvent.TraitsToLevel.Count(TraitsToLevel => TraitsToLevel.Ref.ToLower() == "captor") != 0)
+                {
+                    foreach (TraitToLevel traitToLevel in _listedEvent.TraitsToLevel)
+                    {
+                        if (traitToLevel.Ref.ToLower() != "captor") continue;
+                        if (!traitToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!traitToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+
+                        _dynamics.TraitModifier(hero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
+                    }
+                }
+                else
+                {
+                    if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorTrait)) return;
+
+                    if (!string.IsNullOrEmpty(_option.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.TraitTotal);
+                    else if (!string.IsNullOrEmpty(_option.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.TraitXPTotal);
+                    else if (!string.IsNullOrEmpty(_listedEvent.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitTotal);
+                    else if (!string.IsNullOrEmpty(_listedEvent.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitXPTotal);
+                    else CECustomHandler.LogToFile("Missing Trait TraitTotal");
+
+                    if (!string.IsNullOrEmpty(_option.TraitToLevel)) _dynamics.TraitModifier(hero, _option.TraitToLevel, level, xp);
+                    else if (!string.IsNullOrEmpty(_listedEvent.TraitToLevel)) _dynamics.TraitModifier(hero, _listedEvent.TraitToLevel, level, xp);
+                    else CECustomHandler.LogToFile("Missing TraitToLevel");
+                }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
         }
@@ -786,10 +830,11 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceChangeClan()
         {
-            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeClan)) return;
+            if (_option.ClanOptions == null) return;
 
-            if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.LeaderHero != null) _dynamics.ChangeClan(Hero.MainHero, PlayerCaptivity.CaptorParty.LeaderHero);
-            else if (PlayerCaptivity.CaptorParty != null && CECampaignBehavior.ExtraProps.Owner != null) _dynamics.ChangeClan(Hero.MainHero, CECampaignBehavior.ExtraProps.Owner);
+            if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.LeaderHero != null) _dynamics.ClanChange(_option.ClanOptions, Hero.MainHero, PlayerCaptivity.CaptorParty.LeaderHero);
+            else if (CECampaignBehavior.ExtraProps.Owner != null) _dynamics.ClanChange(_option.ClanOptions, Hero.MainHero, CECampaignBehavior.ExtraProps.Owner);
+            else _dynamics.ClanChange(_option.ClanOptions, Hero.MainHero, null);
         }
 
         private void ConsequenceChangeKingdom()
