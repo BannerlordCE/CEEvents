@@ -41,6 +41,7 @@ namespace CaptivityEvents.Config
             ISettingsBuilder builder = BaseSettingsBuilder.Create("CaptivityEventsCustomEvents", "Captivity Events Optional Events");
 
             EventToggle = new Dictionary<string, bool>();
+            EventSettings = new Dictionary<string, CESettingsEvent>();
 
             if (builder != null)
             {
