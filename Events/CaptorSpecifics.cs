@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿#define BETA
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using HarmonyLib;

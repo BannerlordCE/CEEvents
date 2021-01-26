@@ -16,7 +16,7 @@ namespace CaptivityEvents
 
         public static SkillObject IsSlave => CustomSkills[_StartDefaultSkillNode + 3];
 
-        public static bool IsInitialized => _Initialized;
+        public static bool IsInitialized { get; private set; } = false;
 
         internal static List<SkillObject> CustomSkills { get; private set; }
 
@@ -25,9 +25,6 @@ namespace CaptivityEvents
         private static int _StartDefaultSkillNode = 0;
 
         private static readonly List<CESkillNode> _Skills = new List<CESkillNode>();
-
-        private static bool _Initialized;
-
 
         public static void AddCustomSkill(CESkillNode skillNode) => _Skills.Add(skillNode);
 
@@ -98,7 +95,7 @@ namespace CaptivityEvents
                 CustomSkills[i].Initialize(new TextObject(_Skills[i].Name), new TextObject(_Skills[i].Name), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEAttribute);
             }
 
-            _Initialized = true;
+            IsInitialized = true;
         }
     }
 }

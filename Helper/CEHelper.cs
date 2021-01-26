@@ -1,4 +1,4 @@
-﻿//#define BETA
+﻿#define BETA
 using CaptivityEvents.Custom;
 using System;
 using System.Collections.Generic;

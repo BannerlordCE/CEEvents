@@ -2,15 +2,15 @@
 <Module>
   <Name value="Captivity Events" />
   <Id value="zCaptivityEvents" />
-  <Version value="v1.5.6.1025" />
+  <Version value="v1.5.7.1025" />
   <SingleplayerModule value="true" />
   <MultiplayerModule value="false" />
   <DependedModules>
-    <DependedModule Id="Native" DependentVersion="e1.5.6" />
-    <DependedModule Id="SandBoxCore" DependentVersion="e1.5.6" />
-    <DependedModule Id="Sandbox" DependentVersion="e1.5.6" />
-    <DependedModule Id="CustomBattle" DependentVersion="e1.5.6" />
-    <DependedModule Id="StoryMode" DependentVersion="e1.5.6" />
+    <DependedModule Id="Native" DependentVersion="e1.5.7" />
+    <DependedModule Id="SandBoxCore" DependentVersion="e1.5.7" />
+    <DependedModule Id="Sandbox" DependentVersion="e1.5.7" />
+    <DependedModule Id="CustomBattle" DependentVersion="e1.5.7" />
+    <DependedModule Id="StoryMode" DependentVersion="e1.5.7" />
   </DependedModules>
   <SubModules>
     <SubModule>

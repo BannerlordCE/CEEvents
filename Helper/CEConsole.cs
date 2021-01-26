@@ -1,4 +1,4 @@
-﻿//#define BETA
+﻿#define BETA
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;

@@ -1997,7 +1997,8 @@ namespace CaptivityEvents.Events
                             }
                             else
                             {
-                                _listEvent.WeightedChanceOfOccuring = _listEvent.OldWeightedChanceOfOccuring;
+
+                                if (_listEvent.OldWeightedChanceOfOccuring != null) _listEvent.WeightedChanceOfOccuring = _listEvent.OldWeightedChanceOfOccuring;
                             }
 
                             if (!eventSettingFound.Value.BackgroundName.Equals(""))
@@ -2007,7 +2008,7 @@ namespace CaptivityEvents.Events
                             }
                             else
                             {
-                                _listEvent.BackgroundName = _listEvent.OldBackgroundName;
+                                if (_listEvent.OldWeightedChanceOfOccuring != null) _listEvent.BackgroundName = _listEvent.OldBackgroundName;
                             }
                         }
                     }
