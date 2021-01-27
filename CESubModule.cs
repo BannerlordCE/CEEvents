@@ -459,6 +459,15 @@ namespace CaptivityEvents
                       );
                 }
 
+                if (CESettingsIntegrations.Instance == null)
+                {
+                    CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsIntegrations missing MCMv4");
+                }
+                else
+                {
+                    CESettingsIntegrations.Instance.InitializeSettings();
+                }
+
                 if (CESettingsFlags.Instance == null)
                 {
                     CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsFlags missing MCMv4");

@@ -234,13 +234,19 @@ namespace CaptivityEvents.Custom
     [Serializable]
     public class StripSettings
     {
+        [XmlAttribute()]
         public bool Forced { get; set; }
 
+        [XmlAttribute()]
         public bool QuestEnabled { get; set; }
 
         public string Clothing { get; set; }
 
         public string Mount { get; set; }
+
+        public string Melee { get; set; }
+
+        public string Ranged { get; set; }
     }
 
     [DebuggerStepThrough]

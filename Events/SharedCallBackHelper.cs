@@ -311,24 +311,30 @@ namespace CaptivityEvents.Events
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StripPlayer)) return;
 
             bool forced = false, questEnabled = true;
-            string clothingLevel = "Default";
-            string mountLevel = "Default";
+            string clothingLevel = "default";
+            string mountLevel = "default";
+            string meleeLevel = "default";
+            string rangedLevel = "default";
 
             if (_option.StripSettings != null)
             {
                 forced = _option.StripSettings.Forced;
                 questEnabled = _option.StripSettings.QuestEnabled || true;
-                clothingLevel = _option.StripSettings.Clothing.IsStringNoneOrEmpty() ? "Default" : _option.StripSettings.Clothing;
-                mountLevel = _option.StripSettings.Mount.IsStringNoneOrEmpty() ? "Default" : _option.StripSettings.Clothing;
+                clothingLevel = _option.StripSettings.Clothing.IsStringNoneOrEmpty() ? "default" : _option.StripSettings.Clothing.ToLower();
+                mountLevel = _option.StripSettings.Mount.IsStringNoneOrEmpty() ? "default" : _option.StripSettings.Mount.ToLower();
+                meleeLevel = _option.StripSettings.Melee.IsStringNoneOrEmpty() ? "default" : _option.StripSettings.Melee.ToLower();
+                rangedLevel = _option.StripSettings.Ranged.IsStringNoneOrEmpty() ? "default" : _option.StripSettings.Ranged.ToLower();
             }
+
+            if (CESettingsIntegrations.Instance == null && clothingLevel == "slave" || !CESettingsIntegrations.Instance.ActivateKLBShackles && clothingLevel == "slave") return;
 
             if (CESettings.Instance != null && !CESettings.Instance.StolenGear && !forced) return;
             Equipment randomElement = new Equipment(false);
 
-            if (clothingLevel != "Nude")
+            if (clothingLevel != "nude")
             {
 
-                if (CESettings.Instance != null && MBRandom.Random.Next(100) < CESettings.Instance.BetterOutFitChance && clothingLevel != "Basic" || clothingLevel == "Advanced")
+                if (MBRandom.Random.Next(100) < CESettings.Instance.BetterOutFitChance && clothingLevel == "default" || clothingLevel == "advanced")
                 {
                     string bodyString = "";
                     string legString = "";
@@ -466,87 +472,101 @@ namespace CaptivityEvents.Events
                         randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Gloves, new EquipmentElement(itemObjectGloves));
                     }
                 }
+                else if (clothingLevel == "slave")
+                {
+                    ItemObject itemObjectLeg = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth2");
+                    randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Leg, new EquipmentElement(itemObjectLeg));
+
+                    ItemObject itemObjectCape = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth3");
+                    randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Cape, new EquipmentElement(itemObjectCape));
+
+                    ItemObject itemObjectGloves = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth1");
+                    randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Gloves, new EquipmentElement(itemObjectGloves));
+                }
                 else
                 {
                     ItemObject itemObjectBody = Hero.MainHero.IsFemale
                         ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
                         : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
-                }
+                }         
+            }
 
-                if (CESettings.Instance != null && MBRandom.Random.Next(100) < CESettings.Instance.WeaponChance)
+            if (meleeLevel != "none" || meleeLevel == "default" && MBRandom.Random.Next(100) < CESettings.Instance.WeaponChance)
+            {
+                string item;
+
+                if (MBRandom.Random.Next(100)
+                    < (CESettings.Instance.WeaponSkill
+                        ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.OneHanded) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.TwoHanded) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Polearm) / 275 * 100))
+                        : CESettings.Instance.WeaponChance) && meleeLevel == "Default" || meleeLevel == "Advanced")
                 {
-                    string item;
-
-                    if (MBRandom.Random.Next(100)
-                        < (CESettings.Instance.WeaponSkill
-                            ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.OneHanded) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.TwoHanded) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Polearm) / 275 * 100))
-                            : CESettings.Instance.WeaponChance))
+                    switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
                     {
-                        switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
-                        {
-                            case CultureCode.Sturgia:
-                                item = "sturgia_axe_3_t3";
-                                break;
-                            case CultureCode.Aserai:
-                                item = "eastern_spear_1_t2";
-                                break;
-                            case CultureCode.Empire:
-                                item = "northern_spear_1_t2";
-                                break;
-                            case CultureCode.Battania:
-                                item = "aserai_sword_1_t2";
-                                break;
-                            case CultureCode.Invalid:
-                            case CultureCode.Vlandia:
-                            case CultureCode.Khuzait:
-                            case CultureCode.Nord:
-                            case CultureCode.Darshi:
-                            case CultureCode.Vakken:
-                            case CultureCode.AnyOtherCulture:
-                            default:
-                                item = "vlandia_sword_1_t2";
-                                break;
-                        }
+                        case CultureCode.Sturgia:
+                            item = "sturgia_axe_3_t3";
+                            break;
+                        case CultureCode.Aserai:
+                            item = "eastern_spear_1_t2";
+                            break;
+                        case CultureCode.Empire:
+                            item = "northern_spear_1_t2";
+                            break;
+                        case CultureCode.Battania:
+                            item = "aserai_sword_1_t2";
+                            break;
+                        case CultureCode.Invalid:
+                        case CultureCode.Vlandia:
+                        case CultureCode.Khuzait:
+                        case CultureCode.Nord:
+                        case CultureCode.Darshi:
+                        case CultureCode.Vakken:
+                        case CultureCode.AnyOtherCulture:
+                        default:
+                            item = "vlandia_sword_1_t2";
+                            break;
                     }
-                    else
+                }
+                else
+                {
+                    switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
                     {
-                        switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
-                        {
-                            case CultureCode.Sturgia:
-                                item = "seax";
-                                break;
-                            case CultureCode.Aserai:
-                                item = "celtic_dagger";
-                                break;
-                            case CultureCode.Empire:
-                                item = "gladius_b";
-                                break;
-                            case CultureCode.Battania:
-                                item = "hooked_cleaver";
-                                break;
-                            case CultureCode.Invalid:
-                            case CultureCode.Vlandia:
-                            case CultureCode.Khuzait:
-                            case CultureCode.Nord:
-                            case CultureCode.Darshi:
-                            case CultureCode.Vakken:
-                            case CultureCode.AnyOtherCulture:
-                            default:
-                                item = "seax";
-                                break;
-                        }
+                        case CultureCode.Sturgia:
+                            item = "seax";
+                            break;
+                        case CultureCode.Aserai:
+                            item = "celtic_dagger";
+                            break;
+                        case CultureCode.Empire:
+                            item = "gladius_b";
+                            break;
+                        case CultureCode.Battania:
+                            item = "hooked_cleaver";
+                            break;
+                        case CultureCode.Invalid:
+                        case CultureCode.Vlandia:
+                        case CultureCode.Khuzait:
+                        case CultureCode.Nord:
+                        case CultureCode.Darshi:
+                        case CultureCode.Vakken:
+                        case CultureCode.AnyOtherCulture:
+                        default:
+                            item = "seax";
+                            break;
                     }
-
-                    ItemObject itemObjectWeapon0 = MBObjectManager.Instance.GetObject<ItemObject>(item);
-                    randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Weapon0, new EquipmentElement(itemObjectWeapon0));
                 }
 
-                if (CESettings.Instance != null && (MBRandom.Random.Next(100) < CESettings.Instance.WeaponChance
+                ItemObject itemObjectWeapon0 = MBObjectManager.Instance.GetObject<ItemObject>(item);
+                randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Weapon0, new EquipmentElement(itemObjectWeapon0));
+            }
+
+            if (rangedLevel != "none")
+            {
+                if (CESettings.Instance != null && MBRandom.Random.Next(100) < CESettings.Instance.WeaponChance
                                                     && MBRandom.Random.Next(100)
                                                     < (CESettings.Instance.RangedSkill
                                                         ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.Bow) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.Crossbow) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Throwing) / 275 * 100))
-                                                        : CESettings.Instance.RangedBetterChance)))
+                                                        : CESettings.Instance.RangedBetterChance) && rangedLevel == "default" || rangedLevel == "advanced")
                 {
                     string rangedItem;
                     string rangedAmmo = null;
@@ -607,7 +627,7 @@ namespace CaptivityEvents.Events
             if (CESettings.Instance != null && MBRandom.Random.Next(100)
                 < (CESettings.Instance.HorseSkill
                     ? Hero.MainHero.GetSkillValue(DefaultSkills.Riding) / 275 * 100
-                    : CESettings.Instance.HorseChance) && mountLevel != "None" || mountLevel == "Basic")
+                    : CESettings.Instance.HorseChance) && mountLevel == "default" || mountLevel == "basic")
             {
                 ItemObject poorHorse = MBObjectManager.Instance.GetObject<ItemObject>("sumpter_horse");
                 EquipmentElement horseEquipment = new EquipmentElement(poorHorse);

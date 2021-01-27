@@ -77,6 +77,7 @@
     <Compile Include="Brothel\CEBrothelClanFinanceItemVM.cs" />
     <Compile Include="Brothel\CEBrothelToolTip.cs" />
     <Compile Include="CampaignBehaviors\CECampaignBehavior.cs" />
+    <Compile Include="Config\CESettingsIntegrations.cs" />
     <Compile Include="Config\CEManagedOptionTypesVM.cs" />
     <Compile Include="Config\CESettingsEvents.cs" />
     <Compile Include="Config\CESettingsFlags.cs" />

@@ -45,7 +45,7 @@ namespace CaptivityEvents.Config
 
             if (builder != null)
             {
-                builder.SetFormat("json2").SetFolderName("zCaptivityEvents").SetSubFolder("EventSettings");
+                builder.SetFormat("json2").SetFolderName("Global").SetSubFolder("zCaptivityEvents");
 
                 foreach (CECustomModule module in moduleCustoms)
                 {
