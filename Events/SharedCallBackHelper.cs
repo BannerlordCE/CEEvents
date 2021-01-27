@@ -474,13 +474,13 @@ namespace CaptivityEvents.Events
                 }
                 else if (clothingLevel == "slave")
                 {
-                    ItemObject itemObjectLeg = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth2");
+                    ItemObject itemObjectLeg = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth2a");
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Leg, new EquipmentElement(itemObjectLeg));
 
-                    ItemObject itemObjectCape = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth3");
+                    ItemObject itemObjectCape = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth3a");
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Cape, new EquipmentElement(itemObjectCape));
 
-                    ItemObject itemObjectGloves = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth1");
+                    ItemObject itemObjectGloves = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth1a");
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Gloves, new EquipmentElement(itemObjectGloves));
                 }
                 else

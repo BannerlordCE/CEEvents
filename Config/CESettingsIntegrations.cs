@@ -33,33 +33,34 @@ namespace CaptivityEvents.Config
 
         public void InitializeSettings()
         {
-            ISettingsBuilder builder = BaseSettingsBuilder.Create("CESettingsIntegrations", "Captivity Events Integrations");
-
             bool shouldRegister = false;
+
+#if BETA
+            ModuleInfo KLBShackles = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "KLBShackles"; });
+#else
+            ModuleInfo KLBShackles = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
+#endif
+
+            if (KLBShackles != null) shouldRegister = true;
+            if (!shouldRegister) return;
+
+            ISettingsBuilder builder = BaseSettingsBuilder.Create("CESettingsIntegrations", "Captivity Events Integrations");
 
             if (builder != null)
             {
-
-#if BETA
-                ModuleInfo KLBShackles = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "KLBShackles"; });
-#else
-                ModuleInfo KLBShackles = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
-#endif
-
                 builder.SetFormat("json2").SetFolderName("Global").SetSubFolder("zCaptivityEvents");
 
-                if (KLBShackles != null)
+                builder.CreateGroup("Integrations", groupBuilder =>
                 {
-                    builder.CreateGroup("KLBShackles", groupBuilder =>
+                    if (KLBShackles != null)
                     {
-                        groupBuilder.AddBool("toggleKLBShackles", "Toggle KLBShackles", new ProxyRef<bool>(() => ActivateKLBShackles, o => ActivateKLBShackles = o), boolBuilder => boolBuilder.SetHintText("Toggles ActivateKLBShackles Integration").SetRequireRestart(false));
-                    });
-                    shouldRegister = true;
-                }
+                        groupBuilder.AddBool("KLBShackles", "KLBShackles (Slave Gear)", new ProxyRef<bool>(() => ActivateKLBShackles, o => ActivateKLBShackles = o), boolBuilder => boolBuilder.SetHintText("Enables equipment of slave gear on player-as-captive.").SetRequireRestart(false));
+                    }
+                });
 
                 if (_settings != null) _settings.Unregister();
                 _settings = builder.BuildAsGlobal();
-                if (shouldRegister) _settings.Register();
+                _settings.Register();
             }
         }
     }
