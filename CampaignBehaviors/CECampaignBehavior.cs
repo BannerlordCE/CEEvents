@@ -440,7 +440,7 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
-#endregion
+        #endregion
 
         #region Equipment
         private void CheckEquipmentToReturn(ReturnEquipment returnEquipment)
@@ -483,7 +483,7 @@ namespace CaptivityEvents.CampaignBehaviors
             if (!_returnEquipment.Exists(item => item.Captive == captive)) _returnEquipment.Add(new ReturnEquipment(captive, battleEquipment, civilianEquipment));
         }
 
-#endregion
+        #endregion
 
         public void OnHeroKilled(Hero victim, Hero killer, KillCharacterAction.KillCharacterActionDetail detail, bool showNotification)
         {

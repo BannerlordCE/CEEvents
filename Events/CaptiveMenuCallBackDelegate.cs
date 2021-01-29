@@ -119,14 +119,14 @@ namespace CaptivityEvents.Events
                 args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                            ? "wait_prisoner_female"
                                                            : "wait_prisoner_male");
-                CEHelper.settlementCheck = true;
+                CEHelper.waitMenuCheck = 1;
             }
             else if (PlayerCaptivity.CaptorParty.IsMobile)
             {
                 args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                            ? "wait_captive_female"
                                            : "wait_captive_male");
-                CEHelper.settlementCheck = false;
+                CEHelper.waitMenuCheck = 2;
             }
 
             _sharedCallBackHelper.LoadBackgroundImage("default");
@@ -156,46 +156,7 @@ namespace CaptivityEvents.Events
 
             if (!PlayerCaptivity.IsCaptive) return;
 
-            if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement != null)
-            {
-                if (CEHelper.settlementCheck == false)
-                {
-                    string waitingList = new WaitingList().CEWaitingList();
-
-                    if (waitingList != null)
-                    {
-                        GameMenu.SwitchToMenu(waitingList);
-                    }
-                    // Leave menu on if there is no alternative menu
-                    CEHelper.settlementCheck = true;
-                }
-                else
-                {
-                    text.SetTextVariable("SETTLEMENT_NAME", PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Name);
-                }
-            }
-            else if (PlayerCaptivity.CaptorParty.IsSettlement)
-            {
-                text.SetTextVariable("SETTLEMENT_NAME", PlayerCaptivity.CaptorParty.Settlement.Name);
-            }
-            else
-            {
-                if (CEHelper.settlementCheck == true)
-                {
-                    string waitingList = new WaitingList().CEWaitingList();
-
-                    if (waitingList != null)
-                    {
-                        GameMenu.SwitchToMenu(waitingList);
-                    }
-                    // Leave menu on if there is no alternative menu
-                    CEHelper.settlementCheck = false;
-                }
-                else
-                {
-                    text.SetTextVariable("PARTY_NAME", PlayerCaptivity.CaptorParty.Name);
-                }
-            }
+            text = CEHelper.ShouldChangeMenu(text);
 
             try
             {
@@ -1879,7 +1840,7 @@ namespace CaptivityEvents.Events
                         text.SetTextVariable("COMPANIONISFEMALE_" + item.Key, item.Value.IsFemale ? 1 : 0);
                     }
                 }
-            } 
+            }
             catch (Exception)
             {
                 CECustomHandler.ForceLogToFile("Failed to SetCaptiveTextVariables for " + _listedEvent.Name);

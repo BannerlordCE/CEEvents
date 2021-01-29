@@ -489,7 +489,7 @@ namespace CaptivityEvents.Events
                         ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
                         : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
-                }         
+                }
             }
 
             if (meleeLevel != "none" || meleeLevel == "default" && MBRandom.Random.Next(100) < CESettings.Instance.WeaponChance)

@@ -929,7 +929,7 @@ namespace CaptivityEvents.Helper
                         // Events Removing
                         MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
                         if (mi != null) mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
-                    } 
+                    }
                     else
                     {
                         return "Cannot reload in the current campaign.";

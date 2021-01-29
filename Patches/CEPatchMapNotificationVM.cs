@@ -36,7 +36,7 @@ namespace CaptivityEvents.Patches
 
                 FieldInfo fi = mapNotification.GetType().BaseType.GetField("OnRemove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
                 if (fi != null) fi.SetValue(mapNotification, onRemove);
-                
+
 
                 __result = mapNotification;
 
@@ -54,7 +54,7 @@ namespace CaptivityEvents.Patches
 
                 FieldInfo fi = mapNotification.GetType().BaseType.GetField("OnRemove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
                 if (fi != null) fi.SetValue(mapNotification, onRemove);
-                
+
 
                 __result = mapNotification;
             }

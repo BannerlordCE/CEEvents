@@ -235,7 +235,7 @@ namespace CaptivityEvents.Events
                 {
                     if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
                     InventoryManager.OpenScreenAsInventoryOf(Hero.MainHero.PartyBelongedTo.Party.MobileParty, captiveHero.CharacterObject);
-                } 
+                }
                 catch (Exception e)
                 {
                     CECustomHandler.ForceLogToFile("ConsequenceCompanions. Failed" + e.ToString());

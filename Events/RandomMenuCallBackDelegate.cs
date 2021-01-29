@@ -138,7 +138,7 @@ namespace CaptivityEvents.Events
             {
                 MBTextManager.SetTextVariable("SETTLEMENT_NAME", MobileParty.MainParty.CurrentSettlement.Name);
             }
-            
+
 
             try
             {

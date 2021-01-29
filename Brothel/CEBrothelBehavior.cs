@@ -216,7 +216,7 @@ namespace CaptivityEvents.Brothel
 
                 if (_locations.ContainsKey("brothel"))
                 {
-                   _locations.Remove("brothel");
+                    _locations.Remove("brothel");
                 }
 
                 _brothel.SetOwnerComplex(settlement.LocationComplex);
@@ -396,7 +396,7 @@ namespace CaptivityEvents.Brothel
             CharacterObject townsman = HelperCreateFrom(culture.Townsman, true);
             townsman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
             townsman.StringId = CustomerStrings.GetRandomElement();
-           
+
             string actionSetCode;
 
             if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";

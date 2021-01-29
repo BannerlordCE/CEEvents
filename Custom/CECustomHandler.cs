@@ -30,9 +30,9 @@ namespace CaptivityEvents.Custom
 
         public static List<CEEvent> GetAllVerifiedXSEFSEvents(List<string> modules)
         {
-            #if DEBUG 
-                TestWrite(); 
-            #endif
+#if DEBUG
+            TestWrite();
+#endif
             string errorPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedFlagXML.txt";
             FileInfo file = new FileInfo(errorPath);
             if (file.Exists) file.Delete();
@@ -335,10 +335,10 @@ namespace CaptivityEvents.Custom
                 ns = new XmlSerializerNamespaces();
                 ns.Add("", ""); // Disable the xmlns:xsi and xmlns:xsd lines.
             }
-            using (var textWriter = new System.IO.StringWriter())
+            using (System.IO.StringWriter textWriter = new System.IO.StringWriter())
             {
-                var settings = new XmlWriterSettings() { Indent = true }; // For cosmetic purposes.
-                using (var xmlWriter = XmlWriter.Create(textWriter, settings))
+                XmlWriterSettings settings = new XmlWriterSettings() { Indent = true }; // For cosmetic purposes.
+                using (XmlWriter xmlWriter = XmlWriter.Create(textWriter, settings))
                     (serializer ?? new XmlSerializer(obj.GetType())).Serialize(xmlWriter, obj, ns);
                 return textWriter.ToString();
             }

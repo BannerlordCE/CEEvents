@@ -3,7 +3,6 @@ using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
-using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
@@ -89,7 +88,7 @@ namespace CaptivityEvents.Notifications
                             CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                         }
                         GameMenu.SwitchToMenu(_captorEvent.Name);
-                    }  
+                    }
                 }
                 else
                 {

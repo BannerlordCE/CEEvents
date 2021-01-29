@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Brothel;
+﻿#define BETA
+using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using HarmonyLib;
 using System;
@@ -8,15 +9,16 @@ using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Patches
 {
+#if BETA
     [HarmonyPatch(typeof(DefaultClanFinanceModel), "CalculateClanIncomeInternal")]
+#else
+    [HarmonyPatch(typeof(DefaultClanFinanceModel), "CalculateClanIncome")]
+#endif
     internal class CEPatchDefaultClanFinanceModel
     {
         [HarmonyPrepare]
         private static bool ShouldPatch() => CESettings.Instance != null && CESettings.Instance.ProstitutionControl;
 
-
-        // STABLE CalculateClanIncome
-        // BETA CalculateClanIncomeInternal
         [HarmonyPostfix]
         private static void CalculateClanIncomeInternal(Clan clan, ref ExplainedNumber goldChange, bool applyWithdrawals = false)
         {

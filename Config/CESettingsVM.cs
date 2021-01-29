@@ -32,7 +32,7 @@ namespace CaptivityEvents.Config
         {
             get
             {
-              
+
                 yield break;
             }
         }

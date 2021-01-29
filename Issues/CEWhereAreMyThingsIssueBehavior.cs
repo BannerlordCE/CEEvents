@@ -1,7 +1,6 @@
 ﻿using CaptivityEvents.Config;
 using Helpers;
 using System;
-using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;

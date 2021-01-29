@@ -9,8 +9,8 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
-using TerrainType = TaleWorlds.Core.TerrainType;
 using CETerrainType = CaptivityEvents.Custom.TerrainType;
+using TerrainType = TaleWorlds.Core.TerrainType;
 
 namespace CaptivityEvents.Events
 {
@@ -402,7 +402,7 @@ namespace CaptivityEvents.Events
 
                             heroes = heroes.FindAll(filterHero => !_listEvent.SavedCompanions.ContainsValue(filterHero));
                             if (heroes.Count == 0) return LogError("Skipping event " + _listEvent.Name + " it does not match the CompanionsCheck condition: " + lastConditional);
-                        } 
+                        }
                         else
                         {
                             heroes = heroes.FindAll(filterHero => !_listEvent.SavedCompanions.ContainsValue(filterHero));

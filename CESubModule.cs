@@ -614,7 +614,7 @@ namespace CaptivityEvents
         {
             CEHelper.spouseOne = null;
             CEHelper.spouseTwo = null;
-            CEHelper.settlementCheck = false;
+            CEHelper.waitMenuCheck = -1;
 
             CEHelper.notificationCaptorExists = false;
             CEHelper.notificationCaptorCheck = false;
