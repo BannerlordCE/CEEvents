@@ -1,5 +1,4 @@
-﻿#define BETA
-using CaptivityEvents.Brothel;
+﻿using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -19,9 +18,7 @@ using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-#if BETA
 using TaleWorlds.ModuleManager;
-#endif
 using TaleWorlds.MountAndBlade;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
@@ -558,6 +555,25 @@ namespace CaptivityEvents.Helper
                 string debug = "";
 
                 debug += "Notification Status:\nCaptor Exists: " + CEHelper.notificationCaptorExists + "\nRandom Exists: " + CEHelper.notificationEventExists;
+
+                debug += "\nPregnancy Status:\n";
+
+                int index = 0;
+
+                CECampaignBehavior.HeroPregnancies.ForEach(pregnancy =>
+                {
+                    debug += "Index[" + index + "] - DueDate: " + pregnancy.DueDate + ", Father: " + pregnancy?.Father?.Name + ", Mother: " + pregnancy?.Mother?.Name + ", AlreadyOccured: " + (pregnancy.AlreadyOccured ? "Yes" : "No") + "\n";
+                    index++;
+                });
+
+                debug += "\nReturn Equipment Status:\n";
+                index = 0;
+
+                CECampaignBehavior.ReturnEquipments.ForEach(returnEquipment =>
+                {
+                    debug += "Index[" + index + "] - Name: " + returnEquipment?.Captive?.Name + ", AlreadyOccured: " + (returnEquipment.AlreadyOccured ? "Yes" : "No") + "\n";
+                    index++;
+                });
 
 
                 return debug;

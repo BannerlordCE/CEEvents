@@ -1,5 +1,4 @@
-﻿#define BETA
-using CaptivityEvents.Brothel;
+﻿using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using HarmonyLib;
 using System;
@@ -9,11 +8,7 @@ using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Patches
 {
-#if BETA
     [HarmonyPatch(typeof(DefaultClanFinanceModel), "CalculateClanIncomeInternal")]
-#else
-    [HarmonyPatch(typeof(DefaultClanFinanceModel), "CalculateClanIncome")]
-#endif
     internal class CEPatchDefaultClanFinanceModel
     {
         [HarmonyPrepare]

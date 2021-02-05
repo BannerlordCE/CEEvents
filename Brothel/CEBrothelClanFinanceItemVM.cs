@@ -59,8 +59,6 @@ namespace CaptivityEvents.Brothel
 
         protected override void PopulateStatsList()
         {
-            // BETA SelectableItemPropertyVM
-            // STABLE ClanSelectableItemPropertyVM
             ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0976}Level").ToString(), _brothel.Level.ToString()));
             ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0988}State").ToString(), _brothel.IsRunning
                                                                     ? new TextObject("{=CEBROTHEL0992}Normal").ToString()

@@ -1,11 +1,9 @@
-﻿#define BETA
-using MCM.Abstractions.FluentBuilder;
+﻿using MCM.Abstractions.FluentBuilder;
 using MCM.Abstractions.Ref;
 using MCM.Abstractions.Settings.Base.Global;
 using System.Linq;
-#if BETA
+using TaleWorlds.Library;
 using TaleWorlds.ModuleManager;
-#endif
 
 namespace CaptivityEvents.Config
 {
@@ -35,11 +33,7 @@ namespace CaptivityEvents.Config
         {
             bool shouldRegister = false;
 
-#if BETA
             ModuleInfo KLBShackles = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "KLBShackles"; });
-#else
-            ModuleInfo KLBShackles = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
-#endif
 
             if (KLBShackles != null) shouldRegister = true;
             if (!shouldRegister) return;

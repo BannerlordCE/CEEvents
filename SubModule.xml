@@ -2,7 +2,7 @@
 <Module>
   <Name value="Captivity Events" />
   <Id value="zCaptivityEvents" />
-  <Version value="v1.5.7.1025" />
+  <Version value="v1.5.7.1026" />
   <SingleplayerModule value="true" />
   <MultiplayerModule value="false" />
   <DependedModules>

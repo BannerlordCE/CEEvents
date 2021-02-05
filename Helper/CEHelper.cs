@@ -1,15 +1,13 @@
-﻿#define BETA
-using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.Library;
 using TaleWorlds.Localization;
-#if BETA
 using TaleWorlds.ModuleManager;
-#endif 
 using Path = System.IO.Path;
 
 namespace CaptivityEvents.Helper
@@ -40,12 +38,7 @@ namespace CaptivityEvents.Helper
             {
                 try
                 {
-
-#if BETA
                     ModuleInfo moduleInfo = ModuleHelper.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
-#else
-                    ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
-#endif
 
                     if (moduleInfo != null && !moduleInfo.DependedModules.Exists(item => item.ModuleId == "zCaptivityEvents")) continue;
 
@@ -53,11 +46,7 @@ namespace CaptivityEvents.Helper
                     {
                         if (moduleInfo == null) continue;
                         CECustomHandler.ForceLogToFile("Added to ModuleLoader: " + moduleInfo.Name);
-#if BETA
                         modulePaths.Insert(0, Path.GetDirectoryName(ModuleHelper.GetPath(moduleInfo.Id)));
-#else
-                        modulePaths.Insert(0, Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Id)));
-#endif
 
                         findingModules.Add(moduleInfo);
                     }

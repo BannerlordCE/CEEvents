@@ -529,7 +529,16 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceRelease(Companion companion, Hero hero)
         {
-            // WORK IN PROGRESS
+            if (!companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Leave)) return;
+
+            try
+            {
+                EndCaptivityAction.ApplyByReleasing(hero);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failure of ConsequenceRelease: " + e.ToString());
+            }
         }
 
         private void ConsequenceStrip(Companion companion, Hero hero)

@@ -1,4 +1,3 @@
-#define BETA
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -272,13 +271,9 @@ namespace CaptivityEvents.CampaignBehaviors
             string hairTags = isOffspringFemale ? mother.CharacterObject.HairTags : father.CharacterObject.HairTags;
             string tattooTags = isOffspringFemale ? mother.CharacterObject.TattooTags : father.CharacterObject.TattooTags;
 
-#if BETA
             PropertyInfo pi = hero.GetType().GetProperty("StaticBodyProperties", BindingFlags.Instance | BindingFlags.NonPublic);
             StaticBodyProperties staticBody = BodyProperties.GetRandomBodyProperties(isOffspringFemale, bodyPropertiesMin, bodyPropertiesMin2, 1, seed, hairTags, father.CharacterObject.BeardTags, tattooTags).StaticProperties;
             if (pi != null) pi.SetValue(hero, staticBody);
-#else
-            hero.CharacterObject.StaticBodyPropertiesMin = BodyProperties.GetRandomBodyProperties(isOffspringFemale, bodyPropertiesMin, bodyPropertiesMin2, 1, seed, hairTags, father.CharacterObject.BeardTags, tattooTags).StaticProperties;
-#endif
 
             hero.Mother = mother;
             hero.Father = father;
@@ -676,6 +671,10 @@ namespace CaptivityEvents.CampaignBehaviors
             _returnEquipment = new List<ReturnEquipment>();
             _heroPregnancies = new List<Pregnancy>();
         }
+
+        public static List<Pregnancy> HeroPregnancies => _heroPregnancies;
+
+        public static List<ReturnEquipment> ReturnEquipments => _returnEquipment;
 
         private int _hoursPassed;
 

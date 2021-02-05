@@ -31,7 +31,7 @@ namespace CaptivityEvents.Custom
         public static List<CEEvent> GetAllVerifiedXSEFSEvents(List<string> modules)
         {
 #if DEBUG
-            TestWrite();
+            //TestWrite();
 #endif
             string errorPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedFlagXML.txt";
             FileInfo file = new FileInfo(errorPath);
@@ -84,7 +84,6 @@ namespace CaptivityEvents.Custom
                             TempEvents.AddRange(DeserializeXMLFileToObject(text));
                             ForceLogToFile("Added: " + text);
                         }
-
 
                         CECustomModule item = new CECustomModule(Path.GetFileNameWithoutExtension(fullPath), TempEvents);
                         AllModules.Add(item);

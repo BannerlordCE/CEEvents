@@ -111,8 +111,6 @@ namespace CaptivityEvents.Events
                         }
                     }
 
-                    CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
-
                     try
                     {
                         int level = 0;
@@ -143,11 +141,14 @@ namespace CaptivityEvents.Events
                         if (!party.IsMobile) AddHeroToPartyAction.Apply(hero, party.Settlement.MilitaParty, true);
                         else AddHeroToPartyAction.Apply(hero, party.MobileParty, true);
                     }
+
+                    CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
                 }
                 catch (Exception e)
                 {
                     CECustomHandler.ForceLogToFile("Failed to SpawnTheHero : " + e);
                 }
+
             }
         }
     }
