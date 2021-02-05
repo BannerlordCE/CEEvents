@@ -104,7 +104,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     : (int)(mobileParty.PrisonRoster.TotalManCount * randomFloat);
                 CharacterObject character = null;
 
-                foreach (TroopRosterElement troopRosterElement in mobileParty.PrisonRoster)
+                foreach (TroopRosterElement troopRosterElement in mobileParty.PrisonRoster.GetTroopRoster())
                 {
                     if (!troopRosterElement.Character.IsHero || !flag)
                     {

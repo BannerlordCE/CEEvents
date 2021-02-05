@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Brothel;
+﻿#define BETA // 1.5.8
+using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -410,7 +411,11 @@ namespace CaptivityEvents.Helper
 
                                     if (Game.Current.GameStateManager.ActiveState is MapState mapStateCaptor)
                                     {
+#if BETA
+                                        if (CESettings.Instance.EventCaptorNotifications)
+#else
                                         if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
+#endif
                                         {
                                             LaunchCaptorEvent(returnedEvent);
                                         }
@@ -439,7 +444,12 @@ namespace CaptivityEvents.Helper
 
                         if (Game.Current.GameStateManager.ActiveState is MapState mapStateRandom)
                         {
+
+#if BETA
+                            if (CESettings.Instance.EventCaptorNotifications)
+#else
                             if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
+#endif
                             {
                                 LaunchRandomEvent(returnedEvent);
                             }

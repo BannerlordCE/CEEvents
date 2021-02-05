@@ -56,7 +56,7 @@ namespace CaptivityEvents.Brothel
         {
             int num = 0;
 
-            foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster) num += Campaign.Current.Models.RansomValueCalculationModel.PrisonerRansomValue(troopRosterElement.Character, Hero.MainHero) * troopRosterElement.Number;
+            foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster.GetTroopRoster()) num += Campaign.Current.Models.RansomValueCalculationModel.PrisonerRansomValue(troopRosterElement.Character, Hero.MainHero) * troopRosterElement.Number;
 
             return num;
         }
@@ -454,7 +454,7 @@ namespace CaptivityEvents.Brothel
             if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
             else actionSetCode = "as_human_villager_in_tavern";
 
-            Equipment RandomCivilian = culture.FemaleDancer.CivilianEquipments.GetRandomElement();
+            Equipment RandomCivilian = culture.FemaleDancer.CivilianEquipments.GetRandomElementInefficiently();
             return new LocationCharacter(new AgentData(new PartyAgentOrigin(null, prisoner, -1, default, false)).Monster(Campaign.Current.HumanMonsterSettlementSlow).Age((int)prisoner.Age).CivilianEquipment(true).Equipment(RandomCivilian), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, false);
 
         }
@@ -1519,7 +1519,7 @@ namespace CaptivityEvents.Brothel
 
                 _brothelList[index].CaptiveProstitutes.Clear();
 
-                foreach (TroopRosterElement troopElement in prisoners)
+                foreach (TroopRosterElement troopElement in prisoners.GetTroopRoster())
                 {
                     if (troopElement.Character.IsHero)
                     {
@@ -1537,7 +1537,7 @@ namespace CaptivityEvents.Brothel
 
                                 if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
 
-                                Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElement();
+                                Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElementInefficiently();
                                 Equipment randomBattle = new Equipment(false);
                                 randomBattle.FillFrom(randomCivilian, false);
 
@@ -1601,7 +1601,7 @@ namespace CaptivityEvents.Brothel
 
                         if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(prisoner.HeroObject, prisoner.HeroObject.BattleEquipment, prisoner.HeroObject.CivilianEquipment);
 
-                        Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElement();
+                        Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElementInefficiently();
                         Equipment randomBattle = new Equipment(false);
                         randomBattle.FillFrom(randomCivilian, false);
 

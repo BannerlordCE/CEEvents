@@ -497,7 +497,7 @@ namespace CaptivityEvents.Events
             // Wound Player
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundCaptor)) Hero.MainHero.MakeWounded(_listedEvent.Captive.HeroObject);
             // Wound All
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundAllPrisoners)) _captor.CEWoundPrisoners(args, PartyBase.MainParty.PrisonRoster.Count());
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundAllPrisoners)) _captor.CEWoundPrisoners(args, PartyBase.MainParty.PrisonRoster.Count);
             // Wound Random
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomPrisoners)) _captor.CEWoundPrisoners(args);
         }
@@ -513,7 +513,7 @@ namespace CaptivityEvents.Events
             // Kill Player
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor)) _dynamics.CEKillPlayer(_listedEvent.Captive.HeroObject);
             // Kill All
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillAllPrisoners)) _captor.CEKillPrisoners(args, PartyBase.MainParty.PrisonRoster.Count(), true);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillAllPrisoners)) _captor.CEKillPrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
             // Kill Random
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomPrisoners)) _captor.CEKillPrisoners(args);
         }
@@ -526,7 +526,7 @@ namespace CaptivityEvents.Events
         private void Release(ref MenuCallbackArgs args)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseRandomPrisoners)) _captor.CEReleasePrisoners(args);
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseAllPrisoners)) _captor.CEReleasePrisoners(args, PartyBase.MainParty.PrisonRoster.Count(), true);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseAllPrisoners)) _captor.CEReleasePrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
         }
 
         private void Escape()

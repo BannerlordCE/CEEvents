@@ -1,3 +1,4 @@
+#define BETA // 1.5.8
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -29,7 +30,7 @@ namespace CaptivityEvents.CampaignBehaviors
         private void LaunchCaptorEvent()
         {
             if (CEHelper.notificationCaptorExists || CEHelper.progressEventExists) return;
-            CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
+            CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
             CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
 
             if (returnedEvent == null) return;
@@ -495,7 +496,12 @@ namespace CaptivityEvents.CampaignBehaviors
                 {
                     if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
                     {
+
+#if BETA
+                        if (CESettings.Instance.EventCaptorNotifications)
+#else
                         if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
+#endif
                         {
                             if (CESettings.Instance.EventRandomEnabled && (!CEHelper.notificationEventExists || !CEHelper.notificationCaptorExists))
                             {
@@ -523,20 +529,20 @@ namespace CaptivityEvents.CampaignBehaviors
 
                                         if (returnedEvent != null)
                                         {
-                                            CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
+                                            CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
                                             returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
                                         }
                                     }
                                     else
                                     {
-                                        CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
+                                        CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
                                         returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
                                         if (returnedEvent != null) returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
                                     }
                                 }
                                 else
                                 {
-                                    CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
+                                    CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
                                     returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
                                 }
 
@@ -563,7 +569,12 @@ namespace CaptivityEvents.CampaignBehaviors
                     }
                     else if (CESettings.Instance.EventRandomEnabled)
                     {
+
+#if BETA
+                        if (CESettings.Instance.EventCaptorNotifications)
+#else
                         if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
+#endif
                         {
                             LaunchRandomEvent();
                         }

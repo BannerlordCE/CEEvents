@@ -193,13 +193,13 @@ namespace CaptivityEvents.Events
 
             returnString += "\nTotal Females : " + captorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
             returnString += "\nTotal Males : " + captorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
-            returnString += "\nTotal : " + captorParty.MemberRoster.Count();
+            returnString += "\nTotal : " + captorParty.MemberRoster.Count;
 
             returnString += "\n\n--- Captive Members ---";
 
             returnString += "\nTotal Females : " + captorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
             returnString += "\nTotal Males : " + captorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
-            returnString += "\nTotal : " + captorParty.PrisonRoster.Count();
+            returnString += "\nTotal : " + captorParty.PrisonRoster.Count;
 
             returnString += "\n\n--- Other Settings ---";
             returnString += "\nToo Many Companions : " + (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit);
