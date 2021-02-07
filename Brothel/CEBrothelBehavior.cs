@@ -23,7 +23,7 @@ namespace CaptivityEvents.Brothel
 {
     internal class CEBrothelBehavior : CampaignBehaviorBase
     {
-        public static Location _brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanAlways", "CanAlways", "CanNever", "CanNever", new[] { "empire_house_c_tavern_a", "", "", "" }, null);
+        public static Location _brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanAlways", "CanAlways", "CanNever", "CanNever", new[] { "empire_house_c_tavern_a", "empire_house_c_tavern_a", "", "" }, null);
 
         public static bool _isBrothelInitialized;
 
@@ -225,21 +225,27 @@ namespace CaptivityEvents.Brothel
                 {
                     case CultureCode.Sturgia:
                         _brothel.SetSceneName(0, "sturgia_house_a_interior_tavern");
+                        _brothel.SetSceneName(1, "sturgia_house_a_interior_tavern");
                         break;
                     case CultureCode.Vlandia:
                         _brothel.SetSceneName(0, "vlandia_tavern_interior_a");
+                        _brothel.SetSceneName(1, "vlandia_tavern_interior_a");
                         break;
                     case CultureCode.Aserai:
                         _brothel.SetSceneName(0, "arabian_house_new_c_interior_b_tavern");
+                        _brothel.SetSceneName(1, "arabian_house_new_c_interior_b_tavern");
                         break;
                     case CultureCode.Empire:
                         _brothel.SetSceneName(0, "empire_house_c_tavern_a");
+                        _brothel.SetSceneName(1, "empire_house_c_tavern_a");
                         break;
                     case CultureCode.Battania:
                         _brothel.SetSceneName(0, "battania_tavern_interior_b");
+                        _brothel.SetSceneName(1, "battania_tavern_interior_b");
                         break;
                     case CultureCode.Khuzait:
                         _brothel.SetSceneName(0, "khuzait_tavern_a");
+                        _brothel.SetSceneName(1, "khuzait_tavern_a");
                         break;
                     case CultureCode.Nord:
                     case CultureCode.Darshi:
@@ -248,6 +254,7 @@ namespace CaptivityEvents.Brothel
                     case CultureCode.Invalid:
                     default:
                         _brothel.SetSceneName(0, "empire_house_c_tavern_a");
+                        _brothel.SetSceneName(1, "empire_house_c_tavern_a");
                         break;
                 }
                 List<CharacterObject> brothelPrisoners = FetchBrothelPrisoners(Settlement.CurrentSettlement);
@@ -692,11 +699,14 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddDialogLine("ce_assistant_talk_00", "start", "ce_assistant_response_00", "{=CEBROTHEL1060}Hello boss, how can I help you today?[ib:confident][rb:very_positive]", ConversationWithBrothelAssistantBeforeSelling, null);
 
             campaignGameStarter.AddPlayerLine("ce_ap_response_01", "ce_assistant_response_00", "ce_assistant_sell_00", "{=CEBROTHEL1061}I would like to sell our establishment.", null, null);
-            campaignGameStarter.AddPlayerLine("ce_ap_response_02", "ce_assistant_response_00", "ce_assistant_manage_00", "{=CEBROTHEL0982}I would like to manage our establishment.", null, null);
-            campaignGameStarter.AddPlayerLine("ce_ap_response_03", "ce_assistant_response_00", "ce_assistant_party_00", "{=CEBROTHEL1069}Send some ladies to boost the morale of my party.", ConversationWithBrothelAssistantShowPartyBuy, null);
-            campaignGameStarter.AddPlayerLine("ce_ap_response_04", "ce_assistant_response_00", "ce_assistant_exit_00", "{=CEBROTHEL1055}I don't need anything at the moment.", null, null);
+            campaignGameStarter.AddPlayerLine("ce_ap_response_02", "ce_assistant_response_00", "ce_assistant_upgrade_00", "{=CEBROTHEL1099}I would like to upgrade our establishment.", ConversationCanUpgrade, null);
+            campaignGameStarter.AddPlayerLine("ce_ap_response_03", "ce_assistant_response_00", "ce_assistant_manage_00", "{=CEBROTHEL0982}I would like to manage our establishment.", null, null);
+            campaignGameStarter.AddPlayerLine("ce_ap_response_04", "ce_assistant_response_00", "ce_assistant_party_00", "{=CEBROTHEL1069}Send some ladies to boost the morale of my party.", ConversationWithBrothelAssistantShowPartyBuy, null);
+            campaignGameStarter.AddPlayerLine("ce_ap_response_05", "ce_assistant_response_00", "ce_assistant_exit_00", "{=CEBROTHEL1055}I don't need anything at the moment.", null, null);
 
             campaignGameStarter.AddDialogLine("ce_assistant_sell_00_r", "ce_assistant_sell_00", "ce_assistant_sell_response", "{=CEBROTHEL1062}We can sell this establishment for {AMOUNT} denars.", PriceWithBrothel, null);
+
+            campaignGameStarter.AddPlayerLine("ce_assistant_upgrade_00_r", "ce_assistant_upgrade_00", "ce_assistant_upgrade_response", "{=CEBROTHEL1100}We can upgrade this establishment for {AMOUNT} denars.", null, null);
 
             campaignGameStarter.AddDialogLine("ce_assistant_party_00_n", "ce_assistant_party_00", "ce_assistant_response_00", "{=CEBROTHEL1071}Sorry, {?PLAYER.GENDER}milady{?}my lord{\\?} everyone are currently busy.", () => _hasBoughtProstituteToParty, null);
 
@@ -713,6 +723,9 @@ namespace CaptivityEvents.Brothel
 
             campaignGameStarter.AddPlayerLine("ce_assistant_sell_yes", "ce_assistant_sell_response", "ce_assistant_business_complete", "{=CEBROTHEL1018}That's a fair price I'd say.", null, ConversationSoldBrothel);
             campaignGameStarter.AddPlayerLine("ce_assistant_sell_no", "ce_assistant_sell_response", "ce_assistant_manage_00_response", "{=CEBROTHEL1050}Nevermind.", null, null);
+
+            campaignGameStarter.AddPlayerLine("ce_assistant_upgrade_yes", "ce_assistant_upgrade_response", "ce_assistant_business_complete", "{=CEBROTHEL1018}That's a fair price I'd say.", null, ConversationUpgradedBrothel, 100, ConversationHasEnoughMoneyForBrothel);
+            campaignGameStarter.AddPlayerLine("ce_assistant_upgrade_no", "ce_assistant_upgrade_response", "ce_assistant_manage_00_response", "{=CEBROTHEL1050}Nevermind.", null, null);
 
             campaignGameStarter.AddDialogLine("ce_assistant_business_complete_r", "ce_assistant_business_complete", "close_window", "{=CEBROTHEL1063}It's been a pleasure working for you! [ib:confident][rb:very_positive]", null, null);
 
@@ -764,6 +777,9 @@ namespace CaptivityEvents.Brothel
         // Owner Conditions
         private bool ConversationWithBrothelAssistantAfterSelling() => CharacterObject.OneToOneConversationCharacter.StringId == "brothel_assistant" && !DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
 
+
+        private bool ConversationCanUpgrade() => GetPlayerBrothel(Settlement.CurrentSettlement).Level == 0;
+
         private bool ConversationWithBrothelOwnerAfterSelling() => CharacterObject.OneToOneConversationCharacter.StringId == "brothel_owner" && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
 
         private bool ConversationWithBrothelAssistantBeforeSelling() => CharacterObject.OneToOneConversationCharacter.StringId == "brothel_assistant" && DoesOwnBrothelInSettlement(Settlement.CurrentSettlement);
@@ -782,6 +798,12 @@ namespace CaptivityEvents.Brothel
         {
             int numberOfMen = PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
             return !Campaign.Current.IsMainHeroDisguised && numberOfMen > 1;
+        }
+
+        private void ConversationUpgradedBrothel()
+        {
+            GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, brothelCost);
+            BrothelUpgrade(Settlement.CurrentSettlement, 1);
         }
 
         private void ConversationBoughtBrothel()
@@ -1435,6 +1457,23 @@ namespace CaptivityEvents.Brothel
             }
         }
 
+        public static void BrothelUpgrade(Settlement settlement, int level)
+        {
+            try
+            {
+
+                if (ContainsBrothelData(settlement))
+                {
+                    int i = _brothelList.FindIndex(brothelData => brothelData.Settlement.StringId == settlement.StringId);
+                    _brothelList[i].Level = level;
+                }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed on BrothelUpgrade: " + e);
+            }
+        }
+
         public static void BrothelInteraction(Settlement settlement, bool flagToPurchase, bool releasePrisoners = false, Hero heroReleased = null)
         {
             try
@@ -1444,6 +1483,7 @@ namespace CaptivityEvents.Brothel
                     int i = _brothelList.FindIndex(brothelData => brothelData.Settlement.StringId == settlement.StringId);
                     _brothelList[i].Owner = flagToPurchase ? Hero.MainHero : null;
                     _brothelList[i].Capital = _brothelList[i].InitialCapital;
+                    _brothelList[i].Level = 0;
                     foreach (CharacterObject captive in _brothelList[i].CaptiveProstitutes)
                     {
                         if (!releasePrisoners)

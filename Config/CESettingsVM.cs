@@ -21,45 +21,79 @@ namespace CaptivityEvents.Config
         public CESettingsVM()
         {
             GeneralOptions = new CESettingsVMCategory(this, new TextObject("General", null), GeneralList, false);
-            CaptiveOptions = new CESettingsVMCategory(this, new TextObject("Captive", null), CaptiveList, false);
-            CaptorOptions = new CESettingsVMCategory(this, new TextObject("Captor", null), CaptorList, false);
-            RandomOptions = new CESettingsVMCategory(this, new TextObject("Random", null), RandomList, false);
             EventsListOptions = new CESettingsVMCategory(this, new TextObject("Event List", null), EventsList, false);
             CustomFlagsOptions = new CESettingsVMCategory(this, new TextObject("Custom Flags", null), CustomFlagList, false);
+            IntegrationsOptions = new CESettingsVMCategory(this, new TextObject("Integrations Options", null), IntegrationsList, false);
         }
 
         private IEnumerable<ICEOptionData> GeneralList
         {
             get
             {
+                yield return new CEManagedBooleanOptionData("EventCaptiveOn", "{=CESETTINGS1000}Turn on Captive Events", "{=CESETTINGS1000}Turn on Captive Events", CESettings.Instance.EventCaptiveOn ? 1f : 0f, (value) =>
+                {
+                    return CESettings.Instance.EventCaptiveOn ? 1f : 0f;
+                    //CESettings.Instance.EventCaptiveOn = value == 1f;
+                    //return value;
+                });
 
-                yield break;
-            }
-        }
+                yield return new CEManagedNumericOptionData("EventOccurrenceOther", "{=CESETTINGS1002}Event wait between occurances in Traveling Party", "{=CESETTINGS1003}How often should an event occur while in a regular party. (Gametime in between events)", CESettings.Instance.EventOccurrenceOther, (value) =>
+                {
+                    CESettings.Instance.EventOccurrenceOther = value;
+                    return value;
+                }, 1f, 24f);
 
-        private IEnumerable<ICEOptionData> CaptiveList
-        {
-            get
-            {
-                //yield return new CEManagedBooleanOptionData("captiveToggle", "Captive Events", "", 1f);
-                yield break;
-            }
-        }
+                yield return new CEManagedNumericOptionData("EventOccurrenceSettlement", "{=CESETTINGS1004}Event wait between occurances in Settlement", "{=CESETTINGS1005}How should an event occur in settlements. (Prostitution affected too) (Gametime in between events)", CESettings.Instance.EventOccurrenceSettlement, (value) =>
+                {
+                    CESettings.Instance.EventOccurrenceSettlement = value;
+                    return value;
+                }, 1f, 100f);
 
-        private IEnumerable<ICEOptionData> CaptorList
-        {
-            get
-            {
-                //yield return new CEManagedBooleanOptionData("captorToggle", "Captor Events", "", 1f);
-                yield break;
-            }
-        }
+                yield return new CEManagedNumericOptionData("EventOccurrenceLord", "{=CESETTINGS1006}Event wait between occurances in Lord's Party", "{=CESETTINGS1007}How often should an event occur in a lord's party. (Gametime in between events)", CESettings.Instance.EventOccurrenceLord, (value) =>
+                {
+                    CESettings.Instance.EventOccurrenceLord = value;
+                    return value;
+                }, 1f, 100f);
 
-        private IEnumerable<ICEOptionData> RandomList
-        {
-            get
-            {
-                //yield return new CEManagedBooleanOptionData("randomToggle", "Random Events", "", 1f);
+                yield return new CEManagedBooleanOptionData("EventCaptorOn", "{=CESETTINGS1001}Turn on Captor Events", "{=CESETTINGS1001}Turn on Captor Events", CESettings.Instance.EventCaptorOn ? 1f : 0f, (value) =>
+                {
+                    return CESettings.Instance.EventCaptorOn ? 1f : 0f;
+
+                    //CESettings.Instance.EventCaptorOn = value == 1f;
+                    //return value;
+                });
+
+                yield return new CEManagedNumericOptionData("EventOccurrenceCaptor", "{=CESETTINGS1008}Event wait between occurances while Captor", "{=CESETTINGS1009}How often should an event occur while Captor. (Gametime in between events)", CESettings.Instance.EventOccurrenceCaptor, (value) =>
+                {
+                    CESettings.Instance.EventOccurrenceCaptor = value;
+                    return value;
+                }, 1f, 100f);
+
+                yield return new CEManagedBooleanOptionData("EventCaptorGearCaptives", "{=CESETTINGS1018}Captives Gear (Captor)", "{=CESETTINGS1019}Captive Heroes who have been stripped gain their gear back after escape.", CESettings.Instance.EventCaptorGearCaptives ? 1f : 0f, (value) =>
+                {
+                    CESettings.Instance.EventCaptorGearCaptives = value == 1f;
+                    return value;
+                });
+
+                yield return new CEManagedBooleanOptionData("HuntLetPrisonersEscape", "{=CESETTINGS1094}Allow escape during hunt", "{=CESETTINGS1095}Allows prisoners to escape if not killed or wounded in the hunt", CESettings.Instance.HuntLetPrisonersEscape ? 1f : 0f, (value) =>
+                {
+                    CESettings.Instance.HuntLetPrisonersEscape = value == 1f;
+                    return value;
+                });
+
+                yield return new CEManagedBooleanOptionData("EventCaptorNotifications", "{=CESETTINGS1010}Event Map Notifications", "{=CESETTINGS1011}If events will fire as map notifications for captor/random.", CESettings.Instance.EventCaptorNotifications ? 1f : 0f, (value) =>
+                {
+                    CESettings.Instance.EventCaptorNotifications = value == 1f;
+                    return value;
+                });
+
+
+                yield return new CEManagedBooleanOptionData("EventRandomEnabled", "Random Events Enabled", "Random events are events that do not require captives.", CESettings.Instance.EventRandomEnabled ? 1f : 0f, (value) =>
+                {
+                    CESettings.Instance.EventRandomEnabled = value == 1f;
+                    return value;
+                });
+
                 yield break;
             }
         }
@@ -73,6 +107,14 @@ namespace CaptivityEvents.Config
         }
 
         private IEnumerable<ICEOptionData> CustomFlagList
+        {
+            get
+            {
+                yield break;
+            }
+        }
+
+        private IEnumerable<ICEOptionData> IntegrationsList
         {
             get
             {
@@ -103,6 +145,8 @@ namespace CaptivityEvents.Config
         public CESettingsVMCategory EventsListOptions { get; }
 
         public CESettingsVMCategory CustomFlagsOptions { get; }
+
+        public CESettingsVMCategory IntegrationsOptions { get; }
 
 
     }

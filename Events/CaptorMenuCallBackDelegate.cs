@@ -56,7 +56,7 @@ namespace CaptivityEvents.Events
                                        : "wait_captive_male");
 
             _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
-            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
+            _sharedCallBackHelper.ConsequencePlaySound(true);
 
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                             ? 1
@@ -142,7 +142,7 @@ namespace CaptivityEvents.Events
         {
             SetNames(ref args);
             _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
-            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
+            _sharedCallBackHelper.ConsequencePlaySound(true);
         }
 
         internal bool CaptorEventOptionGameMenu(MenuCallbackArgs args)

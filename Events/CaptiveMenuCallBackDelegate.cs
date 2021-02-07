@@ -54,7 +54,7 @@ namespace CaptivityEvents.Events
                                        : "wait_captive_male");
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
-            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
+            _sharedCallBackHelper.ConsequencePlaySound(true);
 
             SetCaptiveTextVariables(ref args);
 
@@ -130,7 +130,7 @@ namespace CaptivityEvents.Events
             }
 
             _sharedCallBackHelper.LoadBackgroundImage("default");
-            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
+            _sharedCallBackHelper.ConsequencePlaySound(true);
 
             if (PlayerCaptivity.IsCaptive) SetCaptiveTextVariables(ref args);
 
@@ -185,7 +185,7 @@ namespace CaptivityEvents.Events
         internal void CaptiveEventGameMenu(MenuCallbackArgs args)
         {
             _sharedCallBackHelper.LoadBackgroundImage();
-            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
+            _sharedCallBackHelper.ConsequencePlaySound(true);
             SetCaptiveTextVariables(ref args);
         }
 

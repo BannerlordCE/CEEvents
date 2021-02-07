@@ -13,7 +13,7 @@ namespace CaptivityEvents.Config
 
         float GetValue(bool forceRefresh);
 
-        void SetValue(float value);
+        bool SetValue(float value);
 
         string GetName();
 
@@ -46,13 +46,14 @@ namespace CaptivityEvents.Config
 
     public abstract class CEManagedOptionData : ICEOptionData
     {
-        protected CEManagedOptionData(string id, string name, float defaultValue = 0.0f, string description = "")
+        protected CEManagedOptionData(string id, string name, float defaultValue = 0.0f, string description = "", Func<float, float> onChange = null)
         {
             _id = id;
             _name = name;
             _description = description;
             _value = defaultValue;
             _defaultValue = defaultValue;
+            _onChange = onChange;
         }
 
         public virtual float GetDefaultValue() => _defaultValue;
@@ -70,7 +71,11 @@ namespace CaptivityEvents.Config
             return _value;
         }
 
-        public void SetValue(float value) => _value = value;
+        public bool SetValue(float value) {
+            float oldValue = _value;
+            _value = _onChange(value);
+            return oldValue != _value;
+        }
 
         public string GetName() => _name;
 
@@ -83,6 +88,8 @@ namespace CaptivityEvents.Config
         private readonly string _description;
         private float _value;
         private readonly float _defaultValue;
+
+        private readonly Func<float,float> _onChange;
     }
 
     public class CEActionOptionData : ICEOptionData
@@ -110,8 +117,9 @@ namespace CaptivityEvents.Config
 
         public string GetDescription() => "";
 
-        public void SetValue(float value)
+        public bool SetValue(float value)
         {
+            return true;
         }
 
         private readonly string _id;
@@ -120,7 +128,7 @@ namespace CaptivityEvents.Config
 
     public class CEManagedNumericOptionData : CEManagedOptionData, ICENumericOptionData, ICEOptionData
     {
-        public CEManagedNumericOptionData(string id, string name, string description, float defaultValue, float min, float max, bool discrete = true, bool updateContinuously = false) : base(id, name, defaultValue, description)
+        public CEManagedNumericOptionData(string id, string name, string description, float defaultValue, Func<float, float> onChange, float min, float max, bool discrete = true, bool updateContinuously = false) : base(id, name, defaultValue, description, onChange)
         {
             _minValue = min;
             _maxValue = max;
@@ -144,14 +152,14 @@ namespace CaptivityEvents.Config
 
     public class CEManagedBooleanOptionData : CEManagedOptionData, ICEBooleanOptionData, ICEOptionData
     {
-        public CEManagedBooleanOptionData(string id, string name, string description, float defaultValue) : base(id, name, defaultValue, description)
+        public CEManagedBooleanOptionData(string id, string name, string description, float defaultValue, Func<float, float> onChange) : base(id, name, defaultValue, description, onChange)
         {
         }
     }
 
     public class CEManagedSelectionOptionData : CEManagedOptionData, ICESelectionOptionData, ICEOptionData
     {
-        public CEManagedSelectionOptionData(string id, string name, string description, float defaultValue, int limit, IEnumerable<SelectionData> names) : base(id, name, defaultValue, description)
+        public CEManagedSelectionOptionData(string id, string name, string description, float defaultValue, Func<float, float> onChange, int limit, IEnumerable<SelectionData> names) : base(id, name, defaultValue, description, onChange)
         {
             _selectableOptionsLimit = limit;
             _selectableOptionNames = names;
@@ -165,4 +173,6 @@ namespace CaptivityEvents.Config
 
         private readonly IEnumerable<SelectionData> _selectableOptionNames;
     }
+
+
 }

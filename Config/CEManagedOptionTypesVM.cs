@@ -147,9 +147,11 @@ namespace CaptivityEvents.Config
 
         public override void UpdateValue()
         {
-            Option.SetValue(OptionValueAsBoolean ? 1 : 0);
-            Option.Commit();
-            _optionsVM.SetConfig(Option, OptionValueAsBoolean ? 1 : 0);
+            if (!Option.SetValue(OptionValueAsBoolean ? 1 : 0))
+            {
+                Option.Commit();
+                _optionsVM.SetConfig(Option, OptionValueAsBoolean ? 1 : 0);
+            }
         }
 
         public override void Cancel()
@@ -271,7 +273,7 @@ namespace CaptivityEvents.Config
 
         public override void UpdateValue()
         {
-            Option.SetValue(OptionValue);
+            if (!Option.SetValue(OptionValue)) return;
             Option.Commit();
             _optionsVM.SetConfig(Option, OptionValue);
         }
@@ -375,7 +377,7 @@ namespace CaptivityEvents.Config
         {
             if (selector.SelectedIndex >= 0)
             {
-                Option.SetValue(selector.SelectedIndex);
+                if (!Option.SetValue(selector.SelectedIndex)) return;
                 Option.Commit();
                 _optionsVM.SetConfig(Option, selector.SelectedIndex);
             }

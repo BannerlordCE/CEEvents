@@ -668,25 +668,6 @@ namespace CaptivityEvents.Events
 
         }
 
-        internal void ConsequencePlaySound()
-        {
-            try
-            {
-                if (CEPersistence.soundEvent != null)
-                {
-                    CEPersistence.soundEvent.Stop();
-                    CEPersistence.soundLoop = false;
-                }
-                if (_option.SoundName == null) return;
-                int soundIndex = SoundEvent.GetEventIdFromString(_option.SoundName);
-                if (soundIndex != -1) PlayMapSound(soundIndex);
-            }
-            catch (Exception)
-            {
-                CECustomHandler.LogToFile("Missing ConsequencePlaySound");
-            }
-        }
-
         internal void PlayMapSound(int soundIndex)
         {
             Campaign campaign = Campaign.Current;
@@ -700,7 +681,7 @@ namespace CaptivityEvents.Events
             CEPersistence.soundEvent.Play();
         }
 
-        internal void ConsequencePlayEventSound(string SoundName)
+        internal void ConsequencePlaySound(bool isListedEvent = false)
         {
             try
             {
@@ -709,16 +690,20 @@ namespace CaptivityEvents.Events
                     CEPersistence.soundEvent.Stop();
                     CEPersistence.soundLoop = false;
                 }
-                if (SoundName == null) return;
-                int soundIndex = SoundEvent.GetEventIdFromString(SoundName);
+
+                string soundToPlay = isListedEvent ? _listedEvent.SoundName : _option.SoundName;
+
+                if (soundToPlay == null) return;
+                int soundIndex = SoundEvent.GetEventIdFromString(soundToPlay);
                 if (soundIndex != -1) PlayMapSound(soundIndex);
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                CECustomHandler.LogToFile("Missing ConsequencePlayEventSound");
+                CECustomHandler.LogToFile("ConsequencePlaySound " + isListedEvent + " : " + e);
             }
         }
+
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {
