@@ -261,12 +261,15 @@ namespace CaptivityEvents.Events
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner)) _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
             else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0) ConsequenceRandomEventTrigger(ref args);
             else if (!string.IsNullOrEmpty(_option.TriggerEventName)) ConsequenceSingleEventTrigger(ref args);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
+            {
+                _sharedCallBackHelper.ConsequenceStartBattle(() => { _captive.CECaptivityContinue(ref args); }, 0);
+            }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape)) ConsequenceEscapeEventTrigger(ref args);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) _captive.CECaptivityEscape(ref args);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Leave)) _captive.CECaptivityLeave(ref args);
             else _captive.CECaptivityContinue(ref args);
         }
-
 
         #region private
         private void ConsequenceCompanions()
@@ -294,7 +297,6 @@ namespace CaptivityEvents.Events
                 DestroyPartyAction.Apply(null, PlayerCaptivity.CaptorParty.MobileParty);
             }
         }
-
 
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
         {

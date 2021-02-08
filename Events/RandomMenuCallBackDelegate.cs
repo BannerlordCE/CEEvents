@@ -221,6 +221,10 @@ namespace CaptivityEvents.Events
             ConsequenceSoldEvents(ref args);
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor)) _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
+            {
+                _sharedCallBackHelper.ConsequenceStartBattle(() => { captorSpecifics.CECaptorContinue(args); }, 2);
+            }
             else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0) ConsequenceRandomEventTrigger(ref args);
             else if (!string.IsNullOrEmpty(_option.TriggerEventName)) ConsequenceSingleEventTrigger(ref args); // Single Event Trigger 
             else captorSpecifics.CECaptorContinue(args);

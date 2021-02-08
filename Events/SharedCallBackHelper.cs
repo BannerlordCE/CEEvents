@@ -1,6 +1,7 @@
 ﻿using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Issues;
+using HarmonyLib;
 using Helpers;
 using SandBox;
 using System;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
@@ -680,6 +682,156 @@ namespace CaptivityEvents.Events
             CEPersistence.soundEvent = SoundEvent.CreateEvent(soundIndex, _mapScene);
             CEPersistence.soundEvent.Play();
         }
+
+
+        internal void ConsequenceStartBattle(Action callback, int type)
+        {
+            try
+            {
+                if (_option.BattleSettings != null)
+                {
+
+                    CEEvent VictoryEvent, DefeatEvent;
+
+                    try
+                    {
+                        VictoryEvent = _eventList.Find(item => item.Name == _option.BattleSettings.Victory);
+                        VictoryEvent.Captive = _listedEvent.Captive;
+                        VictoryEvent.SavedCompanions = _listedEvent.SavedCompanions;
+
+                        CEPersistence.victoryEvent = VictoryEvent.Name;
+                    }
+                    catch (Exception)
+                    {
+                        CECustomHandler.LogToFile("ConsequenceStartBattle VictoryEvent Missing");
+                        callback();
+                    }
+                    try
+                    {
+                        DefeatEvent = _eventList.Find(item => item.Name == _option.BattleSettings.Defeat);
+                        DefeatEvent.Captive = _listedEvent.Captive;
+                        DefeatEvent.SavedCompanions = _listedEvent.SavedCompanions;
+
+                        CEPersistence.defeatEvent = DefeatEvent.Name;
+                    }
+                    catch (Exception)
+                    {
+                        CECustomHandler.LogToFile("ConsequenceStartBattle VictoryEvent Missing");
+                        callback();
+                    }
+
+
+                    CEPersistence.animationPlayEvent = false;
+
+                    TroopRoster generatedTrooper = TroopRoster.CreateDummyTroopRoster();
+                    int amount = 10;
+
+                    for (int i = 0; i < amount; i++)
+                    {
+                        CharacterObject randomElementWithPredicate = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
+
+                        generatedTrooper.AddToCounts(randomElementWithPredicate, 1, true);
+                    }
+
+
+                    if (!generatedTrooper.GetTroopRoster().IsEmpty())
+                    {
+                        callback();
+
+                        try
+                        {
+                            MobileParty slaverParty = MBObjectManager.Instance.CreateObject<MobileParty>("Slavers_" + MBRandom.RandomFloatRanged(float.MaxValue));
+
+
+                            TextObject textObject = new TextObject("The Slavers", null);
+                            slaverParty.InitializeMobileParty(generatedTrooper, TroopRoster.CreateDummyTroopRoster(), Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
+                            slaverParty.SetCustomName(textObject);
+                            EnterSettlementAction.ApplyForParty(slaverParty, Settlement.CurrentSettlement);
+                            //CharacterObject troopTypeTemplateForDifficulty = this.GetTroopTypeTemplateForDifficulty();
+                            //slaverParty.MemberRoster.AddToCounts(troopTypeTemplateForDifficulty, 9, false, 0, 0, true, -1);
+                            //ItemObject @object = MBObjectManager.Instance.GetObject<ItemObject>("cleaver_sword_t3");
+                            //gangLeader.CharacterObject.FirstCivilianEquipment.AddEquipmentToSlotWithoutAgent(EquipmentIndex.WeaponItemBeginSlot, new EquipmentElement(@object, null));
+                            //this._rivalGangLeaderParty.MemberRoster.AddToCounts(gangLeader.CharacterObject, 1, false, 0, 0, true, -1);
+                            foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
+                            {
+                                if (!troopRosterElement.Character.IsPlayerCharacter)
+                                {
+                                    CEPersistence.playerTroops.Add(troopRosterElement);
+                                }
+                            }
+
+                            PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter);
+
+                            if (!PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter))
+                            {
+                                CEPersistence.removePlayer = true;
+                                PartyBase.MainParty.MemberRoster.AddToCounts(CharacterObject.PlayerCharacter, 1);
+                            } else
+                            {
+                                CEPersistence.removePlayer = false;
+                            }
+                            
+
+                            //PartyBase.MainParty.MemberRoster.AddToCounts(troopTypeTemplateForDifficulty, 5, false, 0, 0, true, -1);
+                            if (!CEPersistence.playerTroops.IsEmpty<TroopRosterElement>())
+                            {
+                                List<CharacterObject> list = new List<CharacterObject>();
+                                int num = 3;
+                                foreach (TroopRosterElement troopRosterElement2 in from t in CEPersistence.playerTroops
+                                                                                   orderby t.Character.Level descending
+                                                                                   select t)
+                                {
+                                    if (num <= 0)
+                                    {
+                                        break;
+                                    }
+                                    int num2 = 0;
+                                    while (num2 < troopRosterElement2.Number - troopRosterElement2.WoundedNumber && num > 0)
+                                    {
+                                        list.Add(troopRosterElement2.Character);
+                                        num--;
+                                        num2++;
+                                    }
+                                }
+                                foreach (CharacterObject character in list)
+                                {
+                                    PartyBase.MainParty.MemberRoster.AddToCounts(character, 1, false, 0, 0, true, -1);
+                                }
+                            }
+                            PlayerEncounter.RestartPlayerEncounter(slaverParty.Party, PartyBase.MainParty, false);
+                            Hero.MainHero.HitPoints += 40;
+                            CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
+                            PlayerEncounter.Current.ForceAlleyFight = true;
+                            PlayerEncounter.StartBattle();
+                            PlayerEncounter.StartAlleyFightMission();
+                        }
+                        catch (Exception)
+                        {
+                            callback();
+                        }
+                    }
+                    else
+                    {
+                        callback();
+                    }
+
+
+
+                }
+                else
+                {
+                    CECustomHandler.LogToFile("ConsequenceStartBattle BattleSettings Missing");
+                    callback();
+                }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.LogToFile("ConsequenceStartBattle Failed: " + e);
+                callback();
+            }
+
+        }
+
 
         internal void ConsequencePlaySound(bool isListedEvent = false)
         {

@@ -28,6 +28,7 @@ using TaleWorlds.TwoDimension;
 using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
+using TaleWorlds.CampaignSystem.Actions;
 
 namespace CaptivityEvents
 {
@@ -58,6 +59,13 @@ namespace CaptivityEvents
             AfterBattle
         }
 
+        public enum BattleState
+        {
+            Normal,
+            StartBattle,
+            AfterBattle,
+        }
+
         // Events
         public static List<CEEvent> CEEvents = new List<CEEvent>();
         public static List<CEEvent> CEEventList = new List<CEEvent>();
@@ -67,6 +75,11 @@ namespace CaptivityEvents
         // Captive Variables
         public static bool captivePlayEvent;
         public static CharacterObject captiveToPlay;
+
+        public static string victoryEvent;
+        public static string defeatEvent;
+        public static List<TroopRosterElement> playerTroops = new List<TroopRosterElement>();
+        public static bool removePlayer = false;
 
         // Animation Variables
         public static bool animationPlayEvent;
@@ -85,6 +98,7 @@ namespace CaptivityEvents
         public static HuntState huntState = HuntState.Normal;
         public static DungeonState dungeonState = DungeonState.Normal;
         public static BrothelState brothelState = BrothelState.Normal;
+        public static BattleState battleState = BattleState.Normal;
 
         // Fade out for Brothel
         public static float brothelFadeIn = 2f;
@@ -793,6 +807,9 @@ namespace CaptivityEvents
 
             // Hunt Event To Play
             HuntStateCheck();
+
+            // Battle Event To Play
+            BattleStateCheck();
         }
 
 
@@ -1164,6 +1181,59 @@ namespace CaptivityEvents
                 else
                 {
                     PlayerEncounter.Update();
+                }
+            }
+        }
+
+        private void BattleStateCheck()
+        {
+            if (CEPersistence.battleState == CEPersistence.BattleState.Normal) return;
+
+            if (CEPersistence.battleState == CEPersistence.BattleState.StartBattle && Game.Current.GameStateManager.ActiveState is MissionState missionState && missionState.CurrentMission.IsLoadingFinished)
+            {
+                CEPersistence.battleState = CEPersistence.BattleState.AfterBattle;
+            }
+            else if(CEPersistence.battleState == CEPersistence.BattleState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState)
+            //TODO: move all of these to their proper listeners and out of the OnApplicationTick
+            {
+                if (PlayerEncounter.Current == null)
+                {
+                    LoadingWindow.DisableGlobalLoadingWindow();
+                    CEPersistence.battleState = CEPersistence.BattleState.Normal;
+                }
+                else
+                {              
+                    if (PlayerEncounter.Battle != null)
+                    {
+                        bool hasPlayerWon = PlayerEncounter.Battle.WinningSide == PlayerEncounter.Battle.PlayerSide;
+                        PlayerEncounter.Current.FinalizeBattle();
+
+                        PlayerEncounter.Finish(false);
+                        Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+                        PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter || CEPersistence.removePlayer);
+
+
+                        foreach (TroopRosterElement troopRosterElement in CEPersistence.playerTroops)
+                        {
+                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, 0, troopRosterElement.Xp, true, -1);
+                        }
+
+                        if (PlayerEncounter.EncounteredMobileParty != null)
+                        {
+                            DestroyPartyAction.Apply(null, PlayerEncounter.EncounteredMobileParty);
+                        }
+
+                        if (hasPlayerWon)
+                        {
+                            GameMenu.SwitchToMenu(CEPersistence.victoryEvent);
+                            mapstate2.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
+                        }
+                        else
+                        {
+                            GameMenu.SwitchToMenu(CEPersistence.defeatEvent);
+                            mapstate2.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
+                        }
+                    }
                 }
             }
         }

@@ -46,6 +46,7 @@ namespace CaptivityEvents.Custom
         SoldToNotable,
         PlayerIsNotBusy,
         PlayerAllowedCompanion,
+        StartBattle,
         HuntPrisoners,
         ReleaseRandomPrisoners,
         ReleaseAllPrisoners,
@@ -261,6 +262,25 @@ namespace CaptivityEvents.Custom
         public string EventWeight { get; set; }
 
         public string EventUseConditions { get; set; }
+    }
+
+    [DebuggerStepThrough]
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = true)]
+    [Serializable]
+    public class BattleSettings
+    {
+        [XmlAttribute()]
+        public string Ref { get; set; }
+
+        [XmlAttribute()]
+        public string Victory { get; set; }
+
+        [XmlAttribute()]
+        public string Defeat { get; set; }
+
+        [XmlArrayItem("SpawnTroop", IsNullable = true)]
+        public SpawnTroop[] SpawnTroops { get; set; }
     }
 
     public class Companion
@@ -633,6 +653,9 @@ namespace CaptivityEvents.Custom
 
         [XmlElement("StripSettings", IsNullable = true)]
         public StripSettings StripSettings { get; set; }
+
+        [XmlElement("BattleSettings", IsNullable = true)]
+        public BattleSettings BattleSettings { get; set; }
 
         [XmlArrayItem("SpawnTroop", IsNullable = true)]
         public SpawnTroop[] SpawnTroops { get; set; }

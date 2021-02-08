@@ -241,6 +241,10 @@ namespace CaptivityEvents.Events
                     CECustomHandler.ForceLogToFile("ConsequenceCompanions. Failed" + e.ToString());
                 }
             }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
+            {
+                _sharedCallBackHelper.ConsequenceStartBattle(() => { _captor.CECaptorContinue(args); }, 1);
+            }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners)) { _captor.CEPrisonerRebel(args); }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.HuntPrisoners)) { _captor.CEHuntPrisoners(args); }
             else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0)
