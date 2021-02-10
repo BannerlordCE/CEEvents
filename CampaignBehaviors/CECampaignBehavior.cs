@@ -20,6 +20,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
+using static CaptivityEvents.Helper.CEHelper;
 
 namespace CaptivityEvents.CampaignBehaviors
 {
@@ -445,8 +446,10 @@ namespace CaptivityEvents.CampaignBehaviors
             {
                 if (returnEquipment.Captive.IsPrisoner || returnEquipment.Captive.PartyBelongedToAsPrisoner != null) return;
 
-                foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                 {
+                    EquipmentIndex i = (EquipmentIndex)index;
+
                     try
                     {
                         EquipmentElement fetchedEquipment = returnEquipment.BattleEquipment.GetEquipmentFromSlot(i);

@@ -7,6 +7,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
+using static CaptivityEvents.Helper.CEHelper;
 
 namespace CaptivityEvents.Issues
 {
@@ -135,8 +136,10 @@ namespace CaptivityEvents.Issues
             {
                 AddLog(OnQuestSucceededLogText);
 
-                foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                 {
+                    EquipmentIndex i = (EquipmentIndex)index;
+
                     try
                     {
                         if (!Hero.MainHero.BattleEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(Hero.MainHero.BattleEquipment.GetEquipmentFromSlot(i).Item, 1);

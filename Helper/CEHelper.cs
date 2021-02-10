@@ -14,6 +14,23 @@ namespace CaptivityEvents.Helper
 {
     public class CEHelper
     {
+
+        public enum EquipmentCustomIndex
+        {
+            Weapon0 = 0,
+            Weapon1 = 1,
+            Weapon2 = 2,
+            Weapon3 = 3,
+            Weapon4 = 4,
+            Head = 5,
+            Body = 6,
+            Leg = 7,
+            Gloves = 8,
+            Cape = 9,
+            Horse = 10, 
+            HorseHarness = 11, 
+        }
+
         public static Hero spouseOne = null;
         public static Hero spouseTwo = null;
         public static bool brothelFlagFemale = false;

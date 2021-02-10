@@ -9,6 +9,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
+using static CaptivityEvents.Helper.CEHelper;
 using CETerrainType = CaptivityEvents.Custom.TerrainType;
 using TerrainType = TaleWorlds.Core.TerrainType;
 
@@ -727,8 +728,10 @@ namespace CaptivityEvents.Events
                 bool flagHaveItem = false;
                 ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
 
-                foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                 {
+                    EquipmentIndex i = (EquipmentIndex)index;
+
                     try
                     {
                         ItemObject battleItem = Hero.MainHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
@@ -777,8 +780,10 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.LeaderHero != null)
                 {
-                    foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                    foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                     {
+                        EquipmentIndex i = (EquipmentIndex)index;
+
                         try
                         {
                             ItemObject battleItem = captorParty.LeaderHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
@@ -1380,8 +1385,10 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.LeaderHero != null)
                 {
-                    foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                    foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                     {
+                        EquipmentIndex i = (EquipmentIndex)index;
+
                         try
                         {
                             ItemObject battleItem = captorParty.LeaderHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
@@ -1461,8 +1468,10 @@ namespace CaptivityEvents.Events
 
                     bool flagHaveItem = false;
 
-                    foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                    foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                     {
+                        EquipmentIndex i = (EquipmentIndex)index;
+
                         try
                         {
                             ItemObject battleItem = captiveHero.BattleEquipment.GetEquipmentFromSlot(i).Item;

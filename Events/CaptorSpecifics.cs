@@ -12,6 +12,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
+using static CaptivityEvents.Helper.CEHelper;
 
 namespace CaptivityEvents.Events
 {
@@ -342,8 +343,12 @@ namespace CaptivityEvents.Events
 
             if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captive, captive.BattleEquipment, captive.CivilianEquipment);
 
-            foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+
+
+            foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
             {
+                EquipmentIndex i = (EquipmentIndex)index;
+
                 try
                 {
                     if (!captive.BattleEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(captive.BattleEquipment.GetEquipmentFromSlot(i).Item, 1);
