@@ -279,6 +279,9 @@ namespace CaptivityEvents.Custom
         [XmlAttribute()]
         public string Defeat { get; set; }
 
+        [XmlAttribute()]
+        public string PlayerTroops { get; set; }
+
         [XmlArrayItem("SpawnTroop", IsNullable = true)]
         public SpawnTroop[] SpawnTroops { get; set; }
     }
