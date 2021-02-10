@@ -690,7 +690,7 @@ namespace CaptivityEvents.Events
             {
                 if (_option.BattleSettings != null)
                 {
-
+                    CEPersistence.animationPlayEvent = false;
                     CEEvent VictoryEvent, DefeatEvent;
 
                     try
@@ -705,7 +705,9 @@ namespace CaptivityEvents.Events
                     {
                         CECustomHandler.LogToFile("ConsequenceStartBattle VictoryEvent Missing");
                         callback();
+                        return;
                     }
+
                     try
                     {
                         DefeatEvent = _eventList.Find(item => item.Name == _option.BattleSettings.Defeat);
@@ -716,25 +718,75 @@ namespace CaptivityEvents.Events
                     }
                     catch (Exception)
                     {
-                        CECustomHandler.LogToFile("ConsequenceStartBattle VictoryEvent Missing");
+                        CECustomHandler.LogToFile("ConsequenceStartBattle DefeatEvent Missing");
                         callback();
+                        return;
                     }
 
+                    TroopRoster enemyTroops = TroopRoster.CreateDummyTroopRoster();
+                    TroopRoster friendlyTroops = TroopRoster.CreateDummyTroopRoster();
 
-                    CEPersistence.animationPlayEvent = false;
-
-                    TroopRoster generatedTrooper = TroopRoster.CreateDummyTroopRoster();
-                    int amount = 10;
-
-                    for (int i = 0; i < amount; i++)
+                    try
                     {
-                        CharacterObject randomElementWithPredicate = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
+                        if (_option.BattleSettings.SpawnTroops != null)
+                        {
+                            foreach (SpawnTroop troop in _option.BattleSettings.SpawnTroops)
+                            {
 
-                        generatedTrooper.AddToCounts(randomElementWithPredicate, 1, true);
+                                try
+                                {
+                                    int num = new CEVariablesLoader().GetIntFromXML(troop.Number);
+                                    int numWounded = new CEVariablesLoader().GetIntFromXML(troop.WoundedNumber);
+                                    CharacterObject characterObject = MBObjectManager.Instance.GetObject<CharacterObject>(troop.Id);
+
+                                    if (characterObject == null)
+                                    {
+                                        foreach (CharacterObject characterObject2 in MBObjectManager.Instance.GetObjectTypeList<CharacterObject>())
+                                        {
+                                            if (characterObject2.Occupation == Occupation.Soldier && string.Equals(characterObject2.Name.ToString(), troop.Id, StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                characterObject = characterObject2;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    if (characterObject != null)
+                                    {
+                                        if (num > 0)
+                                        {
+                                            if (troop.Ref != null && troop.Ref.ToLower() == "friendly")
+                                            {
+                                                friendlyTroops.AddToCounts(characterObject, num, false, numWounded, 0, true, -1);
+                                            }
+                                            else
+                                            {
+                                                enemyTroops.AddToCounts(characterObject, num, false, numWounded, 0, true, -1);
+                                            }
+                                        }
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    CECustomHandler.ForceLogToFile("Failed to SpawnTheTroops : " + e);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < 10; i++)
+                            {
+                                CharacterObject randomElementWithPredicate = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
+                                enemyTroops.AddToCounts(randomElementWithPredicate, 1, true);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        CECustomHandler.LogToFile("ConsequenceStartBattle SpawnTroops Failed");
                     }
 
-
-                    if (!generatedTrooper.GetTroopRoster().IsEmpty())
+                    if (!enemyTroops.GetTroopRoster().IsEmpty())
                     {
                         callback();
 
@@ -744,14 +796,16 @@ namespace CaptivityEvents.Events
 
 
                             TextObject textObject = new TextObject("The Slavers", null);
-                            slaverParty.InitializeMobileParty(generatedTrooper, TroopRoster.CreateDummyTroopRoster(), Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
+                            slaverParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
                             slaverParty.SetCustomName(textObject);
                             EnterSettlementAction.ApplyForParty(slaverParty, Settlement.CurrentSettlement);
+
                             //CharacterObject troopTypeTemplateForDifficulty = this.GetTroopTypeTemplateForDifficulty();
                             //slaverParty.MemberRoster.AddToCounts(troopTypeTemplateForDifficulty, 9, false, 0, 0, true, -1);
                             //ItemObject @object = MBObjectManager.Instance.GetObject<ItemObject>("cleaver_sword_t3");
                             //gangLeader.CharacterObject.FirstCivilianEquipment.AddEquipmentToSlotWithoutAgent(EquipmentIndex.WeaponItemBeginSlot, new EquipmentElement(@object, null));
                             //this._rivalGangLeaderParty.MemberRoster.AddToCounts(gangLeader.CharacterObject, 1, false, 0, 0, true, -1);
+
                             foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
                             {
                                 if (!troopRosterElement.Character.IsPlayerCharacter)
@@ -766,13 +820,14 @@ namespace CaptivityEvents.Events
                             {
                                 CEPersistence.removePlayer = true;
                                 PartyBase.MainParty.MemberRoster.AddToCounts(CharacterObject.PlayerCharacter, 1);
-                            } else
+                            }
+                            else
                             {
                                 CEPersistence.removePlayer = false;
                             }
-                            
 
                             //PartyBase.MainParty.MemberRoster.AddToCounts(troopTypeTemplateForDifficulty, 5, false, 0, 0, true, -1);
+
                             if (!CEPersistence.playerTroops.IsEmpty<TroopRosterElement>())
                             {
                                 List<CharacterObject> list = new List<CharacterObject>();
@@ -798,6 +853,13 @@ namespace CaptivityEvents.Events
                                     PartyBase.MainParty.MemberRoster.AddToCounts(character, 1, false, 0, 0, true, -1);
                                 }
                             }
+                            else
+                            {
+                                foreach (TroopRosterElement troopRosterElement3 in friendlyTroops.GetTroopRoster())
+                                {
+                                    PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement3.Character, troopRosterElement3.Number, false, troopRosterElement3.WoundedNumber, 0, true, -1);
+                                }
+                            }
                             PlayerEncounter.RestartPlayerEncounter(slaverParty.Party, PartyBase.MainParty, false);
                             Hero.MainHero.HitPoints += 40;
                             CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
@@ -805,18 +867,16 @@ namespace CaptivityEvents.Events
                             PlayerEncounter.StartBattle();
                             PlayerEncounter.StartAlleyFightMission();
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
-                            callback();
+                            CECustomHandler.LogToFile("ConsequenceStartBattle : " + e);
                         }
                     }
                     else
                     {
+                        CECustomHandler.LogToFile("ConsequenceStartBattle generatedTrooper is Empty");
                         callback();
                     }
-
-
-
                 }
                 else
                 {
