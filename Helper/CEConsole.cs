@@ -59,9 +59,15 @@ namespace CaptivityEvents.Helper
                     _provider.HuntBegins = customSettings.HuntBegins;
                     _provider.AmountOfTroopsForHunt = customSettings.AmountOfTroopsForHunt;
                     _provider.PrisonerEscapeBehavior = customSettings.PrisonerEscapeBehavior;
+                    _provider.PrisonerHeroEscapeParty = customSettings.PrisonerHeroEscapeParty;
+                    _provider.PrisonerHeroEscapeSettlement = customSettings.PrisonerHeroEscapeSettlement;
+                    _provider.PrisonerHeroEscapeOther = customSettings.PrisonerHeroEscapeOther;
                     _provider.PrisonerHeroEscapeChanceParty = customSettings.PrisonerHeroEscapeChanceParty;
                     _provider.PrisonerHeroEscapeChanceSettlement = customSettings.PrisonerHeroEscapeChanceSettlement;
                     _provider.PrisonerHeroEscapeChanceOther = customSettings.PrisonerHeroEscapeChanceOther;
+                    _provider.PrisonerNonHeroEscapeParty = customSettings.PrisonerNonHeroEscapeParty;
+                    _provider.PrisonerNonHeroEscapeSettlement = customSettings.PrisonerNonHeroEscapeSettlement;
+                    _provider.PrisonerNonHeroEscapeOther = customSettings.PrisonerNonHeroEscapeOther;
                     _provider.PrisonerNonHeroEscapeChanceParty = customSettings.PrisonerNonHeroEscapeChanceParty;
                     _provider.PrisonerNonHeroEscapeChanceSettlement = customSettings.PrisonerNonHeroEscapeChanceSettlement;
                     _provider.PrisonerNonHeroEscapeChanceOther = customSettings.PrisonerNonHeroEscapeChanceOther;

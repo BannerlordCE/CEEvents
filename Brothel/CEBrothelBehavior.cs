@@ -1303,8 +1303,7 @@ namespace CaptivityEvents.Brothel
                             // Workaround for Missing Bug By Bannerlord Tweaks.
                             _brothelList[i].CaptiveProstitutes[y].HeroObject.CaptivityStartTime = CampaignTime.Now;
 
-                            int numEscapeChance = CESettings.Instance.PrisonerHeroEscapeChanceSettlement;
-                            if (numEscapeChance == -1) numEscapeChance = 25;
+                            int numEscapeChance = CESettings.Instance.BrothelHeroEscapeChance;
 
                             if (MBRandom.RandomInt(100) < numEscapeChance)
                             {
@@ -1315,8 +1314,8 @@ namespace CaptivityEvents.Brothel
                         }
                         else
                         {
-                            int numEscapeChance = CESettings.Instance.PrisonerNonHeroEscapeChanceSettlement;
-                            if (numEscapeChance == -1) numEscapeChance = 25;
+
+                            int numEscapeChance = CESettings.Instance.BrothelNonHeroEscapeChance;
 
                             if (MBRandom.RandomInt(100) < numEscapeChance)
                             {
