@@ -461,9 +461,9 @@ namespace CaptivityEvents
                             9990,
                             () => { ScreenManager.PushScreen(new CESettingsScreen()); },
                             // 1.5.7
-                            //false
+                            false
                             // 1.5.8
-                            () => { return false; }
+                            //() => { return false; }
                         )
                       );
                 }
@@ -1066,7 +1066,7 @@ namespace CaptivityEvents
 
                             try
                             {
-                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(Agent.Main.GetAgentVoiceDefinition()); }).GetRandomElementInefficiently().Value;
+                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(Agent.Main.GetAgentVoiceDefinition()); }).GetRandomElement().Value;
                                 Mission.Current.MakeSound(soundnum, Agent.Main.Frame.origin, true, false, -1, -1);
                             }
                             catch (Exception) { }
@@ -1077,7 +1077,7 @@ namespace CaptivityEvents
 
                             try
                             {
-                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(CEPersistence.agentTalkingTo.GetAgentVoiceDefinition()); }).GetRandomElementInefficiently().Value;
+                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(CEPersistence.agentTalkingTo.GetAgentVoiceDefinition()); }).GetRandomElement().Value;
                                 Mission.Current.MakeSound(soundnum, Agent.Main.Frame.origin, true, false, -1, -1);
                             }
                             catch (Exception) { }
@@ -1208,6 +1208,11 @@ namespace CaptivityEvents
                         bool hasPlayerWon = PlayerEncounter.Battle.WinningSide == PlayerEncounter.Battle.PlayerSide;
                         PlayerEncounter.Current.FinalizeBattle();
 
+                        if (PlayerEncounter.EncounteredMobileParty != null)
+                        {
+                            DestroyPartyAction.Apply(null, PlayerEncounter.EncounteredMobileParty);
+                        }
+
                         PlayerEncounter.Finish(false);
                         Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
                         PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter || CEPersistence.removePlayer);
@@ -1216,11 +1221,6 @@ namespace CaptivityEvents
                         foreach (TroopRosterElement troopRosterElement in CEPersistence.playerTroops)
                         {
                             PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, 0, troopRosterElement.Xp, true, -1);
-                        }
-
-                        if (PlayerEncounter.EncounteredMobileParty != null)
-                        {
-                            DestroyPartyAction.Apply(null, PlayerEncounter.EncounteredMobileParty);
                         }
 
                         if (hasPlayerWon)

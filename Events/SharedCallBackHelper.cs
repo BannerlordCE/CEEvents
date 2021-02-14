@@ -742,7 +742,8 @@ namespace CaptivityEvents.Events
 
                                     if (troop.Id != null && troop.Id.ToLower() == "random")
                                     {
-                                        CharacterObject randomElementWithPredicate = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
+                                        //characterObject = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
+                                        characterObject = CharacterObject.All.Where((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier).GetRandomElement();
                                     }
                                     else
                                     {
@@ -790,8 +791,10 @@ namespace CaptivityEvents.Events
                         {
                             for (int i = 0; i < 10; i++)
                             {
-                                CharacterObject randomElementWithPredicate = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
-                                enemyTroops.AddToCounts(randomElementWithPredicate, 1, true);
+                                CharacterObject characterObject = 
+                                    //CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
+                                    CharacterObject.All.Where((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier).GetRandomElement();
+                                enemyTroops.AddToCounts(characterObject, 1, true);
                             }
                         }
                     }
@@ -800,7 +803,7 @@ namespace CaptivityEvents.Events
                         CECustomHandler.LogToFile("ConsequenceStartBattle SpawnTroops Failed");
                     }
 
-                    if (!enemyTroops.GetTroopRoster().IsEmpty() && _option.BattleSettings.Ref != null)
+                    if (!enemyTroops.IsEmpty() && _option.BattleSettings.Ref != null)
                     {
                         callback();
                         Hero.MainHero.HitPoints += 40;
@@ -819,7 +822,7 @@ namespace CaptivityEvents.Events
                                     EnterSettlementAction.ApplyForParty(slaverParty, Settlement.CurrentSettlement);
 
 
-                                    foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
+                                    foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster)
                                     {
                                         if (!troopRosterElement.Character.IsPlayerCharacter) CEPersistence.playerTroops.Add(troopRosterElement);
                                     }
@@ -860,12 +863,12 @@ namespace CaptivityEvents.Events
                                         }
                                     }
 
-                                    foreach (TroopRosterElement troopRosterElement in temporaryTroops.GetTroopRoster())
+                                    foreach (TroopRosterElement troopRosterElement in temporaryTroops)
                                     {
                                         PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
                                     }
 
-                                    foreach (TroopRosterElement troopRosterElement in friendlyTroops.GetTroopRoster())
+                                    foreach (TroopRosterElement troopRosterElement in friendlyTroops)
                                     {
                                         PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
                                         CEPersistence.playerTroops.Add(troopRosterElement);

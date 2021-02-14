@@ -92,7 +92,7 @@ namespace CaptivityEvents.Events
                 MobileParty.MainParty.PrisonRoster.KillNumberOfMenRandomly(amount, false);
                 if (releaseHeroes)
                 {
-                    foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster.GetTroopRoster())
+                    foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster)
                     {
                         if (element.Character.IsHero) element.Character.HeroObject.ChangeState(Hero.CharacterStates.Active);
                     }
@@ -154,7 +154,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-                foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster.GetTroopRoster())
+                foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster)
                 {
                     if (element.Character.IsHero) element.Character.HeroObject.ChangeState(Hero.CharacterStates.Active);
                 }
@@ -166,13 +166,13 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't find anymore prisoners.");
             }
 
-            if (!releasedPrisoners.GetTroopRoster().IsEmpty())
+            if (!releasedPrisoners.IsEmpty())
             {
                 try
                 {
                     MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Rebel_Captives_" + MBRandom.RandomFloatRanged(float.MaxValue));
 
-                    TroopRosterElement leader = releasedPrisoners.GetTroopRoster().FirstOrDefault(hasHero => hasHero.Character.IsHero);
+                    TroopRosterElement leader = releasedPrisoners.FirstOrDefault(hasHero => hasHero.Character.IsHero);
 
                     Clan clan = null;
                     Settlement nearest = null;
@@ -253,7 +253,7 @@ namespace CaptivityEvents.Events
             {
                 for (int i = 0; i < amount; i++)
                 {
-                    TroopRosterElement test = MobileParty.MainParty.PrisonRoster.GetTroopRoster().Where(troop => !troop.Character.IsHero).GetRandomElementInefficiently();
+                    TroopRosterElement test = MobileParty.MainParty.PrisonRoster.Where(troop => !troop.Character.IsHero).GetRandomElement();
 
                     if (test.Character == null) continue;
 
@@ -266,7 +266,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't find anymore prisoners.");
             }
 
-            if (!releasedPrisoners.GetTroopRoster().IsEmpty())
+            if (!releasedPrisoners.IsEmpty())
             {
                 CECaptorContinue(args);
 

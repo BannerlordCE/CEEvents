@@ -1,4 +1,4 @@
-﻿#define BETA // 1.5.8
+﻿//#define BETA // 1.5.8
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using Helpers;
