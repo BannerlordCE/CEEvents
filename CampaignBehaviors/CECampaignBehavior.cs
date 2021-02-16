@@ -221,12 +221,15 @@ namespace CaptivityEvents.CampaignBehaviors
         private Hero DeliverOffSpring(Hero mother, Hero father, bool isOffspringFemale, int age = 1)
         {
             CharacterObject characterObject = isOffspringFemale ? mother.CharacterObject : father.CharacterObject;
-            characterObject.Culture = Hero.MainHero.Culture;
+            characterObject.Culture = mother.Culture;
 
             // Reflection One
             MethodInfo mi = typeof(HeroCreator).GetMethod("CreateNewHero", BindingFlags.NonPublic | BindingFlags.Static);
             if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null, 0);
             Hero hero = (Hero)mi.Invoke(null, new object[] { characterObject, age });
+
+            // For Wanderer Pregnancy
+            hero.SetBirthDay(CampaignTime.Now);
 
             int becomeChildAge = Campaign.Current.Models.AgeModel.BecomeChildAge;
             CharacterObject characterObject2 = CharacterObject.ChildTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
@@ -326,7 +329,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 int num = flag ? 2 : 1;
                 int stillbornCount = 0;
 
-                for (int i = 0; i < num; i++)
+                for (int i = 0; i < 1; i++)
                 {
                     if (MBRandom.RandomFloat > pregnancyModel.StillbirthProbability)
                     {

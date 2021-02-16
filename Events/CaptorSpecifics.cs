@@ -4,6 +4,7 @@ using CaptivityEvents.Custom;
 using HarmonyLib;
 using Helpers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
@@ -170,7 +171,7 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Rebel_Captives_" + MBRandom.RandomFloatRanged(float.MaxValue));
+                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyCE_" + MBRandom.RandomFloatRanged(float.MaxValue));
 
                     TroopRosterElement leader = releasedPrisoners.FirstOrDefault(hasHero => hasHero.Character.IsHero);
 
@@ -272,7 +273,7 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives_" + MBRandom.RandomFloatRanged(float.MaxValue));
+                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyCE_" + MBRandom.RandomFloatRanged(float.MaxValue));
 
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                     clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
@@ -325,6 +326,26 @@ namespace CaptivityEvents.Events
         internal void CEMakeHeroCompanion(Hero captive)
         {
             if (captive == null) return;
+            if (captive.IsFactionLeader)
+            {
+                if (captive.Clan != null && captive.Clan.IsKingdomFaction)
+                {
+                    Kingdom kingdom = captive.Clan.Kingdom;
+                    Clan result = null;
+                    float num = 0f;
+                    IEnumerable<Clan> clans = kingdom.Clans;
+                    foreach (Clan clan in clans.Where((Clan t) => t.Heroes.Any((Hero h) => h.IsAlive) && !t.IsMinorFaction && t != captive.Clan))
+                    {
+                        float clanStrength = Campaign.Current.Models.DiplomacyModel.GetClanStrength(clan);
+                        if (num <= clanStrength)
+                        {
+                            num = clanStrength;
+                            result = clan;
+                        }
+                    }
+                    kingdom.RulingClan = result;
+                }
+            }
             AddCompanionAction.Apply(Clan.PlayerClan, captive);
         }
 

@@ -1983,7 +1983,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroCaptorRelation(ref MenuCallbackArgs args)
         {
-            if (_listedEvent.Captive.HeroObject == null) return;
+            if (_listedEvent?.Captive?.HeroObject == null) return;
 
             try
             {

@@ -3,9 +3,12 @@ using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using Helpers;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.Election;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -37,9 +40,46 @@ namespace CaptivityEvents.Events
             //InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
         }
 
+
+        internal void RemoveFactionLeader(Hero hero)
+        {
+            if ((hero.Clan?.Leader) == hero)
+            {
+                if (hero != Hero.MainHero && hero.Clan.Heroes.Any((Hero x) => !x.IsChild && x != hero && x.IsAlive && (x.IsNoble || x.IsMinorFactionHero)))
+                {
+                    ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(hero.Clan);
+                }
+                if (hero.Clan.Kingdom != null && hero.Clan.Kingdom.RulingClan == hero.Clan)
+                {
+                    List<Clan> list = (from t in hero.Clan.Kingdom.Clans
+                                       where !t.IsEliminated && t.Leader != hero
+                                       select t).ToList();
+                    if (list.IsEmpty())
+                    {
+                        DestroyKingdomAction.Apply(hero.Clan.Kingdom);
+                    }
+                    else if (list.Count > 1)
+                    {
+                        Clan clanToExclude = (hero.Clan.Leader == hero || hero.Clan.Leader == null) ? hero.Clan : null;
+                        hero.Clan.Kingdom.AddDecision(new KingSelectionKingdomDecision(hero.Clan, clanToExclude), true);
+                    }
+                    else
+                    {
+                        hero.Clan.Kingdom.RulingClan = list.First<Clan>();
+                    }
+                }
+            }
+        }
+
         internal void ChangeSpouse(Hero hero, Hero spouseHero)
         {
             Hero heroSpouse = hero.Spouse;
+
+            // Same Clan is Bugged
+            if (hero.Clan == spouseHero.Clan) return;
+
+            if (!hero.IsHumanPlayerCharacter && hero.IsFactionLeader) RemoveFactionLeader(hero);
+            else if (!spouseHero.IsHumanPlayerCharacter && spouseHero.IsFactionLeader) RemoveFactionLeader(spouseHero);
 
             if (heroSpouse != null)
             {
@@ -422,6 +462,7 @@ namespace CaptivityEvents.Events
             }
         }
 
+        // KillCharacterAction && MarriageAction
         internal void ClanOption(Hero firstHero, Clan newClan, bool setLeader = false, bool adopt = false)
         {
             if (firstHero.Clan != newClan)
@@ -430,13 +471,10 @@ namespace CaptivityEvents.Events
                 PropertyInfo pi = Campaign.Current.GetType().GetProperty("PlayerDefaultFaction", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 try
                 {
-                    if (firstHero.GovernorOf != null)
-                    {
-                        ChangeGovernorAction.ApplyByGiveUpCurrent(firstHero);
-                    }
+                    RemoveFactionLeader(firstHero);
+
                     if (firstHero.PartyBelongedTo != null && clan != null && !firstHero.IsHumanPlayerCharacter)
                     {
-
                         if (clan.Kingdom != newClan.Kingdom)
                         {
                             if (firstHero.PartyBelongedTo.Army != null)
@@ -466,6 +504,12 @@ namespace CaptivityEvents.Events
                             partyBelongedTo.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default, 0);
                         }
                     }
+
+                    if (firstHero.GovernorOf != null)
+                    {
+                        ChangeGovernorAction.ApplyByGiveUpCurrent(firstHero);
+                    }
+
                     firstHero.Clan = newClan;
                     if (pi != null && firstHero.IsHumanPlayerCharacter) pi.SetValue(Campaign.Current, newClan);
                     if (clan != null)

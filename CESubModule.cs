@@ -64,6 +64,7 @@ namespace CaptivityEvents
             Normal,
             StartBattle,
             AfterBattle,
+            UpdateBattle,
         }
 
         // Events
@@ -80,6 +81,9 @@ namespace CaptivityEvents
         public static string defeatEvent;
         public static List<TroopRosterElement> playerTroops = new List<TroopRosterElement>();
         public static bool removePlayer = false;
+        public static bool destroyParty = false;
+        public static bool surrenderParty = false;
+        public static bool playerWon = false;
 
         // Animation Variables
         public static bool animationPlayEvent;
@@ -462,8 +466,8 @@ namespace CaptivityEvents
                             () => { ScreenManager.PushScreen(new CESettingsScreen()); },
                             // 1.5.7
                             false
-                            // 1.5.8
-                            //() => { return false; }
+                        // 1.5.8
+                        //() => { return false; }
                         )
                       );
                 }
@@ -610,7 +614,7 @@ namespace CaptivityEvents
             {
                 if (PlayerEncounter.Current == null) return;
                 if (PlayerEncounter.EncounteredMobileParty == null) return;
-                if (PlayerEncounter.EncounteredMobileParty.StringId != "Escaped_Captives") return;
+                if (!PlayerEncounter.EncounteredMobileParty.StringId.StartsWith("CustomPartyCE")) return;
                 CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
             }
             catch (Exception)
@@ -915,7 +919,9 @@ namespace CaptivityEvents
                         }
 
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
-                        mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
+                        mapState.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                                   ? "wait_prisoner_female"
+                                                                   : "wait_prisoner_male");
                     }
                 }
                 catch (Exception)
@@ -1175,7 +1181,6 @@ namespace CaptivityEvents
             {
                 if (PlayerEncounter.Current == null)
                 {
-                    LoadingWindow.DisableGlobalLoadingWindow();
                     CEPersistence.huntState = CEPersistence.HuntState.Normal;
                 }
                 else
@@ -1193,47 +1198,130 @@ namespace CaptivityEvents
             {
                 CEPersistence.battleState = CEPersistence.BattleState.AfterBattle;
             }
-            else if(CEPersistence.battleState == CEPersistence.BattleState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState)
+            else if (CEPersistence.battleState == CEPersistence.BattleState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState)
             //TODO: move all of these to their proper listeners and out of the OnApplicationTick
             {
                 if (PlayerEncounter.Current == null)
                 {
-                    LoadingWindow.DisableGlobalLoadingWindow();
                     CEPersistence.battleState = CEPersistence.BattleState.Normal;
+                    if (CEPersistence.playerWon)
+                    {
+                        GameMenu.ActivateGameMenu(CEPersistence.victoryEvent);
+                        if (mapstate2.MenuContext != null)
+                        {
+                            mapstate2.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                                   ? "wait_prisoner_female"
+                                                                   : "wait_prisoner_male");
+                        }
+                    }
+                    else
+                    {
+                        GameMenu.ActivateGameMenu(CEPersistence.defeatEvent);
+                        if (mapstate2.MenuContext != null)
+                        {
+                            mapstate2.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                                   ? "wait_prisoner_female"
+                                                                   : "wait_prisoner_male");
+                        }
+                    }
                 }
                 else
-                {              
-                    if (PlayerEncounter.Battle != null)
+                {
+                    try
                     {
-                        bool hasPlayerWon = PlayerEncounter.Battle.WinningSide == PlayerEncounter.Battle.PlayerSide;
-                        PlayerEncounter.Current.FinalizeBattle();
+                        if (PlayerEncounter.Battle == null) return;
 
-                        if (PlayerEncounter.EncounteredMobileParty != null)
-                        {
-                            DestroyPartyAction.Apply(null, PlayerEncounter.EncounteredMobileParty);
-                        }
+                        CEPersistence.playerWon = PlayerEncounter.Battle.WinningSide == PlayerEncounter.Battle.PlayerSide;
 
-                        PlayerEncounter.Finish(false);
-                        Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
                         PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter || CEPersistence.removePlayer);
 
+                        if (Settlement.CurrentSettlement != null)
+                        {
+                            Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+                        }
 
                         foreach (TroopRosterElement troopRosterElement in CEPersistence.playerTroops)
                         {
                             PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, 0, troopRosterElement.Xp, true, -1);
                         }
 
-                        if (hasPlayerWon)
+                        if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.destroyParty)
                         {
-                            GameMenu.SwitchToMenu(CEPersistence.victoryEvent);
-                            mapstate2.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
+                            PlayerEncounter.Current.FinalizeBattle();
+                            DestroyPartyAction.Apply(null, PlayerEncounter.EncounteredMobileParty);
+                            PlayerEncounter.Finish(false);
+                        }
+                        else if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.surrenderParty)
+                        {
+                            try
+                            {
+                                if (CEPersistence.playerWon)
+                                {
+                                    PlayerEncounter.EnemySurrender = true;
+                                } 
+                                else
+                                {
+                                    PlayerEncounter.PlayerSurrender = true;
+                                }                         
+                                PlayerEncounter.Update();
+                                CEPersistence.battleState = CEPersistence.BattleState.UpdateBattle;
+                            }
+                            catch (Exception)
+                            {
+                                PlayerEncounter.Finish(true);
+                            }
                         }
                         else
                         {
-                            GameMenu.SwitchToMenu(CEPersistence.defeatEvent);
-                            mapstate2.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
+                            PlayerEncounter.Current.FinalizeBattle();
+                            PlayerEncounter.Finish(false);
                         }
                     }
+                    catch (Exception e)
+                    {
+                        CECustomHandler.ForceLogToFile("BattleStateCheck: " + e);
+                        LoadingWindow.DisableGlobalLoadingWindow();
+                        CEPersistence.battleState = CEPersistence.BattleState.Normal;
+                    }
+                }
+            }
+            else if (CEPersistence.battleState == CEPersistence.BattleState.UpdateBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate3 && !mapstate3.IsMenuState)
+            //TODO: move all of these to their proper listeners and out of the OnApplicationTick
+            {
+                try
+                {
+                    if (PlayerEncounter.Current == null)
+                    {
+                        CEPersistence.battleState = CEPersistence.BattleState.Normal;
+                        if (CEPersistence.playerWon)
+                        {
+                            GameMenu.ActivateGameMenu(CEPersistence.victoryEvent);
+                            if (mapstate3.MenuContext != null)
+                            {
+                                mapstate3.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                                       ? "wait_prisoner_female"
+                                                                       : "wait_prisoner_male");
+                            }
+                        }
+                        else
+                        {
+                            GameMenu.ActivateGameMenu(CEPersistence.defeatEvent);
+                            if (mapstate3.MenuContext != null)
+                            {
+                                mapstate3.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                                       ? "wait_prisoner_female"
+                                                                       : "wait_prisoner_male");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        PlayerEncounter.Update();
+                    }
+                } 
+                catch (Exception)
+                {
+                    CEPersistence.battleState = CEPersistence.BattleState.Normal;
                 }
             }
         }
