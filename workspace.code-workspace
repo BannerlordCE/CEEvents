@@ -1,9 +1,6 @@
 {
 	"folders": [
 		{
-			"path": "..\\..\\zCEAnimations"
-		},
-		{
 			"path": "..\\..\\zCEDefaults"
 		},
 		{
@@ -23,6 +20,9 @@
 		},
 		{
 			"path": "..\\ModuleLogs"
+		},
+		{
+			"path": "..\\..\\zCEDevelopment"
 		}
 	]
 }

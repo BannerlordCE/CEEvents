@@ -807,7 +807,7 @@ namespace CaptivityEvents.Events
                     {
                         callback();
                         Hero.MainHero.HitPoints += 40;
-
+                        CEPersistence.playerTroops.Clear();
                         try
                         {
                             switch (_option.BattleSettings.Ref.ToLower())
@@ -825,7 +825,6 @@ namespace CaptivityEvents.Events
                                         customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
                                         customParty.SetCustomName(textObject);
                                         EnterSettlementAction.ApplyForParty(customParty, Settlement.CurrentSettlement);
-
 
                                         foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster)
                                         {
