@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Config;
+﻿#define BETA // 1.5.8
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Issues;
 using HarmonyLib;
@@ -742,8 +743,11 @@ namespace CaptivityEvents.Events
 
                                     if (troop.Id != null && troop.Id.ToLower() == "random")
                                     {
-                                        //characterObject = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
+#if BETA
+                                        characterObject = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
+#else
                                         characterObject = CharacterObject.All.Where((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier).GetRandomElement();
+#endif          
                                     }
                                     else
                                     {
@@ -792,8 +796,11 @@ namespace CaptivityEvents.Events
                             for (int i = 0; i < 10; i++)
                             {
                                 CharacterObject characterObject =
-                                    //CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
+#if BETA
+                                    CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
+#else
                                     CharacterObject.All.Where((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier).GetRandomElement();
+#endif
                                 enemyTroops.AddToCounts(characterObject, 1, true);
                             }
                         }
@@ -802,8 +809,11 @@ namespace CaptivityEvents.Events
                     {
                         CECustomHandler.ForceLogToFile("ConsequenceStartBattle SpawnTroops Failed");
                     }
-
+#if BETA
+                    if (!enemyTroops.GetTroopRoster().IsEmpty() && _option.BattleSettings.Ref != null)
+#else
                     if (!enemyTroops.IsEmpty() && _option.BattleSettings.Ref != null)
+#endif
                     {
                         callback();
                         Hero.MainHero.HitPoints += 40;
@@ -825,8 +835,11 @@ namespace CaptivityEvents.Events
                                         customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
                                         customParty.SetCustomName(textObject);
                                         EnterSettlementAction.ApplyForParty(customParty, Settlement.CurrentSettlement);
-
+#if BETA
+                                        foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
+#else
                                         foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster)
+#endif
                                         {
                                             if (!troopRosterElement.Character.IsPlayerCharacter) CEPersistence.playerTroops.Add(troopRosterElement);
                                         }
@@ -868,7 +881,18 @@ namespace CaptivityEvents.Events
                                                 PartyBase.MainParty.MemberRoster.AddToCounts(character, 1, false, 0, 0, true, -1);
                                             }
                                         }
+#if BETA
+                                        foreach (TroopRosterElement troopRosterElement in temporaryTroops.GetTroopRoster())
+                                        {
+                                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
+                                        }
 
+                                        foreach (TroopRosterElement troopRosterElement in friendlyTroops.GetTroopRoster())
+                                        {
+                                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
+                                            CEPersistence.playerTroops.Add(troopRosterElement);
+                                        }
+#else
                                         foreach (TroopRosterElement troopRosterElement in temporaryTroops)
                                         {
                                             PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
@@ -879,7 +903,7 @@ namespace CaptivityEvents.Events
                                             PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
                                             CEPersistence.playerTroops.Add(troopRosterElement);
                                         }
-
+#endif
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, false);
                                         CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
                                         CEPersistence.destroyParty = true;
@@ -928,7 +952,11 @@ namespace CaptivityEvents.Events
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
                                         customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
+#if BETA
+                                        foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
+#else
                                         foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster)
+#endif
                                         {
                                             if (!troopRosterElement.Character.IsPlayerCharacter) CEPersistence.playerTroops.Add(troopRosterElement);
                                         }
@@ -969,6 +997,18 @@ namespace CaptivityEvents.Events
                                             }
                                         }
 
+#if BETA
+                                        foreach (TroopRosterElement troopRosterElement in temporaryTroops.GetTroopRoster())
+                                        {
+                                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
+                                        }
+
+                                        foreach (TroopRosterElement troopRosterElement in friendlyTroops.GetTroopRoster())
+                                        {
+                                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
+                                            CEPersistence.playerTroops.Add(troopRosterElement);
+                                        }
+#else
                                         foreach (TroopRosterElement troopRosterElement in temporaryTroops)
                                         {
                                             PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
@@ -979,6 +1019,7 @@ namespace CaptivityEvents.Events
                                             PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
                                             CEPersistence.playerTroops.Add(troopRosterElement);
                                         }
+#endif
 
                                         Campaign.Current.Parties.AddItem(customParty.Party);
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, true);
@@ -1045,7 +1086,11 @@ namespace CaptivityEvents.Events
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
                                         customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
+#if BETA
+                                        foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
+#else
                                         foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster)
+#endif                                  
                                         {
                                             if (!troopRosterElement.Character.IsPlayerCharacter) CEPersistence.playerTroops.Add(troopRosterElement);
                                         }
@@ -1086,6 +1131,18 @@ namespace CaptivityEvents.Events
                                             }
                                         }
 
+#if BETA
+                                        foreach (TroopRosterElement troopRosterElement in temporaryTroops.GetTroopRoster())
+                                        {
+                                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
+                                        }
+
+                                        foreach (TroopRosterElement troopRosterElement in friendlyTroops.GetTroopRoster())
+                                        {
+                                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
+                                            CEPersistence.playerTroops.Add(troopRosterElement);
+                                        }
+#else
                                         foreach (TroopRosterElement troopRosterElement in temporaryTroops)
                                         {
                                             PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
@@ -1096,6 +1153,7 @@ namespace CaptivityEvents.Events
                                             PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
                                             CEPersistence.playerTroops.Add(troopRosterElement);
                                         }
+#endif
 
                                         Campaign.Current.Parties.AddItem(customParty.Party);
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, true);
@@ -1321,6 +1379,6 @@ namespace CaptivityEvents.Events
             }
         }
 
-        #endregion
+#endregion
     }
 }

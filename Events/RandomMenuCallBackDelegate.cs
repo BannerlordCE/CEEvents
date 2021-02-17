@@ -467,7 +467,8 @@ namespace CaptivityEvents.Events
             try
             {
                 Settlement settlement = PartyBase.MainParty.MobileParty.CurrentSettlement;
-                Hero notable = settlement.Notables.Where(findFirstNotable => !findFirstNotable.IsFemale).GetRandomElement();
+                Hero notable = settlement.Notables.GetRandomElementWithPredicate(findFirstNotable => !findFirstNotable.IsFemale);
+                //Hero notable = settlement.Notables.Where(findFirstNotable => !findFirstNotable.IsFemale).GetRandomElement();
                 CECampaignBehavior.ExtraProps.Owner = notable;
 
                 PartyBase party = PartyBase.MainParty.MobileParty.CurrentSettlement.Party;

@@ -109,7 +109,7 @@ namespace CaptivityEvents.Events
             {
                 if (heroname == null)
                 {
-                    foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster)
+                    foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster.GetTroopRoster())
                     {
                         if (troopRosterElement.Character != null)
                         {
@@ -131,7 +131,7 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
-                    TroopRosterElement specificTroopRosterElement = PartyBase.MainParty.PrisonRoster.FirstOrDefault(troopRosterElement => troopRosterElement.Character != null && troopRosterElement.Character.Name.ToString() == heroname);
+                    TroopRosterElement specificTroopRosterElement = PartyBase.MainParty.PrisonRoster.GetTroopRoster().FirstOrDefault(troopRosterElement => troopRosterElement.Character != null && troopRosterElement.Character.Name.ToString() == heroname);
 
                     if (specificTroopRosterElement.Character == null) return "$FAILTOFINDHERO";
 

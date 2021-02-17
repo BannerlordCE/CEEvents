@@ -465,9 +465,9 @@ namespace CaptivityEvents
                             9990,
                             () => { ScreenManager.PushScreen(new CESettingsScreen()); },
                             // 1.5.7
-                            false
-                        // 1.5.8
-                        //() => { return false; }
+                            // false
+                            // 1.5.8
+                            () => { return false; }
                         )
                       );
                 }
@@ -1072,7 +1072,7 @@ namespace CaptivityEvents
 
                             try
                             {
-                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(Agent.Main.GetAgentVoiceDefinition()); }).GetRandomElement().Value;
+                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(Agent.Main.GetAgentVoiceDefinition()); }).GetRandomElementInefficiently().Value;
                                 Mission.Current.MakeSound(soundnum, Agent.Main.Frame.origin, true, false, -1, -1);
                             }
                             catch (Exception) { }
@@ -1083,7 +1083,7 @@ namespace CaptivityEvents
 
                             try
                             {
-                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(CEPersistence.agentTalkingTo.GetAgentVoiceDefinition()); }).GetRandomElement().Value;
+                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(CEPersistence.agentTalkingTo.GetAgentVoiceDefinition()); }).GetRandomElementInefficiently().Value;
                                 Mission.Current.MakeSound(soundnum, Agent.Main.Frame.origin, true, false, -1, -1);
                             }
                             catch (Exception) { }

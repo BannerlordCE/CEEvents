@@ -1,4 +1,4 @@
-﻿//#define BETA // 1.5.8
+﻿#define BETA // 1.5.8
 using CaptivityEvents.Custom;
 using System;
 using System.Linq;
@@ -89,12 +89,12 @@ namespace CaptivityEvents.Events
 #if BETA
                     CharacterObject wanderer = (from x in CharacterObject.Templates
                                                 where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture != null && x.Culture.StringId == culture.ToLower()) && (heroVariables.Gender == null || x.IsFemale == isFemale)
-                                                select x).GetRandomElement();
+                                                select x).GetRandomElementInefficiently();
                     Settlement randomElement = (from settlement in Settlement.All
                                                 where settlement.Culture == wanderer.Culture && settlement.IsTown
-                                                select settlement).GetRandomElement();
+                                                select settlement).GetRandomElementInefficiently();
 
-                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElement(), null, -1);
+                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElementInefficiently(), null, -1);
 #else
                     CharacterObject wanderer = (from x in CharacterObject.Templates
                                                 where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture != null && x.Culture.StringId == culture.ToLower()) && (heroVariables.Gender == null || x.IsFemale == isFemale)

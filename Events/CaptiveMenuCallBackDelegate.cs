@@ -520,7 +520,8 @@ namespace CaptivityEvents.Events
                     ? PlayerCaptivity.CaptorParty.Settlement
                     : PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement;
 
-                Hero notable = settlement.Notables.Where(findFirstNotable => !findFirstNotable.IsFemale).GetRandomElement();
+                Hero notable = settlement.Notables.GetRandomElementWithPredicate(findFirstNotable => !findFirstNotable.IsFemale);
+                //Hero notable = settlement.Notables.Where(findFirstNotable => !findFirstNotable.IsFemale).GetRandomElement();
                 CECampaignBehavior.ExtraProps.Owner = notable;
                 _captive.CECaptivityChange(ref args, settlement.Party);
             }
