@@ -166,7 +166,7 @@ namespace CaptivityEvents.Events
             ScoresCalculation scoresCalculation = new ScoresCalculation();
 
 
-            if (targetHero != null && targetHero.IsFemale && !targetHero.IsPregnant)
+            if (targetHero != null && targetHero.IsFemale && !targetHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(targetHero))
             {
                 if (CESettings.Instance != null && IsHeroAgeSuitableForPregnancy(targetHero) && CESettings.Instance.PregnancyToggle)
                 {
@@ -184,7 +184,8 @@ namespace CaptivityEvents.Events
 
                     if (captorHero != null)
                     {
-                        randomSoldier = captorHero;
+                        if (!captorHero.IsFemale) randomSoldier = captorHero;
+                        else return;
                     }
                     else if (lord && CECampaignBehavior.ExtraProps.Owner != null)
                     {
@@ -266,12 +267,12 @@ namespace CaptivityEvents.Events
                 if (captorHero != null)
                 {
                     randomSoldier = captorHero;
-                    if (!(randomSoldier.IsFemale && !randomSoldier.IsPregnant)) return;
+                    if (!(randomSoldier.IsFemale && !randomSoldier.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(randomSoldier))) return;
                 }
                 else if (lord && targetHero.PartyBelongedToAsPrisoner != null && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty?.LeaderHero != null)
                 {
                     randomSoldier = targetHero.PartyBelongedToAsPrisoner.MobileParty.LeaderHero;
-                    if (!(randomSoldier.IsFemale && !randomSoldier.IsPregnant)) return;
+                    if (!(randomSoldier.IsFemale && !randomSoldier.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(randomSoldier))) return;
                 }
                 else if (targetHero.PartyBelongedToAsPrisoner != null && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty != null)
                 {
