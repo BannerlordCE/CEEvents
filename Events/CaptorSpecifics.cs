@@ -4,6 +4,7 @@ using CaptivityEvents.Custom;
 using HarmonyLib;
 using Helpers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
@@ -12,6 +13,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
+using static CaptivityEvents.Helper.CEHelper;
 
 namespace CaptivityEvents.Events
 {
@@ -91,7 +93,7 @@ namespace CaptivityEvents.Events
                 MobileParty.MainParty.PrisonRoster.KillNumberOfMenRandomly(amount, false);
                 if (releaseHeroes)
                 {
-                    foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster)
+                    foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster.GetTroopRoster())
                     {
                         if (element.Character.IsHero) element.Character.HeroObject.ChangeState(Hero.CharacterStates.Active);
                     }
@@ -153,7 +155,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-                foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster)
+                foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster.GetTroopRoster())
                 {
                     if (element.Character.IsHero) element.Character.HeroObject.ChangeState(Hero.CharacterStates.Active);
                 }
@@ -165,13 +167,13 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't find anymore prisoners.");
             }
 
-            if (!releasedPrisoners.IsEmpty())
+            if (!releasedPrisoners.GetTroopRoster().IsEmpty())
             {
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Rebel_Captives_" + MBRandom.RandomFloatRanged(float.MaxValue));
+                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyCE_" + MBRandom.RandomFloatRanged(float.MaxValue));
 
-                    TroopRosterElement leader = releasedPrisoners.FirstOrDefault(hasHero => hasHero.Character.IsHero);
+                    TroopRosterElement leader = releasedPrisoners.GetTroopRoster().FirstOrDefault(hasHero => hasHero.Character.IsHero);
 
                     Clan clan = null;
                     Settlement nearest = null;
@@ -190,10 +192,6 @@ namespace CaptivityEvents.Events
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
-                    // 1.5.6
-                    // prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-
-                    // 1.5.7
                     prisonerParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
                     prisonerParty.SetCustomName(new TextObject("{=CEEVENTS1107}Escaped Captives"));
 
@@ -256,7 +254,7 @@ namespace CaptivityEvents.Events
             {
                 for (int i = 0; i < amount; i++)
                 {
-                    TroopRosterElement test = MobileParty.MainParty.PrisonRoster.Where(troop => !troop.Character.IsHero).GetRandomElement();
+                    TroopRosterElement test = MobileParty.MainParty.PrisonRoster.GetTroopRoster().Where(troop => !troop.Character.IsHero).GetRandomElementInefficiently();
 
                     if (test.Character == null) continue;
 
@@ -269,13 +267,13 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't find anymore prisoners.");
             }
 
-            if (!releasedPrisoners.IsEmpty())
+            if (!releasedPrisoners.GetTroopRoster().IsEmpty())
             {
                 CECaptorContinue(args);
 
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("Escaped_Captives_" + MBRandom.RandomFloatRanged(float.MaxValue));
+                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyCE_" + MBRandom.RandomFloatRanged(float.MaxValue));
 
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                     clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
@@ -283,10 +281,6 @@ namespace CaptivityEvents.Events
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                     Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
-                    // 1.5.6
-                    // prisonerParty.InitializeMobileParty(new TextObject("{=CEEVENTS1107}Escaped Captives"), defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-
-                    // 1.5.7
                     prisonerParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
                     prisonerParty.SetCustomName(new TextObject("{=CEEVENTS1107}Escaped Captives"));
 
@@ -332,6 +326,26 @@ namespace CaptivityEvents.Events
         internal void CEMakeHeroCompanion(Hero captive)
         {
             if (captive == null) return;
+            if (captive.IsFactionLeader)
+            {
+                if (captive.Clan != null && captive.Clan.IsKingdomFaction)
+                {
+                    Kingdom kingdom = captive.Clan.Kingdom;
+                    Clan result = null;
+                    float num = 0f;
+                    IEnumerable<Clan> clans = kingdom.Clans;
+                    foreach (Clan clan in clans.Where((Clan t) => t.Heroes.Any((Hero h) => h.IsAlive) && !t.IsMinorFaction && t != captive.Clan))
+                    {
+                        float clanStrength = Campaign.Current.Models.DiplomacyModel.GetClanStrength(clan);
+                        if (num <= clanStrength)
+                        {
+                            num = clanStrength;
+                            result = clan;
+                        }
+                    }
+                    kingdom.RulingClan = result;
+                }
+            }
             AddCompanionAction.Apply(Clan.PlayerClan, captive);
         }
 
@@ -350,8 +364,12 @@ namespace CaptivityEvents.Events
 
             if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captive, captive.BattleEquipment, captive.CivilianEquipment);
 
-            foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+
+
+            foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
             {
+                EquipmentIndex i = (EquipmentIndex)index;
+
                 try
                 {
                     if (!captive.BattleEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(captive.BattleEquipment.GetEquipmentFromSlot(i).Item, 1);

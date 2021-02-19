@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Custom;
+﻿#define BETA // 1.5.8
+using CaptivityEvents.Custom;
 using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
@@ -85,6 +86,16 @@ namespace CaptivityEvents.Events
                         culture = heroVariables.Culture;
                     }
 
+#if BETA
+                    CharacterObject wanderer = (from x in CharacterObject.Templates
+                                                where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture != null && x.Culture.StringId == culture.ToLower()) && (heroVariables.Gender == null || x.IsFemale == isFemale)
+                                                select x).GetRandomElementInefficiently();
+                    Settlement randomElement = (from settlement in Settlement.All
+                                                where settlement.Culture == wanderer.Culture && settlement.IsTown
+                                                select settlement).GetRandomElementInefficiently();
+
+                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElementInefficiently(), null, -1);
+#else
                     CharacterObject wanderer = (from x in CharacterObject.Templates
                                                 where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture != null && x.Culture.StringId == culture.ToLower()) && (heroVariables.Gender == null || x.IsFemale == isFemale)
                                                 select x).GetRandomElement();
@@ -93,6 +104,8 @@ namespace CaptivityEvents.Events
                                                 select settlement).GetRandomElement();
 
                     Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElement(), null, -1);
+#endif
+
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);
                     hero.HasMet = true;
                     hero.ChangeState(Hero.CharacterStates.Active);
@@ -110,8 +123,6 @@ namespace CaptivityEvents.Events
                                 break;
                         }
                     }
-
-                    CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
 
                     try
                     {
@@ -140,14 +151,17 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        if (!party.IsMobile) AddHeroToPartyAction.Apply(hero, party.Settlement.MilitaParty, true);
+                        if (!party.IsMobile) AddHeroToPartyAction.Apply(hero, party.Settlement.Party.MobileParty, true);
                         else AddHeroToPartyAction.Apply(hero, party.MobileParty, true);
                     }
+
+                    CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
                 }
                 catch (Exception e)
                 {
                     CECustomHandler.ForceLogToFile("Failed to SpawnTheHero : " + e);
                 }
+
             }
         }
     }

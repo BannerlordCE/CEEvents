@@ -109,28 +109,33 @@ namespace CaptivityEvents.Events
             {
                 if (heroname == null)
                 {
-                    foreach (CharacterObject character in PartyBase.MainParty.PrisonRoster.Troops)
+                    foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster.GetTroopRoster())
                     {
-                        if (foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                        if (troopRosterElement.Character != null)
                         {
-                            string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(character, PartyBase.MainParty);
-
-                            if (force || result == null)
+                            if (foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                             {
-                                foundevent.Captive = character;
-                                ceEvent = foundevent;
-                                return foundevent.Name;
-                            }
+                                string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(troopRosterElement.Character, PartyBase.MainParty);
 
-                            flag = "$" + result;
+                                if (force || result == null)
+                                {
+                                    foundevent.Captive = troopRosterElement.Character;
+                                    ceEvent = foundevent;
+                                    return foundevent.Name;
+                                }
+
+                                flag = "$" + result;
+                            }
                         }
                     }
                 }
                 else
                 {
-                    CharacterObject specificCaptive = PartyBase.MainParty.PrisonRoster.Troops.FirstOrDefault(charaterobject => charaterobject.Name.ToString() == heroname);
+                    TroopRosterElement specificTroopRosterElement = PartyBase.MainParty.PrisonRoster.GetTroopRoster().FirstOrDefault(troopRosterElement => troopRosterElement.Character != null && troopRosterElement.Character.Name.ToString() == heroname);
 
-                    if (specificCaptive == null) return "$FAILTOFINDHERO";
+                    if (specificTroopRosterElement.Character == null) return "$FAILTOFINDHERO";
+
+                    CharacterObject specificCaptive = specificTroopRosterElement.Character;
 
                     if (!foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor)) return flag;
                     string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(specificCaptive, PartyBase.MainParty);

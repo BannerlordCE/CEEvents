@@ -54,7 +54,7 @@ namespace CaptivityEvents.Events
                                        : "wait_captive_male");
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
-            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
+            _sharedCallBackHelper.ConsequencePlaySound(true);
 
             SetCaptiveTextVariables(ref args);
 
@@ -119,18 +119,18 @@ namespace CaptivityEvents.Events
                 args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                            ? "wait_prisoner_female"
                                                            : "wait_prisoner_male");
-                CEHelper.settlementCheck = true;
+                CEHelper.waitMenuCheck = 1;
             }
             else if (PlayerCaptivity.CaptorParty.IsMobile)
             {
                 args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                            ? "wait_captive_female"
                                            : "wait_captive_male");
-                CEHelper.settlementCheck = false;
+                CEHelper.waitMenuCheck = 2;
             }
 
             _sharedCallBackHelper.LoadBackgroundImage("default");
-            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
+            _sharedCallBackHelper.ConsequencePlaySound(true);
 
             if (PlayerCaptivity.IsCaptive) SetCaptiveTextVariables(ref args);
 
@@ -156,46 +156,7 @@ namespace CaptivityEvents.Events
 
             if (!PlayerCaptivity.IsCaptive) return;
 
-            if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement != null)
-            {
-                if (CEHelper.settlementCheck == false)
-                {
-                    string waitingList = new WaitingList().CEWaitingList();
-
-                    if (waitingList != null)
-                    {
-                        GameMenu.SwitchToMenu(waitingList);
-                    }
-                    // Leave menu on if there is no alternative menu
-                    CEHelper.settlementCheck = true;
-                }
-                else
-                {
-                    text.SetTextVariable("SETTLEMENT_NAME", PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Name);
-                }
-            }
-            else if (PlayerCaptivity.CaptorParty.IsSettlement)
-            {
-                text.SetTextVariable("SETTLEMENT_NAME", PlayerCaptivity.CaptorParty.Settlement.Name);
-            }
-            else
-            {
-                if (CEHelper.settlementCheck == true)
-                {
-                    string waitingList = new WaitingList().CEWaitingList();
-
-                    if (waitingList != null)
-                    {
-                        GameMenu.SwitchToMenu(waitingList);
-                    }
-                    // Leave menu on if there is no alternative menu
-                    CEHelper.settlementCheck = false;
-                }
-                else
-                {
-                    text.SetTextVariable("PARTY_NAME", PlayerCaptivity.CaptorParty.Name);
-                }
-            }
+            text = CEHelper.ShouldChangeMenu(text);
 
             try
             {
@@ -224,7 +185,7 @@ namespace CaptivityEvents.Events
         internal void CaptiveEventGameMenu(MenuCallbackArgs args)
         {
             _sharedCallBackHelper.LoadBackgroundImage();
-            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
+            _sharedCallBackHelper.ConsequencePlaySound(true);
             SetCaptiveTextVariables(ref args);
         }
 
@@ -300,12 +261,15 @@ namespace CaptivityEvents.Events
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner)) _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
             else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0) ConsequenceRandomEventTrigger(ref args);
             else if (!string.IsNullOrEmpty(_option.TriggerEventName)) ConsequenceSingleEventTrigger(ref args);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
+            {
+                _sharedCallBackHelper.ConsequenceStartBattle(() => { _captive.CECaptivityContinue(ref args); }, 0);
+            }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape)) ConsequenceEscapeEventTrigger(ref args);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) _captive.CECaptivityEscape(ref args);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Leave)) _captive.CECaptivityLeave(ref args);
             else _captive.CECaptivityContinue(ref args);
         }
-
 
         #region private
         private void ConsequenceCompanions()
@@ -333,7 +297,6 @@ namespace CaptivityEvents.Events
                 DestroyPartyAction.Apply(null, PlayerCaptivity.CaptorParty.MobileParty);
             }
         }
-
 
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
         {
@@ -557,7 +520,8 @@ namespace CaptivityEvents.Events
                     ? PlayerCaptivity.CaptorParty.Settlement
                     : PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement;
 
-                Hero notable = settlement.Notables.Where(findFirstNotable => !findFirstNotable.IsFemale).GetRandomElement();
+                Hero notable = settlement.Notables.GetRandomElementWithPredicate(findFirstNotable => !findFirstNotable.IsFemale);
+                //Hero notable = settlement.Notables.Where(findFirstNotable => !findFirstNotable.IsFemale).GetRandomElement();
                 CECampaignBehavior.ExtraProps.Owner = notable;
                 _captive.CECaptivityChange(ref args, settlement.Party);
             }
@@ -1879,7 +1843,7 @@ namespace CaptivityEvents.Events
                         text.SetTextVariable("COMPANIONISFEMALE_" + item.Key, item.Value.IsFemale ? 1 : 0);
                     }
                 }
-            } 
+            }
             catch (Exception)
             {
                 CECustomHandler.ForceLogToFile("Failed to SetCaptiveTextVariables for " + _listedEvent.Name);

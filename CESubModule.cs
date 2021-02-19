@@ -28,6 +28,7 @@ using TaleWorlds.TwoDimension;
 using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
+using TaleWorlds.CampaignSystem.Actions;
 
 namespace CaptivityEvents
 {
@@ -58,6 +59,14 @@ namespace CaptivityEvents
             AfterBattle
         }
 
+        public enum BattleState
+        {
+            Normal,
+            StartBattle,
+            AfterBattle,
+            UpdateBattle,
+        }
+
         // Events
         public static List<CEEvent> CEEvents = new List<CEEvent>();
         public static List<CEEvent> CEEventList = new List<CEEvent>();
@@ -67,6 +76,14 @@ namespace CaptivityEvents
         // Captive Variables
         public static bool captivePlayEvent;
         public static CharacterObject captiveToPlay;
+
+        public static string victoryEvent;
+        public static string defeatEvent;
+        public static List<TroopRosterElement> playerTroops = new List<TroopRosterElement>();
+        public static bool removePlayer = false;
+        public static bool destroyParty = false;
+        public static bool surrenderParty = false;
+        public static bool playerWon = false;
 
         // Animation Variables
         public static bool animationPlayEvent;
@@ -85,6 +102,7 @@ namespace CaptivityEvents
         public static HuntState huntState = HuntState.Normal;
         public static DungeonState dungeonState = DungeonState.Normal;
         public static BrothelState brothelState = BrothelState.Normal;
+        public static BattleState battleState = BattleState.Normal;
 
         // Fade out for Brothel
         public static float brothelFadeIn = 2f;
@@ -219,11 +237,6 @@ namespace CaptivityEvents
         {
             base.OnSubModuleLoad();
 
-            // 1.5.6
-            // ModuleInfo ceModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
-            // ModuleInfo nativeModule = ModuleInfo.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
-
-            // 1.5.7
             ModuleInfo ceModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
             ModuleInfo nativeModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
 
@@ -376,7 +389,7 @@ namespace CaptivityEvents
             try
             {
                 // Load theMount & Blade II Bannerlord\Modules\SandBox\GUI\Brushes
-                // MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.6)
+                // MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.7)
                 SpriteData loadedData = new SpriteData("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
@@ -451,9 +464,21 @@ namespace CaptivityEvents
                             new TextObject("Captivity Events Settings", null),
                             9990,
                             () => { ScreenManager.PushScreen(new CESettingsScreen()); },
-                            false
+                            // 1.5.7
+                            // false
+                            // 1.5.8
+                            () => { return false; }
                         )
                       );
+                }
+
+                if (CESettingsIntegrations.Instance == null)
+                {
+                    CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsIntegrations missing MCMv4");
+                }
+                else
+                {
+                    CESettingsIntegrations.Instance.InitializeSettings();
                 }
 
                 if (CESettingsFlags.Instance == null)
@@ -589,7 +614,7 @@ namespace CaptivityEvents
             {
                 if (PlayerEncounter.Current == null) return;
                 if (PlayerEncounter.EncounteredMobileParty == null) return;
-                if (PlayerEncounter.EncounteredMobileParty.StringId != "Escaped_Captives") return;
+                if (!PlayerEncounter.EncounteredMobileParty.StringId.StartsWith("CustomPartyCE")) return;
                 CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
             }
             catch (Exception)
@@ -602,7 +627,7 @@ namespace CaptivityEvents
         {
             CEHelper.spouseOne = null;
             CEHelper.spouseTwo = null;
-            CEHelper.settlementCheck = false;
+            CEHelper.waitMenuCheck = -1;
 
             CEHelper.notificationCaptorExists = false;
             CEHelper.notificationCaptorCheck = false;
@@ -610,7 +635,7 @@ namespace CaptivityEvents
             CEHelper.notificationEventCheck = false;
         }
 
-        // 1.5.6 INVESTIGATE  
+        // Do Loading Investigate
         public override bool DoLoading(Game game)
         {
             if (Campaign.Current == null) return true;
@@ -786,6 +811,9 @@ namespace CaptivityEvents
 
             // Hunt Event To Play
             HuntStateCheck();
+
+            // Battle Event To Play
+            BattleStateCheck();
         }
 
 
@@ -891,7 +919,9 @@ namespace CaptivityEvents
                         }
 
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
-                        mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
+                        mapState.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                                   ? "wait_prisoner_female"
+                                                                   : "wait_prisoner_male");
                     }
                 }
                 catch (Exception)
@@ -1042,7 +1072,7 @@ namespace CaptivityEvents
 
                             try
                             {
-                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(Agent.Main.GetAgentVoiceDefinition()); }).GetRandomElement().Value;
+                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(Agent.Main.GetAgentVoiceDefinition()); }).GetRandomElementInefficiently().Value;
                                 Mission.Current.MakeSound(soundnum, Agent.Main.Frame.origin, true, false, -1, -1);
                             }
                             catch (Exception) { }
@@ -1053,7 +1083,7 @@ namespace CaptivityEvents
 
                             try
                             {
-                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(CEPersistence.agentTalkingTo.GetAgentVoiceDefinition()); }).GetRandomElement().Value;
+                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(CEPersistence.agentTalkingTo.GetAgentVoiceDefinition()); }).GetRandomElementInefficiently().Value;
                                 Mission.Current.MakeSound(soundnum, Agent.Main.Frame.origin, true, false, -1, -1);
                             }
                             catch (Exception) { }
@@ -1151,12 +1181,137 @@ namespace CaptivityEvents
             {
                 if (PlayerEncounter.Current == null)
                 {
-                    LoadingWindow.DisableGlobalLoadingWindow();
                     CEPersistence.huntState = CEPersistence.HuntState.Normal;
                 }
                 else
                 {
                     PlayerEncounter.Update();
+                }
+            }
+        }
+
+        private void HandleFinishBattle(MapState mapstate)
+        {
+            CEPersistence.battleState = CEPersistence.BattleState.Normal;
+            if (CEPersistence.playerWon)
+            {
+                GameMenu.ActivateGameMenu(CEPersistence.victoryEvent);
+                if (mapstate.MenuContext != null)
+                {
+                    mapstate.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                           ? "wait_prisoner_female"
+                                                           : "wait_prisoner_male");
+                }
+            }
+            else
+            {
+                GameMenu.ActivateGameMenu(CEPersistence.defeatEvent);
+                if (mapstate.MenuContext != null)
+                {
+                    mapstate.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                           ? "wait_prisoner_female"
+                                                           : "wait_prisoner_male");
+                }
+            }
+        }
+
+        private void BattleStateCheck()
+        {
+            if (CEPersistence.battleState == CEPersistence.BattleState.Normal) return;
+
+            if (CEPersistence.battleState == CEPersistence.BattleState.StartBattle && Game.Current.GameStateManager.ActiveState is MissionState missionState && missionState.CurrentMission.IsLoadingFinished)
+            {
+                CEPersistence.battleState = CEPersistence.BattleState.AfterBattle;
+            }
+            else if (CEPersistence.battleState == CEPersistence.BattleState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState)
+            //TODO: move all of these to their proper listeners and out of the OnApplicationTick
+            {
+                if (PlayerEncounter.Current == null)
+                {
+                    HandleFinishBattle(mapstate2);
+                }
+                else
+                {
+                    try
+                    {
+                        if (PlayerEncounter.Battle == null) return;
+
+                        CEPersistence.playerWon = PlayerEncounter.Battle.WinningSide == PlayerEncounter.Battle.PlayerSide;
+
+                        PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter || CEPersistence.removePlayer);
+
+                        foreach (TroopRosterElement troopRosterElement in CEPersistence.playerTroops)
+                        {
+                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, 0, troopRosterElement.Xp, true, -1);
+                        }
+
+                        if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.surrenderParty)
+                        {
+                            try
+                            {
+                                if (CEPersistence.playerWon)
+                                {
+                                    PlayerEncounter.EnemySurrender = true;
+                                }
+                                else
+                                {
+                                    PlayerEncounter.PlayerSurrender = true;
+                                }
+                                PlayerEncounter.Update();
+                                CEPersistence.battleState = CEPersistence.BattleState.UpdateBattle;
+                            }
+                            catch (Exception)
+                            {
+                                PlayerEncounter.Finish(true);
+                            }
+                        } 
+                        else if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.destroyParty)
+                        {
+                            PlayerEncounter.Current.FinalizeBattle();
+                            DestroyPartyAction.Apply(null, PlayerEncounter.EncounteredMobileParty);
+                            PlayerEncounter.Finish(false);
+                            if (Settlement.CurrentSettlement != null)
+                            {
+                                Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+                                HandleFinishBattle(mapstate2);
+                            }
+                        }
+                        else
+                        {
+                            PlayerEncounter.Current.FinalizeBattle();
+                            PlayerEncounter.Finish(false);
+                            if (Settlement.CurrentSettlement != null)
+                            {
+                                Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+                                HandleFinishBattle(mapstate2);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        CECustomHandler.ForceLogToFile("BattleStateCheck: " + e);
+                        LoadingWindow.DisableGlobalLoadingWindow();
+                        CEPersistence.battleState = CEPersistence.BattleState.Normal;
+                    }
+                }
+            }
+            else if (CEPersistence.battleState == CEPersistence.BattleState.UpdateBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate3 && !mapstate3.IsMenuState)
+            //TODO: move all of these to their proper listeners and out of the OnApplicationTick
+            {
+                try
+                {
+                    if (PlayerEncounter.Current == null)
+                    {
+                        HandleFinishBattle(mapstate3);
+                    }
+                    else
+                    {
+                        PlayerEncounter.Update();
+                    }
+                } 
+                catch (Exception)
+                {
+                    CEPersistence.battleState = CEPersistence.BattleState.Normal;
                 }
             }
         }

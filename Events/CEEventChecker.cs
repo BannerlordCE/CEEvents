@@ -9,8 +9,9 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
-using TerrainType = TaleWorlds.Core.TerrainType;
+using static CaptivityEvents.Helper.CEHelper;
 using CETerrainType = CaptivityEvents.Custom.TerrainType;
+using TerrainType = TaleWorlds.Core.TerrainType;
 
 namespace CaptivityEvents.Events
 {
@@ -193,13 +194,13 @@ namespace CaptivityEvents.Events
 
             returnString += "\nTotal Females : " + captorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
             returnString += "\nTotal Males : " + captorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
-            returnString += "\nTotal : " + captorParty.MemberRoster.Count();
+            returnString += "\nTotal : " + captorParty.MemberRoster.Count;
 
             returnString += "\n\n--- Captive Members ---";
 
             returnString += "\nTotal Females : " + captorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
             returnString += "\nTotal Males : " + captorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
-            returnString += "\nTotal : " + captorParty.PrisonRoster.Count();
+            returnString += "\nTotal : " + captorParty.PrisonRoster.Count;
 
             returnString += "\n\n--- Other Settings ---";
             returnString += "\nToo Many Companions : " + (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit);
@@ -402,7 +403,7 @@ namespace CaptivityEvents.Events
 
                             heroes = heroes.FindAll(filterHero => !_listEvent.SavedCompanions.ContainsValue(filterHero));
                             if (heroes.Count == 0) return LogError("Skipping event " + _listEvent.Name + " it does not match the CompanionsCheck condition: " + lastConditional);
-                        } 
+                        }
                         else
                         {
                             heroes = heroes.FindAll(filterHero => !_listEvent.SavedCompanions.ContainsValue(filterHero));
@@ -727,8 +728,10 @@ namespace CaptivityEvents.Events
                 bool flagHaveItem = false;
                 ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
 
-                foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                 {
+                    EquipmentIndex i = (EquipmentIndex)index;
+
                     try
                     {
                         ItemObject battleItem = Hero.MainHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
@@ -777,8 +780,10 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.LeaderHero != null)
                 {
-                    foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                    foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                     {
+                        EquipmentIndex i = (EquipmentIndex)index;
+
                         try
                         {
                             ItemObject battleItem = captorParty.LeaderHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
@@ -1380,8 +1385,10 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.LeaderHero != null)
                 {
-                    foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                    foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                     {
+                        EquipmentIndex i = (EquipmentIndex)index;
+
                         try
                         {
                             ItemObject battleItem = captorParty.LeaderHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
@@ -1461,8 +1468,10 @@ namespace CaptivityEvents.Events
 
                     bool flagHaveItem = false;
 
-                    foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                    foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                     {
+                        EquipmentIndex i = (EquipmentIndex)index;
+
                         try
                         {
                             ItemObject battleItem = captiveHero.BattleEquipment.GetEquipmentFromSlot(i).Item;
@@ -1997,7 +2006,8 @@ namespace CaptivityEvents.Events
                             }
                             else
                             {
-                                _listEvent.WeightedChanceOfOccuring = _listEvent.OldWeightedChanceOfOccuring;
+
+                                if (_listEvent.OldWeightedChanceOfOccuring != null) _listEvent.WeightedChanceOfOccuring = _listEvent.OldWeightedChanceOfOccuring;
                             }
 
                             if (!eventSettingFound.Value.BackgroundName.Equals(""))
@@ -2007,7 +2017,7 @@ namespace CaptivityEvents.Events
                             }
                             else
                             {
-                                _listEvent.BackgroundName = _listEvent.OldBackgroundName;
+                                if (_listEvent.OldWeightedChanceOfOccuring != null) _listEvent.BackgroundName = _listEvent.OldBackgroundName;
                             }
                         }
                     }

@@ -1,3 +1,4 @@
+#define BETA // 1.5.8
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -19,6 +20,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
+using static CaptivityEvents.Helper.CEHelper;
 
 namespace CaptivityEvents.CampaignBehaviors
 {
@@ -29,7 +31,7 @@ namespace CaptivityEvents.CampaignBehaviors
         private void LaunchCaptorEvent()
         {
             if (CEHelper.notificationCaptorExists || CEHelper.progressEventExists) return;
-            CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
+            CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
             CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
 
             if (returnedEvent == null) return;
@@ -219,12 +221,15 @@ namespace CaptivityEvents.CampaignBehaviors
         private Hero DeliverOffSpring(Hero mother, Hero father, bool isOffspringFemale, int age = 1)
         {
             CharacterObject characterObject = isOffspringFemale ? mother.CharacterObject : father.CharacterObject;
-            characterObject.Culture = Hero.MainHero.Culture;
+            characterObject.Culture = mother.Culture;
 
             // Reflection One
             MethodInfo mi = typeof(HeroCreator).GetMethod("CreateNewHero", BindingFlags.NonPublic | BindingFlags.Static);
             if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null, 0);
             Hero hero = (Hero)mi.Invoke(null, new object[] { characterObject, age });
+
+            // For Wanderer Pregnancy
+            hero.SetBirthDay(CampaignTime.Now);
 
             int becomeChildAge = Campaign.Current.Models.AgeModel.BecomeChildAge;
             CharacterObject characterObject2 = CharacterObject.ChildTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
@@ -271,15 +276,9 @@ namespace CaptivityEvents.CampaignBehaviors
             string hairTags = isOffspringFemale ? mother.CharacterObject.HairTags : father.CharacterObject.HairTags;
             string tattooTags = isOffspringFemale ? mother.CharacterObject.TattooTags : father.CharacterObject.TattooTags;
 
-            // 1.5.6
-            // hero.CharacterObject.StaticBodyPropertiesMin = BodyProperties.GetRandomBodyProperties(isOffspringFemale, bodyPropertiesMin, bodyPropertiesMin2, 1, seed, hairTags, father.CharacterObject.BeardTags, tattooTags).StaticProperties;
-
-            // 1.5.7
-            
             PropertyInfo pi = hero.GetType().GetProperty("StaticBodyProperties", BindingFlags.Instance | BindingFlags.NonPublic);
             StaticBodyProperties staticBody = BodyProperties.GetRandomBodyProperties(isOffspringFemale, bodyPropertiesMin, bodyPropertiesMin2, 1, seed, hairTags, father.CharacterObject.BeardTags, tattooTags).StaticProperties;
             if (pi != null) pi.SetValue(hero, staticBody);
-            
 
             hero.Mother = mother;
             hero.Father = father;
@@ -330,7 +329,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 int num = flag ? 2 : 1;
                 int stillbornCount = 0;
 
-                for (int i = 0; i < num; i++)
+                for (int i = 0; i < 1; i++)
                 {
                     if (MBRandom.RandomFloat > pregnancyModel.StillbirthProbability)
                     {
@@ -450,8 +449,10 @@ namespace CaptivityEvents.CampaignBehaviors
             {
                 if (returnEquipment.Captive.IsPrisoner || returnEquipment.Captive.PartyBelongedToAsPrisoner != null) return;
 
-                foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                 {
+                    EquipmentIndex i = (EquipmentIndex)index;
+
                     try
                     {
                         EquipmentElement fetchedEquipment = returnEquipment.BattleEquipment.GetEquipmentFromSlot(i);
@@ -501,7 +502,12 @@ namespace CaptivityEvents.CampaignBehaviors
                 {
                     if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
                     {
+
+#if BETA
+                        if (CESettings.Instance.EventCaptorNotifications)
+#else
                         if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
+#endif
                         {
                             if (CESettings.Instance.EventRandomEnabled && (!CEHelper.notificationEventExists || !CEHelper.notificationCaptorExists))
                             {
@@ -529,20 +535,20 @@ namespace CaptivityEvents.CampaignBehaviors
 
                                         if (returnedEvent != null)
                                         {
-                                            CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
+                                            CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
                                             returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
                                         }
                                     }
                                     else
                                     {
-                                        CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
+                                        CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
                                         returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
                                         if (returnedEvent != null) returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
                                     }
                                 }
                                 else
                                 {
-                                    CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetRandomElement().Character;
+                                    CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
                                     returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
                                 }
 
@@ -569,7 +575,12 @@ namespace CaptivityEvents.CampaignBehaviors
                     }
                     else if (CESettings.Instance.EventRandomEnabled)
                     {
+
+#if BETA
+                        if (CESettings.Instance.EventCaptorNotifications)
+#else
                         if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
+#endif
                         {
                             LaunchRandomEvent();
                         }
@@ -677,6 +688,10 @@ namespace CaptivityEvents.CampaignBehaviors
             _returnEquipment = new List<ReturnEquipment>();
             _heroPregnancies = new List<Pregnancy>();
         }
+
+        public static List<Pregnancy> HeroPregnancies => _heroPregnancies;
+
+        public static List<ReturnEquipment> ReturnEquipments => _returnEquipment;
 
         private int _hoursPassed;
 

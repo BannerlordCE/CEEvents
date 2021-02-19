@@ -56,7 +56,7 @@ namespace CaptivityEvents.Events
                                        : "wait_captive_male");
 
             _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
-            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
+            _sharedCallBackHelper.ConsequencePlaySound(true);
 
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                             ? 1
@@ -142,7 +142,7 @@ namespace CaptivityEvents.Events
         {
             SetNames(ref args);
             _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
-            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
+            _sharedCallBackHelper.ConsequencePlaySound(true);
         }
 
         internal bool CaptorEventOptionGameMenu(MenuCallbackArgs args)
@@ -235,11 +235,15 @@ namespace CaptivityEvents.Events
                 {
                     if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
                     InventoryManager.OpenScreenAsInventoryOf(Hero.MainHero.PartyBelongedTo.Party.MobileParty, captiveHero.CharacterObject);
-                } 
+                }
                 catch (Exception e)
                 {
                     CECustomHandler.ForceLogToFile("ConsequenceCompanions. Failed" + e.ToString());
                 }
+            }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
+            {
+                _sharedCallBackHelper.ConsequenceStartBattle(() => { _captor.CECaptorContinue(args); }, 1);
             }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners)) { _captor.CEPrisonerRebel(args); }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.HuntPrisoners)) { _captor.CEHuntPrisoners(args); }
@@ -497,7 +501,7 @@ namespace CaptivityEvents.Events
             // Wound Player
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundCaptor)) Hero.MainHero.MakeWounded(_listedEvent.Captive.HeroObject);
             // Wound All
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundAllPrisoners)) _captor.CEWoundPrisoners(args, PartyBase.MainParty.PrisonRoster.Count());
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundAllPrisoners)) _captor.CEWoundPrisoners(args, PartyBase.MainParty.PrisonRoster.Count);
             // Wound Random
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomPrisoners)) _captor.CEWoundPrisoners(args);
         }
@@ -513,7 +517,7 @@ namespace CaptivityEvents.Events
             // Kill Player
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor)) _dynamics.CEKillPlayer(_listedEvent.Captive.HeroObject);
             // Kill All
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillAllPrisoners)) _captor.CEKillPrisoners(args, PartyBase.MainParty.PrisonRoster.Count(), true);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillAllPrisoners)) _captor.CEKillPrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
             // Kill Random
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomPrisoners)) _captor.CEKillPrisoners(args);
         }
@@ -526,7 +530,7 @@ namespace CaptivityEvents.Events
         private void Release(ref MenuCallbackArgs args)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseRandomPrisoners)) _captor.CEReleasePrisoners(args);
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseAllPrisoners)) _captor.CEReleasePrisoners(args, PartyBase.MainParty.PrisonRoster.Count(), true);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseAllPrisoners)) _captor.CEReleasePrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
         }
 
         private void Escape()
@@ -1979,7 +1983,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroCaptorRelation(ref MenuCallbackArgs args)
         {
-            if (_listedEvent.Captive.HeroObject == null) return;
+            if (_listedEvent?.Captive?.HeroObject == null) return;
 
             try
             {

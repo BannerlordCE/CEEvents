@@ -1,3 +1,4 @@
+#define BETA // 1.5.8
 using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
@@ -31,7 +32,7 @@ namespace CaptivityEvents.Brothel
             WorkshopType workshopType = WorkshopType.Find("pottery_shop");
             WorkshopTypeId = workshopType.StringId;
             Location = _brothel.Settlement.Name.ToString();
-            Income = (int)(Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
+            Income = (int)(Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction()) * (_brothel.Level + 1);
 
             IncomeValueText = DetermineIncomeText(Income);
             InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
@@ -45,12 +46,22 @@ namespace CaptivityEvents.Brothel
         protected override void PopulateActionList()
         {
             int sellingCost = _brothel.Capital;
-            string hint = GetBrothelSellHintText(sellingCost);
+#if BETA
+            TextObject hint = GetBrothelSellHintText(sellingCost);
+#else
+            string hint = GetBrothelSellHintText(sellingCost);     
+#endif
             ActionList.Add(new StringItemWithEnabledAndHintVM(ExecuteSellBrothel, new TextObject("{=PHkC8Gia}Sell").ToString(), true, null, hint));
 
             bool isCurrentlyActive = _brothel.IsRunning;
             int costToStart = _brothel.Expense;
+
+
+#if BETA
+            TextObject hint2 = GetBrothelRunningHintText(isCurrentlyActive, costToStart);
+#else
             string hint2 = GetBrothelRunningHintText(isCurrentlyActive, costToStart);
+#endif
 
             ActionList.Add(isCurrentlyActive
                                ? new StringItemWithEnabledAndHintVM(ExecuteToggleBrothel, new TextObject("{=CEBROTHEL0995}Stop Operations").ToString(), true, null, hint2)
@@ -59,8 +70,6 @@ namespace CaptivityEvents.Brothel
 
         protected override void PopulateStatsList()
         {
-            // 1.5.7 SelectableItemPropertyVM
-            // 1.5.6 ClanSelectableItemPropertyVM
             ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0976}Level").ToString(), _brothel.Level.ToString()));
             ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0988}State").ToString(), _brothel.IsRunning
                                                                     ? new TextObject("{=CEBROTHEL0992}Normal").ToString()
@@ -89,17 +98,25 @@ namespace CaptivityEvents.Brothel
 
         private void ExecuteEndHint() => InformationManager.HideInformations();
 
+#if BETA
+        private static TextObject GetBrothelRunningHintText(bool isRunning, int costToStart)
+#else
         private static string GetBrothelRunningHintText(bool isRunning, int costToStart)
+#endif
         {
             TextObject textObject = new TextObject("The brothel is currently {?ISRUNNING}open{?}closed, you will need {AMOUNT} denars to begin operations again{\\?}.");
 
             textObject.SetTextVariable("ISRUNNING", isRunning ? 1 : 0);
             if (!isRunning) textObject.SetTextVariable("AMOUNT", costToStart);
 
+#if BETA
+            return textObject;
+#else
             return textObject.ToString();
+#endif
         }
 
-        private void ExecuteToggleBrothel(object identifier)
+    private void ExecuteToggleBrothel(object identifier)
         {
             if (_brothel == null) return;
             if (!_brothel.IsRunning) GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, _brothel.Expense);
@@ -109,12 +126,19 @@ namespace CaptivityEvents.Brothel
             onRefresh?.Invoke();
         }
 
+#if BETA
+        private static TextObject GetBrothelSellHintText(int sellCost)
+#else
         private static string GetBrothelSellHintText(int sellCost)
+#endif
         {
             TextObject textObject = new TextObject("{=CEBROTHEL1000}You can sell this brothel for {AMOUNT} denars.");
             textObject.SetTextVariable("AMOUNT", sellCost);
-
+#if BETA
+            return textObject;
+#else
             return textObject.ToString();
+#endif
         }
 
         private void ExecuteSellBrothel(object identifier)

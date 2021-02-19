@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Brothel;
+﻿#define BETA // 1.5.8
+using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -58,9 +59,15 @@ namespace CaptivityEvents.Helper
                     _provider.HuntBegins = customSettings.HuntBegins;
                     _provider.AmountOfTroopsForHunt = customSettings.AmountOfTroopsForHunt;
                     _provider.PrisonerEscapeBehavior = customSettings.PrisonerEscapeBehavior;
+                    _provider.PrisonerHeroEscapeParty = customSettings.PrisonerHeroEscapeParty;
+                    _provider.PrisonerHeroEscapeSettlement = customSettings.PrisonerHeroEscapeSettlement;
+                    _provider.PrisonerHeroEscapeOther = customSettings.PrisonerHeroEscapeOther;
                     _provider.PrisonerHeroEscapeChanceParty = customSettings.PrisonerHeroEscapeChanceParty;
                     _provider.PrisonerHeroEscapeChanceSettlement = customSettings.PrisonerHeroEscapeChanceSettlement;
                     _provider.PrisonerHeroEscapeChanceOther = customSettings.PrisonerHeroEscapeChanceOther;
+                    _provider.PrisonerNonHeroEscapeParty = customSettings.PrisonerNonHeroEscapeParty;
+                    _provider.PrisonerNonHeroEscapeSettlement = customSettings.PrisonerNonHeroEscapeSettlement;
+                    _provider.PrisonerNonHeroEscapeOther = customSettings.PrisonerNonHeroEscapeOther;
                     _provider.PrisonerNonHeroEscapeChanceParty = customSettings.PrisonerNonHeroEscapeChanceParty;
                     _provider.PrisonerNonHeroEscapeChanceSettlement = customSettings.PrisonerNonHeroEscapeChanceSettlement;
                     _provider.PrisonerNonHeroEscapeChanceOther = customSettings.PrisonerNonHeroEscapeChanceOther;
@@ -410,7 +417,11 @@ namespace CaptivityEvents.Helper
 
                                     if (Game.Current.GameStateManager.ActiveState is MapState mapStateCaptor)
                                     {
+#if BETA
+                                        if (CESettings.Instance.EventCaptorNotifications)
+#else
                                         if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
+#endif
                                         {
                                             LaunchCaptorEvent(returnedEvent);
                                         }
@@ -439,7 +450,12 @@ namespace CaptivityEvents.Helper
 
                         if (Game.Current.GameStateManager.ActiveState is MapState mapStateRandom)
                         {
+
+#if BETA
+                            if (CESettings.Instance.EventCaptorNotifications)
+#else
                             if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
+#endif
                             {
                                 LaunchRandomEvent(returnedEvent);
                             }
@@ -555,6 +571,25 @@ namespace CaptivityEvents.Helper
                 string debug = "";
 
                 debug += "Notification Status:\nCaptor Exists: " + CEHelper.notificationCaptorExists + "\nRandom Exists: " + CEHelper.notificationEventExists;
+
+                debug += "\nPregnancy Status:\n";
+
+                int index = 0;
+
+                CECampaignBehavior.HeroPregnancies.ForEach(pregnancy =>
+                {
+                    debug += "Index[" + index + "] - DueDate: " + pregnancy.DueDate + ", Father: " + pregnancy?.Father?.Name + ", Mother: " + pregnancy?.Mother?.Name + ", AlreadyOccured: " + (pregnancy.AlreadyOccured ? "Yes" : "No") + "\n";
+                    index++;
+                });
+
+                debug += "\nReturn Equipment Status:\n";
+                index = 0;
+
+                CECampaignBehavior.ReturnEquipments.ForEach(returnEquipment =>
+                {
+                    debug += "Index[" + index + "] - Name: " + returnEquipment?.Captive?.Name + ", AlreadyOccured: " + (returnEquipment.AlreadyOccured ? "Yes" : "No") + "\n";
+                    index++;
+                });
 
 
                 return debug;
@@ -926,7 +961,7 @@ namespace CaptivityEvents.Helper
                         // Events Removing
                         MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
                         if (mi != null) mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
-                    } 
+                    }
                     else
                     {
                         return "Cannot reload in the current campaign.";

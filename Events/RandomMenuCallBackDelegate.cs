@@ -51,7 +51,7 @@ namespace CaptivityEvents.Events
                                        : "wait_captive_male");
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
-            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
+            _sharedCallBackHelper.ConsequencePlaySound(true);
 
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                             ? 1
@@ -128,7 +128,7 @@ namespace CaptivityEvents.Events
                                                                    : "wait_prisoner_male");
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
-            _sharedCallBackHelper.ConsequencePlayEventSound(_listedEvent.SoundName);
+            _sharedCallBackHelper.ConsequencePlaySound(true);
 
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                               ? 1
@@ -138,7 +138,7 @@ namespace CaptivityEvents.Events
             {
                 MBTextManager.SetTextVariable("SETTLEMENT_NAME", MobileParty.MainParty.CurrentSettlement.Name);
             }
-            
+
 
             try
             {
@@ -221,6 +221,10 @@ namespace CaptivityEvents.Events
             ConsequenceSoldEvents(ref args);
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor)) _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
+            {
+                _sharedCallBackHelper.ConsequenceStartBattle(() => { captorSpecifics.CECaptorContinue(args); }, 2);
+            }
             else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0) ConsequenceRandomEventTrigger(ref args);
             else if (!string.IsNullOrEmpty(_option.TriggerEventName)) ConsequenceSingleEventTrigger(ref args); // Single Event Trigger 
             else captorSpecifics.CECaptorContinue(args);
@@ -463,7 +467,8 @@ namespace CaptivityEvents.Events
             try
             {
                 Settlement settlement = PartyBase.MainParty.MobileParty.CurrentSettlement;
-                Hero notable = settlement.Notables.Where(findFirstNotable => !findFirstNotable.IsFemale).GetRandomElement();
+                Hero notable = settlement.Notables.GetRandomElementWithPredicate(findFirstNotable => !findFirstNotable.IsFemale);
+                //Hero notable = settlement.Notables.Where(findFirstNotable => !findFirstNotable.IsFemale).GetRandomElement();
                 CECampaignBehavior.ExtraProps.Owner = notable;
 
                 PartyBase party = PartyBase.MainParty.MobileParty.CurrentSettlement.Party;

@@ -1,9 +1,12 @@
 ﻿using CaptivityEvents.Custom;
+using CaptivityEvents.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Library;
+using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
 
@@ -11,11 +14,28 @@ namespace CaptivityEvents.Helper
 {
     public class CEHelper
     {
+
+        public enum EquipmentCustomIndex
+        {
+            Weapon0 = 0,
+            Weapon1 = 1,
+            Weapon2 = 2,
+            Weapon3 = 3,
+            Weapon4 = 4,
+            Head = 5,
+            Body = 6,
+            Leg = 7,
+            Gloves = 8,
+            Cape = 9,
+            Horse = 10, 
+            HorseHarness = 11, 
+        }
+
         public static Hero spouseOne = null;
         public static Hero spouseTwo = null;
         public static bool brothelFlagFemale = false;
         public static bool brothelFlagMale = false;
-        public static bool settlementCheck = false;
+        public static int waitMenuCheck = -1;
 
         public static bool notificationCaptorExists = false;
         public static bool notificationCaptorCheck = false;
@@ -35,10 +55,6 @@ namespace CaptivityEvents.Helper
             {
                 try
                 {
-                    // 1.5.6
-                    // ModuleInfo moduleInfo = ModuleInfo.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
-
-                    // 1.5.7
                     ModuleInfo moduleInfo = ModuleHelper.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == moduleID);
 
                     if (moduleInfo != null && !moduleInfo.DependedModules.Exists(item => item.ModuleId == "zCaptivityEvents")) continue;
@@ -47,10 +63,6 @@ namespace CaptivityEvents.Helper
                     {
                         if (moduleInfo == null) continue;
                         CECustomHandler.ForceLogToFile("Added to ModuleLoader: " + moduleInfo.Name);
-
-                        // 1.5.6
-                        // modulePaths.Insert(0, Path.GetDirectoryName(ModuleInfo.GetPath(moduleInfo.Id)));
-                        // 1.5.7
                         modulePaths.Insert(0, Path.GetDirectoryName(ModuleHelper.GetPath(moduleInfo.Id)));
 
                         findingModules.Add(moduleInfo);
@@ -69,6 +81,73 @@ namespace CaptivityEvents.Helper
             modules = findingModules;
 
             return modulePaths;
+        }
+
+
+        internal static void ChangeMenu(int number)
+        {
+            string waitingList = new WaitingList().CEWaitingList();
+            if (waitingList != null) GameMenu.SwitchToMenu(waitingList);
+            waitMenuCheck = number;
+        }
+
+
+        internal static TextObject ShouldChangeMenu(TextObject text)
+        {
+            if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement != null)
+            {
+                Settlement current = PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement;
+                switch (waitMenuCheck)
+                {
+                    case 2:
+                        if (!(current.IsUnderSiege || current.IsUnderRaid))
+                        {
+                            ChangeMenu(3);
+                        }
+                        break;
+                    case 3:
+                        if (current.IsUnderSiege || current.IsUnderRaid)
+                        {
+                            ChangeMenu(2);
+                        }
+                        break;
+                    default:
+                        ChangeMenu(3);
+                        break;
+                }
+                text.SetTextVariable("SETTLEMENT_NAME", current.Name);
+            }
+            else if (PlayerCaptivity.CaptorParty.IsSettlement)
+            {
+                Settlement current = PlayerCaptivity.CaptorParty.Settlement;
+                switch (waitMenuCheck)
+                {
+                    case 2:
+                        if (!(current.IsUnderSiege || current.IsUnderRaid))
+                        {
+                            ChangeMenu(3);
+                        }
+                        break;
+                    case 3:
+                        if (current.IsUnderSiege || current.IsUnderRaid)
+                        {
+                            ChangeMenu(2);
+                        }
+                        break;
+                    default:
+                        ChangeMenu(3);
+                        break;
+                }
+
+                text.SetTextVariable("SETTLEMENT_NAME", PlayerCaptivity.CaptorParty.Settlement.Name);
+            }
+            else
+            {
+                if (waitMenuCheck != 1) ChangeMenu(1);
+                text.SetTextVariable("PARTY_NAME", PlayerCaptivity.CaptorParty.Name);
+            }
+
+            return text;
         }
     }
 }

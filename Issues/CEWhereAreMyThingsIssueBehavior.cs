@@ -1,12 +1,13 @@
-﻿using CaptivityEvents.Config;
+﻿#define BETA // 1.5.8
+using CaptivityEvents.Config;
 using Helpers;
 using System;
-using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
+using static CaptivityEvents.Helper.CEHelper;
 
 namespace CaptivityEvents.Issues
 {
@@ -17,7 +18,12 @@ namespace CaptivityEvents.Issues
 
         public override void SyncData(IDataStore dataStore) { }
 
+
+#if BETA
+        public static IssueBase OnStartIssue(in PotentialIssueData potentialIssueData, Hero issueOwner) => new CEWhereAreMyThingsIssue(issueOwner);
+#else
         public static IssueBase OnStartIssue(PotentialIssueData potentialIssueData, Hero issueOwner) => new CEWhereAreMyThingsIssue(issueOwner);
+#endif
 
         internal class CEWhereAreMyThingsIssue : IssueBase
         {
@@ -130,8 +136,10 @@ namespace CaptivityEvents.Issues
             {
                 AddLog(OnQuestSucceededLogText);
 
-                foreach (EquipmentIndex i in Enum.GetValues(typeof(EquipmentIndex)))
+                foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                 {
+                    EquipmentIndex i = (EquipmentIndex)index;
+
                     try
                     {
                         if (!Hero.MainHero.BattleEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(Hero.MainHero.BattleEquipment.GetEquipmentFromSlot(i).Item, 1);
