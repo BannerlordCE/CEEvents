@@ -18,7 +18,7 @@ namespace CaptivityEvents.Events
         {
             ScoresCalculation score = new ScoresCalculation();
 
-            if (targetHero != null && targetHero.IsFemale && !targetHero.IsPregnant)
+            if (targetHero != null && targetHero.IsFemale && !targetHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(targetHero))
             {
                 if (CESettings.Instance != null && (IsHeroAgeSuitableForPregnancy(targetHero) && CESettings.Instance.PregnancyToggle))
                 {
@@ -36,7 +36,8 @@ namespace CaptivityEvents.Events
 
                     if (senderHero != null)
                     {
-                        randomSoldier = senderHero;
+                        if (!senderHero.IsFemale) randomSoldier = senderHero;
+                        else return;
                     }
                     else if (targetHero.CurrentSettlement?.Party != null && !targetHero.CurrentSettlement.Party.MemberRoster.GetTroopRoster().IsEmpty())
                     {
@@ -109,7 +110,9 @@ namespace CaptivityEvents.Events
 
                 if (senderHero != null)
                 {
-                    randomSoldier = senderHero;
+                    if (senderHero.IsFemale && !senderHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(senderHero) && IsHeroAgeSuitableForPregnancy(senderHero))randomSoldier = senderHero;
+                    else return;
+
                 }
                 else if (targetHero.CurrentSettlement?.Party != null && !targetHero.CurrentSettlement.Party.MemberRoster.GetTroopRoster().IsEmpty())
                 {
@@ -151,7 +154,7 @@ namespace CaptivityEvents.Events
 
                 CEHelper.spouseOne = randomSoldier;
                 CEHelper.spouseTwo = targetHero;
-                MakePregnantAction.Apply(targetHero);
+                MakePregnantAction.Apply(randomSoldier);
                 CEHelper.spouseOne = CEHelper.spouseTwo = null;
 
                 //RelationsModifier(randomSoldier, 50, targetHero);
