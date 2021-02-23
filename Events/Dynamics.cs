@@ -73,10 +73,8 @@ namespace CaptivityEvents.Events
 
         internal void ChangeSpouse(Hero hero, Hero spouseHero)
         {
+            if (hero == null) return;
             Hero heroSpouse = hero.Spouse;
-
-            // Same Clan is Bugged
-            if (hero.Clan == spouseHero.Clan) return;
 
             if (!hero.IsHumanPlayerCharacter && hero.IsFactionLeader) RemoveFactionLeader(hero);
             else if (!spouseHero.IsHumanPlayerCharacter && spouseHero.IsFactionLeader) RemoveFactionLeader(spouseHero);
@@ -94,6 +92,9 @@ namespace CaptivityEvents.Events
             }
 
             if (spouseHero == null) return;
+
+            if (hero.Clan == spouseHero.Clan) return;
+
             Hero spouseHeroSpouse = spouseHero.Spouse;
 
             if (spouseHeroSpouse != null)

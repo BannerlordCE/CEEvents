@@ -166,6 +166,7 @@ namespace CaptivityEvents.Config
 
     public class CESettingsCustom : AttributeGlobalSettings<CESettingsCustom>, ICustomSettingsProvider
     {
+
         public override string Id => "CaptivityEventsSettings";
         public override string DisplayName => "Captivity Events";
         public override string FolderName => "zCaptivityEvents";
@@ -173,11 +174,23 @@ namespace CaptivityEvents.Config
 
         public override IDictionary<string, Func<BaseSettings>> GetAvailablePresets()
         {
-            IDictionary<string, Func<BaseSettings>> basePresets = base.GetAvailablePresets(); // include the 'Default' preset that MCM provides
-            basePresets.Add("Developer Mode", () => new CESettingsCustom { LogToggle = true });
-            basePresets.Add("Hard Mode", () => new CESettingsCustom { StolenGear = true, StolenGearChance = 30f, BetterOutFitChance = 10, RenownMin = -300f });
-            basePresets.Add("Easy Mode", () => new CESettingsCustom { StolenGear = false, RenownMin = 0f });
-
+            var basePresets = base.GetAvailablePresets(); // include the 'Default' preset that MCM provides
+            basePresets.Add("Developer Mode", () => new CESettingsCustom()
+            {
+                LogToggle = true
+            });
+            basePresets.Add("Hard Mode", () => new CESettingsCustom()
+            {
+                StolenGear = true,
+                StolenGearChance = 30f,
+                BetterOutFitChance = 10,
+                RenownMin = -300f
+            });
+            basePresets.Add("Easy Mode", () => new CESettingsCustom()
+            {
+                StolenGear = false,
+                RenownMin = 0f
+            });
             return basePresets;
         }
 
