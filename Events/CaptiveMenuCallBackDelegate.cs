@@ -1,4 +1,5 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
 using System;
@@ -20,15 +21,15 @@ namespace CaptivityEvents.Events
         private readonly Option _option;
         private readonly SharedCallBackHelper _sharedCallBackHelper;
         private readonly CECompanionSystem _companionSystem;
-
         private readonly Dynamics _dynamics = new Dynamics();
         private readonly ScoresCalculation _score = new ScoresCalculation();
         private readonly CEImpregnationSystem _impregnation = new CEImpregnationSystem();
-        private readonly CaptiveSpecifics _captive = new CaptiveSpecifics();
         private readonly CEVariablesLoader _variableLoader = new CEVariablesLoader();
 
         private float _timer = 0;
         private float _max = 0;
+
+        private readonly CaptiveSpecifics _captive = new CaptiveSpecifics();
 
         internal CaptiveMenuCallBackDelegate(CEEvent listedEvent, List<CEEvent> eventList)
         {

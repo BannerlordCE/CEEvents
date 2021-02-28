@@ -1,10 +1,12 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -19,9 +21,9 @@ namespace CaptivityEvents.Events
         private readonly Option _option;
         private readonly SharedCallBackHelper _sharedCallBackHelper;
         private readonly CECompanionSystem _companionSystem;
-
-        private readonly ScoresCalculation _score = new ScoresCalculation();
         private readonly Dynamics _dynamics = new Dynamics();
+        private readonly ScoresCalculation _score = new ScoresCalculation();
+        private readonly CEImpregnationSystem _impregnation = new CEImpregnationSystem();
         private readonly CEVariablesLoader _variableLoader = new CEVariablesLoader();
 
         private float _timer = 0;
@@ -537,14 +539,18 @@ namespace CaptivityEvents.Events
 
             try
             {
-                CEImpregnationSystem impregnationSystem = new CEImpregnationSystem();
-
-                if (!string.IsNullOrEmpty(_option.PregnancyRiskModifier)) { impregnationSystem.ImpregnationChance(Hero.MainHero, new CEVariablesLoader().GetIntFromXML(_option.PregnancyRiskModifier)); }
-                else if (!string.IsNullOrEmpty(_listedEvent.PregnancyRiskModifier)) { impregnationSystem.ImpregnationChance(Hero.MainHero, new CEVariablesLoader().GetIntFromXML(_listedEvent.PregnancyRiskModifier)); }
+                if (!string.IsNullOrEmpty(_option.PregnancyRiskModifier))
+                {
+                    _impregnation.ImpregnationChance(Hero.MainHero, new CEVariablesLoader().GetIntFromXML(_option.PregnancyRiskModifier));
+                }
+                else if (!string.IsNullOrEmpty(_listedEvent.PregnancyRiskModifier))
+                {
+                    _impregnation.ImpregnationChance(Hero.MainHero, new CEVariablesLoader().GetIntFromXML(_listedEvent.PregnancyRiskModifier));
+                }
                 else
                 {
                     CECustomHandler.LogToFile("Missing PregnancyRiskModifier");
-                    impregnationSystem.ImpregnationChance(Hero.MainHero, 30);
+                    _impregnation.ImpregnationChance(Hero.MainHero, 30);
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid PregnancyRiskModifier"); }

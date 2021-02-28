@@ -21,8 +21,6 @@ namespace CaptivityEvents.Events
         private readonly Option _option;
         private readonly SharedCallBackHelper _sharedCallBackHelper;
         private readonly CECompanionSystem _companionSystem;
-        private readonly CaptorSpecifics _captor = new CaptorSpecifics();
-
         private readonly Dynamics _dynamics = new Dynamics();
         private readonly ScoresCalculation _score = new ScoresCalculation();
         private readonly CEImpregnationSystem _impregnation = new CEImpregnationSystem();
@@ -30,6 +28,8 @@ namespace CaptivityEvents.Events
 
         private float _timer = 0;
         private float _max = 0;
+
+        private readonly CaptorSpecifics _captor = new CaptorSpecifics();
 
         internal CaptorMenuCallBackDelegate(CEEvent listedEvent, List<CEEvent> eventList)
         {

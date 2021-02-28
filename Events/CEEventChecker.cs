@@ -220,6 +220,12 @@ namespace CaptivityEvents.Events
                 captorParty = PartyBase.MainParty;
             }
 
+            if (captive == null)
+            {
+                ForceLogError("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptiveIsNotDefined.");
+                return LatestMessage;
+            }
+
             if (!ValidateEvent()) return LatestMessage;
             if (!CustomEventCheck()) return LatestMessage;
             if (!SettingsCheck()) return LatestMessage;
