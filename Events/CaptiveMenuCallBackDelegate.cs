@@ -61,7 +61,6 @@ namespace CaptivityEvents.Events
 
             if (_listedEvent.ProgressEvent != null)
             {
-                //args.MenuContext.GameMenu.AllowWaitingAutomatically();
                 _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);
                 _timer = 0f;
 
@@ -77,7 +76,6 @@ namespace CaptivityEvents.Events
 
         internal bool CaptiveProgressConditionWaitGameMenu(MenuCallbackArgs args)
         {
-            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
@@ -135,13 +133,11 @@ namespace CaptivityEvents.Events
 
             if (PlayerCaptivity.IsCaptive) SetCaptiveTextVariables(ref args);
 
-            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.MenuContext.GameMenu.SetMenuAsWaitMenuAndInitiateWaiting();
         }
 
         internal bool CaptiveConditionWaitGameMenu(MenuCallbackArgs args)
         {
-            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
