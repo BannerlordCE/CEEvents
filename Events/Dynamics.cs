@@ -612,7 +612,7 @@ namespace CaptivityEvents.Events
                             if (captor.Clan != null)
                             {
                                 PropertyInfo pi = captor.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                                captor.Clan.Name = clanName;
+                                captor.Clan.ChangeClanName(clanName);
                                 captor.Clan.InformalName = clanName;
                                 if (pi != null) pi.SetValue(captor.Clan, banner);
                                 captor.Clan.SetLeader(leader);
@@ -621,7 +621,7 @@ namespace CaptivityEvents.Events
                         else if (hero.Clan != null)
                         {
                             PropertyInfo pi = hero.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                            hero.Clan.Name = clanName;
+                            hero.Clan.ChangeClanName(clanName);
                             hero.Clan.InformalName = clanName;
                             if (pi != null) pi.SetValue(hero.Clan, banner);
                             hero.Clan.SetLeader(leader);

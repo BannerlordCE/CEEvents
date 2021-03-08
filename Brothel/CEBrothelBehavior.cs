@@ -412,6 +412,21 @@ namespace CaptivityEvents.Brothel
             return new LocationCharacter(new AgentData(new SimpleAgentOrigin(townsman)).Monster(Campaign.Current.HumanMonsterSettlementSlow).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge)), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, true);
         }
 
+        private static LocationCharacter CreateTownsWomanForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
+        {
+            CharacterObject townswoman = HelperCreateFrom(culture.Townswoman, true);
+            townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
+            townswoman.StringId = CustomerStrings.GetRandomElement();
+
+            string actionSetCode;
+
+            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
+            else actionSetCode = "as_human_villager_in_tavern";
+
+            return new LocationCharacter(new AgentData(new SimpleAgentOrigin(townswoman)).Monster(Campaign.Current.HumanMonsterSettlementSlow).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge)), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, true);
+        }
+
+
         private static LocationCharacter CreateTavernWench(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
             CharacterObject townswoman = HelperCreateFrom(culture.TavernWench, true);
@@ -436,7 +451,7 @@ namespace CaptivityEvents.Brothel
             return new LocationCharacter(new AgentData(new SimpleAgentOrigin(townswoman)).Monster(Campaign.Current.HumanMonsterSettlement).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge)), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_dancer", true, relation, "as_human_female_dancer", true);
         }
 
-        private static LocationCharacter CreateTownsWomanForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
+        private static LocationCharacter CreateFemalesForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
             CharacterObject townswoman = HelperCreateFrom(culture.FemaleDancer, true);
 
@@ -452,6 +467,22 @@ namespace CaptivityEvents.Brothel
             return new LocationCharacter(new AgentData(new SimpleAgentOrigin(townswoman, -1, Banner.CreateRandomBanner())).Monster(Campaign.Current.HumanMonsterSettlementSlow).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge)), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, true);
         }
 
+        private static LocationCharacter CreateMalesForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
+        {
+            CharacterObject townsman = HelperCreateFrom(culture.Musician, true);
+
+            townsman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
+            townsman.Name = new TextObject("{=CEEVENTS1095}Prostitute");
+            townsman.StringId = prostituteStrings.GetRandomElement();
+
+            string actionSetCode;
+
+            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
+            else actionSetCode = "as_human_villager_in_tavern";
+
+            return new LocationCharacter(new AgentData(new SimpleAgentOrigin(townsman, -1, Banner.CreateRandomBanner())).Monster(Campaign.Current.HumanMonsterSettlementSlow).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge)), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, true);
+        }
+
         private static LocationCharacter CreateBrothelPrisoner(CharacterObject prisoner, CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
             if (prisoner.Age < 21) prisoner.Age = 21;
@@ -461,7 +492,7 @@ namespace CaptivityEvents.Brothel
             if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
             else actionSetCode = "as_human_villager_in_tavern";
 
-            Equipment RandomCivilian = culture.FemaleDancer.CivilianEquipments.GetRandomElementInefficiently();
+            Equipment RandomCivilian = prisoner.IsFemale ? culture.FemaleDancer.CivilianEquipments.GetRandomElementInefficiently() : culture.Musician.CivilianEquipments.GetRandomElementInefficiently();
             return new LocationCharacter(new AgentData(new PartyAgentOrigin(null, prisoner, -1, default, false)).Monster(Campaign.Current.HumanMonsterSettlementSlow).Age((int)prisoner.Age).CivilianEquipment(true).Equipment(RandomCivilian), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, false);
 
         }
@@ -483,7 +514,21 @@ namespace CaptivityEvents.Brothel
             if (num <= 0) return;
 
             int num2 = (int)(num * 0.2f);
-            if (num2 > 0) LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateTownsManForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num2);
+            if (num2 > 0)
+            {
+                switch (CESettings.Instance.BrothelOption.SelectedIndex)
+                {
+                    case 0:
+                        LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateTownsManForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num2);
+                        break;
+                    case 2:
+                        LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateTownsWomanForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num2);
+                        break;
+                    default:
+                        LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateTownsManForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num2);
+                        break;
+                }
+            }
 
             int num3 = (int)(num * 0.3f);
 
@@ -498,7 +543,21 @@ namespace CaptivityEvents.Brothel
 
             if (num3 > 0)
             {
-                LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateTownsWomanForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, Math.Max(num4, num3));
+                switch (CESettings.Instance.BrothelOption.SelectedIndex)
+                {
+                    case 0:
+                        int num5 = (int)(num3 * 0.5f);
+                        int num6 = (int)(num4 * 0.5f);
+                        LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateFemalesForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, Math.Max(num6, num5));
+                        LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateMalesForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, Math.Max(num6, num5));
+                        break;
+                    case 2:
+                        LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateMalesForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, Math.Max(num4, num3));
+                        break;
+                    default:
+                        LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateFemalesForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, Math.Max(num4, num3));
+                        break;
+                }
             }
         }
 
@@ -534,8 +593,8 @@ namespace CaptivityEvents.Brothel
 
             campaignGameStarter.AddPlayerLine("customer_00_nevermind", "customer_00", "prostitute_service_no_response", "{=CEBROTHEL1011}Uh, nevermind.", null, null);
 
-            // Confident Customer 00
-            campaignGameStarter.AddDialogLine("ccustomer_00_start", "start", "ccustomer_00", "{=CEBROTHEL1014}Well hello there you {?PLAYER.GENDER}fine whore{?}stud{\\?}, would you like {AMOUNT} denars for your services? [ib:confident][rb:very_positive]", () => { return RandomizeConversation(2) && PriceWithProstitute() && ConversationWithConfidentCustomer(); }, null);
+            // Confident Male Customer 00
+            campaignGameStarter.AddDialogLine("ccustomer_00_start", "start", "ccustomer_00", "{=CEBROTHEL1014}Well hello there you {?PLAYER.GENDER}fine whore{?}stud{\\?}, would you like {AMOUNT} denars for your services? [ib:confident][rb:very_positive]", () => { return RandomizeConversation(2) && PriceWithProstitute() && ConversationWithConfidentCustomer() && ConversationWithMaleCustomer(); }, null);
 
             campaignGameStarter.AddPlayerLine("ccustomer_00_service", "ccustomer_00", "close_window", "{=CEBROTHEL1015}Yes, my lord I can do that.", null, ConversationCustomerConsequenceSex);
 
@@ -544,6 +603,17 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddDialogLine("ccustomer_00_rage_reply_r", "ccustomer_00_rage_reply", "close_window", "{=!}{RESPONSE_STRING}", ConversationWithCustomerRandomResponseRage, null);
 
             campaignGameStarter.AddPlayerLine("ccustomer_00_nevermind", "ccustomer_00", "close_window", "{=CEBROTHEL1017}Sorry sir, I have to leave.", null, null);
+
+            // Confident Female Customer 01
+            campaignGameStarter.AddDialogLine("ccustomer_01_start", "start", "ccustomer_01", "{=CEBROTHEL1014}Well hello there you {?PLAYER.GENDER}fine whore{?}stud{\\?}, would you like {AMOUNT} denars for your services? [ib:confident][rb:very_positive]", () => { return RandomizeConversation(2) && PriceWithProstitute() && ConversationWithConfidentCustomer() && ConversationWithFemaleCustomer(); }, null);
+
+            campaignGameStarter.AddPlayerLine("ccustomer_01_service", "ccustomer_01", "close_window", "{=CEBROTHEL1101}Yes, milady I can do that.", null, ConversationCustomerConsequenceSex);
+
+            campaignGameStarter.AddPlayerLine("ccustomer_01_rage", "ccustomer_01", "ccustomer_01_rage_reply", "{=CEBROTHEL1016}Excuse me, I don't work here!", null, null);
+
+            campaignGameStarter.AddDialogLine("ccustomer_01_rage_reply_r", "ccustomer_01_rage_reply", "close_window", "{=!}{RESPONSE_STRING}", ConversationWithCustomerRandomResponseRage, null);
+
+            campaignGameStarter.AddPlayerLine("ccustomer_01_nevermind", "ccustomer_01", "close_window", "{=CEBROTHEL1102}Sorry milady, I have to leave.", null, null);
 
             // Tried Customer 01
             campaignGameStarter.AddDialogLine("tcustomer_00_start", "start", "tcustomer_00", "{=CEBROTHEL1012}Yes? [ib:normal][rb:unsure]", () => ConversationWithTiredCustomer() || ConversationWithConfidentCustomer(), null);
@@ -1032,9 +1102,13 @@ namespace CaptivityEvents.Brothel
 
         private static readonly string[] RageResponses = { "{=CEBROTHEL1065}Well perhaps you should, you sure look like a {?PLAYER.GENDER}whore{?}prostitute{\\?}!", "{=CEBROTHEL1066}My apologies, {?PLAYER.GENDER}milady{?}my lord{\\?}!" };
 
-        private bool ConversationWithCustomerNotMetRequirements() => CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("customer") && (!Hero.MainHero.IsFemale || Campaign.Current.IsMainHeroDisguised);
+        private bool ConversationWithCustomerNotMetRequirements() => CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("customer") && (!Hero.MainHero.IsFemale && !CharacterObject.OneToOneConversationCharacter.IsFemale || Campaign.Current.IsMainHeroDisguised);
 
         private bool ConversationWithConfidentCustomer() => CharacterObject.OneToOneConversationCharacter.StringId == "customer_confident";
+
+        private bool ConversationWithMaleCustomer() => !CharacterObject.OneToOneConversationCharacter.IsFemale;
+
+        private bool ConversationWithFemaleCustomer() => CharacterObject.OneToOneConversationCharacter.IsFemale;
 
         private bool ConversationWithTiredCustomer() => CharacterObject.OneToOneConversationCharacter.StringId == "customer_tired";
 
@@ -1572,11 +1646,10 @@ namespace CaptivityEvents.Brothel
 
                             if (CESettings.Instance.EventProstituteGear)
                             {
-                                CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
+                                CharacterObject character = troopElement.Character.IsFemale ? HelperCreateFrom(settlement.Culture.FemaleDancer, true) : HelperCreateFrom(settlement.Culture.Musician, true);
+                                if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
 
-                                if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
-
-                                Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElementInefficiently();
+                                Equipment randomCivilian = character.CivilianEquipments.GetRandomElementInefficiently();
                                 Equipment randomBattle = new Equipment(false);
                                 randomBattle.FillFrom(randomCivilian, false);
 
