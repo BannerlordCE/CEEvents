@@ -1812,6 +1812,10 @@ namespace CaptivityEvents.Events
             int captiveTimeInDays = PlayerCaptivity.CaptiveTimeInDays;
             TextObject text = args.MenuContext.GameMenu.GetText();
 
+            text.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
+                         ? 1
+                         : 0);
+
             if (PlayerCaptivity.CaptorParty.Leader != null)
             {
                 text.SetTextVariable("CAPTOR_NAME", PlayerCaptivity.CaptorParty.Leader.Name);
@@ -1825,10 +1829,6 @@ namespace CaptivityEvents.Events
                 text.SetTextVariable("CAPTOR_NAME", new TextObject("{=CESETTINGS0099}captor"));
                 text.SetTextVariable("ISCAPTORFEMALE", 0);
             }
-
-            text.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
-                                     ? 1
-                                     : 0);
 
             try
             {

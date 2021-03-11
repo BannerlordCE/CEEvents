@@ -503,7 +503,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
                     {
 
-#if BETA
+#if BETA || STABLE
                         if (CESettings.Instance.EventCaptorNotifications)
 #else
                         if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
@@ -576,7 +576,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     else if (CESettings.Instance.EventRandomEnabled)
                     {
 
-#if BETA
+#if BETA || STABLE
                         if (CESettings.Instance.EventCaptorNotifications)
 #else
                         if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)

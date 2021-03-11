@@ -1,3 +1,4 @@
+#define BETA
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -486,7 +487,11 @@ namespace CaptivityEvents.Brothel
         private static LocationCharacter CreateBrothelPrisoner(CharacterObject prisoner, CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
             if (prisoner.Age < 21) prisoner.Age = 21;
+#if BETA
+            prisoner.HeroObject.StayingInSettlement = Settlement.CurrentSettlement;
+#elif STABLE
             prisoner.HeroObject.StayingInSettlementOfNotable = Settlement.CurrentSettlement;
+#endif
 
             string actionSetCode;
             if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
@@ -561,9 +566,9 @@ namespace CaptivityEvents.Brothel
             }
         }
 
-        #endregion
+#endregion
 
-        #region Dialogues
+#region Dialogues
 
         protected void AddDialogs(CampaignGameStarter campaignGameStarter)
         {
@@ -1184,9 +1189,9 @@ namespace CaptivityEvents.Brothel
 
             return true;
         }
-        #endregion
+#endregion
 
-        #region Session
+#region Session
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter) => AddDialogs(campaignGameStarter);
 
         public void OnMissionEnded(IMission mission) => CleanUpBrothel();
@@ -1748,7 +1753,7 @@ namespace CaptivityEvents.Brothel
             return _brothelList.Exists(brothel => brothel.CaptiveProstitutes.Exists((captive) => { return captive.Name == prisoner.Name; }));
         }
 
-        #endregion
+#endregion
 
         public override void SyncData(IDataStore dataStore)
         {

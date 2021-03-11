@@ -89,6 +89,7 @@ namespace CaptivityEvents.Events
                 MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive.IsFemale ? 1 : 0);
             }
 
+            // END HERE
             if (_listedEvent.ProgressEvent != null)
             {
                 _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);

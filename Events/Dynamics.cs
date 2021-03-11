@@ -724,7 +724,7 @@ namespace CaptivityEvents.Events
             //PartyTemplateObject villagerPartyTemplate = nearest.Culture.VillagerPartyTemplate; Will be used in figuring out on what to give
             MBRandom.RandomInt(1, 10);
 
-#if BETA
+#if BETA || STABLE
             party.PrisonRoster.AddToCounts(nearest.Culture.VillageWoman, 10, false, 7);
             party.PrisonRoster.AddToCounts(nearest.Culture.Villager, 10, false, 7);
 #else

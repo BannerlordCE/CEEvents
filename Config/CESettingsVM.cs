@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TaleWorlds.Engine.Options;
 using TaleWorlds.Engine.Screens;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -93,6 +94,17 @@ namespace CaptivityEvents.Config
                     CESettings.Instance.EventRandomEnabled = value == 1f;
                     return value;
                 });
+
+                List<SelectionData> selectedData = new List<SelectionData>();
+                selectedData.Add(new SelectionData(false, new TextObject("{=CESETTINGS1117}Any").ToString()));
+                selectedData.Add(new SelectionData(false, new TextObject("{=CESETTINGS1118}Female").ToString()));
+                selectedData.Add(new SelectionData(false, new TextObject("{=CESETTINGS1119}Male").ToString()));
+
+                yield return new CEManagedSelectionOptionData("BrothelOption", "{=CESETTINGS1120}Brothel Prisoners Allowed", "{=CESETTINGS1121}Allows the gender to be prisoners in the brothel", CESettings.Instance.BrothelOption.SelectedIndex, (value) =>
+                {
+                    CESettings.Instance.EventRandomEnabled = value == 1f;
+                    return value;
+                }, 1, selectedData);
 
                 yield break;
             }

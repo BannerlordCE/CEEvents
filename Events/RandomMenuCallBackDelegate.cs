@@ -75,6 +75,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Failed to RandomProgressInitWaitGameMenu for " + _listedEvent.Name);
             }
 
+            // ENDS
             if (_listedEvent.ProgressEvent != null)
             {
                 _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);

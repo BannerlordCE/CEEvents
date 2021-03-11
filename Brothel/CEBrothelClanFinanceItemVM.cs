@@ -1,16 +1,18 @@
-#define BETA // 1.5.8
+#define BETA // 1.5.9
 using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement;
+using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance;
 using TaleWorlds.Core;
 using TaleWorlds.Core.ViewModelCollection;
 using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Brothel
 {
+    // TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance ClanFinanceWorkshopItemVM
     internal class CEBrothelClanFinanceItemVM : ClanFinanceIncomeItemBaseVM
     {
         public CEBrothelClanFinanceItemVM(CEBrothel brothel, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh) : base(onSelection, onRefresh)
@@ -46,7 +48,7 @@ namespace CaptivityEvents.Brothel
         protected override void PopulateActionList()
         {
             int sellingCost = _brothel.Capital;
-#if BETA
+#if BETA || STABLE
             TextObject hint = GetBrothelSellHintText(sellingCost);
 #else
             string hint = GetBrothelSellHintText(sellingCost);     
@@ -56,9 +58,8 @@ namespace CaptivityEvents.Brothel
             bool isCurrentlyActive = _brothel.IsRunning;
             int costToStart = _brothel.Expense;
 
-
-#if BETA
-            TextObject hint2 = GetBrothelRunningHintText(isCurrentlyActive, costToStart);
+#if BETA || STABLE
+            TextObject hint2 = GetBrothelSellHintText(sellingCost);
 #else
             string hint2 = GetBrothelRunningHintText(isCurrentlyActive, costToStart);
 #endif
@@ -98,7 +99,7 @@ namespace CaptivityEvents.Brothel
 
         private void ExecuteEndHint() => InformationManager.HideInformations();
 
-#if BETA
+#if BETA || STABLE
         private static TextObject GetBrothelRunningHintText(bool isRunning, int costToStart)
 #else
         private static string GetBrothelRunningHintText(bool isRunning, int costToStart)
@@ -109,7 +110,7 @@ namespace CaptivityEvents.Brothel
             textObject.SetTextVariable("ISRUNNING", isRunning ? 1 : 0);
             if (!isRunning) textObject.SetTextVariable("AMOUNT", costToStart);
 
-#if BETA
+#if BETA || STABLE
             return textObject;
 #else
             return textObject.ToString();
@@ -126,7 +127,7 @@ namespace CaptivityEvents.Brothel
             onRefresh?.Invoke();
         }
 
-#if BETA
+#if BETA || STABLE
         private static TextObject GetBrothelSellHintText(int sellCost)
 #else
         private static string GetBrothelSellHintText(int sellCost)
@@ -134,7 +135,7 @@ namespace CaptivityEvents.Brothel
         {
             TextObject textObject = new TextObject("{=CEBROTHEL1000}You can sell this brothel for {AMOUNT} denars.");
             textObject.SetTextVariable("AMOUNT", sellCost);
-#if BETA
+#if BETA || STABLE
             return textObject;
 #else
             return textObject.ToString();

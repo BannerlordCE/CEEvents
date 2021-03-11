@@ -86,7 +86,7 @@ namespace CaptivityEvents.Events
                         culture = heroVariables.Culture;
                     }
 
-#if BETA
+#if BETA || STABLE
                     CharacterObject wanderer = (from x in CharacterObject.Templates
                                                 where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture != null && x.Culture.StringId == culture.ToLower()) && (heroVariables.Gender == null || x.IsFemale == isFemale)
                                                 select x).GetRandomElementInefficiently();
