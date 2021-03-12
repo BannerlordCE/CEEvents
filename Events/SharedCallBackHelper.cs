@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
@@ -934,14 +933,14 @@ namespace CaptivityEvents.Events
                                         customParty.HomeSettlement = nearest;
 
                                         float totalStrength = customParty.Party.TotalStrength;
-                                        int initialGold = (int)(10f * (float)customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
+                                        int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                                         customParty.InitializePartyTrade(initialGold);
 
                                         foreach (ItemObject itemObject in ItemObject.All)
                                         {
                                             if (itemObject.IsFood)
                                             {
-                                                int num2 = MBRandom.RoundRandomized((float)customParty.MemberRoster.TotalManCount * (1f / (float)itemObject.Value) * 8f * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat);
+                                                int num2 = MBRandom.RoundRandomized(customParty.MemberRoster.TotalManCount * (1f / itemObject.Value) * 8f * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat);
                                                 if (num2 > 0)
                                                 {
                                                     customParty.ItemRoster.AddToCounts(itemObject, num2);
@@ -1068,14 +1067,14 @@ namespace CaptivityEvents.Events
                                         customParty.HomeSettlement = nearest;
 
                                         float totalStrength = customParty.Party.TotalStrength;
-                                        int initialGold = (int)(10f * (float)customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
+                                        int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                                         customParty.InitializePartyTrade(initialGold);
 
                                         foreach (ItemObject itemObject in ItemObject.All)
                                         {
                                             if (itemObject.IsFood)
                                             {
-                                                int num2 = MBRandom.RoundRandomized((float)customParty.MemberRoster.TotalManCount * (1f / (float)itemObject.Value) * 8f * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat);
+                                                int num2 = MBRandom.RoundRandomized(customParty.MemberRoster.TotalManCount * (1f / itemObject.Value) * 8f * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat);
                                                 if (num2 > 0)
                                                 {
                                                     customParty.ItemRoster.AddToCounts(itemObject, num2);

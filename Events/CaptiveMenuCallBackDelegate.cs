@@ -1,5 +1,4 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
-using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
 using System;
@@ -254,18 +253,42 @@ namespace CaptivityEvents.Events
             ConsequenceSoldEvents(ref args);
             ConsequenceGainRandomPrisoners();
 
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor) && PlayerCaptivity.CaptorParty.NumberOfAllMembers == 1) ConsequenceKillCaptor();
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner)) _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
-            else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0) ConsequenceRandomEventTrigger(ref args);
-            else if (!string.IsNullOrEmpty(_option.TriggerEventName)) ConsequenceSingleEventTrigger(ref args);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor) && PlayerCaptivity.CaptorParty.NumberOfAllMembers == 1)
+            {
+                ConsequenceKillCaptor();
+            }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner))
+            {
+                _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
+            }
+            else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0)
+            {
+                ConsequenceRandomEventTrigger(ref args);
+            }
+            else if (!string.IsNullOrEmpty(_option.TriggerEventName))
+            {
+                ConsequenceSingleEventTrigger(ref args);
+            }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
             {
                 _sharedCallBackHelper.ConsequenceStartBattle(() => { _captive.CECaptivityContinue(ref args); }, 0);
             }
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape)) ConsequenceEscapeEventTrigger(ref args);
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) _captive.CECaptivityEscape(ref args);
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Leave)) _captive.CECaptivityLeave(ref args);
-            else _captive.CECaptivityContinue(ref args);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape))
+            {
+                ConsequenceEscapeEventTrigger(ref args);
+            }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape))
+            {
+                _captive.CECaptivityEscape(ref args);
+            }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Leave))
+            {
+                _captive.CECaptivityLeave(ref args);
+            }
+            else
+            {
+                _captive.CECaptivityContinue(ref args);
+            }
         }
 
         #region private

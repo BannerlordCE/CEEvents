@@ -2,15 +2,10 @@
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using HarmonyLib;
-using System;
-using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories;
-using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance;
 using TaleWorlds.Core;
-using TaleWorlds.Library;
 
 namespace CaptivityEvents.Patches
 {

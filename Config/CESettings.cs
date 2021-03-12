@@ -174,7 +174,7 @@ namespace CaptivityEvents.Config
 
         public override IDictionary<string, Func<BaseSettings>> GetAvailablePresets()
         {
-            var basePresets = base.GetAvailablePresets(); // include the 'Default' preset that MCM provides
+            IDictionary<string, Func<BaseSettings>> basePresets = base.GetAvailablePresets(); // include the 'Default' preset that MCM provides
             basePresets.Add("Developer Mode", () => new CESettingsCustom()
             {
                 LogToggle = true

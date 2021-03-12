@@ -95,10 +95,12 @@ namespace CaptivityEvents.Config
                     return value;
                 });
 
-                List<SelectionData> selectedData = new List<SelectionData>();
-                selectedData.Add(new SelectionData(false, new TextObject("{=CESETTINGS1117}Any").ToString()));
-                selectedData.Add(new SelectionData(false, new TextObject("{=CESETTINGS1118}Female").ToString()));
-                selectedData.Add(new SelectionData(false, new TextObject("{=CESETTINGS1119}Male").ToString()));
+                List<SelectionData> selectedData = new List<SelectionData>
+                {
+                    new SelectionData(false, new TextObject("{=CESETTINGS1117}Any").ToString()),
+                    new SelectionData(false, new TextObject("{=CESETTINGS1118}Female").ToString()),
+                    new SelectionData(false, new TextObject("{=CESETTINGS1119}Male").ToString())
+                };
 
                 yield return new CEManagedSelectionOptionData("BrothelOption", "{=CESETTINGS1120}Brothel Prisoners Allowed", "{=CESETTINGS1121}Allows the gender to be prisoners in the brothel", CESettings.Instance.BrothelOption.SelectedIndex, (value) =>
                 {
