@@ -1015,6 +1015,8 @@ namespace CaptivityEvents.Brothel
         {
             CharacterObject captive = ((CharacterObject)ConversationSentence.LastSelectedRepeatObject);
 
+            if (captive?.HeroObject == null) return;
+            
             if (captive.HeroObject.GetSkillValue(CESkills.Slavery) < 50 || captive.HeroObject.GetSkillValue(CESkills.Prostitution) < 50)
             {
                 new Dynamics().RelationsModifier(captive.HeroObject, MBRandom.RandomInt(-10, -1), Hero.MainHero, false, true);

@@ -95,7 +95,7 @@ namespace CaptivityEvents.Config
                     return value;
                 });
 
-                List<SelectionData> selectedData = new List<SelectionData>
+                List<SelectionData> selectedDataBrothel = new List<SelectionData>
                 {
                     new SelectionData(false, new TextObject("{=CESETTINGS1117}Any").ToString()),
                     new SelectionData(false, new TextObject("{=CESETTINGS1118}Female").ToString()),
@@ -106,7 +106,13 @@ namespace CaptivityEvents.Config
                 {
                     CESettings.Instance.EventRandomEnabled = value == 1f;
                     return value;
-                }, 1, selectedData);
+                }, 1, selectedDataBrothel);
+
+                yield return new CEManagedBooleanOptionData("LogToggle", "{=CESETTINGS1088}Logging Toggle (Slows Down The Game)", "{=CESETTINGS1089}Log the events (Debug Mode)", CESettings.Instance.LogToggle ? 1f : 0f, (value) =>
+                {
+                    CESettings.Instance.LogToggle = value == 1f;
+                    return value;
+                });
 
                 yield break;
             }

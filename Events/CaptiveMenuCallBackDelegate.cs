@@ -780,7 +780,6 @@ namespace CaptivityEvents.Events
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Missing RelationTotal");
-                _dynamics.RelationsModifier(hero, MBRandom.RandomInt(-5, 5), null, InformationMessage && !NoMessages, !InformationMessage && !NoMessages);
             }
         }
 

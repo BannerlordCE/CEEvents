@@ -1,9 +1,13 @@
-﻿using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Brothel;
+using CaptivityEvents.Config;
+using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
+using Helpers;
 using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 
@@ -11,8 +15,17 @@ namespace CaptivityEvents
 {
     internal class CEPrisonerDialogue
     {
+        private readonly Dynamics _dynamics = new Dynamics();
+
         public void AddPrisonerLines(CampaignGameStarter campaignGameStarter)
         {
+            campaignGameStarter.AddDialogLine("CELordDefeatedLord", "start", "CELordDefeatedLordAnswer", "{=pURE9lFV}{SURRENDER_OFFER}", ConversationCEEventLordCaptureOnCondition, null, 200, null);
+
+            campaignGameStarter.AddPlayerLine("CELordDefeatedLordAnswerCapture", "CELordDefeatedLordAnswer", "defeat_lord_answer_1", "{=g5G8AJ5n}You are my prisoner now.", null, null, 100, null, null);
+            campaignGameStarter.AddPlayerLine("CELordDefeatedLordAnswerRelease", "CELordDefeatedLordAnswer", "defeat_lord_answer_2", "{=vHKkVkAF}You have fought well. You are free to go.", null, new ConversationSentence.OnConsequenceDelegate(LCELordDefeatedLordAnswerReleaseOnConsequence), 100, null, null);
+            campaignGameStarter.AddPlayerLine("CELordDefeatedLordAnswerStrip", "CELordDefeatedLordAnswer", "LordDefeatedCaptureCEModAnswer", "{=CEEVENTS1107}Time to strip you of your belongings.", null, ConversationCEEventLordCaptureOnConsequence);
+
+
             campaignGameStarter.AddPlayerLine("LordDefeatedCaptureCEMod", "defeated_lord_answer", "LordDefeatedCaptureCEModAnswer", "{=CEEVENTS1107}Time to strip you of your belongings.", null, ConversationCEEventLordCaptureOnConsequence);
             campaignGameStarter.AddDialogLine("LordDefeatedReturn", "LordDefeatedCaptureCEModAnswer", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, null);
 
@@ -29,11 +42,47 @@ namespace CaptivityEvents
 
             campaignGameStarter.AddPlayerLine("CEPrisonerInCell_01", "CEPrisonerInCell", "CEPrisonerInCell_01_response", "{=CEEVENTS1052}You are coming with me.", null, null);
 
-            //if (CESettings.Instance.ProstitutionControl) campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "CEPrisonerInCell_01_response", "{=CEBROTHEL0979}Time to make you work at the brothel.", , null);
+            if (CESettings.Instance.ProstitutionControl) campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "CEPrisonerInCell_02_response", "{=CEBROTHEL0979}Time to make you work at the brothel.", null , null, 100, ConversationCEEventBrothelOnCondition);
 
             campaignGameStarter.AddDialogLine("CEPrisonerInCell_01_r", "CEPrisonerInCell_01_response", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, ConversationCEEventInCellOnConsequence);
 
+            campaignGameStarter.AddDialogLine("CEPrisonerInCell_02_r", "CEPrisonerInCell_02_response", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, ConversationCEEventBrothelOnConsequence);
+
             campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "close_window", "{=CEEVENTS1051}Nevermind.", null, null);
+        }
+
+        private bool ConversationCEEventBrothelOnCondition(out TextObject text)
+        {
+            text = TextObject.Empty;
+            if (Settlement.CurrentSettlement != null && CEBrothelBehavior.DoesOwnBrothelInSettlement(Settlement.CurrentSettlement))
+            {
+                return true;
+            }
+            text = new TextObject("{=}You do not own the brothel in this settlement.");
+            return false;
+        }
+
+        private void LCELordDefeatedLordAnswerReleaseOnConsequence()
+        {
+            EndCaptivityAction.ApplyByReleasedByPlayerAfterBattle(Hero.OneToOneConversationHero, Hero.MainHero, null);
+            _dynamics.RelationsModifier(CharacterObject.OneToOneConversationCharacter.HeroObject, 4, null, true, true);
+            DialogHelper.SetDialogString("DEFEAT_LORD_ANSWER", "str_prisoner_released");
+        }
+
+        private bool ConversationCEEventLordCaptureOnCondition()
+        {
+            if (Campaign.Current.CurrentConversationContext == ConversationContext.CapturedLord && Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.MapFaction != null && Hero.OneToOneConversationHero.MapFaction.IsBanditFaction)
+            {
+                GameState currentState = Game.Current.GameStateManager.ActiveState;
+                DialogHelper.SetDialogString("SURRENDER_OFFER", "str_surrender_offer");
+                return true;
+            }
+            return false;
+        }
+
+        private void ConversationCEEventBrothelOnConsequence()
+        {
+
         }
 
         private void ConversationCEEventLordCaptureOnConsequence()

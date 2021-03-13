@@ -614,7 +614,7 @@ namespace CaptivityEvents
             {
                 if (PlayerEncounter.Current == null) return;
                 if (PlayerEncounter.EncounteredMobileParty == null) return;
-                if (!PlayerEncounter.EncounteredMobileParty.StringId.StartsWith("CustomPartyCE")) return;
+                if (!PlayerEncounter.EncounteredMobileParty.StringId.StartsWith("CustomPartyHuntCE_")) return;
                 CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
             }
             catch (Exception)
@@ -1185,7 +1185,7 @@ namespace CaptivityEvents
                 }
                 else
                 {
-                    PlayerEncounter.Update();
+                    //PlayerEncounter.Update();
                 }
             }
         }

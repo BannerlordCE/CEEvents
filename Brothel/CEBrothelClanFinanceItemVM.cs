@@ -15,13 +15,16 @@ namespace CaptivityEvents.Brothel
     // TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance ClanFinanceWorkshopItemVM
 #if BETA
     internal class CEBrothelClanFinanceItemVM : ClanFinanceWorkshopItemVM
-#else
-    internal class CEBrothelClanFinanceItemVM : ClanFinanceIncomeItemBaseVM
-#endif
     {
         public CEBrothelClanFinanceItemVM(CEBrothel brothel, Workshop workshop, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh) : base(workshop, onSelection, onRefresh)
+
+#else
+    internal class CEBrothelClanFinanceItemVM : ClanFinanceIncomeItemBaseVM
+    {
+        public CEBrothelClanFinanceItemVM(CEBrothel brothel, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh) : base(onSelection, onRefresh)
+#endif
         {
-            _brothel = brothel;
+        _brothel = brothel;
 
             IncomeTypeAsEnum = IncomeTypes.Workshop;
             SettlementComponent component = _brothel.Settlement.GetComponent<SettlementComponent>();
@@ -34,7 +37,9 @@ namespace CaptivityEvents.Brothel
         {
             base.RefreshValues();
 
+#if BETA
             if (_brothel == null) _brothel = new CEBrothel(Workshop.Settlement);
+#endif
 
             Name = _brothel.Name.ToString();
             WorkshopType workshopType = WorkshopType.Find("pottery_shop");
@@ -53,7 +58,10 @@ namespace CaptivityEvents.Brothel
 
         protected override void PopulateActionList()
         {
-            if (_brothel == null) _brothel = new CEBrothel(base.Workshop.Settlement);
+
+#if BETA
+            if (_brothel == null) _brothel = new CEBrothel(Workshop.Settlement);
+#endif
 
             int sellingCost = _brothel.Capital;
 #if BETA || STABLE

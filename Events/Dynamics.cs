@@ -802,6 +802,11 @@ namespace CaptivityEvents.Events
             if (hero2 == null) hero2 = Hero.MainHero;
 
             Campaign.Current.Models.DiplomacyModel.GetHeroesForEffectiveRelation(hero1, hero2, out Hero hero3, out Hero hero4);
+            if (hero3 == null || hero4 == null)
+            {
+                hero3 = hero1;
+                hero4 = hero2;
+            }
             int value = CharacterRelationManager.GetHeroRelation(hero3, hero4) + relationChange;
             value = MBMath.ClampInt(value, -100, 100);
             hero3.SetPersonalRelation(hero4, value);

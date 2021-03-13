@@ -273,7 +273,7 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyCE_" + MBRandom.RandomFloatRanged(float.MaxValue));
+                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyHuntCE_" + MBRandom.RandomFloatRanged(float.MaxValue));
 
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                     clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
