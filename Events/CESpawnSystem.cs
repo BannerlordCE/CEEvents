@@ -1,4 +1,4 @@
-﻿#define BETA // 1.5.8
+﻿#define STABLE // 1.5.8
 using CaptivityEvents.Custom;
 using System;
 using System.Linq;
