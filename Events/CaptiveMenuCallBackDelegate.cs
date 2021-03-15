@@ -49,9 +49,12 @@ namespace CaptivityEvents.Events
 
         internal void CaptiveProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
-            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                       ? "wait_captive_female"
-                                       : "wait_captive_male");
+            if (args.MenuContext != null)
+            {
+                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                           ? "wait_captive_female"
+                                           : "wait_captive_male");
+            }
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -112,14 +115,14 @@ namespace CaptivityEvents.Events
 
         internal void CaptiveInitWaitGameMenu(MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.IsSettlement)
+            if (PlayerCaptivity.CaptorParty.IsSettlement && args.MenuContext != null)
             {
                 args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                            ? "wait_prisoner_female"
                                                            : "wait_prisoner_male");
                 CEHelper.waitMenuCheck = 1;
             }
-            else if (PlayerCaptivity.CaptorParty.IsMobile)
+            else if (PlayerCaptivity.CaptorParty.IsMobile && args.MenuContext != null)
             {
                 args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                            ? "wait_captive_female"
@@ -132,7 +135,7 @@ namespace CaptivityEvents.Events
 
             if (PlayerCaptivity.IsCaptive) SetCaptiveTextVariables(ref args);
 
-            args.MenuContext.GameMenu.SetMenuAsWaitMenuAndInitiateWaiting();
+            if (args.MenuContext != null) args.MenuContext.GameMenu.SetMenuAsWaitMenuAndInitiateWaiting();
         }
 
         internal bool CaptiveConditionWaitGameMenu(MenuCallbackArgs args)

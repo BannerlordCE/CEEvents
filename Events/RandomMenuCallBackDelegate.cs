@@ -46,9 +46,12 @@ namespace CaptivityEvents.Events
 
         internal void RandomProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
-            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                       ? "wait_captive_female"
-                                       : "wait_captive_male");
+            if (args.MenuContext != null)
+            {
+                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                           ? "wait_captive_female"
+                                           : "wait_captive_male");
+            }
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -120,11 +123,14 @@ namespace CaptivityEvents.Events
             PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
 
-        internal void RandomEventGameMenu(MenuCallbackArgs menuCallbackArgs)
+        internal void RandomEventGameMenu(MenuCallbackArgs args)
         {
-            menuCallbackArgs.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                                   ? "wait_prisoner_female"
-                                                                   : "wait_prisoner_male");
+            if (args.MenuContext != null)
+            {
+                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                                       ? "wait_prisoner_female"
+                                                                       : "wait_prisoner_male");
+            }
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
             _sharedCallBackHelper.ConsequencePlaySound(true);

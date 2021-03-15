@@ -896,7 +896,11 @@ namespace CaptivityEvents
                         }
 
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
-                        mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
+
+                        if (mapState.MenuContext != null)
+                        {
+                            mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
+                        }
 
                     }
                     else
@@ -919,9 +923,10 @@ namespace CaptivityEvents
                         }
 
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
-                        mapState.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                                   ? "wait_prisoner_female"
-                                                                   : "wait_prisoner_male");
+                        if (mapState.MenuContext != null)
+                        {
+                            mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
+                        }
                     }
                 }
                 catch (Exception)

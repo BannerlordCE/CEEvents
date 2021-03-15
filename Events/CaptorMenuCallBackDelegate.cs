@@ -51,9 +51,12 @@ namespace CaptivityEvents.Events
 
         internal void CaptorProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
-            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                       ? "wait_captive_female"
-                                       : "wait_captive_male");
+            if (args.MenuContext != null)
+            {
+                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                           ? "wait_captive_female"
+                                           : "wait_captive_male");
+            }
 
             _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -1974,9 +1977,11 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Failed to SetNames for " + _listedEvent.Name);
             }
 
-            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                       ? "wait_prisoner_female"
-                                                       : "wait_prisoner_male");
+            if (args.MenuContext != null) {
+                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                           ? "wait_prisoner_female"
+                                                           : "wait_prisoner_male");
+            }
         }
 
         private void ReqHeroCaptorRelation(ref MenuCallbackArgs args)
