@@ -211,7 +211,7 @@ namespace CaptivityEvents.CampaignBehaviors
         }
 
         /// <summary>
-        /// Behaviour Duplicate found In PregnancyCampaignBehavior 
+        /// Behavior Duplicate found In PregnancyCampaignBehavior 
         /// </summary>
         /// <param name="mother"></param>
         /// <param name="father"></param>
@@ -304,7 +304,7 @@ namespace CaptivityEvents.CampaignBehaviors
         }
 
         /// <summary>
-        /// Behaviour Duplicate found In PregnancyCampaignBehavior 
+        /// Behavior Duplicate found In PregnancyCampaignBehavior 
         /// </summary>
         /// <param name="pregnancy"></param>
         private void CheckOffspringsToDeliver(Pregnancy pregnancy)

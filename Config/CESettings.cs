@@ -375,7 +375,7 @@ namespace CaptivityEvents.Config
 
         #region Escape
 
-        [SettingPropertyBool("{=CESETTINGS1020}Modified Prisoner Escape Behavior", Order = 1, RequireRestart = true, HintText = "{=CESETTINGS1021}Use modified behaviour in game for prisoner escape, Turn off for compatability with mods that effect prisoner behavior.", IsToggle = true)]
+        [SettingPropertyBool("{=CESETTINGS1020}Modified Prisoner Escape Behavior", Order = 1, RequireRestart = true, HintText = "{=CESETTINGS1021}Use modified behavior in game for prisoner escape, Turn off for compatability with mods that effect prisoner behavior.", IsToggle = true)]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape", GroupOrder = 5)]
         public bool PrisonerEscapeBehavior { get; set; } = true;
 
@@ -460,7 +460,7 @@ namespace CaptivityEvents.Config
 
         #endregion
 
-        [SettingPropertyDropdown("{=CESETTINGS1026}Games Default Auto Ransom Behavior", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behaviour regarding auto-ransom")]
+        [SettingPropertyDropdown("{=CESETTINGS1026}Games Default Auto Ransom Behavior", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behavior regarding auto-ransom")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
         public DropdownDefault<string> EscapeAutoRansom { get; set; } = new DropdownDefault<string>(new string[] {
             "{=CESETTINGS1115}Off",
@@ -468,7 +468,7 @@ namespace CaptivityEvents.Config
             "{=CESETTINGS1116}On"
         }, 0);
 
-        [SettingPropertyBool("{=CESETTINGS1110}Games Default Exceeded Prisoners System", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1111}Allows the games default behaviour regarding exceeded prisoner system, Hourly escape chance based on default 10% or above chances")]
+        [SettingPropertyBool("{=CESETTINGS1110}Games Default Exceeded Prisoners System", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1111}Allows the games default behavior regarding exceeded prisoner system, Hourly escape chance based on default 10% or above chances")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
         public bool PrisonerExceeded { get; set; } = false;
 

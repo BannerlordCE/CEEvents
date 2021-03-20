@@ -955,7 +955,7 @@ namespace CaptivityEvents
                         {
                             try
                             {
-                                MissionCameraFadeView behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
+                                MissionCameraFadeView behavior = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
 
                                 Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
 
@@ -974,7 +974,7 @@ namespace CaptivityEvents
                                     dungeonFadeOut = 2f;
                                 }
 
-                                behaviour.BeginFadeOut(dungeonFadeOut);
+                                behavior.BeginFadeOut(dungeonFadeOut);
                             }
                             catch (Exception)
                             {
@@ -1015,7 +1015,7 @@ namespace CaptivityEvents
                         {
                             try
                             {
-                                MissionCameraFadeView behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
+                                MissionCameraFadeView behavior = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
 
                                 Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
 
@@ -1034,7 +1034,7 @@ namespace CaptivityEvents
                                     CEPersistence.brothelFadeIn = 3f;
                                 }
 
-                                behaviour.BeginFadeOutAndIn(CEPersistence.brothelFadeIn, CEPersistence.brothelBlack, CEPersistence.brothelFadeOut);
+                                behavior.BeginFadeOutAndIn(CEPersistence.brothelFadeIn, CEPersistence.brothelBlack, CEPersistence.brothelFadeOut);
                             }
                             catch (Exception)
                             {
