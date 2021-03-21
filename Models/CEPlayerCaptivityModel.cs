@@ -92,9 +92,9 @@ namespace CaptivityEvents.Models
 
             if (PlayerCaptivity.CaptorParty.IsSettlement && PlayerCaptivity.CaptorParty.MapFaction == Hero.MainHero.Clan)
             {
-                int prostituteSkillFlag = Hero.MainHero.GetSkillValue(CESkills.Prostitution);
+                int IsSlave = Hero.MainHero.GetSkillValue(CESkills.IsSlave);
 
-                if (prostituteSkillFlag < 50)
+                if (IsSlave == 1)
                 {
                     return "menu_captivity_end_by_ally_party_saved";
                 }
