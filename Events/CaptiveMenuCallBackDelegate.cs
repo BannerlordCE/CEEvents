@@ -897,15 +897,15 @@ namespace CaptivityEvents.Events
         {
             if (_option.SkillsRequired == null) return;
 
-            if (PlayerCaptivity.CaptorParty.LeaderHero == null)
-            {
-                args.IsEnabled = false;
-                return;
-            }
-
             foreach (SkillRequired skillRequired in _option.SkillsRequired)
             {
                 if (skillRequired.Ref == "Hero") continue;
+
+                if (PlayerCaptivity.CaptorParty.LeaderHero == null)
+                {
+                    args.IsEnabled = false;
+                    return;
+                }
 
                 SkillObject foundSkill = CESkills.FindSkill(skillRequired.Id);
 

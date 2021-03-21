@@ -1,4 +1,4 @@
-#define BETA
+#define STABLE
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -566,9 +566,9 @@ namespace CaptivityEvents.Brothel
             }
         }
 
-#endregion
+        #endregion
 
-#region Dialogues
+        #region Dialogues
 
         protected void AddDialogs(CampaignGameStarter campaignGameStarter)
         {
@@ -1016,7 +1016,7 @@ namespace CaptivityEvents.Brothel
             CharacterObject captive = ((CharacterObject)ConversationSentence.LastSelectedRepeatObject);
 
             if (captive?.HeroObject == null) return;
-            
+
             if (captive.HeroObject.GetSkillValue(CESkills.Slavery) < 50 || captive.HeroObject.GetSkillValue(CESkills.Prostitution) < 50)
             {
                 new Dynamics().RelationsModifier(captive.HeroObject, MBRandom.RandomInt(-10, -1), Hero.MainHero, false, true);
@@ -1191,9 +1191,9 @@ namespace CaptivityEvents.Brothel
 
             return true;
         }
-#endregion
+        #endregion
 
-#region Session
+        #region Session
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter) => AddDialogs(campaignGameStarter);
 
         public void OnMissionEnded(IMission mission) => CleanUpBrothel();
@@ -1755,7 +1755,7 @@ namespace CaptivityEvents.Brothel
             return _brothelList.Exists(brothel => brothel.CaptiveProstitutes.Exists((captive) => { return captive.Name == prisoner.Name; }));
         }
 
-#endregion
+        #endregion
 
         public override void SyncData(IDataStore dataStore)
         {
