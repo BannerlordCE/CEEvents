@@ -220,6 +220,12 @@ namespace CaptivityEvents.Events
                 captorParty = PartyBase.MainParty;
             }
 
+            if (captive == null)
+            {
+                ForceLogError("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptiveIsNotDefined.");
+                return LatestMessage;
+            }
+
             if (!ValidateEvent()) return LatestMessage;
             if (!CustomEventCheck()) return LatestMessage;
             if (!SettingsCheck()) return LatestMessage;
@@ -1356,7 +1362,7 @@ namespace CaptivityEvents.Events
 
         private bool HeroCheck(CharacterObject captive, PartyBase captorParty, bool nonRandomBehaviour)
         {
-            if (captive.IsHero && captive.HeroObject != null && (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptiveIsHero) || captive.IsPlayerCharacter))
+            if (captive.IsHero && captive.HeroObject != null && !_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptiveIsNonHero))
             {
                 Hero captiveHero = captive.HeroObject;
                 return HeroChecks(captiveHero) && (nonRandomBehaviour && CaptiveHaveItemCheck(captiveHero) && RelationCheck(captorParty, captiveHero) && HeroOwnerFlagsCheck(captiveHero, captorParty) || HeroHaveItemCheck(captorParty));
@@ -1513,8 +1519,8 @@ namespace CaptivityEvents.Events
             if (captiveHero.IsChild && _listEvent.SexualContent) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. SexualContent Child Detected.");
             if (captiveHero.Children.Count == 0 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroHaveOffspring)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroHaveOffspring.");
             if (captiveHero.Children.Count > 1 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroNotHaveOffspring)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroNotHaveOffspring.");
-            if (!captiveHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(captiveHero) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsPregnant)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsPregnant.");
-            if ((captiveHero.IsPregnant || CECampaignBehavior.CheckIfPregnancyExists(captiveHero)) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotPregnant)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsNotPregnant.");
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsPregnant) && !captiveHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(captiveHero)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsPregnant.");
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotPregnant) && (captiveHero.IsPregnant || CECampaignBehavior.CheckIfPregnancyExists(captiveHero))) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsNotPregnant.");
             if (captiveHero.Spouse == null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroHaveSpouse)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroHaveSpouse.");
             if (captiveHero.Spouse != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroNotHaveSpouse)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroNotHaveSpouse.");
             if (captiveHero.OwnedCommonAreas.Count == 0 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnsFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroOwnsFief.");
@@ -1612,7 +1618,7 @@ namespace CaptivityEvents.Events
         private bool CaptorSkillsCheck(PartyBase captorParty)
         {
             if (_listEvent.SkillsRequired == null) return true;
-            if (captorParty.Leader == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkill.");
+            if (_listEvent.SkillsRequired.Any((SkillRequired skill) => skill.Ref == "Captor") && captorParty.Leader == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkill.");
             return SkillsCheck(captorParty.Leader, true);
         }
 

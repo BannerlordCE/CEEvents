@@ -2,7 +2,6 @@
 using MCM.Abstractions.Ref;
 using MCM.Abstractions.Settings.Base.Global;
 using System.Linq;
-using TaleWorlds.Library;
 using TaleWorlds.ModuleManager;
 
 namespace CaptivityEvents.Config

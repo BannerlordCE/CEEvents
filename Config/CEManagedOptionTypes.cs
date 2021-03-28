@@ -117,10 +117,7 @@ namespace CaptivityEvents.Config
 
         public string GetDescription() => "";
 
-        public bool SetValue(float value)
-        {
-            return true;
-        }
+        public bool SetValue(float value) => true;
 
         private readonly string _id;
         internal string _name;

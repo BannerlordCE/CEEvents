@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Config;
+﻿#define STABLE
+using CaptivityEvents.Config;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Barterables;
 
@@ -17,7 +18,11 @@ namespace CaptivityEvents.CampaignBehaviors
 
             if (offererParty == null || otherParty == null) return;
 
+#if BETA
+            foreach (CharacterObject characterObject in offererParty.PrisonerHeroes)
+#else
             foreach (CharacterObject characterObject in offererParty.PrisonerHeroes())
+#endif
             {
                 if (characterObject.IsHero && !FactionManager.IsAtWarAgainstFaction(characterObject.HeroObject.MapFaction, otherParty.MapFaction))
                 {
@@ -29,7 +34,11 @@ namespace CaptivityEvents.CampaignBehaviors
                 }
             }
 
+#if BETA
+            foreach (CharacterObject characterObject2 in otherParty.PrisonerHeroes)
+#else
             foreach (CharacterObject characterObject2 in otherParty.PrisonerHeroes())
+#endif
             {
                 if (characterObject2.IsHero && !FactionManager.IsAtWarAgainstFaction(characterObject2.HeroObject.MapFaction, offererParty.MapFaction))
                 {

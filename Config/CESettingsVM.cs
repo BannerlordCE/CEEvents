@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TaleWorlds.Engine.Options;
 using TaleWorlds.Engine.Screens;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -91,6 +92,25 @@ namespace CaptivityEvents.Config
                 yield return new CEManagedBooleanOptionData("EventRandomEnabled", "Random Events Enabled", "Random events are events that do not require captives.", CESettings.Instance.EventRandomEnabled ? 1f : 0f, (value) =>
                 {
                     CESettings.Instance.EventRandomEnabled = value == 1f;
+                    return value;
+                });
+
+                List<SelectionData> selectedDataBrothel = new List<SelectionData>
+                {
+                    new SelectionData(false, new TextObject("{=CESETTINGS1117}Any").ToString()),
+                    new SelectionData(false, new TextObject("{=CESETTINGS1118}Female").ToString()),
+                    new SelectionData(false, new TextObject("{=CESETTINGS1119}Male").ToString())
+                };
+
+                yield return new CEManagedSelectionOptionData("BrothelOption", "{=CESETTINGS1120}Brothel Prisoners Allowed", "{=CESETTINGS1121}Allows the gender to be prisoners in the brothel", CESettings.Instance.BrothelOption.SelectedIndex, (value) =>
+                {
+                    CESettings.Instance.EventRandomEnabled = value == 1f;
+                    return value;
+                }, 1, selectedDataBrothel);
+
+                yield return new CEManagedBooleanOptionData("LogToggle", "{=CESETTINGS1088}Logging Toggle (Slows Down The Game)", "{=CESETTINGS1089}Log the events (Debug Mode)", CESettings.Instance.LogToggle ? 1f : 0f, (value) =>
+                {
+                    CESettings.Instance.LogToggle = value == 1f;
                     return value;
                 });
 

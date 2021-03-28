@@ -1,6 +1,5 @@
 ﻿using Helpers;
 using System.Collections.Generic;
-using System.Linq;
 using TaleWorlds.CampaignSystem;
 
 namespace CaptivityEvents.Models
@@ -31,9 +30,6 @@ namespace CaptivityEvents.Models
             CEHero h = new CEHero
             {
                 Age = hero.Age,
-                IsFertile = hero.IsFertile,
-                Children = GetListOfHeroesFrom(hero.Children),
-                Spouse = GetListOfHeroesFrom(hero.Spouse)
             };
 
             ExplainedNumber explainedNumber = new ExplainedNumber(1f);
@@ -71,11 +67,6 @@ namespace CaptivityEvents.Models
 
             return num;
         }
-
-
-        private List<CEHero> GetListOfHeroesFrom(List<Hero> heroes) => heroes.Select(hero => new CEHero { Age = hero.Age, IsFertile = hero.IsFertile }).ToList();
-
-        private CEHero GetListOfHeroesFrom(Hero hero) => new CEHero { Age = hero.Age, IsFertile = hero.IsFertile };
 
         private const int MinPregnancyAge = 18;
 

@@ -19,9 +19,9 @@ namespace CaptivityEvents.Events
         private readonly Option _option;
         private readonly SharedCallBackHelper _sharedCallBackHelper;
         private readonly CECompanionSystem _companionSystem;
-
-        private readonly ScoresCalculation _score = new ScoresCalculation();
         private readonly Dynamics _dynamics = new Dynamics();
+        private readonly ScoresCalculation _score = new ScoresCalculation();
+        private readonly CEImpregnationSystem _impregnation = new CEImpregnationSystem();
         private readonly CEVariablesLoader _variableLoader = new CEVariablesLoader();
 
         private float _timer = 0;
@@ -46,9 +46,12 @@ namespace CaptivityEvents.Events
 
         internal void RandomProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
-            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                       ? "wait_captive_female"
-                                       : "wait_captive_male");
+            if (args.MenuContext != null)
+            {
+                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                           ? "wait_captive_female"
+                                           : "wait_captive_male");
+            }
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -73,9 +76,9 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Failed to RandomProgressInitWaitGameMenu for " + _listedEvent.Name);
             }
 
+            // ENDS
             if (_listedEvent.ProgressEvent != null)
             {
-                //args.MenuContext.GameMenu.AllowWaitingAutomatically();
                 _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);
                 _timer = 0f;
 
@@ -90,7 +93,6 @@ namespace CaptivityEvents.Events
         }
         internal bool RandomProgressConditionWaitGameMenu(MenuCallbackArgs args)
         {
-            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
@@ -121,11 +123,14 @@ namespace CaptivityEvents.Events
             PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
 
-        internal void RandomEventGameMenu(MenuCallbackArgs menuCallbackArgs)
+        internal void RandomEventGameMenu(MenuCallbackArgs args)
         {
-            menuCallbackArgs.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                                   ? "wait_prisoner_female"
-                                                                   : "wait_prisoner_male");
+            if (args.MenuContext != null)
+            {
+                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                                       ? "wait_prisoner_female"
+                                                                       : "wait_prisoner_male");
+            }
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -220,14 +225,26 @@ namespace CaptivityEvents.Events
             ConsequenceGainRandomPrisoners();
             ConsequenceSoldEvents(ref args);
 
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor)) _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor))
+            {
+                _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
+            }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
             {
                 _sharedCallBackHelper.ConsequenceStartBattle(() => { captorSpecifics.CECaptorContinue(args); }, 2);
             }
-            else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0) ConsequenceRandomEventTrigger(ref args);
-            else if (!string.IsNullOrEmpty(_option.TriggerEventName)) ConsequenceSingleEventTrigger(ref args); // Single Event Trigger 
-            else captorSpecifics.CECaptorContinue(args);
+            else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0)
+            {
+                ConsequenceRandomEventTrigger(ref args);
+            }
+            else if (!string.IsNullOrEmpty(_option.TriggerEventName))
+            {
+                ConsequenceSingleEventTrigger(ref args); // Single Event Trigger 
+            }
+            else
+            {
+                captorSpecifics.CECaptorContinue(args);
+            }
         }
 
 
@@ -537,14 +554,18 @@ namespace CaptivityEvents.Events
 
             try
             {
-                CEImpregnationSystem impregnationSystem = new CEImpregnationSystem();
-
-                if (!string.IsNullOrEmpty(_option.PregnancyRiskModifier)) { impregnationSystem.ImpregnationChance(Hero.MainHero, new CEVariablesLoader().GetIntFromXML(_option.PregnancyRiskModifier)); }
-                else if (!string.IsNullOrEmpty(_listedEvent.PregnancyRiskModifier)) { impregnationSystem.ImpregnationChance(Hero.MainHero, new CEVariablesLoader().GetIntFromXML(_listedEvent.PregnancyRiskModifier)); }
+                if (!string.IsNullOrEmpty(_option.PregnancyRiskModifier))
+                {
+                    _impregnation.ImpregnationChance(Hero.MainHero, new CEVariablesLoader().GetIntFromXML(_option.PregnancyRiskModifier));
+                }
+                else if (!string.IsNullOrEmpty(_listedEvent.PregnancyRiskModifier))
+                {
+                    _impregnation.ImpregnationChance(Hero.MainHero, new CEVariablesLoader().GetIntFromXML(_listedEvent.PregnancyRiskModifier));
+                }
                 else
                 {
                     CECustomHandler.LogToFile("Missing PregnancyRiskModifier");
-                    impregnationSystem.ImpregnationChance(Hero.MainHero, 30);
+                    _impregnation.ImpregnationChance(Hero.MainHero, 30);
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid PregnancyRiskModifier"); }

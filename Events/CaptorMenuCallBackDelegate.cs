@@ -21,8 +21,6 @@ namespace CaptivityEvents.Events
         private readonly Option _option;
         private readonly SharedCallBackHelper _sharedCallBackHelper;
         private readonly CECompanionSystem _companionSystem;
-        private readonly CaptorSpecifics _captor = new CaptorSpecifics();
-
         private readonly Dynamics _dynamics = new Dynamics();
         private readonly ScoresCalculation _score = new ScoresCalculation();
         private readonly CEImpregnationSystem _impregnation = new CEImpregnationSystem();
@@ -30,6 +28,8 @@ namespace CaptivityEvents.Events
 
         private float _timer = 0;
         private float _max = 0;
+
+        private readonly CaptorSpecifics _captor = new CaptorSpecifics();
 
         internal CaptorMenuCallBackDelegate(CEEvent listedEvent, List<CEEvent> eventList)
         {
@@ -51,9 +51,12 @@ namespace CaptivityEvents.Events
 
         internal void CaptorProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
-            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                       ? "wait_captive_female"
-                                       : "wait_captive_male");
+            if (args.MenuContext != null)
+            {
+                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                           ? "wait_captive_female"
+                                           : "wait_captive_male");
+            }
 
             _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -89,9 +92,9 @@ namespace CaptivityEvents.Events
                 MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive.IsFemale ? 1 : 0);
             }
 
+            // END HERE
             if (_listedEvent.ProgressEvent != null)
             {
-                //args.MenuContext.GameMenu.AllowWaitingAutomatically();
                 _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);
                 _timer = 0f;
 
@@ -107,7 +110,6 @@ namespace CaptivityEvents.Events
 
         internal bool CaptorProgressConditionWaitGameMenu(MenuCallbackArgs args)
         {
-            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
@@ -776,7 +778,6 @@ namespace CaptivityEvents.Events
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Missing RelationTotal");
-                _dynamics.RelationsModifier(captiveHero, MBRandom.RandomInt(-5, 5), null, InformationMessage && !NoMessages, !InformationMessage && !NoMessages);
             }
         }
 
@@ -1976,9 +1977,11 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Failed to SetNames for " + _listedEvent.Name);
             }
 
-            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                       ? "wait_prisoner_female"
-                                                       : "wait_prisoner_male");
+            if (args.MenuContext != null) {
+                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                           ? "wait_prisoner_female"
+                                                           : "wait_prisoner_male");
+            }
         }
 
         private void ReqHeroCaptorRelation(ref MenuCallbackArgs args)

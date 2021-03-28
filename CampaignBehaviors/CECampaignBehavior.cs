@@ -1,4 +1,4 @@
-#define BETA // 1.5.8
+#define STABLE // 1.5.8
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -211,7 +211,7 @@ namespace CaptivityEvents.CampaignBehaviors
         }
 
         /// <summary>
-        /// Behaviour Duplicate found In PregnancyCampaignBehavior 
+        /// Behavior Duplicate found In PregnancyCampaignBehavior 
         /// </summary>
         /// <param name="mother"></param>
         /// <param name="father"></param>
@@ -304,7 +304,7 @@ namespace CaptivityEvents.CampaignBehaviors
         }
 
         /// <summary>
-        /// Behaviour Duplicate found In PregnancyCampaignBehavior 
+        /// Behavior Duplicate found In PregnancyCampaignBehavior 
         /// </summary>
         /// <param name="pregnancy"></param>
         private void CheckOffspringsToDeliver(Pregnancy pregnancy)
@@ -503,7 +503,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
                     {
 
-#if BETA
+#if BETA || STABLE
                         if (CESettings.Instance.EventCaptorNotifications)
 #else
                         if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
@@ -576,7 +576,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     else if (CESettings.Instance.EventRandomEnabled)
                     {
 
-#if BETA
+#if BETA || STABLE
                         if (CESettings.Instance.EventCaptorNotifications)
 #else
                         if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)

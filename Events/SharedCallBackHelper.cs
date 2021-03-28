@@ -1,4 +1,4 @@
-﻿#define BETA // 1.5.8
+﻿#define STABLE // 1.5.8
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Issues;
@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
@@ -743,7 +742,7 @@ namespace CaptivityEvents.Events
 
                                     if (troop.Id != null && troop.Id.ToLower() == "random")
                                     {
-#if BETA
+#if BETA || STABLE
                                         characterObject = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
 #else
                                         characterObject = CharacterObject.All.Where((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier).GetRandomElement();
@@ -796,7 +795,7 @@ namespace CaptivityEvents.Events
                             for (int i = 0; i < 10; i++)
                             {
                                 CharacterObject characterObject =
-#if BETA
+#if BETA || STABLE
                                     CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
 #else
                                     CharacterObject.All.Where((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier).GetRandomElement();
@@ -809,7 +808,7 @@ namespace CaptivityEvents.Events
                     {
                         CECustomHandler.ForceLogToFile("ConsequenceStartBattle SpawnTroops Failed");
                     }
-#if BETA
+#if BETA || STABLE
                     if (!enemyTroops.GetTroopRoster().IsEmpty() && _option.BattleSettings.Ref != null)
 #else
                     if (!enemyTroops.IsEmpty() && _option.BattleSettings.Ref != null)
@@ -835,7 +834,7 @@ namespace CaptivityEvents.Events
                                         customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
                                         customParty.SetCustomName(textObject);
                                         EnterSettlementAction.ApplyForParty(customParty, Settlement.CurrentSettlement);
-#if BETA
+#if BETA || STABLE
                                         foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
 #else
                                         foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster)
@@ -881,7 +880,7 @@ namespace CaptivityEvents.Events
                                                 PartyBase.MainParty.MemberRoster.AddToCounts(character, 1, false, 0, 0, true, -1);
                                             }
                                         }
-#if BETA
+#if BETA || STABLE
                                         foreach (TroopRosterElement troopRosterElement in temporaryTroops.GetTroopRoster())
                                         {
                                             PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
@@ -934,14 +933,14 @@ namespace CaptivityEvents.Events
                                         customParty.HomeSettlement = nearest;
 
                                         float totalStrength = customParty.Party.TotalStrength;
-                                        int initialGold = (int)(10f * (float)customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
+                                        int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                                         customParty.InitializePartyTrade(initialGold);
 
                                         foreach (ItemObject itemObject in ItemObject.All)
                                         {
                                             if (itemObject.IsFood)
                                             {
-                                                int num2 = MBRandom.RoundRandomized((float)customParty.MemberRoster.TotalManCount * (1f / (float)itemObject.Value) * 8f * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat);
+                                                int num2 = MBRandom.RoundRandomized(customParty.MemberRoster.TotalManCount * (1f / itemObject.Value) * 8f * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat);
                                                 if (num2 > 0)
                                                 {
                                                     customParty.ItemRoster.AddToCounts(itemObject, num2);
@@ -952,7 +951,7 @@ namespace CaptivityEvents.Events
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
                                         customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
-#if BETA
+#if BETA || STABLE
                                         foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
 #else
                                         foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster)
@@ -997,7 +996,7 @@ namespace CaptivityEvents.Events
                                             }
                                         }
 
-#if BETA
+#if BETA || STABLE
                                         foreach (TroopRosterElement troopRosterElement in temporaryTroops.GetTroopRoster())
                                         {
                                             PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
@@ -1068,14 +1067,14 @@ namespace CaptivityEvents.Events
                                         customParty.HomeSettlement = nearest;
 
                                         float totalStrength = customParty.Party.TotalStrength;
-                                        int initialGold = (int)(10f * (float)customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
+                                        int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                                         customParty.InitializePartyTrade(initialGold);
 
                                         foreach (ItemObject itemObject in ItemObject.All)
                                         {
                                             if (itemObject.IsFood)
                                             {
-                                                int num2 = MBRandom.RoundRandomized((float)customParty.MemberRoster.TotalManCount * (1f / (float)itemObject.Value) * 8f * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat);
+                                                int num2 = MBRandom.RoundRandomized(customParty.MemberRoster.TotalManCount * (1f / itemObject.Value) * 8f * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat);
                                                 if (num2 > 0)
                                                 {
                                                     customParty.ItemRoster.AddToCounts(itemObject, num2);
@@ -1086,7 +1085,7 @@ namespace CaptivityEvents.Events
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
                                         customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
-#if BETA
+#if BETA || STABLE
                                         foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
 #else
                                         foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster)
@@ -1131,7 +1130,7 @@ namespace CaptivityEvents.Events
                                             }
                                         }
 
-#if BETA
+#if BETA || STABLE
                                         foreach (TroopRosterElement troopRosterElement in temporaryTroops.GetTroopRoster())
                                         {
                                             PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);

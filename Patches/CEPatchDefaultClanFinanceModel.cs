@@ -28,9 +28,8 @@ namespace CaptivityEvents.Patches
                 if (brothel.IsRunning)
                 {
                     int num3 = (int)(Math.Max(0, brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction());
+                    num3 *= (brothel.Level + 1);
                     num += num3;
-
-                    num *= (brothel.Level + 1);
 
                     if (applyWithdrawals && num3 > 0) brothel.ChangeGold(-num3);
 

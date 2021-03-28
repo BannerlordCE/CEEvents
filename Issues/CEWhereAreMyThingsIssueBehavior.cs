@@ -1,4 +1,4 @@
-﻿#define BETA // 1.5.8
+﻿#define STABLE // 1.5.8
 using CaptivityEvents.Config;
 using Helpers;
 using System;
@@ -19,7 +19,7 @@ namespace CaptivityEvents.Issues
         public override void SyncData(IDataStore dataStore) { }
 
 
-#if BETA
+#if BETA || STABLE
         public static IssueBase OnStartIssue(in PotentialIssueData potentialIssueData, Hero issueOwner) => new CEWhereAreMyThingsIssue(issueOwner);
 #else
         public static IssueBase OnStartIssue(PotentialIssueData potentialIssueData, Hero issueOwner) => new CEWhereAreMyThingsIssue(issueOwner);

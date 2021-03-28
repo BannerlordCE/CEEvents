@@ -25,7 +25,7 @@ namespace CaptivityEvents.Patches
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner" : "CE_defeated_and_taken_prisoner_male");
 
-                    if (Game.Current.GameStateManager.ActiveState is MapState ms1)
+                    if (Game.Current.GameStateManager.ActiveState is MapState ms1 && ms1.MenuContext != null)
                         ms1.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
                     break;
                 case "taken_prisoner":
@@ -34,7 +34,7 @@ namespace CaptivityEvents.Patches
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner" : "CE_taken_prisoner_male");
 
-                    if (Game.Current.GameStateManager.ActiveState is MapState ms2)
+                    if (Game.Current.GameStateManager.ActiveState is MapState ms2 && ms2.MenuContext != null)
                         ms2.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
                     break;
                 case "menu_captivity_castle_taken_prisoner":
@@ -43,7 +43,7 @@ namespace CaptivityEvents.Patches
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner" : "CE_menu_captivity_castle_taken_prisoner_male");
 
-                    if (Game.Current.GameStateManager.ActiveState is MapState ms3)
+                    if (Game.Current.GameStateManager.ActiveState is MapState ms3 && ms3.MenuContext != null)
                         ms3.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
                     break;
                 case "menu_captivity_end_by_party_removed":
@@ -73,7 +73,7 @@ namespace CaptivityEvents.Patches
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner" : "CE_defeated_and_taken_prisoner_male");
 
-                    if (Game.Current.GameStateManager.ActiveState is MapState ms1)
+                    if (Game.Current.GameStateManager.ActiveState is MapState ms1 && ms1.MenuContext != null)
                         ms1.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
                     break;
                 case "taken_prisoner":
@@ -82,7 +82,7 @@ namespace CaptivityEvents.Patches
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner" : "CE_taken_prisoner_male");
 
-                    if (Game.Current.GameStateManager.ActiveState is MapState ms2)
+                    if (Game.Current.GameStateManager.ActiveState is MapState ms2 && ms2.MenuContext != null)
                         ms2.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
                     break;
                 case "menu_captivity_castle_taken_prisoner":
@@ -91,7 +91,7 @@ namespace CaptivityEvents.Patches
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner" : "CE_menu_captivity_castle_taken_prisoner_male");
 
-                    if (Game.Current.GameStateManager.ActiveState is MapState ms3)
+                    if (Game.Current.GameStateManager.ActiveState is MapState ms3 && ms3.MenuContext != null)
                         ms3.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
                     break;
                 case "menu_captivity_end_by_party_removed":

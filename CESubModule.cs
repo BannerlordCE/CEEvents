@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors.BarterBehaviors;
@@ -22,13 +23,12 @@ using TaleWorlds.Engine.GauntletUI;
 using TaleWorlds.Engine.Screens;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+using TaleWorlds.ModuleManager;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.View.Missions;
 using TaleWorlds.TwoDimension;
-using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
-using TaleWorlds.CampaignSystem.Actions;
 
 namespace CaptivityEvents
 {
@@ -614,7 +614,7 @@ namespace CaptivityEvents
             {
                 if (PlayerEncounter.Current == null) return;
                 if (PlayerEncounter.EncounteredMobileParty == null) return;
-                if (!PlayerEncounter.EncounteredMobileParty.StringId.StartsWith("CustomPartyCE")) return;
+                if (!PlayerEncounter.EncounteredMobileParty.StringId.StartsWith("CustomPartyHuntCE_")) return;
                 CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
             }
             catch (Exception)
@@ -896,7 +896,11 @@ namespace CaptivityEvents
                         }
 
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
-                        mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
+
+                        if (mapState.MenuContext != null)
+                        {
+                            mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
+                        }
 
                     }
                     else
@@ -919,9 +923,10 @@ namespace CaptivityEvents
                         }
 
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
-                        mapState.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                                   ? "wait_prisoner_female"
-                                                                   : "wait_prisoner_male");
+                        if (mapState.MenuContext != null)
+                        {
+                            mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
+                        }
                     }
                 }
                 catch (Exception)
@@ -950,7 +955,7 @@ namespace CaptivityEvents
                         {
                             try
                             {
-                                MissionCameraFadeView behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
+                                MissionCameraFadeView behavior = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
 
                                 Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
 
@@ -969,7 +974,7 @@ namespace CaptivityEvents
                                     dungeonFadeOut = 2f;
                                 }
 
-                                behaviour.BeginFadeOut(dungeonFadeOut);
+                                behavior.BeginFadeOut(dungeonFadeOut);
                             }
                             catch (Exception)
                             {
@@ -1010,7 +1015,7 @@ namespace CaptivityEvents
                         {
                             try
                             {
-                                MissionCameraFadeView behaviour = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
+                                MissionCameraFadeView behavior = Mission.Current.GetMissionBehaviour<MissionCameraFadeView>();
 
                                 Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
 
@@ -1029,7 +1034,7 @@ namespace CaptivityEvents
                                     CEPersistence.brothelFadeIn = 3f;
                                 }
 
-                                behaviour.BeginFadeOutAndIn(CEPersistence.brothelFadeIn, CEPersistence.brothelBlack, CEPersistence.brothelFadeOut);
+                                behavior.BeginFadeOutAndIn(CEPersistence.brothelFadeIn, CEPersistence.brothelBlack, CEPersistence.brothelFadeOut);
                             }
                             catch (Exception)
                             {
@@ -1185,7 +1190,7 @@ namespace CaptivityEvents
                 }
                 else
                 {
-                    PlayerEncounter.Update();
+                    //PlayerEncounter.Update();
                 }
             }
         }

@@ -20,15 +20,15 @@ namespace CaptivityEvents.Events
         private readonly Option _option;
         private readonly SharedCallBackHelper _sharedCallBackHelper;
         private readonly CECompanionSystem _companionSystem;
-
         private readonly Dynamics _dynamics = new Dynamics();
         private readonly ScoresCalculation _score = new ScoresCalculation();
         private readonly CEImpregnationSystem _impregnation = new CEImpregnationSystem();
-        private readonly CaptiveSpecifics _captive = new CaptiveSpecifics();
         private readonly CEVariablesLoader _variableLoader = new CEVariablesLoader();
 
         private float _timer = 0;
         private float _max = 0;
+
+        private readonly CaptiveSpecifics _captive = new CaptiveSpecifics();
 
         internal CaptiveMenuCallBackDelegate(CEEvent listedEvent, List<CEEvent> eventList)
         {
@@ -49,9 +49,12 @@ namespace CaptivityEvents.Events
 
         internal void CaptiveProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
-            args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                       ? "wait_captive_female"
-                                       : "wait_captive_male");
+            if (args.MenuContext != null)
+            {
+                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                           ? "wait_captive_female"
+                                           : "wait_captive_male");
+            }
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -60,7 +63,6 @@ namespace CaptivityEvents.Events
 
             if (_listedEvent.ProgressEvent != null)
             {
-                //args.MenuContext.GameMenu.AllowWaitingAutomatically();
                 _max = _variableLoader.GetFloatFromXML(_listedEvent.ProgressEvent.TimeToTake);
                 _timer = 0f;
 
@@ -76,7 +78,6 @@ namespace CaptivityEvents.Events
 
         internal bool CaptiveProgressConditionWaitGameMenu(MenuCallbackArgs args)
         {
-            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
@@ -114,14 +115,14 @@ namespace CaptivityEvents.Events
 
         internal void CaptiveInitWaitGameMenu(MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.IsSettlement)
+            if (PlayerCaptivity.CaptorParty.IsSettlement && args.MenuContext != null)
             {
                 args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                            ? "wait_prisoner_female"
                                                            : "wait_prisoner_male");
                 CEHelper.waitMenuCheck = 1;
             }
-            else if (PlayerCaptivity.CaptorParty.IsMobile)
+            else if (PlayerCaptivity.CaptorParty.IsMobile && args.MenuContext != null)
             {
                 args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                            ? "wait_captive_female"
@@ -134,13 +135,11 @@ namespace CaptivityEvents.Events
 
             if (PlayerCaptivity.IsCaptive) SetCaptiveTextVariables(ref args);
 
-            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
-            args.MenuContext.GameMenu.SetMenuAsWaitMenuAndInitiateWaiting();
+            if (args.MenuContext != null) args.MenuContext.GameMenu.SetMenuAsWaitMenuAndInitiateWaiting();
         }
 
         internal bool CaptiveConditionWaitGameMenu(MenuCallbackArgs args)
         {
-            //args.MenuContext.GameMenu.AllowWaitingAutomatically();
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
@@ -257,18 +256,42 @@ namespace CaptivityEvents.Events
             ConsequenceSoldEvents(ref args);
             ConsequenceGainRandomPrisoners();
 
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor) && PlayerCaptivity.CaptorParty.NumberOfAllMembers == 1) ConsequenceKillCaptor();
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner)) _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
-            else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0) ConsequenceRandomEventTrigger(ref args);
-            else if (!string.IsNullOrEmpty(_option.TriggerEventName)) ConsequenceSingleEventTrigger(ref args);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor) && PlayerCaptivity.CaptorParty.NumberOfAllMembers == 1)
+            {
+                ConsequenceKillCaptor();
+            }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner))
+            {
+                _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
+            }
+            else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0)
+            {
+                ConsequenceRandomEventTrigger(ref args);
+            }
+            else if (!string.IsNullOrEmpty(_option.TriggerEventName))
+            {
+                ConsequenceSingleEventTrigger(ref args);
+            }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
             {
                 _sharedCallBackHelper.ConsequenceStartBattle(() => { _captive.CECaptivityContinue(ref args); }, 0);
             }
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape)) ConsequenceEscapeEventTrigger(ref args);
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) _captive.CECaptivityEscape(ref args);
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Leave)) _captive.CECaptivityLeave(ref args);
-            else _captive.CECaptivityContinue(ref args);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape))
+            {
+                ConsequenceEscapeEventTrigger(ref args);
+            }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape))
+            {
+                _captive.CECaptivityEscape(ref args);
+            }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Leave))
+            {
+                _captive.CECaptivityLeave(ref args);
+            }
+            else
+            {
+                _captive.CECaptivityContinue(ref args);
+            }
         }
 
         #region private
@@ -760,7 +783,6 @@ namespace CaptivityEvents.Events
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Missing RelationTotal");
-                _dynamics.RelationsModifier(hero, MBRandom.RandomInt(-5, 5), null, InformationMessage && !NoMessages, !InformationMessage && !NoMessages);
             }
         }
 
@@ -875,15 +897,15 @@ namespace CaptivityEvents.Events
         {
             if (_option.SkillsRequired == null) return;
 
-            if (PlayerCaptivity.CaptorParty.LeaderHero == null)
-            {
-                args.IsEnabled = false;
-                return;
-            }
-
             foreach (SkillRequired skillRequired in _option.SkillsRequired)
             {
                 if (skillRequired.Ref == "Hero") continue;
+
+                if (PlayerCaptivity.CaptorParty.LeaderHero == null)
+                {
+                    args.IsEnabled = false;
+                    return;
+                }
 
                 SkillObject foundSkill = CESkills.FindSkill(skillRequired.Id);
 
@@ -1815,6 +1837,10 @@ namespace CaptivityEvents.Events
             int captiveTimeInDays = PlayerCaptivity.CaptiveTimeInDays;
             TextObject text = args.MenuContext.GameMenu.GetText();
 
+            text.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
+                         ? 1
+                         : 0);
+
             if (PlayerCaptivity.CaptorParty.Leader != null)
             {
                 text.SetTextVariable("CAPTOR_NAME", PlayerCaptivity.CaptorParty.Leader.Name);
@@ -1828,10 +1854,6 @@ namespace CaptivityEvents.Events
                 text.SetTextVariable("CAPTOR_NAME", new TextObject("{=CESETTINGS0099}captor"));
                 text.SetTextVariable("ISCAPTORFEMALE", 0);
             }
-
-            text.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
-                                     ? 1
-                                     : 0);
 
             try
             {

@@ -1,4 +1,4 @@
-﻿#define BETA // 1.5.8
+﻿#define STABLE // 1.5.8
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using Helpers;
@@ -73,10 +73,8 @@ namespace CaptivityEvents.Events
 
         internal void ChangeSpouse(Hero hero, Hero spouseHero)
         {
+            if (hero == null) return;
             Hero heroSpouse = hero.Spouse;
-
-            // Same Clan is Bugged
-            if (hero.Clan == spouseHero.Clan) return;
 
             if (!hero.IsHumanPlayerCharacter && hero.IsFactionLeader) RemoveFactionLeader(hero);
             else if (!spouseHero.IsHumanPlayerCharacter && spouseHero.IsFactionLeader) RemoveFactionLeader(spouseHero);
@@ -94,6 +92,9 @@ namespace CaptivityEvents.Events
             }
 
             if (spouseHero == null) return;
+
+            if (hero.Clan == spouseHero.Clan) return;
+
             Hero spouseHeroSpouse = spouseHero.Spouse;
 
             if (spouseHeroSpouse != null)
@@ -611,7 +612,7 @@ namespace CaptivityEvents.Events
                             if (captor.Clan != null)
                             {
                                 PropertyInfo pi = captor.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                                captor.Clan.Name = clanName;
+                                captor.Clan.ChangeClanName(clanName);
                                 captor.Clan.InformalName = clanName;
                                 if (pi != null) pi.SetValue(captor.Clan, banner);
                                 captor.Clan.SetLeader(leader);
@@ -620,7 +621,7 @@ namespace CaptivityEvents.Events
                         else if (hero.Clan != null)
                         {
                             PropertyInfo pi = hero.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                            hero.Clan.Name = clanName;
+                            hero.Clan.ChangeClanName(clanName);
                             hero.Clan.InformalName = clanName;
                             if (pi != null) pi.SetValue(hero.Clan, banner);
                             hero.Clan.SetLeader(leader);
@@ -723,7 +724,7 @@ namespace CaptivityEvents.Events
             //PartyTemplateObject villagerPartyTemplate = nearest.Culture.VillagerPartyTemplate; Will be used in figuring out on what to give
             MBRandom.RandomInt(1, 10);
 
-#if BETA
+#if BETA || STABLE
             party.PrisonRoster.AddToCounts(nearest.Culture.VillageWoman, 10, false, 7);
             party.PrisonRoster.AddToCounts(nearest.Culture.Villager, 10, false, 7);
 #else
@@ -801,6 +802,11 @@ namespace CaptivityEvents.Events
             if (hero2 == null) hero2 = Hero.MainHero;
 
             Campaign.Current.Models.DiplomacyModel.GetHeroesForEffectiveRelation(hero1, hero2, out Hero hero3, out Hero hero4);
+            if (hero3 == null || hero4 == null)
+            {
+                hero3 = hero1;
+                hero4 = hero2;
+            }
             int value = CharacterRelationManager.GetHeroRelation(hero3, hero4) + relationChange;
             value = MBMath.ClampInt(value, -100, 100);
             hero3.SetPersonalRelation(hero4, value);
