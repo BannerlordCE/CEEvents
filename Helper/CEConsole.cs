@@ -1,4 +1,4 @@
-﻿#define STABLE // 1.5.8
+﻿#define BETA // 1.5.8
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;

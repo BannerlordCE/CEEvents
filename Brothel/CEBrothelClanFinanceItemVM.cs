@@ -1,4 +1,4 @@
-#define STABLE // 1.5.9
+#define BETA // 1.5.9
 using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
