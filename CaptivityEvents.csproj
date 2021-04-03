@@ -101,6 +101,7 @@
     <Compile Include="Events\CEVariablesLoader.cs" />
     <Compile Include="Events\WaitingList.cs" />
     <Compile Include="Helper\CETests.cs" />
+    <Compile Include="Helper\CEDelayedEvent.cs" />
     <Compile Include="Notifications\CECaptorMapNotification.cs" />
     <Compile Include="Notifications\CECaptorMapNotificationItemVM.cs" />
     <Compile Include="Helper\CEConsole.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="CESubModule.cs" />
     <Compile Include="Issues\CEWhereAreMyThingsIssueBehavior.cs" />
     <Compile Include="Patches\CEPatchPlayerCaptivity.cs" />
+    <Compile Include="Patches\CEPatchPrisonerReleaseCampaignBehavior.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -286,10 +288,6 @@
     </Reference>
     <Reference Include="TaleWorlds.Diamond.AccessProvider.Test">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Diamond.AccessProvider.Test.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="TaleWorlds.Diamond.ChatSystem">
-      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Diamond.ChatSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="TaleWorlds.Diamond.ChatSystem.Library">

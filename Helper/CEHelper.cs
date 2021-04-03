@@ -44,6 +44,16 @@ namespace CaptivityEvents.Helper
         public static bool progressEventExists = false;
         public static bool progressEventCheck = false;
 
+        public static List<CEDelayedEvent> delayedEvents = new List<CEDelayedEvent>();
+
+        internal static void AddDelayedEvent(CEDelayedEvent delayedEvent)
+        {
+            if (!delayedEvents.Any(item => item.eventName == delayedEvent.eventName))
+            {
+                delayedEvents.Add(delayedEvent);
+            }
+        }
+
         internal static List<string> GetModulePaths(string[] modulesFound, out List<ModuleInfo> modules)
         {
             List<string> modulePaths = new List<string>();
