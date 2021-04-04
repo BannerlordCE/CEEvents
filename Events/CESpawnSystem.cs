@@ -86,7 +86,6 @@ namespace CaptivityEvents.Events
                         culture = heroVariables.Culture;
                     }
 
-#if BETA || STABLE
                     CharacterObject wanderer = (from x in CharacterObject.Templates
                                                 where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture != null && x.Culture.StringId == culture.ToLower()) && (heroVariables.Gender == null || x.IsFemale == isFemale)
                                                 select x).GetRandomElementInefficiently();
@@ -95,16 +94,6 @@ namespace CaptivityEvents.Events
                                                 select settlement).GetRandomElementInefficiently();
 
                     Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElementInefficiently(), null, -1);
-#else
-                    CharacterObject wanderer = (from x in CharacterObject.Templates
-                                                where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture != null && x.Culture.StringId == culture.ToLower()) && (heroVariables.Gender == null || x.IsFemale == isFemale)
-                                                select x).GetRandomElement();
-                    Settlement randomElement = (from settlement in Settlement.All
-                                                where settlement.Culture == wanderer.Culture && settlement.IsTown
-                                                select settlement).GetRandomElement();
-
-                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElement(), null, -1);
-#endif
 
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);
                     hero.HasMet = true;

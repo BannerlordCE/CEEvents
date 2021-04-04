@@ -64,21 +64,15 @@ namespace CaptivityEvents.Brothel
 #endif
 
             int sellingCost = _brothel.Capital;
-#if BETA || STABLE
+
             TextObject hint = GetBrothelSellHintText(sellingCost);
-#else
-            string hint = GetBrothelSellHintText(sellingCost);     
-#endif
+
             ActionList.Add(new StringItemWithEnabledAndHintVM(ExecuteSellBrothel, new TextObject("{=PHkC8Gia}Sell").ToString(), true, null, hint));
 
             bool isCurrentlyActive = _brothel.IsRunning;
             int costToStart = _brothel.Expense;
 
-#if BETA || STABLE
             TextObject hint2 = GetBrothelSellHintText(sellingCost);
-#else
-            string hint2 = GetBrothelRunningHintText(isCurrentlyActive, costToStart);
-#endif
 
             ActionList.Add(isCurrentlyActive
                                ? new StringItemWithEnabledAndHintVM(ExecuteToggleBrothel, new TextObject("{=CEBROTHEL0995}Stop Operations").ToString(), true, null, hint2)
@@ -115,22 +109,16 @@ namespace CaptivityEvents.Brothel
 
         private new void ExecuteEndHint() => InformationManager.HideInformations();
 
-#if BETA || STABLE
+
         private static TextObject GetBrothelRunningHintText(bool isRunning, int costToStart)
-#else
-        private static string GetBrothelRunningHintText(bool isRunning, int costToStart)
-#endif
         {
             TextObject textObject = new TextObject("The brothel is currently {?ISRUNNING}open{?}closed, you will need {AMOUNT} denars to begin operations again{\\?}.");
 
             textObject.SetTextVariable("ISRUNNING", isRunning ? 1 : 0);
             if (!isRunning) textObject.SetTextVariable("AMOUNT", costToStart);
 
-#if BETA || STABLE
+
             return textObject;
-#else
-            return textObject.ToString();
-#endif
         }
 
     private void ExecuteToggleBrothel(object identifier)
@@ -143,19 +131,13 @@ namespace CaptivityEvents.Brothel
             onRefresh?.Invoke();
         }
 
-#if BETA || STABLE
+
         private static TextObject GetBrothelSellHintText(int sellCost)
-#else
-        private static string GetBrothelSellHintText(int sellCost)
-#endif
         {
             TextObject textObject = new TextObject("{=CEBROTHEL1000}You can sell this brothel for {AMOUNT} denars.");
             textObject.SetTextVariable("AMOUNT", sellCost);
-#if BETA || STABLE
+
             return textObject;
-#else
-            return textObject.ToString();
-#endif
         }
 
         private void ExecuteSellBrothel(object identifier)

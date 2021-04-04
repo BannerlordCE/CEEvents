@@ -161,7 +161,7 @@ namespace CaptivityEvents.CampaignBehaviors
             CEEvent eventToFire = null;
             bool shouldFireEvent = delayedEvents.Any(item =>
             {
-                if (item.eventName != null && item.eventTime < PlayerCaptivity.LastCheckTime.ElapsedHoursUntilNow)
+                if (item.eventName != null && item.eventTime < Campaign.Current.CampaignStartTime.ElapsedHoursUntilNow)
                 {
                     CECustomHandler.LogToFile("Firing " + item.eventName);
                     if (item.conditions == true)
@@ -210,7 +210,6 @@ namespace CaptivityEvents.CampaignBehaviors
             if (shouldFireEvent)
             {
                 delayedEvents.RemoveAll(item => item.hasBeenFired);
-                PlayerCaptivity.LastCheckTime = CampaignTime.Now;
                 return eventToFire;
             }
             return null;
@@ -221,7 +220,7 @@ namespace CaptivityEvents.CampaignBehaviors
             CEEvent eventToFire = null;
             bool shouldFireEvent = delayedEvents.Any(item =>
             {
-                if (item.eventName != null && item.eventTime < PlayerCaptivity.LastCheckTime.ElapsedHoursUntilNow)
+                if (item.eventName != null && item.eventTime < Campaign.Current.CampaignStartTime.ElapsedHoursUntilNow)
                 {
                     CECustomHandler.LogToFile("Firing " + item.eventName);
                     if (item.conditions == true)
@@ -270,7 +269,6 @@ namespace CaptivityEvents.CampaignBehaviors
             if (shouldFireEvent)
             {
                 delayedEvents.RemoveAll(item => item.hasBeenFired);
-                PlayerCaptivity.LastCheckTime = CampaignTime.Now;
                 return eventToFire;
             }
 

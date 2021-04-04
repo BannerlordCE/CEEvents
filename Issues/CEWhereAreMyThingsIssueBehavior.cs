@@ -19,11 +19,7 @@ namespace CaptivityEvents.Issues
         public override void SyncData(IDataStore dataStore) { }
 
 
-#if BETA || STABLE
         public static IssueBase OnStartIssue(in PotentialIssueData potentialIssueData, Hero issueOwner) => new CEWhereAreMyThingsIssue(issueOwner);
-#else
-        public static IssueBase OnStartIssue(PotentialIssueData potentialIssueData, Hero issueOwner) => new CEWhereAreMyThingsIssue(issueOwner);
-#endif
 
         internal class CEWhereAreMyThingsIssue : IssueBase
         {
