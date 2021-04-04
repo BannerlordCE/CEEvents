@@ -96,7 +96,13 @@ namespace CaptivityEvents.Models
                         }
                         else
                         {
-                            eventToFire = item.eventName;
+                            eventToFire = item.eventName.ToLower();
+                            CEEvent foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == eventToFire);
+                            if (!foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                            {
+                                eventToFire = null;
+                                return false;
+                            }
                             item.hasBeenFired = true;
                             return true;
                         }

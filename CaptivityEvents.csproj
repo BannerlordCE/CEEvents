@@ -108,7 +108,6 @@
     <Compile Include="Custom\CECustom.cs" />
     <Compile Include="Custom\CECustomEvent.cs" />
     <Compile Include="Custom\CECustomHandler.cs" />
-    <Compile Include="Models\CEDefaultPregnancyModel.cs" />
     <Compile Include="Events\CEEventChecker.cs" />
     <Compile Include="Events\CEEventLoader.cs" />
     <Compile Include="Events\CEEventManager.cs" />

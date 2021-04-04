@@ -325,7 +325,12 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (events.Count > 0) return events.GetRandomElement();
+                if (events.Count > 0)
+                {
+                    CEEvent randomEvent = events.GetRandomElement();
+                    randomEvent.Captive = captive;
+                    return randomEvent;
+                }
             }
             catch (Exception e)
             {
