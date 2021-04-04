@@ -233,6 +233,22 @@ namespace CaptivityEvents.Custom
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = "", IsNullable = true)]
     [Serializable]
+    public class DelayEvent
+    {
+        public string UseConditions { get; set; }
+
+        public string TimeToTake { get; set; }
+
+        public string TriggerEventName { get; set; }
+
+        [XmlArrayItem("TriggerEvent", IsNullable = true)]
+        public TriggerEvent[] TriggerEvents { get; set; }
+    }
+
+    [DebuggerStepThrough]
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = true)]
+    [Serializable]
     public class StripSettings
     {
         [XmlAttribute()]
