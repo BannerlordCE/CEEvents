@@ -55,6 +55,12 @@ namespace CaptivityEvents.Custom
                         {
                             if (Path.GetDirectoryName(text).Contains("ModuleData")) continue;
 
+                            if (Path.GetFullPath(text).Contains("\\Scenes\\"))
+                            {
+                                ForceLogToFile("Custom Scene Found: " + text);
+                                continue;
+                            }
+
                             if (Path.GetFileNameWithoutExtension(text) == "SubModule") continue;
 
                             if (Path.GetFileNameWithoutExtension(text).StartsWith("CEModuleCustom"))
@@ -106,6 +112,12 @@ namespace CaptivityEvents.Custom
 
                 foreach (string text in files)
                 {
+                    if (Path.GetFullPath(text).Contains("\\Scenes\\"))
+                    {
+                        ForceLogToFile("Custom Scene Found: " + text);
+                        continue;
+                    }
+
                     if (Path.GetFileNameWithoutExtension(text).StartsWith("CESettings")) continue;
 
                     if (Path.GetFileNameWithoutExtension(text).StartsWith("CEModuleCustom"))
