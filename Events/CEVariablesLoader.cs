@@ -52,7 +52,6 @@ namespace CaptivityEvents.Events
                 return 0;
             }
         }
-
         public float GetFloatFromXML(string numpassed)
         {
             try

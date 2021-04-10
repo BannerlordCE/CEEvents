@@ -13,7 +13,6 @@ namespace CaptivityEvents.Patches
 		[HarmonyPrefix]
 		private static bool OnGameLoaded(CampaignGameStarter campaignGameStarter)
 		{
-			 Fix
 			foreach (Settlement settlement in Settlement.All)
 			{
 				foreach (TroopRosterElement troopRosterElement in settlement.Party.PrisonRoster.GetTroopRoster())

@@ -55,7 +55,6 @@ namespace CaptivityEvents.Events
                 }
             }
         }
-
         public void SpawnTheHero(SpawnHero[] variables, PartyBase party)
         {
 
