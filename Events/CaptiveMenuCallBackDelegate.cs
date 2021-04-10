@@ -47,6 +47,7 @@ namespace CaptivityEvents.Events
             _companionSystem = new CECompanionSystem(listedEvent, option, eventList);
         }
 
+        #region Progress Event
         internal void CaptiveProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
             if (args.MenuContext != null)
@@ -75,13 +76,11 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Missing Progress Event Settings in " + _listedEvent.Name);
             }
         }
-
         internal bool CaptiveProgressConditionWaitGameMenu(MenuCallbackArgs args)
         {
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
-
         internal void CaptiveProgressConsequenceWaitGameMenu(MenuCallbackArgs args)
         {
             if (_listedEvent.ProgressEvent.TriggerEvents != null && _listedEvent.ProgressEvent.TriggerEvents.Length > 0)
@@ -93,7 +92,6 @@ namespace CaptivityEvents.Events
                 ConsequenceSingleEventTriggerProgress(ref args);
             }
         }
-
         internal void CaptiveProgressTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt)
         {
             _timer += dt.CurrentHourInDay;
@@ -112,6 +110,7 @@ namespace CaptivityEvents.Events
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
 
         }
+        #endregion
 
         internal void CaptiveInitWaitGameMenu(MenuCallbackArgs args)
         {
