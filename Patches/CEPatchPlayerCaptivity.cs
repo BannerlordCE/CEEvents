@@ -1,7 +1,6 @@
-﻿using HarmonyLib;
-using CaptivityEvents.Helper;
+﻿using CaptivityEvents.Helper;
+using HarmonyLib;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.GameMenus;
 
 namespace CaptivityEvents.Patches
 {

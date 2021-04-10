@@ -3,12 +3,10 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Core;
-using TaleWorlds.Library;
-using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Patches
 {
-	[HarmonyPatch(typeof(PrisonerReleaseCampaignBehavior))]
+    [HarmonyPatch(typeof(PrisonerReleaseCampaignBehavior))]
 	internal class CEPatchPrisonerReleaseCampaignBehavior
 	{
 		[HarmonyPatch("OnGameLoaded")]

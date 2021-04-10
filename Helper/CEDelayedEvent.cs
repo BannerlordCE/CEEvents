@@ -1,6 +1,4 @@
-﻿using TaleWorlds.CampaignSystem;
-
-namespace CaptivityEvents.Helper
+﻿namespace CaptivityEvents.Helper
 {
     public class CEDelayedEvent
     {
