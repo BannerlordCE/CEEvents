@@ -582,7 +582,7 @@ namespace CaptivityEvents.Events
                                 clan = Clan.All.GetRandomElement();
                                 break;
                             case "hero":
-                                clan = hero.Clan;
+                                clan = hero?.Clan;
                                 if (clan == null)
                                 {
                                     clanName = new TextObject(hero.Name + "'s Slaves");
@@ -591,7 +591,7 @@ namespace CaptivityEvents.Events
                                 }
                                 break;
                             case "captor":
-                                clan = captor.Clan;
+                                clan = captor?.Clan;
                                 if (clan == null)
                                 {
                                     clanName = new TextObject(captor.Name + "'s Slaves");
@@ -609,7 +609,7 @@ namespace CaptivityEvents.Events
                     {
                         if (clanOption.Ref.ToLower() == "captor")
                         {
-                            if (captor.Clan != null)
+                            if (captor?.Clan != null)
                             {
                                 PropertyInfo pi = captor.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                                 captor.Clan.ChangeClanName(clanName);
@@ -618,7 +618,7 @@ namespace CaptivityEvents.Events
                                 captor.Clan.SetLeader(leader);
                             }
                         }
-                        else if (hero.Clan != null)
+                        else if (hero?.Clan != null)
                         {
                             PropertyInfo pi = hero.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                             hero.Clan.ChangeClanName(clanName);
@@ -628,7 +628,7 @@ namespace CaptivityEvents.Events
                         }
 
                         TextObject text = GameTexts.FindText("str_CE_clan", clanOption.Action.ToLower());
-                        text.SetTextVariable("HERO", clanOption.Ref.ToLower() == "captor" ? captor.Name : hero.Name);
+                        text.SetTextVariable("HERO", clanOption.Ref.ToLower() == "captor" ? captor?.Name : hero?.Name);
                         text.SetTextVariable("CLAN", clanName);
                         InformationManager.DisplayMessage(new InformationMessage(text.ToString(), Colors.Magenta));
 
@@ -640,8 +640,8 @@ namespace CaptivityEvents.Events
                     if (!clanOption.HideNotification)
                     {
                         TextObject text = GameTexts.FindText("str_CE_clan", clanOption.Action.ToLower());
-                        text.SetTextVariable("HERO", clanOption.Ref.ToLower() == "captor" ? captor.Name : hero.Name);
-                        text.SetTextVariable("CLAN", clan.Name);
+                        text.SetTextVariable("HERO", clanOption.Ref.ToLower() == "captor" ? captor?.Name : hero?.Name);
+                        text.SetTextVariable("CLAN", clan?.Name);
                         InformationManager.DisplayMessage(new InformationMessage(text.ToString(), Colors.Magenta));
                     }
 
