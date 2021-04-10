@@ -466,7 +466,7 @@ namespace CaptivityEvents
                             () => { ScreenManager.PushScreen(new CESettingsScreen()); },
                             // 1.5.7
                             // false
-                            // 1.5.8
+                            
                             () => { return false; }
                         )
                       );

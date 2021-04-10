@@ -1,4 +1,4 @@
-﻿#define BETA // 1.5.8
+﻿#define BETA 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Issues;
@@ -34,34 +34,28 @@ namespace CaptivityEvents.Events
             _eventList = eventList;
         }
 
-
-        #region private
-
+        #region Consequences
         internal void ConsequenceXP()
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveXP)) GiveXP();
-        }
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveXP))
+            {
+                try
+                {
+                    string skillToLevel = "";
 
+                    if (!string.IsNullOrEmpty(_option.SkillToLevel)) skillToLevel = _option.SkillToLevel;
+                    else if (!string.IsNullOrEmpty(_listedEvent.SkillToLevel)) skillToLevel = _listedEvent.SkillToLevel;
+                    else CECustomHandler.LogToFile("Missing SkillToLevel");
+
+                    foreach (SkillObject skillObject in SkillObject.All.Where(skillObject => skillObject.Name.ToString().Equals(skillToLevel, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skillToLevel)) _dynamics.GainSkills(skillObject, 50, 100);
+                }
+                catch (Exception) { CECustomHandler.LogToFile("GiveXP Failed"); }
+            }
+        }
         internal void ConsequenceLeaveSpouse()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveLeaveSpouse)) _dynamics.ChangeSpouse(Hero.MainHero, null);
         }
-
-        internal void GiveXP()
-        {
-            try
-            {
-                string skillToLevel = "";
-
-                if (!string.IsNullOrEmpty(_option.SkillToLevel)) skillToLevel = _option.SkillToLevel;
-                else if (!string.IsNullOrEmpty(_listedEvent.SkillToLevel)) skillToLevel = _listedEvent.SkillToLevel;
-                else CECustomHandler.LogToFile("Missing SkillToLevel");
-
-                foreach (SkillObject skillObject in SkillObject.All.Where(skillObject => skillObject.Name.ToString().Equals(skillToLevel, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skillToLevel)) _dynamics.GainSkills(skillObject, 50, 100);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("GiveXP Failed"); }
-        }
-
         internal void ConsequenceGold()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) return;
@@ -72,7 +66,6 @@ namespace CaptivityEvents.Events
             content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveGold);
             GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, content);
         }
-
         internal void ConsequenceChangeGold()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) return;
@@ -89,7 +82,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
         }
-
         internal void ConsequenceChangeTrait()
         {
             try
@@ -136,7 +128,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
         }
-
         internal void ConsequenceChangeSkill()
         {
             try
@@ -184,7 +175,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }
-
         internal void ConsequenceSlaveryLevel()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSlaveryLevel)) return;
@@ -201,7 +191,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid SlaveryTotal"); }
         }
-
         internal void ConsequenceSlaveryFlags()
         {
             bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
@@ -210,7 +199,6 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddSlaveryFlag)) _dynamics.VictimSlaveryModifier(1, Hero.MainHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveSlaveryFlag)) _dynamics.VictimSlaveryModifier(0, Hero.MainHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
         }
-
         internal void ConsequenceProstitutionLevel()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeProstitutionLevel)) return;
@@ -227,7 +215,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid ProstitutionTotal"); }
         }
-
         internal void ConsequenceProstitutionFlags()
         {
             bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
@@ -236,7 +223,6 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag)) _dynamics.VictimProstitutionModifier(1, Hero.MainHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) _dynamics.VictimProstitutionModifier(0, Hero.MainHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
         }
-
         internal void ConsequenceSpawnTroop()
         {
             if (_option.SpawnTroops != null)
@@ -244,7 +230,6 @@ namespace CaptivityEvents.Events
                 new CESpawnSystem().SpawnTheTroops(_option.SpawnTroops, PartyBase.MainParty);
             }
         }
-
         internal void ConsequenceSpawnHero()
         {
             if (_option.SpawnHeroes != null)
@@ -252,7 +237,6 @@ namespace CaptivityEvents.Events
                 new CESpawnSystem().SpawnTheHero(_option.SpawnHeroes, PartyBase.MainParty);
             }
         }
-
         internal void ConsequenceRenown()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRenown)) return;
@@ -269,7 +253,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid RenownTotal"); }
         }
-
         internal void ConsequenceChangeHealth()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeHealth)) return;
@@ -286,7 +269,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Missing HealthTotal"); }
         }
-
         internal void ConsequenceChangeMorale()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
@@ -307,7 +289,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid MoralTotal"); }
         }
-
         internal void ConsequenceStripPlayer()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StripPlayer)) return;
@@ -669,21 +650,6 @@ namespace CaptivityEvents.Events
             EquipmentHelper.AssignHeroEquipmentFromEquipment(Hero.MainHero, randomElement2);
 
         }
-
-        internal void PlayMapSound(int soundIndex)
-        {
-            Campaign campaign = Campaign.Current;
-            Scene _mapScene = null;
-            if ((campaign?.MapSceneWrapper) != null)
-            {
-                _mapScene = ((MapScene)Campaign.Current.MapSceneWrapper).Scene;
-            }
-
-            CEPersistence.soundEvent = SoundEvent.CreateEvent(soundIndex, _mapScene);
-            CEPersistence.soundEvent.Play();
-        }
-
-
         internal void ConsequenceStartBattle(Action callback, int type)
         {
             try
@@ -1150,8 +1116,6 @@ namespace CaptivityEvents.Events
             }
 
         }
-
-
         internal void ConsequencePlaySound(bool isListedEvent = false)
         {
             try
@@ -1166,7 +1130,18 @@ namespace CaptivityEvents.Events
 
                 if (soundToPlay == null) return;
                 int soundIndex = SoundEvent.GetEventIdFromString(soundToPlay);
-                if (soundIndex != -1) PlayMapSound(soundIndex);
+                if (soundIndex != -1)
+                {
+                    Campaign campaign = Campaign.Current;
+                    Scene _mapScene = null;
+                    if ((campaign?.MapSceneWrapper) != null)
+                    {
+                        _mapScene = ((MapScene)Campaign.Current.MapSceneWrapper).Scene;
+                    }
+
+                    CEPersistence.soundEvent = SoundEvent.CreateEvent(soundIndex, _mapScene);
+                    CEPersistence.soundEvent.Play();
+                }
 
             }
             catch (Exception e)
@@ -1174,7 +1149,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("ConsequencePlaySound " + isListedEvent + " : " + e);
             }
         }
-
+        #endregion
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {
@@ -1318,6 +1293,5 @@ namespace CaptivityEvents.Events
             }
         }
 
-#endregion
     }
 }

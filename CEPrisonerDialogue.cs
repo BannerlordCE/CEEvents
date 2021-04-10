@@ -88,7 +88,7 @@ namespace CaptivityEvents
         private void ConversationCEEventLordCaptureOnConsequence()
         {
             Campaign.Current.CurrentConversationContext = ConversationContext.Default;
-            new CaptorSpecifics().CEStripVictim(CharacterObject.OneToOneConversationCharacter.HeroObject);
+            new CaptorSpecifics().CECaptorStripVictim(CharacterObject.OneToOneConversationCharacter.HeroObject);
 
             if (CharacterObject.OneToOneConversationCharacter.HeroObject.GetSkillValue(CESkills.Slavery) < 50) new Dynamics().RelationsModifier(CharacterObject.OneToOneConversationCharacter.HeroObject, -10);
 

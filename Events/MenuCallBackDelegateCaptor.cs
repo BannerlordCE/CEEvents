@@ -14,7 +14,7 @@ using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Events
 {
-    public class CaptorMenuCallBackDelegate
+    public class MenuCallBackDelegateCaptor
     {
         private readonly CEEvent _listedEvent;
         private readonly List<CEEvent> _eventList;
@@ -31,7 +31,7 @@ namespace CaptivityEvents.Events
 
         private readonly CaptorSpecifics _captor = new CaptorSpecifics();
 
-        internal CaptorMenuCallBackDelegate(CEEvent listedEvent, List<CEEvent> eventList)
+        internal MenuCallBackDelegateCaptor(CEEvent listedEvent, List<CEEvent> eventList)
         {
             _listedEvent = listedEvent;
             _eventList = eventList;
@@ -39,7 +39,7 @@ namespace CaptivityEvents.Events
             _companionSystem = new CECompanionSystem(listedEvent, null, eventList);
         }
 
-        internal CaptorMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
+        internal MenuCallBackDelegateCaptor(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
             _listedEvent = listedEvent;
             _option = option;
@@ -244,8 +244,8 @@ namespace CaptivityEvents.Events
             {
                 _sharedCallBackHelper.ConsequenceStartBattle(() => { _captor.CECaptorContinue(args); }, 1);
             }
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners)) { _captor.CEPrisonerRebel(args); }
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.HuntPrisoners)) { _captor.CEHuntPrisoners(args); }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners)) { _captor.CECaptorPrisonerRebel(args); }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.HuntPrisoners)) { _captor.CECaptorHuntPrisoners(args); }
             else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0)
             {
                 ConsequenceRandomEventTrigger(ref args);
@@ -493,9 +493,9 @@ namespace CaptivityEvents.Events
             // Wound Player
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundCaptor)) Hero.MainHero.MakeWounded(_listedEvent.Captive.HeroObject);
             // Wound All
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundAllPrisoners)) _captor.CEWoundPrisoners(args, PartyBase.MainParty.PrisonRoster.Count);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundAllPrisoners)) _captor.CECaptorWoundPrisoners(args, PartyBase.MainParty.PrisonRoster.Count);
             // Wound Random
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomPrisoners)) _captor.CEWoundPrisoners(args);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomPrisoners)) _captor.CECaptorWoundPrisoners(args);
         }
         private void ConsequenceKillPrisoner(ref MenuCallbackArgs args)
         {
@@ -508,9 +508,9 @@ namespace CaptivityEvents.Events
             // Kill Player
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor)) _dynamics.CEKillPlayer(_listedEvent.Captive.HeroObject);
             // Kill All
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillAllPrisoners)) _captor.CEKillPrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillAllPrisoners)) _captor.CECaptorKillPrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
             // Kill Random
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomPrisoners)) _captor.CEKillPrisoners(args);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomPrisoners)) _captor.CECaptorKillPrisoners(args);
         }
         private void ConsequenceGainRandomPrisoners()
         {
@@ -518,8 +518,8 @@ namespace CaptivityEvents.Events
         }
         private void ConsequenceRelease(ref MenuCallbackArgs args)
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseRandomPrisoners)) _captor.CEReleasePrisoners(args);
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseAllPrisoners)) _captor.CEReleasePrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseRandomPrisoners)) _captor.CECaptorReleasePrisoners(args);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseAllPrisoners)) _captor.CECaptorReleasePrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
         }
         private void ConsequenceEscape()
         {
@@ -537,11 +537,11 @@ namespace CaptivityEvents.Events
         }
         private void ConsequenceStrip(Hero captiveHero)
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip)) _captor.CEStripVictim(captiveHero);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip)) _captor.CECaptorStripVictim(captiveHero);
         }
         private void ConsequenceMakeHeroCompanion(Hero captiveHero)
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.MakeHeroCompanion)) _captor.CEMakeHeroCompanion(captiveHero);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.MakeHeroCompanion)) _captor.CECaptorMakeHeroCompanion(captiveHero);
         }
         private void ConsequenceImpregnation(Hero captiveHero)
         {

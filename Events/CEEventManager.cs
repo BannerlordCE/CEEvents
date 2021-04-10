@@ -18,6 +18,7 @@ namespace CaptivityEvents.Events
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
         }
 
+        #region Return Specifics Events
         public static string FireSpecificEvent(string specificEvent, bool force = false)
         {
             List<string> eventNames = new List<string>();
@@ -53,7 +54,6 @@ namespace CaptivityEvents.Events
 
             return flag;
         }
-
         public static string FireSpecificEventRandom(string specificEvent, out CEEvent ceEvent, bool force = false)
         {
             List<string> eventNames = new List<string>();
@@ -93,7 +93,6 @@ namespace CaptivityEvents.Events
 
             return flag;
         }
-
         public static string FireSpecificEventPartyLeader(string specificEvent, out CEEvent ceEvent, bool force = false, string heroname = null)
         {
             List<string> eventNames = new List<string>();
@@ -157,7 +156,10 @@ namespace CaptivityEvents.Events
 
             return flag;
         }
+        #endregion
 
+
+        #region Return Random Events
         public static CEEvent ReturnWeightedChoiceOfEventsRandom()
         {
             List<CEEvent> events = new List<CEEvent>();
@@ -217,7 +219,6 @@ namespace CaptivityEvents.Events
 
             return null;
         }
-
         public static CEEvent ReturnWeightedChoiceOfEvents()
         {
             List<CEEvent> events = new List<CEEvent>();
@@ -277,7 +278,6 @@ namespace CaptivityEvents.Events
 
             return null;
         }
-
         public static CEEvent ReturnWeightedChoiceOfEventsPartyLeader(CharacterObject captive)
         {
             List<CEEvent> events = new List<CEEvent>();
@@ -340,5 +340,7 @@ namespace CaptivityEvents.Events
 
             return null;
         }
+        #endregion
+
     }
 }

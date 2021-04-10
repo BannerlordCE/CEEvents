@@ -8,11 +8,13 @@ namespace CaptivityEvents.Events
 {
     internal class CEEventLoader
     {
-
-        // Waiting Menus
         public static string CEWaitingList() => new WaitingList().CEWaitingList();
 
-        // CEProgressMode
+        /// <summary>
+        /// Checks which type of progress mode to display.
+        /// </summary>
+        /// <param name="state">Progress Mode</param>
+        /// <returns>MenuAndOptionType</returns>
         private static GameMenu.MenuAndOptionType CEProgressMode(int state)
         {
             switch (state)
@@ -26,11 +28,11 @@ namespace CaptivityEvents.Events
             }
         }
 
-        // Event Loaders
+        #region Event Loader
         public static void CELoadRandomEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
-            RandomMenuCallBackDelegate rcb = new RandomMenuCallBackDelegate(listedEvent, eventList);
+            MenuCallBackDelegateRandom rcb = new MenuCallBackDelegateRandom(listedEvent, eventList);
 
             if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
             {
@@ -63,7 +65,7 @@ namespace CaptivityEvents.Events
 
             foreach (Option op in sorted)
             {
-                RandomMenuCallBackDelegate mcb = new RandomMenuCallBackDelegate(listedEvent, op, eventList);
+                MenuCallBackDelegateRandom mcb = new MenuCallBackDelegateRandom(listedEvent, op, eventList);
                 gameStarter.AddGameMenuOption(
                     listedEvent.Name,
                     listedEvent.Name + op.Order,
@@ -73,11 +75,10 @@ namespace CaptivityEvents.Events
                     false, variablesLoader.GetIntFromXML(op.Order));
             }
         }
-
         public static void CELoadCaptiveEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
-            CaptiveMenuCallBackDelegate cb = new CaptiveMenuCallBackDelegate(listedEvent, eventList);
+            MenuCallBackDelegateCaptive cb = new MenuCallBackDelegateCaptive(listedEvent, eventList);
 
             if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
             {
@@ -125,7 +126,7 @@ namespace CaptivityEvents.Events
 
             foreach (Option op in sorted)
             {
-                CaptiveMenuCallBackDelegate mcb = new CaptiveMenuCallBackDelegate(listedEvent, op, eventList);
+                MenuCallBackDelegateCaptive mcb = new MenuCallBackDelegateCaptive(listedEvent, op, eventList);
                 gameStarter.AddGameMenuOption(
                     listedEvent.Name,
                     listedEvent.Name + op.Order,
@@ -136,11 +137,10 @@ namespace CaptivityEvents.Events
                     variablesLoader.GetIntFromXML(op.Order));
             }
         }
-
         public static void CELoadCaptorEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
             CEVariablesLoader variablesLoader = new CEVariablesLoader();
-            CaptorMenuCallBackDelegate cb = new CaptorMenuCallBackDelegate(listedEvent, eventList);
+            MenuCallBackDelegateCaptor cb = new MenuCallBackDelegateCaptor(listedEvent, eventList);
 
             if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
             {
@@ -171,7 +171,7 @@ namespace CaptivityEvents.Events
 
             foreach (Option op in sorted)
             {
-                CaptorMenuCallBackDelegate mcb = new CaptorMenuCallBackDelegate(listedEvent, op, eventList);
+                MenuCallBackDelegateCaptor mcb = new MenuCallBackDelegateCaptor(listedEvent, op, eventList);
                 gameStarter.AddGameMenuOption(
                     listedEvent.Name,
                     listedEvent.Name + op.Order,
@@ -183,5 +183,7 @@ namespace CaptivityEvents.Events
                     false);
             }
         }
+        #endregion
+
     }
 }

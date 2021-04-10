@@ -12,7 +12,7 @@ using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Events
 {
-    public class RandomMenuCallBackDelegate
+    public class MenuCallBackDelegateRandom
     {
         private readonly CEEvent _listedEvent;
         private readonly List<CEEvent> _eventList;
@@ -27,7 +27,7 @@ namespace CaptivityEvents.Events
         private float _timer = 0;
         private float _max = 0;
 
-        internal RandomMenuCallBackDelegate(CEEvent listedEvent, List<CEEvent> eventList)
+        internal MenuCallBackDelegateRandom(CEEvent listedEvent, List<CEEvent> eventList)
         {
             _listedEvent = listedEvent;
             _eventList = eventList;
@@ -35,7 +35,7 @@ namespace CaptivityEvents.Events
             _companionSystem = new CECompanionSystem(listedEvent, null, eventList);
         }
 
-        internal RandomMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
+        internal MenuCallBackDelegateRandom(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
             _listedEvent = listedEvent;
             _option = option;

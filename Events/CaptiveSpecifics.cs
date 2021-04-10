@@ -45,7 +45,6 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Critical Error: CECaptivityContinue : " + e);
             }
         }
-
         internal void CECaptivityEscapeAttempt(ref MenuCallbackArgs args, int escapeChance = 10)
         {
             if (MBRandom.Random.Next(100) > escapeChance + new ScoresCalculation().EscapeProwessScore(Hero.MainHero))
@@ -79,7 +78,6 @@ namespace CaptivityEvents.Events
                                           : "CE_captivity_sexual_escape_success_male");
             }
         }
-
         internal void CECaptivityLeave(ref MenuCallbackArgs args)
         {
             new CESubModule().LoadTexture("default");
@@ -128,7 +126,6 @@ namespace CaptivityEvents.Events
                 PlayerCaptivity.EndCaptivity();
             }
         }
-
         internal void CECaptivityEscape(ref MenuCallbackArgs args)
         {
             CECampaignBehavior.ExtraProps.Owner = null;
@@ -152,7 +149,6 @@ namespace CaptivityEvents.Events
             new CESubModule().LoadTexture("default");
             PlayerCaptivity.EndCaptivity();
         }
-
         internal void CECaptivityChange(ref MenuCallbackArgs args, PartyBase party)
         {
             try

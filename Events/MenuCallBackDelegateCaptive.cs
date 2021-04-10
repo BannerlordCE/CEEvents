@@ -13,7 +13,7 @@ using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Events
 {
-    public class CaptiveMenuCallBackDelegate
+    public class MenuCallBackDelegateCaptive
     {
         private readonly CEEvent _listedEvent;
         private readonly List<CEEvent> _eventList;
@@ -30,7 +30,7 @@ namespace CaptivityEvents.Events
 
         private readonly CaptiveSpecifics _captive = new CaptiveSpecifics();
 
-        internal CaptiveMenuCallBackDelegate(CEEvent listedEvent, List<CEEvent> eventList)
+        internal MenuCallBackDelegateCaptive(CEEvent listedEvent, List<CEEvent> eventList)
         {
             _listedEvent = listedEvent;
             _eventList = eventList;
@@ -38,7 +38,7 @@ namespace CaptivityEvents.Events
             _companionSystem = new CECompanionSystem(listedEvent, null, eventList);
         }
 
-        internal CaptiveMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
+        internal MenuCallBackDelegateCaptive(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
             _listedEvent = listedEvent;
             _option = option;

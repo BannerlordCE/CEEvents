@@ -84,7 +84,7 @@ namespace CaptivityEvents.Events
             }
         }
 
-        internal void CEReleasePrisoners(MenuCallbackArgs args, int amount = 10, bool releaseHeroes = false)
+        internal void CECaptorReleasePrisoners(MenuCallbackArgs args, int amount = 10, bool releaseHeroes = false)
         {
             try
             {
@@ -110,8 +110,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't release any prisoners.");
             }
         }
-
-        internal void CEWoundPrisoners(MenuCallbackArgs args, int amount = 10)
+        internal void CECaptorWoundPrisoners(MenuCallbackArgs args, int amount = 10)
         {
             try
             {
@@ -128,8 +127,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't wound any prisoners.");
             }
         }
-
-        internal void CEKillPrisoners(MenuCallbackArgs args, int amount = 10, bool killHeroes = false)
+        internal void CECaptorKillPrisoners(MenuCallbackArgs args, int amount = 10, bool killHeroes = false)
         {
             try
             {
@@ -146,8 +144,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't kill any prisoners.");
             }
         }
-
-        internal void CEPrisonerRebel(MenuCallbackArgs args)
+        internal void CECaptorPrisonerRebel(MenuCallbackArgs args)
         {
             CEPersistence.animationPlayEvent = false;
 
@@ -241,8 +238,7 @@ namespace CaptivityEvents.Events
                 CECaptorContinue(args);
             }
         }
-
-        internal void CEHuntPrisoners(MenuCallbackArgs args, int amount = 20)
+        internal void CECaptorHuntPrisoners(MenuCallbackArgs args, int amount = 20)
         {
             CEPersistence.animationPlayEvent = false;
 
@@ -314,7 +310,7 @@ namespace CaptivityEvents.Events
                 }
                 catch (Exception)
                 {
-                    CEKillPrisoners(args, amount);
+                    CECaptorKillPrisoners(args, amount);
                 }
             }
             else
@@ -322,8 +318,7 @@ namespace CaptivityEvents.Events
                 CECaptorContinue(args);
             }
         }
-
-        internal void CEMakeHeroCompanion(Hero captive)
+        internal void CECaptorMakeHeroCompanion(Hero captive)
         {
             if (captive == null) return;
             if (captive.IsFactionLeader)
@@ -348,9 +343,7 @@ namespace CaptivityEvents.Events
             }
             AddCompanionAction.Apply(Clan.PlayerClan, captive);
         }
-
-
-        public void CEStripVictim(Hero captive)
+        internal void CECaptorStripVictim(Hero captive)
         {
             if (captive == null) return;
             Equipment randomElement = new Equipment(false);
