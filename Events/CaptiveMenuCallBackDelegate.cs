@@ -60,7 +60,7 @@ namespace CaptivityEvents.Events
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
             _sharedCallBackHelper.ConsequencePlaySound(true);
 
-            SetCaptiveTextVariables(ref args);
+            InitCaptiveTextVariables(ref args);
 
             if (_listedEvent.ProgressEvent != null)
             {
@@ -112,6 +112,7 @@ namespace CaptivityEvents.Events
         }
         #endregion
 
+        #region Wait Menu
         internal void CaptiveInitWaitGameMenu(MenuCallbackArgs args)
         {
             if (PlayerCaptivity.CaptorParty.IsSettlement && args.MenuContext != null)
@@ -132,25 +133,22 @@ namespace CaptivityEvents.Events
             _sharedCallBackHelper.LoadBackgroundImage("default");
             _sharedCallBackHelper.ConsequencePlaySound(true);
 
-            if (PlayerCaptivity.IsCaptive) SetCaptiveTextVariables(ref args);
+            if (PlayerCaptivity.IsCaptive) InitCaptiveTextVariables(ref args);
 
             if (args.MenuContext != null) args.MenuContext.GameMenu.SetMenuAsWaitMenuAndInitiateWaiting();
         }
-
         internal bool CaptiveConditionWaitGameMenu(MenuCallbackArgs args)
         {
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
-
         internal void CaptiveConsequenceWaitGameMenu(MenuCallbackArgs args) { }
-
         internal void CaptiveTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt)
         {
             int captiveTimeInDays = PlayerCaptivity.CaptiveTimeInDays;
             TextObject text = args.MenuContext.GameMenu.GetText();
 
-            SetCaptiveTimeInDays(captiveTimeInDays, ref text);
+            InitCaptiveTimeInDays(captiveTimeInDays, ref text);
 
             if (!PlayerCaptivity.IsCaptive) return;
 
@@ -179,27 +177,28 @@ namespace CaptivityEvents.Events
             string eventToRun = Campaign.Current.Models.PlayerCaptivityModel.CheckCaptivityChange(Campaign.Current.CampaignDt);
             if (!eventToRun.IsStringNoneOrEmpty()) GameMenu.SwitchToMenu(eventToRun);
         }
+        #endregion
 
+        #region Regular Event
         internal void CaptiveEventGameMenu(MenuCallbackArgs args)
         {
             _sharedCallBackHelper.LoadBackgroundImage();
             _sharedCallBackHelper.ConsequencePlaySound(true);
-            SetCaptiveTextVariables(ref args);
+            InitCaptiveTextVariables(ref args);
         }
-
         internal bool CaptiveEventOptionGameMenu(MenuCallbackArgs args)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape) || _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) args.optionLeaveType = GameMenuOption.LeaveType.Escape;
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Leave)) args.optionLeaveType = GameMenuOption.LeaveType.Leave;
 
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) SetGiveGold();
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) SetChangeGold();
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorGold)) SetChangeCaptorGold();
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToSettlement)) SetSoldToSettlement();
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToCaravan)) SetSoldToCaravan();
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToLordParty)) SetSoldToLordParty();
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) InitGiveGold();
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) InitChangeGold();
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorGold)) InitChangeCaptorGold();
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToSettlement)) InitSoldToSettlement();
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToCaravan)) InitSoldToCaravan();
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToLordParty)) InitSoldToLordParty();
 
-            SetLeaveType(ref args);
+            InitLeaveType(ref args);
 
             ReqMorale(ref args);
             ReqTroops(ref args);
@@ -222,7 +221,6 @@ namespace CaptivityEvents.Events
 
             return true;
         }
-
         internal void CaptiveEventOptionConsequenceGameMenu(MenuCallbackArgs args)
         {
             // For Captive and Random Similarity
@@ -292,8 +290,9 @@ namespace CaptivityEvents.Events
                 _captive.CECaptivityContinue(ref args);
             }
         }
+        #endregion
 
-        #region private
+        #region Consequences
         private void ConsequenceCompanions()
         {
             try
@@ -305,7 +304,6 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("ConsequenceCaptiveCompanions. Failed" + e.ToString());
             }
         }
-
         private void ConsequenceKillCaptor()
         {
 
@@ -319,7 +317,6 @@ namespace CaptivityEvents.Events
                 DestroyPartyAction.Apply(null, PlayerCaptivity.CaptorParty.MobileParty);
             }
         }
-
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
         {
             List<CEEvent> eventNames = new List<CEEvent>();
@@ -395,7 +392,6 @@ namespace CaptivityEvents.Events
                 _captive.CECaptivityContinue(ref args);
             }
         }
-
         private void ConsequenceSingleEventTriggerProgress(ref MenuCallbackArgs args)
         {
 
@@ -412,7 +408,6 @@ namespace CaptivityEvents.Events
                 _captive.CECaptivityContinue(ref args);
             }
         }
-
         private void ConsequenceRandomEventTrigger(ref MenuCallbackArgs args)
         {
             List<CEEvent> eventNames = new List<CEEvent>();
@@ -488,7 +483,6 @@ namespace CaptivityEvents.Events
                 _captive.CECaptivityContinue(ref args);
             }
         }
-
         private void ConsequenceSingleEventTrigger(ref MenuCallbackArgs args)
         {
 
@@ -505,7 +499,6 @@ namespace CaptivityEvents.Events
                 _captive.CECaptivityContinue(ref args);
             }
         }
-
         private void ConsequenceEscapeEventTrigger(ref MenuCallbackArgs args)
         {
             try
@@ -520,12 +513,10 @@ namespace CaptivityEvents.Events
                 _captive.CECaptivityEscapeAttempt(ref args);
             }
         }
-
         private void ConsequenceGainRandomPrisoners()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GainRandomPrisoners)) _dynamics.CEGainRandomPrisoners(PlayerCaptivity.CaptorParty);
         }
-
         private void ConsequenceSoldEvents(ref MenuCallbackArgs args)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToCaravan)) ConsequenceSoldToCaravan(ref args);
@@ -533,7 +524,6 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToLordParty)) ConsequenceSoldToLordParty(ref args);
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToNotable)) ConsequenceSoldToNotable(ref args);
         }
-
         private void ConsequenceSoldToNotable(ref MenuCallbackArgs args)
         {
             try
@@ -549,7 +539,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
         }
-
         private void ConsequenceSoldToLordParty(ref MenuCallbackArgs args)
         {
             try
@@ -567,7 +556,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Lord"); }
         }
-
         private void ConsequenceSoldToSettlement(ref MenuCallbackArgs args)
         {
             try
@@ -581,7 +569,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
         }
-
         private void ConsequenceSoldToCaravan(ref MenuCallbackArgs args)
         {
             try
@@ -603,7 +590,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }
         }
-
         private void ConsequenceSpecificCaptor()
         {
             if (PlayerCaptivity.CaptorParty == null)
@@ -624,7 +610,6 @@ namespace CaptivityEvents.Events
             ConsequenceSpecificCaptorTrait(hero);
             ConsequenceSpecificCaptorRenown(hero);
         }
-
         private void ConsequenceSpecificCaptorRenown(Hero hero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorRenown)) return;
@@ -641,7 +626,6 @@ namespace CaptivityEvents.Events
                 _dynamics.RenownModifier(MBRandom.RandomInt(-5, 5), hero);
             }
         }
-
         private void ConsequenceSpecificCaptorSkill(Hero hero)
         {
             try
@@ -690,7 +674,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }
-
         private void ConsequenceSpecificCaptorTrait(Hero hero)
         {
             try
@@ -737,7 +720,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
         }
-
         private void ConsequenceSpecificCaptorChangeGold(Hero hero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorGold)) return;
@@ -754,7 +736,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid CaptorGoldTotal"); }
         }
-
         private void ConsequenceSpecificCaptorGold(Hero hero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveCaptorGold)) return;
@@ -765,7 +746,6 @@ namespace CaptivityEvents.Events
             content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveCaptorGold);
             GiveGoldAction.ApplyBetweenCharacters(null, hero, content);
         }
-
         private void ConsequenceSpecificCaptorRelations(Hero hero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRelation)) return;
@@ -784,7 +764,6 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Missing RelationTotal");
             }
         }
-
         private void ConsequenceSpawnTroop()
         {
             if (_option.SpawnTroops != null)
@@ -792,7 +771,6 @@ namespace CaptivityEvents.Events
                 new CESpawnSystem().SpawnTheTroops(_option.SpawnTroops, PlayerCaptivity.CaptorParty);
             }
         }
-
         private void ConsequenceSpawnHero()
         {
             if (_option.SpawnHeroes != null)
@@ -800,7 +778,6 @@ namespace CaptivityEvents.Events
                 new CESpawnSystem().SpawnTheHero(_option.SpawnHeroes, PlayerCaptivity.CaptorParty);
             }
         }
-
         private void ConsequenceImpregnation()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationRisk)) return;
@@ -817,7 +794,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid PregnancyRiskModifier"); }
         }
-
         private void ConsequenceImpregnationByLeader()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationHero)) return;
@@ -834,7 +810,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid PregnancyRiskModifier"); }
         }
-
         private void ConsequenceChangeClan()
         {
             if (_option.ClanOptions == null) return;
@@ -843,7 +818,6 @@ namespace CaptivityEvents.Events
             else if (CECampaignBehavior.ExtraProps.Owner != null) _dynamics.ClanChange(_option.ClanOptions, Hero.MainHero, CECampaignBehavior.ExtraProps.Owner);
             else _dynamics.ClanChange(_option.ClanOptions, Hero.MainHero, null);
         }
-
         private void ConsequenceChangeKingdom()
         {
             if (_option.KingdomOptions == null) return;
@@ -852,7 +826,6 @@ namespace CaptivityEvents.Events
             else if (CECampaignBehavior.ExtraProps.Owner != null) _dynamics.KingdomChange(_option.KingdomOptions, Hero.MainHero, CECampaignBehavior.ExtraProps.Owner);
             else _dynamics.KingdomChange(_option.KingdomOptions, Hero.MainHero, null);
         }
-
         private void ConsequenceForceMarry()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveMarryCaptor)) return;
@@ -860,7 +833,11 @@ namespace CaptivityEvents.Events
             if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.LeaderHero != null) _dynamics.ChangeSpouse(Hero.MainHero, PlayerCaptivity.CaptorParty.LeaderHero);
             else if (PlayerCaptivity.CaptorParty != null && CECampaignBehavior.ExtraProps.Owner != null) _dynamics.ChangeSpouse(Hero.MainHero, CECampaignBehavior.ExtraProps.Owner);
         }
+        #endregion
 
+        #region Requirements
+
+        #region ReqGold
         private void ReqGold(ref MenuCallbackArgs args)
         {
             try
@@ -875,7 +852,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqGoldBelow / Failed "); }
         }
-
         private void ReqGoldBelow(ref MenuCallbackArgs args)
         {
             if (Hero.MainHero.Gold <= new CEVariablesLoader().GetIntFromXML(_option.ReqGoldBelow)) return;
@@ -883,7 +859,6 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_gold_level", "high");
             args.IsEnabled = false;
         }
-
         private void ReqGoldAbove(ref MenuCallbackArgs args)
         {
             if (Hero.MainHero.Gold >= new CEVariablesLoader().GetIntFromXML(_option.ReqGoldAbove)) return;
@@ -891,7 +866,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_gold_level", "low");
             args.IsEnabled = false;
         }
+        #endregion
 
+        #region ReqSkills
         private void ReqCaptorSkills(ref MenuCallbackArgs args)
         {
             if (_option.SkillsRequired == null) return;
@@ -930,7 +907,6 @@ namespace CaptivityEvents.Events
 
             }
         }
-
         private void ReqHeroSkills(ref MenuCallbackArgs args)
         {
             if (_option.SkillsRequired == null) return;
@@ -963,7 +939,6 @@ namespace CaptivityEvents.Events
 
             }
         }
-
         private bool ReqSkillsLevelBelow(ref MenuCallbackArgs args, SkillObject skillRequired, int skillLevel, string max, string type)
         {
             if (max.IsStringNoneOrEmpty()) return false;
@@ -976,7 +951,6 @@ namespace CaptivityEvents.Events
 
             return true;
         }
-
         private bool ReqSkillsLevelAbove(ref MenuCallbackArgs args, SkillObject skillRequired, int skillLevel, string min, string type)
         {
             if (min.IsStringNoneOrEmpty()) return false;
@@ -989,7 +963,9 @@ namespace CaptivityEvents.Events
 
             return true;
         }
+        #endregion
 
+        #region ReqCaptorSkill
         private void ReqCaptorSkill(ref MenuCallbackArgs args)
         {
             if (_option.ReqCaptorSkill.IsStringNoneOrEmpty()) return;
@@ -1023,7 +999,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Missing ReqCaptorSkillLevelBelow"); }
         }
-
         private void ReqCaptorSkillLevelBelow(ref MenuCallbackArgs args, int skillLevel)
         {
             if (skillLevel <= new CEVariablesLoader().GetIntFromXML(_option.ReqCaptorSkillLevelBelow)) return;
@@ -1033,7 +1008,6 @@ namespace CaptivityEvents.Events
             args.Tooltip = text;
             args.IsEnabled = false;
         }
-
         private void ReqCaptorSkillLevelAbove(ref MenuCallbackArgs args, int skillLevel)
         {
             if (skillLevel >= new CEVariablesLoader().GetIntFromXML(_option.ReqCaptorSkillLevelAbove)) return;
@@ -1043,7 +1017,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = text;
             args.IsEnabled = false;
         }
+        #endregion
 
+        #region ReqHeroSkill
         private void ReqHeroSkill(ref MenuCallbackArgs args)
         {
             if (_option.ReqHeroSkill.IsStringNoneOrEmpty()) return;
@@ -1076,7 +1052,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid ReqHeroSkillLevelBelow"); }
         }
-
         private void ReqHeroSkillLevelBelow(ref MenuCallbackArgs args, int skillLevel)
         {
             if (skillLevel <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroSkillLevelBelow)) return;
@@ -1086,7 +1061,6 @@ namespace CaptivityEvents.Events
             args.Tooltip = text;
             args.IsEnabled = false;
         }
-
         private void ReqHeroSkillLevelAbove(ref MenuCallbackArgs args, int skillLevel)
         {
             if (skillLevel >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroSkillLevelAbove)) return;
@@ -1096,7 +1070,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = text;
             args.IsEnabled = false;
         }
+        #endregion
 
+        #region ReqCaptorTrait
         private void ReqCaptorTrait(ref MenuCallbackArgs args)
         {
             if (_option.ReqCaptorTrait.IsStringNoneOrEmpty()) return;
@@ -1123,7 +1099,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Missing ReqCaptorTraitLevelBelow"); }
         }
-
         private void ReqCaptorTraitLevelBelow(ref MenuCallbackArgs args, int traitLevel)
         {
             if (traitLevel <= new CEVariablesLoader().GetIntFromXML(_option.ReqCaptorTraitLevelBelow)) return;
@@ -1133,7 +1108,6 @@ namespace CaptivityEvents.Events
             args.Tooltip = text;
             args.IsEnabled = false;
         }
-
         private void ReqCaptorTraitLevelAbove(ref MenuCallbackArgs args, int traitLevel)
         {
             if (traitLevel >= new CEVariablesLoader().GetIntFromXML(_option.ReqCaptorTraitLevelAbove)) return;
@@ -1143,7 +1117,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = text;
             args.IsEnabled = false;
         }
+        #endregion
 
+        #region ReqTrait
         private void ReqTrait(ref MenuCallbackArgs args)
         {
             if (_option.ReqHeroTrait.IsStringNoneOrEmpty()) return;
@@ -1168,7 +1144,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid ReqHeroTraitLevelBelow"); }
         }
-
         private void ReqHeroTraitLevelBelow(ref MenuCallbackArgs args, int traitLevel)
         {
             if (traitLevel <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroTraitLevelBelow)) return;
@@ -1178,7 +1153,6 @@ namespace CaptivityEvents.Events
             args.Tooltip = text;
             args.IsEnabled = false;
         }
-
         private void ReqHeroTraitLevelAbove(ref MenuCallbackArgs args, int traitLevel)
         {
             if (traitLevel >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroTraitLevelAbove)) return;
@@ -1188,7 +1162,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = text;
             args.IsEnabled = false;
         }
+        #endregion
 
+        #region ReqProstitute
         private void ReqProstitute(ref MenuCallbackArgs args)
         {
             int prostitute = Hero.MainHero.GetSkillValue(CESkills.Prostitution);
@@ -1205,7 +1181,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroProstituteLevelBelow / Failed "); }
         }
-
         private void ReqHeroProstituteLevelBelow(ref MenuCallbackArgs args, int prostitute)
         {
             if (prostitute <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroProstituteLevelBelow)) return;
@@ -1213,7 +1188,6 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_prostitution_level", "high");
             args.IsEnabled = false;
         }
-
         private void ReqHeroProstituteLevelAbove(ref MenuCallbackArgs args, int prostitute)
         {
             if (prostitute >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroProstituteLevelAbove)) return;
@@ -1221,92 +1195,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_prostitution_level", "low");
             args.IsEnabled = false;
         }
+        #endregion
 
-        private void SetGiveGold()
-        {
-            int content = new ScoresCalculation().AttractivenessScore(Hero.MainHero);
-            content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveGold);
-            MBTextManager.SetTextVariable("MONEY_AMOUNT", content);
-        }
-
-        private void SetChangeGold()
-        {
-            try
-            {
-                int level = 0;
-
-                if (!string.IsNullOrEmpty(_option.GoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.GoldTotal);
-                else if (!string.IsNullOrEmpty(_listedEvent.GoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.GoldTotal);
-                else CECustomHandler.LogToFile("Missing GoldTotal");
-                MBTextManager.SetTextVariable("MONEY_AMOUNT", level);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
-        }
-
-        private void SetChangeCaptorGold()
-        {
-            try
-            {
-                int level = 0;
-
-                if (!string.IsNullOrEmpty(_option.CaptorGoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.CaptorGoldTotal);
-                else if (!string.IsNullOrEmpty(_listedEvent.CaptorGoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.CaptorGoldTotal);
-                else CECustomHandler.LogToFile("Missing CaptorGoldTotal");
-                MBTextManager.SetTextVariable("CAPTOR_MONEY_AMOUNT", level);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid CaptorGoldTotal"); }
-        }
-
-        private static void SetSoldToSettlement()
-        {
-            try
-            {
-                PartyBase party = !PlayerCaptivity.CaptorParty.IsSettlement
-                    ? PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Party
-                    : PlayerCaptivity.CaptorParty;
-
-                MBTextManager.SetTextVariable("BUYERSETTLEMENT", party.Name);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
-        }
-
-        private static void SetSoldToCaravan()
-        {
-            try
-            {
-                PartyBase party = PlayerCaptivity.CaptorParty.IsSettlement
-                    ? PlayerCaptivity.CaptorParty.Settlement.Parties.First(mobileParty => mobileParty.IsCaravan).Party
-                    : PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.First(mobileParty => mobileParty.IsCaravan).Party;
-
-                MBTextManager.SetTextVariable("BUYERCARAVAN", party.Name);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }
-        }
-
-        private static void SetSoldToLordParty()
-        {
-            try
-            {
-                PartyBase party = PlayerCaptivity.CaptorParty.IsSettlement
-                    ? PlayerCaptivity.CaptorParty.Settlement.Parties.First(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty).Party
-                    : PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.First(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty).Party;
-
-                MBTextManager.SetTextVariable("BUYERLORDPARTY", party.Name);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Failed to get Lord"); }
-        }
-
-        private void SetLeaveType(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Wait)) args.optionLeaveType = GameMenuOption.LeaveType.Wait;
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Trade)) args.optionLeaveType = GameMenuOption.LeaveType.Trade;
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RansomAndBribe)) args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.BribeAndEscape)) args.optionLeaveType = GameMenuOption.LeaveType.BribeAndEscape;
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Submenu)) args.optionLeaveType = GameMenuOption.LeaveType.Submenu;
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Continue)) args.optionLeaveType = GameMenuOption.LeaveType.Continue;
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.EmptyIcon)) args.optionLeaveType = GameMenuOption.LeaveType.Default;
-        }
-
+        #region ReqSlavery
         private void ReqSlavery(ref MenuCallbackArgs args)
         {
             int slave = Hero.MainHero.GetSkillValue(CESkills.Slavery);
@@ -1323,7 +1214,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroSlaveLevelBelow / Failed "); }
         }
-
         private void SetReqHeroSlaveLevelBelow(ref MenuCallbackArgs args, int slave)
         {
             if (slave <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroSlaveLevelBelow)) return;
@@ -1331,7 +1221,6 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_slavery_level", "high");
             args.IsEnabled = false;
         }
-
         private void SetReqHeroSlaveLevelAbove(ref MenuCallbackArgs args, int slave)
         {
             if (slave >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroSlaveLevelAbove)) return;
@@ -1339,93 +1228,77 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_slavery_level", "low");
             args.IsEnabled = false;
         }
+        #endregion
 
+        #region ReqHeroHealthPercentage
         private void ReqHeroHealthPercentage(ref MenuCallbackArgs args)
         {
             try
             {
-                if (!string.IsNullOrEmpty(_option.ReqHeroHealthAbovePercentage)) SetReqHeroHealthAbovePercentage(ref args);
+                if (!string.IsNullOrEmpty(_option.ReqHeroHealthAbovePercentage)) ReqHeroHealthAbovePercentage(ref args);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroHealthAbovePercentage / Failed "); }
 
             try
             {
-                if (!string.IsNullOrEmpty(_option.ReqHeroHealthBelowPercentage)) SetReqHeroHealthBelowPercentage(ref args);
+                if (!string.IsNullOrEmpty(_option.ReqHeroHealthBelowPercentage)) ReqHeroHealthBelowPercentage(ref args);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroHealthBelowPercentage / Failed "); }
         }
+        private void ReqHeroHealthBelowPercentage(ref MenuCallbackArgs args)
+        {
+            if (Hero.MainHero.HitPoints <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroHealthBelowPercentage)) return;
 
+            args.Tooltip = GameTexts.FindText("str_CE_health", "high");
+            args.IsEnabled = false;
+        }
+        private void ReqHeroHealthAbovePercentage(ref MenuCallbackArgs args)
+        {
+            if (Hero.MainHero.HitPoints >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroHealthAbovePercentage)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_health", "low");
+            args.IsEnabled = false;
+        }
+        #endregion
+
+        #region ReqHeroCaptorRelation
         private void ReqHeroCaptorRelation(ref MenuCallbackArgs args)
         {
             if (PlayerCaptivity.CaptorParty?.LeaderHero == null) return;
 
             try
             {
-                if (!_option.ReqHeroCaptorRelationAbove.IsStringNoneOrEmpty()) SetReqHeroCaptorRelationAbove(ref args);
+                if (!_option.ReqHeroCaptorRelationAbove.IsStringNoneOrEmpty()) ReqHeroCaptorRelationAbove(ref args);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptorRelationAbove / Failed "); }
 
             try
             {
-                if (!_option.ReqHeroCaptorRelationBelow.IsStringNoneOrEmpty()) SetReqHeroCaptorRelationBelow(ref args);
+                if (!_option.ReqHeroCaptorRelationBelow.IsStringNoneOrEmpty()) ReqHeroCaptorRelationBelow(ref args);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptorRelationBelow / Failed "); }
         }
-
-        private void ReqFemaleCaptives(ref MenuCallbackArgs args)
+        private void ReqHeroCaptorRelationBelow(ref MenuCallbackArgs args)
         {
-            try
-            {
-                if (!_option.ReqFemaleCaptivesAbove.IsStringNoneOrEmpty()) SetReqFemaleCaptivesAbove(ref args);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqFemaleCaptivesAbove / Failed "); }
+            if (!(PlayerCaptivity.CaptorParty.LeaderHero.GetRelationWithPlayer() > new CEVariablesLoader().GetFloatFromXML(_option.ReqHeroCaptorRelationBelow))) return;
 
-            try
-            {
-                if (!_option.ReqHeroFemaleCaptivesAbove.IsStringNoneOrEmpty()) SetReqHeroFemaleCaptivesAbove(ref args);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroFemaleCaptivesAbove / Failed "); }
-
-            try
-            {
-                if (!_option.ReqFemaleCaptivesBelow.IsStringNoneOrEmpty()) SetReqFemaleCaptivesBelow(ref args);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqFemaleCaptivesBelow / Failed "); }
-
-            try
-            {
-                if (!_option.ReqHeroFemaleCaptivesBelow.IsStringNoneOrEmpty()) SetReqHeroFemaleCaptivesBelow(ref args);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroFemaleCaptivesBelow / Failed "); }
+            TextObject textResponse3 = GameTexts.FindText("str_CE_relationship", "high");
+            textResponse3.SetTextVariable("HERO", PlayerCaptivity.CaptorParty.LeaderHero.Name.ToString());
+            args.Tooltip = textResponse3;
+            args.IsEnabled = false;
         }
-
-        private void ReqMaleCaptives(ref MenuCallbackArgs args)
+        private void ReqHeroCaptorRelationAbove(ref MenuCallbackArgs args)
         {
-            try
-            {
-                if (!_option.ReqMaleCaptivesAbove.IsStringNoneOrEmpty()) SetReqMaleCaptivesAbove(ref args);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqMaleCaptivesAbove / Failed "); }
+            if (!(PlayerCaptivity.CaptorParty.LeaderHero.GetRelationWithPlayer() < new CEVariablesLoader().GetFloatFromXML(_option.ReqHeroCaptorRelationAbove))) return;
 
-            try
-            {
-                if (!_option.ReqHeroMaleCaptivesAbove.IsStringNoneOrEmpty()) SetReqHeroMaleCaptivesAbove(ref args);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroMaleCaptivesAbove / Failed "); }
-
-            try
-            {
-                if (!_option.ReqMaleCaptivesBelow.IsStringNoneOrEmpty()) SetReqMaleCaptivesBelow(ref args);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqMaleCaptivesBelow / Failed "); }
-
-            try
-            {
-                if (!_option.ReqHeroMaleCaptivesBelow.IsStringNoneOrEmpty()) SetReqHeroMaleCaptivesBelow(ref args);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroMaleCaptivesBelow / Failed "); }
+            TextObject textResponse4 = GameTexts.FindText("str_CE_relationship", "low");
+            textResponse4.SetTextVariable("HERO", PlayerCaptivity.CaptorParty.LeaderHero.Name.ToString());
+            args.Tooltip = textResponse4;
+            args.IsEnabled = false;
         }
+        #endregion
 
+        #region ReqCaptives
         private void ReqCaptives(ref MenuCallbackArgs args)
         {
             try
@@ -1452,61 +1325,61 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptivesBelow / Failed "); }
         }
-
-        private void ReqFemaleTroops(ref MenuCallbackArgs args)
+        private void ReqFemaleCaptives(ref MenuCallbackArgs args)
         {
             try
             {
-                if (!_option.ReqFemaleTroopsAbove.IsStringNoneOrEmpty()) SetReqFemaleTroopsAbove(ref args);
+                if (!_option.ReqFemaleCaptivesAbove.IsStringNoneOrEmpty()) SetReqFemaleCaptivesAbove(ref args);
             }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqFemaleTroopsAbove / Failed "); }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqFemaleCaptivesAbove / Failed "); }
 
             try
             {
-                if (!_option.ReqHeroFemaleTroopsAbove.IsStringNoneOrEmpty()) SetReqHeroFemaleTroopsAbove(ref args);
+                if (!_option.ReqHeroFemaleCaptivesAbove.IsStringNoneOrEmpty()) SetReqHeroFemaleCaptivesAbove(ref args);
             }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroFemaleTroopsAbove / Failed "); }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroFemaleCaptivesAbove / Failed "); }
 
             try
             {
-                if (!_option.ReqFemaleTroopsBelow.IsStringNoneOrEmpty()) SetReqFemaleTroopsBelow(ref args);
+                if (!_option.ReqFemaleCaptivesBelow.IsStringNoneOrEmpty()) SetReqFemaleCaptivesBelow(ref args);
             }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqFemaleTroopsBelow / Failed "); }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqFemaleCaptivesBelow / Failed "); }
 
             try
             {
-                if (!_option.ReqHeroFemaleTroopsBelow.IsStringNoneOrEmpty()) SetReqHeroFemaleTroopsBelow(ref args);
+                if (!_option.ReqHeroFemaleCaptivesBelow.IsStringNoneOrEmpty()) SetReqHeroFemaleCaptivesBelow(ref args);
             }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroFemaleTroopsBelow / Failed "); }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroFemaleCaptivesBelow / Failed "); }
         }
-
-        private void ReqMaleTroops(ref MenuCallbackArgs args)
+        private void ReqMaleCaptives(ref MenuCallbackArgs args)
         {
             try
             {
-                if (!_option.ReqMaleTroopsAbove.IsStringNoneOrEmpty()) SetReqMaleTroopsAbove(ref args);
+                if (!_option.ReqMaleCaptivesAbove.IsStringNoneOrEmpty()) SetReqMaleCaptivesAbove(ref args);
             }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqMaleTroopsAbove / Failed "); }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqMaleCaptivesAbove / Failed "); }
 
             try
             {
-                if (!_option.ReqHeroMaleTroopsAbove.IsStringNoneOrEmpty()) SetReqHeroMaleTroopsAbove(ref args);
+                if (!_option.ReqHeroMaleCaptivesAbove.IsStringNoneOrEmpty()) SetReqHeroMaleCaptivesAbove(ref args);
             }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroMaleTroopsAbove / Failed "); }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroMaleCaptivesAbove / Failed "); }
 
             try
             {
-                if (!_option.ReqMaleTroopsBelow.IsStringNoneOrEmpty()) SetReqMaleTroopsBelow(ref args);
+                if (!_option.ReqMaleCaptivesBelow.IsStringNoneOrEmpty()) SetReqMaleCaptivesBelow(ref args);
             }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqMaleTroopsBelow / Failed "); }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqMaleCaptivesBelow / Failed "); }
 
             try
             {
-                if (!_option.ReqHeroMaleTroopsBelow.IsStringNoneOrEmpty()) SetReqHeroMaleTroopsBelow(ref args);
+                if (!_option.ReqHeroMaleCaptivesBelow.IsStringNoneOrEmpty()) SetReqHeroMaleCaptivesBelow(ref args);
             }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroMaleTroopsBelow / Failed "); }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroMaleCaptivesBelow / Failed "); }
         }
+        #endregion
 
+        #region ReqTroops
         private void ReqTroops(ref MenuCallbackArgs args)
         {
             try
@@ -1533,57 +1406,90 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqTroopsBelow / Failed "); }
         }
+        private void ReqFemaleTroops(ref MenuCallbackArgs args)
+        {
+            try
+            {
+                if (!_option.ReqFemaleTroopsAbove.IsStringNoneOrEmpty()) SetReqFemaleTroopsAbove(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqFemaleTroopsAbove / Failed "); }
 
+            try
+            {
+                if (!_option.ReqHeroFemaleTroopsAbove.IsStringNoneOrEmpty()) SetReqHeroFemaleTroopsAbove(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroFemaleTroopsAbove / Failed "); }
+
+            try
+            {
+                if (!_option.ReqFemaleTroopsBelow.IsStringNoneOrEmpty()) SetReqFemaleTroopsBelow(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqFemaleTroopsBelow / Failed "); }
+
+            try
+            {
+                if (!_option.ReqHeroFemaleTroopsBelow.IsStringNoneOrEmpty()) SetReqHeroFemaleTroopsBelow(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroFemaleTroopsBelow / Failed "); }
+        }
+        private void ReqMaleTroops(ref MenuCallbackArgs args)
+        {
+            try
+            {
+                if (!_option.ReqMaleTroopsAbove.IsStringNoneOrEmpty()) SetReqMaleTroopsAbove(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqMaleTroopsAbove / Failed "); }
+
+            try
+            {
+                if (!_option.ReqHeroMaleTroopsAbove.IsStringNoneOrEmpty()) SetReqHeroMaleTroopsAbove(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroMaleTroopsAbove / Failed "); }
+
+            try
+            {
+                if (!_option.ReqMaleTroopsBelow.IsStringNoneOrEmpty()) SetReqMaleTroopsBelow(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqMaleTroopsBelow / Failed "); }
+
+            try
+            {
+                if (!_option.ReqHeroMaleTroopsBelow.IsStringNoneOrEmpty()) SetReqHeroMaleTroopsBelow(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroMaleTroopsBelow / Failed "); }
+        }
+        #endregion
+
+        #region ReqMorale
         private void ReqMorale(ref MenuCallbackArgs args)
         {
             try
             {
-                if (!_option.ReqMoraleAbove.IsStringNoneOrEmpty()) SetReqMoraleAbove(ref args);
+                if (!_option.ReqMoraleAbove.IsStringNoneOrEmpty()) ReqMoraleAbove(ref args);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqMoralAbove / Failed "); }
 
             try
             {
-                if (!_option.ReqMoraleBelow.IsStringNoneOrEmpty()) SetReqMoraleBelow(ref args);
+                if (!_option.ReqMoraleBelow.IsStringNoneOrEmpty()) ReqMoraleBelow(ref args);
             }
             catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqMoralBelow / Failed "); }
         }
-
-        private void SetReqHeroHealthBelowPercentage(ref MenuCallbackArgs args)
+        private void ReqMoraleBelow(ref MenuCallbackArgs args)
         {
-            if (Hero.MainHero.HitPoints <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroHealthBelowPercentage)) return;
+            if (!PlayerCaptivity.CaptorParty.IsMobile || !(PlayerCaptivity.CaptorParty.MobileParty.Morale > new CEVariablesLoader().GetIntFromXML(_option.ReqMoraleBelow))) return;
 
-            args.Tooltip = GameTexts.FindText("str_CE_health", "high");
+            args.Tooltip = GameTexts.FindText("str_CE_morale_level", "high");
             args.IsEnabled = false;
         }
-
-        private void SetReqHeroHealthAbovePercentage(ref MenuCallbackArgs args)
+        private void ReqMoraleAbove(ref MenuCallbackArgs args)
         {
-            if (Hero.MainHero.HitPoints >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroHealthAbovePercentage)) return;
+            if (!PlayerCaptivity.CaptorParty.IsMobile || !(PlayerCaptivity.CaptorParty.MobileParty.Morale < new CEVariablesLoader().GetIntFromXML(_option.ReqMoraleAbove))) return;
 
-            args.Tooltip = GameTexts.FindText("str_CE_health", "low");
+            args.Tooltip = GameTexts.FindText("str_CE_morale_level", "low");
             args.IsEnabled = false;
         }
-
-        private void SetReqHeroCaptorRelationBelow(ref MenuCallbackArgs args)
-        {
-            if (!(PlayerCaptivity.CaptorParty.LeaderHero.GetRelationWithPlayer() > new CEVariablesLoader().GetFloatFromXML(_option.ReqHeroCaptorRelationBelow))) return;
-
-            TextObject textResponse3 = GameTexts.FindText("str_CE_relationship", "high");
-            textResponse3.SetTextVariable("HERO", PlayerCaptivity.CaptorParty.LeaderHero.Name.ToString());
-            args.Tooltip = textResponse3;
-            args.IsEnabled = false;
-        }
-
-        private void SetReqHeroCaptorRelationAbove(ref MenuCallbackArgs args)
-        {
-            if (!(PlayerCaptivity.CaptorParty.LeaderHero.GetRelationWithPlayer() < new CEVariablesLoader().GetFloatFromXML(_option.ReqHeroCaptorRelationAbove))) return;
-
-            TextObject textResponse4 = GameTexts.FindText("str_CE_relationship", "low");
-            textResponse4.SetTextVariable("HERO", PlayerCaptivity.CaptorParty.LeaderHero.Name.ToString());
-            args.Tooltip = textResponse4;
-            args.IsEnabled = false;
-        }
+        #endregion
 
         #region ReqFemaleCaptives
 
@@ -1799,23 +1705,88 @@ namespace CaptivityEvents.Events
 
         #endregion
 
-        private void SetReqMoraleBelow(ref MenuCallbackArgs args)
+        #endregion
+
+        #region Init Options
+        private void InitGiveGold()
         {
-            if (!PlayerCaptivity.CaptorParty.IsMobile || !(PlayerCaptivity.CaptorParty.MobileParty.Morale > new CEVariablesLoader().GetIntFromXML(_option.ReqMoraleBelow))) return;
-
-            args.Tooltip = GameTexts.FindText("str_CE_morale_level", "high");
-            args.IsEnabled = false;
+            int content = new ScoresCalculation().AttractivenessScore(Hero.MainHero);
+            content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveGold);
+            MBTextManager.SetTextVariable("MONEY_AMOUNT", content);
         }
-
-        private void SetReqMoraleAbove(ref MenuCallbackArgs args)
+        private void InitChangeGold()
         {
-            if (!PlayerCaptivity.CaptorParty.IsMobile || !(PlayerCaptivity.CaptorParty.MobileParty.Morale < new CEVariablesLoader().GetIntFromXML(_option.ReqMoraleAbove))) return;
+            try
+            {
+                int level = 0;
 
-            args.Tooltip = GameTexts.FindText("str_CE_morale_level", "low");
-            args.IsEnabled = false;
+                if (!string.IsNullOrEmpty(_option.GoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.GoldTotal);
+                else if (!string.IsNullOrEmpty(_listedEvent.GoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.GoldTotal);
+                else CECustomHandler.LogToFile("Missing GoldTotal");
+                MBTextManager.SetTextVariable("MONEY_AMOUNT", level);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
         }
+        private void InitChangeCaptorGold()
+        {
+            try
+            {
+                int level = 0;
 
-        private void SetCaptiveTimeInDays(int captiveTimeInDays, ref TextObject text)
+                if (!string.IsNullOrEmpty(_option.CaptorGoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.CaptorGoldTotal);
+                else if (!string.IsNullOrEmpty(_listedEvent.CaptorGoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.CaptorGoldTotal);
+                else CECustomHandler.LogToFile("Missing CaptorGoldTotal");
+                MBTextManager.SetTextVariable("CAPTOR_MONEY_AMOUNT", level);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid CaptorGoldTotal"); }
+        }
+        private static void InitSoldToSettlement()
+        {
+            try
+            {
+                PartyBase party = !PlayerCaptivity.CaptorParty.IsSettlement
+                    ? PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Party
+                    : PlayerCaptivity.CaptorParty;
+
+                MBTextManager.SetTextVariable("BUYERSETTLEMENT", party.Name);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
+        }
+        private static void InitSoldToCaravan()
+        {
+            try
+            {
+                PartyBase party = PlayerCaptivity.CaptorParty.IsSettlement
+                    ? PlayerCaptivity.CaptorParty.Settlement.Parties.First(mobileParty => mobileParty.IsCaravan).Party
+                    : PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.First(mobileParty => mobileParty.IsCaravan).Party;
+
+                MBTextManager.SetTextVariable("BUYERCARAVAN", party.Name);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }
+        }
+        private static void InitSoldToLordParty()
+        {
+            try
+            {
+                PartyBase party = PlayerCaptivity.CaptorParty.IsSettlement
+                    ? PlayerCaptivity.CaptorParty.Settlement.Parties.First(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty).Party
+                    : PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.First(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty).Party;
+
+                MBTextManager.SetTextVariable("BUYERLORDPARTY", party.Name);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Lord"); }
+        }
+        private void InitLeaveType(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Wait)) args.optionLeaveType = GameMenuOption.LeaveType.Wait;
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Trade)) args.optionLeaveType = GameMenuOption.LeaveType.Trade;
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RansomAndBribe)) args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.BribeAndEscape)) args.optionLeaveType = GameMenuOption.LeaveType.BribeAndEscape;
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Submenu)) args.optionLeaveType = GameMenuOption.LeaveType.Submenu;
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Continue)) args.optionLeaveType = GameMenuOption.LeaveType.Continue;
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.EmptyIcon)) args.optionLeaveType = GameMenuOption.LeaveType.Default;
+        }
+        private void InitCaptiveTimeInDays(int captiveTimeInDays, ref TextObject text)
         {
             if (captiveTimeInDays != 0)
             {
@@ -1828,8 +1799,7 @@ namespace CaptivityEvents.Events
             }
             else { text.SetTextVariable("DAYS", 0); }
         }
-
-        private void SetCaptiveTextVariables(ref MenuCallbackArgs args)
+        private void InitCaptiveTextVariables(ref MenuCallbackArgs args)
         {
             if (!PlayerCaptivity.IsCaptive) return;
 
@@ -1892,41 +1862,8 @@ namespace CaptivityEvents.Events
                 text.SetTextVariable("PARTY_NAME", PlayerCaptivity.CaptorParty.Name);
             }
 
-            SetCaptiveTimeInDays(captiveTimeInDays, ref text);
+            InitCaptiveTimeInDays(captiveTimeInDays, ref text);
         }
-
-        /*
-        private void LoadBackgroundImage()
-        {
-            try
-            {
-                string backgroundName = _listedEvent.BackgroundName;
-
-                if (!backgroundName.IsStringNoneOrEmpty())
-                {
-                    CESubModule.animationPlayEvent = false;
-                    CESubModule.LoadTexture(backgroundName);
-                }
-                else if (_listedEvent.BackgroundAnimation != null && _listedEvent.BackgroundAnimation.Count > 0)
-                {
-                    CESubModule.animationImageList = _listedEvent.BackgroundAnimation;
-                    CESubModule.animationIndex = 0;
-                    CESubModule.animationPlayEvent = true;
-                    float speed = 0.03f;
-
-                    try
-                    {
-                        if (!_listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = VariablesLoader.GetFloatFromXML(_listedEvent.BackgroundAnimationSpeed);
-                    }
-                    catch (Exception e) { CECustomHandler.ForceLogToFile("Failed to load BackgroundAnimationSpeed for " + _listedEvent.Name + " : Exception: " + e); }
-
-                    CESubModule.animationSpeed = speed;
-                }
-                else { CESubModule.animationPlayEvent = false; }
-            }
-            catch (Exception) { CECustomHandler.ForceLogToFile("Failed to load background for " + _listedEvent.Name); }
-        }*/
-
         #endregion
     }
 }
