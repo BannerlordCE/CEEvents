@@ -320,7 +320,8 @@ namespace CaptivityEvents.Events
         }
 
 
-        private void SetModifier(int amount, Hero hero, SkillObject skill, SkillObject flag, bool displayMessage = true, bool quickInformation = false) //Warning: SkillObject flag never used.
+        private void SetModifier(int amount, Hero hero, SkillObject skill, SkillObject flag, bool displayMessage = true, bool quickInformation = false) 
+            //Warning: SkillObject flag never used.
         {
             if (amount == 0)
             {

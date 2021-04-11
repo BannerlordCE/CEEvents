@@ -25,7 +25,7 @@ namespace CaptivityEvents.Patches
 						}
 						else
 						{
-							settlement.Party.PrisonRoster.RemoveTroop(troopRosterElement.Character, 1, default(UniqueTroopDescriptor), 0);
+							settlement.Party.PrisonRoster.RemoveTroop(troopRosterElement.Character, 1, default, 0);
 						}
 					}
 				}

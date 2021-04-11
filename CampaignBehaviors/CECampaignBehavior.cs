@@ -35,7 +35,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 if (notificationCaptorExists || progressEventExists) return false;
             }
 
-            CEEvent returnedEvent = null;
+            CEEvent returnedEvent;
             if (OverrideEvent == null)
             {
                 CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
@@ -100,7 +100,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 if (notificationEventExists || progressEventExists) return false;
             }
 
-            CEEvent returnedEvent = null;
+            CEEvent returnedEvent;
             if (OverrideEvent == null)
             {
                 returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();

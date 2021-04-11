@@ -234,7 +234,9 @@ namespace CaptivityEvents.Events
             }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
             {
-                _sharedCallBackHelper.ConsequenceStartBattle(() => { captorSpecifics.CECaptorContinue(args); }, 2);
+                _sharedCallBackHelper.ConsequenceStartBattle(() => { 
+                    captorSpecifics.CECaptorContinue(args); 
+                }, 2);
             }
             else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0)
             {
@@ -1332,7 +1334,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
         }
-
         private void InitGiveGold()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) return;
@@ -1340,7 +1341,6 @@ namespace CaptivityEvents.Events
             content *= _option.MultipleRestrictedListOfConsequences.Count(consquence => { return consquence == RestrictedListOfConsequences.GiveGold; });
             MBTextManager.SetTextVariable("MONEY_AMOUNT", content);
         }
-
         private void InitSoldToLordParty()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToLordParty)) return;
@@ -1352,7 +1352,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Lord"); }
         }
-
         private void InitSoldToCaravan()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToCaravan)) return;
@@ -1364,7 +1363,6 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }
         }
-
         private void InitSoldToSettlement()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToSettlement)) return;
@@ -1375,7 +1373,7 @@ namespace CaptivityEvents.Events
                 MBTextManager.SetTextVariable("BUYERSETTLEMENT", party.Name);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
-        }
+        }   
         #endregion
 
         #region CustomConsequencesReq
