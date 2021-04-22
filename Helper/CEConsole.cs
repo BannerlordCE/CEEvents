@@ -439,7 +439,7 @@ namespace CaptivityEvents.Helper
                         }
                         else
                         {
-                            return "Please add more prisoners to your party.\n\"Format is \"campaign.add_prisoner [PositiveNumber] [TroopName]\".";
+                            return result.Substring(1) + "\n Please add more prisoners to your party.\n\"Format is \"campaign.add_prisoner [PositiveNumber] [TroopName]\".";
                         }
                     default:
                         if (result.StartsWith("$")) return result.Substring(1);

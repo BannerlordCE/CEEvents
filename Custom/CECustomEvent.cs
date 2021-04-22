@@ -44,6 +44,7 @@ namespace CaptivityEvents.Custom
         SoldToSettlement,
         SoldToLordParty,
         SoldToNotable,
+        CapturePlayer,
         PlayerIsNotBusy,
         PlayerAllowedCompanion,
         StartBattle,

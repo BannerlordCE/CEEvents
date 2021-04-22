@@ -1,14 +1,18 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
+using HarmonyLib;
+using Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events
 {
@@ -219,6 +223,7 @@ namespace CaptivityEvents.Events
             _sharedCallBackHelper.ConsequenceChangeMorale();
             _sharedCallBackHelper.ConsequenceSpawnTroop();
             _sharedCallBackHelper.ConsequenceSpawnHero();
+            _sharedCallBackHelper.ConsequenceStripPlayer();
             _sharedCallBackHelper.ConsequencePlaySound();
 
             ConsequenceCompanions();
@@ -226,6 +231,7 @@ namespace CaptivityEvents.Events
             ConsequenceChangeKingdom();
             ConsequenceImpregnation();
             ConsequenceGainRandomPrisoners();
+            ConsequenceCapturedByParty(ref args);
             ConsequenceSoldEvents(ref args);
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor))
@@ -234,8 +240,9 @@ namespace CaptivityEvents.Events
             }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
             {
-                _sharedCallBackHelper.ConsequenceStartBattle(() => { 
-                    captorSpecifics.CECaptorContinue(args); 
+                _sharedCallBackHelper.ConsequenceStartBattle(() =>
+                {
+                    captorSpecifics.CECaptorContinue(args);
                 }, 2);
             }
             else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0)
@@ -450,9 +457,77 @@ namespace CaptivityEvents.Events
                 captorSpecifics.CECaptorContinue(args);
             }
         }
+        private void ConsequenceCapturedByParty(ref MenuCallbackArgs args)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CapturePlayer)) return;
+            try
+            {
+                TroopRoster enemyTroops = TroopRoster.CreateDummyTroopRoster();
+
+                foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
+                {
+                    if (!troopRosterElement.Character.IsPlayerCharacter)
+                    {
+                        if (troopRosterElement.Character.IsHero && troopRosterElement.Character.HeroObject.IsPlayerCompanion)
+                        {
+                            ScatterCompanionAction.ApplyInPrison(troopRosterElement.Character.HeroObject);
+                        }
+                        else
+                        {
+                            enemyTroops.AddToCounts(troopRosterElement.Character, 1, false, 0, 0, true, -1);
+                        }
+                    }
+                }
+
+                PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter);
+
+
+                if (!enemyTroops.GetTroopRoster().IsEmpty())
+                {
+                    Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
+                    clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
+
+                    Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
+
+                    MobileParty customParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomFloatRanged(float.MaxValue), clan, nearest.Hideout, false);
+                    TextObject textObject = new TextObject("Bandits", null);
+                    customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), MobileParty.MainParty.Position2D, 1f, 0.5f);
+                    customParty.SetCustomName(textObject);
+                    customParty.IsActive = true;
+
+                    customParty.ActualClan = clan;
+                    customParty.Party.Owner = clan.Leader;
+                    customParty.Party.Visuals.SetMapIconAsDirty();
+                    customParty.HomeSettlement = nearest;
+
+                    float totalStrength = customParty.Party.TotalStrength;
+                    int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
+                    customParty.InitializePartyTrade(initialGold);
+
+                    foreach (ItemObject itemObject in ItemObject.All)
+                    {
+                        if (itemObject.IsFood)
+                        {
+                            int num2 = MBRandom.RoundRandomized(customParty.MemberRoster.TotalManCount * (1f / itemObject.Value) * 8f * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat * MBRandom.RandomFloat);
+                            if (num2 > 0)
+                            {
+                                customParty.ItemRoster.AddToCounts(itemObject, num2);
+                            }
+                        }
+                    }
+
+                    customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
+                    customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
+                    Campaign.Current.Parties.AddItem(customParty.Party);
+
+                    ConsequenceRandomCaptivityChange(ref args, customParty.Party);
+                }
+            }
+            catch (Exception e) { CECustomHandler.LogToFile("Failed ConsequenceCapturedByParty" + e); }
+        }
         private void ConsequenceSoldEvents(ref MenuCallbackArgs args)
         {
-            if (Hero.MainHero.PartyBelongedTo.CurrentSettlement == null) return;
+            if (Hero.MainHero.PartyBelongedTo?.CurrentSettlement == null) return;
             ConsequenceSoldToSettlement(ref args);
             ConsequenceSoldToCaravan(ref args);
             ConsequenceSoldToNotable(ref args);
@@ -1373,7 +1448,7 @@ namespace CaptivityEvents.Events
                 MBTextManager.SetTextVariable("BUYERSETTLEMENT", party.Name);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
-        }   
+        }
         #endregion
 
         #region CustomConsequencesReq
