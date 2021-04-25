@@ -49,6 +49,16 @@ namespace CaptivityEvents
             campaignGameStarter.AddDialogLine("CEPrisonerInCell_02_r", "CEPrisonerInCell_02_response", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, ConversationCEEventBrothelOnConsequence);
 
             campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "close_window", "{=CEEVENTS1051}Nevermind.", null, null);
+
+
+            campaignGameStarter.AddDialogLine("scene_r_32432423", "start", "close_window", "{=!}This is a test.", ConversationCUSTOMSCENECONDITION, null);
+        }
+
+        private bool ConversationCUSTOMSCENECONDITION()
+        {
+            CharacterObject conversation = CharacterObject.OneToOneConversationCharacter;
+
+            return conversation.StringId == "testScene_convo1";
         }
 
         private bool ConversationCEEventBrothelOnCondition(out TextObject text)
@@ -82,7 +92,11 @@ namespace CaptivityEvents
 
         private void ConversationCEEventBrothelOnConsequence()
         {
+            CharacterObject captive = CharacterObject.OneToOneConversationCharacter;
+            captive.HeroObject.PartyBelongedToAsPrisoner.AddPrisoner(captive, -1);
+            PartyBase.MainParty.AddPrisoner(captive, 1);
 
+            CEBrothelBehavior.AddBrothelPrisoner(Settlement.CurrentSettlement, captive);
         }
 
         private void ConversationCEEventLordCaptureOnConsequence()

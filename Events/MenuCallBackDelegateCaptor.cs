@@ -228,6 +228,9 @@ namespace CaptivityEvents.Events
             ConsequenceKillPrisoner(ref args);
             ConsequenceJoinParty();
 
+            _sharedCallBackHelper.ConsequenceMission();
+            _sharedCallBackHelper.ConsequenceTeleportPlayer();
+
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StripHero) && captiveHero != null)
             {
                 try

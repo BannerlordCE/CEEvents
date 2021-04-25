@@ -234,6 +234,9 @@ namespace CaptivityEvents.Events
             ConsequenceCapturedByParty(ref args);
             ConsequenceSoldEvents(ref args);
 
+            _sharedCallBackHelper.ConsequenceMission();
+            _sharedCallBackHelper.ConsequenceTeleportPlayer();
+
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor))
             {
                 _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);

@@ -14,6 +14,8 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+using TaleWorlds.MountAndBlade;
+using TaleWorlds.MountAndBlade.View.Missions;
 using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events
@@ -325,7 +327,7 @@ namespace CaptivityEvents.Events
                     string capeString = "";
                     string glovesString = "";
 
-                    switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
+                    switch (PlayerCaptivity.CaptorParty?.Culture?.GetCultureCode())
                     {
                         case CultureCode.Sturgia:
                             headString = "nordic_fur_cap";
@@ -512,7 +514,7 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
-                    switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
+                    switch (PlayerCaptivity.CaptorParty?.Culture?.GetCultureCode())
                     {
                         case CultureCode.Sturgia:
                             item = "seax";
@@ -708,7 +710,7 @@ namespace CaptivityEvents.Events
 
                                     if (troop.Id != null && troop.Id.ToLower() == "random")
                                     {
-                                        characterObject = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);        
+                                        characterObject = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject t) => !t.IsHero && t.Occupation == Occupation.Soldier);
                                     }
                                     else
                                     {
@@ -1008,7 +1010,7 @@ namespace CaptivityEvents.Events
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
                                         customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
-                                        foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())                           
+                                        foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
                                         {
                                             if (!troopRosterElement.Character.IsPlayerCharacter) CEPersistence.playerTroops.Add(troopRosterElement);
                                         }
@@ -1148,6 +1150,64 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.LogToFile("ConsequencePlaySound " + isListedEvent + " : " + e);
             }
+        }
+
+        internal void ConsequenceTeleportPlayer()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.TeleportPlayer)) return;
+
+            try
+            {
+                Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return settlement.IsTown && settlement.MapFaction != Hero.MainHero.MapFaction; });
+                if (Hero.MainHero.IsPrisoner)
+                {
+                    TakePrisonerAction.Apply(nearest.Party, Hero.MainHero);
+                }
+                else
+                {
+                    MobileParty.MainParty.Position2D = nearest.GatePosition;
+                    Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, nearest);
+                }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("ConsequenceTeleportPlayer Failed: " + e);
+            }
+        }
+       
+        internal void ConsequenceMission()
+        {
+            try
+            {
+                if (_option.SceneSettings != null)
+                {
+                    ConversationCharacterData data1 = new ConversationCharacterData(Hero.MainHero.CharacterObject);
+
+                    CharacterObject character2 = null;
+
+                    switch (_option.SceneSettings.TalkTo?.ToLower())
+                    {
+                        case "none":
+                            break;
+                        default:
+                            character2 = Hero.MainHero.IsPrisoner ? Hero.MainHero.PartyBelongedToAsPrisoner.Leader : _listedEvent.Captive;
+                        break;
+                    }
+
+                    character2.StringId = _option.SceneSettings.SceneName + "_convo1";
+                    ConversationCharacterData data2 = new ConversationCharacterData(character2);
+
+                    CampaignMission.OpenConversationMission(data1, data2);
+
+
+                }
+            }
+             catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("ConsequenceMission Failed: " + e);
+            }
+
+
         }
         #endregion
 

@@ -54,7 +54,14 @@ namespace CaptivityEvents.Events
                         else
                         {
                             CECustomHandler.ForceLogToFile("General Error: CECaptorContinue : menuToSwitchBackTo : prisoner_wait");
-                            GameMenu.ExitToLast();
+                            if (Settlement.CurrentSettlement != null)
+                            {
+                                Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+                            }
+                            else
+                            {
+                                GameMenu.ExitToLast();
+                            }
                             Campaign.Current.TimeControlMode = Campaign.Current.LastTimeControlMode;
                             new CESubModule().LoadTexture("default");
                             return;
@@ -69,7 +76,14 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        GameMenu.ExitToLast();
+                        if (Settlement.CurrentSettlement != null)
+                        {
+                            Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+                        }
+                        else
+                        {
+                            GameMenu.ExitToLast();
+                        }
                     }
 
                     Campaign.Current.TimeControlMode = Campaign.Current.LastTimeControlMode;

@@ -253,6 +253,9 @@ namespace CaptivityEvents.Events
             ConsequenceSoldEvents(ref args);
             ConsequenceGainRandomPrisoners();
 
+            _sharedCallBackHelper.ConsequenceMission();
+            _sharedCallBackHelper.ConsequenceTeleportPlayer();
+
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor) && PlayerCaptivity.CaptorParty.NumberOfAllMembers == 1)
             {
                 ConsequenceKillCaptor();

@@ -98,7 +98,7 @@ namespace CaptivityEvents.Models
                         {
                             eventToFire = item.eventName.ToLower();
                             CEEvent foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == eventToFire);
-                            if (!foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                            if (foundevent != null && !foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                             {
                                 eventToFire = null;
                                 return false;
