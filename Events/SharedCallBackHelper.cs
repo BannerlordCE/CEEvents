@@ -1194,7 +1194,7 @@ namespace CaptivityEvents.Events
                         break;
                     }
 
-                    character2.StringId = _option.SceneSettings.SceneName + "_convo1";
+                    character2.StringId = "CECustomStringId_" + _option.SceneSettings.SceneName;
                     ConversationCharacterData data2 = new ConversationCharacterData(character2);
 
                     CampaignMission.OpenConversationMission(data1, data2);

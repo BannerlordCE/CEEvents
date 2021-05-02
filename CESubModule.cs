@@ -110,6 +110,7 @@ namespace CaptivityEvents
         public static float brothelFadeOut = 2f;
 
         public static List<CECustom> CECustomFlags = new List<CECustom>();
+        public static List<CEScene> CECustomScenes = new List<CEScene>();
 
         public static List<CECustomModule> CECustomModules = new List<CECustomModule>();
 
@@ -273,6 +274,7 @@ namespace CaptivityEvents
             // Load Events
             CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
             CEPersistence.CECustomFlags = CECustomHandler.GetCustom();
+            CEPersistence.CECustomScenes = CECustomHandler.GetScenes();
             CEPersistence.CECustomModules = CECustomHandler.GetModules();
 
             try
@@ -680,7 +682,9 @@ namespace CaptivityEvents
                 campaignStarter.AddBehavior(new CESetPrisonerFreeBarterBehavior());
             }
             if (CESettings.Instance.EventCaptiveOn) ReplaceModel<PlayerCaptivityModel, CEPlayerCaptivityModel>(campaignStarter);
-            if (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue) new CEPrisonerDialogue().AddPrisonerLines(campaignStarter);
+            CEPrisonerDialogue prisonerDialogue = new CEPrisonerDialogue();
+            if (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue) prisonerDialogue.AddPrisonerLines(campaignStarter);
+            if (CEPersistence.CECustomScenes.Count > 0) prisonerDialogue.AddCustomLines(campaignStarter, CEPersistence.CECustomScenes);
             //if (CESettings.Instance.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
 
             if (_isLoadedInGame) CEConsole.ReloadEvents(new List<string>());

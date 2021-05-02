@@ -1000,7 +1000,7 @@ namespace CaptivityEvents.Brothel
         {
             if (ConversationSentence.SelectedRepeatObject is CharacterObject characterObject)
             {
-                StringHelpers.SetCharacterProperties("HERO", characterObject, null, ConversationSentence.SelectedRepeatLine, true);
+                StringHelpers.SetRepeatableCharacterProperties("HERO", characterObject);
                 return true;
             }
             return false;

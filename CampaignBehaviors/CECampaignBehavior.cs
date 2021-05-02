@@ -547,7 +547,7 @@ namespace CaptivityEvents.CampaignBehaviors
                         if (mother == Hero.MainHero)
                         {
                             TextObject textObject = new TextObject("{=pw4cUPEn}{MOTHER.LINK} has delivered stillborn.");
-                            StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, null, textObject);
+                            StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, textObject);
                             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString()));
                         }
 
@@ -579,7 +579,7 @@ namespace CaptivityEvents.CampaignBehaviors
                             textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=CEEVENTS1170}two healthy babies"));
                             break;
                     }
-                    StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, null, textObject);
+                    StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, textObject);
                     InformationManager.AddQuickInformation(textObject);
                 }
 

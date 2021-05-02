@@ -173,7 +173,7 @@ namespace CaptivityEvents.Issues
                 get
                 {
                     TextObject textObject = new TextObject("{=CEEVENTS1077}{QUEST_GIVER.LINK} of {QUEST_SETTLEMENT.LINK} has found your equipment you must find {?QUEST_GIVER.GENDER}her{?}him{\\?}. Otherwise they will sell it.");
-                    StringHelpers.SetCharacterProperties("QUEST_GIVER", QuestGiver.CharacterObject, null, textObject);
+                    StringHelpers.SetCharacterProperties("QUEST_GIVER", QuestGiver.CharacterObject, textObject);
                     StringHelpers.SetSettlementProperties("QUEST_SETTLEMENT", QuestGiver.CurrentSettlement, textObject);
 
                     return textObject;
@@ -185,7 +185,7 @@ namespace CaptivityEvents.Issues
                 get
                 {
                     TextObject textObject = new TextObject("{=CEEVENTS1076}You have recovered your equipment back from {QUEST_GIVER.LINK}.");
-                    StringHelpers.SetCharacterProperties("QUEST_GIVER", QuestGiver.CharacterObject, null, textObject);
+                    StringHelpers.SetCharacterProperties("QUEST_GIVER", QuestGiver.CharacterObject, textObject);
 
                     return textObject;
                 }

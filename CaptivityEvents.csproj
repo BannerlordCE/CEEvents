@@ -87,6 +87,7 @@
     <Compile Include="Config\CEManagedOptionTypes.cs" />
     <Compile Include="Custom\CECustomModule.cs" />
     <Compile Include="Custom\CECustomSettings.cs" />
+    <Compile Include="Custom\CECustomScene.cs" />
     <Compile Include="Events\MenuCallBackDelegateCaptive.cs" />
     <Compile Include="Events\CaptiveSpecifics.cs" />
     <Compile Include="Events\MenuCallBackDelegateCaptor.cs" />

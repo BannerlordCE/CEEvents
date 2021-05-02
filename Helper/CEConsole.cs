@@ -968,6 +968,7 @@ namespace CaptivityEvents.Helper
                     // Load Events
                     CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
                     CEPersistence.CECustomFlags = CECustomHandler.GetCustom();
+                    CEPersistence.CECustomScenes = CECustomHandler.GetScenes();
                     CEPersistence.CECustomModules = CECustomHandler.GetModules();
 
                     try
