@@ -297,11 +297,10 @@ namespace CaptivityEvents.CampaignBehaviors
             try
             {
                 if (CEHelper.spouseOne == null && CEHelper.spouseTwo == null) return;
-
                 Hero father = CEHelper.spouseOne == hero
                     ? CEHelper.spouseTwo
                     : CEHelper.spouseOne;
-                CECustomHandler.LogToFile("Added " + hero.Name + "'s Pregenancy");
+                CECustomHandler.ForceLogToFile("Added " + hero.Name + "'s Pregnancy");
                 if (CESettings.Instance != null) _heroPregnancies.Add(new Pregnancy(hero, father, CampaignTime.DaysFromNow(CESettings.Instance.PregnancyDurationInDays)));
             }
             catch (Exception e)
