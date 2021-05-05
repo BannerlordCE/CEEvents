@@ -1,6 +1,7 @@
 ﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
+using CaptivityEvents.Helper;
 using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -155,6 +156,7 @@ namespace CaptivityEvents.Events
             {
                 PlayerCaptivity.CaptorParty = party;
                 PlayerCaptivity.StartCaptivity(party);
+                CEHelper.delayedEvents.Clear();
             }
             catch (Exception e)
             {

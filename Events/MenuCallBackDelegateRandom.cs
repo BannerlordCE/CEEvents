@@ -547,6 +547,7 @@ namespace CaptivityEvents.Events
                 party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
 
                 if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(party);
+                CEHelper.delayedEvents.Clear();
             }
             catch (Exception e)
             {
