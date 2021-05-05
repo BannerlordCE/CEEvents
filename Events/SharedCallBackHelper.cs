@@ -96,8 +96,8 @@ namespace CaptivityEvents.Events
                     foreach (TraitToLevel traitToLevel in _option.TraitsToLevel)
                     {
                         if (traitToLevel.Ref.ToLower() != "hero") continue;
-                        if (!traitToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!traitToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
 
                         _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                     }
@@ -107,8 +107,8 @@ namespace CaptivityEvents.Events
                     foreach (TraitToLevel traitToLevel in _listedEvent.TraitsToLevel)
                     {
                         if (traitToLevel.Ref.ToLower() != "hero") continue;
-                        if (!traitToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!traitToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
 
                         _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                     }
@@ -142,8 +142,8 @@ namespace CaptivityEvents.Events
                     foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
                     {
                         if (skillToLevel.Ref.ToLower() != "hero") continue;
-                        if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
 
                         new Dynamics().SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }
@@ -153,8 +153,8 @@ namespace CaptivityEvents.Events
                     foreach (SkillToLevel skillToLevel in _listedEvent.SkillsToLevel)
                     {
                         if (skillToLevel.Ref.ToLower() != "hero") continue;
-                        if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
 
                         new Dynamics().SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }
@@ -163,14 +163,14 @@ namespace CaptivityEvents.Events
                 {
                     if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSkill)) return;
 
-                    if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(_option.SkillTotal);
-                    else if (!_option.SkillXPTotal.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(_option.SkillXPTotal);
-                    else if (!_listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.SkillTotal);
-                    else if (!_listedEvent.SkillXPTotal.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.SkillXPTotal);
+                    if (!string.IsNullOrWhiteSpace(_option.SkillTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.SkillTotal);
+                    else if (!string.IsNullOrWhiteSpace(_option.SkillXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.SkillXPTotal);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.SkillTotal);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.SkillXPTotal);
                     else CECustomHandler.LogToFile("Missing Skill SkillTotal");
 
-                    if (!_option.SkillToLevel.IsStringNoneOrEmpty()) new Dynamics().SkillModifier(Hero.MainHero, _option.SkillToLevel, level, xp);
-                    else if (!_listedEvent.SkillToLevel.IsStringNoneOrEmpty()) new Dynamics().SkillModifier(Hero.MainHero, _listedEvent.SkillToLevel, level, xp);
+                    if (!string.IsNullOrWhiteSpace(_option.SkillToLevel)) new Dynamics().SkillModifier(Hero.MainHero, _option.SkillToLevel, level, xp);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillToLevel)) new Dynamics().SkillModifier(Hero.MainHero, _listedEvent.SkillToLevel, level, xp);
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
                 }
 
@@ -305,10 +305,10 @@ namespace CaptivityEvents.Events
             {
                 forced = _option.StripSettings.Forced;
                 questEnabled = _option.StripSettings.QuestEnabled || true;
-                clothingLevel = _option.StripSettings.Clothing.IsStringNoneOrEmpty() ? "default" : _option.StripSettings.Clothing.ToLower();
-                mountLevel = _option.StripSettings.Mount.IsStringNoneOrEmpty() ? "default" : _option.StripSettings.Mount.ToLower();
-                meleeLevel = _option.StripSettings.Melee.IsStringNoneOrEmpty() ? "default" : _option.StripSettings.Melee.ToLower();
-                rangedLevel = _option.StripSettings.Ranged.IsStringNoneOrEmpty() ? "default" : _option.StripSettings.Ranged.ToLower();
+                clothingLevel = string.IsNullOrWhiteSpace(_option.StripSettings.Clothing) ? "default" : _option.StripSettings.Clothing.ToLower();
+                mountLevel = string.IsNullOrWhiteSpace(_option.StripSettings.Mount) ? "default" : _option.StripSettings.Mount.ToLower();
+                meleeLevel = string.IsNullOrWhiteSpace(_option.StripSettings.Melee) ? "default" : _option.StripSettings.Melee.ToLower();
+                rangedLevel = string.IsNullOrWhiteSpace(_option.StripSettings.Ranged) ? "default" : _option.StripSettings.Ranged.ToLower();
             }
 
             if (CESettingsIntegrations.Instance == null && clothingLevel == "slave" || !CESettingsIntegrations.Instance.ActivateKLBShackles && clothingLevel == "slave") return;
@@ -633,7 +633,11 @@ namespace CaptivityEvents.Events
 
                     if (nearestSettlement.IsUnderRaid || nearestSettlement.IsRaided) continue;
 
+#if BETA
+                    foreach (Hero hero in nearestSettlement.Notables.Where(hero => hero.Issue == null && !hero.IsHeroOccupied(Hero.EventRestrictionFlags.CantBeIssueOrQuestTarget)))
+#else
                     foreach (Hero hero in nearestSettlement.Notables.Where(hero => hero.Issue == null && !hero.IsOccupiedByAnEvent()))
+#endif
                     {
                         issueOwner = hero;
                         break;
@@ -957,7 +961,11 @@ namespace CaptivityEvents.Events
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
+#if BETA
+                                            DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
+#else
                                             DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToFriendsMultiplier(),
+#endif
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
@@ -1074,7 +1082,11 @@ namespace CaptivityEvents.Events
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
+#if BETA
+                                            DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
+#else
                                             DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToFriendsMultiplier(),
+#endif
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
@@ -1166,7 +1178,11 @@ namespace CaptivityEvents.Events
                 else
                 {
                     MobileParty.MainParty.Position2D = nearest.GatePosition;
+#if BETA
+                    EncounterManager.StartSettlementEncounter(MobileParty.MainParty, nearest);
+#else
                     Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, nearest);
+#endif
                 }
             }
             catch (Exception e)
@@ -1209,7 +1225,7 @@ namespace CaptivityEvents.Events
 
 
         }
-        #endregion
+#endregion
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {
@@ -1264,7 +1280,7 @@ namespace CaptivityEvents.Events
 
                                 try
                                 {
-                                    weightedChance = new CEVariablesLoader().GetIntFromXML(!background.Weight.IsStringNoneOrEmpty()
+                                    weightedChance = new CEVariablesLoader().GetIntFromXML(!string.IsNullOrWhiteSpace(background.Weight)
                                                                                   ? background.Weight
                                                                                   : triggeredEvent.WeightedChanceOfOccuring);
                                 }
@@ -1315,7 +1331,7 @@ namespace CaptivityEvents.Events
                 {
                     string backgroundName = _listedEvent.BackgroundName;
 
-                    if (!backgroundName.IsStringNoneOrEmpty())
+                    if (!string.IsNullOrWhiteSpace(backgroundName))
                     {
                         CEPersistence.animationPlayEvent = false;
                         new CESubModule().LoadTexture(backgroundName);
@@ -1329,7 +1345,7 @@ namespace CaptivityEvents.Events
 
                         try
                         {
-                            if (!_listedEvent.BackgroundAnimationSpeed.IsStringNoneOrEmpty()) speed = new CEVariablesLoader().GetFloatFromXML(_listedEvent.BackgroundAnimationSpeed);
+                            if (!string.IsNullOrWhiteSpace(_listedEvent.BackgroundAnimationSpeed)) speed = new CEVariablesLoader().GetFloatFromXML(_listedEvent.BackgroundAnimationSpeed);
                         }
                         catch (Exception e)
                         {

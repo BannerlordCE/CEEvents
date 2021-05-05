@@ -487,11 +487,7 @@ namespace CaptivityEvents.Brothel
         private static LocationCharacter CreateBrothelPrisoner(CharacterObject prisoner, CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
             if (prisoner.Age < 21) prisoner.Age = 21;
-#if BETA
             prisoner.HeroObject.StayingInSettlement = Settlement.CurrentSettlement;
-#elif STABLE
-            prisoner.HeroObject.StayingInSettlementOfNotable = Settlement.CurrentSettlement;
-#endif
 
             string actionSetCode;
             if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";

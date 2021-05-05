@@ -324,8 +324,8 @@ namespace CaptivityEvents.Events
                     foreach (TraitToLevel traitToLevel in companion.TraitsToLevel)
                     {
                         if (traitToLevel.Ref.ToLower() == "captor" && hero.PartyBelongedToAsPrisoner.LeaderHero == null) continue;
-                        if (!traitToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!traitToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
 
                         _dynamics.TraitModifier(traitToLevel.Ref.ToLower() != "hero" ? hero.PartyBelongedToAsPrisoner.LeaderHero : hero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                     }
@@ -346,8 +346,8 @@ namespace CaptivityEvents.Events
                     foreach (SkillToLevel skillToLevel in companion.SkillsToLevel)
                     {
                         if (skillToLevel.Ref.ToLower() == "captor" && hero.PartyBelongedToAsPrisoner.LeaderHero == null) continue;
-                        if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
 
                         new Dynamics().SkillModifier(skillToLevel.Ref.ToLower() != "hero" ? hero.PartyBelongedToAsPrisoner.LeaderHero : hero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }

@@ -95,6 +95,12 @@ namespace CaptivityEvents.Config
                     return value;
                 });
 
+                yield return new CEManagedNumericOptionData("EventOccurrenceRandom", "{=CESETTINGS0083}Event wait between occurances while Random", "{=CESETTINGS0084}How often should an event occur while Random. (Gametime in between events)", CESettings.Instance.EventOccurrenceRandom, (value) =>
+                {
+                    CESettings.Instance.EventOccurrenceRandom = value;
+                    return value;
+                }, 1f, 100f);
+
                 List<SelectionData> selectedDataBrothel = new List<SelectionData>
                 {
                     new SelectionData(false, new TextObject("{=CESETTINGS1117}Any").ToString()),

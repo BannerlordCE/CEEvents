@@ -145,7 +145,7 @@ namespace CaptivityEvents.Models
         }
 
         /// <summary>
-        ///     Modified Default
+        /// Modified Default
         /// </summary>
         /// <param name="dt"></param>
         /// <returns></returns>

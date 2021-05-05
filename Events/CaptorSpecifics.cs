@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿#define BETA
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using HarmonyLib;
@@ -56,7 +57,11 @@ namespace CaptivityEvents.Events
                             CECustomHandler.ForceLogToFile("General Error: CECaptorContinue : menuToSwitchBackTo : prisoner_wait");
                             if (Settlement.CurrentSettlement != null)
                             {
+#if BETA
+                                EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+#else
                                 Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+#endif
                             }
                             else
                             {
@@ -78,7 +83,11 @@ namespace CaptivityEvents.Events
                     {
                         if (Settlement.CurrentSettlement != null)
                         {
+#if BETA
+                            EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+#else
                             Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+#endif
                         }
                         else
                         {
@@ -219,7 +228,11 @@ namespace CaptivityEvents.Events
                     if (leader.Character != null)
                     {
                         prisonerParty.Party.Owner = leader.Character.HeroObject;
+#if BETA
+                        prisonerParty.ChangePartyLeader(leader.Character);
+#else
                         prisonerParty.ChangePartyLeader(leader.Character, true);
+#endif
                     }
                     else
                     {

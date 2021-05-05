@@ -1,3 +1,4 @@
+#define BETA
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -156,7 +157,7 @@ namespace CaptivityEvents
 
         public void LoadTexture(string name, bool swap = false, bool forcelog = false)
         {
-            if (name.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(name)) return;
 
             try
             {
@@ -466,10 +467,12 @@ namespace CaptivityEvents
                             new TextObject("Captivity Events Settings", null),
                             9990,
                             () => { ScreenManager.PushScreen(new CESettingsScreen()); },
-                            // 1.5.7
-                            // false
-                            
-                            () => { return false; }
+
+#if BETA
+                             () => new ValueTuple<bool, TextObject>(false, TextObject.Empty)
+#else
+                             () => { return false; }
+#endif
                         )
                       );
                 }
@@ -501,7 +504,7 @@ namespace CaptivityEvents
                 CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettings is being accessed improperly.");
             }
 
-            foreach (CEEvent _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !_listedEvent.Name.IsStringNoneOrEmpty()))
+            foreach (CEEvent _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !string.IsNullOrWhiteSpace(_listedEvent.Name)))
             {
                 if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEPersistence.CEEvents.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 1) continue;
 
@@ -1153,7 +1156,11 @@ namespace CaptivityEvents
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
                                                          select agent)
                                 {
+#if BETA
+                                    CommonAIComponent component = agent2.GetComponent<CommonAIComponent>();
+#else
                                     MoraleAgentComponent component = agent2.GetComponent<MoraleAgentComponent>();
+#endif
                                     component?.Panic();
                                     agent2.DestinationSpeed = 0.5f;
                                 }
@@ -1273,7 +1280,7 @@ namespace CaptivityEvents
                             {
                                 PlayerEncounter.Finish(true);
                             }
-                        } 
+                        }
                         else if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.destroyParty)
                         {
                             PlayerEncounter.Current.FinalizeBattle();
@@ -1281,7 +1288,11 @@ namespace CaptivityEvents
                             PlayerEncounter.Finish(false);
                             if (Settlement.CurrentSettlement != null)
                             {
+#if BETA
+                                EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+#else
                                 Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+#endif
                                 HandleFinishBattle(mapstate2);
                             }
                         }
@@ -1291,7 +1302,11 @@ namespace CaptivityEvents
                             PlayerEncounter.Finish(false);
                             if (Settlement.CurrentSettlement != null)
                             {
+#if BETA
+                                EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+#else
                                 Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+#endif
                                 HandleFinishBattle(mapstate2);
                             }
                         }
@@ -1317,7 +1332,7 @@ namespace CaptivityEvents
                     {
                         PlayerEncounter.Update();
                     }
-                } 
+                }
                 catch (Exception)
                 {
                     CEPersistence.battleState = CEPersistence.BattleState.Normal;

@@ -53,7 +53,7 @@ namespace CaptivityEvents.CampaignBehaviors
             {
                 try
                 {
-                    if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName);
+                    if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName)) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName);
                     else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_sexual_notification");
                     else new CESubModule().LoadCampaignNotificationTexture("CE_castle_notification");
                 }
@@ -89,7 +89,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 }
 
             }
-            
+
             return true;
         }
 
@@ -117,7 +117,7 @@ namespace CaptivityEvents.CampaignBehaviors
             {
                 try
                 {
-                    if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
+                    if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName)) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
                     else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
                     else new CESubModule().LoadCampaignNotificationTexture("CE_random_notification", 1);
                 }
@@ -152,7 +152,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     GameMenu.SwitchToMenu(returnedEvent.Name);
                 }
             }
-            
+
             return true;
         }
 
@@ -280,7 +280,22 @@ namespace CaptivityEvents.CampaignBehaviors
             if (CEHelper.progressEventExists) return false;
             _hoursPassed++;
             if (CESettings.Instance == null) return false;
-            if (!(_hoursPassed > CESettings.Instance.EventOccurrenceCaptor)) return false;
+
+            float value = CESettings.Instance.EventOccurrenceRandom;
+
+            try
+            {
+                if (CESettings.Instance.EventCaptorOn && PartyBase.MainParty.NumberOfPrisoners > 0)
+                {
+                    value = CESettings.Instance.EventOccurrenceCaptor;
+                }
+            }
+            catch (Exception)
+            {
+                value = CESettings.Instance.EventOccurrenceRandom;
+            }
+
+            if (!(_hoursPassed > value)) return false;
             CEHelper.notificationEventCheck = true;
             CEHelper.notificationCaptorCheck = true;
             _hoursPassed = 0;
@@ -709,7 +724,8 @@ namespace CaptivityEvents.CampaignBehaviors
                         {
                             notificationEventExists = false;
                             LaunchCaptorEvent(randomEventCheck);
-                        } else
+                        }
+                        else
                         {
                             shouldEventsFire = true;
                         }

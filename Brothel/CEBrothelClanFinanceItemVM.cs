@@ -1,4 +1,3 @@
-#define BETA // 1.5.9
 using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
@@ -13,16 +12,9 @@ using TaleWorlds.Localization;
 namespace CaptivityEvents.Brothel
 {
     // TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance ClanFinanceWorkshopItemVM
-#if BETA
     internal class CEBrothelClanFinanceItemVM : ClanFinanceWorkshopItemVM
     {
         public CEBrothelClanFinanceItemVM(CEBrothel brothel, Workshop workshop, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh) : base(workshop, onSelection, onRefresh)
-
-#else
-    internal class CEBrothelClanFinanceItemVM : ClanFinanceIncomeItemBaseVM
-    {
-        public CEBrothelClanFinanceItemVM(CEBrothel brothel, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh) : base(onSelection, onRefresh)
-#endif
         {
         _brothel = brothel;
 
@@ -37,9 +29,8 @@ namespace CaptivityEvents.Brothel
         {
             base.RefreshValues();
 
-#if BETA
+            // WORKAROUND IN 1.5.9
             if (_brothel == null) _brothel = new CEBrothel(Workshop.Settlement);
-#endif
 
             Name = _brothel.Name.ToString();
             WorkshopType workshopType = WorkshopType.Find("pottery_shop");
@@ -58,10 +49,7 @@ namespace CaptivityEvents.Brothel
 
         protected override void PopulateActionList()
         {
-
-#if BETA
             if (_brothel == null) _brothel = new CEBrothel(Workshop.Settlement);
-#endif
 
             int sellingCost = _brothel.Capital;
 
@@ -159,11 +147,7 @@ namespace CaptivityEvents.Brothel
             {
                 if (value == _workshopTypeId) return;
                 _workshopTypeId = value;
-#if BETA
                 OnPropertyChangedWithValue(value, "WorkshopTypeId");
-#else
-                OnPropertyChanged();
-#endif
             }
         }
 
@@ -174,11 +158,7 @@ namespace CaptivityEvents.Brothel
             {
                 if (value == _inputsText) return;
                 _inputsText = value;
-#if BETA
                 OnPropertyChangedWithValue(value, "InputsText");
-#else
-                OnPropertyChanged();
-#endif
             }
         }
 
@@ -189,11 +169,7 @@ namespace CaptivityEvents.Brothel
             {
                 if (value == _outputsText) return;
                 _outputsText = value;
-#if BETA
                 OnPropertyChangedWithValue(value, "OutputsText");
-#else
-                OnPropertyChanged();
-#endif
             }
         }
 
@@ -204,11 +180,7 @@ namespace CaptivityEvents.Brothel
             {
                 if (value == _inputProducts) return;
                 _inputProducts = value;
-#if BETA
                 OnPropertyChangedWithValue(value, "InputProducts");
-#else
-                OnPropertyChanged();
-#endif
             }
         }
 
@@ -219,11 +191,7 @@ namespace CaptivityEvents.Brothel
             {
                 if (value == _outputProducts) return;
                 _outputProducts = value;
-#if BETA
                 OnPropertyChangedWithValue(value, "OutputProducts");
-#else
-                OnPropertyChanged();
-#endif
             }
         }
 

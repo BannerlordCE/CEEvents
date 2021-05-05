@@ -26,8 +26,6 @@ namespace CaptivityEvents.Patches
 
             foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
             {
-
-#if BETA
                 Workshop workshop = new Workshop(brothel.Settlement, brothel.Name.ToString());
                 WorkshopType workshopType = WorkshopType.Find("pottery_shop");
                 workshop.SetWorkshop(brothel.Owner, workshopType, brothel.Capital, true, 0, 1, brothel.Name);
@@ -36,10 +34,6 @@ namespace CaptivityEvents.Patches
                 __instance.Incomes.Add(brothelFinanceItemVM);
 
                 Hero.MainHero.RemoveOwnedWorkshop(workshop);
-#else
-                CEBrothelClanFinanceItemVM brothelFinanceItemVM = new CEBrothelClanFinanceItemVM(brothel, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh);
-                __instance.Incomes.Add(brothelFinanceItemVM);
-#endif
             }
 
 

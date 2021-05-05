@@ -22,6 +22,7 @@ namespace CaptivityEvents
         public bool EventCaptorCustomTextureNotifications { get; set; } = true;
         public bool EventRandomEnabled { get; set; } = true;
         public float EventRandomFireChance { get; set; } = 20f;
+        public float EventOccurrenceRandom { get; set; } = 12f;
         public bool EventCaptorGearCaptives { get; set; } = true;
         public bool EventProstituteGear { get; set; } = true;
         public bool HuntLetPrisonersEscape { get; set; } = false;
