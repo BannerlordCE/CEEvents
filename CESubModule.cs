@@ -1133,7 +1133,7 @@ namespace CaptivityEvents
                         case CEPersistence.HuntState.StartHunt:
                             if (Mission.Current != null && Mission.Current.IsLoadingFinished && Mission.Current.Time > 2f && Mission.Current.Agents != null)
                             {
-                                foreach (Agent agent2 in from agent in Mission.Current.Agents
+                                foreach (Agent agent2 in from agent in Mission.Current.Agents.ToList()
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
                                                          select agent)
                                 {
@@ -1152,7 +1152,7 @@ namespace CaptivityEvents
                         case CEPersistence.HuntState.HeadStart:
                             if (Mission.Current != null && Mission.Current.Time > CESettings.Instance.HuntBegins && Mission.Current.Agents != null)
                             {
-                                foreach (Agent agent2 in from agent in Mission.Current.Agents
+                                foreach (Agent agent2 in from agent in Mission.Current.Agents.ToList()
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
                                                          select agent)
                                 {

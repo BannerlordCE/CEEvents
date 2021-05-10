@@ -779,6 +779,60 @@ namespace CaptivityEvents.Events
                         CEPersistence.playerTroops.Clear();
                         try
                         {
+                            // Player Party Setup
+                            foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
+                            {
+                                if (!troopRosterElement.Character.IsPlayerCharacter) CEPersistence.playerTroops.Add(troopRosterElement);
+                            }
+
+                            PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter);
+
+                            if (!PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter))
+                            {
+                                CEPersistence.removePlayer = true;
+                                PartyBase.MainParty.MemberRoster.AddToCounts(CharacterObject.PlayerCharacter, 1);
+                            }
+                            else
+                            {
+                                CEPersistence.removePlayer = false;
+                            }
+
+                            if (!CEPersistence.playerTroops.IsEmpty())
+                            {
+                                List<CharacterObject> list = new List<CharacterObject>();
+                                int num = new CEVariablesLoader().GetIntFromXML(_option.BattleSettings.PlayerTroops);
+                                foreach (TroopRosterElement troopRosterElement in from t in CEPersistence.playerTroops
+                                                                                  orderby t.Character.Level descending
+                                                                                  select t)
+                                {
+                                    if (num <= 0) break;
+                                    int num2 = 0;
+                                    while (num2 < troopRosterElement.Number - troopRosterElement.WoundedNumber && num > 0)
+                                    {
+                                        list.Add(troopRosterElement.Character);
+                                        num--;
+                                        num2++;
+                                    }
+                                }
+
+                                foreach (CharacterObject character in list)
+                                {
+                                    PartyBase.MainParty.MemberRoster.AddToCounts(character, 1, false, 0, 0, true, -1);
+                                }
+                            }
+
+                            foreach (TroopRosterElement troopRosterElement in temporaryTroops.GetTroopRoster())
+                            {
+                                PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
+                            }
+
+                            foreach (TroopRosterElement troopRosterElement in friendlyTroops.GetTroopRoster())
+                            {
+                                PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
+                                CEPersistence.playerTroops.Add(troopRosterElement);
+                            }
+                            // Player Party Setup Ends Here
+
                             switch (_option.BattleSettings.Ref.ToLower())
                             {
                                 case "city":
@@ -788,66 +842,12 @@ namespace CaptivityEvents.Events
                                             CECustomHandler.ForceLogToFile("ConsequenceStartBattle : city required. ");
                                         }
                                         // StartCommonAreaBattle RivalGangMovingInIssue
-                                        MobileParty customParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyCE_" + MBRandom.RandomFloatRanged(float.MaxValue));
+                                        MobileParty customParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue));
 
                                         TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
                                         customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
                                         customParty.SetCustomName(textObject);
                                         EnterSettlementAction.ApplyForParty(customParty, Settlement.CurrentSettlement);
-
-                                        foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
-                                        {
-                                            if (!troopRosterElement.Character.IsPlayerCharacter) CEPersistence.playerTroops.Add(troopRosterElement);
-                                        }
-
-                                        PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter);
-
-                                        if (!PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter))
-                                        {
-                                            CEPersistence.removePlayer = true;
-                                            PartyBase.MainParty.MemberRoster.AddToCounts(CharacterObject.PlayerCharacter, 1);
-                                        }
-                                        else
-                                        {
-                                            CEPersistence.removePlayer = false;
-                                        }
-
-                                        if (!CEPersistence.playerTroops.IsEmpty())
-                                        {
-                                            List<CharacterObject> list = new List<CharacterObject>();
-                                            int num = _option.BattleSettings.PlayerTroops != null ? new CEVariablesLoader().GetIntFromXML(_option.BattleSettings.PlayerTroops) : 100000;
-
-
-                                            foreach (TroopRosterElement troopRosterElement in from t in CEPersistence.playerTroops
-                                                                                              orderby t.Character.Level descending
-                                                                                              select t)
-                                            {
-                                                if (num <= 0) break;
-                                                int num2 = 0;
-                                                while (num2 < troopRosterElement.Number - troopRosterElement.WoundedNumber && num > 0)
-                                                {
-                                                    list.Add(troopRosterElement.Character);
-                                                    num--;
-                                                    num2++;
-                                                }
-                                            }
-
-                                            foreach (CharacterObject character in list)
-                                            {
-                                                PartyBase.MainParty.MemberRoster.AddToCounts(character, 1, false, 0, 0, true, -1);
-                                            }
-                                        }
-
-                                        foreach (TroopRosterElement troopRosterElement in temporaryTroops.GetTroopRoster())
-                                        {
-                                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
-                                        }
-
-                                        foreach (TroopRosterElement troopRosterElement in friendlyTroops.GetTroopRoster())
-                                        {
-                                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
-                                            CEPersistence.playerTroops.Add(troopRosterElement);
-                                        }
 
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, false);
                                         CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
@@ -867,7 +867,7 @@ namespace CaptivityEvents.Events
 
                                         Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
-                                        MobileParty customParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomFloatRanged(float.MaxValue), clan, nearest.Hideout, false);
+                                        MobileParty customParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest.Hideout, false);
                                         TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
                                         customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), MobileParty.MainParty.Position2D, 1f, 0.5f);
                                         customParty.SetCustomName(textObject);
@@ -897,59 +897,6 @@ namespace CaptivityEvents.Events
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
                                         customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
-                                        foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
-                                        {
-                                            if (!troopRosterElement.Character.IsPlayerCharacter) CEPersistence.playerTroops.Add(troopRosterElement);
-                                        }
-
-                                        PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter);
-
-                                        if (!PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter))
-                                        {
-                                            CEPersistence.removePlayer = true;
-                                            PartyBase.MainParty.MemberRoster.AddToCounts(CharacterObject.PlayerCharacter, 1);
-                                        }
-                                        else
-                                        {
-                                            CEPersistence.removePlayer = false;
-                                        }
-
-                                        if (!CEPersistence.playerTroops.IsEmpty())
-                                        {
-                                            List<CharacterObject> list = new List<CharacterObject>();
-                                            int num = new CEVariablesLoader().GetIntFromXML(_option.BattleSettings.PlayerTroops);
-                                            foreach (TroopRosterElement troopRosterElement in from t in CEPersistence.playerTroops
-                                                                                              orderby t.Character.Level descending
-                                                                                              select t)
-                                            {
-                                                if (num <= 0) break;
-                                                int num2 = 0;
-                                                while (num2 < troopRosterElement.Number - troopRosterElement.WoundedNumber && num > 0)
-                                                {
-                                                    list.Add(troopRosterElement.Character);
-                                                    num--;
-                                                    num2++;
-                                                }
-                                            }
-
-                                            foreach (CharacterObject character in list)
-                                            {
-                                                PartyBase.MainParty.MemberRoster.AddToCounts(character, 1, false, 0, 0, true, -1);
-                                            }
-                                        }
-
-                                        foreach (TroopRosterElement troopRosterElement in temporaryTroops.GetTroopRoster())
-                                        {
-                                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
-                                        }
-
-                                        foreach (TroopRosterElement troopRosterElement in friendlyTroops.GetTroopRoster())
-                                        {
-                                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
-                                            CEPersistence.playerTroops.Add(troopRosterElement);
-                                        }
-
-                                        Campaign.Current.Parties.AddItem(customParty.Party);
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, true);
                                         CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
                                         CEPersistence.destroyParty = false;
@@ -988,7 +935,7 @@ namespace CaptivityEvents.Events
 
                                         Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
-                                        MobileParty customParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomFloatRanged(float.MaxValue), clan, nearest.Hideout, false);
+                                        MobileParty customParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest.Hideout, false);
                                         TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
                                         customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), MobileParty.MainParty.Position2D, 1f, 0.5f);
                                         customParty.SetCustomName(textObject);
@@ -1018,59 +965,6 @@ namespace CaptivityEvents.Events
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
                                         customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
-                                        foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
-                                        {
-                                            if (!troopRosterElement.Character.IsPlayerCharacter) CEPersistence.playerTroops.Add(troopRosterElement);
-                                        }
-
-                                        PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter);
-
-                                        if (!PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter))
-                                        {
-                                            CEPersistence.removePlayer = true;
-                                            PartyBase.MainParty.MemberRoster.AddToCounts(CharacterObject.PlayerCharacter, 1);
-                                        }
-                                        else
-                                        {
-                                            CEPersistence.removePlayer = false;
-                                        }
-
-                                        if (!CEPersistence.playerTroops.IsEmpty())
-                                        {
-                                            List<CharacterObject> list = new List<CharacterObject>();
-                                            int num = new CEVariablesLoader().GetIntFromXML(_option.BattleSettings.PlayerTroops);
-                                            foreach (TroopRosterElement troopRosterElement in from t in CEPersistence.playerTroops
-                                                                                              orderby t.Character.Level descending
-                                                                                              select t)
-                                            {
-                                                if (num <= 0) break;
-                                                int num2 = 0;
-                                                while (num2 < troopRosterElement.Number - troopRosterElement.WoundedNumber && num > 0)
-                                                {
-                                                    list.Add(troopRosterElement.Character);
-                                                    num--;
-                                                    num2++;
-                                                }
-                                            }
-
-                                            foreach (CharacterObject character in list)
-                                            {
-                                                PartyBase.MainParty.MemberRoster.AddToCounts(character, 1, false, 0, 0, true, -1);
-                                            }
-                                        }
-
-                                        foreach (TroopRosterElement troopRosterElement in temporaryTroops.GetTroopRoster())
-                                        {
-                                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
-                                        }
-
-                                        foreach (TroopRosterElement troopRosterElement in friendlyTroops.GetTroopRoster())
-                                        {
-                                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
-                                            CEPersistence.playerTroops.Add(troopRosterElement);
-                                        }
-
-                                        Campaign.Current.Parties.AddItem(customParty.Party);
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, true);
                                         CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
                                         CEPersistence.destroyParty = true;

@@ -73,43 +73,50 @@ namespace CaptivityEvents.Events
 
         internal void ChangeSpouse(Hero hero, Hero spouseHero)
         {
-            if (hero == null) return;
-            Hero heroSpouse = hero.Spouse;
-
-            if (!hero.IsHumanPlayerCharacter && hero.IsFactionLeader) RemoveFactionLeader(hero);
-            else if (!spouseHero.IsHumanPlayerCharacter && spouseHero.IsFactionLeader) RemoveFactionLeader(spouseHero);
-
-            if (heroSpouse != null)
+            try
             {
-                TextObject textObject = GameTexts.FindText("str_CE_spouse_leave");
-                textObject.SetTextVariable("HERO", hero.Name);
-                textObject.SetTextVariable("SPOUSE", heroSpouse.Name);
-                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
+                if (hero == null) return;
+                Hero heroSpouse = hero.Spouse;
 
-                if (heroSpouse.Father != null) heroSpouse.Clan = heroSpouse.Father.Clan;
-                else if (heroSpouse.Mother != null) heroSpouse.Clan = heroSpouse.Mother.Clan;
-                hero.Spouse = null;
+                if (!hero.IsHumanPlayerCharacter && hero.IsFactionLeader) RemoveFactionLeader(hero);
+                else if (!spouseHero.IsHumanPlayerCharacter && spouseHero.IsFactionLeader) RemoveFactionLeader(spouseHero);
+
+                if (heroSpouse != null)
+                {
+                    TextObject textObject = GameTexts.FindText("str_CE_spouse_leave");
+                    textObject.SetTextVariable("HERO", hero.Name);
+                    textObject.SetTextVariable("SPOUSE", heroSpouse.Name);
+                    InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
+
+                    if (heroSpouse.Father != null) heroSpouse.Clan = heroSpouse.Father.Clan;
+                    else if (heroSpouse.Mother != null) heroSpouse.Clan = heroSpouse.Mother.Clan;
+                    hero.Spouse = null;
+                }
+
+                if (spouseHero == null) return;
+
+                if (hero.Clan == spouseHero.Clan) return;
+
+                Hero spouseHeroSpouse = spouseHero.Spouse;
+
+                if (spouseHeroSpouse != null)
+                {
+                    TextObject textObject3 = GameTexts.FindText("str_CE_spouse_leave");
+                    textObject3.SetTextVariable("HERO", hero.Name);
+                    textObject3.SetTextVariable("SPOUSE", spouseHeroSpouse.Name);
+                    InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
+
+                    if (spouseHeroSpouse.Father != null) spouseHeroSpouse.Clan = spouseHeroSpouse.Father.Clan;
+                    else if (spouseHeroSpouse.Mother != null) spouseHeroSpouse.Clan = spouseHeroSpouse.Mother.Clan;
+                    spouseHero.Spouse = null;
+                }
+
+                MarriageAction.Apply(hero, spouseHero);
             }
-
-            if (spouseHero == null) return;
-
-            if (hero.Clan == spouseHero.Clan) return;
-
-            Hero spouseHeroSpouse = spouseHero.Spouse;
-
-            if (spouseHeroSpouse != null)
+            catch (Exception e)
             {
-                TextObject textObject3 = GameTexts.FindText("str_CE_spouse_leave");
-                textObject3.SetTextVariable("HERO", hero.Name);
-                textObject3.SetTextVariable("SPOUSE", spouseHeroSpouse.Name);
-                InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
-
-                if (spouseHeroSpouse.Father != null) spouseHeroSpouse.Clan = spouseHeroSpouse.Father.Clan;
-                else if (spouseHeroSpouse.Mother != null) spouseHeroSpouse.Clan = spouseHeroSpouse.Mother.Clan;
-                spouseHero.Spouse = null;
+                CECustomHandler.ForceLogToFile("Failed ChangeSpouse " + e + " HERO1: " + hero + " HERO2: " + spouseHero);
             }
-
-            MarriageAction.Apply(hero, spouseHero);
         }
 
         private void TraitObjectModifier(TraitObject traitObject, Color color, Hero hero, string trait, int amount, int xp, bool display)
@@ -320,8 +327,8 @@ namespace CaptivityEvents.Events
         }
 
 
-        private void SetModifier(int amount, Hero hero, SkillObject skill, SkillObject flag, bool displayMessage = true, bool quickInformation = false) 
-            //Warning: SkillObject flag never used.
+        private void SetModifier(int amount, Hero hero, SkillObject skill, SkillObject flag, bool displayMessage = true, bool quickInformation = false)
+        //Warning: SkillObject flag never used.
         {
             if (amount == 0)
             {

@@ -492,7 +492,7 @@ namespace CaptivityEvents.Events
 
                     Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
-                    MobileParty customParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomFloatRanged(float.MaxValue), clan, nearest.Hideout, false);
+                    MobileParty customParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest.Hideout, false);
                     TextObject textObject = new TextObject("Bandits", null);
                     customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), MobileParty.MainParty.Position2D, 1f, 0.5f);
                     customParty.SetCustomName(textObject);
@@ -521,7 +521,6 @@ namespace CaptivityEvents.Events
 
                     customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
                     customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
-                    Campaign.Current.Parties.AddItem(customParty.Party);
 
                     ConsequenceRandomCaptivityChange(ref args, customParty.Party);
                 }

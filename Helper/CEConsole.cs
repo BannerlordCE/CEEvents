@@ -5,6 +5,7 @@ using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Notifications;
+using HarmonyLib;
 using SandBox;
 using System;
 using System.Collections.Generic;
@@ -1168,6 +1169,36 @@ namespace CaptivityEvents.Helper
                 {
                     return "Failed : " + e;
                 }
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("clear_parties", "captivity")]
+        public static string ClearParties(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.clear_parties [PARTY_ID]\".";
+
+                List<MobileParty> mobileParties = MobileParty.All
+                    .Where((mobileParty) =>
+                    {
+                        return mobileParty.StringId.StartsWith("CustomPartyCE_");
+                    }
+                    ).ToList();
+
+                foreach (MobileParty mobile in mobileParties)
+                {
+                    mobile.RemoveParty();
+                }
+
+                return "Success";
             }
             catch (Exception e)
             {

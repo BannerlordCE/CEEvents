@@ -191,23 +191,25 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyCE_" + MBRandom.RandomFloatRanged(float.MaxValue));
 
                     TroopRosterElement leader = releasedPrisoners.GetTroopRoster().FirstOrDefault(hasHero => hasHero.Character.IsHero);
 
                     Clan clan = null;
                     Settlement nearest = null;
+                    MobileParty prisonerParty = null;
 
                     if (leader.Character != null)
                     {
                         clan = leader.Character.HeroObject.Clan;
                         nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlement(settlement => true);
+                        prisonerParty = LordPartyComponent.CreateLordParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), leader.Character.HeroObject, MobileParty.MainParty.Position2D, 0.5f, nearest);
                     }
                     else
                     {
                         clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
                         nearest = SettlementHelper.FindNearestSettlement(settlement => true);
+                        prisonerParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest.Hideout, false);
                     }
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
@@ -244,12 +246,8 @@ namespace CaptivityEvents.Events
                     prisonerParty.RecentEventsMorale = -100;
                     prisonerParty.Aggressiveness = 0.2f;
                     prisonerParty.InitializePartyTrade(0);
-                    prisonerParty.EnableAi();
-
-                    prisonerParty.Party.Visuals.SetMapIconAsDirty();
 
                     Hero.MainHero.HitPoints += 40;
-                    Campaign.Current.Parties.AddItem(prisonerParty.Party);
 
                     CECustomHandler.LogToFile(prisonerParty.Leader.Name.ToString());
                     PlayerEncounter.RestartPlayerEncounter(MobileParty.MainParty.Party, prisonerParty.Party);
@@ -296,13 +294,14 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyHuntCE_" + MBRandom.RandomFloatRanged(float.MaxValue));
-
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                     clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
-                    PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                     Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
+
+                    MobileParty prisonerParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_Hunt_" + MBRandom.RandomInt(int.MaxValue), clan, nearest.Hideout, false);
+
+                    PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
                     prisonerParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
                     prisonerParty.SetCustomName(new TextObject("{=CEEVENTS1107}Escaped Captives"));
@@ -314,22 +313,17 @@ namespace CaptivityEvents.Events
                     prisonerParty.IsActive = true;
                     prisonerParty.ActualClan = clan;
                     prisonerParty.Party.Owner = clan.Leader;
-                    prisonerParty.Aggressiveness = 0.2f;
-
-                    prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
-                                                               ? nearest.GatePosition
-                                                               : nearest.Position2D);
-                    prisonerParty.HomeSettlement = nearest;
-                    prisonerParty.InitializePartyTrade(0);
-                    prisonerParty.EnableAi();
                     prisonerParty.Party.Visuals.SetMapIconAsDirty();
 
+                    prisonerParty.HomeSettlement = nearest;
+                    prisonerParty.InitializePartyTrade(0);
+
                     Hero.MainHero.HitPoints += 40;
-                    Campaign.Current.Parties.AddItem(prisonerParty.Party);
+
 
                     CECustomHandler.LogToFile(prisonerParty.Leader.Name.ToString());
+                    PlayerEncounter.RestartPlayerEncounter(prisonerParty.Party, MobileParty.MainParty.Party, true);
                     StartBattleAction.Apply(MobileParty.MainParty.Party, prisonerParty.Party);
-                    PlayerEncounter.RestartPlayerEncounter(prisonerParty.Party, MobileParty.MainParty.Party);
                     PlayerEncounter.Update();
 
                     CEPersistence.huntState = CEPersistence.HuntState.StartHunt;
