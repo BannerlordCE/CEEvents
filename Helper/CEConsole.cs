@@ -677,6 +677,7 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
+                    ClearParties(strings);
                     bool successful = CECampaignBehavior.ClearPregnancyList();
                     CEBrothelBehavior.CleanList();
                     ResetStatus(new List<string>());
