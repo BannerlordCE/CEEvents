@@ -1,4 +1,4 @@
-﻿#define BETA 
+﻿#define STABLE
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Issues;

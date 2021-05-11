@@ -1,8 +1,7 @@
-﻿#define BETA
+﻿#define STABLE
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
-using HarmonyLib;
 using Helpers;
 using System;
 using System.Collections.Generic;
