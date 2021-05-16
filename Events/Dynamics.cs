@@ -79,7 +79,7 @@ namespace CaptivityEvents.Events
                 Hero heroSpouse = hero.Spouse;
 
                 if (!hero.IsHumanPlayerCharacter && hero.IsFactionLeader) RemoveFactionLeader(hero);
-                else if (!spouseHero.IsHumanPlayerCharacter && spouseHero.IsFactionLeader) RemoveFactionLeader(spouseHero);
+                else if (spouseHero != null && !spouseHero.IsHumanPlayerCharacter && spouseHero.IsFactionLeader) RemoveFactionLeader(spouseHero);
 
                 if (heroSpouse != null)
                 {
