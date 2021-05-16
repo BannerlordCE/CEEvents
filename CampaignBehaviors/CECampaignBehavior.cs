@@ -1,4 +1,4 @@
-#define STABLE // 1.5.8
+#define BETA
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -28,65 +28,274 @@ namespace CaptivityEvents.CampaignBehaviors
     {
         #region Events
 
-        private void LaunchCaptorEvent()
+        private bool LaunchCaptorEvent(CEEvent OverrideEvent = null)
         {
-            if (CEHelper.notificationCaptorExists || CEHelper.progressEventExists) return;
-            CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
-            CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
-
-            if (returnedEvent == null) return;
-            returnedEvent.Captive = captive;
-            CEHelper.notificationCaptorExists = true;
-
-            try
+            if (CESettings.Instance.EventCaptorNotifications)
             {
-                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName);
-                else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_sexual_notification");
-                else new CESubModule().LoadCampaignNotificationTexture("CE_castle_notification");
-            }
-            catch (Exception e)
-            {
-                InformationManager.DisplayMessage(new InformationMessage("LoadCampaignNotificationTextureFailure", Colors.Red));
-
-                CECustomHandler.ForceLogToFile("LoadCampaignNotificationTexture");
-                CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+                if (notificationCaptorExists || progressEventExists) return false;
             }
 
-            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new CECaptorMapNotification(returnedEvent, new TextObject("{=CEEVENTS1090}Captor event is ready")));
+            CEEvent returnedEvent;
+            if (OverrideEvent == null)
+            {
+                CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
+                returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
+            }
+            else
+            {
+                returnedEvent = OverrideEvent;
+            }
 
+            if (returnedEvent == null) return false;
+            notificationCaptorExists = true;
+
+            if (CESettings.Instance.EventCaptorNotifications)
+            {
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName)) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName);
+                    else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_sexual_notification");
+                    else new CESubModule().LoadCampaignNotificationTexture("CE_castle_notification");
+                }
+                catch (Exception e)
+                {
+                    InformationManager.DisplayMessage(new InformationMessage("LoadCampaignNotificationTextureFailure", Colors.Red));
+
+                    CECustomHandler.ForceLogToFile("LoadCampaignNotificationTexture");
+                    CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+                }
+
+                Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new CECaptorMapNotification(returnedEvent, new TextObject("{=CEEVENTS1090}Captor event is ready")));
+            }
+            else
+            {
+                if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+                {
+                    Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+
+                    if (!mapState.AtMenu)
+                    {
+                        _extraVariables.menuToSwitchBackTo = null;
+                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
+                        GameMenu.ActivateGameMenu("prisoner_wait");
+                    }
+                    else
+                    {
+                        _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
+                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                    }
+
+                    GameMenu.SwitchToMenu(returnedEvent.Name);
+                }
+
+            }
+
+            return true;
         }
 
-        private void LaunchRandomEvent()
+        private bool LaunchRandomEvent(CEEvent OverrideEvent = null)
         {
-            if (CEHelper.notificationEventExists || CEHelper.progressEventExists) return;
-            CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
-            if (returnedEvent == null) return;
-            CEHelper.notificationEventExists = true;
-
-            try
+            if (CESettings.Instance.EventCaptorNotifications)
             {
-                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
-                else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
-                else new CESubModule().LoadCampaignNotificationTexture("CE_random_notification", 1);
-            }
-            catch (Exception e)
-            {
-                InformationManager.DisplayMessage(new InformationMessage("LoadCampaignNotificationTextureFailure", Colors.Red));
-
-                CECustomHandler.ForceLogToFile("LoadCampaignNotificationTexture");
-                CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+                if (notificationEventExists || progressEventExists) return false;
             }
 
-            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new CEEventMapNotification(returnedEvent, new TextObject("{=CEEVENTS1059}Random event is ready")));
+            CEEvent returnedEvent;
+            if (OverrideEvent == null)
+            {
+                returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
+            }
+            else
+            {
+                returnedEvent = OverrideEvent;
+            }
+
+            if (returnedEvent == null) return false;
+            notificationEventExists = true;
+
+            if (CESettings.Instance.EventCaptorNotifications)
+            {
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName)) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
+                    else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
+                    else new CESubModule().LoadCampaignNotificationTexture("CE_random_notification", 1);
+                }
+                catch (Exception e)
+                {
+                    InformationManager.DisplayMessage(new InformationMessage("LoadCampaignNotificationTextureFailure", Colors.Red));
+
+                    CECustomHandler.ForceLogToFile("LoadCampaignNotificationTexture");
+                    CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+                }
+
+                Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new CEEventMapNotification(returnedEvent, new TextObject("{=CEEVENTS1059}Random event is ready")));
+            }
+            else
+            {
+                if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+                {
+                    Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+
+                    if (!mapState.AtMenu)
+                    {
+                        _extraVariables.menuToSwitchBackTo = null;
+                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
+                        GameMenu.ActivateGameMenu("prisoner_wait");
+                    }
+                    else
+                    {
+                        _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
+                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                    }
+
+                    GameMenu.SwitchToMenu(returnedEvent.Name);
+                }
+            }
+
+            return true;
+        }
+
+        private CEEvent CheckDelayedCaptorEvent()
+        {
+            CEEvent eventToFire = null;
+            bool shouldFireEvent = delayedEvents.Any(item =>
+            {
+                if (item.eventName != null && item.eventTime < Campaign.Current.CampaignStartTime.ElapsedHoursUntilNow)
+                {
+                    CECustomHandler.LogToFile("Firing " + item.eventName);
+                    if (item.conditions == true)
+                    {
+                        string result = CEEventManager.FireSpecificEventPartyLeader(item.eventName, out CEEvent ceEvent, true, item.heroName);
+                        switch (result)
+                        {
+                            case "$FAILEDTOFIND":
+                                CECustomHandler.LogToFile("Failed to load event list.");
+                                break;
+                            case "$EVENTNOTFOUND":
+                                CECustomHandler.LogToFile("Event not found.");
+                                break;
+                            case "$EVENTCONDITIONSNOTMET":
+                                CECustomHandler.LogToFile("Event conditions are not met.");
+                                break;
+                            default:
+                                if (result.StartsWith("$"))
+                                {
+                                    CECustomHandler.LogToFile(result.Substring(1));
+                                }
+                                else
+                                {
+                                    eventToFire = ceEvent;
+                                    item.hasBeenFired = true;
+                                    return true;
+                                }
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        eventToFire = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == item.eventName.ToLower());
+                        if (!eventToFire.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                        {
+                            eventToFire = null;
+                            return false;
+                        }
+                        item.hasBeenFired = true;
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+            if (shouldFireEvent)
+            {
+                delayedEvents.RemoveAll(item => item.hasBeenFired);
+                return eventToFire;
+            }
+            return null;
+        }
+
+        private CEEvent CheckDelayedRandomEvent()
+        {
+            CEEvent eventToFire = null;
+            bool shouldFireEvent = delayedEvents.Any(item =>
+            {
+                if (item.eventName != null && item.eventTime < Campaign.Current.CampaignStartTime.ElapsedHoursUntilNow)
+                {
+                    CECustomHandler.LogToFile("Firing " + item.eventName);
+                    if (item.conditions == true)
+                    {
+                        string result = CEEventManager.FireSpecificEventRandom(item.eventName, out CEEvent ceEvent, true);
+                        switch (result)
+                        {
+                            case "$FAILEDTOFIND":
+                                CECustomHandler.LogToFile("Failed to load event list.");
+                                break;
+                            case "$EVENTNOTFOUND":
+                                CECustomHandler.LogToFile("Event not found.");
+                                break;
+                            case "$EVENTCONDITIONSNOTMET":
+                                CECustomHandler.LogToFile("Event conditions are not met.");
+                                break;
+                            default:
+                                if (result.StartsWith("$"))
+                                {
+                                    CECustomHandler.LogToFile(result.Substring(1));
+                                }
+                                else
+                                {
+                                    eventToFire = ceEvent;
+                                    item.hasBeenFired = true;
+                                    return true;
+                                }
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        eventToFire = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == item.eventName.ToLower());
+                        if (!eventToFire.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                        {
+                            eventToFire = null;
+                            return false;
+                        }
+                        item.hasBeenFired = true;
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+            if (shouldFireEvent)
+            {
+                delayedEvents.RemoveAll(item => item.hasBeenFired);
+                return eventToFire;
+            }
+
+            return null;
         }
 
         private bool CheckEventHourly()
         {
             if (CEHelper.progressEventExists) return false;
             _hoursPassed++;
-
             if (CESettings.Instance == null) return false;
-            if (!(_hoursPassed > CESettings.Instance.EventOccurrenceCaptor)) return false;
+
+            float value = CESettings.Instance.EventOccurrenceRandom;
+
+            try
+            {
+                if (CESettings.Instance.EventCaptorOn && PartyBase.MainParty.NumberOfPrisoners > 0)
+                {
+                    value = CESettings.Instance.EventOccurrenceCaptor;
+                }
+            }
+            catch (Exception)
+            {
+                value = CESettings.Instance.EventOccurrenceRandom;
+            }
+
+            if (!(_hoursPassed > value)) return false;
             CEHelper.notificationEventCheck = true;
             CEHelper.notificationCaptorCheck = true;
             _hoursPassed = 0;
@@ -103,11 +312,10 @@ namespace CaptivityEvents.CampaignBehaviors
             try
             {
                 if (CEHelper.spouseOne == null && CEHelper.spouseTwo == null) return;
-
                 Hero father = CEHelper.spouseOne == hero
                     ? CEHelper.spouseTwo
                     : CEHelper.spouseOne;
-                CECustomHandler.LogToFile("Added " + hero.Name + "'s Pregenancy");
+                CECustomHandler.ForceLogToFile("Added " + hero.Name + "'s Pregnancy");
                 if (CESettings.Instance != null) _heroPregnancies.Add(new Pregnancy(hero, father, CampaignTime.DaysFromNow(CESettings.Instance.PregnancyDurationInDays)));
             }
             catch (Exception e)
@@ -353,7 +561,7 @@ namespace CaptivityEvents.CampaignBehaviors
                         if (mother == Hero.MainHero)
                         {
                             TextObject textObject = new TextObject("{=pw4cUPEn}{MOTHER.LINK} has delivered stillborn.");
-                            StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, null, textObject);
+                            StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, textObject);
                             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString()));
                         }
 
@@ -385,7 +593,7 @@ namespace CaptivityEvents.CampaignBehaviors
                             textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=CEEVENTS1170}two healthy babies"));
                             break;
                     }
-                    StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, null, textObject);
+                    StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, textObject);
                     InformationManager.AddQuickInformation(textObject);
                 }
 
@@ -500,115 +708,50 @@ namespace CaptivityEvents.CampaignBehaviors
 
                 try
                 {
-                    if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
+                    bool shouldEventsFire = !progressEventExists;
+
+                    if (delayedEvents.Count > 0 && shouldEventsFire)
+                    {
+                        CEEvent captorEventCheck = CheckDelayedCaptorEvent();
+                        CEEvent randomEventCheck = CheckDelayedRandomEvent();
+
+                        if (captorEventCheck != null)
+                        {
+                            notificationCaptorExists = false;
+                            LaunchCaptorEvent(captorEventCheck);
+                        }
+                        else if (randomEventCheck != null)
+                        {
+                            notificationEventExists = false;
+                            LaunchCaptorEvent(randomEventCheck);
+                        }
+                        else
+                        {
+                            shouldEventsFire = true;
+                        }
+                    }
+
+                    if (shouldEventsFire)
                     {
 
-#if BETA || STABLE
-                        if (CESettings.Instance.EventCaptorNotifications)
-#else
-                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
-#endif
+                        if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
                         {
-                            if (CESettings.Instance.EventRandomEnabled && (!CEHelper.notificationEventExists || !CEHelper.notificationCaptorExists))
+                            if (CESettings.Instance.EventRandomEnabled)
                             {
                                 int randomNumber = MBRandom.RandomInt(100);
 
-                                if (!CEHelper.notificationEventExists && randomNumber < CESettings.Instance.EventRandomFireChance) LaunchRandomEvent();
-                                else if (!CEHelper.notificationCaptorExists && randomNumber > CESettings.Instance.EventRandomFireChance) LaunchCaptorEvent();
+                                if (randomNumber < CESettings.Instance.EventRandomFireChance && !LaunchRandomEvent()) LaunchCaptorEvent();
+                                if (randomNumber > CESettings.Instance.EventRandomFireChance && !LaunchCaptorEvent()) LaunchRandomEvent();
                             }
                             else
                             {
                                 LaunchCaptorEvent();
                             }
+
                         }
-                        else
-                        {
-                            if (Game.Current.GameStateManager.ActiveState is MapState mapState)
-                            {
-                                CEEvent returnedEvent;
-
-                                if (CESettings.Instance.EventRandomEnabled)
-                                {
-                                    if (MBRandom.RandomInt(100) < CESettings.Instance.EventRandomFireChance)
-                                    {
-                                        returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
-
-                                        if (returnedEvent != null)
-                                        {
-                                            CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
-                                            returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
-                                        returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
-                                        if (returnedEvent != null) returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
-                                    }
-                                }
-                                else
-                                {
-                                    CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
-                                    returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
-                                }
-
-                                if (returnedEvent != null)
-                                {
-                                    Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-
-                                    if (!mapState.AtMenu)
-                                    {
-                                        _extraVariables.menuToSwitchBackTo = null;
-                                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
-                                        GameMenu.ActivateGameMenu("prisoner_wait");
-                                    }
-                                    else
-                                    {
-                                        _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                                    }
-
-                                    GameMenu.SwitchToMenu(returnedEvent.Name);
-                                }
-                            }
-                        }
-                    }
-                    else if (CESettings.Instance.EventRandomEnabled)
-                    {
-
-#if BETA || STABLE
-                        if (CESettings.Instance.EventCaptorNotifications)
-#else
-                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
-#endif
+                        else if (CESettings.Instance.EventRandomEnabled)
                         {
                             LaunchRandomEvent();
-                        }
-                        else
-                        {
-                            if (Game.Current.GameStateManager.ActiveState is MapState mapState)
-                            {
-                                CEEvent returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
-
-                                if (returnedEvent != null)
-                                {
-                                    Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-
-                                    if (!mapState.AtMenu)
-                                    {
-                                        _extraVariables.menuToSwitchBackTo = null;
-                                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
-                                        GameMenu.ActivateGameMenu("prisoner_wait");
-                                    }
-                                    else
-                                    {
-                                        _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                                    }
-
-                                    GameMenu.SwitchToMenu(returnedEvent.Name);
-                                }
-                            }
                         }
                     }
                 }
@@ -619,6 +762,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 }
             }
 
+            // Pregnancies
             try
             {
                 _heroPregnancies.ForEach(item =>
@@ -645,6 +789,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 CECustomHandler.ForceLogToFile(e.Message + " : " + e);
             }
 
+            // Gear
             if (CESettings.Instance.EventCaptorGearCaptives)
             {
                 try

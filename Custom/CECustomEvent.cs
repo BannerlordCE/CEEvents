@@ -44,6 +44,7 @@ namespace CaptivityEvents.Custom
         SoldToSettlement,
         SoldToLordParty,
         SoldToNotable,
+        CapturePlayer,
         PlayerIsNotBusy,
         PlayerAllowedCompanion,
         StartBattle,
@@ -74,7 +75,8 @@ namespace CaptivityEvents.Custom
         WoundAllPrisoners,
         WoundRandomPrisoners,
         MakeHeroCompanion,
-        CaptorLeaveSpouse
+        CaptorLeaveSpouse,
+        TeleportPlayer
     }
 
     [XmlType(AnonymousType = true)]
@@ -233,6 +235,22 @@ namespace CaptivityEvents.Custom
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = "", IsNullable = true)]
     [Serializable]
+    public class DelayEvent
+    {
+        public string UseConditions { get; set; }
+
+        public string TimeToTake { get; set; }
+
+        public string TriggerEventName { get; set; }
+
+        [XmlArrayItem("TriggerEvent", IsNullable = true)]
+        public TriggerEvent[] TriggerEvents { get; set; }
+    }
+
+    [DebuggerStepThrough]
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = true)]
+    [Serializable]
     public class StripSettings
     {
         [XmlAttribute()]
@@ -262,6 +280,18 @@ namespace CaptivityEvents.Custom
         public string EventWeight { get; set; }
 
         public string EventUseConditions { get; set; }
+    }
+    [DebuggerStepThrough]
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = true)]
+    [Serializable]
+    public class SceneSettings
+    {
+        [XmlAttribute()]
+        public string  TalkTo { get; set; }
+
+        [XmlAttribute()]
+        public string SceneName { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -662,6 +692,9 @@ namespace CaptivityEvents.Custom
 
         [XmlElement("BattleSettings", IsNullable = true)]
         public BattleSettings BattleSettings { get; set; }
+
+        [XmlElement("SceneSettings", IsNullable = true)]
+        public SceneSettings SceneSettings { get; set; }
 
         [XmlArrayItem("SpawnTroop", IsNullable = true)]
         public SpawnTroop[] SpawnTroops { get; set; }

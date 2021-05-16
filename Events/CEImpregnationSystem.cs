@@ -14,6 +14,8 @@ namespace CaptivityEvents.Events
 {
     public class CEImpregnationSystem
     {
+
+        // Random Version
         public void ImpregnationChance(Hero targetHero, int modifier = 0, bool forcePreg = false, Hero senderHero = null)
         {
             ScoresCalculation score = new ScoresCalculation();
@@ -161,6 +163,7 @@ namespace CaptivityEvents.Events
             }
         }
 
+        // Captor / Captive Version
         public void CaptivityImpregnationChance(Hero targetHero, int modifier = 0, bool forcePreg = false, bool lord = true, Hero captorHero = null)
         {
             ScoresCalculation scoresCalculation = new ScoresCalculation();

@@ -1,7 +1,7 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿#define STABLE
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
-using HarmonyLib;
 using Helpers;
 using System;
 using System.Collections.Generic;
@@ -54,7 +54,18 @@ namespace CaptivityEvents.Events
                         else
                         {
                             CECustomHandler.ForceLogToFile("General Error: CECaptorContinue : menuToSwitchBackTo : prisoner_wait");
-                            GameMenu.ExitToLast();
+                            if (Settlement.CurrentSettlement != null)
+                            {
+#if BETA
+                                EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+#else
+                                Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+#endif
+                            }
+                            else
+                            {
+                                GameMenu.ExitToLast();
+                            }
                             Campaign.Current.TimeControlMode = Campaign.Current.LastTimeControlMode;
                             new CESubModule().LoadTexture("default");
                             return;
@@ -69,7 +80,18 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        GameMenu.ExitToLast();
+                        if (Settlement.CurrentSettlement != null)
+                        {
+#if BETA
+                            EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+#else
+                            Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+#endif
+                        }
+                        else
+                        {
+                            GameMenu.ExitToLast();
+                        }
                     }
 
                     Campaign.Current.TimeControlMode = Campaign.Current.LastTimeControlMode;
@@ -84,7 +106,7 @@ namespace CaptivityEvents.Events
             }
         }
 
-        internal void CEReleasePrisoners(MenuCallbackArgs args, int amount = 10, bool releaseHeroes = false)
+        internal void CECaptorReleasePrisoners(MenuCallbackArgs args, int amount = 10, bool releaseHeroes = false)
         {
             try
             {
@@ -110,8 +132,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't release any prisoners.");
             }
         }
-
-        internal void CEWoundPrisoners(MenuCallbackArgs args, int amount = 10)
+        internal void CECaptorWoundPrisoners(MenuCallbackArgs args, int amount = 10)
         {
             try
             {
@@ -128,8 +149,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't wound any prisoners.");
             }
         }
-
-        internal void CEKillPrisoners(MenuCallbackArgs args, int amount = 10, bool killHeroes = false)
+        internal void CECaptorKillPrisoners(MenuCallbackArgs args, int amount = 10, bool killHeroes = false)
         {
             try
             {
@@ -146,8 +166,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't kill any prisoners.");
             }
         }
-
-        internal void CEPrisonerRebel(MenuCallbackArgs args)
+        internal void CECaptorPrisonerRebel(MenuCallbackArgs args)
         {
             CEPersistence.animationPlayEvent = false;
 
@@ -171,23 +190,25 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyCE_" + MBRandom.RandomFloatRanged(float.MaxValue));
 
                     TroopRosterElement leader = releasedPrisoners.GetTroopRoster().FirstOrDefault(hasHero => hasHero.Character.IsHero);
 
                     Clan clan = null;
                     Settlement nearest = null;
+                    MobileParty prisonerParty = null;
 
                     if (leader.Character != null)
                     {
                         clan = leader.Character.HeroObject.Clan;
                         nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlement(settlement => true);
+                        prisonerParty = LordPartyComponent.CreateLordParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), leader.Character.HeroObject, MobileParty.MainParty.Position2D, 0.5f, nearest);
                     }
                     else
                     {
                         clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
                         nearest = SettlementHelper.FindNearestSettlement(settlement => true);
+                        prisonerParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest.Hideout, false);
                     }
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
@@ -208,7 +229,11 @@ namespace CaptivityEvents.Events
                     if (leader.Character != null)
                     {
                         prisonerParty.Party.Owner = leader.Character.HeroObject;
+#if BETA
+                        prisonerParty.ChangePartyLeader(leader.Character);
+#else
                         prisonerParty.ChangePartyLeader(leader.Character, true);
+#endif
                     }
                     else
                     {
@@ -220,12 +245,8 @@ namespace CaptivityEvents.Events
                     prisonerParty.RecentEventsMorale = -100;
                     prisonerParty.Aggressiveness = 0.2f;
                     prisonerParty.InitializePartyTrade(0);
-                    prisonerParty.EnableAi();
-
-                    prisonerParty.Party.Visuals.SetMapIconAsDirty();
 
                     Hero.MainHero.HitPoints += 40;
-                    Campaign.Current.Parties.AddItem(prisonerParty.Party);
 
                     CECustomHandler.LogToFile(prisonerParty.Leader.Name.ToString());
                     PlayerEncounter.RestartPlayerEncounter(MobileParty.MainParty.Party, prisonerParty.Party);
@@ -241,8 +262,7 @@ namespace CaptivityEvents.Events
                 CECaptorContinue(args);
             }
         }
-
-        internal void CEHuntPrisoners(MenuCallbackArgs args, int amount = 20)
+        internal void CECaptorHuntPrisoners(MenuCallbackArgs args, int amount = 20)
         {
             CEPersistence.animationPlayEvent = false;
 
@@ -273,13 +293,14 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    MobileParty prisonerParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyHuntCE_" + MBRandom.RandomFloatRanged(float.MaxValue));
-
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                     clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
-                    PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
                     Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
+
+                    MobileParty prisonerParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_Hunt_" + MBRandom.RandomInt(int.MaxValue), clan, nearest.Hideout, false);
+
+                    PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
                     prisonerParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
                     prisonerParty.SetCustomName(new TextObject("{=CEEVENTS1107}Escaped Captives"));
@@ -291,22 +312,17 @@ namespace CaptivityEvents.Events
                     prisonerParty.IsActive = true;
                     prisonerParty.ActualClan = clan;
                     prisonerParty.Party.Owner = clan.Leader;
-                    prisonerParty.Aggressiveness = 0.2f;
-
-                    prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
-                                                               ? nearest.GatePosition
-                                                               : nearest.Position2D);
-                    prisonerParty.HomeSettlement = nearest;
-                    prisonerParty.InitializePartyTrade(0);
-                    prisonerParty.EnableAi();
                     prisonerParty.Party.Visuals.SetMapIconAsDirty();
 
+                    prisonerParty.HomeSettlement = nearest;
+                    prisonerParty.InitializePartyTrade(0);
+
                     Hero.MainHero.HitPoints += 40;
-                    Campaign.Current.Parties.AddItem(prisonerParty.Party);
+
 
                     CECustomHandler.LogToFile(prisonerParty.Leader.Name.ToString());
+                    PlayerEncounter.RestartPlayerEncounter(prisonerParty.Party, MobileParty.MainParty.Party, true);
                     StartBattleAction.Apply(MobileParty.MainParty.Party, prisonerParty.Party);
-                    PlayerEncounter.RestartPlayerEncounter(prisonerParty.Party, MobileParty.MainParty.Party);
                     PlayerEncounter.Update();
 
                     CEPersistence.huntState = CEPersistence.HuntState.StartHunt;
@@ -314,7 +330,7 @@ namespace CaptivityEvents.Events
                 }
                 catch (Exception)
                 {
-                    CEKillPrisoners(args, amount);
+                    CECaptorKillPrisoners(args, amount);
                 }
             }
             else
@@ -322,8 +338,7 @@ namespace CaptivityEvents.Events
                 CECaptorContinue(args);
             }
         }
-
-        internal void CEMakeHeroCompanion(Hero captive)
+        internal void CECaptorMakeHeroCompanion(Hero captive)
         {
             if (captive == null) return;
             if (captive.IsFactionLeader)
@@ -348,9 +363,7 @@ namespace CaptivityEvents.Events
             }
             AddCompanionAction.Apply(Clan.PlayerClan, captive);
         }
-
-
-        public void CEStripVictim(Hero captive)
+        internal void CECaptorStripVictim(Hero captive)
         {
             if (captive == null) return;
             Equipment randomElement = new Equipment(false);

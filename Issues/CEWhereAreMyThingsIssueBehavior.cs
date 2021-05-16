@@ -1,4 +1,4 @@
-﻿#define STABLE // 1.5.8
+﻿#define STABLE
 using CaptivityEvents.Config;
 using Helpers;
 using System;
@@ -9,9 +9,9 @@ using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
 using static CaptivityEvents.Helper.CEHelper;
 
-namespace CaptivityEvents.Issues
+namespace CaptivityEvents.Issues 
 {
-    // Quest Reference
+    // Quest Reference TaleWorlds.CampaignSystem.SandBox.Issues
     public class CEWhereAreMyThingsIssueBehavior : CampaignBehaviorBase
     {
         public override void RegisterEvents() { }
@@ -19,23 +19,30 @@ namespace CaptivityEvents.Issues
         public override void SyncData(IDataStore dataStore) { }
 
 
-#if BETA || STABLE
         public static IssueBase OnStartIssue(in PotentialIssueData potentialIssueData, Hero issueOwner) => new CEWhereAreMyThingsIssue(issueOwner);
-#else
-        public static IssueBase OnStartIssue(PotentialIssueData potentialIssueData, Hero issueOwner) => new CEWhereAreMyThingsIssue(issueOwner);
-#endif
 
         internal class CEWhereAreMyThingsIssue : IssueBase
         {
             protected override int RewardGold => 500 + MathF.Round(1200f * base.IssueDifficultyMultiplier);
+
+#if BETA
+            public override bool IsThereAlternativeSolution => false;
+            public override bool IsThereLordSolution => false;
+            public override TextObject IssueBriefByIssueGiver => new TextObject("{=CEEVENTS1087}Been looking at this equipment someone left here.");
+            public override TextObject IssueAcceptByPlayer => new TextObject("{=CEEVENTS1086}Hey, that looks like my equipment!");
+            public override TextObject IssueQuestSolutionExplanationByIssueGiver => new TextObject("{=CEEVENTS1085}Well you can pay for it.");
+            public override TextObject IssueQuestSolutionAcceptByPlayer => new TextObject("{=CEEVENTS1084}Are you serious?");
+#else
             protected override bool IsThereAlternativeSolution => false;
             protected override bool IsThereLordSolution => false;
-            public override TextObject Title => new TextObject("{=CEEVENTS1089}Missing Equipment");
-            public override TextObject Description => new TextObject("{=CEEVENTS1088}Someone found some equipment that looks like yours.");
             protected override TextObject IssueBriefByIssueGiver => new TextObject("{=CEEVENTS1087}Been looking at this equipment someone left here.");
             protected override TextObject IssueAcceptByPlayer => new TextObject("{=CEEVENTS1086}Hey, that looks like my equipment!");
             protected override TextObject IssueQuestSolutionExplanationByIssueGiver => new TextObject("{=CEEVENTS1085}Well you can pay for it.");
             protected override TextObject IssueQuestSolutionAcceptByPlayer => new TextObject("{=CEEVENTS1084}Are you serious?");
+#endif
+
+            public override TextObject Title => new TextObject("{=CEEVENTS1089}Missing Equipment");
+            public override TextObject Description => new TextObject("{=CEEVENTS1088}Someone found some equipment that looks like yours.");
 
             public CEWhereAreMyThingsIssue(Hero issueOwner) : base(issueOwner, CampaignTime.DaysFromNow(25f)) { }
 
@@ -177,7 +184,7 @@ namespace CaptivityEvents.Issues
                 get
                 {
                     TextObject textObject = new TextObject("{=CEEVENTS1077}{QUEST_GIVER.LINK} of {QUEST_SETTLEMENT.LINK} has found your equipment you must find {?QUEST_GIVER.GENDER}her{?}him{\\?}. Otherwise they will sell it.");
-                    StringHelpers.SetCharacterProperties("QUEST_GIVER", QuestGiver.CharacterObject, null, textObject);
+                    StringHelpers.SetCharacterProperties("QUEST_GIVER", QuestGiver.CharacterObject, textObject);
                     StringHelpers.SetSettlementProperties("QUEST_SETTLEMENT", QuestGiver.CurrentSettlement, textObject);
 
                     return textObject;
@@ -189,7 +196,7 @@ namespace CaptivityEvents.Issues
                 get
                 {
                     TextObject textObject = new TextObject("{=CEEVENTS1076}You have recovered your equipment back from {QUEST_GIVER.LINK}.");
-                    StringHelpers.SetCharacterProperties("QUEST_GIVER", QuestGiver.CharacterObject, null, textObject);
+                    StringHelpers.SetCharacterProperties("QUEST_GIVER", QuestGiver.CharacterObject, textObject);
 
                     return textObject;
                 }

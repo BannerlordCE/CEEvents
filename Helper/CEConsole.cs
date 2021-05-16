@@ -1,4 +1,4 @@
-﻿#define STABLE // 1.5.8
+﻿#define STABLE
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -53,6 +53,7 @@ namespace CaptivityEvents.Helper
                     _provider.EventCaptorCustomTextureNotifications = customSettings.EventCaptorCustomTextureNotifications;
                     _provider.EventRandomEnabled = customSettings.EventRandomEnabled;
                     _provider.EventRandomFireChance = customSettings.EventRandomFireChance;
+                    _provider.EventOccurrenceRandom = customSettings.EventOccurrenceRandom;
                     _provider.EventCaptorGearCaptives = customSettings.EventCaptorGearCaptives;
                     _provider.EventProstituteGear = customSettings.EventProstituteGear;
                     _provider.HuntLetPrisonersEscape = customSettings.HuntLetPrisonersEscape;
@@ -133,7 +134,7 @@ namespace CaptivityEvents.Helper
                 {
                     eventName = strings[0];
 
-                    if (eventName.IsStringNoneOrEmpty()) return "Wrong input.\nFormat is \"captivity.force_fire_event [EventName] [CaptiveName]\".";
+                    if (string.IsNullOrEmpty(eventName)) return "Wrong input.\nFormat is \"captivity.force_fire_event [EventName] [CaptiveName]\".";
 
                     flag = true;
                 }
@@ -142,7 +143,7 @@ namespace CaptivityEvents.Helper
                     eventName = strings[0];
                     heroName = strings[1];
 
-                    if (eventName.IsStringNoneOrEmpty() || heroName.IsStringNoneOrEmpty()) return "Wrong input.\nFormat is \"captivity.force_fire_event [EventName] [CaptiveName]\".";
+                    if (string.IsNullOrEmpty(eventName) || string.IsNullOrEmpty(heroName)) return "Wrong input.\nFormat is \"captivity.force_fire_event [EventName] [CaptiveName]\".";
 
                     flag = true;
                 }
@@ -267,7 +268,7 @@ namespace CaptivityEvents.Helper
 
             try
             {
-                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName);
+                if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName)) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName);
                 else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_sexual_notification");
                 else new CESubModule().LoadCampaignNotificationTexture("CE_castle_notification");
             }
@@ -291,7 +292,7 @@ namespace CaptivityEvents.Helper
 
             try
             {
-                if (!returnedEvent.NotificationName.IsStringNoneOrEmpty()) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
+                if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName)) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
                 else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
                 else new CESubModule().LoadCampaignNotificationTexture("CE_random_notification", 1);
             }
@@ -323,8 +324,7 @@ namespace CaptivityEvents.Helper
                 if (CampaignCheats.CheckParameters(strings, 1))
                 {
                     eventName = strings[0];
-
-                    if (eventName.IsStringNoneOrEmpty()) return "Wrong input.\nFormat is \"captivity.fire_event [EventName] [CaptiveName]\".";
+                    if (string.IsNullOrEmpty(eventName)) return "Wrong input.\nFormat is \"captivity.fire_event [EventName] [CaptiveName]\".";
 
                     flag = true;
                 }
@@ -333,7 +333,7 @@ namespace CaptivityEvents.Helper
                     eventName = strings[0];
                     heroName = strings[1];
 
-                    if (eventName.IsStringNoneOrEmpty() || heroName.IsStringNoneOrEmpty()) return "Wrong input.\nFormat is \"captivity.fire_event [EventName] [CaptiveName]\".";
+                    if (string.IsNullOrEmpty(eventName) || string.IsNullOrEmpty(heroName)) return "Wrong input.\nFormat is \"captivity.fire_event [EventName] [CaptiveName]\".";
 
                     flag = true;
                 }
@@ -417,11 +417,7 @@ namespace CaptivityEvents.Helper
 
                                     if (Game.Current.GameStateManager.ActiveState is MapState mapStateCaptor)
                                     {
-#if BETA || STABLE
                                         if (CESettings.Instance.EventCaptorNotifications)
-#else
-                                        if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
-#endif
                                         {
                                             LaunchCaptorEvent(returnedEvent);
                                         }
@@ -443,7 +439,7 @@ namespace CaptivityEvents.Helper
                         }
                         else
                         {
-                            return "Please add more prisoners to your party.\n\"Format is \"campaign.add_prisoner [PositiveNumber] [TroopName]\".";
+                            return result.Substring(1) + "\n Please add more prisoners to your party.\n\"Format is \"campaign.add_prisoner [PositiveNumber] [TroopName]\".";
                         }
                     default:
                         if (result.StartsWith("$")) return result.Substring(1);
@@ -451,11 +447,7 @@ namespace CaptivityEvents.Helper
                         if (Game.Current.GameStateManager.ActiveState is MapState mapStateRandom)
                         {
 
-#if BETA || STABLE
                             if (CESettings.Instance.EventCaptorNotifications)
-#else
-                            if (CampaignOptions.IsMapNotificationsEnabled && CESettings.Instance.EventCaptorNotifications)
-#endif
                             {
                                 LaunchRandomEvent(returnedEvent);
                             }
@@ -498,7 +490,7 @@ namespace CaptivityEvents.Helper
 
                 if (CEPersistence.CEEvents == null || CEPersistence.CEEvents.Count <= 0) return "Failed to load event list.";
                 string text = "";
-                bool searchActive = !searchTerm.IsStringNoneOrEmpty();
+                bool searchActive = !string.IsNullOrWhiteSpace(searchTerm);
 
                 if (searchActive) searchTerm = searchTerm.ToLower();
 
@@ -545,7 +537,7 @@ namespace CaptivityEvents.Helper
 
                 if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
-                Hero hero = searchTerm.IsStringNoneOrEmpty()
+                Hero hero = string.IsNullOrWhiteSpace(searchTerm)
                     ? Hero.MainHero
                     : Campaign.Current.Heroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
 
@@ -613,7 +605,7 @@ namespace CaptivityEvents.Helper
 
                 if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
-                Hero hero = searchTerm.IsStringNoneOrEmpty()
+                Hero hero = string.IsNullOrWhiteSpace(searchTerm)
                     ? Hero.MainHero
                     : Campaign.Current.Heroes.FirstOrDefault(heroToFind => { return heroToFind.Name.ToString() == searchTerm; });
 
@@ -684,6 +676,7 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
+                    ClearParties(strings);
                     bool successful = CECampaignBehavior.ClearPregnancyList();
                     CEBrothelBehavior.CleanList();
                     ResetStatus(new List<string>());
@@ -976,6 +969,7 @@ namespace CaptivityEvents.Helper
                     // Load Events
                     CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
                     CEPersistence.CECustomFlags = CECustomHandler.GetCustom();
+                    CEPersistence.CECustomScenes = CECustomHandler.GetScenes();
                     CEPersistence.CECustomModules = CECustomHandler.GetModules();
 
                     try
@@ -994,7 +988,7 @@ namespace CaptivityEvents.Helper
                     CEHelper.brothelFlagMale = false;
 
                     // Go Through Events
-                    foreach (CEEvent _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !_listedEvent.Name.IsStringNoneOrEmpty()))
+                    foreach (CEEvent _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !string.IsNullOrWhiteSpace(_listedEvent.Name)))
                     {
                         if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEPersistence.CEEvents.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 1) continue;
 
@@ -1182,6 +1176,36 @@ namespace CaptivityEvents.Helper
             }
         }
 
+        [CommandLineFunctionality.CommandLineArgumentFunction("clear_parties", "captivity")]
+        public static string ClearParties(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.clear_parties [PARTY_ID]\".";
+
+                List<MobileParty> mobileParties = MobileParty.All
+                    .Where((mobileParty) =>
+                    {
+                        return mobileParty.StringId.StartsWith("CustomPartyCE_");
+                    }
+                    ).ToList();
+
+                foreach (MobileParty mobile in mobileParties)
+                {
+                    mobile.RemoveParty();
+                }
+
+                return "Success";
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
         [CommandLineFunctionality.CommandLineArgumentFunction("play_sound", "captivity")]
         public static string PlaySound(List<string> strings)
         {
@@ -1202,7 +1226,7 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
-                    if (!searchTerm.IsStringNoneOrEmpty()) id = SoundEvent.GetEventIdFromString(searchTerm);
+                    if (!string.IsNullOrWhiteSpace(searchTerm)) id = SoundEvent.GetEventIdFromString(searchTerm);
 
                     if (id == -1) return "Sound not found.";
                 }

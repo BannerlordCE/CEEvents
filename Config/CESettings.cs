@@ -23,6 +23,7 @@ namespace CaptivityEvents.Config
         bool EventCaptorCustomTextureNotifications { get; set; }
         bool EventRandomEnabled { get; set; }
         float EventRandomFireChance { get; set; }
+        float EventOccurrenceRandom { get; set; }
         bool EventCaptorGearCaptives { get; set; }
         bool EventProstituteGear { get; set; }
         bool HuntLetPrisonersEscape { get; set; }
@@ -92,6 +93,7 @@ namespace CaptivityEvents.Config
         public bool EventCaptorCustomTextureNotifications { get; set; } = true;
         public bool EventRandomEnabled { get; set; } = true;
         public float EventRandomFireChance { get; set; } = 20f;
+        public float EventOccurrenceRandom { get; set; } = 12f;
         public bool EventCaptorGearCaptives { get; set; } = true;
         public bool EventProstituteGear { get; set; } = true;
         public bool HuntLetPrisonersEscape { get; set; } = false;
@@ -371,6 +373,11 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0088}Random")]
         public float EventRandomFireChance { get; set; } = 20f;
 
+        [SettingPropertyFloatingInteger("{=CESETTINGS0083}Event wait between occurances while Random", 1f, 100f, "#0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS0084}How often should an event occur while Random. (Gametime in between events)")]
+        [SettingPropertyGroup("{=CESETTINGS0088}Random")]
+        public float EventOccurrenceRandom { get; set; } = 12f;
+
+
         #endregion
 
         #region Escape
@@ -595,6 +602,7 @@ namespace CaptivityEvents.Config
                     _provider.EventCaptorCustomTextureNotifications = customSettings.EventCaptorCustomTextureNotifications;
                     _provider.EventRandomEnabled = customSettings.EventRandomEnabled;
                     _provider.EventRandomFireChance = customSettings.EventRandomFireChance;
+                    _provider.EventOccurrenceRandom = customSettings.EventOccurrenceRandom;
                     _provider.EventCaptorGearCaptives = customSettings.EventCaptorGearCaptives;
                     _provider.EventProstituteGear = customSettings.EventProstituteGear;
                     _provider.HuntLetPrisonersEscape = customSettings.HuntLetPrisonersEscape;

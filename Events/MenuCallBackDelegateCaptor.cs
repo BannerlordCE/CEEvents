@@ -14,7 +14,7 @@ using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Events
 {
-    public class CaptorMenuCallBackDelegate
+    public class MenuCallBackDelegateCaptor
     {
         private readonly CEEvent _listedEvent;
         private readonly List<CEEvent> _eventList;
@@ -31,7 +31,7 @@ namespace CaptivityEvents.Events
 
         private readonly CaptorSpecifics _captor = new CaptorSpecifics();
 
-        internal CaptorMenuCallBackDelegate(CEEvent listedEvent, List<CEEvent> eventList)
+        internal MenuCallBackDelegateCaptor(CEEvent listedEvent, List<CEEvent> eventList)
         {
             _listedEvent = listedEvent;
             _eventList = eventList;
@@ -39,7 +39,7 @@ namespace CaptivityEvents.Events
             _companionSystem = new CECompanionSystem(listedEvent, null, eventList);
         }
 
-        internal CaptorMenuCallBackDelegate(CEEvent listedEvent, Option option, List<CEEvent> eventList)
+        internal MenuCallBackDelegateCaptor(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
             _listedEvent = listedEvent;
             _option = option;
@@ -48,7 +48,7 @@ namespace CaptivityEvents.Events
             _companionSystem = new CECompanionSystem(listedEvent, option, eventList);
         }
 
-
+        #region Progress Event
         internal void CaptorProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
             if (args.MenuContext != null)
@@ -107,25 +107,22 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Missing Progress Event Settings in " + _listedEvent.Name);
             }
         }
-
         internal bool CaptorProgressConditionWaitGameMenu(MenuCallbackArgs args)
         {
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
-
         internal void CaptorProgressConsequenceWaitGameMenu(MenuCallbackArgs args)
         {
             if (_listedEvent.ProgressEvent.TriggerEvents != null && _listedEvent.ProgressEvent.TriggerEvents.Length > 0)
             {
                 ConsequenceRandomEventTriggerProgress(ref args);
             }
-            else if (!string.IsNullOrEmpty(_listedEvent.ProgressEvent.TriggerEventName))
+            else if (!string.IsNullOrWhiteSpace(_listedEvent.ProgressEvent.TriggerEventName))
             {
                 ConsequenceSingleEventTriggerProgress(ref args);
             }
         }
-
         internal void CaptorProgressTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt)
         {
             _timer += dt.CurrentHourInDay;
@@ -139,21 +136,22 @@ namespace CaptivityEvents.Events
 
             PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
+        #endregion
 
+        #region Regular Event
         internal void CaptorEventWaitGameMenu(MenuCallbackArgs args)
         {
-            SetNames(ref args);
+            InitSetNames(ref args);
             _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
             _sharedCallBackHelper.ConsequencePlaySound(true);
         }
-
         internal bool CaptorEventOptionGameMenu(MenuCallbackArgs args)
         {
             PlayerIsNotBusy(ref args);
             PlayerHasOpenSpaceForCompanions(ref args);
-            GiveCaptorGold();
-            CaptorGoldTotal();
             LeaveTypes(ref args);
+            InitGiveCaptorGold();
+            InitCaptorGoldTotal();
             ReqHeroCaptorRelation(ref args);
             ReqMorale(ref args);
             ReqTroops(ref args);
@@ -171,7 +169,6 @@ namespace CaptivityEvents.Events
             ReqGold(ref args);
             return true;
         }
-
         internal void CaptorConsequenceGameMenu(MenuCallbackArgs args)
         {
             Hero captiveHero = null;
@@ -188,48 +185,51 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
 
             _sharedCallBackHelper.ConsequencePlaySound();
-            CaptorLeaveSpouse();
-            CaptorGold(captiveHero);
-            CaptorChangeGold();
-            CaptorSkill();
-            CaptorTrait();
-            CaptorRenown();
-            ChangeMorale();
+            ConsequenceCaptorLeaveSpouse();
+            ConsequenceCaptorGold(captiveHero);
+            ConsequenceCaptorChangeGold();
+            ConsequenceCaptorSkill();
+            ConsequenceCaptorTrait();
+            ConsequenceCaptorRenown();
+            ConsequenceChangeMorale();
 
             ConsequenceChangeClan(captiveHero);
             ConsequenceChangeKingdom(captiveHero);
 
             if (captiveHero != null)
             {
-                LeaveSpouse(captiveHero);
-                ForceMarry(captiveHero);
-                SlaveryFlags(captiveHero);
-                SlaveryLevel(captiveHero);
-                ProstitutionFlags(captiveHero);
-                ProstitutionLevel(captiveHero);
-                Relations(captiveHero);
-                Gold(captiveHero);
-                ChangeGold(captiveHero);
-                Trait(captiveHero);
-                Skill(captiveHero);
-                Renown(captiveHero);
-                ChangeHealth(captiveHero);
-                Impregnation(captiveHero);
-                Strip(captiveHero);
-                MakeHeroCompanion(captiveHero);
+                ConsequenceLeaveSpouse(captiveHero);
+                ConsequenceForceMarry(captiveHero);
+                ConsequenceSlaveryFlags(captiveHero);
+                ConsequenceSlaveryLevel(captiveHero);
+                ConsequenceProstitutionFlags(captiveHero);
+                ConsequenceProstitutionLevel(captiveHero);
+                ConsequenceRelations(captiveHero);
+                ConsequenceGold(captiveHero);
+                ConsequenceChangeGold(captiveHero);
+                ConsequenceTrait(captiveHero);
+                ConsequenceSkill(captiveHero);
+                ConsequenceRenown(captiveHero);
+                ConsequenceChangeHealth(captiveHero);
+                ConsequenceImpregnation(captiveHero);
+                ConsequenceStrip(captiveHero);
+                ConsequenceMakeHeroCompanion(captiveHero);
             }
 
             ConsequenceCompanions();
             ConsequenceSpawnTroop();
             ConsequenceSpawnHero();
 
-            GainRandomPrisoners();
-            Escape();
-            Release(ref args);
-            WoundPrisoner(ref args);
-            KillPrisoner(ref args);
+            ConsequenceGainRandomPrisoners();
 
-            JoinParty();
+            ConsequenceEscape();
+            ConsequenceRelease(ref args);
+            ConsequenceWoundPrisoner(ref args);
+            ConsequenceKillPrisoner(ref args);
+            ConsequenceJoinParty();
+
+            _sharedCallBackHelper.ConsequenceMission();
+            _sharedCallBackHelper.ConsequenceTeleportPlayer();
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StripHero) && captiveHero != null)
             {
@@ -247,21 +247,21 @@ namespace CaptivityEvents.Events
             {
                 _sharedCallBackHelper.ConsequenceStartBattle(() => { _captor.CECaptorContinue(args); }, 1);
             }
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners)) { _captor.CEPrisonerRebel(args); }
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.HuntPrisoners)) { _captor.CEHuntPrisoners(args); }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RebelPrisoners)) { _captor.CECaptorPrisonerRebel(args); }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.HuntPrisoners)) { _captor.CECaptorHuntPrisoners(args); }
             else if (_option.TriggerEvents != null && _option.TriggerEvents.Length > 0)
             {
                 ConsequenceRandomEventTrigger(ref args);
             }
-            else if (!string.IsNullOrEmpty(_option.TriggerEventName))
+            else if (!string.IsNullOrWhiteSpace(_option.TriggerEventName))
             {
                 ConsequenceSingleEventTrigger(ref args);
             }
             else { _captor.CECaptorContinue(args); }
         }
+        #endregion
 
-
-        #region private
+        #region Consequences
 
         private void ConsequenceCompanions()
         {
@@ -274,7 +274,6 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("ConsequenceCompanions. Failed" + e.ToString());
             }
         }
-
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
         {
             List<CEEvent> eventNames = new List<CEEvent>();
@@ -292,7 +291,7 @@ namespace CaptivityEvents.Events
                         continue;
                     }
 
-                    if (!triggerEvent.EventUseConditions.IsStringNoneOrEmpty() && triggerEvent.EventUseConditions.ToLower() == "true")
+                    if (!string.IsNullOrWhiteSpace(triggerEvent.EventUseConditions) && triggerEvent.EventUseConditions.ToLower() == "true")
                     {
                         string conditionMatched = null;
                         if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
@@ -315,7 +314,7 @@ namespace CaptivityEvents.Events
 
                     try
                     {
-                        weightedChance = _variableLoader.GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
+                        weightedChance = _variableLoader.GetIntFromXML(!string.IsNullOrWhiteSpace(triggerEvent.EventWeight)
                                                                      ? triggerEvent.EventWeight
                                                                      : triggeredEvent.WeightedChanceOfOccuring);
                     }
@@ -350,7 +349,6 @@ namespace CaptivityEvents.Events
                 _captor.CECaptorContinue(args);
             }
         }
-
         private void ConsequenceSingleEventTriggerProgress(ref MenuCallbackArgs args)
         {
             try
@@ -367,8 +365,6 @@ namespace CaptivityEvents.Events
                 _captor.CECaptorContinue(args);
             }
         }
-
-
         private void ConsequenceRandomEventTrigger(ref MenuCallbackArgs args)
         {
             List<CEEvent> eventNames = new List<CEEvent>();
@@ -386,7 +382,7 @@ namespace CaptivityEvents.Events
                         continue;
                     }
 
-                    if (!triggerEvent.EventUseConditions.IsStringNoneOrEmpty() && triggerEvent.EventUseConditions.ToLower() == "true")
+                    if (!string.IsNullOrWhiteSpace(triggerEvent.EventUseConditions) && triggerEvent.EventUseConditions.ToLower() == "true")
                     {
                         string conditionMatched = null;
                         if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
@@ -409,7 +405,7 @@ namespace CaptivityEvents.Events
 
                     try
                     {
-                        weightedChance = _variableLoader.GetIntFromXML(!triggerEvent.EventWeight.IsStringNoneOrEmpty()
+                        weightedChance = _variableLoader.GetIntFromXML(!string.IsNullOrWhiteSpace(triggerEvent.EventWeight)
                                                                      ? triggerEvent.EventWeight
                                                                      : triggeredEvent.WeightedChanceOfOccuring);
                     }
@@ -444,7 +440,6 @@ namespace CaptivityEvents.Events
                 _captor.CECaptorContinue(args);
             }
         }
-
         private void ConsequenceSingleEventTrigger(ref MenuCallbackArgs args)
         {
             try
@@ -461,8 +456,7 @@ namespace CaptivityEvents.Events
                 _captor.CECaptorContinue(args);
             }
         }
-
-        private void JoinParty()
+        private void ConsequenceJoinParty()
         {
             if (!(_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.JoinCaptor))) return;
 
@@ -484,8 +478,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Failure of JoinParty: " + e.ToString());
             }
         }
-
-        private void WoundPrisoner(ref MenuCallbackArgs args)
+        private void ConsequenceWoundPrisoner(ref MenuCallbackArgs args)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundPrisoner))
             {
@@ -503,12 +496,11 @@ namespace CaptivityEvents.Events
             // Wound Player
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundCaptor)) Hero.MainHero.MakeWounded(_listedEvent.Captive.HeroObject);
             // Wound All
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundAllPrisoners)) _captor.CEWoundPrisoners(args, PartyBase.MainParty.PrisonRoster.Count);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundAllPrisoners)) _captor.CECaptorWoundPrisoners(args, PartyBase.MainParty.PrisonRoster.Count);
             // Wound Random
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomPrisoners)) _captor.CEWoundPrisoners(args);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomPrisoners)) _captor.CECaptorWoundPrisoners(args);
         }
-
-        private void KillPrisoner(ref MenuCallbackArgs args)
+        private void ConsequenceKillPrisoner(ref MenuCallbackArgs args)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner))
             {
@@ -519,23 +511,20 @@ namespace CaptivityEvents.Events
             // Kill Player
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor)) _dynamics.CEKillPlayer(_listedEvent.Captive.HeroObject);
             // Kill All
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillAllPrisoners)) _captor.CEKillPrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillAllPrisoners)) _captor.CECaptorKillPrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
             // Kill Random
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomPrisoners)) _captor.CEKillPrisoners(args);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomPrisoners)) _captor.CECaptorKillPrisoners(args);
         }
-
-        private void GainRandomPrisoners()
+        private void ConsequenceGainRandomPrisoners()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GainRandomPrisoners)) _dynamics.CEGainRandomPrisoners(PartyBase.MainParty);
         }
-
-        private void Release(ref MenuCallbackArgs args)
+        private void ConsequenceRelease(ref MenuCallbackArgs args)
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseRandomPrisoners)) _captor.CEReleasePrisoners(args);
-            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseAllPrisoners)) _captor.CEReleasePrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseRandomPrisoners)) _captor.CECaptorReleasePrisoners(args);
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseAllPrisoners)) _captor.CECaptorReleasePrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
         }
-
-        private void Escape()
+        private void ConsequenceEscape()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) return;
 
@@ -549,24 +538,21 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Failure of Captor Escape: " + e.ToString());
             }
         }
-
-        private void Strip(Hero captiveHero)
+        private void ConsequenceStrip(Hero captiveHero)
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip)) _captor.CEStripVictim(captiveHero);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip)) _captor.CECaptorStripVictim(captiveHero);
         }
-
-        private void MakeHeroCompanion(Hero captiveHero)
+        private void ConsequenceMakeHeroCompanion(Hero captiveHero)
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.MakeHeroCompanion)) _captor.CEMakeHeroCompanion(captiveHero);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.MakeHeroCompanion)) _captor.CECaptorMakeHeroCompanion(captiveHero);
         }
-
-        private void Impregnation(Hero captiveHero)
+        private void ConsequenceImpregnation(Hero captiveHero)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationHero))
             {
                 try
                 {
-                    _impregnation.CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
+                    _impregnation.CaptivityImpregnationChance(captiveHero, !string.IsNullOrWhiteSpace(_option.PregnancyRiskModifier)
                                                       ? _variableLoader.GetIntFromXML(_option.PregnancyRiskModifier)
                                                       : _variableLoader.GetIntFromXML(_listedEvent.PregnancyRiskModifier));
                 }
@@ -580,7 +566,7 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    _impregnation.CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
+                    _impregnation.CaptivityImpregnationChance(captiveHero, !string.IsNullOrWhiteSpace(_option.PregnancyRiskModifier)
                                                       ? _variableLoader.GetIntFromXML(_option.PregnancyRiskModifier)
                                                       : _variableLoader.GetIntFromXML(_listedEvent.PregnancyRiskModifier), false, false);
                 }
@@ -594,7 +580,7 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    _impregnation.CaptivityImpregnationChance(captiveHero, !string.IsNullOrEmpty(_option.PregnancyRiskModifier)
+                    _impregnation.CaptivityImpregnationChance(captiveHero, !string.IsNullOrWhiteSpace(_option.PregnancyRiskModifier)
                                                       ? _variableLoader.GetIntFromXML(_option.PregnancyRiskModifier)
                                                       : _variableLoader.GetIntFromXML(_listedEvent.PregnancyRiskModifier), false, false, Hero.MainHero);
                 }
@@ -605,14 +591,13 @@ namespace CaptivityEvents.Events
                 }
             }
         }
-
-        private void ChangeHealth(Hero captiveHero)
+        private void ConsequenceChangeHealth(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeHealth)) return;
 
             try
             {
-                captiveHero.HitPoints += !string.IsNullOrEmpty(_option.HealthTotal)
+                captiveHero.HitPoints += !string.IsNullOrWhiteSpace(_option.HealthTotal)
                     ? _variableLoader.GetIntFromXML(_option.HealthTotal)
                     : _variableLoader.GetIntFromXML(_listedEvent.HealthTotal);
             }
@@ -622,14 +607,13 @@ namespace CaptivityEvents.Events
                 captiveHero.HitPoints += MBRandom.RandomInt(-20, 20);
             }
         }
-
-        private void Renown(Hero captiveHero)
+        private void ConsequenceRenown(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRenown)) return;
 
             try
             {
-                _dynamics.RenownModifier(!string.IsNullOrEmpty(_option.RenownTotal)
+                _dynamics.RenownModifier(!string.IsNullOrWhiteSpace(_option.RenownTotal)
                                                   ? _variableLoader.GetIntFromXML(_option.RenownTotal)
                                                   : _variableLoader.GetIntFromXML(_listedEvent.RenownTotal), captiveHero);
             }
@@ -639,8 +623,7 @@ namespace CaptivityEvents.Events
                 _dynamics.RenownModifier(MBRandom.RandomInt(-5, 5), captiveHero);
             }
         }
-
-        private void Skill(Hero captiveHero)
+        private void ConsequenceSkill(Hero captiveHero)
         {
             try
             {
@@ -652,8 +635,8 @@ namespace CaptivityEvents.Events
                     foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
                     {
                         if (skillToLevel.Ref.ToLower() != "hero") continue;
-                        if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
 
                         _dynamics.SkillModifier(captiveHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }
@@ -663,8 +646,8 @@ namespace CaptivityEvents.Events
                     foreach (SkillToLevel skillToLevel in _listedEvent.SkillsToLevel)
                     {
                         if (skillToLevel.Ref.ToLower() != "hero") continue;
-                        if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
 
                         _dynamics.SkillModifier(captiveHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }
@@ -673,21 +656,20 @@ namespace CaptivityEvents.Events
                 {
                     if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSkill)) return;
 
-                    if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = _variableLoader.GetIntFromXML(_option.SkillTotal);
-                    else if (!_option.SkillXPTotal.IsStringNoneOrEmpty()) xp = _variableLoader.GetIntFromXML(_option.SkillXPTotal);
-                    else if (!_listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = _variableLoader.GetIntFromXML(_listedEvent.SkillTotal);
-                    else if (!_listedEvent.SkillXPTotal.IsStringNoneOrEmpty()) xp = _variableLoader.GetIntFromXML(_listedEvent.SkillXPTotal);
+                    if (!string.IsNullOrWhiteSpace(_option.SkillTotal)) level = _variableLoader.GetIntFromXML(_option.SkillTotal);
+                    else if (!string.IsNullOrWhiteSpace(_option.SkillXPTotal)) xp = _variableLoader.GetIntFromXML(_option.SkillXPTotal);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.SkillTotal);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillXPTotal)) xp = _variableLoader.GetIntFromXML(_listedEvent.SkillXPTotal);
                     else CECustomHandler.LogToFile("Missing Skill SkillTotal");
 
-                    if (!_option.SkillToLevel.IsStringNoneOrEmpty()) _dynamics.SkillModifier(captiveHero, _option.SkillToLevel, level, xp);
-                    else if (!_listedEvent.SkillToLevel.IsStringNoneOrEmpty()) _dynamics.SkillModifier(captiveHero, _listedEvent.SkillToLevel, level, xp);
+                    if (!string.IsNullOrWhiteSpace(_option.SkillToLevel)) _dynamics.SkillModifier(captiveHero, _option.SkillToLevel, level, xp);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillToLevel)) _dynamics.SkillModifier(captiveHero, _listedEvent.SkillToLevel, level, xp);
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }
-
-        internal void Trait(Hero captiveHero)
+        internal void ConsequenceTrait(Hero captiveHero)
         {
             try
             {
@@ -699,8 +681,8 @@ namespace CaptivityEvents.Events
                     foreach (TraitToLevel traitToLevel in _option.TraitsToLevel)
                     {
                         if (traitToLevel.Ref.ToLower() != "hero") continue;
-                        if (!traitToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!traitToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
 
                         _dynamics.TraitModifier(captiveHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                     }
@@ -710,8 +692,8 @@ namespace CaptivityEvents.Events
                     foreach (TraitToLevel traitToLevel in _listedEvent.TraitsToLevel)
                     {
                         if (traitToLevel.Ref.ToLower() != "hero") continue;
-                        if (!traitToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!traitToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
 
                         _dynamics.TraitModifier(captiveHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                     }
@@ -720,22 +702,20 @@ namespace CaptivityEvents.Events
                 {
                     if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeTrait)) return;
 
-                    if (!string.IsNullOrEmpty(_option.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.TraitTotal);
-                    else if (!string.IsNullOrEmpty(_option.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.TraitXPTotal);
-                    else if (!string.IsNullOrEmpty(_listedEvent.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitTotal);
-                    else if (!string.IsNullOrEmpty(_listedEvent.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitXPTotal);
+                    if (!string.IsNullOrWhiteSpace(_option.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.TraitTotal);
+                    else if (!string.IsNullOrWhiteSpace(_option.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.TraitXPTotal);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitTotal);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitXPTotal);
                     else CECustomHandler.LogToFile("Missing Trait TraitTotal");
 
-                    if (!string.IsNullOrEmpty(_option.TraitToLevel)) _dynamics.TraitModifier(captiveHero, _option.TraitToLevel, level, xp);
-                    else if (!string.IsNullOrEmpty(_listedEvent.TraitToLevel)) _dynamics.TraitModifier(captiveHero, _listedEvent.TraitToLevel, level, xp);
+                    if (!string.IsNullOrWhiteSpace(_option.TraitToLevel)) _dynamics.TraitModifier(captiveHero, _option.TraitToLevel, level, xp);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.TraitToLevel)) _dynamics.TraitModifier(captiveHero, _listedEvent.TraitToLevel, level, xp);
                     else CECustomHandler.LogToFile("Missing TraitToLevel");
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
         }
-
-
-        private void ChangeGold(Hero captiveHero)
+        private void ConsequenceChangeGold(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) return;
 
@@ -743,16 +723,15 @@ namespace CaptivityEvents.Events
             {
                 int level = 0;
 
-                if (!string.IsNullOrEmpty(_option.GoldTotal)) level = _variableLoader.GetIntFromXML(_option.GoldTotal);
-                else if (!string.IsNullOrEmpty(_listedEvent.GoldTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.GoldTotal);
+                if (!string.IsNullOrWhiteSpace(_option.GoldTotal)) level = _variableLoader.GetIntFromXML(_option.GoldTotal);
+                else if (!string.IsNullOrWhiteSpace(_listedEvent.GoldTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.GoldTotal);
                 else CECustomHandler.LogToFile("Missing GoldTotal");
 
                 GiveGoldAction.ApplyBetweenCharacters(null, captiveHero, level);
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
         }
-
-        private void Gold(Hero captiveHero)
+        private void ConsequenceGold(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) return;
 
@@ -762,8 +741,7 @@ namespace CaptivityEvents.Events
             content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveGold);
             GiveGoldAction.ApplyBetweenCharacters(null, captiveHero, content);
         }
-
-        private void Relations(Hero captiveHero)
+        private void ConsequenceRelations(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRelation)) return;
             bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
@@ -771,7 +749,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-                _dynamics.RelationsModifier(captiveHero, !string.IsNullOrEmpty(_option.RelationTotal)
+                _dynamics.RelationsModifier(captiveHero, !string.IsNullOrWhiteSpace(_option.RelationTotal)
                                                ? _variableLoader.GetIntFromXML(_option.RelationTotal)
                                                : _variableLoader.GetIntFromXML(_listedEvent.RelationTotal), null, InformationMessage && !NoMessages, !InformationMessage && !NoMessages);
             }
@@ -780,14 +758,13 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Missing RelationTotal");
             }
         }
-
-        private void ProstitutionLevel(Hero captiveHero)
+        private void ConsequenceProstitutionLevel(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeProstitutionLevel)) return;
 
             try
             {
-                _dynamics.VictimProstitutionModifier(!string.IsNullOrEmpty(_option.ProstitutionTotal)
+                _dynamics.VictimProstitutionModifier(!string.IsNullOrWhiteSpace(_option.ProstitutionTotal)
                                                         ? _variableLoader.GetIntFromXML(_option.ProstitutionTotal)
                                                         : _variableLoader.GetIntFromXML(_listedEvent.ProstitutionTotal), captiveHero);
             }
@@ -797,8 +774,7 @@ namespace CaptivityEvents.Events
                 _dynamics.VictimProstitutionModifier(1, captiveHero);
             }
         }
-
-        private void ProstitutionFlags(Hero captiveHero)
+        private void ConsequenceProstitutionFlags(Hero captiveHero)
         {
             bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
             bool NoMessages = _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoMessages);
@@ -806,14 +782,13 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag)) _dynamics.VictimProstitutionModifier(1, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) _dynamics.VictimProstitutionModifier(0, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
         }
-
-        private void SlaveryLevel(Hero captiveHero)
+        private void ConsequenceSlaveryLevel(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSlaveryLevel)) return;
 
             try
             {
-                _dynamics.VictimSlaveryModifier(!string.IsNullOrEmpty(_option.SlaveryTotal)
+                _dynamics.VictimSlaveryModifier(!string.IsNullOrWhiteSpace(_option.SlaveryTotal)
                                                    ? _variableLoader.GetIntFromXML(_option.SlaveryTotal)
                                                    : _variableLoader.GetIntFromXML(_listedEvent.SlaveryTotal), captiveHero);
             }
@@ -823,8 +798,7 @@ namespace CaptivityEvents.Events
                 _dynamics.VictimSlaveryModifier(1, captiveHero);
             }
         }
-
-        private void SlaveryFlags(Hero captiveHero)
+        private void ConsequenceSlaveryFlags(Hero captiveHero)
         {
 
             bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
@@ -833,7 +807,6 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddSlaveryFlag)) _dynamics.VictimSlaveryModifier(1, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveSlaveryFlag)) _dynamics.VictimSlaveryModifier(0, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
         }
-
         private void ConsequenceSpawnTroop()
         {
             if (_option.SpawnTroops != null)
@@ -841,7 +814,6 @@ namespace CaptivityEvents.Events
                 new CESpawnSystem().SpawnTheTroops(_option.SpawnTroops, PartyBase.MainParty);
             }
         }
-
         private void ConsequenceSpawnHero()
         {
             if (_option.SpawnHeroes != null)
@@ -853,29 +825,25 @@ namespace CaptivityEvents.Events
         {
             if (_option.KingdomOptions != null) _dynamics.KingdomChange(_option.KingdomOptions, captiveHero, Hero.MainHero);
         }
-
         private void ConsequenceChangeClan(Hero captiveHero)
         {
             if (_option.ClanOptions != null) _dynamics.ClanChange(_option.ClanOptions, captiveHero, Hero.MainHero);
         }
-
-        private void ForceMarry(Hero captiveHero)
+        private void ConsequenceForceMarry(Hero captiveHero)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveMarryCaptor)) _dynamics.ChangeSpouse(captiveHero, Hero.MainHero);
         }
-
-        private void LeaveSpouse(Hero captiveHero)
+        private void ConsequenceLeaveSpouse(Hero captiveHero)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveLeaveSpouse)) _dynamics.ChangeSpouse(captiveHero, null);
         }
-
-        private void ChangeMorale()
+        private void ConsequenceChangeMorale()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
 
             try
             {
-                _dynamics.MoraleChange(!string.IsNullOrEmpty(_option.MoraleTotal)
+                _dynamics.MoraleChange(!string.IsNullOrWhiteSpace(_option.MoraleTotal)
                                          ? _variableLoader.GetIntFromXML(_option.MoraleTotal)
                                          : _variableLoader.GetIntFromXML(_listedEvent.MoraleTotal), PartyBase.MainParty);
             }
@@ -885,14 +853,13 @@ namespace CaptivityEvents.Events
                 _dynamics.MoraleChange(MBRandom.RandomInt(-5, 5), PlayerCaptivity.CaptorParty);
             }
         }
-
-        private void CaptorRenown()
+        private void ConsequenceCaptorRenown()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorRenown)) return;
 
             try
             {
-                _dynamics.RenownModifier(!string.IsNullOrEmpty(_option.RenownTotal)
+                _dynamics.RenownModifier(!string.IsNullOrWhiteSpace(_option.RenownTotal)
                                             ? _variableLoader.GetIntFromXML(_option.RenownTotal)
                                             : _variableLoader.GetIntFromXML(_listedEvent.RenownTotal), Hero.MainHero);
             }
@@ -902,9 +869,7 @@ namespace CaptivityEvents.Events
                 _dynamics.RenownModifier(MBRandom.RandomInt(-5, 5), Hero.MainHero);
             }
         }
-
-
-        private void CaptorTrait()
+        private void ConsequenceCaptorTrait()
         {
 
             try
@@ -917,8 +882,8 @@ namespace CaptivityEvents.Events
                     foreach (TraitToLevel traitToLevel in _option.TraitsToLevel)
                     {
                         if (traitToLevel.Ref.ToLower() != "captor") continue;
-                        if (!traitToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!traitToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
 
                         _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                     }
@@ -928,8 +893,8 @@ namespace CaptivityEvents.Events
                     foreach (TraitToLevel traitToLevel in _listedEvent.TraitsToLevel)
                     {
                         if (traitToLevel.Ref.ToLower() != "captor") continue;
-                        if (!traitToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!traitToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
 
                         _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                     }
@@ -938,22 +903,20 @@ namespace CaptivityEvents.Events
                 {
                     if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorTrait)) return;
 
-                    if (!string.IsNullOrEmpty(_option.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.TraitTotal);
-                    else if (!string.IsNullOrEmpty(_option.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.TraitXPTotal);
-                    else if (!string.IsNullOrEmpty(_listedEvent.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitTotal);
-                    else if (!string.IsNullOrEmpty(_listedEvent.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitXPTotal);
+                    if (!string.IsNullOrWhiteSpace(_option.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.TraitTotal);
+                    else if (!string.IsNullOrWhiteSpace(_option.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.TraitXPTotal);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitTotal);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitXPTotal);
                     else CECustomHandler.LogToFile("Missing Trait TraitTotal");
 
-                    if (!string.IsNullOrEmpty(_option.TraitToLevel)) _dynamics.TraitModifier(Hero.MainHero, _option.TraitToLevel, level, xp);
-                    else if (!string.IsNullOrEmpty(_listedEvent.TraitToLevel)) _dynamics.TraitModifier(Hero.MainHero, _listedEvent.TraitToLevel, level, xp);
+                    if (!string.IsNullOrWhiteSpace(_option.TraitToLevel)) _dynamics.TraitModifier(Hero.MainHero, _option.TraitToLevel, level, xp);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.TraitToLevel)) _dynamics.TraitModifier(Hero.MainHero, _listedEvent.TraitToLevel, level, xp);
                     else CECustomHandler.LogToFile("Missing TraitToLevel");
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
         }
-
-
-        private void CaptorSkill()
+        private void ConsequenceCaptorSkill()
         {
             try
             {
@@ -965,8 +928,8 @@ namespace CaptivityEvents.Events
                     foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
                     {
                         if (skillToLevel.Ref.ToLower() != "captor") continue;
-                        if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
 
                         _dynamics.SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }
@@ -976,8 +939,8 @@ namespace CaptivityEvents.Events
                     foreach (SkillToLevel skillToLevel in _listedEvent.SkillsToLevel)
                     {
                         if (skillToLevel.Ref.ToLower() != "captor") continue;
-                        if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
 
                         _dynamics.SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }
@@ -986,21 +949,20 @@ namespace CaptivityEvents.Events
                 {
                     if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorSkill)) return;
 
-                    if (!_option.SkillTotal.IsStringNoneOrEmpty()) level = _variableLoader.GetIntFromXML(_option.SkillTotal);
-                    else if (!_option.SkillXPTotal.IsStringNoneOrEmpty()) xp = _variableLoader.GetIntFromXML(_option.SkillXPTotal);
-                    else if (!_listedEvent.SkillTotal.IsStringNoneOrEmpty()) level = _variableLoader.GetIntFromXML(_listedEvent.SkillTotal);
-                    else if (!_listedEvent.SkillXPTotal.IsStringNoneOrEmpty()) xp = _variableLoader.GetIntFromXML(_listedEvent.SkillXPTotal);
+                    if (!string.IsNullOrWhiteSpace(_option.SkillTotal)) level = _variableLoader.GetIntFromXML(_option.SkillTotal);
+                    else if (!string.IsNullOrWhiteSpace(_option.SkillXPTotal)) xp = _variableLoader.GetIntFromXML(_option.SkillXPTotal);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.SkillTotal);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillXPTotal)) xp = _variableLoader.GetIntFromXML(_listedEvent.SkillXPTotal);
                     else CECustomHandler.LogToFile("Missing Skill SkillTotal");
 
-                    if (!_option.SkillToLevel.IsStringNoneOrEmpty()) _dynamics.SkillModifier(Hero.MainHero, _option.SkillToLevel, level, xp);
-                    else if (!_listedEvent.SkillToLevel.IsStringNoneOrEmpty()) _dynamics.SkillModifier(Hero.MainHero, _listedEvent.SkillToLevel, level, xp);
+                    if (!string.IsNullOrWhiteSpace(_option.SkillToLevel)) _dynamics.SkillModifier(Hero.MainHero, _option.SkillToLevel, level, xp);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillToLevel)) _dynamics.SkillModifier(Hero.MainHero, _listedEvent.SkillToLevel, level, xp);
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }
-
-        private void CaptorChangeGold()
+        private void ConsequenceCaptorChangeGold()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorGold)) return;
 
@@ -1008,30 +970,31 @@ namespace CaptivityEvents.Events
             {
                 int level = 0;
 
-                if (!string.IsNullOrEmpty(_option.CaptorGoldTotal)) level = _variableLoader.GetIntFromXML(_option.CaptorGoldTotal);
-                else if (!string.IsNullOrEmpty(_listedEvent.CaptorGoldTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.CaptorGoldTotal);
+                if (!string.IsNullOrWhiteSpace(_option.CaptorGoldTotal)) level = _variableLoader.GetIntFromXML(_option.CaptorGoldTotal);
+                else if (!string.IsNullOrWhiteSpace(_listedEvent.CaptorGoldTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.CaptorGoldTotal);
                 else CECustomHandler.LogToFile("Missing CaptorGoldTotal");
 
                 GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, level);
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid CaptorGoldTotal"); }
         }
-
-        private void CaptorGold(Hero captiveHero)
+        private void ConsequenceCaptorGold(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveCaptorGold)) return;
             int content = _score.AttractivenessScore(captiveHero);
-            int currentValue = captiveHero.GetSkillValue(CESkills.Prostitution);
+            int currentValue = captiveHero != null ? captiveHero.GetSkillValue(CESkills.Prostitution) : 2;
             content += currentValue / 2;
             content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveCaptorGold);
             GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, content);
         }
-
-        private void CaptorLeaveSpouse()
+        private void ConsequenceCaptorLeaveSpouse()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptorLeaveSpouse)) return;
             _dynamics.ChangeSpouse(Hero.MainHero, null);
         }
+        #endregion
+
+        #region Requirements
 
         #region ReqGold
 
@@ -1052,7 +1015,7 @@ namespace CaptivityEvents.Events
 
         private void ReqGoldBelow(ref MenuCallbackArgs args)
         {
-            if (string.IsNullOrEmpty(_option.ReqGoldBelow)) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqGoldBelow)) return;
             if (Hero.MainHero.Gold <= _variableLoader.GetIntFromXML(_option.ReqGoldBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_gold_level", "high");
@@ -1061,7 +1024,7 @@ namespace CaptivityEvents.Events
 
         private void ReqGoldAbove(ref MenuCallbackArgs args)
         {
-            if (string.IsNullOrEmpty(_option.ReqGoldAbove)) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqGoldAbove)) return;
             if (Hero.MainHero.Gold >= _variableLoader.GetIntFromXML(_option.ReqGoldAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_gold_level", "low");
@@ -1140,7 +1103,7 @@ namespace CaptivityEvents.Events
 
         private bool ReqSkillsLevelBelow(ref MenuCallbackArgs args, SkillObject skillRequired, int skillLevel, string max, string type)
         {
-            if (max.IsStringNoneOrEmpty()) return false;
+            if (string.IsNullOrWhiteSpace(max)) return false;
             if (skillLevel <= _variableLoader.GetIntFromXML(max)) return false;
 
             TextObject text = GameTexts.FindText(type, "high");
@@ -1153,7 +1116,7 @@ namespace CaptivityEvents.Events
 
         private bool ReqSkillsLevelAbove(ref MenuCallbackArgs args, SkillObject skillRequired, int skillLevel, string min, string type)
         {
-            if (min.IsStringNoneOrEmpty()) return false;
+            if (string.IsNullOrWhiteSpace(min)) return false;
             if (skillLevel >= _variableLoader.GetIntFromXML(min)) return false;
 
             TextObject text = GameTexts.FindText(type, "low");
@@ -1170,7 +1133,7 @@ namespace CaptivityEvents.Events
 
         private void ReqCaptorSkill(ref MenuCallbackArgs args)
         {
-            if (_option.ReqCaptorSkill.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqCaptorSkill)) return;
 
             int skillLevel = ReqCaptorSkill();
 
@@ -1189,7 +1152,7 @@ namespace CaptivityEvents.Events
 
         private void ReqCaptorSkillLevelBelow(ref MenuCallbackArgs args, int skillLevel)
         {
-            if (!_option.ReqCaptorSkillLevelBelow.IsStringNoneOrEmpty()) return;
+            if (!string.IsNullOrWhiteSpace(_option.ReqCaptorSkillLevelBelow)) return;
             if (skillLevel <= _variableLoader.GetIntFromXML(_option.ReqCaptorSkillLevelBelow)) return;
 
             TextObject text = GameTexts.FindText("str_CE_skill_level", "high");
@@ -1200,7 +1163,7 @@ namespace CaptivityEvents.Events
 
         private void ReqCaptorSkillLevelAbove(ref MenuCallbackArgs args, int skillLevel)
         {
-            if (_option.ReqCaptorSkillLevelAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqCaptorSkillLevelAbove)) return;
             if (skillLevel >= _variableLoader.GetIntFromXML(_option.ReqCaptorSkillLevelAbove)) return;
 
             TextObject text = GameTexts.FindText("str_CE_skill_level", "low");
@@ -1236,7 +1199,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroSkill(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroSkill.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroSkill)) return;
 
             int skillLevel = ReqHeroSkill();
 
@@ -1255,7 +1218,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroSkillLevelBelow(ref MenuCallbackArgs args, int skillLevel)
         {
-            if (_option.ReqHeroSkillLevelBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroSkillLevelBelow)) return;
             if (skillLevel <= _variableLoader.GetIntFromXML(_option.ReqHeroSkillLevelBelow)) return;
 
             TextObject text = GameTexts.FindText("str_CE_skill_captive_level", "high");
@@ -1266,7 +1229,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroSkillLevelAbove(ref MenuCallbackArgs args, int skillLevel)
         {
-            if (_option.ReqHeroSkillLevelAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroSkillLevelAbove)) return;
             if (skillLevel >= _variableLoader.GetIntFromXML(_option.ReqHeroSkillLevelAbove)) return;
 
             TextObject text = GameTexts.FindText("str_CE_skill_captive_level", "low");
@@ -1303,7 +1266,7 @@ namespace CaptivityEvents.Events
         #region CaptorTrait
         private void ReqCaptorTrait(ref MenuCallbackArgs args)
         {
-            if (_option.ReqCaptorTrait.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqCaptorTrait)) return;
 
             int traitLevel = SetCaptorTraitLevel();
 
@@ -1322,7 +1285,7 @@ namespace CaptivityEvents.Events
 
         private void ReqCaptorTraitLevelBelow(ref MenuCallbackArgs args, int traitLevel)
         {
-            if (string.IsNullOrEmpty(_option.ReqCaptorTraitLevelBelow)) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqCaptorTraitLevelBelow)) return;
             if (traitLevel <= _variableLoader.GetIntFromXML(_option.ReqCaptorTraitLevelBelow)) return;
 
             TextObject text = GameTexts.FindText("str_CE_trait_level", "high");
@@ -1333,7 +1296,7 @@ namespace CaptivityEvents.Events
 
         private void ReqCaptorTraitLevelAbove(ref MenuCallbackArgs args, int traitLevel)
         {
-            if (string.IsNullOrEmpty(_option.ReqCaptorTraitLevelAbove)) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqCaptorTraitLevelAbove)) return;
             if (traitLevel >= _variableLoader.GetIntFromXML(_option.ReqCaptorTraitLevelAbove)) return;
 
             TextObject text = GameTexts.FindText("str_CE_trait_level", "low");
@@ -1362,7 +1325,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroTrait(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroTrait.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroTrait)) return;
 
             int traitLevel = SetCaptiveTraitLevel();
 
@@ -1381,7 +1344,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroTraitLevelBelow(ref MenuCallbackArgs args, int traitLevel)
         {
-            if (string.IsNullOrEmpty(_option.ReqHeroTraitLevelBelow)) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroTraitLevelBelow)) return;
             if (traitLevel <= _variableLoader.GetIntFromXML(_option.ReqHeroTraitLevelBelow)) return;
 
             TextObject text = GameTexts.FindText("str_CE_trait_captive_level", "high");
@@ -1392,7 +1355,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroTraitLevelAbove(ref MenuCallbackArgs args, int traitLevel)
         {
-            if (string.IsNullOrEmpty(_option.ReqHeroTraitLevelAbove)) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroTraitLevelAbove)) return;
             if (traitLevel >= _variableLoader.GetIntFromXML(_option.ReqHeroTraitLevelAbove)) return;
 
             TextObject text = GameTexts.FindText("str_CE_trait_captive_level", "low");
@@ -1448,7 +1411,7 @@ namespace CaptivityEvents.Events
 
         private void ReqFemaleCaptivesBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqFemaleCaptivesBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqFemaleCaptivesBelow)) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) <= _variableLoader.GetIntFromXML(_option.ReqFemaleCaptivesBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
@@ -1457,7 +1420,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroFemaleCaptivesBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroFemaleCaptivesBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroFemaleCaptivesBelow)) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= _variableLoader.GetIntFromXML(_option.ReqHeroFemaleCaptivesBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
@@ -1466,7 +1429,7 @@ namespace CaptivityEvents.Events
 
         private void ReqFemaleCaptivesAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqFemaleCaptivesAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqFemaleCaptivesAbove)) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqFemaleCaptivesAbove)) return;
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
             args.IsEnabled = false;
@@ -1474,7 +1437,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroFemaleCaptivesAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroFemaleCaptivesAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroFemaleCaptivesAbove)) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqHeroFemaleCaptivesAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
@@ -1513,7 +1476,7 @@ namespace CaptivityEvents.Events
 
         private void ReqMaleCaptivesBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqMaleCaptivesBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqMaleCaptivesBelow)) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqMaleCaptivesBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
@@ -1522,7 +1485,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroMaleCaptivesBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroMaleCaptivesBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroMaleCaptivesBelow)) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqHeroMaleCaptivesBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
@@ -1531,7 +1494,7 @@ namespace CaptivityEvents.Events
 
         private void ReqMaleCaptivesAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqMaleCaptivesAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqMaleCaptivesAbove)) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqMaleCaptivesAbove)) return;
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
             args.IsEnabled = false;
@@ -1539,7 +1502,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroMaleCaptivesAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroMaleCaptivesAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroMaleCaptivesAbove)) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqHeroMaleCaptivesAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
@@ -1579,7 +1542,7 @@ namespace CaptivityEvents.Events
 
         private void ReqCaptivesBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqCaptivesBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqCaptivesBelow)) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return troopRosterElement.Number; }) <= _variableLoader.GetIntFromXML(_option.ReqCaptivesBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
@@ -1588,7 +1551,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroCaptivesBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroCaptivesBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroCaptivesBelow)) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= _variableLoader.GetIntFromXML(_option.ReqHeroCaptivesBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
@@ -1597,7 +1560,7 @@ namespace CaptivityEvents.Events
 
         private void ReqCaptivesAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqCaptivesAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqCaptivesAbove)) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return troopRosterElement.Number; }) >= _variableLoader.GetIntFromXML(_option.ReqCaptivesAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
@@ -1606,7 +1569,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroCaptivesAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroCaptivesAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroCaptivesAbove)) return;
             if (PartyBase.MainParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqHeroCaptivesAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
@@ -1646,7 +1609,7 @@ namespace CaptivityEvents.Events
 
         private void ReqFemaleTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqFemaleTroopsBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqFemaleTroopsBelow)) return;
             if (PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) <= _variableLoader.GetIntFromXML(_option.ReqFemaleTroopsBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
@@ -1655,7 +1618,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroFemaleTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroFemaleTroopsBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroFemaleTroopsBelow)) return;
             if (PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= _variableLoader.GetIntFromXML(_option.ReqHeroFemaleTroopsBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
@@ -1664,7 +1627,7 @@ namespace CaptivityEvents.Events
 
         private void ReqFemaleTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqFemaleTroopsAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqFemaleTroopsAbove)) return;
             if (PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqFemaleTroopsAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
@@ -1673,7 +1636,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroFemaleTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroFemaleTroopsAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroFemaleTroopsAbove)) return;
             if (PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqHeroFemaleTroopsAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
@@ -1713,7 +1676,7 @@ namespace CaptivityEvents.Events
 
         private void ReqMaleTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqMaleTroopsBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqMaleTroopsBelow)) return;
             if (PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqMaleTroopsBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
@@ -1722,7 +1685,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroMaleTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroMaleTroopsBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroMaleTroopsBelow)) return;
             if (PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqHeroMaleTroopsBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
@@ -1731,7 +1694,7 @@ namespace CaptivityEvents.Events
 
         private void ReqMaleTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqMaleTroopsAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqMaleTroopsAbove)) return;
             if (PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqMaleTroopsAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
@@ -1740,7 +1703,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroMaleTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroMaleTroopsAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroMaleTroopsAbove)) return;
             if (PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= _variableLoader.GetIntFromXML(_option.ReqHeroMaleTroopsAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
@@ -1780,7 +1743,7 @@ namespace CaptivityEvents.Events
 
         private void ReqTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqTroopsBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqTroopsBelow)) return;
             if ((PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return troopRosterElement.Number; })) <= _variableLoader.GetIntFromXML(_option.ReqTroopsBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
@@ -1789,7 +1752,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroTroopsBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroTroopsBelow)) return;
             if ((PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; })) <= _variableLoader.GetIntFromXML(_option.ReqHeroTroopsBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
@@ -1798,7 +1761,7 @@ namespace CaptivityEvents.Events
 
         private void ReqTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqTroopsAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqTroopsAbove)) return;
             if ((PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return troopRosterElement.Number; })) >= _variableLoader.GetIntFromXML(_option.ReqTroopsAbove)) return;
 
 
@@ -1808,7 +1771,7 @@ namespace CaptivityEvents.Events
 
         private void ReqHeroTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqHeroTroopsAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroTroopsAbove)) return;
             if ((PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; })) >= _variableLoader.GetIntFromXML(_option.ReqHeroTroopsAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
@@ -1835,7 +1798,7 @@ namespace CaptivityEvents.Events
 
         private void ReqMoraleBelow(ref MenuCallbackArgs args)
         {
-            if (_option.ReqMoraleBelow.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqMoraleBelow)) return;
             if (!PartyBase.MainParty.IsMobile || !(PartyBase.MainParty.MobileParty.Morale > _variableLoader.GetIntFromXML(_option.ReqMoraleBelow))) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_morale_level", "high");
@@ -1844,7 +1807,7 @@ namespace CaptivityEvents.Events
 
         private void ReqMoraleAbove(ref MenuCallbackArgs args)
         {
-            if (_option.ReqMoraleAbove.IsStringNoneOrEmpty()) return;
+            if (string.IsNullOrWhiteSpace(_option.ReqMoraleAbove)) return;
             if (!PartyBase.MainParty.IsMobile || !(PartyBase.MainParty.MobileParty.Morale < _variableLoader.GetIntFromXML(_option.ReqMoraleAbove))) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_morale_level", "low");
@@ -1853,7 +1816,52 @@ namespace CaptivityEvents.Events
 
         #endregion
 
-        #region LeaveTypes
+        #region ReqHeroCaptorRelation
+        private void ReqHeroCaptorRelation(ref MenuCallbackArgs args)
+        {
+            if (_listedEvent?.Captive?.HeroObject == null) return;
+
+            try
+            {
+                ReqHeroCaptorRelationAbove(ref args);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptorRelationAbove / Failed "); }
+
+            try
+            {
+                if (ReqHeroCaptorRelationBelow(ref args)) return;
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptorRelationBelow / Failed "); }
+        }
+
+        private bool ReqHeroCaptorRelationBelow(ref MenuCallbackArgs args)
+        {
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroCaptorRelationBelow)) return true;
+
+            if (!(_listedEvent.Captive.HeroObject.GetRelationWithPlayer() > _variableLoader.GetFloatFromXML(_option.ReqHeroCaptorRelationBelow))) return false;
+            TextObject textResponse3 = GameTexts.FindText("str_CE_relationship", "high");
+            textResponse3.SetTextVariable("HERO", _listedEvent.Captive.HeroObject.Name.ToString());
+            args.Tooltip = textResponse3;
+            args.IsEnabled = false;
+
+            return false;
+        }
+
+        private void ReqHeroCaptorRelationAbove(ref MenuCallbackArgs args)
+        {
+            if (string.IsNullOrWhiteSpace(_option.ReqHeroCaptorRelationAbove)) return;
+            if (!(_listedEvent.Captive.HeroObject.GetRelationWithPlayer() < _variableLoader.GetFloatFromXML(_option.ReqHeroCaptorRelationAbove))) return;
+
+            TextObject textResponse4 = GameTexts.FindText("str_CE_relationship", "low");
+            textResponse4.SetTextVariable("HERO", _listedEvent.Captive.HeroObject.Name.ToString());
+            args.Tooltip = textResponse4;
+            args.IsEnabled = false;
+        }
+        #endregion
+
+        #endregion
+
+        #region Icons
 
         private void LeaveTypes(ref MenuCallbackArgs args)
         {
@@ -1897,7 +1905,8 @@ namespace CaptivityEvents.Events
 
         #endregion
 
-        private void CaptorGoldTotal()
+        #region Init Options
+        private void InitCaptorGoldTotal()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorGold)) return;
 
@@ -1905,15 +1914,14 @@ namespace CaptivityEvents.Events
             {
                 int level = 0;
 
-                if (!string.IsNullOrEmpty(_option.CaptorGoldTotal)) level = _variableLoader.GetIntFromXML(_option.CaptorGoldTotal);
-                else if (!string.IsNullOrEmpty(_listedEvent.CaptorGoldTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.CaptorGoldTotal);
+                if (!string.IsNullOrWhiteSpace(_option.CaptorGoldTotal)) level = _variableLoader.GetIntFromXML(_option.CaptorGoldTotal);
+                else if (!string.IsNullOrWhiteSpace(_listedEvent.CaptorGoldTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.CaptorGoldTotal);
                 else CECustomHandler.LogToFile("Missing CaptorGoldTotal");
                 MBTextManager.SetTextVariable("CAPTOR_MONEY_AMOUNT", level);
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid CaptorGoldTotal"); }
         }
-
-        private void GiveCaptorGold()
+        private void InitGiveCaptorGold()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveCaptorGold)) return;
 
@@ -1922,26 +1930,7 @@ namespace CaptivityEvents.Events
             content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveCaptorGold);
             MBTextManager.SetTextVariable("CAPTOR_MONEY_AMOUNT", content);
         }
-
-        private void PlayerIsNotBusy(ref MenuCallbackArgs args)
-        {
-            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerIsNotBusy)) return;
-            if (PlayerEncounter.Current == null) return;
-
-            args.Tooltip = GameTexts.FindText("str_CE_busy_right_now");
-            args.IsEnabled = false;
-        }
-
-        private void PlayerHasOpenSpaceForCompanions(ref MenuCallbackArgs args)
-        {
-            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerAllowedCompanion)) return;
-            if (!(Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit)) return;
-
-            args.Tooltip = GameTexts.FindText("str_CE_companions_too_many");
-            args.IsEnabled = false;
-        }
-
-        private void SetNames(ref MenuCallbackArgs args)
+        private void InitSetNames(ref MenuCallbackArgs args)
         {
             try
             {
@@ -1949,8 +1938,8 @@ namespace CaptivityEvents.Events
                 {
                     //Hero captiveHero = null;
                     //if (_listedEvent.Captive.IsHero) captiveHero = _listedEvent.Captive.HeroObject; //WARNING: captiveHero never used
-                    MBTextManager.SetTextVariable("CAPTIVE_NAME", _listedEvent.Captive.Name);
-                    MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive.IsFemale ? 1 : 0);
+                    MBTextManager.SetTextVariable("CAPTIVE_NAME", _listedEvent.Captive?.Name);
+                    MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive?.IsFemale == true ? 1 : 0);
                 }
 
             }
@@ -1977,54 +1966,33 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Failed to SetNames for " + _listedEvent.Name);
             }
 
-            if (args.MenuContext != null) {
+            if (args.MenuContext != null)
+            {
                 args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                            ? "wait_prisoner_female"
                                                            : "wait_prisoner_male");
             }
         }
+        #endregion
 
-        private void ReqHeroCaptorRelation(ref MenuCallbackArgs args)
+        #region CustomConsequencesReq
+        private void PlayerIsNotBusy(ref MenuCallbackArgs args)
         {
-            if (_listedEvent?.Captive?.HeroObject == null) return;
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerIsNotBusy)) return;
+            if (PlayerEncounter.Current == null) return;
 
-            try
-            {
-                ReqHeroCaptorRelationAbove(ref args);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptorRelationAbove / Failed "); }
-
-            try
-            {
-                if (ReqHeroCaptorRelationBelow(ref args)) return;
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Incorrect ReqHeroCaptorRelationBelow / Failed "); }
-        }
-
-        private bool ReqHeroCaptorRelationBelow(ref MenuCallbackArgs args)
-        {
-            if (string.IsNullOrEmpty(_option.ReqHeroCaptorRelationBelow)) return true;
-
-            if (!(_listedEvent.Captive.HeroObject.GetRelationWithPlayer() > _variableLoader.GetFloatFromXML(_option.ReqHeroCaptorRelationBelow))) return false;
-            TextObject textResponse3 = GameTexts.FindText("str_CE_relationship", "high");
-            textResponse3.SetTextVariable("HERO", _listedEvent.Captive.HeroObject.Name.ToString());
-            args.Tooltip = textResponse3;
-            args.IsEnabled = false;
-
-            return false;
-        }
-
-        private void ReqHeroCaptorRelationAbove(ref MenuCallbackArgs args)
-        {
-            if (_option.ReqHeroCaptorRelationAbove.IsStringNoneOrEmpty()) return;
-            if (!(_listedEvent.Captive.HeroObject.GetRelationWithPlayer() < _variableLoader.GetFloatFromXML(_option.ReqHeroCaptorRelationAbove))) return;
-
-            TextObject textResponse4 = GameTexts.FindText("str_CE_relationship", "low");
-            textResponse4.SetTextVariable("HERO", _listedEvent.Captive.HeroObject.Name.ToString());
-            args.Tooltip = textResponse4;
+            args.Tooltip = GameTexts.FindText("str_CE_busy_right_now");
             args.IsEnabled = false;
         }
 
+        private void PlayerHasOpenSpaceForCompanions(ref MenuCallbackArgs args)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerAllowedCompanion)) return;
+            if (!(Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit)) return;
+
+            args.Tooltip = GameTexts.FindText("str_CE_companions_too_many");
+            args.IsEnabled = false;
+        }
         #endregion
     }
 }

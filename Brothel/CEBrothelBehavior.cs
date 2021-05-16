@@ -1,4 +1,4 @@
-#define STABLE
+#define BETA
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -344,6 +344,7 @@ namespace CaptivityEvents.Brothel
             while (PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter)) PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, -1, true);
             capturerParty.AddPrisoner(prisonerCharacter.CharacterObject, 1);
             if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(capturerParty);
+            CEHelper.delayedEvents.Clear();
             string waitingMenu = CEEventLoader.CEWaitingList();
             GameMenu.ExitToLast();
             if (waitingMenu != null) GameMenu.ActivateGameMenu(waitingMenu);
@@ -487,11 +488,7 @@ namespace CaptivityEvents.Brothel
         private static LocationCharacter CreateBrothelPrisoner(CharacterObject prisoner, CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
             if (prisoner.Age < 21) prisoner.Age = 21;
-#if BETA
             prisoner.HeroObject.StayingInSettlement = Settlement.CurrentSettlement;
-#elif STABLE
-            prisoner.HeroObject.StayingInSettlementOfNotable = Settlement.CurrentSettlement;
-#endif
 
             string actionSetCode;
             if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
@@ -1000,7 +997,7 @@ namespace CaptivityEvents.Brothel
         {
             if (ConversationSentence.SelectedRepeatObject is CharacterObject characterObject)
             {
-                StringHelpers.SetCharacterProperties("HERO", characterObject, null, ConversationSentence.SelectedRepeatLine, true);
+                StringHelpers.SetRepeatableCharacterProperties("HERO", characterObject);
                 return true;
             }
             return false;

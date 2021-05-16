@@ -1,4 +1,4 @@
-﻿#define STABLE // 1.5.8
+﻿#define STABLE
 using CaptivityEvents.Custom;
 using System;
 using System.Linq;
@@ -55,7 +55,6 @@ namespace CaptivityEvents.Events
                 }
             }
         }
-
         public void SpawnTheHero(SpawnHero[] variables, PartyBase party)
         {
 
@@ -86,7 +85,6 @@ namespace CaptivityEvents.Events
                         culture = heroVariables.Culture;
                     }
 
-#if BETA || STABLE
                     CharacterObject wanderer = (from x in CharacterObject.Templates
                                                 where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture != null && x.Culture.StringId == culture.ToLower()) && (heroVariables.Gender == null || x.IsFemale == isFemale)
                                                 select x).GetRandomElementInefficiently();
@@ -95,16 +93,6 @@ namespace CaptivityEvents.Events
                                                 select settlement).GetRandomElementInefficiently();
 
                     Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElementInefficiently(), null, -1);
-#else
-                    CharacterObject wanderer = (from x in CharacterObject.Templates
-                                                where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture != null && x.Culture.StringId == culture.ToLower()) && (heroVariables.Gender == null || x.IsFemale == isFemale)
-                                                select x).GetRandomElement();
-                    Settlement randomElement = (from settlement in Settlement.All
-                                                where settlement.Culture == wanderer.Culture && settlement.IsTown
-                                                select settlement).GetRandomElement();
-
-                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElement(), null, -1);
-#endif
 
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);
                     hero.HasMet = true;
@@ -133,8 +121,8 @@ namespace CaptivityEvents.Events
                         {
                             foreach (SkillToLevel skillToLevel in heroVariables.SkillsToLevel)
                             {
-                                if (!skillToLevel.ByLevel.IsStringNoneOrEmpty()) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
-                                else if (!skillToLevel.ByXP.IsStringNoneOrEmpty()) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+                                if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
+                                else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
 
                                 new Dynamics().SkillModifier(hero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                             }

@@ -23,8 +23,11 @@ namespace CaptivityEvents.Custom
         private static readonly List<CECustomModule> AllModules = new List<CECustomModule>();
         private static readonly List<CEEvent> AllEvents = new List<CEEvent>();
         private static readonly List<CECustom> AllCustom = new List<CECustom>();
+        private static readonly List<CEScene> AllScenes = new List<CEScene>();
 
         public static List<CECustom> GetCustom() => AllCustom;
+
+        public static List<CEScene> GetScenes() => AllScenes;
 
         public static List<CECustomModule> GetModules() => AllModules;
 
@@ -54,6 +57,19 @@ namespace CaptivityEvents.Custom
                         foreach (string text in files)
                         {
                             if (Path.GetDirectoryName(text).Contains("ModuleData")) continue;
+
+                            if (Path.GetFullPath(text).Contains("\\Scenes\\"))
+                            {
+                                ForceLogToFile("Custom Scene Found: " + text);
+
+                                if (XMLFileCompliesWithSceneXSD(text))
+                                {
+                                    AllScenes.AddRange(DeserializeXMLFileToScene(text));
+                                    ForceLogToFile("Custom Scene Added: " + text);
+                                }
+
+                                continue;
+                            }
 
                             if (Path.GetFileNameWithoutExtension(text) == "SubModule") continue;
 
@@ -106,6 +122,19 @@ namespace CaptivityEvents.Custom
 
                 foreach (string text in files)
                 {
+                    if (Path.GetFullPath(text).Contains("\\Scenes\\"))
+                    {
+                        ForceLogToFile("Custom Scene Found: " + text);
+
+                        if (XMLFileCompliesWithSceneXSD(text))
+                        {
+                            AllScenes.AddRange(DeserializeXMLFileToScene(text));
+                            ForceLogToFile("Custom Scene Added: " + text);
+                        }
+
+                        continue;
+                    }
+
                     if (Path.GetFileNameWithoutExtension(text).StartsWith("CESettings")) continue;
 
                     if (Path.GetFileNameWithoutExtension(text).StartsWith("CEModuleCustom"))
@@ -159,7 +188,8 @@ namespace CaptivityEvents.Custom
                 return null;
             }
         }
-        // Settings
+        
+        // Setting XML
         public static CECustomSettings DeserializeXMLFileToSettings(string XmlFilename)
         {
             CECustomSettings _CESettings;
@@ -184,7 +214,74 @@ namespace CaptivityEvents.Custom
             return _CESettings;
         }
 
-        // Custom
+        #region Scenes
+        private static bool XMLFileCompliesWithSceneXSD(string file)
+        {
+            string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CECustomScenes.xsd";
+            XmlSchemaSet xmlSchemaSet = new XmlSchemaSet();
+            string msg = "";
+
+            try
+            {
+                xmlSchemaSet.Add(null, fullPath);
+                XDocument source = XDocument.Load(file);
+
+                source.Validate(xmlSchemaSet, delegate (object o, ValidationEventArgs e)
+                {
+                    msg = msg + e.Message + Environment.NewLine;
+                });
+            }
+            catch (Exception innerException)
+            {
+                TextObject textObject = new TextObject("{=CEEVENTS1002}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
+                textObject.SetTextVariable("FILE", file);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
+                msg = "ERROR XMLFileCompliesWithSceneXSD:  -- filename: " + file + " : " + innerException;
+            }
+
+            bool result;
+
+            if (msg == "")
+            {
+                result = true;
+            }
+            else
+            {
+                LogXMLCustomIssueToFile(msg, file, 1);
+                result = false;
+            }
+
+            return result;
+        }
+
+        public static List<CEScene> DeserializeXMLFileToScene(string XmlFilename)
+        {
+            List<CEScene> list = new List<CEScene>();
+
+            try
+            {
+                if (string.IsNullOrEmpty(XmlFilename)) return null;
+                StreamReader textReader = new StreamReader(XmlFilename);
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(CECustomScenes));
+                CECustomScenes xsefsevents = (CECustomScenes)xmlSerializer.Deserialize(textReader);
+                list.AddRange(xsefsevents.CEScene);
+            }
+            catch (Exception innerException)
+            {
+                TextObject textObject = new TextObject("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedSceneXML.txt");
+                textObject.SetTextVariable("FILE", XmlFilename);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
+
+                throw new Exception("ERROR DeserializeXMLFileToScene:  -- filename: " + XmlFilename, innerException);
+            }
+
+            return list;
+        }
+
+        #endregion
+
+        #region Custom Settings
+
         private static bool XMLFileCompliesWithCustomXSD(string file)
         {
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CECustomModal.xsd";
@@ -246,21 +343,12 @@ namespace CaptivityEvents.Custom
             }
 
             return list;
-        }
+        }  
 
-        [DebuggerStepThroughAttribute]
-        private static void LogXMLCustomIssueToFile(string msg, string xmlFile = "")
-        {
-            string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedFlagXML.txt";
-            FileInfo file = new FileInfo(fullPath);
-            file.Directory?.Create();
-            if (Lines == 0) File.WriteAllText(BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedFlagXML.txt", "");
-            string contents = xmlFile + " does not comply to CEFlagsModal format described in CECustomModal.xsd " + msg + Environment.NewLine;
-            File.AppendAllText(fullPath, contents);
-            Lines++;
-        }
+        #endregion
 
-        // Standard Events
+        #region Events
+
         private static bool XMLFileCompliesWithStandardXSD(string file)
         {
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CEEventsModal.xsd";
@@ -325,50 +413,36 @@ namespace CaptivityEvents.Custom
             return list;
         }
 
-#if DEBUG
-        public static string GetEventXml(CEEvents obj, XmlSerializer serializer = null, bool omitStandardNamespaces = false)
-        {
-            XmlSerializerNamespaces ns = null;
-            if (omitStandardNamespaces)
-            {
-                ns = new XmlSerializerNamespaces();
-                ns.Add("", ""); // Disable the xmlns:xsi and xmlns:xsd lines.
-            }
-            using (System.IO.StringWriter textWriter = new System.IO.StringWriter())
-            {
-                XmlWriterSettings settings = new XmlWriterSettings() { Indent = true }; // For cosmetic purposes.
-                using (XmlWriter xmlWriter = XmlWriter.Create(textWriter, settings))
-                    (serializer ?? new XmlSerializer(obj.GetType())).Serialize(xmlWriter, obj, ns);
-                return textWriter.ToString();
-            }
-        }
+        #endregion
 
-        public static void TestWrite()
-        {
-            CEEvents ceEvents = new CEEvents
-            {
-                CEEvent = new CEEvent[]
-                {
-                    new CEEvent {
-                        TerrainTypesRequirements = new TerrainType[][]
-                        {
-                            new TerrainType[] {
-                                TerrainType.Water,
-                                TerrainType.Steppe
-                            }
-                        }
-                    }
-                }
-            };
+        #region Logs
 
-            string xml = GetEventXml(ceEvents, omitStandardNamespaces: true);
-            string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/TESTXML.xml";
+        [DebuggerStepThroughAttribute]
+        private static void LogXMLCustomIssueToFile(string msg, string xmlFile = "", int type = 0)
+        {
+            string location;
+            string errorMessage;
+
+            switch (type)
+            {
+                case 1:
+                    location = "LoadingFailedSceneXML.txt";
+                    errorMessage = " does not comply to CEScene format described in CECustomScenes.xsd ";
+                    break;
+                default:
+                    location = "LoadingFailedFlagXML.txt";
+                    errorMessage = " does not comply to CEFlagsModal format described in CECustomModal.xsd ";
+                    break;
+            }
+
+            string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/" + location;
             FileInfo file = new FileInfo(fullPath);
             file.Directory?.Create();
-            File.WriteAllText(BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/TESTXML.xml", xml);
+            if (Lines == 0) File.WriteAllText(BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/" + location, "");
+            string contents = xmlFile + errorMessage + msg + Environment.NewLine;
+            File.AppendAllText(fullPath, contents);
+            Lines++;
         }
-#endif
-
 
         [DebuggerStepThroughAttribute]
         private static void LogXMLIssueToFile(string msg, string xmlFile = "")
@@ -381,7 +455,6 @@ namespace CaptivityEvents.Custom
             else File.AppendAllText(fullPath, contents);
             ErrorLines++;
         }
-
 
         [DebuggerStepThroughAttribute]
         public static void LogToFile(string msg)
@@ -429,5 +502,52 @@ namespace CaptivityEvents.Custom
             File.AppendAllText(fullPath, contents);
             Lines++;
         }
+
+        #endregion
+
+#if DEBUG
+        public static string GetEventXml(CEEvents obj, XmlSerializer serializer = null, bool omitStandardNamespaces = false)
+        {
+            XmlSerializerNamespaces ns = null;
+            if (omitStandardNamespaces)
+            {
+                ns = new XmlSerializerNamespaces();
+                ns.Add("", ""); // Disable the xmlns:xsi and xmlns:xsd lines.
+            }
+            using (System.IO.StringWriter textWriter = new System.IO.StringWriter())
+            {
+                XmlWriterSettings settings = new XmlWriterSettings() { Indent = true }; // For cosmetic purposes.
+                using (XmlWriter xmlWriter = XmlWriter.Create(textWriter, settings))
+                    (serializer ?? new XmlSerializer(obj.GetType())).Serialize(xmlWriter, obj, ns);
+                return textWriter.ToString();
+            }
+        }
+
+        public static void TestWrite()
+        {
+            CEEvents ceEvents = new CEEvents
+            {
+                CEEvent = new CEEvent[]
+                {
+                    new CEEvent {
+                        TerrainTypesRequirements = new TerrainType[][]
+                        {
+                            new TerrainType[] {
+                                TerrainType.Water,
+                                TerrainType.Steppe
+                            }
+                        }
+                    }
+                }
+            };
+
+            string xml = GetEventXml(ceEvents, omitStandardNamespaces: true);
+            string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/TESTXML.xml";
+            FileInfo file = new FileInfo(fullPath);
+            file.Directory?.Create();
+            File.WriteAllText(BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/TESTXML.xml", xml);
+        }
+#endif
+
     }
 }

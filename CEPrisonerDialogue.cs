@@ -4,10 +4,12 @@ using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using Helpers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 
@@ -42,13 +44,51 @@ namespace CaptivityEvents
 
             campaignGameStarter.AddPlayerLine("CEPrisonerInCell_01", "CEPrisonerInCell", "CEPrisonerInCell_01_response", "{=CEEVENTS1052}You are coming with me.", null, null);
 
-            if (CESettings.Instance.ProstitutionControl) campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "CEPrisonerInCell_02_response", "{=CEBROTHEL0979}Time to make you work at the brothel.", null , null, 100, ConversationCEEventBrothelOnCondition);
+            if (CESettings.Instance.ProstitutionControl) campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "CEPrisonerInCell_02_response", "{=CEBROTHEL0979}Time to make you work at the brothel.", null, null, 100, ConversationCEEventBrothelOnCondition);
 
             campaignGameStarter.AddDialogLine("CEPrisonerInCell_01_r", "CEPrisonerInCell_01_response", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, ConversationCEEventInCellOnConsequence);
 
             campaignGameStarter.AddDialogLine("CEPrisonerInCell_02_r", "CEPrisonerInCell_02_response", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, ConversationCEEventBrothelOnConsequence);
 
             campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "close_window", "{=CEEVENTS1051}Nevermind.", null, null);
+
+        }
+
+        public void AddCustomLines(CampaignGameStarter campaignGameStarter, List<CEScene> CECustomScenes)
+        {
+
+            try
+            {
+                foreach (CEScene CustomScene in CECustomScenes)
+                {
+                    foreach (Line CustomLine in CustomScene.Dialogue.Lines)
+                    {
+                        if (CustomLine.Ref != null && CustomLine.Ref.ToLower() == "ai")
+                        {
+                            campaignGameStarter.AddDialogLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, () => { return ConversationCECustomScenes(CustomScene.Name); }, null);
+                        }
+                        else
+                        {
+                            campaignGameStarter.AddPlayerLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, null, null);
+                        }
+                    }
+
+                }
+            }
+            catch (Exception e)
+            {
+                TextObject textObject = new TextObject("{=CEEVENTS0999}Error: failed to initialize scenes");
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
+                CECustomHandler.ForceLogToFile("Error: failed to initialize scenes");
+                CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+            }
+
+        }
+
+        private bool ConversationCECustomScenes(string SceneName)
+        {
+            CharacterObject conversation = CharacterObject.OneToOneConversationCharacter;
+            return conversation.StringId == "CECustomStringId_" + SceneName;
         }
 
         private bool ConversationCEEventBrothelOnCondition(out TextObject text)
@@ -82,13 +122,17 @@ namespace CaptivityEvents
 
         private void ConversationCEEventBrothelOnConsequence()
         {
+            CharacterObject captive = CharacterObject.OneToOneConversationCharacter;
+            captive.HeroObject.PartyBelongedToAsPrisoner.AddPrisoner(captive, -1);
+            PartyBase.MainParty.AddPrisoner(captive, 1);
 
+            CEBrothelBehavior.AddBrothelPrisoner(Settlement.CurrentSettlement, captive);
         }
 
         private void ConversationCEEventLordCaptureOnConsequence()
         {
             Campaign.Current.CurrentConversationContext = ConversationContext.Default;
-            new CaptorSpecifics().CEStripVictim(CharacterObject.OneToOneConversationCharacter.HeroObject);
+            new CaptorSpecifics().CECaptorStripVictim(CharacterObject.OneToOneConversationCharacter.HeroObject);
 
             if (CharacterObject.OneToOneConversationCharacter.HeroObject.GetSkillValue(CESkills.Slavery) < 50) new Dynamics().RelationsModifier(CharacterObject.OneToOneConversationCharacter.HeroObject, -10);
 
