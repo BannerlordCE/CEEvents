@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿#define BETA
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using Helpers;
@@ -126,7 +126,7 @@ namespace CaptivityEvents.Events
             {
                 int currentTraitLevel = hero.GetTraitLevel(traitObject);
                 int newNumber = currentTraitLevel + amount;
-                if (newNumber < 0) newNumber = 0;
+                if (newNumber < (traitObject?.MinValue ?? 0)) newNumber = traitObject?.MinValue ?? 0;
 
 
                 hero.SetTraitLevel(traitObject, newNumber);
@@ -137,11 +137,27 @@ namespace CaptivityEvents.Events
                 textObject.SetTextVariable("POSITIVE", newNumber >= 0 ? 1 : 0);
                 textObject.SetTextVariable("TRAIT", CEStrings.FetchTraitString(trait));
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
-
             }
             else if (hero == Hero.MainHero)
             {
-                Campaign.Current.PlayerTraitDeveloper.AddTraitXp(traitObject, xp);
+                try
+                {
+                    int traitLevel = Hero.MainHero.GetTraitLevel(traitObject);
+                    Campaign.Current.PlayerTraitDeveloper.AddTraitXp(traitObject, xp);
+                    if (traitLevel != Hero.MainHero.GetTraitLevel(traitObject))
+                    {
+                        // Reflection One
+                        MethodInfo mi = typeof(CampaignEventDispatcher).GetMethod("OnPlayerTraitChanged", BindingFlags.NonPublic | BindingFlags.Static);
+                        if (mi != null)
+                        {
+                           mi.Invoke(CampaignEventDispatcher.Instance, new object[] { traitObject, traitLevel });
+                        }
+                    }
+                } 
+                catch (Exception e)
+                {
+                    CECustomHandler.ForceLogToFile("Failed TraitObjectModifier " + e);
+                }
             }
 
 
