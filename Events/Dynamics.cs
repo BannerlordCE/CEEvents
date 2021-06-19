@@ -147,7 +147,7 @@ namespace CaptivityEvents.Events
                     if (traitLevel != Hero.MainHero.GetTraitLevel(traitObject))
                     {
                         // Reflection One
-                        MethodInfo mi = typeof(CampaignEventDispatcher).GetMethod("OnPlayerTraitChanged", BindingFlags.NonPublic | BindingFlags.Static);
+                        MethodInfo mi = typeof(CampaignEventDispatcher).GetMethod("OnPlayerTraitChanged", BindingFlags.Instance | BindingFlags.NonPublic);
                         if (mi != null)
                         {
                            mi.Invoke(CampaignEventDispatcher.Instance, new object[] { traitObject, traitLevel });
