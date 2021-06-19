@@ -1,10 +1,13 @@
-﻿using CaptivityEvents.Custom;
+﻿#define BETA
+using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
@@ -26,8 +29,8 @@ namespace CaptivityEvents.Helper
             Leg = 7,
             Gloves = 8,
             Cape = 9,
-            Horse = 10, 
-            HorseHarness = 11, 
+            Horse = 10,
+            HorseHarness = 11,
         }
 
         public static Hero spouseOne = null;
@@ -45,6 +48,17 @@ namespace CaptivityEvents.Helper
         public static bool progressEventCheck = false;
 
         public static List<CEDelayedEvent> delayedEvents = new List<CEDelayedEvent>();
+
+        internal static void SetSkillValue(Hero hero, SkillObject skillObject, int value)
+        {
+#if BETA
+            MethodInfo mi = typeof(Hero).GetMethod("SetSkillValueInternal", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+            if (mi == null) hero.HeroDeveloper.SetInitialSkillLevel(skillObject, value);
+            mi.Invoke(hero, new object[] { skillObject, value });
+#else
+            hero.SetSkillValue(skillObject, value);
+#endif
+        }
 
         internal static void AddDelayedEvent(CEDelayedEvent delayedEvent)
         {
@@ -92,14 +106,12 @@ namespace CaptivityEvents.Helper
             return modulePaths;
         }
 
-
         internal static void ChangeMenu(int number)
         {
             string waitingList = new WaitingList().CEWaitingList();
             if (waitingList != null) GameMenu.SwitchToMenu(waitingList);
             waitMenuCheck = number;
         }
-
 
         internal static TextObject ShouldChangeMenu(TextObject text)
         {

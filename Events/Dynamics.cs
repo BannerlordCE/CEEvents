@@ -1,6 +1,7 @@
 ﻿#define BETA
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
+using CaptivityEvents.Helper;
 using Helpers;
 using System;
 using System.Collections.Generic;
@@ -129,7 +130,7 @@ namespace CaptivityEvents.Events
                 if (newNumber < (traitObject?.MinValue ?? 0)) newNumber = traitObject?.MinValue ?? 0;
 
 
-                hero.SetTraitLevel(traitObject, newNumber);
+                hero.SetTraitLevelInternal(traitObject, newNumber);
 
                 if (!display) return;
                 TextObject textObject = GameTexts.FindText("str_CE_trait_level");
@@ -150,10 +151,10 @@ namespace CaptivityEvents.Events
                         MethodInfo mi = typeof(CampaignEventDispatcher).GetMethod("OnPlayerTraitChanged", BindingFlags.Instance | BindingFlags.NonPublic);
                         if (mi != null)
                         {
-                           mi.Invoke(CampaignEventDispatcher.Instance, new object[] { traitObject, traitLevel });
+                            mi.Invoke(CampaignEventDispatcher.Instance, new object[] { traitObject, traitLevel });
                         }
                     }
-                } 
+                }
                 catch (Exception e)
                 {
                     CECustomHandler.ForceLogToFile("Failed TraitObjectModifier " + e);
@@ -190,18 +191,19 @@ namespace CaptivityEvents.Events
 
             if (found) return;
 
+#if STABLE
+            foreach (TraitObject traitObject in DefaultTraits.All)
             {
-                foreach (TraitObject traitObject in DefaultTraits.All)
+                if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                 {
-                    if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
-                    {
-                        found = true;
-                        TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
-                    }
+                    found = true;
+                    TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
                 }
-
-                if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + trait);
             }
+#endif
+
+            if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + trait);
+
         }
 
         private void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp, bool display = true, bool resetSkill = false)
@@ -245,7 +247,7 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
-                    hero.SetSkillValue(skillObject, newNumber);
+                    CEHelper.SetSkillValue(hero, skillObject, newNumber);
                 }
 
                 if (!display) return;
@@ -329,7 +331,12 @@ namespace CaptivityEvents.Events
 
             if (found) return;
 
+
+#if BETA
+            foreach (SkillObject skillObject in Skills.All)
+#else
             foreach (SkillObject skillObject in SkillObject.All)
+#endif
             {
                 if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
                 {
@@ -360,15 +367,15 @@ namespace CaptivityEvents.Events
                         if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
                     }
                 }
-
-                hero.SetSkillValue(skill, 0);
+                CEHelper.SetSkillValue(hero, skill, 0);
             }
             else
             {
                 int currentValue = hero.GetSkillValue(skill);
                 int valueToSet = currentValue + amount;
                 if (valueToSet < 1) valueToSet = 1;
-                hero.SetSkillValue(skill, valueToSet);
+
+                CEHelper.SetSkillValue(hero, skill, valueToSet);
 
                 if (!displayMessage && !quickInformation) return;
                 TextObject textObject = GameTexts.FindText("str_CE_level_skill");
@@ -420,8 +427,7 @@ namespace CaptivityEvents.Events
                         if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
                     }
                 }
-
-                hero.SetSkillValue(slaveryFlag, amount);
+                CEHelper.SetSkillValue(hero, slaveryFlag, amount);
             }
             else
             {
@@ -464,7 +470,7 @@ namespace CaptivityEvents.Events
                     }
                 }
 
-                hero.SetSkillValue(prostitutionFlag, amount);
+                CEHelper.SetSkillValue(hero, prostitutionFlag, amount);
             }
             else
             {

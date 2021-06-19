@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Brothel;
+﻿#define BETA
+using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -732,7 +733,11 @@ namespace CaptivityEvents.Events
                 if (string.IsNullOrWhiteSpace(_listEvent.ReqHeroPartyHaveItem)) return true;
 
                 bool flagHaveItem = false;
+#if BETA
+                ItemObject foundItem = Items.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
+#else
                 ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
+#endif
 
                 foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                 {
@@ -782,7 +787,12 @@ namespace CaptivityEvents.Events
                 if (string.IsNullOrWhiteSpace(_listEvent.ReqCaptorPartyHaveItem)) return true;
 
                 bool flagHaveItem = false;
+
+#if BETA
+                ItemObject foundItem = Items.All.FirstOrDefault(item => item.StringId == _listEvent.ReqCaptorPartyHaveItem);
+#else
                 ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqCaptorPartyHaveItem);
+#endif
 
                 if (captorParty.LeaderHero != null)
                 {
@@ -836,7 +846,11 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.LeaderHero == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkill.");
 
+#if BETA
+                int skillLevel = captorParty.LeaderHero.GetSkillValue(Skills.All.Single(skill => skill.StringId == _listEvent.ReqCaptorSkill));
+#else
                 int skillLevel = captorParty.LeaderHero.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _listEvent.ReqCaptorSkill));
+#endif
 
                 try
                 {
@@ -879,7 +893,11 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.LeaderHero == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTrait.");
 
+#if BETA
+                int traitLevel = captorParty.LeaderHero.GetTraitLevel(TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _listEvent.ReqCaptorTrait));
+#else
                 int traitLevel = captorParty.LeaderHero.GetTraitLevel(TraitObject.Find(_listEvent.ReqCaptorTrait));
+#endif
 
                 try
                 {
@@ -1387,7 +1405,11 @@ namespace CaptivityEvents.Events
                 if (string.IsNullOrWhiteSpace(_listEvent.ReqHeroPartyHaveItem)) return true;
 
                 bool flagHaveItem = false;
+#if BETA
+                ItemObject foundItem = Items.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
+#else
                 ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
+#endif
 
                 if (captorParty.LeaderHero != null)
                 {
@@ -1468,7 +1490,11 @@ namespace CaptivityEvents.Events
             {
                 if (!string.IsNullOrWhiteSpace(_listEvent.ReqHeroPartyHaveItem))
                 {
+#if BETA
+                    ItemObject foundItem = Items.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
+#else
                     ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
+#endif
 
                     if (foundItem == null) return LogError("ReqCaptiveHaveItem " + _listEvent.ReqHeroPartyHaveItem + " not found for " + _listEvent.Name);
 
@@ -1732,7 +1758,11 @@ namespace CaptivityEvents.Events
                 {
                     if (captor && traitRequired.Ref == "Hero") continue;
 
+#if BETA
+                    TraitObject foundTrait = TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == traitRequired.Id);
+#else
                     TraitObject foundTrait = TraitObject.Find(traitRequired.Id);
+#endif
                     if (foundTrait == null) return LogError("Couldn't find " + traitRequired.Id);
                     int traitLevel = character.GetTraitLevel(foundTrait);
 
@@ -1778,7 +1808,13 @@ namespace CaptivityEvents.Events
             {
                 if (string.IsNullOrWhiteSpace(_listEvent.ReqHeroTrait)) return true;
 
-                int traitLevel = captive.GetTraitLevel(TraitObject.Find(_listEvent.ReqHeroTrait));
+#if BETA
+                TraitObject foundTrait = TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _listEvent.ReqHeroTrait);
+#else
+                TraitObject foundTrait = TraitObject.Find(_listEvent.ReqHeroTrait);
+#endif
+
+                int traitLevel = captive.GetTraitLevel(foundTrait);
 
                 try
                 {
@@ -2087,6 +2123,6 @@ namespace CaptivityEvents.Events
             return false;
         }
 
-        #endregion
+#endregion
     }
 }

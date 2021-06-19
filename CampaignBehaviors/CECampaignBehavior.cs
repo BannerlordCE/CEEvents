@@ -462,7 +462,11 @@ namespace CaptivityEvents.CampaignBehaviors
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment2);
             }
 
+#if BETA
+            hero.SetName(NameGenerator.Current.GenerateHeroFirstName(hero, true), null);
+#else
             hero.FirstName = NameGenerator.Current.GenerateHeroFirstName(hero, true);
+#endif
             hero.CharacterObject.Name = hero.FirstName;
 
             // Reflection Two
@@ -648,9 +652,9 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
-        #endregion
+#endregion
 
-        #region Equipment
+#region Equipment
         private void CheckEquipmentToReturn(ReturnEquipment returnEquipment)
         {
             try
@@ -693,7 +697,7 @@ namespace CaptivityEvents.CampaignBehaviors
             if (!_returnEquipment.Exists(item => item.Captive == captive)) _returnEquipment.Add(new ReturnEquipment(captive, battleEquipment, civilianEquipment));
         }
 
-        #endregion
+#endregion
 
         public void OnHeroKilled(Hero victim, Hero killer, KillCharacterAction.KillCharacterActionDetail detail, bool showNotification)
         {

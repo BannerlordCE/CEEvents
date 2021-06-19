@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿#define BETA
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
 using HarmonyLib;
@@ -506,8 +507,11 @@ namespace CaptivityEvents.Events
                     float totalStrength = customParty.Party.TotalStrength;
                     int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                     customParty.InitializePartyTrade(initialGold);
-
+#if BETA
+                                        foreach (ItemObject itemObject in Items.All)
+#else
                     foreach (ItemObject itemObject in ItemObject.All)
+#endif
                     {
                         if (itemObject.IsFood)
                         {
@@ -679,7 +683,14 @@ namespace CaptivityEvents.Events
             if (string.IsNullOrWhiteSpace(_option.ReqHeroTrait)) return;
             int traitLevel;
 
-            try { traitLevel = Hero.MainHero.GetTraitLevel(TraitObject.Find(_option.ReqHeroTrait)); }
+            try 
+            {
+#if BETA
+                traitLevel = Hero.MainHero.GetTraitLevel(TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _option.ReqHeroTrait));
+#else
+              traitLevel = Hero.MainHero.GetTraitLevel(TraitObject.Find(_option.ReqHeroTrait)); 
+#endif
+            }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Invalid Trait Captive");

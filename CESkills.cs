@@ -1,6 +1,8 @@
-﻿using CaptivityEvents.Custom;
+﻿#define BETA
+using CaptivityEvents.Custom;
 using System;
 using System.Collections.Generic;
+using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 
@@ -53,7 +55,11 @@ namespace CaptivityEvents
                 }
             }
 
+#if BETA
+            foreach (SkillObject skillObject in Skills.All)
+#else
             foreach (SkillObject skillObject in SkillObject.All)
+#endif
             {
                 if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
                 {
@@ -88,7 +94,11 @@ namespace CaptivityEvents
 
         public static void InitializeAll()
         {
+#if BETA
+            CEAttribute.Initialize(new TextObject("CE"), new TextObject("CE represents the ability to move with speed and force."), new TextObject("CE"));
+#else
             CEAttribute.Initialize(new TextObject("CE"), new TextObject("CE represents the ability to move with speed and force."), new TextObject("CE"), CharacterAttributesEnum.Social);
+#endif
 
             for (int i = 0; i < CustomSkills.Count; i++)
             {

@@ -537,9 +537,15 @@ namespace CaptivityEvents.Helper
 
                 if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
+#if BETA
+                Hero hero = string.IsNullOrWhiteSpace(searchTerm)
+                    ? Hero.MainHero
+                    : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
+#else
                 Hero hero = string.IsNullOrWhiteSpace(searchTerm)
                     ? Hero.MainHero
                     : Campaign.Current.Heroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
+#endif
 
                 return hero == null
                     ? "Hero not found."
@@ -605,9 +611,15 @@ namespace CaptivityEvents.Helper
 
                 if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
+#if BETA
+                Hero hero = string.IsNullOrWhiteSpace(searchTerm)
+                ? Hero.MainHero
+                : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
+#else
                 Hero hero = string.IsNullOrWhiteSpace(searchTerm)
                     ? Hero.MainHero
                     : Campaign.Current.Heroes.FirstOrDefault(heroToFind => { return heroToFind.Name.ToString() == searchTerm; });
+#endif
 
                 if (hero == null) return "Hero not found.";
 

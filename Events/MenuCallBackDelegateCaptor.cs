@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿#define BETA
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -1309,7 +1310,14 @@ namespace CaptivityEvents.Events
         {
             int traitLevel;
 
-            try { traitLevel = Hero.MainHero.GetTraitLevel(TraitObject.Find(_option.ReqCaptorTrait)); }
+            try 
+            {
+#if BETA
+                traitLevel = Hero.MainHero.GetTraitLevel(TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _option.ReqCaptorTrait));                 
+#else
+                traitLevel = Hero.MainHero.GetTraitLevel(TraitObject.Find(_option.ReqCaptorTrait));
+#endif
+            }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Invalid Trait Captor");
@@ -1368,7 +1376,14 @@ namespace CaptivityEvents.Events
         {
             int traitLevel;
 
-            try { traitLevel = _listedEvent.Captive.GetTraitLevel(TraitObject.Find(_option.ReqCaptorTrait)); }
+            try 
+            {
+#if BETA
+                traitLevel = _listedEvent.Captive.GetTraitLevel(TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _option.ReqCaptorTrait));
+#else
+                traitLevel = _listedEvent.Captive.GetTraitLevel(TraitObject.Find(_option.ReqCaptorTrait)); 
+#endif
+            }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Invalid Trait Captive");

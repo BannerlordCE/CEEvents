@@ -328,10 +328,14 @@ namespace CaptivityEvents.Brothel
         public static void ProstitutionMenuJoinOnConsequence(MenuCallbackArgs args)
         {
             SkillObject ProstitueFlag = CESkills.IsProstitute;
-            Hero.MainHero.SetSkillValue(ProstitueFlag, 1);
+            CEHelper.SetSkillValue(Hero.MainHero, ProstitueFlag, 1); 
+
             SkillObject ProstitutionSkill = CESkills.Prostitution;
 
-            if (Hero.MainHero.GetSkillValue(ProstitutionSkill) < 100) Hero.MainHero.SetSkillValue(ProstitutionSkill, 100);
+            if (Hero.MainHero.GetSkillValue(ProstitutionSkill) < 100)
+            {
+                CEHelper.SetSkillValue(Hero.MainHero, ProstitueFlag, 100);
+            }
             TextObject textObject = GameTexts.FindText("str_CE_join_prostitution");
             textObject.SetTextVariable("PLAYER_HERO", Hero.MainHero.Name);
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
@@ -1122,7 +1126,10 @@ namespace CaptivityEvents.Brothel
             {
                 GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, prostitutionCost);
                 SkillObject prostitutionSkill = CESkills.Prostitution;
-                if (Hero.MainHero.GetSkillValue(prostitutionSkill) < 100) Hero.MainHero.SetSkillValue(prostitutionSkill, 100);
+                if (Hero.MainHero.GetSkillValue(prostitutionSkill) < 100)
+                {
+                    CEHelper.SetSkillValue(Hero.MainHero, prostitutionSkill, 100);
+                }
                 new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(1, 10), Hero.MainHero, false, true, true);
 
                 switch (Settlement.CurrentSettlement.Culture.GetCultureCode())

@@ -49,7 +49,11 @@ namespace CaptivityEvents.Events
                     else if (!string.IsNullOrEmpty(_listedEvent.SkillToLevel)) skillToLevel = _listedEvent.SkillToLevel;
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
 
-                    foreach (SkillObject skillObject in SkillObject.All.Where(skillObject => skillObject.Name.ToString().Equals(skillToLevel, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skillToLevel)) _dynamics.GainSkills(skillObject, 50, 100);
+#if BETA
+                    foreach (SkillObject skillObject in Skills.All.Where(skillObject => skillObject.Name.ToString().Equals(skillToLevel, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skillToLevel)) _dynamics.GainSkills(skillObject, 50, 100);
+#else
+                     foreach (SkillObject skillObject in SkillObject.All.Where(skillObject => skillObject.Name.ToString().Equals(skillToLevel, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skillToLevel)) _dynamics.GainSkills(skillObject, 50, 100);
+#endif
                 }
                 catch (Exception) { CECustomHandler.LogToFile("GiveXP Failed"); }
             }
@@ -634,14 +638,14 @@ namespace CaptivityEvents.Events
                     if (nearestSettlement.IsUnderRaid || nearestSettlement.IsRaided) continue;
 
 #if BETA
-                    foreach (Hero hero in nearestSettlement.Notables.Where(hero => hero.Issue == null && !hero.IsHeroOccupied(Hero.EventRestrictionFlags.CantBeIssueOrQuestTarget)))
+                    issueOwner = nearestSettlement.Notables.FirstOrDefault((Hero y) => y.CanHaveQuestsOrIssues() && y.GetTraitLevel(DefaultTraits.Mercy) <= 0);
 #else
-                    foreach (Hero hero in nearestSettlement.Notables.Where(hero => hero.Issue == null && !hero.IsOccupiedByAnEvent()))
-#endif
+                   foreach (Hero hero in nearestSettlement.Notables.Where(hero => hero.Issue == null && !hero.IsHeroOccupied(Hero.EventRestrictionFlags.CantBeIssueOrQuestTarget)))
                     {
                         issueOwner = hero;
                         break;
                     }
+#endif
 
                     if (issueOwner == null) continue;
 
@@ -882,7 +886,11 @@ namespace CaptivityEvents.Events
                                         int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                                         customParty.InitializePartyTrade(initialGold);
 
+#if BETA
+                                        foreach (ItemObject itemObject in Items.All)
+#else
                                         foreach (ItemObject itemObject in ItemObject.All)
+#endif
                                         {
                                             if (itemObject.IsFood)
                                             {
@@ -950,7 +958,11 @@ namespace CaptivityEvents.Events
                                         int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                                         customParty.InitializePartyTrade(initialGold);
 
+#if BETA
+                                        foreach (ItemObject itemObject in Items.All)
+#else
                                         foreach (ItemObject itemObject in ItemObject.All)
+#endif
                                         {
                                             if (itemObject.IsFood)
                                             {
@@ -1084,7 +1096,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("ConsequenceTeleportPlayer Failed: " + e);
             }
         }
-       
+
         internal void ConsequenceMission()
         {
             try
@@ -1101,7 +1113,7 @@ namespace CaptivityEvents.Events
                             break;
                         default:
                             character2 = Hero.MainHero.IsPrisoner ? Hero.MainHero.PartyBelongedToAsPrisoner.Leader : _listedEvent.Captive;
-                        break;
+                            break;
                     }
 
                     character2.StringId = "CECustomStringId_" + _option.SceneSettings.SceneName;
@@ -1112,14 +1124,14 @@ namespace CaptivityEvents.Events
 
                 }
             }
-             catch (Exception e)
+            catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("ConsequenceMission Failed: " + e);
             }
 
 
         }
-#endregion
+        #endregion
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {
