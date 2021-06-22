@@ -184,11 +184,20 @@ namespace CaptivityEvents.Events
 
             returnString += "\n\n\n------- Party Status -------";
             if (captorParty.IsMobile) returnString += "\nMoral Total : " + captorParty.MobileParty.Morale;
-            if (captorParty != PartyBase.MainParty && captorParty?.Leader != null)
+            if (captorParty != PartyBase.MainParty)
             {
-                returnString += "\nParty Leader Name : " + captorParty.Leader.Name.ToString();
-                returnString += "\nParty Leader Hero : " + (captorParty.Leader.IsHero ? "True" : "False");
-                returnString += "\nParty Leader Gender : " + (captorParty.Leader.IsFemale ? "Female" : "Male");
+                if (captorParty?.Leader != null)
+                {
+                    returnString += "\nParty Leader Name : " + captorParty.Leader.Name.ToString();
+                    returnString += "\nParty Leader Hero : " + (captorParty.Leader.IsHero ? "True" : "False");
+                    returnString += "\nParty Leader Gender : " + (captorParty.Leader.IsFemale ? "Female" : "Male");
+                }
+
+                string type = "DefaultParty";
+                if (captorParty.MobileParty.IsCaravan) type = "CaravanParty";
+                if (captorParty.MobileParty.IsBandit || captorParty.MobileParty.IsBanditBossParty) type = "BanditParty";
+                if (captorParty.MobileParty.IsLordParty) type = "LordParty";
+                returnString += "\nParty Type : " + type;
             }
 
             returnString += "\n\n--- Party Members ---";
@@ -247,6 +256,7 @@ namespace CaptivityEvents.Events
             if (!PlayerItemCheck()) return LatestMessage;
             if (!IsOwnedByNotableCheck()) return LatestMessage;
             if (!CaptorCheck(captorParty)) return LatestMessage;
+            if (!PartyCheck(captorParty)) return LatestMessage;
             if (!CaptivesOutNumberCheck(captorParty)) return LatestMessage;
             if (!TroopsCheck(captorParty)) return LatestMessage;
             if (!MaleTroopsCheck(captorParty)) return LatestMessage;
@@ -429,6 +439,25 @@ namespace CaptivityEvents.Events
             {
                 return LogError("Incorrect CompanionsCheck: " + e.ToString());
             }
+            return true;
+        }
+
+        private bool PartyCheck(PartyBase party)
+        {
+            int type = 0;
+
+            if (party != PartyBase.MainParty)
+            {
+                if (party.MobileParty.IsCaravan) type = 1;
+                if (party.MobileParty.IsBandit || party.MobileParty.IsBanditBossParty) type = 2;
+                if (party.MobileParty.IsLordParty) type = 3;
+            }
+
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DefaultParty) && type != 0) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. DefaultParty.");
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaravanParty) && type != 1) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaravanParty.");
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BanditParty) && type != 2) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. BanditParty.");
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LordParty) && type != 3) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. LordParty.");
+
             return true;
         }
 

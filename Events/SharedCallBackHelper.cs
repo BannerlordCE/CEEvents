@@ -1184,6 +1184,13 @@ namespace CaptivityEvents.Events
                                     continue;
                                 }
 
+                                if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
+                                {
+                                    CECustomHandler.LogToFile("IgnoreAllOther detected - autofire " + triggeredEvent.Name);
+                                    backgroundNames.Add(background.Name);
+                                    break;
+                                }
+
                                 try
                                 {
                                     weightedChance = new CEVariablesLoader().GetIntFromXML(!string.IsNullOrWhiteSpace(background.Weight)
