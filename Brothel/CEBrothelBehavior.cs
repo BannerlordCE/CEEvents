@@ -334,7 +334,7 @@ namespace CaptivityEvents.Brothel
 
             if (Hero.MainHero.GetSkillValue(ProstitutionSkill) < 100)
             {
-                CEHelper.SetSkillValue(Hero.MainHero, ProstitueFlag, 100);
+                CEHelper.SetSkillValue(Hero.MainHero, ProstitutionSkill, 100);
             }
             TextObject textObject = GameTexts.FindText("str_CE_join_prostitution");
             textObject.SetTextVariable("PLAYER_HERO", Hero.MainHero.Name);

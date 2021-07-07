@@ -10,9 +10,6 @@ namespace CaptivityEvents.Patches
     {
         [HarmonyPatch("ChildConceived")]
         [HarmonyPrefix]
-        private static bool ChildConceived(Hero mother)
-        {
-            return CEHelper.spouseOne == null && CEHelper.spouseTwo == null;
-        }
+        private static bool ChildConceived(Hero mother) => CEHelper.spouseOne == null && CEHelper.spouseTwo == null;
     }
 }

@@ -2,7 +2,6 @@
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Issues;
-using HarmonyLib;
 using Helpers;
 using SandBox;
 using System;
@@ -12,10 +11,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
-using TaleWorlds.Library;
 using TaleWorlds.Localization;
-using TaleWorlds.MountAndBlade;
-using TaleWorlds.MountAndBlade.View.Missions;
 using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events

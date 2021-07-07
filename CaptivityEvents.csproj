@@ -115,6 +115,7 @@
     <Compile Include="Notifications\CEEventMapNotification.cs" />
     <Compile Include="Notifications\CEEventMapNotificationItemVM.cs" />
     <Compile Include="Helper\CEHelper.cs" />
+    <Compile Include="Patches\CEPatchCharacterVM.cs" />
     <Compile Include="Patches\CEPatchClanIncomeVM.cs" />
     <Compile Include="Patches\CEPatchDefaultClanFinanceModel.cs" />
     <Compile Include="Patches\CEPatchGameMenu.cs" />

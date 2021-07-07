@@ -194,9 +194,12 @@ namespace CaptivityEvents.Events
                 }
 
                 string type = "DefaultParty";
-                if (captorParty.MobileParty.IsCaravan) type = "CaravanParty";
-                if (captorParty.MobileParty.IsBandit || captorParty.MobileParty.IsBanditBossParty) type = "BanditParty";
-                if (captorParty.MobileParty.IsLordParty) type = "LordParty";
+                if (captorParty.IsMobile)
+                {
+                    if (captorParty.MobileParty.IsCaravan) type = "CaravanParty";
+                    if (captorParty.MobileParty.IsBandit || captorParty.MobileParty.IsBanditBossParty) type = "BanditParty";
+                    if (captorParty.MobileParty.IsLordParty) type = "LordParty";
+                }
                 returnString += "\nParty Type : " + type;
             }
 
@@ -446,7 +449,7 @@ namespace CaptivityEvents.Events
         {
             int type = 0;
 
-            if (party != PartyBase.MainParty)
+            if (party != PartyBase.MainParty && party.IsMobile)
             {
                 if (party.MobileParty.IsCaravan) type = 1;
                 if (party.MobileParty.IsBandit || party.MobileParty.IsBanditBossParty) type = 2;

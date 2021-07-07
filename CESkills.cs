@@ -95,9 +95,9 @@ namespace CaptivityEvents
         public static void InitializeAll()
         {
 #if BETA
-            CEAttribute.Initialize(new TextObject("CE"), new TextObject("CE represents the ability to move with speed and force."), new TextObject("CE"));
+            CEAttribute.Initialize(new TextObject("CE"), new TextObject("Skills added by Captivity Events."), new TextObject("CE"));
 #else
-            CEAttribute.Initialize(new TextObject("CE"), new TextObject("CE represents the ability to move with speed and force."), new TextObject("CE"), CharacterAttributesEnum.Social);
+            CEAttribute.Initialize(new TextObject("CE"), new TextObject("Skills added by Captivity Events."), new TextObject("CE"), CharacterAttributesEnum.Social);
 #endif
 
             for (int i = 0; i < CustomSkills.Count; i++)

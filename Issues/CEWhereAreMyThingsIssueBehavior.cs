@@ -9,7 +9,7 @@ using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
 using static CaptivityEvents.Helper.CEHelper;
 
-namespace CaptivityEvents.Issues 
+namespace CaptivityEvents.Issues
 {
     // Quest Reference TaleWorlds.CampaignSystem.SandBox.Issues
     public class CEWhereAreMyThingsIssueBehavior : CampaignBehaviorBase

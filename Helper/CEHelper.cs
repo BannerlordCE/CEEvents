@@ -53,8 +53,14 @@ namespace CaptivityEvents.Helper
         {
 #if BETA
             MethodInfo mi = typeof(Hero).GetMethod("SetSkillValueInternal", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-            if (mi == null) hero.HeroDeveloper.SetInitialSkillLevel(skillObject, value);
-            mi.Invoke(hero, new object[] { skillObject, value });
+            if (mi == null)
+            {
+                hero.HeroDeveloper.SetInitialSkillLevel(skillObject, value);
+            }
+            else
+            {
+                mi.Invoke(hero, new object[] { skillObject, value });
+            }
 #else
             hero.SetSkillValue(skillObject, value);
 #endif
