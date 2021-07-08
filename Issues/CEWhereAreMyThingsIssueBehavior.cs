@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define STABLE
 using CaptivityEvents.Config;
 using Helpers;
 using System;
@@ -25,21 +25,12 @@ namespace CaptivityEvents.Issues
         {
             protected override int RewardGold => 500 + MathF.Round(1200f * base.IssueDifficultyMultiplier);
 
-#if BETA
             public override bool IsThereAlternativeSolution => false;
             public override bool IsThereLordSolution => false;
             public override TextObject IssueBriefByIssueGiver => new TextObject("{=CEEVENTS1087}Been looking at this equipment someone left here.");
             public override TextObject IssueAcceptByPlayer => new TextObject("{=CEEVENTS1086}Hey, that looks like my equipment!");
             public override TextObject IssueQuestSolutionExplanationByIssueGiver => new TextObject("{=CEEVENTS1085}Well you can pay for it.");
             public override TextObject IssueQuestSolutionAcceptByPlayer => new TextObject("{=CEEVENTS1084}Are you serious?");
-#else
-            protected override bool IsThereAlternativeSolution => false;
-            protected override bool IsThereLordSolution => false;
-            protected override TextObject IssueBriefByIssueGiver => new TextObject("{=CEEVENTS1087}Been looking at this equipment someone left here.");
-            protected override TextObject IssueAcceptByPlayer => new TextObject("{=CEEVENTS1086}Hey, that looks like my equipment!");
-            protected override TextObject IssueQuestSolutionExplanationByIssueGiver => new TextObject("{=CEEVENTS1085}Well you can pay for it.");
-            protected override TextObject IssueQuestSolutionAcceptByPlayer => new TextObject("{=CEEVENTS1084}Are you serious?");
-#endif
 
             public override TextObject Title => new TextObject("{=CEEVENTS1089}Missing Equipment");
             public override TextObject Description => new TextObject("{=CEEVENTS1088}Someone found some equipment that looks like yours.");

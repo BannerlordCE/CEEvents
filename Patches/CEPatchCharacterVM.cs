@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿#define STABLE
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ using TaleWorlds.Library;
 
 namespace CaptivityEvents.Patches
 {
+#if BETA
     // TaleWorlds.CampaignSystem.ViewModelCollection.CharacterDeveloper CharacterVM
     [HarmonyPatch(typeof(CharacterVM), "InitializeCharacter")]
     internal class CEPatchCharacterVM
@@ -101,5 +103,5 @@ namespace CaptivityEvents.Patches
             return false;
         }
     }
-
+#endif
 }

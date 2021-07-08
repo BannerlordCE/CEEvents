@@ -1,4 +1,4 @@
-#define BETA
+#define STABLE
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -467,12 +467,7 @@ namespace CaptivityEvents
                             new TextObject("Captivity Events Settings", null),
                             9990,
                             () => { ScreenManager.PushScreen(new CESettingsScreen()); },
-
-#if BETA
                              () => new ValueTuple<bool, TextObject>(false, TextObject.Empty)
-#else
-                             () => { return false; }
-#endif
                         )
                       );
                 }
@@ -1156,11 +1151,7 @@ namespace CaptivityEvents
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
                                                          select agent)
                                 {
-#if BETA
                                     CommonAIComponent component = agent2.GetComponent<CommonAIComponent>();
-#else
-                                    MoraleAgentComponent component = agent2.GetComponent<MoraleAgentComponent>();
-#endif
                                     component?.Panic();
                                     agent2.DestinationSpeed = 0.5f;
                                 }
@@ -1288,11 +1279,7 @@ namespace CaptivityEvents
                             PlayerEncounter.Finish(false);
                             if (Settlement.CurrentSettlement != null)
                             {
-#if BETA
                                 EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
-#else
-                                Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
-#endif
                                 HandleFinishBattle(mapstate2);
                             }
                         }
@@ -1302,11 +1289,7 @@ namespace CaptivityEvents
                             PlayerEncounter.Finish(false);
                             if (Settlement.CurrentSettlement != null)
                             {
-#if BETA
                                 EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
-#else
-                                Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
-#endif
                                 HandleFinishBattle(mapstate2);
                             }
                         }

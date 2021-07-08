@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define STABLE
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -130,7 +130,11 @@ namespace CaptivityEvents.Events
                 if (newNumber < (traitObject?.MinValue ?? 0)) newNumber = traitObject?.MinValue ?? 0;
 
 
+#if BETA
                 hero.SetTraitLevelInternal(traitObject, newNumber);
+#else
+                hero.SetTraitLevel(traitObject, newNumber);
+#endif
 
                 if (!display) return;
                 TextObject textObject = GameTexts.FindText("str_CE_trait_level");

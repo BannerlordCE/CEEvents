@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define STABLE
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Issues;
@@ -912,11 +912,7 @@ namespace CaptivityEvents.Events
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
-#if BETA
                                             DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
-#else
-                                            DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToFriendsMultiplier(),
-#endif
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
@@ -984,11 +980,7 @@ namespace CaptivityEvents.Events
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
-#if BETA
                                             DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
-#else
-                                            DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToFriendsMultiplier(),
-#endif
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
@@ -1080,11 +1072,7 @@ namespace CaptivityEvents.Events
                 else
                 {
                     MobileParty.MainParty.Position2D = nearest.GatePosition;
-#if BETA
                     EncounterManager.StartSettlementEncounter(MobileParty.MainParty, nearest);
-#else
-                    Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, nearest);
-#endif
                 }
             }
             catch (Exception e)

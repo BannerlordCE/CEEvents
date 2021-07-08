@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define STABLE
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -136,11 +136,7 @@ namespace CaptivityEvents.Events
 
             if (PlayerCaptivity.IsCaptive) InitCaptiveTextVariables(ref args);
 
-#if BETA
             if (args.MenuContext != null) args.MenuContext.GameMenu.StartWait();
-#else
-            if (args.MenuContext != null) args.MenuContext.GameMenu.SetMenuAsWaitMenuAndInitiateWaiting();
-#endif
         }
         internal bool CaptiveConditionWaitGameMenu(MenuCallbackArgs args)
         {
