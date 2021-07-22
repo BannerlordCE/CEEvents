@@ -116,6 +116,7 @@
     <Compile Include="Notifications\CEEventMapNotificationItemVM.cs" />
     <Compile Include="Helper\CEHelper.cs" />
     <Compile Include="Patches\CEPatchAttributes.cs" />
+    <Compile Include="Patches\CEPatchCharacterCreationGainedPropertiesVM.cs" />
     <Compile Include="Patches\CEPatchCharacterVM.cs" />
     <Compile Include="Patches\CEPatchClanIncomeVM.cs" />
     <Compile Include="Patches\CEPatchClanLordItemVM.cs" />
@@ -140,8 +141,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Lib.Harmony.2.0.4\lib\net48\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Lib.Harmony.2.1.0\lib\net48\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Bannerlord.ButterLib, Version=1.0.24.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>packages\Bannerlord.ButterLib.1.0.24\lib\net472\Bannerlord.ButterLib.dll</HintPath>
