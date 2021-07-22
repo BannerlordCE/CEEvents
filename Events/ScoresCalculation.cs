@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿#define BETA
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 

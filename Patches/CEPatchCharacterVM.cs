@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿#define BETA
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
