@@ -213,6 +213,20 @@ namespace CaptivityEvents.Events
                     prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
                     prisonerParty.IsActive = true;
 
+#if BETA
+                    prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
+                                       ? nearest.GatePosition
+                                       : nearest.Position2D);
+
+                    if (leader.Character != null)
+                    {
+                        prisonerParty.Party.SetCustomOwner(leader.Character.HeroObject);
+                        prisonerParty.ChangePartyLeader(leader.Character);
+                    } else
+                    {
+                        prisonerParty.Party.SetCustomOwner(clan.Leader);
+                    }
+#else
                     prisonerParty.HomeSettlement = nearest;
                     prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
                                        ? nearest.GatePosition
@@ -227,8 +241,7 @@ namespace CaptivityEvents.Events
                     {
                         prisonerParty.Party.Owner = clan.Leader;
                     }
-
-
+#endif
 
                     prisonerParty.RecentEventsMorale = -100;
                     prisonerParty.Aggressiveness = 0.2f;
@@ -299,11 +312,18 @@ namespace CaptivityEvents.Events
                     prisonerParty.RecentEventsMorale = -100;
                     prisonerParty.IsActive = true;
                     prisonerParty.ActualClan = clan;
+
+#if BETA
+                    prisonerParty.Party.SetCustomOwner(clan.Leader);
+                    prisonerParty.Party.Visuals.SetMapIconAsDirty();
+                    prisonerParty.InitializePartyTrade(0);
+#else
                     prisonerParty.Party.Owner = clan.Leader;
                     prisonerParty.Party.Visuals.SetMapIconAsDirty();
 
                     prisonerParty.HomeSettlement = nearest;
                     prisonerParty.InitializePartyTrade(0);
+#endif
 
                     Hero.MainHero.HitPoints += 40;
 

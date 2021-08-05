@@ -378,6 +378,7 @@ namespace CaptivityEvents.Events
                 int currentValue = hero.GetSkillValue(skill);
                 int valueToSet = currentValue + amount;
                 if (valueToSet < 1) valueToSet = 1;
+                if (valueToSet > 1000) valueToSet = 1000; 
 
                 CEHelper.SetSkillValue(hero, skill, valueToSet);
 
@@ -528,9 +529,14 @@ namespace CaptivityEvents.Events
                         }
 
                         DisbandPartyAction.ApplyDisband(firstHero.PartyBelongedTo);
+                        
                         if (firstHero.PartyBelongedTo != null)
                         {
+#if BETA
+                            firstHero.PartyBelongedTo.Party.SetCustomOwner(null);
+#else
                             firstHero.PartyBelongedTo.Party.Owner = null;
+#endif
                         }
                         firstHero.ChangeState(Hero.CharacterStates.Fugitive);
                         MobileParty partyBelongedTo = firstHero.PartyBelongedTo;

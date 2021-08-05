@@ -45,11 +45,7 @@ namespace CaptivityEvents.Events
                     else if (!string.IsNullOrEmpty(_listedEvent.SkillToLevel)) skillToLevel = _listedEvent.SkillToLevel;
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
 
-#if BETA
                     foreach (SkillObject skillObject in Skills.All.Where(skillObject => skillObject.Name.ToString().Equals(skillToLevel, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skillToLevel)) _dynamics.GainSkills(skillObject, 50, 100);
-#else
-                     foreach (SkillObject skillObject in SkillObject.All.Where(skillObject => skillObject.Name.ToString().Equals(skillToLevel, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skillToLevel)) _dynamics.GainSkills(skillObject, 50, 100);
-#endif
                 }
                 catch (Exception) { CECustomHandler.LogToFile("GiveXP Failed"); }
             }
@@ -633,15 +629,7 @@ namespace CaptivityEvents.Events
 
                     if (nearestSettlement.IsUnderRaid || nearestSettlement.IsRaided) continue;
 
-#if BETA
                     issueOwner = nearestSettlement.Notables.FirstOrDefault((Hero y) => y.CanHaveQuestsOrIssues() && y.GetTraitLevel(DefaultTraits.Mercy) <= 0);
-#else
-                   foreach (Hero hero in nearestSettlement.Notables.Where(hero => hero.Issue == null && !hero.IsHeroOccupied(Hero.EventRestrictionFlags.CantBeIssueOrQuestTarget)))
-                    {
-                        issueOwner = hero;
-                        break;
-                    }
-#endif
 
                     if (issueOwner == null) continue;
 
@@ -873,20 +861,22 @@ namespace CaptivityEvents.Events
                                         customParty.SetCustomName(textObject);
                                         customParty.IsActive = true;
 
+#if BETA
+                                        customParty.ActualClan = clan;
+                                        customParty.Party.SetCustomOwner(clan.Leader);
+                                        customParty.Party.Visuals.SetMapIconAsDirty();
+#else
                                         customParty.ActualClan = clan;
                                         customParty.Party.Owner = clan.Leader;
                                         customParty.Party.Visuals.SetMapIconAsDirty();
                                         customParty.HomeSettlement = nearest;
+#endif
 
                                         float totalStrength = customParty.Party.TotalStrength;
                                         int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                                         customParty.InitializePartyTrade(initialGold);
 
-#if BETA
                                         foreach (ItemObject itemObject in Items.All)
-#else
-                                        foreach (ItemObject itemObject in ItemObject.All)
-#endif
                                         {
                                             if (itemObject.IsFood)
                                             {
@@ -941,20 +931,22 @@ namespace CaptivityEvents.Events
                                         customParty.SetCustomName(textObject);
                                         customParty.IsActive = true;
 
+#if BETA
+                                        customParty.ActualClan = clan;
+                                        customParty.Party.SetCustomOwner(clan.Leader);
+                                        customParty.Party.Visuals.SetMapIconAsDirty();
+#else
                                         customParty.ActualClan = clan;
                                         customParty.Party.Owner = clan.Leader;
                                         customParty.Party.Visuals.SetMapIconAsDirty();
                                         customParty.HomeSettlement = nearest;
+#endif
 
                                         float totalStrength = customParty.Party.TotalStrength;
                                         int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                                         customParty.InitializePartyTrade(initialGold);
 
-#if BETA
                                         foreach (ItemObject itemObject in Items.All)
-#else
-                                        foreach (ItemObject itemObject in ItemObject.All)
-#endif
                                         {
                                             if (itemObject.IsFood)
                                             {

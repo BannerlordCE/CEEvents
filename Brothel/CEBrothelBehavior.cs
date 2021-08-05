@@ -35,7 +35,15 @@ namespace CaptivityEvents.Brothel
             if (!CESettings.Instance.ProstitutionControl) return;
 
             // Option Added To Town
-            campaignGameStarter.AddGameMenuOption("town", "town_brothel", "{=CEEVENTS1100}Go to the brothel district", CanGoToBrothelDistrictOnCondition, delegate { try { GameMenu.SwitchToMenu("town_brothel"); } catch (Exception) { GameMenu.SwitchToMenu("town"); } }, false, 1);
+            campaignGameStarter.AddGameMenuOption("town", "town_brothel", "{=CEEVENTS1100}Go to the brothel district", CanGoToBrothelDistrictOnCondition, 
+                delegate { 
+                    try { 
+                        GameMenu.SwitchToMenu("town_brothel"); 
+                    } 
+                    catch (Exception) { 
+                        GameMenu.SwitchToMenu("town"); 
+                    } 
+                }, false, 1);
 
             campaignGameStarter.AddGameMenu("town_brothel", "{=CEEVENTS1098}You are in the brothel district", BrothelDistrictOnInit, GameOverlays.MenuOverlayType.SettlementWithBoth);
 
@@ -1485,8 +1493,12 @@ namespace CaptivityEvents.Brothel
             CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, new Action<Hero, Hero, KillCharacterAction.KillCharacterActionDetail, bool>(OnHeroDeath));
             CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, DailyTick);
             CampaignEvents.WeeklyTickEvent.AddNonSerializedListener(this, WeeklyTick);
+#if BETA
+            CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, new Action<CampaignGameStarter>(AddGameMenus));
+#else
             CampaignEvents.OnNewGameCreatedEvent.AddNonSerializedListener(this, AddGameMenus);
             CampaignEvents.OnGameLoadedEvent.AddNonSerializedListener(this, AddGameMenus);
+#endif
             CampaignEvents.OnMissionEndedEvent.AddNonSerializedListener(this, OnMissionEnded);
             CampaignEvents.OnSettlementLeftEvent.AddNonSerializedListener(this, OnSettlementLeft);
             CampaignEvents.OnSettlementOwnerChangedEvent.AddNonSerializedListener(this, OnSettlementOwnerChanged);
