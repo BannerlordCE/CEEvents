@@ -313,12 +313,20 @@ namespace CaptivityEvents.Events
 
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor) || PlayerCaptivity.CaptorParty.NumberOfAllMembers <= 1) return;
 
-            if (PlayerCaptivity.CaptorParty.LeaderHero != null) KillCharacterAction.ApplyByMurder(PlayerCaptivity.CaptorParty.LeaderHero, Hero.MainHero);
-            else PlayerCaptivity.CaptorParty.MemberRoster.AddToCounts(PlayerCaptivity.CaptorParty.Leader, -1);
-
-            if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MemberRoster.Count == 0)
+            try
             {
-                DestroyPartyAction.Apply(null, PlayerCaptivity.CaptorParty.MobileParty);
+                if (PlayerCaptivity.CaptorParty.LeaderHero != null) KillCharacterAction.ApplyByMurder(PlayerCaptivity.CaptorParty.LeaderHero, Hero.MainHero);
+                else PlayerCaptivity.CaptorParty.MemberRoster.AddToCounts(PlayerCaptivity.CaptorParty.Leader, -1);
+
+                if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MemberRoster.Count == 0)
+                {
+
+                    DestroyPartyAction.Apply(null, PlayerCaptivity.CaptorParty.MobileParty);
+                }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("ConsequenceKillCaptor. Failed" + e.ToString());
             }
         }
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)

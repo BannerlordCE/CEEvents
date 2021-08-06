@@ -1275,7 +1275,15 @@ namespace CaptivityEvents
                         else if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.destroyParty)
                         {
                             PlayerEncounter.Current.FinalizeBattle();
-                            DestroyPartyAction.Apply(null, PlayerEncounter.EncounteredMobileParty);
+                            try 
+                            {
+                                DestroyPartyAction.Apply(PartyBase.MainParty, PlayerEncounter.EncounteredMobileParty);
+                            } 
+                            catch (Exception e)
+                            {
+                                CECustomHandler.ForceLogToFile("FinalizeBattle: " + e);
+                            }
+
                             PlayerEncounter.Finish(false);
                             if (Settlement.CurrentSettlement != null)
                             {

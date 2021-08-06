@@ -830,7 +830,7 @@ namespace CaptivityEvents.Events
                                             CECustomHandler.ForceLogToFile("ConsequenceStartBattle : city required. ");
                                         }
                                         // StartCommonAreaBattle RivalGangMovingInIssue
-                                        MobileParty customParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue));
+                                        MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue));
 
                                         TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
                                         customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
