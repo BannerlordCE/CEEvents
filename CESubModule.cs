@@ -78,6 +78,9 @@ namespace CaptivityEvents
         public static bool captivePlayEvent;
         public static CharacterObject captiveToPlay;
 
+        public static int captiveInventoryStage = 0;
+        public static Hero removeHero = null;
+
         public static string victoryEvent;
         public static string defeatEvent;
         public static List<TroopRosterElement> playerTroops = new List<TroopRosterElement>();
@@ -802,6 +805,9 @@ namespace CaptivityEvents
             // CaptiveState
             CaptiveStateCheck();
 
+            // RemoveCaptiveState
+            RemoveCaptiveStateCheck();
+
             // SoundState
             SoundStateCheck();
 
@@ -861,6 +867,36 @@ namespace CaptivityEvents
             }
         }
 
+        private void RemoveCaptiveStateCheck()
+        {
+            switch (CEPersistence.captiveInventoryStage)
+            {
+                case 0:
+                    break;
+                case 1:
+                    if (Game.Current.GameStateManager.ActiveState is InventoryState inventoryState)
+                    {
+                            CEPersistence.captiveInventoryStage = 2;
+                    }
+                    break;
+                case 2:
+                    if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+                    {
+                        if (CEPersistence.removeHero != null)
+                        {
+                            while (MobileParty.MainParty.MemberRoster.Contains(CEPersistence.removeHero.CharacterObject))
+                            {
+                                MobileParty.MainParty.MemberRoster.RemoveTroop(CEPersistence.removeHero.CharacterObject, 1);
+                            }
+                            
+                            CEPersistence.removeHero = null;
+                            PartyBase.MainParty.Visuals.SetMapIconAsDirty();
+                        }
+                        CEPersistence.captiveInventoryStage = 0;
+                    }
+                    break;
+            }
+        }
         private void CaptiveStateCheck()
         {
             // CaptiveState

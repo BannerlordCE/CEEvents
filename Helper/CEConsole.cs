@@ -5,6 +5,7 @@ using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Notifications;
+using HarmonyLib;
 using SandBox;
 using System;
 using System.Collections.Generic;
@@ -692,6 +693,11 @@ namespace CaptivityEvents.Helper
                     bool successful = CECampaignBehavior.ClearPregnancyList();
                     CEBrothelBehavior.CleanList();
                     ResetStatus(new List<string>());
+                    if (successful)
+                    {
+                        successful = CESkills.Uninstall(Game.Current);
+                    }
+
 
                     return successful
                         ? "Successfully cleaned save of captivity events data. Save the game now."

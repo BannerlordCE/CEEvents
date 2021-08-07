@@ -24,7 +24,8 @@ namespace CaptivityEvents.Patches
         {
 			foreach (SkillObject skillObject in Skills.All)
 			{
-				if (CESkills.CustomSkills.Exists(item => item.StringId == skillObject.StringId)) continue;
+
+				if (skillObject.CharacterAttribute == null || skillObject.CharacterAttribute.StringId == "CEAttribute") continue;
 				int focus = _child(__instance).HeroDeveloper.GetFocus(skillObject);
 				if (_affectedSkillFocusMap(__instance).ContainsKey(skillObject))
 				{

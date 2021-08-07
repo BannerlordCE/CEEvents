@@ -62,7 +62,7 @@ namespace CaptivityEvents.Patches
                 while (enumerator3.MoveNext())
                 {
                     SkillObject skill = enumerator3.Current;
-                    if (CESkills.CustomSkills.Exists(item => item.StringId == skill.StringId)) continue;
+                    if (skill.CharacterAttribute == null || skill.CharacterAttribute.StringId == "CEAttribute") continue;
                     if (__instance.Skills.All((SkillVM s) => s.Skill != skill))
                     {
                         __instance.Skills.Add(new SkillVM(skill, __instance, new Action<PerkVM>((PerkVM perk) =>

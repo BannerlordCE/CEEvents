@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
 namespace CaptivityEvents
@@ -20,6 +21,8 @@ namespace CaptivityEvents
 
         public static bool IsInitialized { get; private set; } = false;
 
+        public static bool isUninstalled { get; private set; } = false;
+
         internal static List<SkillObject> CustomSkills { get; private set; }
 
         internal static CharacterAttribute CEAttribute { get; private set; }
@@ -33,6 +36,7 @@ namespace CaptivityEvents
 
         public static CESkillNode FindSkillNode(string skill)
         {
+            if (isUninstalled) return null;
             try
             {
                 return _Skills.Find(skillNode => skillNode.Id == skill);
@@ -46,6 +50,7 @@ namespace CaptivityEvents
 
         public static SkillObject FindSkill(string skill)
         {
+            if (isUninstalled) return null;
 
             foreach (SkillObject skillObjectCustom in CustomSkills)
             {
@@ -90,6 +95,33 @@ namespace CaptivityEvents
             }
 
             InitializeAll();
+        }
+
+        public static bool Uninstall(Game game)
+        {
+            try
+            {
+
+                foreach (SkillObject skill in CustomSkills)
+                {
+                    game.ObjectManager.UnregisterObject(skill);
+                }
+
+                game.ObjectManager.UnregisterObject(CEAttribute);
+
+                isUninstalled = true;
+                return true;
+
+            } 
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Uninstall Error: " + e.ToString());
+                InformationManager.DisplayMessage(new InformationMessage("Failure to Uninstall. Refer to LogFileFC.txt in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs", Colors.Red));
+
+                isUninstalled = true;
+                return false;
+            }
+
         }
 
         public static void InitializeAll()
