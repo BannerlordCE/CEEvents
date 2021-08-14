@@ -5,6 +5,7 @@ using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Notifications;
+using HarmonyLib;
 using SandBox;
 using System;
 using System.Collections.Generic;
@@ -539,7 +540,7 @@ namespace CaptivityEvents.Helper
 
                 Hero hero = string.IsNullOrWhiteSpace(searchTerm)
                     ? Hero.MainHero
-                    : Campaign.Current.Heroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
+                    : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
 
                 return hero == null
                     ? "Hero not found."
@@ -606,9 +607,8 @@ namespace CaptivityEvents.Helper
                 if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
                 Hero hero = string.IsNullOrWhiteSpace(searchTerm)
-                    ? Hero.MainHero
-                    : Campaign.Current.Heroes.FirstOrDefault(heroToFind => { return heroToFind.Name.ToString() == searchTerm; });
-
+                ? Hero.MainHero
+                : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
                 if (hero == null) return "Hero not found.";
 
                 try
@@ -680,6 +680,11 @@ namespace CaptivityEvents.Helper
                     bool successful = CECampaignBehavior.ClearPregnancyList();
                     CEBrothelBehavior.CleanList();
                     ResetStatus(new List<string>());
+                    if (successful)
+                    {
+                        successful = CESkills.Uninstall(Game.Current);
+                    }
+
 
                     return successful
                         ? "Successfully cleaned save of captivity events data. Save the game now."

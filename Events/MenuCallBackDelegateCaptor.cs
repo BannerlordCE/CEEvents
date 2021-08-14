@@ -1,7 +1,9 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿#define STABLE
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
+using Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -236,11 +238,18 @@ namespace CaptivityEvents.Events
                 try
                 {
                     if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
-                    InventoryManager.OpenScreenAsInventoryOf(Hero.MainHero.PartyBelongedTo.Party.MobileParty, captiveHero.CharacterObject);
+
+                    MobileParty.MainParty.MemberRoster.AddToCounts(captiveHero.CharacterObject, 1, false);
+
+                    // WORK ON THIS
+                    InventoryManager.OpenScreenAsInventoryOf(MobileParty.MainParty, captiveHero.CharacterObject);
+
+                    CEPersistence.removeHero = captiveHero;
+                    CEPersistence.captiveInventoryStage = 1;
                 }
                 catch (Exception e)
                 {
-                    CECustomHandler.ForceLogToFile("ConsequenceCompanions. Failed" + e.ToString());
+                    CECustomHandler.ForceLogToFile("StripHero. Failed" + e.ToString());
                 }
             }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
@@ -1309,7 +1318,10 @@ namespace CaptivityEvents.Events
         {
             int traitLevel;
 
-            try { traitLevel = Hero.MainHero.GetTraitLevel(TraitObject.Find(_option.ReqCaptorTrait)); }
+            try
+            {
+                traitLevel = Hero.MainHero.GetTraitLevel(TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _option.ReqCaptorTrait));
+            }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Invalid Trait Captor");
@@ -1368,7 +1380,10 @@ namespace CaptivityEvents.Events
         {
             int traitLevel;
 
-            try { traitLevel = _listedEvent.Captive.GetTraitLevel(TraitObject.Find(_option.ReqCaptorTrait)); }
+            try
+            {
+                traitLevel = _listedEvent.Captive.GetTraitLevel(TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _option.ReqCaptorTrait));
+            }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Invalid Trait Captive");

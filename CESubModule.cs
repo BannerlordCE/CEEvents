@@ -78,6 +78,9 @@ namespace CaptivityEvents
         public static bool captivePlayEvent;
         public static CharacterObject captiveToPlay;
 
+        public static int captiveInventoryStage = 0;
+        public static Hero removeHero = null;
+
         public static string victoryEvent;
         public static string defeatEvent;
         public static List<TroopRosterElement> playerTroops = new List<TroopRosterElement>();
@@ -467,12 +470,7 @@ namespace CaptivityEvents
                             new TextObject("Captivity Events Settings", null),
                             9990,
                             () => { ScreenManager.PushScreen(new CESettingsScreen()); },
-
-#if BETA
                              () => new ValueTuple<bool, TextObject>(false, TextObject.Empty)
-#else
-                             () => { return false; }
-#endif
                         )
                       );
                 }
@@ -807,6 +805,9 @@ namespace CaptivityEvents
             // CaptiveState
             CaptiveStateCheck();
 
+            // RemoveCaptiveState
+            RemoveCaptiveStateCheck();
+
             // SoundState
             SoundStateCheck();
 
@@ -866,6 +867,36 @@ namespace CaptivityEvents
             }
         }
 
+        private void RemoveCaptiveStateCheck()
+        {
+            switch (CEPersistence.captiveInventoryStage)
+            {
+                case 0:
+                    break;
+                case 1:
+                    if (Game.Current.GameStateManager.ActiveState is InventoryState inventoryState)
+                    {
+                            CEPersistence.captiveInventoryStage = 2;
+                    }
+                    break;
+                case 2:
+                    if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+                    {
+                        if (CEPersistence.removeHero != null)
+                        {
+                            while (MobileParty.MainParty.MemberRoster.Contains(CEPersistence.removeHero.CharacterObject))
+                            {
+                                MobileParty.MainParty.MemberRoster.RemoveTroop(CEPersistence.removeHero.CharacterObject, 1);
+                            }
+                            
+                            CEPersistence.removeHero = null;
+                            PartyBase.MainParty.Visuals.SetMapIconAsDirty();
+                        }
+                        CEPersistence.captiveInventoryStage = 0;
+                    }
+                    break;
+            }
+        }
         private void CaptiveStateCheck()
         {
             // CaptiveState
@@ -1156,11 +1187,7 @@ namespace CaptivityEvents
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
                                                          select agent)
                                 {
-#if BETA
                                     CommonAIComponent component = agent2.GetComponent<CommonAIComponent>();
-#else
-                                    MoraleAgentComponent component = agent2.GetComponent<MoraleAgentComponent>();
-#endif
                                     component?.Panic();
                                     agent2.DestinationSpeed = 0.5f;
                                 }
@@ -1284,15 +1311,19 @@ namespace CaptivityEvents
                         else if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.destroyParty)
                         {
                             PlayerEncounter.Current.FinalizeBattle();
-                            DestroyPartyAction.Apply(null, PlayerEncounter.EncounteredMobileParty);
+                            try 
+                            {
+                                DestroyPartyAction.Apply(PartyBase.MainParty, PlayerEncounter.EncounteredMobileParty);
+                            } 
+                            catch (Exception e)
+                            {
+                                CECustomHandler.ForceLogToFile("FinalizeBattle: " + e);
+                            }
+
                             PlayerEncounter.Finish(false);
                             if (Settlement.CurrentSettlement != null)
                             {
-#if BETA
                                 EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
-#else
-                                Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
-#endif
                                 HandleFinishBattle(mapstate2);
                             }
                         }
@@ -1302,11 +1333,7 @@ namespace CaptivityEvents
                             PlayerEncounter.Finish(false);
                             if (Settlement.CurrentSettlement != null)
                             {
-#if BETA
                                 EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
-#else
-                                Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
-#endif
                                 HandleFinishBattle(mapstate2);
                             }
                         }

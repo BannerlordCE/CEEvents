@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Brothel;
+﻿#define STABLE
+using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -183,11 +184,23 @@ namespace CaptivityEvents.Events
 
             returnString += "\n\n\n------- Party Status -------";
             if (captorParty.IsMobile) returnString += "\nMoral Total : " + captorParty.MobileParty.Morale;
-            if (captorParty != PartyBase.MainParty && captorParty?.Leader != null)
+            if (captorParty != PartyBase.MainParty)
             {
-                returnString += "\nParty Leader Name : " + captorParty.Leader.Name.ToString();
-                returnString += "\nParty Leader Hero : " + (captorParty.Leader.IsHero ? "True" : "False");
-                returnString += "\nParty Leader Gender : " + (captorParty.Leader.IsFemale ? "Female" : "Male");
+                if (captorParty?.Leader != null)
+                {
+                    returnString += "\nParty Leader Name : " + captorParty.Leader.Name.ToString();
+                    returnString += "\nParty Leader Hero : " + (captorParty.Leader.IsHero ? "True" : "False");
+                    returnString += "\nParty Leader Gender : " + (captorParty.Leader.IsFemale ? "Female" : "Male");
+                }
+
+                string type = "DefaultParty";
+                if (captorParty.IsMobile)
+                {
+                    if (captorParty.MobileParty.IsCaravan) type = "CaravanParty";
+                    if (captorParty.MobileParty.IsBandit || captorParty.MobileParty.IsBanditBossParty) type = "BanditParty";
+                    if (captorParty.MobileParty.IsLordParty) type = "LordParty";
+                }
+                returnString += "\nParty Type : " + type;
             }
 
             returnString += "\n\n--- Party Members ---";
@@ -246,6 +259,7 @@ namespace CaptivityEvents.Events
             if (!PlayerItemCheck()) return LatestMessage;
             if (!IsOwnedByNotableCheck()) return LatestMessage;
             if (!CaptorCheck(captorParty)) return LatestMessage;
+            if (!PartyCheck(captorParty)) return LatestMessage;
             if (!CaptivesOutNumberCheck(captorParty)) return LatestMessage;
             if (!TroopsCheck(captorParty)) return LatestMessage;
             if (!MaleTroopsCheck(captorParty)) return LatestMessage;
@@ -428,6 +442,25 @@ namespace CaptivityEvents.Events
             {
                 return LogError("Incorrect CompanionsCheck: " + e.ToString());
             }
+            return true;
+        }
+
+        private bool PartyCheck(PartyBase party)
+        {
+            int type = 0;
+
+            if (party != PartyBase.MainParty && party.IsMobile)
+            {
+                if (party.MobileParty.IsCaravan) type = 1;
+                if (party.MobileParty.IsBandit || party.MobileParty.IsBanditBossParty) type = 2;
+                if (party.MobileParty.IsLordParty) type = 3;
+            }
+
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DefaultParty) && type != 0) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. DefaultParty.");
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaravanParty) && type != 1) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaravanParty.");
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BanditParty) && type != 2) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. BanditParty.");
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LordParty) && type != 3) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. LordParty.");
+
             return true;
         }
 
@@ -732,7 +765,7 @@ namespace CaptivityEvents.Events
                 if (string.IsNullOrWhiteSpace(_listEvent.ReqHeroPartyHaveItem)) return true;
 
                 bool flagHaveItem = false;
-                ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
+                ItemObject foundItem = Items.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
 
                 foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                 {
@@ -782,7 +815,8 @@ namespace CaptivityEvents.Events
                 if (string.IsNullOrWhiteSpace(_listEvent.ReqCaptorPartyHaveItem)) return true;
 
                 bool flagHaveItem = false;
-                ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqCaptorPartyHaveItem);
+
+                ItemObject foundItem = Items.All.FirstOrDefault(item => item.StringId == _listEvent.ReqCaptorPartyHaveItem);
 
                 if (captorParty.LeaderHero != null)
                 {
@@ -836,7 +870,7 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.LeaderHero == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkill.");
 
-                int skillLevel = captorParty.LeaderHero.GetSkillValue(SkillObject.FindFirst(skill => skill.StringId == _listEvent.ReqCaptorSkill));
+                int skillLevel = captorParty.LeaderHero.GetSkillValue(Skills.All.Single(skill => skill.StringId == _listEvent.ReqCaptorSkill));
 
                 try
                 {
@@ -879,7 +913,7 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.LeaderHero == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTrait.");
 
-                int traitLevel = captorParty.LeaderHero.GetTraitLevel(TraitObject.Find(_listEvent.ReqCaptorTrait));
+                int traitLevel = captorParty.LeaderHero.GetTraitLevel(TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _listEvent.ReqCaptorTrait));
 
                 try
                 {
@@ -1387,7 +1421,7 @@ namespace CaptivityEvents.Events
                 if (string.IsNullOrWhiteSpace(_listEvent.ReqHeroPartyHaveItem)) return true;
 
                 bool flagHaveItem = false;
-                ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
+                ItemObject foundItem = Items.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
 
                 if (captorParty.LeaderHero != null)
                 {
@@ -1468,7 +1502,7 @@ namespace CaptivityEvents.Events
             {
                 if (!string.IsNullOrWhiteSpace(_listEvent.ReqHeroPartyHaveItem))
                 {
-                    ItemObject foundItem = ItemObject.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
+                    ItemObject foundItem = Items.All.FirstOrDefault(item => item.StringId == _listEvent.ReqHeroPartyHaveItem);
 
                     if (foundItem == null) return LogError("ReqCaptiveHaveItem " + _listEvent.ReqHeroPartyHaveItem + " not found for " + _listEvent.Name);
 
@@ -1732,7 +1766,8 @@ namespace CaptivityEvents.Events
                 {
                     if (captor && traitRequired.Ref == "Hero") continue;
 
-                    TraitObject foundTrait = TraitObject.Find(traitRequired.Id);
+                    TraitObject foundTrait = TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == traitRequired.Id);
+
                     if (foundTrait == null) return LogError("Couldn't find " + traitRequired.Id);
                     int traitLevel = character.GetTraitLevel(foundTrait);
 
@@ -1778,7 +1813,9 @@ namespace CaptivityEvents.Events
             {
                 if (string.IsNullOrWhiteSpace(_listEvent.ReqHeroTrait)) return true;
 
-                int traitLevel = captive.GetTraitLevel(TraitObject.Find(_listEvent.ReqHeroTrait));
+                TraitObject foundTrait = TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _listEvent.ReqHeroTrait);
+
+                int traitLevel = captive.GetTraitLevel(foundTrait);
 
                 try
                 {
@@ -2087,6 +2124,6 @@ namespace CaptivityEvents.Events
             return false;
         }
 
-        #endregion
+#endregion
     }
 }

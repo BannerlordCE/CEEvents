@@ -1,4 +1,4 @@
-#define BETA
+#define STABLE
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -35,7 +35,15 @@ namespace CaptivityEvents.Brothel
             if (!CESettings.Instance.ProstitutionControl) return;
 
             // Option Added To Town
-            campaignGameStarter.AddGameMenuOption("town", "town_brothel", "{=CEEVENTS1100}Go to the brothel district", CanGoToBrothelDistrictOnCondition, delegate { try { GameMenu.SwitchToMenu("town_brothel"); } catch (Exception) { GameMenu.SwitchToMenu("town"); } }, false, 1);
+            campaignGameStarter.AddGameMenuOption("town", "town_brothel", "{=CEEVENTS1100}Go to the brothel district", CanGoToBrothelDistrictOnCondition, 
+                delegate { 
+                    try { 
+                        GameMenu.SwitchToMenu("town_brothel"); 
+                    } 
+                    catch (Exception) { 
+                        GameMenu.SwitchToMenu("town"); 
+                    } 
+                }, false, 1);
 
             campaignGameStarter.AddGameMenu("town_brothel", "{=CEEVENTS1098}You are in the brothel district", BrothelDistrictOnInit, GameOverlays.MenuOverlayType.SettlementWithBoth);
 
@@ -328,10 +336,14 @@ namespace CaptivityEvents.Brothel
         public static void ProstitutionMenuJoinOnConsequence(MenuCallbackArgs args)
         {
             SkillObject ProstitueFlag = CESkills.IsProstitute;
-            Hero.MainHero.SetSkillValue(ProstitueFlag, 1);
+            CEHelper.SetSkillValue(Hero.MainHero, ProstitueFlag, 1); 
+
             SkillObject ProstitutionSkill = CESkills.Prostitution;
 
-            if (Hero.MainHero.GetSkillValue(ProstitutionSkill) < 100) Hero.MainHero.SetSkillValue(ProstitutionSkill, 100);
+            if (Hero.MainHero.GetSkillValue(ProstitutionSkill) < 100)
+            {
+                CEHelper.SetSkillValue(Hero.MainHero, ProstitutionSkill, 100);
+            }
             TextObject textObject = GameTexts.FindText("str_CE_join_prostitution");
             textObject.SetTextVariable("PLAYER_HERO", Hero.MainHero.Name);
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
@@ -1122,7 +1134,10 @@ namespace CaptivityEvents.Brothel
             {
                 GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, prostitutionCost);
                 SkillObject prostitutionSkill = CESkills.Prostitution;
-                if (Hero.MainHero.GetSkillValue(prostitutionSkill) < 100) Hero.MainHero.SetSkillValue(prostitutionSkill, 100);
+                if (Hero.MainHero.GetSkillValue(prostitutionSkill) < 100)
+                {
+                    CEHelper.SetSkillValue(Hero.MainHero, prostitutionSkill, 100);
+                }
                 new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(1, 10), Hero.MainHero, false, true, true);
 
                 switch (Settlement.CurrentSettlement.Culture.GetCultureCode())
@@ -1478,8 +1493,12 @@ namespace CaptivityEvents.Brothel
             CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, new Action<Hero, Hero, KillCharacterAction.KillCharacterActionDetail, bool>(OnHeroDeath));
             CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, DailyTick);
             CampaignEvents.WeeklyTickEvent.AddNonSerializedListener(this, WeeklyTick);
+#if BETA
+            CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, new Action<CampaignGameStarter>(AddGameMenus));
+#else
             CampaignEvents.OnNewGameCreatedEvent.AddNonSerializedListener(this, AddGameMenus);
             CampaignEvents.OnGameLoadedEvent.AddNonSerializedListener(this, AddGameMenus);
+#endif
             CampaignEvents.OnMissionEndedEvent.AddNonSerializedListener(this, OnMissionEnded);
             CampaignEvents.OnSettlementLeftEvent.AddNonSerializedListener(this, OnSettlementLeft);
             CampaignEvents.OnSettlementOwnerChangedEvent.AddNonSerializedListener(this, OnSettlementOwnerChanged);

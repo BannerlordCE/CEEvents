@@ -2,7 +2,6 @@
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Issues;
-using HarmonyLib;
 using Helpers;
 using SandBox;
 using System;
@@ -12,10 +11,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
-using TaleWorlds.Library;
 using TaleWorlds.Localization;
-using TaleWorlds.MountAndBlade;
-using TaleWorlds.MountAndBlade.View.Missions;
 using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events
@@ -49,7 +45,7 @@ namespace CaptivityEvents.Events
                     else if (!string.IsNullOrEmpty(_listedEvent.SkillToLevel)) skillToLevel = _listedEvent.SkillToLevel;
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
 
-                    foreach (SkillObject skillObject in SkillObject.All.Where(skillObject => skillObject.Name.ToString().Equals(skillToLevel, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skillToLevel)) _dynamics.GainSkills(skillObject, 50, 100);
+                    foreach (SkillObject skillObject in Skills.All.Where(skillObject => skillObject.Name.ToString().Equals(skillToLevel, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skillToLevel)) _dynamics.GainSkills(skillObject, 50, 100);
                 }
                 catch (Exception) { CECustomHandler.LogToFile("GiveXP Failed"); }
             }
@@ -633,15 +629,7 @@ namespace CaptivityEvents.Events
 
                     if (nearestSettlement.IsUnderRaid || nearestSettlement.IsRaided) continue;
 
-#if BETA
-                    foreach (Hero hero in nearestSettlement.Notables.Where(hero => hero.Issue == null && !hero.IsHeroOccupied(Hero.EventRestrictionFlags.CantBeIssueOrQuestTarget)))
-#else
-                    foreach (Hero hero in nearestSettlement.Notables.Where(hero => hero.Issue == null && !hero.IsOccupiedByAnEvent()))
-#endif
-                    {
-                        issueOwner = hero;
-                        break;
-                    }
+                    issueOwner = nearestSettlement.Notables.FirstOrDefault((Hero y) => y.CanHaveQuestsOrIssues() && y.GetTraitLevel(DefaultTraits.Mercy) <= 0);
 
                     if (issueOwner == null) continue;
 
@@ -842,7 +830,7 @@ namespace CaptivityEvents.Events
                                             CECustomHandler.ForceLogToFile("ConsequenceStartBattle : city required. ");
                                         }
                                         // StartCommonAreaBattle RivalGangMovingInIssue
-                                        MobileParty customParty = MBObjectManager.Instance.CreateObject<MobileParty>("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue));
+                                        MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue));
 
                                         TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
                                         customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
@@ -873,16 +861,22 @@ namespace CaptivityEvents.Events
                                         customParty.SetCustomName(textObject);
                                         customParty.IsActive = true;
 
+#if BETA
+                                        customParty.ActualClan = clan;
+                                        customParty.Party.SetCustomOwner(clan.Leader);
+                                        customParty.Party.Visuals.SetMapIconAsDirty();
+#else
                                         customParty.ActualClan = clan;
                                         customParty.Party.Owner = clan.Leader;
                                         customParty.Party.Visuals.SetMapIconAsDirty();
                                         customParty.HomeSettlement = nearest;
+#endif
 
                                         float totalStrength = customParty.Party.TotalStrength;
                                         int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                                         customParty.InitializePartyTrade(initialGold);
 
-                                        foreach (ItemObject itemObject in ItemObject.All)
+                                        foreach (ItemObject itemObject in Items.All)
                                         {
                                             if (itemObject.IsFood)
                                             {
@@ -908,11 +902,7 @@ namespace CaptivityEvents.Events
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
-#if BETA
                                             DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
-#else
-                                            DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToFriendsMultiplier(),
-#endif
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
@@ -941,16 +931,22 @@ namespace CaptivityEvents.Events
                                         customParty.SetCustomName(textObject);
                                         customParty.IsActive = true;
 
+#if BETA
+                                        customParty.ActualClan = clan;
+                                        customParty.Party.SetCustomOwner(clan.Leader);
+                                        customParty.Party.Visuals.SetMapIconAsDirty();
+#else
                                         customParty.ActualClan = clan;
                                         customParty.Party.Owner = clan.Leader;
                                         customParty.Party.Visuals.SetMapIconAsDirty();
                                         customParty.HomeSettlement = nearest;
+#endif
 
                                         float totalStrength = customParty.Party.TotalStrength;
                                         int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                                         customParty.InitializePartyTrade(initialGold);
 
-                                        foreach (ItemObject itemObject in ItemObject.All)
+                                        foreach (ItemObject itemObject in Items.All)
                                         {
                                             if (itemObject.IsFood)
                                             {
@@ -976,11 +972,7 @@ namespace CaptivityEvents.Events
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
-#if BETA
                                             DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
-#else
-                                            DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToFriendsMultiplier(),
-#endif
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
@@ -1072,11 +1064,7 @@ namespace CaptivityEvents.Events
                 else
                 {
                     MobileParty.MainParty.Position2D = nearest.GatePosition;
-#if BETA
                     EncounterManager.StartSettlementEncounter(MobileParty.MainParty, nearest);
-#else
-                    Campaign.Current.HandleSettlementEncounter(MobileParty.MainParty, nearest);
-#endif
                 }
             }
             catch (Exception e)
@@ -1084,7 +1072,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("ConsequenceTeleportPlayer Failed: " + e);
             }
         }
-       
+
         internal void ConsequenceMission()
         {
             try
@@ -1101,7 +1089,7 @@ namespace CaptivityEvents.Events
                             break;
                         default:
                             character2 = Hero.MainHero.IsPrisoner ? Hero.MainHero.PartyBelongedToAsPrisoner.Leader : _listedEvent.Captive;
-                        break;
+                            break;
                     }
 
                     character2.StringId = "CECustomStringId_" + _option.SceneSettings.SceneName;
@@ -1112,14 +1100,14 @@ namespace CaptivityEvents.Events
 
                 }
             }
-             catch (Exception e)
+            catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("ConsequenceMission Failed: " + e);
             }
 
 
         }
-#endregion
+        #endregion
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {
@@ -1170,6 +1158,13 @@ namespace CaptivityEvents.Events
                                 {
                                     CECustomHandler.LogToFile(conditionMatched);
                                     continue;
+                                }
+
+                                if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
+                                {
+                                    CECustomHandler.LogToFile("IgnoreAllOther detected - autofire " + triggeredEvent.Name);
+                                    backgroundNames.Add(background.Name);
+                                    break;
                                 }
 
                                 try

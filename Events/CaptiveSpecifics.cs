@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿#define STABLE
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -79,6 +80,8 @@ namespace CaptivityEvents.Events
                                           : "CE_captivity_sexual_escape_success_male");
             }
         }
+
+        /// EndCaptivityInternal from PlayerCaptivity
         internal void CECaptivityLeave(ref MenuCallbackArgs args)
         {
             new CESubModule().LoadTexture("default");
@@ -117,7 +120,7 @@ namespace CaptivityEvents.Events
                     MobileParty.MainParty.IsActive = true;
                     PartyBase.MainParty.SetAsCameraFollowParty();
                     MobileParty.MainParty.SetMoveModeHold();
-                    PartyBase.MainParty.UpdateVisibilityAndInspected(true);
+                    PartyBase.MainParty.UpdateVisibilityAndInspected(0f, true);
                 }
 
                 PlayerCaptivity.CaptorParty = null;
