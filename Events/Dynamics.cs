@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define STABLE
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -129,12 +129,7 @@ namespace CaptivityEvents.Events
                 int newNumber = currentTraitLevel + amount;
                 if (newNumber < (traitObject?.MinValue ?? 0)) newNumber = traitObject?.MinValue ?? 0;
 
-
-#if BETA
                 hero.SetTraitLevelInternal(traitObject, newNumber);
-#else
-                hero.SetTraitLevel(traitObject, newNumber);
-#endif
 
                 if (!display) return;
                 TextObject textObject = GameTexts.FindText("str_CE_trait_level");
@@ -195,16 +190,16 @@ namespace CaptivityEvents.Events
 
             if (found) return;
 
-#if STABLE
-            foreach (TraitObject traitObject in DefaultTraits.All)
-            {
-                if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
-                {
-                    found = true;
-                    TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
-                }
-            }
-#endif
+//#if STABLE
+//            foreach (TraitObject traitObject in DefaultTraits.All)
+//            {
+//                if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
+//                {
+//                    found = true;
+//                    TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
+//                }
+//            }
+//#endif
 
             if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + trait);
 
@@ -336,11 +331,7 @@ namespace CaptivityEvents.Events
             if (found) return;
 
 
-#if BETA
             foreach (SkillObject skillObject in Skills.All)
-#else
-            foreach (SkillObject skillObject in SkillObject.All)
-#endif
             {
                 if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
                 {

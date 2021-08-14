@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define STABLE
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using System;
@@ -51,7 +51,6 @@ namespace CaptivityEvents.Helper
 
         internal static void SetSkillValue(Hero hero, SkillObject skillObject, int value)
         {
-#if BETA
             MethodInfo mi = typeof(Hero).GetMethod("SetSkillValueInternal", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             if (mi == null)
             {
@@ -61,9 +60,6 @@ namespace CaptivityEvents.Helper
             {
                 mi.Invoke(hero, new object[] { skillObject, value });
             }
-#else
-            hero.SetSkillValue(skillObject, value);
-#endif
         }
 
         internal static void AddDelayedEvent(CEDelayedEvent delayedEvent)

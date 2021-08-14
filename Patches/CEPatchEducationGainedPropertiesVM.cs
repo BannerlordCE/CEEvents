@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define STABLE
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,6 @@ using TaleWorlds.Core;
 
 namespace CaptivityEvents.Patches
 {
-#if BETA
     // TaleWorlds.CampaignSystem.ViewModelCollection.Education EducationGainedPropertiesVM
     [HarmonyPatch(typeof(EducationGainedPropertiesVM), "PopulateInitialValues")]
     internal class CEPatchEducationGainedPropertiesVM
@@ -65,5 +64,4 @@ namespace CaptivityEvents.Patches
 			return false;
         }
     }
-#endif
 }

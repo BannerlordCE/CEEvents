@@ -1,4 +1,4 @@
-#define BETA
+#define STABLE
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -462,11 +462,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment2);
             }
 
-#if BETA
             hero.SetName(NameGenerator.Current.GenerateHeroFirstName(hero, true), null);
-#else
-            hero.FirstName = NameGenerator.Current.GenerateHeroFirstName(hero, true);
-#endif
             hero.CharacterObject.Name = hero.FirstName;
 
             // Reflection Two

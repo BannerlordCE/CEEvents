@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define STABLE
 using CaptivityEvents.Custom;
 using HarmonyLib;
 using System;
@@ -14,7 +14,7 @@ using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Patches
 {
-#if BETA
+
     // TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement ClanLordItemVM
     [HarmonyPatch(typeof(ClanLordItemVM), "UpdateProperties")]
     internal class CEPatchClanLordItemVM
@@ -65,5 +65,4 @@ namespace CaptivityEvents.Patches
             return false;
         }
     }
-#endif
 }

@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define STABLE
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -1094,11 +1094,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-#if BETA
                 traitLevel = PlayerCaptivity.CaptorParty.LeaderHero.GetTraitLevel(TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _option.ReqCaptorTrait));
-#else
-                traitLevel = PlayerCaptivity.CaptorParty.LeaderHero.GetTraitLevel(TraitObject.Find(_option.ReqCaptorTrait));
-#endif
             }
             catch (Exception)
             {
@@ -1146,11 +1142,7 @@ namespace CaptivityEvents.Events
             int traitLevel;
             try
             {
-#if BETA
                 traitLevel = Hero.MainHero.GetTraitLevel(TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _option.ReqCaptorTrait));
-#else
-              traitLevel = Hero.MainHero.GetTraitLevel(TraitObject.Find(_option.ReqCaptorTrait)); 
-#endif
             }
             catch (Exception)
             {

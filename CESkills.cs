@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define STABLE
 using CaptivityEvents.Custom;
 using System;
 using System.Collections.Generic;
@@ -60,11 +60,7 @@ namespace CaptivityEvents
                 }
             }
 
-#if BETA
             foreach (SkillObject skillObject in Skills.All)
-#else
-            foreach (SkillObject skillObject in SkillObject.All)
-#endif
             {
                 if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
                 {
@@ -126,11 +122,7 @@ namespace CaptivityEvents
 
         public static void InitializeAll()
         {
-#if BETA
             CEAttribute.Initialize(new TextObject("CE"), new TextObject("Skills added by Captivity Events."), new TextObject("CE"));
-#else
-            CEAttribute.Initialize(new TextObject("CE"), new TextObject("Skills added by Captivity Events."), new TextObject("CE"), CharacterAttributesEnum.Social);
-#endif
 
             for (int i = 0; i < CustomSkills.Count; i++)
             {

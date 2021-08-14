@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define STABLE
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using HarmonyLib;

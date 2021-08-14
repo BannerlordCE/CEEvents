@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define STABLE
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -120,11 +120,7 @@ namespace CaptivityEvents.Events
                     MobileParty.MainParty.IsActive = true;
                     PartyBase.MainParty.SetAsCameraFollowParty();
                     MobileParty.MainParty.SetMoveModeHold();
-#if BETA
                     PartyBase.MainParty.UpdateVisibilityAndInspected(0f, true);
-#else
-                    PartyBase.MainParty.UpdateVisibilityAndInspected(true);
-#endif
                 }
 
                 PlayerCaptivity.CaptorParty = null;
