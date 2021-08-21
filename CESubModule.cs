@@ -1,4 +1,4 @@
-#define STABLE
+
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -624,6 +624,7 @@ namespace CaptivityEvents
             {
                 return;
             }
+
         }
 
         private void ResetHelper()

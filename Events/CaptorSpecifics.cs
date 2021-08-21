@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -182,7 +182,7 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-
+                    //SpawnAPartyInFaction
                     TroopRosterElement leader = releasedPrisoners.GetTroopRoster().FirstOrDefault(hasHero => hasHero.Character.IsHero);
 
                     Clan clan = null;
@@ -200,7 +200,7 @@ namespace CaptivityEvents.Events
                         clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
                         nearest = SettlementHelper.FindNearestSettlement(settlement => true);
-                        prisonerParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest.Hideout, false);
+                        prisonerParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false);
                     }
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
@@ -213,7 +213,7 @@ namespace CaptivityEvents.Events
                     prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
                     prisonerParty.IsActive = true;
 
-#if BETA
+
                     prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
                                        ? nearest.GatePosition
                                        : nearest.Position2D);
@@ -226,26 +226,11 @@ namespace CaptivityEvents.Events
                     {
                         prisonerParty.Party.SetCustomOwner(clan.Leader);
                     }
-#else
-                    prisonerParty.HomeSettlement = nearest;
-                    prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
-                                       ? nearest.GatePosition
-                                       : nearest.Position2D);
-
-                    if (leader.Character != null)
-                    {
-                        prisonerParty.Party.Owner = leader.Character.HeroObject;
-                        prisonerParty.ChangePartyLeader(leader.Character);
-                    }
-                    else
-                    {
-                        prisonerParty.Party.Owner = clan.Leader;
-                    }
-#endif
 
                     prisonerParty.RecentEventsMorale = -100;
                     prisonerParty.Aggressiveness = 0.2f;
                     prisonerParty.InitializePartyTrade(0);
+                    prisonerParty.SetCustomHomeSettlement(nearest);
 
                     Hero.MainHero.HitPoints += 40;
 
@@ -294,12 +279,13 @@ namespace CaptivityEvents.Events
 
                 try
                 {
+                    //SpawnAPartyInFaction
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                     clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
                     Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
-                    MobileParty prisonerParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_Hunt_" + MBRandom.RandomInt(int.MaxValue), clan, nearest.Hideout, false);
+                    MobileParty prisonerParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_Hunt_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false);
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
@@ -313,17 +299,10 @@ namespace CaptivityEvents.Events
                     prisonerParty.IsActive = true;
                     prisonerParty.ActualClan = clan;
 
-#if BETA
                     prisonerParty.Party.SetCustomOwner(clan.Leader);
                     prisonerParty.Party.Visuals.SetMapIconAsDirty();
                     prisonerParty.InitializePartyTrade(0);
-#else
-                    prisonerParty.Party.Owner = clan.Leader;
-                    prisonerParty.Party.Visuals.SetMapIconAsDirty();
-
-                    prisonerParty.HomeSettlement = nearest;
-                    prisonerParty.InitializePartyTrade(0);
-#endif
+                    prisonerParty.SetCustomHomeSettlement(nearest);
 
                     Hero.MainHero.HitPoints += 40;
 

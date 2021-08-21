@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -523,11 +523,7 @@ namespace CaptivityEvents.Events
                         
                         if (firstHero.PartyBelongedTo != null)
                         {
-#if BETA
                             firstHero.PartyBelongedTo.Party.SetCustomOwner(null);
-#else
-                            firstHero.PartyBelongedTo.Party.Owner = null;
-#endif
                         }
                         firstHero.ChangeState(Hero.CharacterStates.Fugitive);
                         MobileParty partyBelongedTo = firstHero.PartyBelongedTo;

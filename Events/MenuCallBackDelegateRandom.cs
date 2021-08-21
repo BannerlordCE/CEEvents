@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -475,7 +475,7 @@ namespace CaptivityEvents.Events
                         }
                         else
                         {
-                            enemyTroops.AddToCounts(troopRosterElement.Character, 1, false, 0, 0, true, -1);
+                            enemyTroops.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, troopRosterElement.Xp, true, -1);
                         }
                     }
                 }
@@ -485,28 +485,27 @@ namespace CaptivityEvents.Events
 
                 if (!enemyTroops.GetTroopRoster().IsEmpty())
                 {
+                    //SpawnAPartyInFaction
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                     clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
                     Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
-                    MobileParty customParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest.Hideout, false);
-                    TextObject textObject = new TextObject("Bandits", null);
-                    customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), MobileParty.MainParty.Position2D, 1f, 0.5f);
-                    customParty.SetCustomName(textObject);
-                    customParty.IsActive = true;
+                    MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false);
 
-#if BETA
-                    customParty.ActualClan = clan;
-                    customParty.Party.SetCustomOwner(clan.Leader);
-                    customParty.Party.Visuals.SetMapIconAsDirty();
-#else
-                    customParty.ActualClan = clan;
-                    customParty.Party.Owner = clan.Leader;
-                    customParty.Party.Visuals.SetMapIconAsDirty();
-                    customParty.HomeSettlement = nearest;
-#endif
+                    PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
+                    customParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+                    customParty.SetCustomName(new TextObject("Bandits", null));
+
+                    customParty.MemberRoster.Clear();
+                    customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
+
+                    // InitBanditParty
+                    customParty.Party.Visuals.SetMapIconAsDirty();
+                    customParty.ActualClan = clan;
+
+                    // CreatePartyTrade
                     float totalStrength = customParty.Party.TotalStrength;
                     int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                     customParty.InitializePartyTrade(initialGold);
@@ -541,15 +540,34 @@ namespace CaptivityEvents.Events
         }
         private void ConsequenceRandomCaptivityChange(ref MenuCallbackArgs args, PartyBase party)
         {
+            // TakePrisonerAction
             try
             {
                 Hero prisonerCharacter = Hero.MainHero;
-                prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
-                prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
-                while (PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter)) PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, -1, true);
-                party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
 
-                if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(party);
+                if (prisonerCharacter.IsPrisoner)
+                {
+                    if (prisonerCharacter.PartyBelongedToAsPrisoner != null)
+                    {
+                        prisonerCharacter.PartyBelongedToAsPrisoner.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                    }
+                    prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
+                    prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
+                    party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
+                    if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(party);
+                }
+                else
+                {
+                    if (prisonerCharacter.PartyBelongedTo != null)
+                    {
+                        prisonerCharacter.PartyBelongedTo.MemberRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                    }
+                    prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
+                    prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
+                    party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
+
+                    if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(party);
+                }
                 CEHelper.delayedEvents.Clear();
             }
             catch (Exception e)
@@ -642,11 +660,11 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid PregnancyRiskModifier"); }
         }
-#endregion
+        #endregion
 
-#region Requirements
+        #region Requirements
 
-#region ReqGold
+        #region ReqGold
         private void ReqGold(ref MenuCallbackArgs args)
         {
             try
@@ -675,9 +693,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_gold_level", "low");
             args.IsEnabled = false;
         }
-#endregion
+        #endregion
 
-#region ReqTrait
+        #region ReqTrait
         private void ReqTrait(ref MenuCallbackArgs args)
         {
             if (string.IsNullOrWhiteSpace(_option.ReqHeroTrait)) return;
@@ -721,9 +739,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = text;
             args.IsEnabled = false;
         }
-#endregion
+        #endregion
 
-#region ReqHeroSkills
+        #region ReqHeroSkills
         private void ReqHeroSkills(ref MenuCallbackArgs args)
         {
             if (_option.SkillsRequired == null) return;
@@ -780,9 +798,9 @@ namespace CaptivityEvents.Events
 
             return true;
         }
-#endregion
+        #endregion
 
-#region ReqHeroSkill
+        #region ReqHeroSkill
         private void ReqHeroSkill(ref MenuCallbackArgs args)
         {
             if (string.IsNullOrWhiteSpace(_option.ReqHeroSkill)) return;
@@ -830,9 +848,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = text;
             args.IsEnabled = false;
         }
-#endregion
+        #endregion
 
-#region ReqProstitute
+        #region ReqProstitute
         private void ReqProstitute(ref MenuCallbackArgs args)
         {
             int prostitute = Hero.MainHero.GetSkillValue(CESkills.Prostitution);
@@ -861,9 +879,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_prostitution_level", "low");
             args.IsEnabled = false;
         }
-#endregion
+        #endregion
 
-#region ReqSlavery
+        #region ReqSlavery
         private void ReqSlavery(ref MenuCallbackArgs args)
         {
             int slave = Hero.MainHero.GetSkillValue(CESkills.Slavery);
@@ -892,9 +910,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_slavery_level", "low");
             args.IsEnabled = false;
         }
-#endregion
+        #endregion
 
-#region ReqHeroHealthPercentage
+        #region ReqHeroHealthPercentage
         private void ReqHeroHealthPercentage(ref MenuCallbackArgs args)
         {
             try
@@ -921,9 +939,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_health", "low");
             args.IsEnabled = false;
         }
-#endregion
+        #endregion
 
-#region ReqFemaleCaptives
+        #region ReqFemaleCaptives
 
         private void ReqFemaleCaptives(ref MenuCallbackArgs args)
         {
@@ -988,9 +1006,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion
+        #endregion
 
-#region ReqMaleCaptives
+        #region ReqMaleCaptives
 
         private void ReqMaleCaptives(ref MenuCallbackArgs args)
         {
@@ -1055,9 +1073,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion
+        #endregion
 
-#region ReqCaptives
+        #region ReqCaptives
 
         private void ReqCaptives(ref MenuCallbackArgs args)
         {
@@ -1122,9 +1140,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion
+        #endregion
 
-#region ReqFemaleTroops
+        #region ReqFemaleTroops
 
         private void ReqFemaleTroops(ref MenuCallbackArgs args)
         {
@@ -1189,9 +1207,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion
+        #endregion
 
-#region ReqMaleTroops
+        #region ReqMaleTroops
 
         private void ReqMaleTroops(ref MenuCallbackArgs args)
         {
@@ -1256,9 +1274,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion
+        #endregion
 
-#region ReqTroops
+        #region ReqTroops
 
         private void ReqTroops(ref MenuCallbackArgs args)
         {
@@ -1323,9 +1341,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion
+        #endregion
 
-#region ReqMorale
+        #region ReqMorale
         private void ReqMorale(ref MenuCallbackArgs args)
         {
             try
@@ -1352,11 +1370,11 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_morale_level", "low");
             args.IsEnabled = false;
         }
-#endregion
+        #endregion
 
-#endregion
+        #endregion
 
-#region Icons
+        #region Icons
         private void EmptyIcon(ref MenuCallbackArgs args)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.EmptyIcon)) args.optionLeaveType = GameMenuOption.LeaveType.Default;
@@ -1401,9 +1419,9 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape) || _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) args.optionLeaveType = GameMenuOption.LeaveType.Escape;
         }
 
-#endregion
+        #endregion
 
-#region Init Options
+        #region Init Options
         private void InitChangeGold()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) return;
@@ -1459,9 +1477,9 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
         }
-#endregion
+        #endregion
 
-#region CustomConsequencesReq
+        #region CustomConsequencesReq
         private void PlayerHasOpenSpaceForCompanions(ref MenuCallbackArgs args)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerAllowedCompanion)) return;
@@ -1479,6 +1497,6 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_busy_right_now");
             args.IsEnabled = false;
         }
-#endregion
+        #endregion
     }
 }

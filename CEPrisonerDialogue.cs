@@ -65,11 +65,26 @@ namespace CaptivityEvents
                     {
                         if (CustomLine.Ref != null && CustomLine.Ref.ToLower() == "ai")
                         {
-                            campaignGameStarter.AddDialogLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, () => { return ConversationCECustomScenes(CustomScene.Name); }, null);
+
+                            campaignGameStarter.AddDialogLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, () => { return ConversationCECustomScenes(CustomScene.Name); }, () =>
+                            {
+                                if (CustomLine.OutputToken == "close_window")
+                                {
+                                    CharacterObject.OneToOneConversationCharacter.StringId = "";
+                                }
+                            }
+                            );
                         }
                         else
                         {
-                            campaignGameStarter.AddPlayerLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, null, null);
+                            campaignGameStarter.AddPlayerLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, null, () =>
+                            {
+                                if (CustomLine.OutputToken == "close_window")
+                                {
+                                    CharacterObject.OneToOneConversationCharacter.StringId = "";
+                                }
+                            }
+                            );
                         }
                     }
 

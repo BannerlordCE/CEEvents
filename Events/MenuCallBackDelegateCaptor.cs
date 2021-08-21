@@ -1,9 +1,8 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
-using Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;

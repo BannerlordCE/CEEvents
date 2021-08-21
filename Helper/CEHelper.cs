@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using System;

@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -180,6 +180,7 @@ namespace CaptivityEvents.Events
             string environmentTerrainTypes = "";
             faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
             if (atmosphere.SnowInfo.Density > 0) environmentTerrainTypes += "(Snow)";
+
             returnString += "\nEnvironment Terrain Types : " + environmentTerrainTypes;
 
             returnString += "\n\n\n------- Party Status -------";

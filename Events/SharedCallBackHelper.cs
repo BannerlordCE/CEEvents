@@ -1,6 +1,7 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
+using CaptivityEvents.Helper;
 using CaptivityEvents.Issues;
 using Helpers;
 using SandBox;
@@ -832,9 +833,19 @@ namespace CaptivityEvents.Events
                                         // StartCommonAreaBattle RivalGangMovingInIssue
                                         MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue));
 
+                                        Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
+                                        clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
+
+                
+                                        PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
+
+                                        customParty.InitializeMobileParty(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
+                                        customParty.MemberRoster.Clear();
+                                        customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
+
                                         TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
-                                        customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
                                         customParty.SetCustomName(textObject);
+
                                         EnterSettlementAction.ApplyForParty(customParty, Settlement.CurrentSettlement);
 
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, false);
@@ -855,24 +866,23 @@ namespace CaptivityEvents.Events
 
                                         Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
-                                        MobileParty customParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest.Hideout, false);
+                                        MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false);
+
+                                        PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
+
+                                        customParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+
+                                        customParty.MemberRoster.Clear();
+                                        customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
+
                                         TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
-                                        customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), MobileParty.MainParty.Position2D, 1f, 0.5f);
                                         customParty.SetCustomName(textObject);
-                                        customParty.IsActive = true;
 
-#if BETA
-                                        customParty.ActualClan = clan;
-                                        customParty.Party.SetCustomOwner(clan.Leader);
+                                        // InitBanditParty
                                         customParty.Party.Visuals.SetMapIconAsDirty();
-#else
                                         customParty.ActualClan = clan;
-                                        customParty.Party.Owner = clan.Leader;
-                                        customParty.Party.Visuals.SetMapIconAsDirty();
-                                        customParty.HomeSettlement = nearest;
-#endif
 
-                                        float totalStrength = customParty.Party.TotalStrength;
+                                        // CreatePartyTrade
                                         int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                                         customParty.InitializePartyTrade(initialGold);
 
@@ -925,24 +935,22 @@ namespace CaptivityEvents.Events
 
                                         Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
 
-                                        MobileParty customParty = BanditPartyComponent.CreateBanditParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest.Hideout, false);
+                                        MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false);
+                                        PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
+
+                                        customParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+
+                                        customParty.MemberRoster.Clear();
+                                        customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
+
                                         TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
-                                        customParty.InitializeMobileParty(enemyTroops, TroopRoster.CreateDummyTroopRoster(), MobileParty.MainParty.Position2D, 1f, 0.5f);
                                         customParty.SetCustomName(textObject);
-                                        customParty.IsActive = true;
 
-#if BETA
-                                        customParty.ActualClan = clan;
-                                        customParty.Party.SetCustomOwner(clan.Leader);
+                                        // InitBanditParty
                                         customParty.Party.Visuals.SetMapIconAsDirty();
-#else
                                         customParty.ActualClan = clan;
-                                        customParty.Party.Owner = clan.Leader;
-                                        customParty.Party.Visuals.SetMapIconAsDirty();
-                                        customParty.HomeSettlement = nearest;
-#endif
 
-                                        float totalStrength = customParty.Party.TotalStrength;
+                                        // CreatePartyTrade
                                         int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                                         customParty.InitializePartyTrade(initialGold);
 
@@ -1059,7 +1067,26 @@ namespace CaptivityEvents.Events
                 Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return settlement.IsTown && settlement.MapFaction != Hero.MainHero.MapFaction; });
                 if (Hero.MainHero.IsPrisoner)
                 {
-                    TakePrisonerAction.Apply(nearest.Party, Hero.MainHero);
+                    try
+                    {
+                        Hero prisonerCharacter = Hero.MainHero;
+                        PartyBase party = nearest.Party;
+
+                        if (prisonerCharacter.PartyBelongedToAsPrisoner != null)
+                        {
+                            prisonerCharacter.PartyBelongedToAsPrisoner.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                        }
+                        prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
+                        prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
+                        party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
+
+                        PlayerCaptivity.StartCaptivity(party);
+                        CEHelper.delayedEvents.Clear();
+                    }
+                    catch (Exception e)
+                    {
+                        CECustomHandler.LogToFile("Failed to ConsequenceTeleportPlayer: " + e.Message + " stacktrace: " + e.StackTrace);
+                    }
                 }
                 else
                 {
@@ -1096,8 +1123,6 @@ namespace CaptivityEvents.Events
                     ConversationCharacterData data2 = new ConversationCharacterData(character2);
 
                     CampaignMission.OpenConversationMission(data1, data2);
-
-
                 }
             }
             catch (Exception e)

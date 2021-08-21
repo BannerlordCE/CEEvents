@@ -1,16 +1,15 @@
-﻿#define STABLE
+﻿
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ViewModelCollection.CharacterCreation;
-using TaleWorlds.CampaignSystem.ViewModelCollection.Education;
 using TaleWorlds.Core;
 
 namespace CaptivityEvents.Patches
 {
-	//  TaleWorlds.CampaignSystem.ViewModelCollection.CharacterCreation CharacterCreationGainedPropertiesVM
-	[HarmonyPatch(typeof(CharacterCreationGainedPropertiesVM), "PopulateInitialValues")]
+    //  TaleWorlds.CampaignSystem.ViewModelCollection.CharacterCreation CharacterCreationGainedPropertiesVM
+    [HarmonyPatch(typeof(CharacterCreationGainedPropertiesVM), "PopulateInitialValues")]
 	internal class CEPatchCharacterCreationGainedPropertiesVM
 	{
 		public static AccessTools.FieldRef<CharacterCreationGainedPropertiesVM, Dictionary<SkillObject, Tuple<int, int>>> _affectedSkillMap = AccessTools.FieldRefAccess<CharacterCreationGainedPropertiesVM, Dictionary<SkillObject, Tuple<int, int>>>("_affectedSkillMap");
