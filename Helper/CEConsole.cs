@@ -686,7 +686,7 @@ namespace CaptivityEvents.Helper
 
 
                     return successful
-                        ? "Successfully cleaned save of captivity events data. Save the game now."
+                        ? "Successfully cleaned save of captivity events data. Save & Exit the game now."
                         : "Failed to Clean";
                 }
                 catch (Exception e)

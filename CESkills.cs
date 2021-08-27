@@ -31,7 +31,21 @@ namespace CaptivityEvents
 
         private static readonly List<CESkillNode> _Skills = new List<CESkillNode>();
 
-        public static void AddCustomSkill(CESkillNode skillNode) => _Skills.Add(skillNode);
+        public static void AddCustomSkill(CESkillNode skillNode) {
+
+            int index = _Skills.FindIndex((item) => item.Id == skillNode.Id);
+            if (index == -1)
+            {
+                _Skills.Add(skillNode);
+            } 
+            else
+            {
+                _Skills[index].MaxLevel = skillNode.MaxLevel;
+                _Skills[index].MinLevel = skillNode.MinLevel;
+                _Skills[index].Name = skillNode.Name;
+            }
+        }
+            
 
 
         public static CESkillNode FindSkillNode(string skill)
