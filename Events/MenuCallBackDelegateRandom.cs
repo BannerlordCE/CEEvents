@@ -480,6 +480,16 @@ namespace CaptivityEvents.Events
                     }
                 }
 
+                foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster.GetTroopRoster())
+                {
+                    if (troopRosterElement.Character.IsHero)
+                    {
+                        EndCaptivityAction.ApplyByEscape(troopRosterElement.Character.HeroObject);
+                        continue;
+                    }
+                    PartyBase.MainParty.PrisonRoster.RemoveTroop(troopRosterElement.Character, 1);
+                }
+
                 PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter);
 
 
@@ -504,6 +514,9 @@ namespace CaptivityEvents.Events
                     // InitBanditParty
                     customParty.Party.Visuals.SetMapIconAsDirty();
                     customParty.ActualClan = clan;
+
+                    customParty.IsActive = true;
+                    customParty.Party.SetCustomOwner(clan.Leader);
 
                     // CreatePartyTrade
                     float totalStrength = customParty.Party.TotalStrength;
