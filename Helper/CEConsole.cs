@@ -994,7 +994,7 @@ namespace CaptivityEvents.Helper
                     // Go Through Events
                     foreach (CEEvent _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !string.IsNullOrWhiteSpace(_listedEvent.Name)))
                     {
-                        if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && (CEPersistence.CEEventList.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 1 || CEPersistence.CEWaitingList.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 1)) continue;
+                        if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && (CEPersistence.CEEventList.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 0 || CEPersistence.CEWaitingList.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 0)) continue;
 
                         if (!CEHelper.brothelFlagFemale)
                         {

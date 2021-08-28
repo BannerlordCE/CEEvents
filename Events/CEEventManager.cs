@@ -27,6 +27,7 @@ namespace CaptivityEvents.Events
 
             if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
+
             CEEvent foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
 
             if (foundevent != null)
