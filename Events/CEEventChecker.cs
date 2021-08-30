@@ -457,10 +457,19 @@ namespace CaptivityEvents.Events
                 if (party.MobileParty.IsLordParty) type = 3;
             }
 
-            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DefaultParty) && type != 0) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. DefaultParty.");
-            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaravanParty) && type != 1) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaravanParty.");
-            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BanditParty) && type != 2) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. BanditParty.");
-            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LordParty) && type != 3) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. LordParty.");
+            bool hasDefaultFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DefaultParty);
+            bool hasCaravanFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaravanParty);
+            bool hasBanditFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BanditParty);
+            bool hasLordParty = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LordParty);
+
+
+            if (hasDefaultFlag || hasCaravanFlag || hasBanditFlag || hasLordParty)
+            {
+                if (!hasDefaultFlag && type == 0) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. DefaultParty.");
+                if (!hasCaravanFlag && type == 1) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaravanParty.");
+                if (!hasBanditFlag && type == 2) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. BanditParty.");
+                if (!hasLordParty && type == 3) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. LordParty.");
+            }
 
             return true;
         }
