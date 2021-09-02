@@ -1314,7 +1314,10 @@ namespace CaptivityEvents
                             PlayerEncounter.Current.FinalizeBattle();
                             try 
                             {
-                                DestroyPartyAction.Apply(PartyBase.MainParty, PlayerEncounter.EncounteredMobileParty);
+                                if (PlayerEncounter.EncounteredMobileParty.ActualClan != null)
+                                {
+                                    DestroyPartyAction.Apply(PartyBase.MainParty, PlayerEncounter.EncounteredMobileParty);
+                                }
                             } 
                             catch (Exception e)
                             {

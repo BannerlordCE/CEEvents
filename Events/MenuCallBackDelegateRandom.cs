@@ -231,6 +231,8 @@ namespace CaptivityEvents.Events
             ConsequenceGainRandomPrisoners();
             ConsequenceCapturedByParty(ref args);
             ConsequenceSoldEvents(ref args);
+            ConsequenceWoundTroops();
+            ConsequenceKillTroops();
 
             _sharedCallBackHelper.ConsequenceMission();
             _sharedCallBackHelper.ConsequenceTeleportPlayer();
@@ -458,6 +460,23 @@ namespace CaptivityEvents.Events
                 captorSpecifics.CECaptorContinue(args);
             }
         }
+        private void ConsequenceWoundTroops()
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomTroops)) _dynamics.CEWoundTroops(PartyBase.MainParty);
+            else
+            {
+
+            }
+        }
+        private void ConsequenceKillTroops()
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomTroops)) _dynamics.CEKillTroops(PartyBase.MainParty);
+            else
+            {
+
+            }
+        }
+
         private void ConsequenceCapturedByParty(ref MenuCallbackArgs args)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CapturePlayer)) return;

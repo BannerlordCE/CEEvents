@@ -744,7 +744,40 @@ namespace CaptivityEvents.Events
                 }
             }
         }
-
+        internal void CEWoundTroops(PartyBase party, int amount = 10)
+        {
+            try
+            {
+                int prisonerCount = party.MemberRoster.Count;
+                if (prisonerCount < amount) amount = prisonerCount;
+                party.MemberRoster.WoundNumberOfTroopsRandomly(amount);
+                TextObject textObject = GameTexts.FindText("str_CE_wound_troops");
+                textObject.SetTextVariable("PARTY", party.Name);
+                textObject.SetTextVariable("AMOUNT", amount);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("CEWoundTroops Couldn't wound any troops.");
+            }
+        }
+        internal void CEKillTroops(PartyBase party, int amount = 10, bool killHeroes = false)
+        {
+            try
+            {
+                int prisonerCount = party.MemberRoster.Count;
+                if (prisonerCount < amount) amount = prisonerCount;
+                party.MemberRoster.KillNumberOfMenRandomly(amount, killHeroes);
+                TextObject textObject = GameTexts.FindText("str_CE_kill_troops");
+                textObject.SetTextVariable("PARTY", party.Name);
+                textObject.SetTextVariable("AMOUNT", amount);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("CEKillTroops Couldn't kill any troops.");
+            }
+        }
         internal void CEGainRandomPrisoners(PartyBase party)
         {
             Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.IsVillage);

@@ -76,7 +76,9 @@ namespace CaptivityEvents.Custom
         WoundRandomPrisoners,
         MakeHeroCompanion,
         CaptorLeaveSpouse,
-        TeleportPlayer
+        TeleportPlayer,
+        KillRandomTroops,
+        WoundRandomTroops
     }
 
     [XmlType(AnonymousType = true)]
@@ -285,6 +287,23 @@ namespace CaptivityEvents.Custom
 
         public string EventUseConditions { get; set; }
     }
+
+    [DebuggerStepThrough]
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = true)]
+    [Serializable]
+    public class TeleportSettings
+    {
+        [XmlAttribute()]
+        public string Location { get; set; }
+        [XmlAttribute()]
+        public string LocationName { get; set; }
+        [XmlAttribute()]
+        public string Distance { get; set; }
+        [XmlAttribute()]
+        public string Faction { get; set; }
+    }
+
     [DebuggerStepThrough]
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = "", IsNullable = true)]
@@ -696,6 +715,9 @@ namespace CaptivityEvents.Custom
 
         [XmlElement("BattleSettings", IsNullable = true)]
         public BattleSettings BattleSettings { get; set; }
+
+        [XmlElement("TeleportSettings", IsNullable = true)]
+        public TeleportSettings TeleportSettings { get; set; }
 
         [XmlElement("SceneSettings", IsNullable = true)]
         public SceneSettings SceneSettings { get; set; }

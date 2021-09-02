@@ -958,6 +958,7 @@ namespace CaptivityEvents.Helper
                         // Events Removing
                         MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
                         if (mi != null) mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
+                        else { Campaign.Current.GameMenuManager.RemoveRelatedGameMenus("CEEVENTS"); }
                     }
                     else
                     {
@@ -1292,7 +1293,7 @@ namespace CaptivityEvents.Helper
             {
                 Thread.Sleep(500);
 
-                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.reload_events \".";
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.create_new_prisoner \".";
 
                 try
                 {

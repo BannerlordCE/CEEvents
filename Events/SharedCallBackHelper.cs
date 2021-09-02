@@ -647,8 +647,9 @@ namespace CaptivityEvents.Events
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(Hero.MainHero, randomElement2);
 
             }
-            catch (Exception e) {
-                CECustomHandler.ForceLogToFile("ConsequenceStripPlayer : " + e.ToString());       
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("ConsequenceStripPlayer : " + e.ToString());
             }
 
         }
@@ -843,7 +844,7 @@ namespace CaptivityEvents.Events
                                         Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
-                
+
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
                                         customParty.InitializeMobileParty(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
@@ -1065,40 +1066,157 @@ namespace CaptivityEvents.Events
             }
         }
 
+        internal bool TeleportChecker(bool firstStatement, Settlement settlement, string faction)
+        {
+            switch (faction)
+            {
+                case "enemy":
+                    return firstStatement && settlement.MapFaction.IsAtWarWith(Hero.MainHero.MapFaction);
+                case "otherenemy":
+                    return firstStatement && settlement.MapFaction != Hero.MainHero.MapFaction;
+                case "netural":
+                    return firstStatement && !settlement.MapFaction.IsAtWarWith(Hero.MainHero.MapFaction) && settlement.MapFaction != Hero.MainHero.MapFaction;
+                case "otherfriendly":
+                    return firstStatement && !settlement.MapFaction.IsAtWarWith(Hero.MainHero.MapFaction);
+                case "friendly":
+                    return firstStatement && settlement.MapFaction == Hero.MainHero.MapFaction;
+                default:
+                    return firstStatement;
+            }
+        }
+
         internal void ConsequenceTeleportPlayer()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.TeleportPlayer)) return;
-
             try
             {
-                Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return settlement.IsTown && settlement.MapFaction != Hero.MainHero.MapFaction; });
-                if (Hero.MainHero.IsPrisoner)
+                TeleportSettings teleportSettings = new TeleportSettings();
+                if (_option.TeleportSettings != null)
                 {
-                    try
-                    {
-                        Hero prisonerCharacter = Hero.MainHero;
-                        PartyBase party = nearest.Party;
+                    teleportSettings = _option.TeleportSettings;
+                }
 
-                        if (prisonerCharacter.PartyBelongedToAsPrisoner != null)
-                        {
-                            prisonerCharacter.PartyBelongedToAsPrisoner.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
-                        }
-                        prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
-                        prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
-                        party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
-
-                        PlayerCaptivity.StartCaptivity(party);
-                        CEHelper.delayedEvents.Clear();
-                    }
-                    catch (Exception e)
+                Settlement nearest;
+                if (teleportSettings.LocationName != null)
+                {
+                    nearest = SettlementHelper.FindNearestSettlement(settlement => { return settlement.IsTown && settlement.MapFaction != Hero.MainHero.MapFaction; });
+                    if (nearest != null)
                     {
-                        CECustomHandler.LogToFile("Failed to ConsequenceTeleportPlayer: " + e.Message + " stacktrace: " + e.StackTrace);
+                        CECustomHandler.ForceLogToFile("LocationName Failed to Find: " + teleportSettings.LocationName);
                     }
                 }
                 else
                 {
-                    MobileParty.MainParty.Position2D = nearest.GatePosition;
-                    EncounterManager.StartSettlementEncounter(MobileParty.MainParty, nearest);
+                    string location = teleportSettings?.Location ?? "";
+                    string distance = teleportSettings?.Distance ?? "";
+                    string faction = teleportSettings?.Faction ?? "";
+
+                    location = location.ToLower();
+                    distance = distance.ToLower();
+                    faction = faction.ToLower();
+
+                    switch (location)
+                    {
+                        case "village":
+                            switch (distance)
+                            {
+                                case "random":
+                                    nearest = SettlementHelper.FindRandomSettlement(settlement =>
+                                    {
+                                        return TeleportChecker(settlement.IsVillage, settlement, faction);
+                                    });
+                                    break;
+                                default:
+                                    nearest = SettlementHelper.FindNearestSettlement(settlement =>
+                                    {
+                                        return TeleportChecker(settlement.IsVillage, settlement, faction);
+                                    });
+                                    break;
+                            }
+                            break;
+                        case "castle":
+                            switch (distance)
+                            {
+                                case "random":
+                                    nearest = SettlementHelper.FindRandomSettlement(settlement =>
+                                    {
+                                        return TeleportChecker(settlement.IsCastle, settlement, faction);
+                                    });
+                                    break;
+                                default:
+                                    nearest = SettlementHelper.FindNearestSettlement(settlement =>
+                                    {
+                                        return TeleportChecker(settlement.IsCastle, settlement, faction);
+                                    });
+                                    break;
+                            }
+                            break;
+                        case "hideout":
+                            switch (distance)
+                            {
+                                case "random":
+                                    nearest = SettlementHelper.FindRandomSettlement(settlement =>
+                                    {
+                                        return TeleportChecker(settlement.IsHideout(), settlement, faction);
+                                    });
+                                    break;
+                                default:
+                                    nearest = SettlementHelper.FindNearestSettlement(settlement =>
+                                    {
+                                        return TeleportChecker(settlement.IsHideout(), settlement, faction);
+                                    });
+                                    break;
+                            }
+                            nearest.Hideout.IsSpotted = true;
+                            break;
+                        default:
+                            switch (distance)
+                            {
+                                case "random":
+                                    nearest = SettlementHelper.FindRandomSettlement(settlement =>
+                                    {
+                                        return TeleportChecker(settlement.IsTown, settlement, faction);
+                                    });
+                                    break;
+                                default:
+                                    nearest = SettlementHelper.FindNearestSettlement(settlement =>
+                                    {
+                                        return TeleportChecker(settlement.IsTown, settlement, faction);
+                                    });
+                                    break;
+                            }
+                            break;
+                    }
+
+
+                    if (Hero.MainHero.IsPrisoner)
+                    {
+                        try
+                        {
+                            Hero prisonerCharacter = Hero.MainHero;
+                            PartyBase party = nearest.Party;
+
+                            if (prisonerCharacter.PartyBelongedToAsPrisoner != null)
+                            {
+                                prisonerCharacter.PartyBelongedToAsPrisoner.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                            }
+                            prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
+                            prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
+                            party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
+
+                            PlayerCaptivity.StartCaptivity(party);
+                            CEHelper.delayedEvents.Clear();
+                        }
+                        catch (Exception e)
+                        {
+                            CECustomHandler.LogToFile("Failed to ConsequenceTeleportPlayer: " + e.Message + " stacktrace: " + e.StackTrace);
+                        }
+                    }
+                    else
+                    {
+                        MobileParty.MainParty.Position2D = nearest.GatePosition;
+                        EncounterManager.StartSettlementEncounter(MobileParty.MainParty, nearest);
+                    }
                 }
             }
             catch (Exception e)
