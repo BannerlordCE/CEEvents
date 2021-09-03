@@ -455,6 +455,10 @@ namespace CaptivityEvents.Events
                 if (party.MobileParty.IsCaravan) type = 1;
                 if (party.MobileParty.IsBandit || party.MobileParty.IsBanditBossParty) type = 2;
                 if (party.MobileParty.IsLordParty) type = 3;
+            } 
+            else if (party.IsSettlement)
+            {
+                if (party.Settlement.IsHideout()) type = 2;
             }
 
             bool hasDefaultFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DefaultParty);
