@@ -13,9 +13,9 @@ namespace CaptivityEvents.Patches
         [HarmonyPostfix]
         private static void All(ref MBReadOnlyList<SkillObject> __result)
         {
-            if (__result.Any((SkillObject item) => item.CharacterAttribute.StringId == "CEAttribute"))
+            if (__result.Any((SkillObject item) => item?.CharacterAttribute == null || item?.CharacterAttribute?.StringId == "CEAttribute"))
             {
-                __result = new MBReadOnlyList<SkillObject>(__result.Where((SkillObject item) => item.CharacterAttribute.StringId != "CEAttribute").ToList());
+                __result = new MBReadOnlyList<SkillObject>(__result.Where((SkillObject item) => item.CharacterAttribute != null && item.CharacterAttribute.StringId != "CEAttribute").ToList());
             }
 
         }

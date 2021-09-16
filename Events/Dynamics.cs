@@ -44,6 +44,8 @@ namespace CaptivityEvents.Events
 
         internal void RemoveFactionLeader(Hero hero)
         {
+            if (hero.Clan == null) return;
+
             if ((hero.Clan?.Leader) == hero)
             {
                 if (hero != Hero.MainHero && hero.Clan.Heroes.Any((Hero x) => !x.IsChild && x != hero && x.IsAlive && (x.IsNoble || x.IsMinorFactionHero)))
@@ -96,7 +98,7 @@ namespace CaptivityEvents.Events
 
                 if (spouseHero == null) return;
 
-                if (hero.Clan == spouseHero.Clan) return;
+                if (hero?.Clan == spouseHero?.Clan) return;
 
                 Hero spouseHeroSpouse = spouseHero.Spouse;
 
@@ -369,7 +371,7 @@ namespace CaptivityEvents.Events
                 int currentValue = hero.GetSkillValue(skill);
                 int valueToSet = currentValue + amount;
                 if (valueToSet < 1) valueToSet = 1;
-                if (valueToSet > 1000) valueToSet = 1000; 
+                if (valueToSet > 999) valueToSet = 999; 
 
                 CEHelper.SetSkillValue(hero, skill, valueToSet);
 
