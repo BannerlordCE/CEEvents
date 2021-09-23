@@ -1157,13 +1157,13 @@ namespace CaptivityEvents.Events
                                 case "random":
                                     nearest = SettlementHelper.FindRandomSettlement(settlement =>
                                     {
-                                        return TeleportChecker(settlement.IsHideout(), settlement, faction);
+                                        return TeleportChecker(settlement.IsHideout, settlement, faction);
                                     });
                                     break;
                                 default:
                                     nearest = SettlementHelper.FindNearestSettlement(settlement =>
                                     {
-                                        return TeleportChecker(settlement.IsHideout(), settlement, faction);
+                                        return TeleportChecker(settlement.IsHideout, settlement, faction);
                                     });
                                     break;
                             }

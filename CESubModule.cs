@@ -151,8 +151,15 @@ namespace CaptivityEvents
         private static readonly float brothelSoundMin = 1f;
         private static readonly float brothelSoundMax = 3f;
 
-        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml  (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.5)
-        private static readonly int[] sprite_index = new int[] { 13, 18, 29, 30 };
+        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml 
+        // Mount & Blade II Bannerlord\Modules\Native\GUI\NativeSpriteData.xml
+        // SheetID 21 - wait_captive_female
+        // SheetID 30 - wait_captive_male
+        // SheetID 28 - wait_prisoner_female
+        // SheetID 27 - wait_prisoner_male
+        // 162
+        // private static readonly int[] sprite_index = new int[] { 13, 18, 29, 30 };
+        private static readonly int[] sprite_index = new int[] { 20, 29, 27, 26 };
 
         // Sounds for Brothel
         private static readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
@@ -1058,19 +1065,22 @@ namespace CaptivityEvents
 
                                 Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
 
-                                WorldPosition worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
+                                if (CEPersistence.gameEntity != null)
+                                {
+                                    WorldPosition worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
 
-                                if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
-                                {
-                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
-                                    CEPersistence.brothelFadeIn = 3f;
-                                }
-                                else
-                                {
-                                    CEPersistence.agentTalkingTo.DisableScriptedMovement();
-                                    CEPersistence.agentTalkingTo.HandleStopUsingAction();
-                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
-                                    CEPersistence.brothelFadeIn = 3f;
+                                    if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
+                                    {
+                                        CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
+                                        CEPersistence.brothelFadeIn = 3f;
+                                    }
+                                    else
+                                    {
+                                        CEPersistence.agentTalkingTo.DisableScriptedMovement();
+                                        CEPersistence.agentTalkingTo.HandleStopUsingAction();
+                                        CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
+                                        CEPersistence.brothelFadeIn = 3f;
+                                    }
                                 }
 
                                 behavior.BeginFadeOutAndIn(CEPersistence.brothelFadeIn, CEPersistence.brothelBlack, CEPersistence.brothelFadeOut);
@@ -1096,7 +1106,10 @@ namespace CaptivityEvents
                             Hero.MainHero.HitPoints += 10;
 
                             CEPersistence.agentTalkingTo.ResetAI();
-                            Mission.Current.MainAgent.TeleportToPosition(CEPersistence.gameEntity.GlobalPosition);
+                            if (CEPersistence.gameEntity != null)
+                            {
+                                Mission.Current.MainAgent.TeleportToPosition(CEPersistence.gameEntity.GlobalPosition);
+                            }
                             CEPersistence.brothelState = CEPersistence.BrothelState.Black;
                         }
 

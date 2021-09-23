@@ -264,7 +264,7 @@ namespace CaptivityEvents.Events
                 textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
 
                 textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
-                textObject.SetTextVariable("SKILL", skillObject.Name.ToLower());
+                textObject.SetTextVariable("SKILL", skillObject.Name.ToString().ToLower());
                 textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
             }

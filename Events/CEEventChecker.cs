@@ -94,7 +94,7 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.Settlement.IsVillage) returnString += "(hasVillageFlag)";
 
-                if (captorParty.Settlement.IsHideout()) returnString += "(hasHideoutFlag)";
+                if (captorParty.Settlement.IsHideout) returnString += "(hasHideoutFlag)";
 
                 if (captorParty.Settlement.IsCastle)
                 {
@@ -159,7 +159,7 @@ namespace CaptivityEvents.Events
                     }
                 }
 
-                if (captorParty.MobileParty.CurrentSettlement.IsHideout()) returnString += "(hasHideoutFlag)";
+                if (captorParty.MobileParty.CurrentSettlement.IsHideout) returnString += "(hasHideoutFlag)";
 
                 if (captorParty.MobileParty.CurrentSettlement.IsUnderSiege) returnString += "(duringSiegeFlag)";
 
@@ -458,7 +458,7 @@ namespace CaptivityEvents.Events
             } 
             else if (party.IsSettlement)
             {
-                if (party.Settlement.IsHideout()) type = 2;
+                if (party.Settlement.IsHideout) type = 2;
             }
 
             bool hasDefaultFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DefaultParty);
@@ -659,7 +659,7 @@ namespace CaptivityEvents.Events
 
                     if (hasVillageFlag && captorParty.Settlement.IsVillage) eventMatchingCondition = true;
 
-                    if (hasHideoutFlag && captorParty.Settlement.IsHideout()) eventMatchingCondition = true;
+                    if (hasHideoutFlag && captorParty.Settlement.IsHideout) eventMatchingCondition = true;
 
                     if ((hasCastleFlag || hasDungeonFlag) && captorParty.Settlement.IsCastle)
                     {
@@ -743,7 +743,7 @@ namespace CaptivityEvents.Events
 
                     if (duringSiegeFlag != captorParty.MobileParty.CurrentSettlement.IsUnderSiege) eventMatchingCondition = false;
                     if (duringRaidFlag != captorParty.MobileParty.CurrentSettlement.IsUnderRaid) eventMatchingCondition = false;
-                    if (hasHideoutFlag && captorParty.MobileParty.CurrentSettlement.IsHideout()) eventMatchingCondition = true;
+                    if (hasHideoutFlag && captorParty.MobileParty.CurrentSettlement.IsHideout) eventMatchingCondition = true;
                 }
                 else if (hasTravelingFlag)
                 {

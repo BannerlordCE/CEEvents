@@ -1,4 +1,4 @@
-﻿#define BETA
+﻿#define V163
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -1035,11 +1035,10 @@ namespace CaptivityEvents.Helper
                             CEPersistence.CEEventList.Add(_listedEvent);
                         }
                     }
-
-#if BETA
-                    new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager));
-#else
+#if V161
                     new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager, Campaign.Current.CampaignGameLoadingType == Campaign.GameLoadingType.Tutorial)); 
+#else
+                    new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager));
 #endif
 
                     try
