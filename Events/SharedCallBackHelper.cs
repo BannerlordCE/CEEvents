@@ -300,6 +300,12 @@ namespace CaptivityEvents.Events
                 string meleeLevel = "default";
                 string rangedLevel = "default";
 
+                string customBody = "";
+                string customCape = "";
+                string customGloves = "";
+                string customLegs = "";
+                string customHead = "";
+
                 if (_option.StripSettings != null)
                 {
                     forced = _option.StripSettings.Forced;
@@ -308,6 +314,12 @@ namespace CaptivityEvents.Events
                     mountLevel = string.IsNullOrWhiteSpace(_option.StripSettings.Mount) ? "default" : _option.StripSettings.Mount.ToLower();
                     meleeLevel = string.IsNullOrWhiteSpace(_option.StripSettings.Melee) ? "default" : _option.StripSettings.Melee.ToLower();
                     rangedLevel = string.IsNullOrWhiteSpace(_option.StripSettings.Ranged) ? "default" : _option.StripSettings.Ranged.ToLower();
+
+                    customBody = string.IsNullOrWhiteSpace(_option.StripSettings.CustomBody) ? "default" : _option.StripSettings.CustomBody;
+                    customCape = string.IsNullOrWhiteSpace(_option.StripSettings.CustomCape) ? "default" : _option.StripSettings.CustomCape;
+                    customGloves = string.IsNullOrWhiteSpace(_option.StripSettings.CustomGloves) ? "default" : _option.StripSettings.CustomGloves;
+                    customLegs = string.IsNullOrWhiteSpace(_option.StripSettings.CustomLegs) ? "default" : _option.StripSettings.CustomLegs;
+                    customHead = string.IsNullOrWhiteSpace(_option.StripSettings.CustomHead) ? "default" : _option.StripSettings.CustomHead;
                 }
 
                 if (CESettingsIntegrations.Instance == null && clothingLevel == "slave" || !CESettingsIntegrations.Instance.ActivateKLBShackles && clothingLevel == "slave") return;
@@ -466,6 +478,20 @@ namespace CaptivityEvents.Events
 
                         ItemObject itemObjectGloves = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth1a");
                         randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Gloves, new EquipmentElement(itemObjectGloves));
+                    }
+                    else if(clothingLevel == "custom")
+                    {
+                        ItemObject itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(customBody);
+                        ItemObject itemObjectCape = MBObjectManager.Instance.GetObject<ItemObject>(customCape);
+                        ItemObject itemObjectGloves = MBObjectManager.Instance.GetObject<ItemObject>(customGloves);
+                        ItemObject itemObjectLeg = MBObjectManager.Instance.GetObject<ItemObject>(customLegs);
+                        ItemObject itemObjectHead = MBObjectManager.Instance.GetObject<ItemObject>(customHead);
+
+                        if (itemObjectBody != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
+                        if (itemObjectCape != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Cape, new EquipmentElement(itemObjectCape));
+                        if (itemObjectGloves != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Gloves, new EquipmentElement(itemObjectGloves));
+                        if (itemObjectLeg != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Leg, new EquipmentElement(itemObjectLeg));
+                        if (itemObjectHead != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Head, new EquipmentElement(itemObjectHead));
                     }
                     else
                     {

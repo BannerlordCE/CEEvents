@@ -272,6 +272,16 @@ namespace CaptivityEvents.Custom
         public string Melee { get; set; }
 
         public string Ranged { get; set; }
+
+        public string CustomBody { get; set; }
+
+        public string CustomCape { get; set; }
+
+        public string CustomGloves { get; set; }
+
+        public string CustomLegs { get; set; }
+
+        public string CustomHead { get; set; }
     }
 
     [DebuggerStepThrough]
