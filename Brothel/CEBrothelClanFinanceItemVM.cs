@@ -33,7 +33,7 @@ namespace CaptivityEvents.Brothel
             if (_brothel == null) _brothel = new CEBrothel(Workshop.Settlement);
 
             Name = _brothel.Name.ToString();
-            WorkshopType workshopType = WorkshopType.Find("pottery_shop");
+            WorkshopType workshopType = WorkshopType.Find("brewery");
             WorkshopTypeId = workshopType.StringId;
             Location = _brothel.Settlement.Name.ToString();
             Income = (int)(Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction()) * (_brothel.Level + 1);

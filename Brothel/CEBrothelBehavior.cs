@@ -1,4 +1,4 @@
-#define V163
+#define V164
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -229,10 +229,8 @@ namespace CaptivityEvents.Brothel
                 FieldInfo fi = LocationComplex.Current.GetType().GetField("_locations", BindingFlags.Instance | BindingFlags.NonPublic);
                 Dictionary<string, Location> _locations = (Dictionary<string, Location>)fi.GetValue(LocationComplex.Current);
 
-#if V163
                 string backgroundMeshName = settlement.Culture.StringId + "_tavern";
                 args.MenuContext.SetBackgroundMeshName(backgroundMeshName);
-#endif
 
                 if (_locations.ContainsKey("brothel"))
                 {

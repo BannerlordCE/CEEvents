@@ -1,4 +1,4 @@
-
+#define V164
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -326,7 +326,11 @@ namespace CaptivityEvents
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                    texture.PreloadTexture(false);
+#else
                                     texture.PreloadTexture();
+#endif
                                     Texture texture2D = new Texture(new EngineTexture(texture));
                                     CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
@@ -358,7 +362,11 @@ namespace CaptivityEvents
                         try
                         {
                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                            texture.PreloadTexture(false);
+#else
                             texture.PreloadTexture();
+#endif
                             Texture texture2D = new Texture(new EngineTexture(texture));
                             CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                         }
@@ -380,7 +388,11 @@ namespace CaptivityEvents
                     try
                     {
                         TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                        texture.PreloadTexture(false);
+#else
                         texture.PreloadTexture();
+#endif
                         Texture texture2D = new Texture(new EngineTexture(texture));
                         CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                     }
@@ -1026,14 +1038,21 @@ namespace CaptivityEvents
                             {
                                 CECustomHandler.ForceLogToFile("Failed MissionCameraFadeView.");
                             }
-
+#if V164
+                            brothelTimerOne = missionStateDungeon.CurrentMission.CurrentTime + dungeonFadeOut;
+#else
                             brothelTimerOne = missionStateDungeon.CurrentMission.Time + dungeonFadeOut;
+#endif
                             CEPersistence.dungeonState = CEPersistence.DungeonState.FadeIn;
                         }
 
                         break;
                     case CEPersistence.DungeonState.FadeIn:
+#if V164
+                        if (brothelTimerOne < missionStateDungeon.CurrentMission.CurrentTime)
+#else
                         if (brothelTimerOne < missionStateDungeon.CurrentMission.Time)
+#endif
                         {
                             CEPersistence.agentTalkingTo.ResetAI();
                             CEPersistence.dungeonState = CEPersistence.DungeonState.Normal;
@@ -1089,20 +1108,30 @@ namespace CaptivityEvents
                             {
                                 CECustomHandler.ForceLogToFile("Failed MissionCameraFadeView.");
                             }
-
+#if V164
+                            brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelFadeIn;
+#else
                             brothelTimerOne = missionStateBrothel.CurrentMission.Time + CEPersistence.brothelFadeIn;
+#endif
                             CEPersistence.brothelState = CEPersistence.BrothelState.FadeIn;
                         }
 
                         break;
 
                     case CEPersistence.BrothelState.FadeIn:
+#if V164
+                        if (brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
+                        {
+                            brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelBlack;
+                            brothelTimerTwo = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
+                            brothelTimerThree = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
+#else
                         if (brothelTimerOne < missionStateBrothel.CurrentMission.Time)
                         {
                             brothelTimerOne = missionStateBrothel.CurrentMission.Time + CEPersistence.brothelBlack;
                             brothelTimerTwo = missionStateBrothel.CurrentMission.Time + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
                             brothelTimerThree = missionStateBrothel.CurrentMission.Time + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
-
+#endif
                             Hero.MainHero.HitPoints += 10;
 
                             CEPersistence.agentTalkingTo.ResetAI();
@@ -1116,16 +1145,27 @@ namespace CaptivityEvents
                         break;
 
                     case CEPersistence.BrothelState.Black:
+#if V164
+                        if (brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
+                        {
+                            brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelFadeOut;
+#else
                         if (brothelTimerOne < missionStateBrothel.CurrentMission.Time)
                         {
-                            Mission.Current.MainAgentServer.Controller = Agent.ControllerType.Player;
-
                             brothelTimerOne = missionStateBrothel.CurrentMission.Time + CEPersistence.brothelFadeOut;
+#endif
+                            Mission.Current.MainAgentServer.Controller = Agent.ControllerType.Player;
                             CEPersistence.brothelState = CEPersistence.BrothelState.FadeOut;
                         }
+#if V164
+                        else if (brothelTimerTwo < missionStateBrothel.CurrentMission.CurrentTime)
+                        {
+                            brothelTimerTwo = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
+#else
                         else if (brothelTimerTwo < missionStateBrothel.CurrentMission.Time)
                         {
                             brothelTimerTwo = missionStateBrothel.CurrentMission.Time + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
+#endif
 
                             try
                             {
@@ -1134,9 +1174,15 @@ namespace CaptivityEvents
                             }
                             catch (Exception) { }
                         }
-                        else if (brothelTimerThree < missionStateBrothel.CurrentMission.Time)
+#if V164
+                        else if (brothelTimerThree < missionStateBrothel.CurrentMission.CurrentTime)
                         {
-                            brothelTimerThree = missionStateBrothel.CurrentMission.Time + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
+                            brothelTimerThree = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
+#else
+                       else if (brothelTimerThree < missionStateBrothel.CurrentMission.Time)
+                        {
+                             brothelTimerThree = missionStateBrothel.CurrentMission.Time + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
+#endif
 
                             try
                             {
@@ -1149,7 +1195,11 @@ namespace CaptivityEvents
                         break;
 
                     case CEPersistence.BrothelState.FadeOut:
+#if V164
+                        if (brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
+#else
                         if (brothelTimerOne < missionStateBrothel.CurrentMission.Time)
+#endif
                         {
                             CEPersistence.agentTalkingTo = null;
                             CEPersistence.brothelState = CEPersistence.BrothelState.Normal;
@@ -1176,7 +1226,11 @@ namespace CaptivityEvents
                     switch (CEPersistence.huntState)
                     {
                         case CEPersistence.HuntState.StartHunt:
+#if V164
+                            if (Mission.Current != null && Mission.Current.IsLoadingFinished && Mission.Current.CurrentTime > 2f && Mission.Current.Agents != null)
+#else
                             if (Mission.Current != null && Mission.Current.IsLoadingFinished && Mission.Current.Time > 2f && Mission.Current.Agents != null)
+#endif
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents.ToList()
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
@@ -1195,7 +1249,11 @@ namespace CaptivityEvents
                             break;
 
                         case CEPersistence.HuntState.HeadStart:
+#if V164
+                            if (Mission.Current != null && Mission.Current.CurrentTime > CESettings.Instance.HuntBegins && Mission.Current.Agents != null)
+#else
                             if (Mission.Current != null && Mission.Current.Time > CESettings.Instance.HuntBegins && Mission.Current.Agents != null)
+#endif
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents.ToList()
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)

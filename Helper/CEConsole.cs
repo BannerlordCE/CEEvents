@@ -1,4 +1,4 @@
-﻿#define V163
+﻿#define V164
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -850,7 +850,11 @@ namespace CaptivityEvents.Helper
                                         try
                                         {
                                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                            texture.PreloadTexture(false);
+#else
                                             texture.PreloadTexture();
+#endif
                                             Texture texture2D = new Texture(new EngineTexture(texture));
                                             CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                         }
@@ -882,7 +886,11 @@ namespace CaptivityEvents.Helper
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                    texture.PreloadTexture(false);
+#else
                                     texture.PreloadTexture();
+#endif
                                     Texture texture2D = new Texture(new EngineTexture(texture));
                                     CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
@@ -904,7 +912,11 @@ namespace CaptivityEvents.Helper
                             try
                             {
                                 TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                texture.PreloadTexture(false);
+#else
                                 texture.PreloadTexture();
+#endif
                                 Texture texture2D = new Texture(new EngineTexture(texture));
                                 CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                             }
@@ -1098,7 +1110,11 @@ namespace CaptivityEvents.Helper
                                         try
                                         {
                                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                            texture.PreloadTexture(false);
+#else
                                             texture.PreloadTexture();
+#endif
                                             Texture texture2D = new Texture(new EngineTexture(texture));
                                             CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                         }
@@ -1130,7 +1146,11 @@ namespace CaptivityEvents.Helper
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                    texture.PreloadTexture(false);
+#else
                                     texture.PreloadTexture();
+#endif
                                     Texture texture2D = new Texture(new EngineTexture(texture));
                                     CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
@@ -1152,7 +1172,11 @@ namespace CaptivityEvents.Helper
                             try
                             {
                                 TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                texture.PreloadTexture(false);
+#else
                                 texture.PreloadTexture();
+#endif
                                 Texture texture2D = new Texture(new EngineTexture(texture));
                                 CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                             }
