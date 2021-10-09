@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.SandBox;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -175,11 +176,12 @@ namespace CaptivityEvents.Events
 
             Vec3? position3D = (captorParty != null && captorParty.IsMobile) ? captorParty?.MobileParty?.GetPosition() : captorParty?.Settlement?.GetPosition();
             List<TaleWorlds.Core.TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
-            AtmosphereInfo atmosphere = new DefaultMapWeatherModel().GetAtmosphereModel(CampaignTime.Now, (Vec3)position3D);
+            AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, (Vec3)position3D);
 
             string environmentTerrainTypes = "";
             faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
-            if (atmosphere.SnowInfo.Density > 0) environmentTerrainTypes += "(Snow)";
+
+            if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
 
             returnString += "\nEnvironment Terrain Types : " + environmentTerrainTypes;
 
@@ -507,11 +509,10 @@ namespace CaptivityEvents.Events
                 {
                     Vec3? position3D = (party != null && party.IsMobile) ? party?.MobileParty?.GetPosition() : party?.Settlement?.GetPosition();
                     List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(party.Position2D);
-                    AtmosphereInfo atmosphere = new DefaultMapWeatherModel().GetAtmosphereModel(CampaignTime.Now, (Vec3)position3D);
 
                     string environmentTerrainTypes = "";
                     faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
-                    if (atmosphere.SnowInfo.Density > 0) environmentTerrainTypes += "(Snow)";
+                    if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
 
                     eventMatchingCondition = false;
                     if (hasWorldMapWater) eventMatchingCondition = environmentTerrainTypes.Contains("Water");
