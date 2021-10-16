@@ -110,7 +110,7 @@ namespace CaptivityEvents.Helper
 
         internal static void ChangeMenu(int number)
         {
-            string waitingList = new WaitingList().CEWaitingList();
+            string waitingList = WaitingList.CEWaitingList();
             if (waitingList != null) GameMenu.SwitchToMenu(waitingList);
             waitMenuCheck = number;
         }

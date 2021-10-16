@@ -164,6 +164,7 @@ namespace CaptivityEvents.Events
         public static CEEvent ReturnWeightedChoiceOfEventsRandom()
         {
             List<CEEvent> events = new List<CEEvent>();
+            int CurrentOrder = 0;
 
             if (CEPersistence.CECallableEvents != null && CEPersistence.CECallableEvents.Count > 0)
             {
@@ -185,11 +186,28 @@ namespace CaptivityEvents.Events
                                 return listEvent;
                             }
 
-                            try
+                            int OrderToCall = 0;
+                            if (!string.IsNullOrEmpty(listEvent.OrderToCall))
+                            {
+                                OrderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
+                            }
+
+                            if (OrderToCall < CurrentOrder)
+                            {
+                                CECustomHandler.LogToFile("OrderToCall - " + OrderToCall + " was less than CurrentOrder - " + CurrentOrder + " for " + listEvent.Name);
+                                continue;
+                            }
+                            else if (OrderToCall > CurrentOrder)
+                            {
+                                events.Clear();
+                                CurrentOrder = OrderToCall;
+                            }
+
+                            if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccuring))
                             {
                                 weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
                             }
-                            catch (Exception)
+                            else
                             {
                                 CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring");
                             }
@@ -223,6 +241,7 @@ namespace CaptivityEvents.Events
         public static CEEvent ReturnWeightedChoiceOfEvents()
         {
             List<CEEvent> events = new List<CEEvent>();
+            int CurrentOrder = 0;
 
             if (CEPersistence.CECallableEvents != null && CEPersistence.CECallableEvents.Count > 0)
             {
@@ -244,11 +263,28 @@ namespace CaptivityEvents.Events
                                 return listEvent;
                             }
 
-                            try
+                            int OrderToCall = 0;
+                            if (!string.IsNullOrEmpty(listEvent.OrderToCall))
                             {
-                                if (listEvent.WeightedChanceOfOccuring != null) weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                                OrderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
                             }
-                            catch (Exception)
+
+                            if (OrderToCall < CurrentOrder)
+                            {
+                                CECustomHandler.LogToFile("OrderToCall - " + OrderToCall + " was less than CurrentOrder - " + CurrentOrder + " for " + listEvent.Name);
+                                continue;
+                            }
+                            else if (OrderToCall > CurrentOrder)
+                            {
+                                events.Clear();
+                                CurrentOrder = OrderToCall;
+                            }
+
+                            if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccuring))
+                            {
+                                weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                            }
+                            else
                             {
                                 CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring");
                             }
@@ -283,6 +319,7 @@ namespace CaptivityEvents.Events
         {
             List<CEEvent> events = new List<CEEvent>();
 
+            int CurrentOrder = 0;
             CECustomHandler.LogToFile("Number of Filitered events is " + events.Count);
 
             if (CEPersistence.CECallableEvents == null || CEPersistence.CECallableEvents.Count <= 0) return null;
@@ -304,11 +341,28 @@ namespace CaptivityEvents.Events
                             return listEvent;
                         }
 
-                        try
+                        int OrderToCall = 0;
+                        if (!string.IsNullOrEmpty(listEvent.OrderToCall))
+                        {
+                            OrderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
+                        }
+
+                        if (OrderToCall < CurrentOrder)
+                        {
+                            CECustomHandler.LogToFile("OrderToCall - " + OrderToCall + " was less than CurrentOrder - " + CurrentOrder + " for " + listEvent.Name);
+                            continue;
+                        }
+                        else if (OrderToCall > CurrentOrder)
+                        {
+                            events.Clear();
+                            CurrentOrder = OrderToCall;
+                        }
+
+                        if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccuring))
                         {
                             weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
                         }
-                        catch (Exception)
+                        else
                         {
                             CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring");
                         }

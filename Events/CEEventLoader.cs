@@ -8,8 +8,6 @@ namespace CaptivityEvents.Events
 {
     internal class CEEventLoader
     {
-        public static string CEWaitingList() => new WaitingList().CEWaitingList();
-
         /// <summary>
         /// Checks which type of progress mode to display.
         /// </summary>

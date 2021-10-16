@@ -1,5 +1,6 @@
 ﻿using CaptivityEvents.Custom;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -8,9 +9,10 @@ namespace CaptivityEvents.Events
 {
     public class WaitingList
     {
-        public string CEWaitingList()
+        public static string CEWaitingList()
         {
             List<string> eventNames = new List<string>();
+            int CurrentOrder = 0;
 
             if (CEPersistence.CEWaitingList != null && CEPersistence.CEWaitingList.Count > 0)
             {
@@ -24,11 +26,34 @@ namespace CaptivityEvents.Events
                     {
                         int weightedChance = 10;
 
-                        try
+                        if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
                         {
-                            if (listEvent.WeightedChanceOfOccuring != null) weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                            CECustomHandler.LogToFile("IgnoreAllOther detected - autofire " + listEvent.Name);
+                            return listEvent.Name;
                         }
-                        catch (Exception)
+
+                        int OrderToCall = 0;
+                        if (!string.IsNullOrEmpty(listEvent.OrderToCall))
+                        {
+                            OrderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
+                        }
+
+                        if (OrderToCall < CurrentOrder)
+                        {
+                            CECustomHandler.LogToFile("OrderToCall - " + OrderToCall + " was less than CurrentOrder - " + CurrentOrder + " for " + listEvent.Name);
+                            continue;
+                        }
+                        else if (OrderToCall > CurrentOrder)
+                        {
+                            eventNames.Clear();
+                            CurrentOrder = OrderToCall;
+                        }
+
+                        if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccuring))
+                        {
+                            weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                        }
+                        else
                         {
                             CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring");
                         }

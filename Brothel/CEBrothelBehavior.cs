@@ -366,7 +366,7 @@ namespace CaptivityEvents.Brothel
             capturerParty.AddPrisoner(prisonerCharacter.CharacterObject, 1);
             if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(capturerParty);
             CEHelper.delayedEvents.Clear();
-            string waitingMenu = CEEventLoader.CEWaitingList();
+            string waitingMenu = WaitingList.CEWaitingList();
             GameMenu.ExitToLast();
             if (waitingMenu != null) GameMenu.ActivateGameMenu(waitingMenu);
         }

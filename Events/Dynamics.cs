@@ -192,16 +192,16 @@ namespace CaptivityEvents.Events
 
             if (found) return;
 
-//#if STABLE
-//            foreach (TraitObject traitObject in DefaultTraits.All)
-//            {
-//                if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
-//                {
-//                    found = true;
-//                    TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
-//                }
-//            }
-//#endif
+            //#if STABLE
+            //            foreach (TraitObject traitObject in DefaultTraits.All)
+            //            {
+            //                if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
+            //                {
+            //                    found = true;
+            //                    TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
+            //                }
+            //            }
+            //#endif
 
             if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + trait);
 
@@ -213,13 +213,22 @@ namespace CaptivityEvents.Events
             {
                 int currentSkillLevel = hero.GetSkillValue(skillObject);
                 int newNumber = resetSkill ? 0 : currentSkillLevel + amount;
+                bool isToggle = false;
+                bool wasPositive = false;
 
                 CESkillNode skillNode = CESkills.FindSkillNode(skill);
                 if (skillNode != null)
                 {
                     int maxLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MaxLevel);
-
                     int minLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MinLevel);
+
+                    if (maxLevel == 1 && minLevel == 0)
+                    {
+                        isToggle = true;
+                    }
+
+                    wasPositive = amount > 0;
+
                     if (maxLevel != 0 && newNumber > maxLevel)
                     {
                         newNumber = maxLevel;
@@ -253,19 +262,30 @@ namespace CaptivityEvents.Events
 
                 if (!display) return;
 
-                TextObject textObject = GameTexts.FindText("str_CE_level_skill");
-                textObject.SetTextVariable("HERO", hero.Name);
+                TextObject textObject;
 
-                if (xp == 0)
-                    textObject.SetTextVariable("NEGATIVE", amount > 0 ? 0 : 1);
+                if (isToggle)
+                {
+                    textObject = wasPositive ? GameTexts.FindText("str_CE_level_enter") : GameTexts.FindText("str_CE_level_leave");
+                    textObject.SetTextVariable("HERO", hero.Name);
+                    textObject.SetTextVariable("OCCUPATION", skillObject.Name.ToString());
+                }
                 else
-                    textObject.SetTextVariable("NEGATIVE", xp >= 0 ? 0 : 1);
+                {
+                    textObject = GameTexts.FindText("str_CE_level_skill");
+                    textObject.SetTextVariable("HERO", hero.Name);
 
-                textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
+                    if (xp == 0)
+                        textObject.SetTextVariable("NEGATIVE", wasPositive ? 1 : 0);
+                    else
+                        textObject.SetTextVariable("NEGATIVE", xp >= 0 ? 0 : 1);
 
-                textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
-                textObject.SetTextVariable("SKILL", skillObject.Name.ToString().ToLower());
-                textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
+                    textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
+                    textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
+                    textObject.SetTextVariable("SKILL", skillObject.Name.ToString().ToLower());
+                    textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
+                }
+
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
             }
             else
@@ -371,7 +391,7 @@ namespace CaptivityEvents.Events
                 int currentValue = hero.GetSkillValue(skill);
                 int valueToSet = currentValue + amount;
                 if (valueToSet < 1) valueToSet = 1;
-                if (valueToSet > 999) valueToSet = 999; 
+                if (valueToSet > 999) valueToSet = 999;
 
                 CEHelper.SetSkillValue(hero, skill, valueToSet);
 
@@ -522,7 +542,7 @@ namespace CaptivityEvents.Events
                         }
 
                         DisbandPartyAction.ApplyDisband(firstHero.PartyBelongedTo);
-                        
+
                         if (firstHero.PartyBelongedTo != null)
                         {
                             firstHero.PartyBelongedTo.Party.SetCustomOwner(null);
