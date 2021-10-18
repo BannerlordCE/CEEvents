@@ -272,10 +272,10 @@ namespace CaptivityEvents.Events
             if (!FemaleCaptivesCheck(captorParty)) return LatestMessage;
             if (!MoraleCheck(captorParty)) return LatestMessage;
             if (!CompanionsCheck(captive, captorParty)) return LatestMessage;
+            if (!CaptorOwnerFlagsCheck(captorParty)) return LatestMessage;
 
             if (nonRandomBehaviour)
             {
-                if (!CaptorOwnerFlagsCheck(captorParty)) return LatestMessage;
                 if (!CaptorTraitCheck(captorParty)) return LatestMessage;
                 if (!CaptorTraitsCheck(captorParty)) return LatestMessage;
                 if (!CaptorSkillCheck(captorParty)) return LatestMessage;
