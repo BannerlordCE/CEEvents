@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using HarmonyLib;
@@ -6,6 +6,7 @@ using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 
 namespace CaptivityEvents.Patches
 {
@@ -27,7 +28,8 @@ namespace CaptivityEvents.Patches
             foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
             {
                 Workshop workshop = new Workshop(brothel.Settlement, brothel.Name.ToString());
-                WorkshopType workshopType = WorkshopType.Find("pottery_shop");
+                WorkshopType workshopType = WorkshopType.Find("brewery");
+
                 workshop.SetWorkshop(brothel.Owner, workshopType, brothel.Capital, true, 0, 1, brothel.Name);
 
                 CEBrothelClanFinanceItemVM brothelFinanceItemVM = new CEBrothelClanFinanceItemVM(brothel, workshop, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh);

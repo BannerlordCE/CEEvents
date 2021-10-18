@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.Custom;
 using System;
 using System.Collections.Generic;
@@ -21,8 +21,6 @@ namespace CaptivityEvents
 
         public static bool IsInitialized { get; private set; } = false;
 
-        public static bool isUninstalled { get; private set; } = false;
-
         internal static List<SkillObject> CustomSkills { get; private set; }
 
         internal static CharacterAttribute CEAttribute { get; private set; }
@@ -31,12 +29,25 @@ namespace CaptivityEvents
 
         private static readonly List<CESkillNode> _Skills = new List<CESkillNode>();
 
-        public static void AddCustomSkill(CESkillNode skillNode) => _Skills.Add(skillNode);
+        public static void AddCustomSkill(CESkillNode skillNode) {
+
+            int index = _Skills.FindIndex((item) => item.Id == skillNode.Id);
+            if (index == -1)
+            {
+                _Skills.Add(skillNode);
+            } 
+            else
+            {
+                _Skills[index].MaxLevel = skillNode.MaxLevel;
+                _Skills[index].MinLevel = skillNode.MinLevel;
+                _Skills[index].Name = skillNode.Name;
+            }
+        }
+            
 
 
         public static CESkillNode FindSkillNode(string skill)
         {
-            if (isUninstalled) return null;
             try
             {
                 return _Skills.Find(skillNode => skillNode.Id == skill);
@@ -50,8 +61,6 @@ namespace CaptivityEvents
 
         public static SkillObject FindSkill(string skill)
         {
-            if (isUninstalled) return null;
-
             foreach (SkillObject skillObjectCustom in CustomSkills)
             {
                 if (skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill)
@@ -104,8 +113,6 @@ namespace CaptivityEvents
                 }
 
                 game.ObjectManager.UnregisterObject(CEAttribute);
-
-                isUninstalled = true;
                 return true;
 
             } 
@@ -114,7 +121,6 @@ namespace CaptivityEvents
                 CECustomHandler.ForceLogToFile("Uninstall Error: " + e.ToString());
                 InformationManager.DisplayMessage(new InformationMessage("Failure to Uninstall. Refer to LogFileFC.txt in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs", Colors.Red));
 
-                isUninstalled = true;
                 return false;
             }
 

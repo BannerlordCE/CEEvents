@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.Config;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Barterables;

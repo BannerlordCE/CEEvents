@@ -1,4 +1,4 @@
-#define STABLE
+
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -508,6 +508,16 @@ namespace CaptivityEvents.CampaignBehaviors
                 hero.Clan = father.Clan;
             }
             CampaignEventDispatcher.Instance.OnHeroCreated(hero, true);
+            int heroComesOfAge = Campaign.Current.Models.AgeModel.HeroComesOfAge;
+            if (hero.Age > (float)becomeChildAge || (hero.Age == (float)becomeChildAge && hero.BirthDay.GetDayOfYear < CampaignTime.Now.GetDayOfYear))
+            {
+                CampaignEventDispatcher.Instance.OnHeroGrowsOutOfInfancy(hero);
+            }
+            if (hero.Age > (float)heroComesOfAge || (hero.Age == (float)heroComesOfAge && hero.BirthDay.GetDayOfYear < CampaignTime.Now.GetDayOfYear))
+            {
+                CampaignEventDispatcher.Instance.OnHeroComesOfAge(hero);
+            }
+
             return hero;
         }
 

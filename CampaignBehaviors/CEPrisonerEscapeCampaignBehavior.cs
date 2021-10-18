@@ -20,6 +20,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         public override void SyncData(IDataStore dataStore) { }
 
+        // DailyHeroTick
         public void DailyHeroTick(Hero hero)
         {
 
@@ -87,6 +88,7 @@ namespace CaptivityEvents.CampaignBehaviors
             return true;
         }
 
+        // HourlyPartyTick
         public void HourlyPartyTick(MobileParty mobileParty)
         {
             int prisonerSizeLimit = mobileParty.Party.PrisonerSizeLimit;
@@ -122,6 +124,7 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
+        // ApplyEscapeChanceToExceededPrisoners
         private void ApplyEscapeChanceToExceededPrisoners(CharacterObject character, MobileParty capturerParty)
         {
             const float num = 0.1f;

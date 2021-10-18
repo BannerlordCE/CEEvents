@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 

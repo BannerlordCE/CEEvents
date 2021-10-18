@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -44,6 +44,8 @@ namespace CaptivityEvents.Events
 
         internal void RemoveFactionLeader(Hero hero)
         {
+            if (hero.Clan == null) return;
+
             if ((hero.Clan?.Leader) == hero)
             {
                 if (hero != Hero.MainHero && hero.Clan.Heroes.Any((Hero x) => !x.IsChild && x != hero && x.IsAlive && (x.IsNoble || x.IsMinorFactionHero)))
@@ -96,7 +98,7 @@ namespace CaptivityEvents.Events
 
                 if (spouseHero == null) return;
 
-                if (hero.Clan == spouseHero.Clan) return;
+                if (hero?.Clan == spouseHero?.Clan) return;
 
                 Hero spouseHeroSpouse = spouseHero.Spouse;
 
@@ -190,16 +192,16 @@ namespace CaptivityEvents.Events
 
             if (found) return;
 
-//#if STABLE
-//            foreach (TraitObject traitObject in DefaultTraits.All)
-//            {
-//                if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
-//                {
-//                    found = true;
-//                    TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
-//                }
-//            }
-//#endif
+            //#if STABLE
+            //            foreach (TraitObject traitObject in DefaultTraits.All)
+            //            {
+            //                if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
+            //                {
+            //                    found = true;
+            //                    TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
+            //                }
+            //            }
+            //#endif
 
             if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + trait);
 
@@ -211,13 +213,22 @@ namespace CaptivityEvents.Events
             {
                 int currentSkillLevel = hero.GetSkillValue(skillObject);
                 int newNumber = resetSkill ? 0 : currentSkillLevel + amount;
+                bool isToggle = false;
+                bool wasPositive = false;
 
                 CESkillNode skillNode = CESkills.FindSkillNode(skill);
                 if (skillNode != null)
                 {
                     int maxLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MaxLevel);
-
                     int minLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MinLevel);
+
+                    if (maxLevel == 1 && minLevel == 0)
+                    {
+                        isToggle = true;
+                    }
+
+                    wasPositive = amount > 0;
+
                     if (maxLevel != 0 && newNumber > maxLevel)
                     {
                         newNumber = maxLevel;
@@ -251,19 +262,30 @@ namespace CaptivityEvents.Events
 
                 if (!display) return;
 
-                TextObject textObject = GameTexts.FindText("str_CE_level_skill");
-                textObject.SetTextVariable("HERO", hero.Name);
+                TextObject textObject;
 
-                if (xp == 0)
-                    textObject.SetTextVariable("NEGATIVE", amount > 0 ? 0 : 1);
+                if (isToggle)
+                {
+                    textObject = wasPositive ? GameTexts.FindText("str_CE_level_enter") : GameTexts.FindText("str_CE_level_leave");
+                    textObject.SetTextVariable("HERO", hero.Name);
+                    textObject.SetTextVariable("OCCUPATION", skillObject.Name.ToString());
+                }
                 else
-                    textObject.SetTextVariable("NEGATIVE", xp >= 0 ? 0 : 1);
+                {
+                    textObject = GameTexts.FindText("str_CE_level_skill");
+                    textObject.SetTextVariable("HERO", hero.Name);
 
-                textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
+                    if (xp == 0)
+                        textObject.SetTextVariable("NEGATIVE", wasPositive ? 1 : 0);
+                    else
+                        textObject.SetTextVariable("NEGATIVE", xp >= 0 ? 0 : 1);
 
-                textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
-                textObject.SetTextVariable("SKILL", skillObject.Name.ToLower());
-                textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
+                    textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
+                    textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
+                    textObject.SetTextVariable("SKILL", skillObject.Name.ToString().ToLower());
+                    textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
+                }
+
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
             }
             else
@@ -369,7 +391,7 @@ namespace CaptivityEvents.Events
                 int currentValue = hero.GetSkillValue(skill);
                 int valueToSet = currentValue + amount;
                 if (valueToSet < 1) valueToSet = 1;
-                if (valueToSet > 1000) valueToSet = 1000; 
+                if (valueToSet > 999) valueToSet = 999;
 
                 CEHelper.SetSkillValue(hero, skill, valueToSet);
 
@@ -520,14 +542,10 @@ namespace CaptivityEvents.Events
                         }
 
                         DisbandPartyAction.ApplyDisband(firstHero.PartyBelongedTo);
-                        
+
                         if (firstHero.PartyBelongedTo != null)
                         {
-#if BETA
                             firstHero.PartyBelongedTo.Party.SetCustomOwner(null);
-#else
-                            firstHero.PartyBelongedTo.Party.Owner = null;
-#endif
                         }
                         firstHero.ChangeState(Hero.CharacterStates.Fugitive);
                         MobileParty partyBelongedTo = firstHero.PartyBelongedTo;
@@ -748,7 +766,40 @@ namespace CaptivityEvents.Events
                 }
             }
         }
-
+        internal void CEWoundTroops(PartyBase party, int amount = 10)
+        {
+            try
+            {
+                int prisonerCount = party.MemberRoster.Count;
+                if (prisonerCount < amount) amount = prisonerCount;
+                party.MemberRoster.WoundNumberOfTroopsRandomly(amount);
+                TextObject textObject = GameTexts.FindText("str_CE_wound_troops");
+                textObject.SetTextVariable("PARTY", party.Name);
+                textObject.SetTextVariable("AMOUNT", amount);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("CEWoundTroops Couldn't wound any troops.");
+            }
+        }
+        internal void CEKillTroops(PartyBase party, int amount = 10, bool killHeroes = false)
+        {
+            try
+            {
+                int prisonerCount = party.MemberRoster.Count;
+                if (prisonerCount < amount) amount = prisonerCount;
+                party.MemberRoster.KillNumberOfMenRandomly(amount, killHeroes);
+                TextObject textObject = GameTexts.FindText("str_CE_kill_troops");
+                textObject.SetTextVariable("PARTY", party.Name);
+                textObject.SetTextVariable("AMOUNT", amount);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("CEKillTroops Couldn't kill any troops.");
+            }
+        }
         internal void CEGainRandomPrisoners(PartyBase party)
         {
             Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.IsVillage);

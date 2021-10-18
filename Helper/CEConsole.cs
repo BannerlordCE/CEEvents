@@ -1,11 +1,10 @@
-﻿#define STABLE
+﻿#define V164
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Notifications;
-using HarmonyLib;
 using SandBox;
 using System;
 using System.Collections.Generic;
@@ -687,7 +686,7 @@ namespace CaptivityEvents.Helper
 
 
                     return successful
-                        ? "Successfully cleaned save of captivity events data. Save the game now."
+                        ? "Successfully cleaned save of captivity events data. Save & Exit the game now."
                         : "Failed to Clean";
                 }
                 catch (Exception e)
@@ -851,7 +850,11 @@ namespace CaptivityEvents.Helper
                                         try
                                         {
                                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                            texture.PreloadTexture(false);
+#else
                                             texture.PreloadTexture();
+#endif
                                             Texture texture2D = new Texture(new EngineTexture(texture));
                                             CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                         }
@@ -883,7 +886,11 @@ namespace CaptivityEvents.Helper
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                    texture.PreloadTexture(false);
+#else
                                     texture.PreloadTexture();
+#endif
                                     Texture texture2D = new Texture(new EngineTexture(texture));
                                     CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
@@ -905,7 +912,11 @@ namespace CaptivityEvents.Helper
                             try
                             {
                                 TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                texture.PreloadTexture(false);
+#else
                                 texture.PreloadTexture();
+#endif
                                 Texture texture2D = new Texture(new EngineTexture(texture));
                                 CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                             }
@@ -959,6 +970,7 @@ namespace CaptivityEvents.Helper
                         // Events Removing
                         MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
                         if (mi != null) mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
+                        else { Campaign.Current.GameMenuManager.RemoveRelatedGameMenus("CEEVENTS"); }
                     }
                     else
                     {
@@ -995,7 +1007,7 @@ namespace CaptivityEvents.Helper
                     // Go Through Events
                     foreach (CEEvent _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !string.IsNullOrWhiteSpace(_listedEvent.Name)))
                     {
-                        if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && CEPersistence.CEEvents.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 1) continue;
+                        if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwriteable) && (CEPersistence.CEEventList.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 0 || CEPersistence.CEWaitingList.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 0)) continue;
 
                         if (!CEHelper.brothelFlagFemale)
                         {
@@ -1035,8 +1047,11 @@ namespace CaptivityEvents.Helper
                             CEPersistence.CEEventList.Add(_listedEvent);
                         }
                     }
-
-                    new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager, Campaign.Current.CampaignGameLoadingType == Campaign.GameLoadingType.Tutorial));
+#if V161
+                    new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager, Campaign.Current.CampaignGameLoadingType == Campaign.GameLoadingType.Tutorial)); 
+#else
+                    new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager));
+#endif
 
                     try
                     {
@@ -1095,7 +1110,11 @@ namespace CaptivityEvents.Helper
                                         try
                                         {
                                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                            texture.PreloadTexture(false);
+#else
                                             texture.PreloadTexture();
+#endif
                                             Texture texture2D = new Texture(new EngineTexture(texture));
                                             CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                         }
@@ -1127,7 +1146,11 @@ namespace CaptivityEvents.Helper
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                    texture.PreloadTexture(false);
+#else
                                     texture.PreloadTexture();
+#endif
                                     Texture texture2D = new Texture(new EngineTexture(texture));
                                     CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
@@ -1149,7 +1172,11 @@ namespace CaptivityEvents.Helper
                             try
                             {
                                 TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
+#if V164
+                                texture.PreloadTexture(false);
+#else
                                 texture.PreloadTexture();
+#endif
                                 Texture texture2D = new Texture(new EngineTexture(texture));
                                 CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                             }
@@ -1289,7 +1316,7 @@ namespace CaptivityEvents.Helper
             {
                 Thread.Sleep(500);
 
-                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.reload_events \".";
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.create_new_prisoner \".";
 
                 try
                 {

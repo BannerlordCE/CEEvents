@@ -116,12 +116,8 @@
     <Compile Include="Notifications\CEEventMapNotificationItemVM.cs" />
     <Compile Include="Helper\CEHelper.cs" />
     <Compile Include="Patches\CEPatchAttributes.cs" />
-    <Compile Include="Patches\CEPatchCharacterCreationGainedPropertiesVM.cs" />
-    <Compile Include="Patches\CEPatchCharacterVM.cs" />
     <Compile Include="Patches\CEPatchClanIncomeVM.cs" />
-    <Compile Include="Patches\CEPatchClanLordItemVM.cs" />
     <Compile Include="Patches\CEPatchDefaultClanFinanceModel.cs" />
-    <Compile Include="Patches\CEPatchEducationGainedPropertiesVM.cs" />
     <Compile Include="Patches\CEPatchGameMenu.cs" />
     <Compile Include="Patches\CEPatchHero.cs" />
     <Compile Include="Patches\CEPatchMapNotificationVM.cs" />
@@ -138,14 +134,15 @@
     <Compile Include="Patches\CEPatchPlayerCaptivity.cs" />
     <Compile Include="Patches\CEPatchPregnancyCampaignBehavior.cs" />
     <Compile Include="Patches\CEPatchPrisonerReleaseCampaignBehavior.cs" />
+    <Compile Include="Patches\CEPatchSkills.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=2.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Lib.Harmony.2.1.1\lib\net48\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Bannerlord.ButterLib, Version=1.0.27.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>packages\Bannerlord.ButterLib.1.0.27\lib\net472\Bannerlord.ButterLib.dll</HintPath>
+    <Reference Include="Bannerlord.ButterLib, Version=1.0.29.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>packages\Bannerlord.ButterLib.1.0.29\lib\net472\Bannerlord.ButterLib.dll</HintPath>
     </Reference>
     <Reference Include="MCMv4, Version=4.3.10.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>packages\Bannerlord.MCM.4.3.10\lib\net472\MCMv4.dll</HintPath>

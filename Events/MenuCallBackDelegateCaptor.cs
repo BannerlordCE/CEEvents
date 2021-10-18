@@ -1,9 +1,8 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
-using Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -228,6 +227,8 @@ namespace CaptivityEvents.Events
             ConsequenceRelease(ref args);
             ConsequenceWoundPrisoner(ref args);
             ConsequenceKillPrisoner(ref args);
+            ConsequenceWoundTroops(ref args);
+            ConsequenceKillTroops(ref args);
             ConsequenceJoinParty();
 
             _sharedCallBackHelper.ConsequenceMission();
@@ -523,6 +524,15 @@ namespace CaptivityEvents.Events
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillAllPrisoners)) _captor.CECaptorKillPrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
             // Kill Random
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomPrisoners)) _captor.CECaptorKillPrisoners(args);
+        }
+        private void ConsequenceWoundTroops(ref MenuCallbackArgs args)
+        {
+           if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomTroops)) _dynamics.CEWoundTroops(PartyBase.MainParty);
+        }
+        private void ConsequenceKillTroops(ref MenuCallbackArgs args)
+        {
+            // Kill Random
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomTroops)) _dynamics.CEKillTroops(PartyBase.MainParty);
         }
         private void ConsequenceGainRandomPrisoners()
         {

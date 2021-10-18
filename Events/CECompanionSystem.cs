@@ -195,13 +195,13 @@ namespace CaptivityEvents.Events
                         }
                         catch (Exception e)
                         {
-                            CECustomHandler.ForceLogToFile("Incorrect ConsequenceCompanions heroSelected: " + e.ToString());
+                            CECustomHandler.ForceLogToFile("Incorrect ConsequenceCompanions heroSelected: " + e.ToString() + _listedEvent.Name);
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    CECustomHandler.ForceLogToFile("Incorrect ConsequenceCompanions: " + e.ToString());
+                    CECustomHandler.ForceLogToFile("Incorrect ConsequenceCompanions: " + e.ToString() + _listedEvent.Name);
                 }
             }
         }

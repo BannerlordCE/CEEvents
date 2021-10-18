@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.SandBox;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -94,7 +95,7 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.Settlement.IsVillage) returnString += "(hasVillageFlag)";
 
-                if (captorParty.Settlement.IsHideout()) returnString += "(hasHideoutFlag)";
+                if (captorParty.Settlement.IsHideout) returnString += "(hasHideoutFlag)";
 
                 if (captorParty.Settlement.IsCastle)
                 {
@@ -159,7 +160,7 @@ namespace CaptivityEvents.Events
                     }
                 }
 
-                if (captorParty.MobileParty.CurrentSettlement.IsHideout()) returnString += "(hasHideoutFlag)";
+                if (captorParty.MobileParty.CurrentSettlement.IsHideout) returnString += "(hasHideoutFlag)";
 
                 if (captorParty.MobileParty.CurrentSettlement.IsUnderSiege) returnString += "(duringSiegeFlag)";
 
@@ -175,11 +176,13 @@ namespace CaptivityEvents.Events
 
             Vec3? position3D = (captorParty != null && captorParty.IsMobile) ? captorParty?.MobileParty?.GetPosition() : captorParty?.Settlement?.GetPosition();
             List<TaleWorlds.Core.TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
-            AtmosphereInfo atmosphere = new DefaultMapWeatherModel().GetAtmosphereModel(CampaignTime.Now, (Vec3)position3D);
+            AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, (Vec3)position3D);
 
             string environmentTerrainTypes = "";
             faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
-            if (atmosphere.SnowInfo.Density > 0) environmentTerrainTypes += "(Snow)";
+
+            if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
+
             returnString += "\nEnvironment Terrain Types : " + environmentTerrainTypes;
 
             returnString += "\n\n\n------- Party Status -------";
@@ -269,10 +272,10 @@ namespace CaptivityEvents.Events
             if (!FemaleCaptivesCheck(captorParty)) return LatestMessage;
             if (!MoraleCheck(captorParty)) return LatestMessage;
             if (!CompanionsCheck(captive, captorParty)) return LatestMessage;
+            if (!CaptorOwnerFlagsCheck(captorParty)) return LatestMessage;
 
             if (nonRandomBehaviour)
             {
-                if (!CaptorOwnerFlagsCheck(captorParty)) return LatestMessage;
                 if (!CaptorTraitCheck(captorParty)) return LatestMessage;
                 if (!CaptorTraitsCheck(captorParty)) return LatestMessage;
                 if (!CaptorSkillCheck(captorParty)) return LatestMessage;
@@ -454,12 +457,25 @@ namespace CaptivityEvents.Events
                 if (party.MobileParty.IsCaravan) type = 1;
                 if (party.MobileParty.IsBandit || party.MobileParty.IsBanditBossParty) type = 2;
                 if (party.MobileParty.IsLordParty) type = 3;
+            } 
+            else if (party.IsSettlement)
+            {
+                if (party.Settlement.IsHideout) type = 2;
             }
 
-            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DefaultParty) && type != 0) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. DefaultParty.");
-            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaravanParty) && type != 1) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaravanParty.");
-            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BanditParty) && type != 2) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. BanditParty.");
-            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LordParty) && type != 3) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. LordParty.");
+            bool hasDefaultFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DefaultParty);
+            bool hasCaravanFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaravanParty);
+            bool hasBanditFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BanditParty);
+            bool hasLordParty = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LordParty);
+
+
+            if (hasDefaultFlag || hasCaravanFlag || hasBanditFlag || hasLordParty)
+            {
+                if (!hasDefaultFlag && type == 0) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. DefaultParty.");
+                if (!hasCaravanFlag && type == 1) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaravanParty.");
+                if (!hasBanditFlag && type == 2) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. BanditParty.");
+                if (!hasLordParty && type == 3) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. LordParty.");
+            }
 
             return true;
         }
@@ -493,11 +509,10 @@ namespace CaptivityEvents.Events
                 {
                     Vec3? position3D = (party != null && party.IsMobile) ? party?.MobileParty?.GetPosition() : party?.Settlement?.GetPosition();
                     List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(party.Position2D);
-                    AtmosphereInfo atmosphere = new DefaultMapWeatherModel().GetAtmosphereModel(CampaignTime.Now, (Vec3)position3D);
 
                     string environmentTerrainTypes = "";
                     faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
-                    if (atmosphere.SnowInfo.Density > 0) environmentTerrainTypes += "(Snow)";
+                    if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
 
                     eventMatchingCondition = false;
                     if (hasWorldMapWater) eventMatchingCondition = environmentTerrainTypes.Contains("Water");
@@ -645,7 +660,7 @@ namespace CaptivityEvents.Events
 
                     if (hasVillageFlag && captorParty.Settlement.IsVillage) eventMatchingCondition = true;
 
-                    if (hasHideoutFlag && captorParty.Settlement.IsHideout()) eventMatchingCondition = true;
+                    if (hasHideoutFlag && captorParty.Settlement.IsHideout) eventMatchingCondition = true;
 
                     if ((hasCastleFlag || hasDungeonFlag) && captorParty.Settlement.IsCastle)
                     {
@@ -729,7 +744,7 @@ namespace CaptivityEvents.Events
 
                     if (duringSiegeFlag != captorParty.MobileParty.CurrentSettlement.IsUnderSiege) eventMatchingCondition = false;
                     if (duringRaidFlag != captorParty.MobileParty.CurrentSettlement.IsUnderRaid) eventMatchingCondition = false;
-                    if (hasHideoutFlag && captorParty.MobileParty.CurrentSettlement.IsHideout()) eventMatchingCondition = true;
+                    if (hasHideoutFlag && captorParty.MobileParty.CurrentSettlement.IsHideout) eventMatchingCondition = true;
                 }
                 else if (hasTravelingFlag)
                 {

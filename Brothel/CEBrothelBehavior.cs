@@ -1,4 +1,4 @@
-#define STABLE
+#define V164
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -29,6 +29,12 @@ namespace CaptivityEvents.Brothel
         public static bool _isBrothelInitialized;
 
         #region GameMenu
+        [GameMenuInitializationHandler("town_brothel")]
+        public static void BrothelMenuSoundOnInit(MenuCallbackArgs args)
+        {
+            args.MenuContext.SetAmbientSound("event:/map/ambient/node/settlements/2d/tavern");
+        }
+
         private void AddGameMenus(CampaignGameStarter campaignGameStarter)
         {
             if (CESettings.Instance == null) return;
@@ -223,6 +229,9 @@ namespace CaptivityEvents.Brothel
                 FieldInfo fi = LocationComplex.Current.GetType().GetField("_locations", BindingFlags.Instance | BindingFlags.NonPublic);
                 Dictionary<string, Location> _locations = (Dictionary<string, Location>)fi.GetValue(LocationComplex.Current);
 
+                string backgroundMeshName = settlement.Culture.StringId + "_tavern";
+                args.MenuContext.SetBackgroundMeshName(backgroundMeshName);
+
                 if (_locations.ContainsKey("brothel"))
                 {
                     _locations.Remove("brothel");
@@ -357,13 +366,13 @@ namespace CaptivityEvents.Brothel
             capturerParty.AddPrisoner(prisonerCharacter.CharacterObject, 1);
             if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(capturerParty);
             CEHelper.delayedEvents.Clear();
-            string waitingMenu = CEEventLoader.CEWaitingList();
+            string waitingMenu = WaitingList.CEWaitingList();
             GameMenu.ExitToLast();
             if (waitingMenu != null) GameMenu.ActivateGameMenu(waitingMenu);
         }
-        #endregion
+#endregion
 
-        #region Mission
+#region Mission
 
         public void LocationCharactersAreReadyToSpawn(Dictionary<string, int> unusedUsablePointCount)
         {
@@ -575,9 +584,9 @@ namespace CaptivityEvents.Brothel
             }
         }
 
-        #endregion
+#endregion
 
-        #region Dialogues
+#region Dialogues
 
         protected void AddDialogs(CampaignGameStarter campaignGameStarter)
         {
@@ -1203,9 +1212,9 @@ namespace CaptivityEvents.Brothel
 
             return true;
         }
-        #endregion
+#endregion
 
-        #region Session
+#region Session
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter) => AddDialogs(campaignGameStarter);
 
         public void OnMissionEnded(IMission mission) => CleanUpBrothel();
@@ -1493,12 +1502,7 @@ namespace CaptivityEvents.Brothel
             CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, new Action<Hero, Hero, KillCharacterAction.KillCharacterActionDetail, bool>(OnHeroDeath));
             CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, DailyTick);
             CampaignEvents.WeeklyTickEvent.AddNonSerializedListener(this, WeeklyTick);
-#if BETA
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, new Action<CampaignGameStarter>(AddGameMenus));
-#else
-            CampaignEvents.OnNewGameCreatedEvent.AddNonSerializedListener(this, AddGameMenus);
-            CampaignEvents.OnGameLoadedEvent.AddNonSerializedListener(this, AddGameMenus);
-#endif
             CampaignEvents.OnMissionEndedEvent.AddNonSerializedListener(this, OnMissionEnded);
             CampaignEvents.OnSettlementLeftEvent.AddNonSerializedListener(this, OnSettlementLeft);
             CampaignEvents.OnSettlementOwnerChangedEvent.AddNonSerializedListener(this, OnSettlementOwnerChanged);
@@ -1771,7 +1775,7 @@ namespace CaptivityEvents.Brothel
             return _brothelList.Exists(brothel => brothel.CaptiveProstitutes.Exists((captive) => { return captive.Name == prisoner.Name; }));
         }
 
-        #endregion
+#endregion
 
         public override void SyncData(IDataStore dataStore)
         {

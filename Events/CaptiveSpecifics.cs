@@ -1,4 +1,4 @@
-﻿#define STABLE
+﻿
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -21,7 +21,7 @@ namespace CaptivityEvents.Events
             {
                 if (PlayerCaptivity.CaptorParty != null)
                 {
-                    string waitingList = new WaitingList().CEWaitingList();
+                    string waitingList = WaitingList.CEWaitingList();
 
                     if (waitingList != null)
                     {

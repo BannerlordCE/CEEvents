@@ -1,5 +1,4 @@
-﻿#define STABLE
-using CaptivityEvents.CampaignBehaviors;
+﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
 using System;
@@ -254,13 +253,17 @@ namespace CaptivityEvents.Events
             ConsequenceSoldEvents(ref args);
             ConsequenceGainRandomPrisoners();
 
+            ConsequenceWoundTroops();
+            ConsequenceKillTroops();
+
             _sharedCallBackHelper.ConsequenceMission();
             _sharedCallBackHelper.ConsequenceTeleportPlayer();
+
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor) && PlayerCaptivity.CaptorParty.NumberOfAllMembers == 1)
             {
                 ConsequenceKillCaptor();
-            }
+            } 
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner))
             {
                 _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
@@ -318,10 +321,9 @@ namespace CaptivityEvents.Events
                 if (PlayerCaptivity.CaptorParty.LeaderHero != null) KillCharacterAction.ApplyByMurder(PlayerCaptivity.CaptorParty.LeaderHero, Hero.MainHero);
                 else PlayerCaptivity.CaptorParty.MemberRoster.AddToCounts(PlayerCaptivity.CaptorParty.Leader, -1);
 
-                if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MemberRoster.Count == 0)
+                if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MemberRoster.Count == 0 && PlayerCaptivity.CaptorParty.MobileParty.ActualClan != null)
                 {
-
-                    DestroyPartyAction.Apply(null, PlayerCaptivity.CaptorParty.MobileParty);
+                   DestroyPartyAction.Apply(null, PlayerCaptivity.CaptorParty.MobileParty);
                 }
             }
             catch (Exception e)
@@ -528,6 +530,14 @@ namespace CaptivityEvents.Events
         private void ConsequenceGainRandomPrisoners()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GainRandomPrisoners)) _dynamics.CEGainRandomPrisoners(PlayerCaptivity.CaptorParty);
+        }
+        private void ConsequenceWoundTroops()
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomTroops)) _dynamics.CEWoundTroops(PlayerCaptivity.CaptorParty);
+        }
+        private void ConsequenceKillTroops()
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomTroops)) _dynamics.CEKillTroops(PlayerCaptivity.CaptorParty);
         }
         private void ConsequenceSoldEvents(ref MenuCallbackArgs args)
         {
