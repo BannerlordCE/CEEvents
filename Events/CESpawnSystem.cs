@@ -113,13 +113,13 @@ namespace CaptivityEvents.Events
 
                     try
                     {
-                        int level = 0;
-                        int xp = 0;
-
                         if (heroVariables.SkillsToLevel != null)
                         {
                             foreach (SkillToLevel skillToLevel in heroVariables.SkillsToLevel)
                             {
+                                int level = 0;
+                                int xp = 0;
+
                                 if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
                                 else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
 

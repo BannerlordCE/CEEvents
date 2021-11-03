@@ -315,13 +315,14 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                int level = 0;
-                int xp = 0;
 
                 if (companion.TraitsToLevel != null && companion.TraitsToLevel.Count(TraitToLevel => TraitToLevel.Ref.ToLower() == "hero") != 0)
                 {
                     foreach (TraitToLevel traitToLevel in companion.TraitsToLevel)
                     {
+                        int level = 0;
+                        int xp = 0;
+
                         if (traitToLevel.Ref.ToLower() == "captor" && hero.PartyBelongedToAsPrisoner.LeaderHero == null) continue;
                         if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
@@ -337,13 +338,13 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                int level = 0;
-                int xp = 0;
-
                 if (companion.SkillsToLevel != null && companion.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref.ToLower() == "hero") != 0)
                 {
                     foreach (SkillToLevel skillToLevel in companion.SkillsToLevel)
                     {
+                        int level = 0;
+                        int xp = 0;
+
                         if (skillToLevel.Ref.ToLower() == "captor" && hero.PartyBelongedToAsPrisoner.LeaderHero == null) continue;
                         if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);

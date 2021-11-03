@@ -652,13 +652,13 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                int level = 0;
-                int xp = 0;
-
                 if (_option.SkillsToLevel != null && _option.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref.ToLower() == "captor") != 0)
                 {
                     foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
                     {
+                        int level = 0;
+                        int xp = 0;
+
                         if (skillToLevel.Ref.ToLower() != "captor") continue;
                         if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
@@ -671,6 +671,9 @@ namespace CaptivityEvents.Events
                 {
                     foreach (SkillToLevel skillToLevel in _listedEvent.SkillsToLevel)
                     {
+                        int level = 0;
+                        int xp = 0;
+
                         if (skillToLevel.Ref.ToLower() != "captor") continue;
                         if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
@@ -681,6 +684,9 @@ namespace CaptivityEvents.Events
                 else
                 {
                     if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorSkill)) return;
+
+                    int level = 0;
+                    int xp = 0;
 
                     if (!string.IsNullOrWhiteSpace(_option.SkillTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.SkillTotal);
                     else if (!string.IsNullOrWhiteSpace(_option.SkillXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.SkillXPTotal);
@@ -700,13 +706,13 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                int level = 0;
-                int xp = 0;
-
                 if (_option.TraitsToLevel != null && _option.TraitsToLevel.Count(TraitToLevel => TraitToLevel.Ref.ToLower() == "captor") != 0)
                 {
                     foreach (TraitToLevel traitToLevel in _option.TraitsToLevel)
                     {
+                        int level = 0;
+                        int xp = 0;
+
                         if (traitToLevel.Ref.ToLower() != "captor") continue;
                         if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
@@ -718,6 +724,9 @@ namespace CaptivityEvents.Events
                 {
                     foreach (TraitToLevel traitToLevel in _listedEvent.TraitsToLevel)
                     {
+                        int level = 0;
+                        int xp = 0;
+
                         if (traitToLevel.Ref.ToLower() != "captor") continue;
                         if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
@@ -728,6 +737,9 @@ namespace CaptivityEvents.Events
                 else
                 {
                     if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorTrait)) return;
+
+                    int level = 0;
+                    int xp = 0;
 
                     if (!string.IsNullOrEmpty(_option.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.TraitTotal);
                     else if (!string.IsNullOrEmpty(_option.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.TraitXPTotal);
