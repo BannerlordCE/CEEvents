@@ -165,6 +165,12 @@ namespace CaptivityEvents.Brothel
 
         private static bool BrothelTroopTransferableDelegate(CharacterObject character, PartyScreenLogic.TroopType type, PartyScreenLogic.PartyRosterSide side, PartyBase LeftOwnerParty)
         {
+            // No Selling Children (If you somehow manage to get children as prisoners??)
+            if (character.Age < 18)
+            {
+                return false;
+            }
+
             switch (CESettings.Instance.BrothelOption.SelectedIndex)
             {
                 case 0:
