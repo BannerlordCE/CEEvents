@@ -896,7 +896,7 @@ namespace CaptivityEvents
                 case 1:
                     if (Game.Current.GameStateManager.ActiveState is InventoryState inventoryState)
                     {
-                            CEPersistence.captiveInventoryStage = 2;
+                        CEPersistence.captiveInventoryStage = 2;
                     }
                     break;
                 case 2:
@@ -908,7 +908,7 @@ namespace CaptivityEvents
                             {
                                 MobileParty.MainParty.MemberRoster.RemoveTroop(CEPersistence.removeHero.CharacterObject, 1);
                             }
-                            
+
                             CEPersistence.removeHero = null;
                             PartyBase.MainParty.Visuals.SetMapIconAsDirty();
                         }
@@ -1383,13 +1383,10 @@ namespace CaptivityEvents
                         else if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.destroyParty)
                         {
                             PlayerEncounter.Current.FinalizeBattle();
-                            try 
+                            try
                             {
-                                if (PlayerEncounter.EncounteredMobileParty.ActualClan != null)
-                                {
-                                    DestroyPartyAction.Apply(PartyBase.MainParty, PlayerEncounter.EncounteredMobileParty);
-                                }
-                            } 
+                                DestroyPartyAction.Apply(PartyBase.MainParty, PlayerEncounter.EncounteredMobileParty);
+                            }
                             catch (Exception e)
                             {
                                 CECustomHandler.ForceLogToFile("FinalizeBattle: " + e);
