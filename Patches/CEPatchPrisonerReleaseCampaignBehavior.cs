@@ -10,7 +10,7 @@ namespace CaptivityEvents.Patches
 	{
 		[HarmonyPatch("OnGameLoaded")]
 		[HarmonyPrefix]
-		private static bool OnGameLoaded(CampaignGameStarter campaignGameStarter)
+		private static bool OnGameLoaded()
 		{
 			foreach (Settlement settlement in Settlement.All)
 			{
