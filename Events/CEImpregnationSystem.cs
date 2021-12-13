@@ -64,7 +64,11 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer).GetRandomElementInefficiently();
+#if V165
+                        CharacterObject m = CharacterObject.Templates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+#else
+                        CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+#endif
                         randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
                     }
 
@@ -82,7 +86,11 @@ namespace CaptivityEvents.Events
                 }
                 else if (forcePreg)
                 {
-                    CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale == false).GetRandomElementInefficiently();
+#if V165
+                    CharacterObject m = CharacterObject.Templates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false);
+#else
+                    CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+#endif
                     Hero randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.BornSettlement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
                     CEHelper.spouseOne = randomSoldier;
                     CEHelper.spouseTwo = targetHero;
@@ -112,7 +120,7 @@ namespace CaptivityEvents.Events
 
                 if (senderHero != null)
                 {
-                    if (senderHero.IsFemale && !senderHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(senderHero) && IsHeroAgeSuitableForPregnancy(senderHero))randomSoldier = senderHero;
+                    if (senderHero.IsFemale && !senderHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(senderHero) && IsHeroAgeSuitableForPregnancy(senderHero)) randomSoldier = senderHero;
                     else return;
 
                 }
@@ -145,7 +153,11 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
+#if V165
                     CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale && characterObject.Occupation == Occupation.Wanderer).GetRandomElementInefficiently();
+#else
+                    CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale && characterObject.Occupation == Occupation.Wanderer);
+#endif
                     randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(15) + 18);
                 }
 
@@ -221,7 +233,11 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer).GetRandomElementInefficiently();
+#if V165
+                        CharacterObject m = CharacterObject.Templates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+#else
+                        CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+#endif
                         randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
                     }
 
@@ -239,7 +255,11 @@ namespace CaptivityEvents.Events
                 }
                 else if (forcePreg)
                 {
-                    CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale == false).GetRandomElementInefficiently();
+#if V165
+                    CharacterObject m = CharacterObject.Templates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+#else
+                    CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+#endif
                     Hero randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.BornSettlement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(20) + 20);
                     CEHelper.spouseOne = randomSoldier;
                     CEHelper.spouseTwo = targetHero;
@@ -306,7 +326,11 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
-                    CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale && characterObject.IsRegular).GetRandomElementInefficiently();
+#if V165
+                    CharacterObject m = CharacterObject.Templates.Where(characterObject => characterObject.IsFemale && characterObject.Occupation == Occupation.Wanderer).GetRandomElementInefficiently();
+#else
+                    CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale && characterObject.Occupation == Occupation.Wanderer);
+#endif
                     randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, MBRandom.Random.Next(15) + 18);
                 }
 

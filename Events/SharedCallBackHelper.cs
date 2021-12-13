@@ -1,4 +1,4 @@
-﻿
+﻿#define V170
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -887,7 +887,12 @@ namespace CaptivityEvents.Events
 
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
+#if V165
                                         customParty.InitializeMobileParty(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
+#else
+                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
+#endif
+
                                         customParty.MemberRoster.Clear();
                                         customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
 
@@ -918,7 +923,11 @@ namespace CaptivityEvents.Events
 
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
+#if V165
                                         customParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#else
+                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#endif
 
                                         customParty.MemberRoster.Clear();
                                         customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
@@ -956,7 +965,13 @@ namespace CaptivityEvents.Events
                                         PlayerEncounter.StartBattle();
                                         PlayerEncounter.Update();
                                         //EncounterAttackConsequence
+#if V165
                                         MissionInitializerRecord rec = new MissionInitializerRecord(PlayerEncounter.GetBattleSceneForMapPosition(MobileParty.MainParty.Position2D))
+#else
+                                        MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position2D);
+                                        string battleSceneForMapPatch = PlayerEncounter.GetBattleSceneForMapPatch(mapPatchAtPosition);
+                                        MissionInitializerRecord rec = new MissionInitializerRecord(battleSceneForMapPatch)
+#endif
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
@@ -985,8 +1000,11 @@ namespace CaptivityEvents.Events
 
                                         MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false);
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
-
+#if V165
                                         customParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#else
+                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#endif
 
                                         customParty.MemberRoster.Clear();
                                         customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
@@ -1024,7 +1042,13 @@ namespace CaptivityEvents.Events
                                         PlayerEncounter.StartBattle();
                                         PlayerEncounter.Update();
                                         //EncounterAttackConsequence
+#if V165
                                         MissionInitializerRecord rec = new MissionInitializerRecord(PlayerEncounter.GetBattleSceneForMapPosition(MobileParty.MainParty.Position2D))
+#else
+                                        MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position2D);
+                                        string battleSceneForMapPatch = PlayerEncounter.GetBattleSceneForMapPatch(mapPatchAtPosition);
+                                        MissionInitializerRecord rec = new MissionInitializerRecord(battleSceneForMapPatch)
+#endif
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
@@ -1280,7 +1304,7 @@ namespace CaptivityEvents.Events
                         case "none":
                             break;
                         default:
-                            character2 = Hero.MainHero.IsPrisoner ? Hero.MainHero.PartyBelongedToAsPrisoner.Leader : _listedEvent.Captive;
+                            character2 = Hero.MainHero.IsPrisoner ? Hero.MainHero.PartyBelongedToAsPrisoner.LeaderHero?.CharacterObject : _listedEvent.Captive;
                             break;
                     }
 
@@ -1297,7 +1321,7 @@ namespace CaptivityEvents.Events
 
 
         }
-        #endregion
+#endregion
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {

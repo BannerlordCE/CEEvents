@@ -84,12 +84,22 @@ namespace CaptivityEvents.Events
                         culture = heroVariables.Culture;
                     }
 
+#if V165
                     CharacterObject wanderer = (from x in CharacterObject.Templates
                                                 where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture != null && x.Culture.StringId == culture.ToLower()) && (heroVariables.Gender == null || x.IsFemale == isFemale)
                                                 select x).GetRandomElementInefficiently();
                     Settlement randomElement = (from settlement in Settlement.All
                                                 where settlement.Culture == wanderer.Culture && settlement.IsTown
                                                 select settlement).GetRandomElementInefficiently();
+#else
+                    CultureObject cultureObject = MBObjectManager.Instance.GetObjectTypeList<CultureObject>().Where(x => (culture == null && x.IsMainCulture || x.StringId == culture.ToLower())).FirstOrDefault();
+                    if (cultureObject == null)
+                    {
+                        cultureObject = Hero.MainHero.Culture;
+                    }
+                    CharacterObject wanderer = cultureObject.NotableAndWandererTemplates.GetRandomElementWithPredicate((CharacterObject x) => x.Occupation == Occupation.Wanderer && (heroVariables.Gender == null || x.IsFemale == isFemale));
+                    Settlement randomElement = Settlement.All.GetRandomElementWithPredicate((Settlement settlement) => settlement.Culture == wanderer.Culture && settlement.IsTown);
+#endif
 
                     Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElementInefficiently(), null, -1);
 

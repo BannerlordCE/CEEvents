@@ -850,11 +850,7 @@ namespace CaptivityEvents.Helper
                                         try
                                         {
                                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-#if V164
                                             texture.PreloadTexture(false);
-#else
-                                            texture.PreloadTexture();
-#endif
                                             Texture texture2D = new Texture(new EngineTexture(texture));
                                             CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                         }
@@ -886,11 +882,7 @@ namespace CaptivityEvents.Helper
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-#if V164
                                     texture.PreloadTexture(false);
-#else
-                                    texture.PreloadTexture();
-#endif
                                     Texture texture2D = new Texture(new EngineTexture(texture));
                                     CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
@@ -912,11 +904,7 @@ namespace CaptivityEvents.Helper
                             try
                             {
                                 TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-#if V164
                                 texture.PreloadTexture(false);
-#else
-                                texture.PreloadTexture();
-#endif
                                 Texture texture2D = new Texture(new EngineTexture(texture));
                                 CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                             }
@@ -1047,11 +1035,8 @@ namespace CaptivityEvents.Helper
                             CEPersistence.CEEventList.Add(_listedEvent);
                         }
                     }
-#if V161
-                    new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager, Campaign.Current.CampaignGameLoadingType == Campaign.GameLoadingType.Tutorial)); 
-#else
+
                     new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager));
-#endif
 
                     try
                     {
@@ -1110,11 +1095,7 @@ namespace CaptivityEvents.Helper
                                         try
                                         {
                                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-#if V164
                                             texture.PreloadTexture(false);
-#else
-                                            texture.PreloadTexture();
-#endif
                                             Texture texture2D = new Texture(new EngineTexture(texture));
                                             CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                         }
@@ -1146,11 +1127,7 @@ namespace CaptivityEvents.Helper
                                 try
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-#if V164
                                     texture.PreloadTexture(false);
-#else
-                                    texture.PreloadTexture();
-#endif
                                     Texture texture2D = new Texture(new EngineTexture(texture));
                                     CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
@@ -1172,11 +1149,7 @@ namespace CaptivityEvents.Helper
                             try
                             {
                                 TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-#if V164
                                 texture.PreloadTexture(false);
-#else
-                                texture.PreloadTexture();
-#endif
                                 Texture texture2D = new Texture(new EngineTexture(texture));
                                 CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                             }
