@@ -515,6 +515,40 @@ namespace CaptivityEvents.Helper
             }
         }
 
+        [CommandLineFunctionality.CommandLineArgumentFunction("impregnant", "captivity")]
+        public static string ImpregnantHero(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.impregnant [HERO]\".";
+
+                CEImpregnationSystem _impregnation = new CEImpregnationSystem();
+                string searchTerm = null;
+
+                if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
+
+                Hero hero = string.IsNullOrWhiteSpace(searchTerm)
+                    ? Hero.MainHero
+                    : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
+
+                if (hero == null)
+                {
+                    return "Hero not found.";
+                }
+                else
+                {
+                    _impregnation.ImpregnationChance(hero, 0, true, null);
+                    return "Done.";
+                }
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
         [CommandLineFunctionality.CommandLineArgumentFunction("current_status", "captivity")]
         public static string CurrentStatus(List<string> strings)
         {
