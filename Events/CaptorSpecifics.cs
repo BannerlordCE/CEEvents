@@ -1,4 +1,4 @@
-﻿
+﻿#define V170
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;

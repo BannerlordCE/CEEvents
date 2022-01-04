@@ -94,6 +94,7 @@ namespace CaptivityEvents.Events
                 return;
             }
 
+            // EndCaptivityInternal
             try
             {
                 if (Hero.MainHero.IsAlive)
@@ -103,6 +104,9 @@ namespace CaptivityEvents.Events
                     PlayerEncounter.ProtectPlayerSide();
                     MobileParty.MainParty.IsDisorganized = false;
                     PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, 1, true);
+#if V170
+                    MobileParty.MainParty.ChangePartyLeader(Hero.MainHero);
+#endif
                 }
 
                 MobileParty.MainParty.CurrentSettlement = PlayerCaptivity.CaptorParty.Settlement;
