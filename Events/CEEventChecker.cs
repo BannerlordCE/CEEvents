@@ -49,6 +49,12 @@ namespace CaptivityEvents.Events
                     "Male") +
                 "\n";
 
+            if (captive.IsFemale)
+            {
+                bool isPregnant = CECampaignBehavior.CheckIfPregnancyExists(captive.HeroObject) || captive.HeroObject.IsPregnant;
+                returnString += "Pregnant: " + isPregnant + "\n";
+            }
+
             foreach (SkillObject skill in CESkills.CustomSkills)
             {
                 int value = captive.GetSkillValue(skill);

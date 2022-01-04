@@ -1,4 +1,4 @@
-﻿
+﻿#define V170
 using CaptivityEvents.Custom;
 using System;
 using System.Linq;

@@ -1,4 +1,4 @@
-
+#define V170
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -476,8 +476,8 @@ namespace CaptivityEvents.CampaignBehaviors
             hero.SetName(NameGenerator.Current.GenerateHeroFirstName(hero, true), null);
             hero.CharacterObject.Name = hero.FirstName;
 #else
-            NameGenerator.Current.GenerateHeroNameAndHeroFullName(hero, out TextObject firstName, out TextObject fullName, false, true);
-            hero.SetName(fullName, firstName);
+            TextObject name = NameGenerator.Current.GenerateHeroFirstName(hero, true);
+            hero.SetName(name, name);
 #endif
 
             // Reflection Two

@@ -1,4 +1,4 @@
-﻿#define V164
+﻿#define V170
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;

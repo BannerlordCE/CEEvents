@@ -1,4 +1,4 @@
-#define V164
+#define V170
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -392,12 +392,23 @@ namespace CaptivityEvents.Brothel
             InformationManager.AddQuickInformation(textObject, 0, CharacterObject.PlayerCharacter, "event:/ui/notification/relation");
 
             PartyBase capturerParty = SettlementHelper.FindNearestSettlement(settlement => settlement.IsTown).Party;
+            // TaleWorlds.CampaignSystem.Actions TakePrisonerAction
             Hero prisonerCharacter = Hero.MainHero;
+            if (prisonerCharacter.PartyBelongedTo != null)  
+            {
+#if V170
+                if (prisonerCharacter.PartyBelongedTo.LeaderHero == prisonerCharacter)
+                {
+                    prisonerCharacter.PartyBelongedTo.RemovePartyLeader();
+                }
+#endif
+                prisonerCharacter.PartyBelongedTo.MemberRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+            }
             prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
             prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
-            while (PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter)) PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, -1, true);
             capturerParty.AddPrisoner(prisonerCharacter.CharacterObject, 1);
             if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(capturerParty);
+            if (capturerParty.IsSettlement && prisonerCharacter.StayingInSettlement != null) prisonerCharacter.StayingInSettlement = null;
             CEHelper.delayedEvents.Clear();
             string waitingMenu = WaitingList.CEWaitingList();
             GameMenu.ExitToLast();

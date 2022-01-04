@@ -878,8 +878,9 @@ namespace CaptivityEvents.Events
                                         {
                                             CECustomHandler.ForceLogToFile("ConsequenceStartBattle : city required. ");
                                         }
-                                        // StartCommonAreaBattle RivalGangMovingInIssue
-                                        MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue));
+#if V165
+                                        // StartCommonAreaBattle RivalGangMovingInIssueBehavior
+                                        MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), null, null);
 
                                         Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
@@ -887,12 +888,7 @@ namespace CaptivityEvents.Events
 
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
-#if V165
                                         customParty.InitializeMobileParty(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
-#else
-                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
-#endif
-
                                         customParty.MemberRoster.Clear();
                                         customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
 
@@ -908,6 +904,36 @@ namespace CaptivityEvents.Events
                                         PlayerEncounter.Current.ForceAlleyFight = true;
                                         PlayerEncounter.StartBattle();
                                         PlayerEncounter.StartAlleyFightMission();
+#else
+                                        // StartCommonAreaBattle RivalGangMovingInIssueBehavior
+                                        MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), null, null);
+
+                                        Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
+                                        clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
+
+
+                                        PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
+
+                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
+                                        customParty.MemberRoster.Clear();
+                                        customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
+
+                                        TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
+                                        customParty.SetCustomName(textObject);
+
+                                        EnterSettlementAction.ApplyForParty(customParty, Settlement.CurrentSettlement);
+
+                                        PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, false);
+
+                                        CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
+                                        CEPersistence.destroyParty = true;
+                                        CEPersistence.surrenderParty = false;
+
+                                        PlayerEncounter.Current.ForceAlleyFight = true;
+                                        PlayerEncounter.StartBattle();
+                                        PlayerEncounter.StartAlleyFightMission();                            
+#endif
+                                        
                                         break;
                                     }
                                 case "regularspawn":
