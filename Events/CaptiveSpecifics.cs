@@ -103,11 +103,12 @@ namespace CaptivityEvents.Events
                     PlayerEncounter.ProtectPlayerSide();
                     MobileParty.MainParty.IsDisorganized = false;
                     PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, 1, true);
+                    MobileParty.MainParty.ChangePartyLeader(Hero.MainHero);
                 }
 
                 MobileParty.MainParty.CurrentSettlement = PlayerCaptivity.CaptorParty.Settlement;
                 if (Campaign.Current.CurrentMenuContext != null) GameMenu.SwitchToMenu("town");
-
+                
                 if (Hero.MainHero.IsAlive)
                 {
                     Hero.MainHero.ChangeState(Hero.CharacterStates.Active);

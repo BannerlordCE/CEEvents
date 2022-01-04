@@ -1,4 +1,4 @@
-
+#define V170
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;

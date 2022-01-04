@@ -1,4 +1,4 @@
-#define V164
+#define V170
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -390,14 +390,27 @@ namespace CaptivityEvents.Brothel
             textObject.SetTextVariable("PLAYER_HERO", Hero.MainHero.Name);
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
             InformationManager.AddQuickInformation(textObject, 0, CharacterObject.PlayerCharacter, "event:/ui/notification/relation");
-
-            PartyBase capturerParty = SettlementHelper.FindNearestSettlement(settlement => settlement.IsTown).Party;
-            Hero prisonerCharacter = Hero.MainHero;
-            prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
-            prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
-            while (PartyBase.MainParty.MemberRoster.Contains(CharacterObject.PlayerCharacter)) PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, -1, true);
-            capturerParty.AddPrisoner(prisonerCharacter.CharacterObject, 1);
-            if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(capturerParty);
+            PartyBase party = SettlementHelper.FindNearestSettlement(settlement => settlement.IsTown).Party;
+            Hero mainHero = Hero.MainHero;
+            if (mainHero.PartyBelongedTo != null)
+            {
+                if (mainHero.PartyBelongedTo.LeaderHero == mainHero)
+                {
+                    mainHero.PartyBelongedTo.RemovePartyLeader();
+                }
+                mainHero.PartyBelongedTo.MemberRoster.RemoveTroop(mainHero.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+            }
+            mainHero.CaptivityStartTime = CampaignTime.Now;
+            mainHero.ChangeState(Hero.CharacterStates.Prisoner);
+            party.AddPrisoner(mainHero.CharacterObject, 1);
+            if (mainHero == Hero.MainHero)
+            {
+                PlayerCaptivity.StartCaptivity(party);
+            }
+            if (party.IsSettlement && mainHero.StayingInSettlement != null)
+            {   
+                mainHero.StayingInSettlement = null;
+            }
             CEHelper.delayedEvents.Clear();
             string waitingMenu = WaitingList.CEWaitingList();
             GameMenu.ExitToLast();

@@ -879,7 +879,7 @@ namespace CaptivityEvents.Events
                                             CECustomHandler.ForceLogToFile("ConsequenceStartBattle : city required. ");
                                         }
                                         // StartCommonAreaBattle RivalGangMovingInIssue
-                                        MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue));
+                                        MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), null, null);
 
                                         Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);

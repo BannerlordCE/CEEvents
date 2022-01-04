@@ -171,52 +171,6 @@ namespace CaptivityEvents
 
             try
             {
-#if V170
-                CECustomHandler.ForceLogToFile("Loading Textures 1.7.0");
-                PropertyInfo propertyWidth = typeof(SpritePart).GetProperty("Width");
-                PropertyInfo propertyHeight = typeof(SpritePart).GetProperty("Height");
-                foreach (SpritePart spritePart in UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteParts)
-                {
-                    switch (spritePart.Name)
-                    {
-                        case "wait_prisoner_female":
-                            spritePart.SheetID = 7;
-                            spritePart.SheetX = 0;
-                            spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
-                            spritePart.UpdateInitValues();
-                            break;
-                        case "wait_prisoner_male":
-                            spritePart.SheetID = 6;
-                            spritePart.SheetX = 0;
-                            spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
-                            spritePart.UpdateInitValues();
-                            break;
-                        case "wait_captive_female":
-                            spritePart.SheetID = 5;
-                            spritePart.SheetX = 0;
-                            spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
-                            spritePart.UpdateInitValues();
-                            break;
-                        case "wait_captive_male":
-                            spritePart.SheetID = 4;
-                            spritePart.SheetX = 0;
-                            spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
-                            spritePart.UpdateInitValues();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-#endif
-
                 if (!swap)
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
@@ -440,6 +394,48 @@ namespace CaptivityEvents
                 spriteCategory.SpriteSheets.AddRange(new Texture[]{ CEPersistence.CEEventImageList["default_female_prison"], CEPersistence.CEEventImageList["default_male_prison"], CEPersistence.CEEventImageList["default_female"], CEPersistence.CEEventImageList["default_male"] });
                 spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray(new Vec2i[] { new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805) });
                 spriteCategory.SpriteSheetCount = 7;
+                PropertyInfo propertyWidth = typeof(SpritePart).GetProperty("Width");
+                PropertyInfo propertyHeight = typeof(SpritePart).GetProperty("Height");
+                foreach (SpritePart spritePart in UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteParts)
+                {
+                    switch (spritePart.Name)
+                    {
+                        case "wait_prisoner_female":
+                            spritePart.SheetID = 7;
+                            spritePart.SheetX = 0;
+                            spritePart.SheetY = 0;
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
+                            spritePart.UpdateInitValues();
+                            break;
+                        case "wait_prisoner_male":
+                            spritePart.SheetID = 6;
+                            spritePart.SheetX = 0;
+                            spritePart.SheetY = 0;
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
+                            spritePart.UpdateInitValues();
+                            break;
+                        case "wait_captive_female":
+                            spritePart.SheetID = 5;
+                            spritePart.SheetX = 0;
+                            spritePart.SheetY = 0;
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
+                            spritePart.UpdateInitValues();
+                            break;
+                        case "wait_captive_male":
+                            spritePart.SheetID = 4;
+                            spritePart.SheetX = 0;
+                            spritePart.SheetY = 0;
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
+                            spritePart.UpdateInitValues();
+                            break;
+                        default:
+                            break;
+                    }
+                }
 #endif
 
                 LoadTexture("default", false, true);
