@@ -43,7 +43,7 @@ namespace CaptivityEvents.Events
                     CEProgressMode(variablesLoader.GetIntFromXML(listedEvent.ProgressEvent.DisplayProgressMode)),
                     TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
                     variablesLoader.GetFloatFromXML(listedEvent.ProgressEvent.TimeToTake),
-                    GameMenu.MenuFlags.none,
+                    GameMenu.MenuFlags.None,
                     "CEEVENTS");
             }
             else
@@ -53,7 +53,7 @@ namespace CaptivityEvents.Events
                     listedEvent.Text,
                     rcb.RandomEventGameMenu,
                     TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
-                    GameMenu.MenuFlags.none,
+                    GameMenu.MenuFlags.None,
                     "CEEVENTS");
             }
 
@@ -89,7 +89,7 @@ namespace CaptivityEvents.Events
                     CEProgressMode(variablesLoader.GetIntFromXML(listedEvent.ProgressEvent.DisplayProgressMode)),
                     TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
                     variablesLoader.GetFloatFromXML(listedEvent.ProgressEvent.TimeToTake),
-                    GameMenu.MenuFlags.none,
+                    GameMenu.MenuFlags.None,
                     "CEEVENTS");
             }
             else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
@@ -104,7 +104,7 @@ namespace CaptivityEvents.Events
                     GameMenu.MenuAndOptionType.WaitMenuHideProgressAndHoursOption,
                     TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
                     0,
-                    GameMenu.MenuFlags.none,
+                    GameMenu.MenuFlags.None,
                     "CEEVENTS");
             }
             else
@@ -114,7 +114,7 @@ namespace CaptivityEvents.Events
                     listedEvent.Text,
                     cb.CaptiveEventGameMenu,
                     TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
-                    GameMenu.MenuFlags.none,
+                    GameMenu.MenuFlags.None,
                     "CEEVENTS");
             }
 
@@ -151,7 +151,7 @@ namespace CaptivityEvents.Events
                     CEProgressMode(variablesLoader.GetIntFromXML(listedEvent.ProgressEvent.DisplayProgressMode)),
                     TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
                     variablesLoader.GetFloatFromXML(listedEvent.ProgressEvent.TimeToTake),
-                    GameMenu.MenuFlags.none,
+                    GameMenu.MenuFlags.None,
                     "CEEVENTS");
             }
             else
@@ -161,7 +161,7 @@ namespace CaptivityEvents.Events
                 listedEvent.Text,
                 cb.CaptorEventWaitGameMenu,
                 TaleWorlds.CampaignSystem.Overlay.GameOverlays.MenuOverlayType.None,
-                GameMenu.MenuFlags.none,
+                GameMenu.MenuFlags.None,
                 "CEEVENTS");
             }
 

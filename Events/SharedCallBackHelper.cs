@@ -1,4 +1,4 @@
-﻿
+﻿#define V170
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -85,13 +85,14 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                int level = 0;
-                int xp = 0;
 
                 if (_option.TraitsToLevel != null && _option.TraitsToLevel.Count(TraitToLevel => TraitToLevel.Ref.ToLower() == "hero") != 0)
                 {
                     foreach (TraitToLevel traitToLevel in _option.TraitsToLevel)
                     {
+                        int level = 0;
+                        int xp = 0;
+
                         if (traitToLevel.Ref.ToLower() != "hero") continue;
                         if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
@@ -103,6 +104,9 @@ namespace CaptivityEvents.Events
                 {
                     foreach (TraitToLevel traitToLevel in _listedEvent.TraitsToLevel)
                     {
+                        int level = 0;
+                        int xp = 0;
+
                         if (traitToLevel.Ref.ToLower() != "hero") continue;
                         if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
@@ -113,6 +117,9 @@ namespace CaptivityEvents.Events
                 else
                 {
                     if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeTrait)) return;
+
+                    int level = 0;
+                    int xp = 0;
 
                     if (!string.IsNullOrEmpty(_option.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.TraitTotal);
                     else if (!string.IsNullOrEmpty(_option.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.TraitXPTotal);
@@ -131,13 +138,14 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                int level = 0;
-                int xp = 0;
 
                 if (_option.SkillsToLevel != null && _option.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref.ToLower() == "hero") != 0)
                 {
                     foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
                     {
+                        int level = 0;
+                        int xp = 0;
+
                         if (skillToLevel.Ref.ToLower() != "hero") continue;
                         if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
@@ -149,6 +157,9 @@ namespace CaptivityEvents.Events
                 {
                     foreach (SkillToLevel skillToLevel in _listedEvent.SkillsToLevel)
                     {
+                        int level = 0;
+                        int xp = 0;
+
                         if (skillToLevel.Ref.ToLower() != "hero") continue;
                         if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
@@ -159,6 +170,9 @@ namespace CaptivityEvents.Events
                 else
                 {
                     if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSkill)) return;
+
+                    int level = 0;
+                    int xp = 0;
 
                     if (!string.IsNullOrWhiteSpace(_option.SkillTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.SkillTotal);
                     else if (!string.IsNullOrWhiteSpace(_option.SkillXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.SkillXPTotal);
@@ -873,7 +887,12 @@ namespace CaptivityEvents.Events
 
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
+#if V165
                                         customParty.InitializeMobileParty(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
+#else
+                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
+#endif
+
                                         customParty.MemberRoster.Clear();
                                         customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
 
@@ -904,7 +923,11 @@ namespace CaptivityEvents.Events
 
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
+#if V165
                                         customParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#else
+                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#endif
 
                                         customParty.MemberRoster.Clear();
                                         customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
@@ -942,7 +965,13 @@ namespace CaptivityEvents.Events
                                         PlayerEncounter.StartBattle();
                                         PlayerEncounter.Update();
                                         //EncounterAttackConsequence
+#if V165
                                         MissionInitializerRecord rec = new MissionInitializerRecord(PlayerEncounter.GetBattleSceneForMapPosition(MobileParty.MainParty.Position2D))
+#else
+                                        MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position2D);
+                                        string battleSceneForMapPatch = PlayerEncounter.GetBattleSceneForMapPatch(mapPatchAtPosition);
+                                        MissionInitializerRecord rec = new MissionInitializerRecord(battleSceneForMapPatch)
+#endif
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
@@ -971,8 +1000,11 @@ namespace CaptivityEvents.Events
 
                                         MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false);
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
-
+#if V165
                                         customParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#else
+                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#endif
 
                                         customParty.MemberRoster.Clear();
                                         customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
@@ -1010,7 +1042,13 @@ namespace CaptivityEvents.Events
                                         PlayerEncounter.StartBattle();
                                         PlayerEncounter.Update();
                                         //EncounterAttackConsequence
+#if V165
                                         MissionInitializerRecord rec = new MissionInitializerRecord(PlayerEncounter.GetBattleSceneForMapPosition(MobileParty.MainParty.Position2D))
+#else
+                                        MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position2D);
+                                        string battleSceneForMapPatch = PlayerEncounter.GetBattleSceneForMapPatch(mapPatchAtPosition);
+                                        MissionInitializerRecord rec = new MissionInitializerRecord(battleSceneForMapPatch)
+#endif
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
@@ -1266,7 +1304,7 @@ namespace CaptivityEvents.Events
                         case "none":
                             break;
                         default:
-                            character2 = Hero.MainHero.IsPrisoner ? Hero.MainHero.PartyBelongedToAsPrisoner.Leader : _listedEvent.Captive;
+                            character2 = Hero.MainHero.IsPrisoner ? Hero.MainHero.PartyBelongedToAsPrisoner.LeaderHero?.CharacterObject : _listedEvent.Captive;
                             break;
                     }
 
@@ -1283,7 +1321,7 @@ namespace CaptivityEvents.Events
 
 
         }
-        #endregion
+#endregion
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {

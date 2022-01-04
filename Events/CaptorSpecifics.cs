@@ -193,7 +193,11 @@ namespace CaptivityEvents.Events
                     {
                         clan = leader.Character.HeroObject.Clan;
                         nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlement(settlement => true);
+#if V165
                         prisonerParty = LordPartyComponent.CreateLordParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), leader.Character.HeroObject, MobileParty.MainParty.Position2D, 0.5f, nearest);
+#else
+                        prisonerParty = LordPartyComponent.CreateLordParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), leader.Character.HeroObject, MobileParty.MainParty.Position2D, 0.5f, nearest, leader.Character.HeroObject);
+#endif
                     }
                     else
                     {
@@ -204,8 +208,11 @@ namespace CaptivityEvents.Events
                     }
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
-
+#if V165
                     prisonerParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#else
+                    prisonerParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#endif
                     prisonerParty.SetCustomName(new TextObject("{=CEEVENTS1107}Escaped Captives"));
 
                     prisonerParty.MemberRoster.Clear();
@@ -221,8 +228,13 @@ namespace CaptivityEvents.Events
                     if (leader.Character != null)
                     {
                         prisonerParty.Party.SetCustomOwner(leader.Character.HeroObject);
+#if V165
                         prisonerParty.ChangePartyLeader(leader.Character);
-                    } else
+#else
+                        prisonerParty.ChangePartyLeader(leader.Character.HeroObject);
+#endif
+                    }
+                    else
                     {
                         prisonerParty.Party.SetCustomOwner(clan.Leader);
                     }
@@ -234,7 +246,11 @@ namespace CaptivityEvents.Events
 
                     Hero.MainHero.HitPoints += 40;
 
+#if V165
                     CECustomHandler.LogToFile(prisonerParty.Leader.Name.ToString());
+#else
+                    CECustomHandler.LogToFile(prisonerParty.Name.ToString());
+#endif
                     PlayerEncounter.RestartPlayerEncounter(MobileParty.MainParty.Party, prisonerParty.Party);
                     GameMenu.SwitchToMenu("encounter");
                 }
@@ -289,7 +305,11 @@ namespace CaptivityEvents.Events
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
+#if V165
                     prisonerParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#else
+                    prisonerParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+#endif
                     prisonerParty.SetCustomName(new TextObject("{=CEEVENTS1107}Escaped Captives"));
 
                     prisonerParty.MemberRoster.Clear();
@@ -307,13 +327,38 @@ namespace CaptivityEvents.Events
                     Hero.MainHero.HitPoints += 40;
 
 
+#if V165
                     CECustomHandler.LogToFile(prisonerParty.Leader.Name.ToString());
+#else
+                    CECustomHandler.LogToFile(prisonerParty.Name.ToString());
+#endif
                     PlayerEncounter.RestartPlayerEncounter(prisonerParty.Party, MobileParty.MainParty.Party, true);
                     StartBattleAction.Apply(MobileParty.MainParty.Party, prisonerParty.Party);
                     PlayerEncounter.Update();
 
                     CEPersistence.huntState = CEPersistence.HuntState.StartHunt;
+#if V165
                     CampaignMission.OpenBattleMission(PlayerEncounter.GetBattleSceneForMapPosition(MobileParty.MainParty.Position2D));
+#else
+                    MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position2D);
+                    string battleSceneForMapPatch = PlayerEncounter.GetBattleSceneForMapPatch(mapPatchAtPosition);
+                    MissionInitializerRecord rec = new MissionInitializerRecord(battleSceneForMapPatch)
+                    {
+                        TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
+                        DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
+                        DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
+                        NeedsRandomTerrain = false,
+                        PlayingInCampaignMode = true,
+                        RandomTerrainSeed = MBRandom.RandomInt(10000),
+                        AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, MobileParty.MainParty.GetLogicalPosition())
+                    };
+                    float timeOfDay = Campaign.CurrentTime % 24f;
+                    if (Campaign.Current != null)
+                    {
+                        rec.TimeOfDay = timeOfDay;
+                    }
+                    CampaignMission.OpenBattleMission(rec);
+#endif
                 }
                 catch (Exception)
                 {

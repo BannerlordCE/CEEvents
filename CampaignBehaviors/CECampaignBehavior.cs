@@ -426,21 +426,30 @@ namespace CaptivityEvents.CampaignBehaviors
         /// <param name="isOffspringFemale"></param>
         /// <param name="age"></param>
         /// <returns></returns>
-        private Hero DeliverOffSpring(Hero mother, Hero father, bool isOffspringFemale, int age = 1)
+        private Hero DeliverOffSpring(Hero mother, Hero father, bool isOffspringFemale, CultureObject culture = null)
         {
             CharacterObject characterObject = isOffspringFemale ? mother.CharacterObject : father.CharacterObject;
-            characterObject.Culture = mother.Culture;
+            characterObject.Culture = (culture ?? mother.Culture);
 
             // Reflection One
             MethodInfo mi = typeof(HeroCreator).GetMethod("CreateNewHero", BindingFlags.NonPublic | BindingFlags.Static);
+#if V165
             if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null, 0);
-            Hero hero = (Hero)mi.Invoke(null, new object[] { characterObject, age });
+#else
+            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null);
+#endif
+            Hero hero = (Hero)mi.Invoke(null, new object[] { characterObject, 0 });
 
             // For Wanderer Pregnancy
             hero.SetBirthDay(CampaignTime.Now);
 
             int becomeChildAge = Campaign.Current.Models.AgeModel.BecomeChildAge;
+#if V165
             CharacterObject characterObject2 = CharacterObject.ChildTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
+#else
+            culture = (culture ?? mother.Culture);
+            CharacterObject characterObject2 = culture.ChildCharacterTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
+#endif
 
             if (characterObject2 != null)
             {
@@ -462,8 +471,14 @@ namespace CaptivityEvents.CampaignBehaviors
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment2);
             }
 
+
+#if V165
             hero.SetName(NameGenerator.Current.GenerateHeroFirstName(hero, true), null);
             hero.CharacterObject.Name = hero.FirstName;
+#else
+            NameGenerator.Current.GenerateHeroNameAndHeroFullName(hero, out TextObject firstName, out TextObject fullName, false, true);
+            hero.SetName(fullName, firstName);
+#endif
 
             // Reflection Two
             mi = hero.HeroDeveloper.GetType().GetMethod("CheckInitialLevel", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -493,7 +508,11 @@ namespace CaptivityEvents.CampaignBehaviors
 
             // Reflection Two
             MethodInfo mi2 = typeof(HeroCreator).GetMethod("DecideBornSettlement", BindingFlags.NonPublic | BindingFlags.Static);
+#if V165
             if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null, 0);
+#else
+            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null);
+#endif
             hero.BornSettlement = (Settlement)mi2.Invoke(null, new object[] { hero });
 
             hero.IsNoble = true;
@@ -555,14 +574,18 @@ namespace CaptivityEvents.CampaignBehaviors
 
                         try
                         {
-                            Hero item = DeliverOffSpring(pregnancy.Mother, pregnancy.Father, isOffspringFemale, 0);
+                            Hero item = DeliverOffSpring(pregnancy.Mother, pregnancy.Father, isOffspringFemale, null);
                             aliveOffsprings.Add(item);
                         }
                         catch (Exception e)
                         {
                             CECustomHandler.ForceLogToFile("Bad pregnancy " + (isOffspringFemale ? "Female" : "Male"));
                             CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+#if V165
                             Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, !isOffspringFemale, null, 0);
+#else
+                            Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, !isOffspringFemale, null);
+#endif
                             aliveOffsprings.Add(item);
                         }
                     }

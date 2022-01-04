@@ -227,7 +227,7 @@ namespace CaptivityEvents.Events
                         isToggle = true;
                     }
 
-                    wasPositive = amount > 0;
+                    wasPositive = amount >= 0;
 
                     if (maxLevel != 0 && newNumber > maxLevel)
                     {
@@ -276,7 +276,7 @@ namespace CaptivityEvents.Events
                     textObject.SetTextVariable("HERO", hero.Name);
 
                     if (xp == 0)
-                        textObject.SetTextVariable("NEGATIVE", wasPositive ? 1 : 0);
+                        textObject.SetTextVariable("NEGATIVE", wasPositive ? 0 : 1);
                     else
                         textObject.SetTextVariable("NEGATIVE", xp >= 0 ? 0 : 1);
 

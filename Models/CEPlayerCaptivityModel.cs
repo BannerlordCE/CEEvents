@@ -28,7 +28,11 @@ namespace CaptivityEvents.Models
             if (PlayerCaptivity.CaptorParty == null) return false;
             float gameProcess = MiscHelper.GetGameProcess();
             bool isInSettlement = PlayerCaptivity.CaptorParty.IsSettlement;
+#if V165
             bool isInLordParty = !isInSettlement && PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.Leader != null && PlayerCaptivity.CaptorParty.Leader.IsHero;
+#else
+            bool isInLordParty = !isInSettlement && PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.LeaderHero != null;
+#endif
             float eventOccurence =
                 isInSettlement ?
                 CESettings.Instance.EventOccurrenceSettlement :
