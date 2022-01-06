@@ -1695,7 +1695,7 @@ namespace CaptivityEvents.Events
             return SkillsCheck(captorParty.Leader, true);
 #else
             if (_listEvent.SkillsRequired.Any((SkillRequired skill) => skill.Ref == "Captor") && captorParty.LeaderHero == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkill.");
-            return SkillsCheck(captorParty.LeaderHero.CharacterObject, true);
+            return SkillsCheck(captorParty.LeaderHero?.CharacterObject, true);
 #endif
         }
 
@@ -1800,7 +1800,7 @@ namespace CaptivityEvents.Events
             return TraitsCheck(captorParty.Leader, true);
 #else
             if (captorParty.LeaderHero == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTrait.");
-            return TraitsCheck(captorParty.LeaderHero.CharacterObject, true);
+            return TraitsCheck(captorParty.LeaderHero?.CharacterObject, true);
 #endif
         }
 

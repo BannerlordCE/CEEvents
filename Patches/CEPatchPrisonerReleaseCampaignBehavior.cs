@@ -1,11 +1,13 @@
-﻿using HarmonyLib;
+﻿#define V171
+#if !V171
+using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 
 namespace CaptivityEvents.Patches
 {
-    [HarmonyPatch(typeof(PrisonerReleaseCampaignBehavior))]
+	[HarmonyPatch(typeof(PrisonerReleaseCampaignBehavior))]
 	internal class CEPatchPrisonerReleaseCampaignBehavior
 	{
 		[HarmonyPatch("OnGameLoaded")]
@@ -31,7 +33,6 @@ namespace CaptivityEvents.Patches
 			}
 			return false;
 		}
-
-      
     }
 }
+#endif
