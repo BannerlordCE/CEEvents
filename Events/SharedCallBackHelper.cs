@@ -1330,7 +1330,7 @@ namespace CaptivityEvents.Events
                         case "none":
                             break;
                         default:
-                            character2 = Hero.MainHero.IsPrisoner ? Hero.MainHero.PartyBelongedToAsPrisoner.LeaderHero?.CharacterObject : _listedEvent.Captive;
+                            character2 = Hero.MainHero.IsPrisoner ? Hero.MainHero.PartyBelongedToAsPrisoner.LeaderHero?.CharacterObject ?? Hero.MainHero.PartyBelongedToAsPrisoner.MemberRoster.GetCharacterAtIndex(0) : _listedEvent.Captive;
                             break;
                     }
 
@@ -1344,8 +1344,6 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.ForceLogToFile("ConsequenceMission Failed: " + e);
             }
-
-
         }
 #endregion
 

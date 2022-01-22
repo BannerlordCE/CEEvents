@@ -1,4 +1,4 @@
-﻿#define V171
+﻿#define V170
 #if !V171
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;

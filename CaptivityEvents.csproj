@@ -141,8 +141,8 @@
     <Reference Include="0Harmony, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Lib.Harmony.2.2.0\lib\net48\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Bannerlord.ButterLib, Version=1.0.31.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>packages\Bannerlord.ButterLib.1.0.31\lib\net472\Bannerlord.ButterLib.dll</HintPath>
+    <Reference Include="Bannerlord.ButterLib, Version=1.0.33.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>packages\Bannerlord.ButterLib.1.0.33\lib\net472\Bannerlord.ButterLib.dll</HintPath>
     </Reference>
     <Reference Include="MCMv4, Version=4.3.17.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>packages\Bannerlord.MCM.4.3.17\lib\net472\MCMv4.dll</HintPath>
