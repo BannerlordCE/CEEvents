@@ -1,6 +1,8 @@
 ﻿using CaptivityEvents.Helper;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Encounters;
+using TaleWorlds.CampaignSystem.Party;
 
 namespace CaptivityEvents.Patches
 {

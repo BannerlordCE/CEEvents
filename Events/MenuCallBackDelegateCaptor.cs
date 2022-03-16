@@ -8,7 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.Inventory;
+using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -242,7 +246,6 @@ namespace CaptivityEvents.Events
 
                     MobileParty.MainParty.MemberRoster.AddToCounts(captiveHero.CharacterObject, 1, false);
 
-                    // WORK ON THIS
                     InventoryManager.OpenScreenAsInventoryOf(MobileParty.MainParty, captiveHero.CharacterObject);
 
                     CEPersistence.removeHero = captiveHero;

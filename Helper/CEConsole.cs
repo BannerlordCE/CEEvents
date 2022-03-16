@@ -1,4 +1,4 @@
-﻿#define V170
+﻿#define V172
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -14,6 +14,9 @@ using System.Reflection;
 using System.Threading;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements.Locations;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
@@ -991,7 +994,10 @@ namespace CaptivityEvents.Helper
                     {
                         // Events Removing
                         MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
-                        if (mi != null) mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
+                        if (mi != null)
+                        {
+                            mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
+                        }
                         else { Campaign.Current.GameMenuManager.RemoveRelatedGameMenus("CEEVENTS"); }
                     }
                     else

@@ -1,4 +1,4 @@
-﻿
+﻿#define V172
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -7,13 +7,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.SandBox;
-using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.Encounters;
+using TaleWorlds.CampaignSystem.Extensions;
+using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using static CaptivityEvents.Helper.CEHelper;
 using CETerrainType = CaptivityEvents.Custom.TerrainType;
 using TerrainType = TaleWorlds.Core.TerrainType;
+
+#if V171
+using TaleWorlds.CampaignSystem.SandBox;
+using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
+#endif
 
 namespace CaptivityEvents.Events
 {
@@ -786,13 +793,9 @@ namespace CaptivityEvents.Events
 
         private bool CaptorPartyGenderCheck(PartyBase captorParty)
         {
-#if V165
-            if (captorParty?.Leader != null && captorParty.Leader.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsMale.");
-            if (captorParty?.Leader != null && !captorParty.Leader.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale/Femdom.");
-#else
             if (captorParty?.LeaderHero != null && captorParty.LeaderHero.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsMale.");
             if (captorParty?.LeaderHero != null && !captorParty.LeaderHero.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale/Femdom.");
-#endif
+
             return true;
         }
 

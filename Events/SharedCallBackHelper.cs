@@ -10,6 +10,16 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.Conversation;
+using TaleWorlds.CampaignSystem.Encounters;
+using TaleWorlds.CampaignSystem.Extensions;
+using TaleWorlds.CampaignSystem.Issues;
+using TaleWorlds.CampaignSystem.Map;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Party.PartyComponents;
+using TaleWorlds.CampaignSystem.Roster;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Localization;
@@ -878,33 +888,6 @@ namespace CaptivityEvents.Events
                                         {
                                             CECustomHandler.ForceLogToFile("ConsequenceStartBattle : city required. ");
                                         }
-#if V165
-                                        // StartCommonAreaBattle RivalGangMovingInIssueBehavior
-                                        MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), null, null);
-
-                                        Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
-                                        clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
-
-
-                                        PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
-
-                                        customParty.InitializeMobileParty(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
-                                        customParty.MemberRoster.Clear();
-                                        customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
-
-                                        TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
-                                        customParty.SetCustomName(textObject);
-
-                                        EnterSettlementAction.ApplyForParty(customParty, Settlement.CurrentSettlement);
-
-                                        PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, false);
-                                        CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
-                                        CEPersistence.destroyParty = true;
-                                        CEPersistence.surrenderParty = false;
-                                        PlayerEncounter.Current.ForceAlleyFight = true;
-                                        PlayerEncounter.StartBattle();
-                                        PlayerEncounter.StartAlleyFightMission();
-#else
                                         // StartCommonAreaBattle RivalGangMovingInIssueBehavior
                                         MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), null, null);
 
@@ -931,9 +914,7 @@ namespace CaptivityEvents.Events
 
                                         PlayerEncounter.Current.ForceAlleyFight = true;
                                         PlayerEncounter.StartBattle();
-                                        PlayerEncounter.StartAlleyFightMission();                            
-#endif
-                                        
+                                        PlayerEncounter.StartAlleyFightMission();                    
                                         break;
                                     }
                                 case "regularspawn":
@@ -991,13 +972,10 @@ namespace CaptivityEvents.Events
                                         PlayerEncounter.StartBattle();
                                         PlayerEncounter.Update();
                                         //EncounterAttackConsequence
-#if V165
-                                        MissionInitializerRecord rec = new MissionInitializerRecord(PlayerEncounter.GetBattleSceneForMapPosition(MobileParty.MainParty.Position2D))
-#else
+
                                         MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position2D);
                                         string battleSceneForMapPatch = PlayerEncounter.GetBattleSceneForMapPatch(mapPatchAtPosition);
                                         MissionInitializerRecord rec = new MissionInitializerRecord(battleSceneForMapPatch)
-#endif
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),

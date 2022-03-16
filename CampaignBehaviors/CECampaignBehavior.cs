@@ -1,4 +1,4 @@
-#define V170
+#define V172
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -13,9 +13,13 @@ using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.LogEntries;
 using TaleWorlds.CampaignSystem.MapNotificationTypes;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -433,23 +437,18 @@ namespace CaptivityEvents.CampaignBehaviors
 
             // Reflection One
             MethodInfo mi = typeof(HeroCreator).GetMethod("CreateNewHero", BindingFlags.NonPublic | BindingFlags.Static);
-#if V165
-            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null, 0);
-#else
+
             if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null);
-#endif
+
             Hero hero = (Hero)mi.Invoke(null, new object[] { characterObject, 0 });
 
             // For Wanderer Pregnancy
             hero.SetBirthDay(CampaignTime.Now);
 
             int becomeChildAge = Campaign.Current.Models.AgeModel.BecomeChildAge;
-#if V165
-            CharacterObject characterObject2 = CharacterObject.ChildTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
-#else
+
             culture = (culture ?? mother.Culture);
             CharacterObject characterObject2 = culture.ChildCharacterTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
-#endif
 
             if (characterObject2 != null)
             {
@@ -471,14 +470,8 @@ namespace CaptivityEvents.CampaignBehaviors
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment2);
             }
 
-
-#if V165
-            hero.SetName(NameGenerator.Current.GenerateHeroFirstName(hero, true), null);
-            hero.CharacterObject.Name = hero.FirstName;
-#else
             TextObject name = NameGenerator.Current.GenerateHeroFirstName(hero, true);
             hero.SetName(name, name);
-#endif
 
             // Reflection Two
             mi = hero.HeroDeveloper.GetType().GetMethod("CheckInitialLevel", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -508,11 +501,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
             // Reflection Two
             MethodInfo mi2 = typeof(HeroCreator).GetMethod("DecideBornSettlement", BindingFlags.NonPublic | BindingFlags.Static);
-#if V165
-            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null, 0);
-#else
             if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null);
-#endif
             hero.BornSettlement = (Settlement)mi2.Invoke(null, new object[] { hero });
 
             hero.IsNoble = true;
@@ -528,11 +517,11 @@ namespace CaptivityEvents.CampaignBehaviors
             }
             CampaignEventDispatcher.Instance.OnHeroCreated(hero, true);
             int heroComesOfAge = Campaign.Current.Models.AgeModel.HeroComesOfAge;
-            if (hero.Age > (float)becomeChildAge || (hero.Age == (float)becomeChildAge && hero.BirthDay.GetDayOfYear < CampaignTime.Now.GetDayOfYear))
+            if (hero.Age > becomeChildAge || (hero.Age == becomeChildAge && hero.BirthDay.GetDayOfYear < CampaignTime.Now.GetDayOfYear))
             {
                 CampaignEventDispatcher.Instance.OnHeroGrowsOutOfInfancy(hero);
             }
-            if (hero.Age > (float)heroComesOfAge || (hero.Age == (float)heroComesOfAge && hero.BirthDay.GetDayOfYear < CampaignTime.Now.GetDayOfYear))
+            if (hero.Age > heroComesOfAge || (hero.Age == heroComesOfAge && hero.BirthDay.GetDayOfYear < CampaignTime.Now.GetDayOfYear))
             {
                 CampaignEventDispatcher.Instance.OnHeroComesOfAge(hero);
             }

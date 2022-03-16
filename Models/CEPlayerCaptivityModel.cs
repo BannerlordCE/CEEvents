@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.Config;
+﻿#define V172
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
@@ -6,9 +7,14 @@ using Helpers;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
+using TaleWorlds.CampaignSystem.GameComponents;
+using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
+#if V171
+using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
+#endif
 
 namespace CaptivityEvents.Models
 {

@@ -133,19 +133,18 @@
     <Compile Include="Issues\CEWhereAreMyThingsIssueBehavior.cs" />
     <Compile Include="Patches\CEPatchPlayerCaptivity.cs" />
     <Compile Include="Patches\CEPatchPregnancyCampaignBehavior.cs" />
-    <Compile Include="Patches\CEPatchPrisonerReleaseCampaignBehavior.cs" />
     <Compile Include="Patches\CEPatchSkills.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Lib.Harmony.2.2.0\lib\net48\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Lib.Harmony.2.2.1\lib\net48\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Bannerlord.ButterLib, Version=1.0.33.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>packages\Bannerlord.ButterLib.1.0.33\lib\net472\Bannerlord.ButterLib.dll</HintPath>
+    <Reference Include="Bannerlord.ButterLib, Version=1.0.38.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>packages\Bannerlord.ButterLib.1.0.38\lib\net472\Bannerlord.ButterLib.dll</HintPath>
     </Reference>
-    <Reference Include="MCMv4, Version=4.3.17.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>packages\Bannerlord.MCM.4.3.17\lib\net472\MCMv4.dll</HintPath>
+    <Reference Include="MCMv4, Version=4.3.21.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>packages\Bannerlord.MCM.4.3.21\lib\net472\MCMv4.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Bcl.HashCode.1.1.0\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
@@ -255,6 +254,9 @@
     <Reference Include="TaleWorlds.AchievementSystem">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.AchievementSystem.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.ActivitySystem">
+      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.ActivitySystem.dll</HintPath>
     </Reference>
     <Reference Include="TaleWorlds.BattlEye.Client">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.BattlEye.Client.dll</HintPath>
@@ -392,6 +394,9 @@
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.Helpers.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.Launcher.Library">
+      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.Launcher.Library.dll</HintPath>
+    </Reference>
     <Reference Include="TaleWorlds.MountAndBlade.Launcher.Steam">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.Launcher.Steam.dll</HintPath>
       <Private>False</Private>
@@ -443,6 +448,9 @@
     <Reference Include="TaleWorlds.SaveSystem">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.SaveSystem.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.ScreenSystem">
+      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.ScreenSystem.dll</HintPath>
     </Reference>
     <Reference Include="TaleWorlds.Starter.DotNetCore">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.Starter.DotNetCore.dll</HintPath>

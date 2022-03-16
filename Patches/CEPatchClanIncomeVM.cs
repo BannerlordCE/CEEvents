@@ -4,9 +4,9 @@ using CaptivityEvents.Config;
 using HarmonyLib;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories;
 using TaleWorlds.Core;
-using TaleWorlds.Library;
 
 namespace CaptivityEvents.Patches
 {
@@ -43,7 +43,11 @@ namespace CaptivityEvents.Patches
             int count = CEBrothelBehavior.GetPlayerBrothels().Count;
             GameTexts.SetVariable("STR1", GameTexts.FindText("str_CE_properties", null));
             GameTexts.SetVariable("LEFT", Hero.MainHero.OwnedWorkshops.Count + count);
+#if V171
             GameTexts.SetVariable("RIGHT", Campaign.Current.Models.WorkshopModel.GetMaxWorkshopCountForPlayer() + count);
+#else
+            GameTexts.SetVariable("RIGHT", Campaign.Current.Models.WorkshopModel.GetMaxWorkshopCountForTier(Clan.PlayerClan.Tier) + count);
+#endif
             GameTexts.SetVariable("STR2", GameTexts.FindText("str_LEFT_over_RIGHT_in_paranthesis", null));
             __instance.WorkshopText = GameTexts.FindText("str_STR1_space_STR2", null).ToString();
 

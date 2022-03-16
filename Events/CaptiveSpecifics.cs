@@ -1,11 +1,14 @@
-﻿#define V170
+﻿#define V172
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
 using System;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 
@@ -104,9 +107,7 @@ namespace CaptivityEvents.Events
                     PlayerEncounter.ProtectPlayerSide();
                     MobileParty.MainParty.IsDisorganized = false;
                     PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, 1, true);
-#if V170
                     MobileParty.MainParty.ChangePartyLeader(Hero.MainHero);
-#endif
                 }
 
                 MobileParty.MainParty.CurrentSettlement = PlayerCaptivity.CaptorParty.Settlement;

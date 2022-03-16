@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using TaleWorlds.Engine.Options;
-using TaleWorlds.Engine.Screens;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+using TaleWorlds.ScreenSystem;
 
 namespace CaptivityEvents.Config
 {

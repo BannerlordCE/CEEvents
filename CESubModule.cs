@@ -1,4 +1,4 @@
-#define V170
+#define V172
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -15,22 +15,33 @@ using System.Reflection;
 using System.Windows.Forms;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.BarterSystem;
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
+using TaleWorlds.CampaignSystem.CampaignBehaviors.BarterBehaviors;
+using TaleWorlds.CampaignSystem.ComponentInterfaces;
+using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
-using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors.BarterBehaviors;
+using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Roster;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Core.ViewModelCollection;
 using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
-using TaleWorlds.Engine.Screens;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.View.Missions;
+using TaleWorlds.ScreenSystem;
 using TaleWorlds.TwoDimension;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
+#if V171
+using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
+using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors.BarterBehaviors;
+#endif
 
 namespace CaptivityEvents
 {
@@ -154,10 +165,10 @@ namespace CaptivityEvents
 
         // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml 
         // Mount & Blade II Bannerlord\Modules\Native\GUI\NativeSpriteData.xml
-#if V165
-        private static readonly int[] sprite_index = new int[] { 20, 29, 27, 26 };
-#else
+#if V171
         private static readonly int[] sprite_index = new int[] { 3, 4, 5, 6 };
+#else
+        private static readonly int[] sprite_index = new int[] { 2, 3, 4, 5 };
 #endif
 
 
@@ -389,13 +400,13 @@ namespace CaptivityEvents
                         CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                     }
                 }
-#if V170
-                SpriteCategory spriteCategory = UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"];
-                spriteCategory.SpriteSheets.AddRange(new Texture[]{ CEPersistence.CEEventImageList["default_female_prison"], CEPersistence.CEEventImageList["default_male_prison"], CEPersistence.CEEventImageList["default_female"], CEPersistence.CEEventImageList["default_male"] });
-                spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray(new Vec2i[] { new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805) });
-                spriteCategory.SpriteSheetCount = 7;
 
-                CECustomHandler.ForceLogToFile("Loading Textures 1.7.0");
+                SpriteCategory spriteCategory = UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"];
+                spriteCategory.SpriteSheets.AddRange(new Texture[] { CEPersistence.CEEventImageList["default_female_prison"], CEPersistence.CEEventImageList["default_male_prison"], CEPersistence.CEEventImageList["default_female"], CEPersistence.CEEventImageList["default_male"] });
+                spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray(new Vec2i[] { new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805) });
+                spriteCategory.SpriteSheetCount = 6;
+
+                CECustomHandler.ForceLogToFile("Loading Textures 1.7.2");
                 PropertyInfo propertyWidth = typeof(SpritePart).GetProperty("Width");
                 PropertyInfo propertyHeight = typeof(SpritePart).GetProperty("Height");
                 foreach (SpritePart spritePart in UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteParts)
@@ -403,14 +414,6 @@ namespace CaptivityEvents
                     switch (spritePart.Name)
                     {
                         case "wait_prisoner_female":
-                            spritePart.SheetID = 7;
-                            spritePart.SheetX = 0;
-                            spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
-                            spritePart.UpdateInitValues();
-                            break;
-                        case "wait_prisoner_male":
                             spritePart.SheetID = 6;
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
@@ -418,7 +421,7 @@ namespace CaptivityEvents
                             propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
                             spritePart.UpdateInitValues();
                             break;
-                        case "wait_captive_female":
+                        case "wait_prisoner_male":
                             spritePart.SheetID = 5;
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
@@ -426,8 +429,16 @@ namespace CaptivityEvents
                             propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
                             spritePart.UpdateInitValues();
                             break;
-                        case "wait_captive_male":
+                        case "wait_captive_female":
                             spritePart.SheetID = 4;
+                            spritePart.SheetX = 0;
+                            spritePart.SheetY = 0;
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
+                            spritePart.UpdateInitValues();
+                            break;
+                        case "wait_captive_male":
+                            spritePart.SheetID = 3;
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
                             propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
@@ -438,7 +449,6 @@ namespace CaptivityEvents
                             break;
                     }
                 }
-#endif
 
                 LoadTexture("default", false, true);
             }

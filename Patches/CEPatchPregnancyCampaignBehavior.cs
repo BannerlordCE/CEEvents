@@ -1,7 +1,11 @@
-﻿using CaptivityEvents.Helper;
+﻿#define V172
+using CaptivityEvents.Helper;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
+#if V171
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
+#endif
 
 namespace CaptivityEvents.Patches
 {

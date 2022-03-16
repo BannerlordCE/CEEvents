@@ -1,4 +1,4 @@
-#define V170
+#define V172
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -11,14 +11,26 @@ using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.AgentOrigins;
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.Conversation;
+using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Overlay;
-using TaleWorlds.CampaignSystem.SandBox;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Roster;
+using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.CampaignSystem.Settlements.Locations;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.ObjectSystem;
+
+#if V171
+using TaleWorlds.CampaignSystem.SandBox;
+#endif
 
 namespace CaptivityEvents.Brothel
 {
@@ -30,10 +42,7 @@ namespace CaptivityEvents.Brothel
 
         #region GameMenu
         [GameMenuInitializationHandler("town_brothel")]
-        public static void BrothelMenuSoundOnInit(MenuCallbackArgs args)
-        {
-            args.MenuContext.SetAmbientSound("event:/map/ambient/node/settlements/2d/tavern");
-        }
+        public static void BrothelMenuSoundOnInit(MenuCallbackArgs args) => args.MenuContext.SetAmbientSound("event:/map/ambient/node/settlements/2d/tavern");
 
         private void AddGameMenus(CampaignGameStarter campaignGameStarter)
         {
@@ -145,13 +154,6 @@ namespace CaptivityEvents.Brothel
                 TextObject textObject = new TextObject("{=CEBROTHEL0984}The brothel of {SETTLEMENT}", null);
                 textObject.SetTextVariable("SETTLEMENT", Hero.MainHero.CurrentSettlement.Name);
 
-#if V165
-                _partyScreenLogic.Initialize(TroopRoster.CreateDummyTroopRoster(), prisonRoster, MobileParty.MainParty, true, textObject, leftPartyMembersSizeLimit, new PartyPresentationDoneButtonDelegate(ManageBrothelDoneHandler), new TextObject("{=aadTnAEg}Manage Prisoners", null), false);
-
-                _partyScreenLogic.InitializeTrade(PartyScreenLogic.TransferState.NotTransferable, PartyScreenLogic.TransferState.Transferable, PartyScreenLogic.TransferState.NotTransferable);
-
-                _partyScreenLogic.SetTroopTransferableDelegate(new PartyScreenLogic.IsTroopTransferableDelegate(BrothelTroopTransferableDelegate));
-#else
                 TroopRoster leftMemberRoster = TroopRoster.CreateDummyTroopRoster();
                 TroopRoster leftPrisonerRoster = prisonRoster;
                 PartyScreenLogic.TransferState memberTransferState = PartyScreenLogic.TransferState.NotTransferable;
@@ -165,8 +167,6 @@ namespace CaptivityEvents.Brothel
                 PartyScreenLogicInitializationData initializationData = PartyScreenLogicInitializationData.CreateBasicInitDataWithMainParty(TroopRoster.CreateDummyTroopRoster(), leftPrisonerRoster, memberTransferState, prisonerTransferState, accompanyingTransferState, troopTransferableDelegate, leftOwnerParty, leftPartyName, new TextObject("{=aadTnAEg}Manage Prisoners", null), null, leftPartyMembersSizeLimit, 0, partyPresentationDoneButtonDelegate, null, null, null, null, false, false, false, false);
 
                 _partyScreenLogic.Initialize(initializationData);
-#endif
-
 
                 PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
                 partyState.InitializeLogic(_partyScreenLogic);
@@ -396,13 +396,11 @@ namespace CaptivityEvents.Brothel
             Hero prisonerCharacter = Hero.MainHero;
             if (prisonerCharacter.PartyBelongedTo != null)  
             {
-#if V170
                 if (prisonerCharacter.PartyBelongedTo.LeaderHero == prisonerCharacter)
                 {
                     prisonerCharacter.PartyBelongedTo.RemovePartyLeader();
                 }
-#endif
-                prisonerCharacter.PartyBelongedTo.MemberRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                prisonerCharacter.PartyBelongedTo.MemberRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
             }
             prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
             prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);

@@ -8,7 +8,14 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.Encounters;
+using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Party.PartyComponents;
+using TaleWorlds.CampaignSystem.Roster;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 
@@ -462,7 +469,10 @@ namespace CaptivityEvents.Events
         }
         private void ConsequenceWoundTroops()
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomTroops)) _dynamics.CEWoundTroops(PartyBase.MainParty);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomTroops))
+            {
+                _dynamics.CEWoundTroops(PartyBase.MainParty);
+            }
             else
             {
 
@@ -470,7 +480,10 @@ namespace CaptivityEvents.Events
         }
         private void ConsequenceKillTroops()
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomTroops)) _dynamics.CEKillTroops(PartyBase.MainParty);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomTroops))
+            {
+                _dynamics.CEKillTroops(PartyBase.MainParty);
+            }
             else
             {
 

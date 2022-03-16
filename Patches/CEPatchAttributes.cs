@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using System.Linq;
-using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 
