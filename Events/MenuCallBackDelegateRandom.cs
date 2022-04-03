@@ -1,4 +1,4 @@
-﻿#define V170
+﻿#define V171
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -8,16 +8,19 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.Core;
+using TaleWorlds.Localization;
+#if V171
+#else
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Extensions;
-using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Party.PartyComponents;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.Core;
-using TaleWorlds.Localization;
+#endif
 
 namespace CaptivityEvents.Events
 {
@@ -54,7 +57,7 @@ namespace CaptivityEvents.Events
         }
 
 
-        #region Progress Event
+#region Progress Event
         internal void RandomProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
             if (args.MenuContext != null)
@@ -131,9 +134,9 @@ namespace CaptivityEvents.Events
 
             PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
-        #endregion
+#endregion
 
-        #region Regular Event
+#region Regular Event
         internal void RandomEventGameMenu(MenuCallbackArgs args)
         {
             if (args.MenuContext != null)
@@ -268,9 +271,9 @@ namespace CaptivityEvents.Events
                 captorSpecifics.CECaptorContinue(args);
             }
         }
-        #endregion
+#endregion
 
-        #region Consequences
+#region Consequences
         private void ConsequenceCompanions()
         {
             try

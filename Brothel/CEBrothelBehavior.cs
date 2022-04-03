@@ -1,4 +1,4 @@
-#define V172
+#define V171
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -11,17 +11,8 @@ using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.AgentOrigins;
-using TaleWorlds.CampaignSystem.CharacterDevelopment;
-using TaleWorlds.CampaignSystem.Conversation;
-using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Overlay;
-using TaleWorlds.CampaignSystem.Party;
-using TaleWorlds.CampaignSystem.Roster;
-using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.CampaignSystem.Settlements.Locations;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -30,6 +21,16 @@ using TaleWorlds.ObjectSystem;
 
 #if V171
 using TaleWorlds.CampaignSystem.SandBox;
+#else
+using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Roster;
+using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.CampaignSystem.Settlements.Locations;
+using TaleWorlds.CampaignSystem.AgentOrigins;
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.Conversation;
+using TaleWorlds.CampaignSystem.Encounters;
 #endif
 
 namespace CaptivityEvents.Brothel
@@ -190,15 +191,12 @@ namespace CaptivityEvents.Brothel
                 return false;
             }
 
-            switch (CESettings.Instance.BrothelOption.SelectedIndex)
+            return CESettings.Instance.BrothelOption.SelectedIndex switch
             {
-                case 0:
-                    return true;
-                case 2:
-                    return !character.IsFemale;
-                default:
-                    return character.IsFemale;
-            }
+                0 => true,
+                2 => !character.IsFemale,
+                _ => character.IsFemale,
+            };
         }
 
 #if V165
@@ -1176,36 +1174,16 @@ namespace CaptivityEvents.Brothel
             {
                 if (!DoesOwnBrothelInSettlement(Settlement.CurrentSettlement)) GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, prostitutionCost);
 
-                switch (Settlement.CurrentSettlement.Culture.GetCultureCode())
+                CEPersistence.gameEntity = Settlement.CurrentSettlement.Culture.GetCultureCode() switch
                 {
-                    case CultureCode.Sturgia:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a");
-                        break;
-                    case CultureCode.Vlandia:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i");
-                        break;
-                    case CultureCode.Aserai:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a");
-                        break;
-                    case CultureCode.Empire:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
-                        break;
-                    case CultureCode.Battania:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_wodden_straw_a");
-                        break;
-                    case CultureCode.Khuzait:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_f");
-                        break;
-                    case CultureCode.Invalid:
-                    case CultureCode.Nord:
-                    case CultureCode.Darshi:
-                    case CultureCode.Vakken:
-                    case CultureCode.AnyOtherCulture:
-                    default:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
-                        break;
-                }
-
+                    CultureCode.Sturgia => Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a"),
+                    CultureCode.Vlandia => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i"),
+                    CultureCode.Aserai => Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a"),
+                    CultureCode.Empire => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a"),
+                    CultureCode.Battania => Mission.Current.Scene.GetFirstEntityWithName("bed_wodden_straw_a"),
+                    CultureCode.Khuzait => Mission.Current.Scene.GetFirstEntityWithName("bed_ground_f"),
+                    _ => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a"),
+                };
                 CEPersistence.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => agent.Character == CharacterObject.OneToOneConversationCharacter);
                 CEPersistence.brothelState = CEPersistence.BrothelState.Start;
             }
@@ -1244,36 +1222,16 @@ namespace CaptivityEvents.Brothel
                 }
                 new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(1, 10), Hero.MainHero, false, true, true);
 
-                switch (Settlement.CurrentSettlement.Culture.GetCultureCode())
+                CEPersistence.gameEntity = Settlement.CurrentSettlement.Culture.GetCultureCode() switch
                 {
-                    case CultureCode.Sturgia:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a");
-                        break;
-                    case CultureCode.Vlandia:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i");
-                        break;
-                    case CultureCode.Aserai:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a");
-                        break;
-                    case CultureCode.Empire:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a");
-                        break;
-                    case CultureCode.Battania:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
-                        break;
-                    case CultureCode.Khuzait:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_b");
-                        break;
-                    case CultureCode.Invalid:
-                    case CultureCode.Nord:
-                    case CultureCode.Darshi:
-                    case CultureCode.Vakken:
-                    case CultureCode.AnyOtherCulture:
-                    default:
-                        CEPersistence.gameEntity = Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f");
-                        break;
-                }
-
+                    CultureCode.Sturgia => Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a"),
+                    CultureCode.Vlandia => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i"),
+                    CultureCode.Aserai => Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a"),
+                    CultureCode.Empire => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a"),
+                    CultureCode.Battania => Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f"),
+                    CultureCode.Khuzait => Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_b"),
+                    _ => Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f"),
+                };
                 CEPersistence.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => { return agent.Character == CharacterObject.OneToOneConversationCharacter; });
                 CEPersistence.brothelState = CEPersistence.BrothelState.Start;
             }

@@ -1,12 +1,15 @@
-﻿
+﻿#define V171
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using HarmonyLib;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories;
 using TaleWorlds.Core;
+#if V171
+#else
+using TaleWorlds.CampaignSystem.Settlements.Workshops;
+#endif
 
 namespace CaptivityEvents.Patches
 {

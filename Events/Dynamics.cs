@@ -1,4 +1,4 @@
-﻿
+﻿#define V171
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -9,15 +9,18 @@ using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Election;
-using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.CampaignSystem.Party;
-using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+#if V171
+#else
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.Extensions;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
+#endif
 
 namespace CaptivityEvents.Events
 {
@@ -306,33 +309,17 @@ namespace CaptivityEvents.Events
 
         internal Color PickColor(string color)
         {
-            switch (color)
+            return color switch
             {
-                case "Black":
-                case "black":
-                    return Colors.Black;
-                case "White":
-                case "white":
-                    return Colors.White;
-                case "Yellow":
-                case "yellow":
-                    return Colors.Yellow;
-                case "Red":
-                case "red":
-                    return Colors.Red;
-                case "Magenta":
-                case "magenta":
-                    return Colors.Magenta;
-                case "Green":
-                case "green":
-                    return Colors.Green;
-                case "Cyan":
-                case "cyan":
-                    return Colors.Cyan;
-                default:
-                    return Colors.Gray;
-
-            }
+                "Black" or "black" => Colors.Black,
+                "White" or "white" => Colors.White,
+                "Yellow" or "yellow" => Colors.Yellow,
+                "Red" or "red" => Colors.Red,
+                "Magenta" or "magenta" => Colors.Magenta,
+                "Green" or "green" => Colors.Green,
+                "Cyan" or "cyan" => Colors.Cyan,
+                _ => Colors.Gray,
+            };
         }
 
         internal void ResetCustomSkills(Hero hero)

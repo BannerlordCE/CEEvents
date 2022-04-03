@@ -1,16 +1,20 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿#define V171
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.CampaignSystem.GameState;
-using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+#if V171
+#else
+using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.CampaignSystem.Party;
+#endif
 
 namespace CaptivityEvents.Notifications
 {
@@ -64,7 +68,7 @@ namespace CaptivityEvents.Notifications
 
                 if (returnString == null)
                 {
-                    if (!(Game.Current.GameStateManager.ActiveState is MapState mapState))
+                    if (Game.Current.GameStateManager.ActiveState is not MapState mapState)
                     {
                         TextObject textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
                         InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));

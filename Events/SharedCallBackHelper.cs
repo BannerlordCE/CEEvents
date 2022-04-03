@@ -1,4 +1,4 @@
-﻿#define V170
+﻿#define V171
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -10,6 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.Core;
+using TaleWorlds.Engine;
+using TaleWorlds.Localization;
+using TaleWorlds.ObjectSystem;
+
+#if V171
+#else
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Encounters;
@@ -20,10 +27,7 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Party.PartyComponents;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.Core;
-using TaleWorlds.Engine;
-using TaleWorlds.Localization;
-using TaleWorlds.ObjectSystem;
+#endif
 
 namespace CaptivityEvents.Events
 {
@@ -43,7 +47,7 @@ namespace CaptivityEvents.Events
             _eventList = eventList;
         }
 
-        #region Consequences
+#region Consequences
         internal void ConsequenceXP()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveXP))
@@ -535,59 +539,25 @@ namespace CaptivityEvents.Events
                             ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.OneHanded) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.TwoHanded) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Polearm) / 275 * 100))
                             : CESettings.Instance.WeaponChance) && meleeLevel == "Default" || meleeLevel == "Advanced")
                     {
-                        switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
+                        item = PlayerCaptivity.CaptorParty.Culture.GetCultureCode() switch
                         {
-                            case CultureCode.Sturgia:
-                                item = "sturgia_axe_3_t3";
-                                break;
-                            case CultureCode.Aserai:
-                                item = "eastern_spear_1_t2";
-                                break;
-                            case CultureCode.Empire:
-                                item = "northern_spear_1_t2";
-                                break;
-                            case CultureCode.Battania:
-                                item = "aserai_sword_1_t2";
-                                break;
-                            case CultureCode.Invalid:
-                            case CultureCode.Vlandia:
-                            case CultureCode.Khuzait:
-                            case CultureCode.Nord:
-                            case CultureCode.Darshi:
-                            case CultureCode.Vakken:
-                            case CultureCode.AnyOtherCulture:
-                            default:
-                                item = "vlandia_sword_1_t2";
-                                break;
-                        }
+                            CultureCode.Sturgia => "sturgia_axe_3_t3",
+                            CultureCode.Aserai => "eastern_spear_1_t2",
+                            CultureCode.Empire => "northern_spear_1_t2",
+                            CultureCode.Battania => "aserai_sword_1_t2",
+                            _ => "vlandia_sword_1_t2",
+                        };
                     }
                     else
                     {
-                        switch (PlayerCaptivity.CaptorParty?.Culture?.GetCultureCode())
+                        item = (PlayerCaptivity.CaptorParty?.Culture?.GetCultureCode()) switch
                         {
-                            case CultureCode.Sturgia:
-                                item = "seax";
-                                break;
-                            case CultureCode.Aserai:
-                                item = "celtic_dagger";
-                                break;
-                            case CultureCode.Empire:
-                                item = "gladius_b";
-                                break;
-                            case CultureCode.Battania:
-                                item = "hooked_cleaver";
-                                break;
-                            case CultureCode.Invalid:
-                            case CultureCode.Vlandia:
-                            case CultureCode.Khuzait:
-                            case CultureCode.Nord:
-                            case CultureCode.Darshi:
-                            case CultureCode.Vakken:
-                            case CultureCode.AnyOtherCulture:
-                            default:
-                                item = "seax";
-                                break;
-                        }
+                            CultureCode.Sturgia => "seax",
+                            CultureCode.Aserai => "celtic_dagger",
+                            CultureCode.Empire => "gladius_b",
+                            CultureCode.Battania => "hooked_cleaver",
+                            _ => "seax",
+                        };
                     }
 
                     ItemObject itemObjectWeapon0 = MBObjectManager.Instance.GetObject<ItemObject>(item);
@@ -1136,21 +1106,15 @@ namespace CaptivityEvents.Events
 
         internal bool TeleportChecker(bool firstStatement, Settlement settlement, string faction)
         {
-            switch (faction)
+            return faction switch
             {
-                case "enemy":
-                    return firstStatement && settlement.MapFaction.IsAtWarWith(Hero.MainHero.MapFaction);
-                case "otherenemy":
-                    return firstStatement && settlement.MapFaction != Hero.MainHero.MapFaction;
-                case "netural":
-                    return firstStatement && !settlement.MapFaction.IsAtWarWith(Hero.MainHero.MapFaction) && settlement.MapFaction != Hero.MainHero.MapFaction;
-                case "otherfriendly":
-                    return firstStatement && !settlement.MapFaction.IsAtWarWith(Hero.MainHero.MapFaction);
-                case "friendly":
-                    return firstStatement && settlement.MapFaction == Hero.MainHero.MapFaction;
-                default:
-                    return firstStatement;
-            }
+                "enemy" => firstStatement && settlement.MapFaction.IsAtWarWith(Hero.MainHero.MapFaction),
+                "otherenemy" => firstStatement && settlement.MapFaction != Hero.MainHero.MapFaction,
+                "netural" => firstStatement && !settlement.MapFaction.IsAtWarWith(Hero.MainHero.MapFaction) && settlement.MapFaction != Hero.MainHero.MapFaction,
+                "otherfriendly" => firstStatement && !settlement.MapFaction.IsAtWarWith(Hero.MainHero.MapFaction),
+                "friendly" => firstStatement && settlement.MapFaction == Hero.MainHero.MapFaction,
+                _ => firstStatement,
+            };
         }
 
         internal void ConsequenceTeleportPlayer()
@@ -1186,73 +1150,57 @@ namespace CaptivityEvents.Events
                     switch (location)
                     {
                         case "village":
-                            switch (distance)
+                            nearest = distance switch
                             {
-                                case "random":
-                                    nearest = SettlementHelper.FindRandomSettlement(settlement =>
-                                    {
-                                        return TeleportChecker(settlement.IsVillage, settlement, faction);
-                                    });
-                                    break;
-                                default:
-                                    nearest = SettlementHelper.FindNearestSettlement(settlement =>
-                                    {
-                                        return TeleportChecker(settlement.IsVillage, settlement, faction);
-                                    });
-                                    break;
-                            }
+                                "random" => SettlementHelper.FindRandomSettlement(settlement =>
+                                                                     {
+                                                                         return TeleportChecker(settlement.IsVillage, settlement, faction);
+                                                                     }),
+                                _ => SettlementHelper.FindNearestSettlement(settlement =>
+                               {
+                                   return TeleportChecker(settlement.IsVillage, settlement, faction);
+                               }),
+                            };
                             break;
                         case "castle":
-                            switch (distance)
+                            nearest = distance switch
                             {
-                                case "random":
-                                    nearest = SettlementHelper.FindRandomSettlement(settlement =>
-                                    {
-                                        return TeleportChecker(settlement.IsCastle, settlement, faction);
-                                    });
-                                    break;
-                                default:
-                                    nearest = SettlementHelper.FindNearestSettlement(settlement =>
-                                    {
-                                        return TeleportChecker(settlement.IsCastle, settlement, faction);
-                                    });
-                                    break;
-                            }
+                                "random" => SettlementHelper.FindRandomSettlement(settlement =>
+                                                                     {
+                                                                         return TeleportChecker(settlement.IsCastle, settlement, faction);
+                                                                     }),
+                                _ => SettlementHelper.FindNearestSettlement(settlement =>
+                               {
+                                   return TeleportChecker(settlement.IsCastle, settlement, faction);
+                               }),
+                            };
                             break;
                         case "hideout":
-                            switch (distance)
+                            nearest = distance switch
                             {
-                                case "random":
-                                    nearest = SettlementHelper.FindRandomSettlement(settlement =>
-                                    {
-                                        return TeleportChecker(settlement.IsHideout, settlement, faction);
-                                    });
-                                    break;
-                                default:
-                                    nearest = SettlementHelper.FindNearestSettlement(settlement =>
-                                    {
-                                        return TeleportChecker(settlement.IsHideout, settlement, faction);
-                                    });
-                                    break;
-                            }
+                                "random" => SettlementHelper.FindRandomSettlement(settlement =>
+                                                                     {
+                                                                         return TeleportChecker(settlement.IsHideout, settlement, faction);
+                                                                     }),
+                                _ => SettlementHelper.FindNearestSettlement(settlement =>
+                               {
+                                   return TeleportChecker(settlement.IsHideout, settlement, faction);
+                               }),
+                            };
                             nearest.Hideout.IsSpotted = true;
                             break;
                         default:
-                            switch (distance)
+                            nearest = distance switch
                             {
-                                case "random":
-                                    nearest = SettlementHelper.FindRandomSettlement(settlement =>
-                                    {
-                                        return TeleportChecker(settlement.IsTown, settlement, faction);
-                                    });
-                                    break;
-                                default:
-                                    nearest = SettlementHelper.FindNearestSettlement(settlement =>
-                                    {
-                                        return TeleportChecker(settlement.IsTown, settlement, faction);
-                                    });
-                                    break;
-                            }
+                                "random" => SettlementHelper.FindRandomSettlement(settlement =>
+                                                                     {
+                                                                         return TeleportChecker(settlement.IsTown, settlement, faction);
+                                                                     }),
+                                _ => SettlementHelper.FindNearestSettlement(settlement =>
+                               {
+                                   return TeleportChecker(settlement.IsTown, settlement, faction);
+                               }),
+                            };
                             break;
                     }
 

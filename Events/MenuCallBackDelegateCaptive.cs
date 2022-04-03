@@ -1,4 +1,5 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿#define V171
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
 using System;
@@ -6,13 +7,16 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.CampaignSystem.Party;
-using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+#if V171
+#else
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
+#endif
 
 namespace CaptivityEvents.Events
 {
@@ -50,7 +54,7 @@ namespace CaptivityEvents.Events
             _companionSystem = new CECompanionSystem(listedEvent, option, eventList);
         }
 
-        #region Progress Event
+#region Progress Event
         internal void CaptiveProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
             if (args.MenuContext != null)
@@ -113,9 +117,9 @@ namespace CaptivityEvents.Events
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
 
         }
-        #endregion
+#endregion
 
-        #region Wait Menu
+#region Wait Menu
         internal void CaptiveInitWaitGameMenu(MenuCallbackArgs args)
         {
             if (PlayerCaptivity.CaptorParty.IsSettlement && args.MenuContext != null)
@@ -180,9 +184,9 @@ namespace CaptivityEvents.Events
             string eventToRun = Campaign.Current.Models.PlayerCaptivityModel.CheckCaptivityChange(Campaign.Current.CampaignDt);
             if (!string.IsNullOrWhiteSpace(eventToRun)) GameMenu.SwitchToMenu(eventToRun);
         }
-        #endregion
+#endregion
 
-        #region Regular Event
+#region Regular Event
         internal void CaptiveEventGameMenu(MenuCallbackArgs args)
         {
             _sharedCallBackHelper.LoadBackgroundImage();
@@ -300,9 +304,9 @@ namespace CaptivityEvents.Events
                 _captive.CECaptivityContinue(ref args);
             }
         }
-        #endregion
+#endregion
 
-        #region Consequences
+#region Consequences
         private void ConsequenceCompanions()
         {
             try

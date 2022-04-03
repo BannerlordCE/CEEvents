@@ -1,4 +1,4 @@
-﻿
+﻿#define V171
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using System;
@@ -7,11 +7,14 @@ using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
+#if V171
+#else
+using TaleWorlds.CampaignSystem.Settlements;
+#endif
 
 namespace CaptivityEvents.Helper
 {

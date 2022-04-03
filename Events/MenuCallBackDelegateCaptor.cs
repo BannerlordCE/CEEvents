@@ -1,4 +1,4 @@
-﻿
+﻿#define V171
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -8,14 +8,17 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.CharacterDevelopment;
-using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.CampaignSystem.Inventory;
-using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+#if V171
+#else
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.Encounters;
+using TaleWorlds.CampaignSystem.Inventory;
+using TaleWorlds.CampaignSystem.Party;
+#endif
 
 namespace CaptivityEvents.Events
 {
@@ -53,7 +56,7 @@ namespace CaptivityEvents.Events
             _companionSystem = new CECompanionSystem(listedEvent, option, eventList);
         }
 
-        #region Progress Event
+#region Progress Event
         internal void CaptorProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
             if (args.MenuContext != null)
@@ -141,9 +144,9 @@ namespace CaptivityEvents.Events
 
             PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
-        #endregion
+#endregion
 
-        #region Regular Event
+#region Regular Event
         internal void CaptorEventWaitGameMenu(MenuCallbackArgs args)
         {
             InitSetNames(ref args);
@@ -272,9 +275,9 @@ namespace CaptivityEvents.Events
             }
             else { _captor.CECaptorContinue(args); }
         }
-        #endregion
+#endregion
 
-        #region Consequences
+#region Consequences
 
         private void ConsequenceCompanions()
         {
@@ -1041,11 +1044,11 @@ namespace CaptivityEvents.Events
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptorLeaveSpouse)) return;
             _dynamics.ChangeSpouse(Hero.MainHero, null);
         }
-        #endregion
+#endregion
 
-        #region Requirements
+#region Requirements
 
-        #region ReqGold
+#region ReqGold
 
         private void ReqGold(ref MenuCallbackArgs args)
         {
@@ -1080,9 +1083,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion
+#endregion
 
-        #region ReqSkills
+#region ReqSkills
 
         private void ReqCaptorSkills(ref MenuCallbackArgs args)
         {
@@ -1176,9 +1179,9 @@ namespace CaptivityEvents.Events
             return true;
         }
 
-        #endregion
+#endregion
 
-        #region ReqCaptorSkill
+#region ReqCaptorSkill
 
         private void ReqCaptorSkill(ref MenuCallbackArgs args)
         {
@@ -1242,9 +1245,9 @@ namespace CaptivityEvents.Events
             return skillLevel;
         }
 
-        #endregion
+#endregion
 
-        #region ReqHeroSkill
+#region ReqHeroSkill
 
         private void ReqHeroSkill(ref MenuCallbackArgs args)
         {
@@ -1310,9 +1313,9 @@ namespace CaptivityEvents.Events
             return skillLevel;
         }
 
-        #endregion
+#endregion
 
-        #region CaptorTrait
+#region CaptorTrait
         private void ReqCaptorTrait(ref MenuCallbackArgs args)
         {
             if (string.IsNullOrWhiteSpace(_option.ReqCaptorTrait)) return;
@@ -1371,9 +1374,9 @@ namespace CaptivityEvents.Events
             return traitLevel;
         }
 
-        #endregion
+#endregion
 
-        #region CaptiveTrait
+#region CaptiveTrait
 
         private void ReqHeroTrait(ref MenuCallbackArgs args)
         {
@@ -1433,9 +1436,9 @@ namespace CaptivityEvents.Events
             return traitLevel;
         }
 
-        #endregion
+#endregion
 
-        #region ReqFemaleCaptives
+#region ReqFemaleCaptives
 
         private void ReqFemaleCaptives(ref MenuCallbackArgs args)
         {
@@ -1498,9 +1501,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
             args.IsEnabled = false;
         }
-        #endregion
+#endregion
 
-        #region ReqMaleCaptives
+#region ReqMaleCaptives
 
         private void ReqMaleCaptives(ref MenuCallbackArgs args)
         {
@@ -1564,9 +1567,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion
+#endregion
 
-        #region ReqCaptives
+#region ReqCaptives
 
         private void ReqCaptives(ref MenuCallbackArgs args)
         {
@@ -1631,9 +1634,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion
+#endregion
 
-        #region ReqFemaleTroops
+#region ReqFemaleTroops
 
         private void ReqFemaleTroops(ref MenuCallbackArgs args)
         {
@@ -1698,9 +1701,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion
+#endregion
 
-        #region ReqMaleTroops
+#region ReqMaleTroops
 
         private void ReqMaleTroops(ref MenuCallbackArgs args)
         {
@@ -1765,9 +1768,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion
+#endregion
 
-        #region ReqTroops
+#region ReqTroops
 
         private void ReqTroops(ref MenuCallbackArgs args)
         {
@@ -1832,9 +1835,9 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
         }
-        #endregion
+#endregion
 
-        #region ReqMorale
+#region ReqMorale
 
         private void ReqMorale(ref MenuCallbackArgs args)
         {
@@ -1869,9 +1872,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion
+#endregion
 
-        #region ReqHeroCaptorRelation
+#region ReqHeroCaptorRelation
         private void ReqHeroCaptorRelation(ref MenuCallbackArgs args)
         {
             if (_listedEvent?.Captive?.HeroObject == null) return;
@@ -1912,11 +1915,11 @@ namespace CaptivityEvents.Events
             args.Tooltip = textResponse4;
             args.IsEnabled = false;
         }
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Icons
+#region Icons
 
         private void LeaveTypes(ref MenuCallbackArgs args)
         {
@@ -1958,9 +1961,9 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Wait)) args.optionLeaveType = GameMenuOption.LeaveType.Wait;
         }
 
-        #endregion
+#endregion
 
-        #region Init Options
+#region Init Options
         private void InitCaptorGoldTotal()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorGold)) return;
@@ -2028,9 +2031,9 @@ namespace CaptivityEvents.Events
                                                            : "wait_prisoner_male");
             }
         }
-        #endregion
+#endregion
 
-        #region CustomConsequencesReq
+#region CustomConsequencesReq
         private void PlayerIsNotBusy(ref MenuCallbackArgs args)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerIsNotBusy)) return;
@@ -2048,6 +2051,6 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_companions_too_many");
             args.IsEnabled = false;
         }
-        #endregion
+#endregion
     }
 }

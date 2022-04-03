@@ -1,15 +1,19 @@
-﻿
+﻿#define V171
 using CaptivityEvents.Config;
 using Helpers;
 using System;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.Issues;
-using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
 using static CaptivityEvents.Helper.CEHelper;
+
+#if V171
+#else
+using TaleWorlds.CampaignSystem.Issues;
+using TaleWorlds.CampaignSystem.Party;
+#endif
 
 namespace CaptivityEvents.Issues
 {

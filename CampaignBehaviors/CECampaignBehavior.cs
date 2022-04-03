@@ -1,4 +1,4 @@
-#define V172
+#define V171
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -13,24 +13,29 @@ using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.LogEntries;
 using TaleWorlds.CampaignSystem.MapNotificationTypes;
-using TaleWorlds.CampaignSystem.Party;
-using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
 using static CaptivityEvents.Helper.CEHelper;
 
+#if V171
+
+#else
+using TaleWorlds.CampaignSystem.ComponentInterfaces;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
+#endif
+
 namespace CaptivityEvents.CampaignBehaviors
 {
     internal class CECampaignBehavior : CampaignBehaviorBase
     {
-        #region Events
+#region Events
 
         private bool LaunchCaptorEvent(CEEvent OverrideEvent = null)
         {
@@ -307,9 +312,9 @@ namespace CaptivityEvents.CampaignBehaviors
         }
 
 
-        #endregion
+#endregion
 
-        #region Pregnancy
+#region Pregnancy
 
         private void OnChildConceived(Hero hero)
         {
@@ -447,7 +452,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
             int becomeChildAge = Campaign.Current.Models.AgeModel.BecomeChildAge;
 
-            culture = (culture ?? mother.Culture);
+            culture ??= mother.Culture;
             CharacterObject characterObject2 = culture.ChildCharacterTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
 
             if (characterObject2 != null)

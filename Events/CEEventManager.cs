@@ -1,13 +1,18 @@
-﻿using CaptivityEvents.Custom;
+﻿#define V171
+using CaptivityEvents.Custom;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.Party;
-using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+
+#if V171
+#else
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Roster;
+#endif
 
 namespace CaptivityEvents.Events
 {
@@ -20,7 +25,7 @@ namespace CaptivityEvents.Events
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
         }
 
-        #region Return Specifics Events
+#region Return Specifics Events
         public static string FireSpecificEvent(string specificEvent, bool force = false)
         {
             List<string> eventNames = new List<string>();
@@ -159,10 +164,10 @@ namespace CaptivityEvents.Events
 
             return flag;
         }
-        #endregion
+#endregion
 
 
-        #region Return Random Events
+#region Return Random Events
         public static CEEvent ReturnWeightedChoiceOfEventsRandom()
         {
             List<CEEvent> events = new List<CEEvent>();
@@ -397,7 +402,7 @@ namespace CaptivityEvents.Events
 
             return null;
         }
-        #endregion
+#endregion
 
     }
 }

@@ -1,6 +1,6 @@
 ﻿using TaleWorlds.Engine.GauntletUI;
+using TaleWorlds.Engine.Screens;
 using TaleWorlds.Library;
-using TaleWorlds.ScreenSystem;
 
 namespace CaptivityEvents.Config
 {

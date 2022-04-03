@@ -1,13 +1,17 @@
-﻿#define V170
+﻿#define V171
 using CaptivityEvents.Custom;
 using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.Party;
-using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.ObjectSystem;
+
+#if V171
+#else
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
+#endif
 
 namespace CaptivityEvents.Events
 {
@@ -68,18 +72,12 @@ namespace CaptivityEvents.Events
                     string culture = null;
                     if (heroVariables.Culture != null)
                     {
-                        switch (heroVariables.Culture.ToLower())
+                        culture = heroVariables.Culture.ToLower() switch
                         {
-                            case "player":
-                                culture = Hero.MainHero.Culture.StringId;
-                                break;
-                            case "captor":
-                                culture = party.Culture.StringId;
-                                break;
-                            default:
-                                culture = heroVariables.Culture;
-                                break;
-                        }
+                            "player" => Hero.MainHero.Culture.StringId,
+                            "captor" => party.Culture.StringId,
+                            _ => heroVariables.Culture,
+                        };
                     }
                     else
                     {
