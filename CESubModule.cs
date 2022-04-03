@@ -404,10 +404,16 @@ namespace CaptivityEvents
 
                 SpriteCategory spriteCategory = UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"];
                 spriteCategory.SpriteSheets.AddRange(new Texture[] { CEPersistence.CEEventImageList["default_female_prison"], CEPersistence.CEEventImageList["default_male_prison"], CEPersistence.CEEventImageList["default_female"], CEPersistence.CEEventImageList["default_male"] });
+#if V171
+                spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray(new Vec2i[] { new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805) });
+                spriteCategory.SpriteSheetCount = 7;
+                CECustomHandler.ForceLogToFile("Loading Textures 1.7.1");
+#else
                 spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray(new Vec2i[] { new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805) });
                 spriteCategory.SpriteSheetCount = 6;
-
                 CECustomHandler.ForceLogToFile("Loading Textures 1.7.2");
+#endif
+
                 PropertyInfo propertyWidth = typeof(SpritePart).GetProperty("Width");
                 PropertyInfo propertyHeight = typeof(SpritePart).GetProperty("Height");
                 foreach (SpritePart spritePart in UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteParts)
@@ -415,7 +421,11 @@ namespace CaptivityEvents
                     switch (spritePart.Name)
                     {
                         case "wait_prisoner_female":
+#if V171
+                            spritePart.SheetID = 7;
+#else
                             spritePart.SheetID = 6;
+#endif
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
                             propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
@@ -423,7 +433,11 @@ namespace CaptivityEvents
                             spritePart.UpdateInitValues();
                             break;
                         case "wait_prisoner_male":
+#if V171
+                            spritePart.SheetID = 6;
+#else
                             spritePart.SheetID = 5;
+#endif
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
                             propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
@@ -431,7 +445,11 @@ namespace CaptivityEvents
                             spritePart.UpdateInitValues();
                             break;
                         case "wait_captive_female":
+#if V171
+                            spritePart.SheetID = 5;
+#else
                             spritePart.SheetID = 4;
+#endif
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
                             propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
@@ -439,7 +457,11 @@ namespace CaptivityEvents
                             spritePart.UpdateInitValues();
                             break;
                         case "wait_captive_male":
+#if V171
+                            spritePart.SheetID = 4;
+#else
                             spritePart.SheetID = 3;
+#endif
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
                             propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
