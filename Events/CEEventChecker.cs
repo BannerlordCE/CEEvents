@@ -12,7 +12,6 @@ using TaleWorlds.Library;
 using static CaptivityEvents.Helper.CEHelper;
 using CETerrainType = CaptivityEvents.Custom.TerrainType;
 using TerrainType = TaleWorlds.Core.TerrainType;
-
 #if V171
 using TaleWorlds.CampaignSystem.SandBox;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
@@ -203,20 +202,11 @@ namespace CaptivityEvents.Events
             if (captorParty.IsMobile) returnString += "\nMoral Total : " + captorParty.MobileParty.Morale;
             if (captorParty != PartyBase.MainParty)
             {
-#if V165
-                if (captorParty?.Leader != null)
-                {
-                    returnString += "\nParty Leader Name : " + captorParty.Leader.Name.ToString();
-                    returnString += "\nParty Leader Hero : " + (captorParty.Leader.IsHero ? "True" : "False");
-                    returnString += "\nParty Leader Gender : " + (captorParty.Leader.IsFemale ? "Female" : "Male");
-                }
-#else
                 if (captorParty?.LeaderHero != null)
                 {
                     returnString += "\nParty Leader Name : " + captorParty.LeaderHero.Name.ToString();
                     returnString += "\nParty Leader Gender : " + (captorParty.LeaderHero.IsFemale ? "Female" : "Male");
                 }
-#endif
 
                 string type = "DefaultParty";
                 if (captorParty.IsMobile)
@@ -337,13 +327,8 @@ namespace CaptivityEvents.Events
                                     referenceHero = hero.HeroObject;
                                     break;
                                 case "captor":
-#if V165
-                                    if (!party.Leader.IsHero) { return LogError("Skipping event " + _listEvent.Name + " it does not match the captor conditions."); }
-                                    referenceHero = party.Leader.HeroObject;
-#else
                                     if (party.LeaderHero != null) { return LogError("Skipping event " + _listEvent.Name + " it does not match the captor conditions."); }
                                     referenceHero = party.LeaderHero;
-#endif
                                     break;
                                 default:
                                     referenceHero = Hero.MainHero;
@@ -1694,13 +1679,8 @@ namespace CaptivityEvents.Events
         private bool CaptorSkillsCheck(PartyBase captorParty)
         {
             if (_listEvent.SkillsRequired == null) return true;
-#if V165
-            if (_listEvent.SkillsRequired.Any((SkillRequired skill) => skill.Ref == "Captor") && captorParty.Leader == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkill.");
-            return SkillsCheck(captorParty.Leader, true);
-#else
             if (_listEvent.SkillsRequired.Any((SkillRequired skill) => skill.Ref == "Captor") && captorParty.LeaderHero == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkill.");
             return SkillsCheck(captorParty.LeaderHero?.CharacterObject, true);
-#endif
         }
 
         private bool SkillsCheck(CharacterObject character, bool captor = false)
@@ -1799,13 +1779,8 @@ namespace CaptivityEvents.Events
         private bool CaptorTraitsCheck(PartyBase captorParty)
         {
             if (_listEvent.TraitsRequired == null) return true;
-#if V165
-            if (captorParty.Leader == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTrait.");
-            return TraitsCheck(captorParty.Leader, true);
-#else
             if (captorParty.LeaderHero == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTrait.");
             return TraitsCheck(captorParty.LeaderHero?.CharacterObject, true);
-#endif
         }
 
         private bool TraitsCheck(CharacterObject character, bool captor = false)

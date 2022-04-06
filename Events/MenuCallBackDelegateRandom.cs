@@ -540,11 +540,8 @@ namespace CaptivityEvents.Events
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
-#if V165
-                    customParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-#else
+
                     customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-#endif
                     customParty.SetCustomName(new TextObject("Bandits", null));
 
                     customParty.MemberRoster.Clear();
@@ -601,7 +598,7 @@ namespace CaptivityEvents.Events
                 {
                     if (prisonerCharacter.PartyBelongedToAsPrisoner != null)
                     {
-                        prisonerCharacter.PartyBelongedToAsPrisoner.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                        prisonerCharacter.PartyBelongedToAsPrisoner.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
                     }
                     prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
                     prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
@@ -612,7 +609,7 @@ namespace CaptivityEvents.Events
                 {
                     if (prisonerCharacter.PartyBelongedTo != null)
                     {
-                        prisonerCharacter.PartyBelongedTo.MemberRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                        prisonerCharacter.PartyBelongedTo.MemberRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
                     }
                     prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
                     prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);

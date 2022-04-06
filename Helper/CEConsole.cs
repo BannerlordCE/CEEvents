@@ -23,7 +23,6 @@ using TaleWorlds.ModuleManager;
 using TaleWorlds.MountAndBlade;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
-
 #if V171
 #else
 using TaleWorlds.CampaignSystem.GameState;

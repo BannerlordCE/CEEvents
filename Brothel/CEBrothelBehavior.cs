@@ -18,7 +18,6 @@ using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.ObjectSystem;
-
 #if V171
 using TaleWorlds.CampaignSystem.SandBox;
 #else
@@ -199,19 +198,11 @@ namespace CaptivityEvents.Brothel
             };
         }
 
-#if V165
-        private static bool ManageBrothelDoneHandler(TroopRoster leftMemberRoster, TroopRoster leftPrisonRoster, TroopRoster rightMemberRoster, TroopRoster rightPrisonRoster, FlattenedTroopRoster takenPrisonerRoster, FlattenedTroopRoster releasedPrisonerRoster, bool isForced, List<MobileParty> leftParties = null, List<MobileParty> rightParties = null)
-        {
-            SetBrothelPrisoners(Hero.MainHero.CurrentSettlement, leftPrisonRoster);
-            return true;
-        }
-#else
         private static bool ManageBrothelDoneHandler(TroopRoster leftMemberRoster, TroopRoster leftPrisonRoster, TroopRoster rightMemberRoster, TroopRoster rightPrisonRoster, FlattenedTroopRoster leftSideTransferredPrisonerRoster, FlattenedTroopRoster rightSideTransferredPrisonerRoster, bool isForced, PartyBase leftParty = null, PartyBase rightParty = null)
         {
             SetBrothelPrisoners(Hero.MainHero.CurrentSettlement, leftPrisonRoster);
             return true;
         }
-#endif
 
 
         // Ends Here
@@ -434,13 +425,10 @@ namespace CaptivityEvents.Brothel
 
                 owner.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
                 owner.IsFemale = true;
-#if V165
-                owner.Name = new TextObject("{=CEEVENTS1050}Brothel Assistant");
-#else
+
                 TextObject name = new TextObject("{=CEEVENTS1050}Brothel Assistant");
                 FieldInfo fi = owner.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (fi != null) fi.SetValue(owner, name);
-#endif
                 owner.StringId = "brothel_assistant";
             }
             else
@@ -449,13 +437,10 @@ namespace CaptivityEvents.Brothel
 
                 owner.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge);
                 owner.IsFemale = true;
-#if V165
-                owner.Name = new TextObject("{=CEEVENTS1066}Brothel Owner");
-#else
+
                 TextObject name = new TextObject("{=CEEVENTS1066}Brothel Owner");
                 FieldInfo fi = owner.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (fi != null) fi.SetValue(owner, name);
-#endif
                 owner.StringId = "brothel_owner";
             }
 
@@ -465,13 +450,10 @@ namespace CaptivityEvents.Brothel
         private static LocationCharacter CreateRansomBroker(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
             BasicCharacterObject owner = HelperCreateFrom(culture.RansomBroker, true);
-#if V165
-            owner.Name = new TextObject("{=CEEVENTS1065}Slave Trader");
-#else
+
             TextObject name = new TextObject("{=CEEVENTS1065}Slave Trader");
             FieldInfo fi = owner.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
             if (fi != null) fi.SetValue(owner, name);
-#endif
             owner.StringId = "brothel_slaver";
 
             return new LocationCharacter(new AgentData(new SimpleAgentOrigin(owner)).Monster(Campaign.Current.HumanMonsterSettlement).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge)), SandBoxManager.Instance.AgentBehaviorManager.AddOutdoorWandererBehaviors, "npc_common", true, relation, null, true);
@@ -513,13 +495,10 @@ namespace CaptivityEvents.Brothel
             CharacterObject townswoman = HelperCreateFrom(culture.TavernWench, true);
 
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-#if V165
-            townswoman.Name = new TextObject("{=CEEVENTS1093}Server");
-#else
+
             TextObject name = new TextObject("{=CEEVENTS1093}Server");
             FieldInfo fi = townswoman.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
             if (fi != null) fi.SetValue(townswoman, name);
-#endif
             townswoman.StringId = "bar_maid";
 
             AgentData agentData = new AgentData(new SimpleAgentOrigin(townswoman)).Monster(Campaign.Current.HumanMonsterSettlement).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge));
@@ -532,13 +511,11 @@ namespace CaptivityEvents.Brothel
             CharacterObject townswoman = HelperCreateFrom(culture.FemaleDancer, true);
 
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-#if V165
-            townswoman.Name = new TextObject("{=CEEVENTS1095}Prostitute");
-#else
+
             TextObject name = new TextObject("{=CEEVENTS1095}Prostitute");
             FieldInfo fi = townswoman.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
             if (fi != null) fi.SetValue(townswoman, name);
-#endif
+
             townswoman.StringId = prostituteStrings.GetRandomElement();
 
             return new LocationCharacter(new AgentData(new SimpleAgentOrigin(townswoman)).Monster(Campaign.Current.HumanMonsterSettlement).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge)), SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_dancer", true, relation, "as_human_female_dancer", true);
@@ -549,13 +526,11 @@ namespace CaptivityEvents.Brothel
             CharacterObject townswoman = HelperCreateFrom(culture.FemaleDancer, true);
 
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-#if V165
-            townswoman.Name = new TextObject("{=CEEVENTS1095}Prostitute");
-#else
+
             TextObject name = new TextObject("{=CEEVENTS1095}Prostitute");
             FieldInfo fi = townswoman.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
             if (fi != null) fi.SetValue(townswoman, name);
-#endif
+
             townswoman.StringId = prostituteStrings.GetRandomElement();
 
             string actionSetCode;
@@ -571,13 +546,11 @@ namespace CaptivityEvents.Brothel
             CharacterObject townsman = HelperCreateFrom(culture.Musician, true);
 
             townsman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-#if V165
-            townsman.Name = new TextObject("{=CEEVENTS1095}Prostitute");
-#else
+
             TextObject name = new TextObject("{=CEEVENTS1095}Prostitute");
             FieldInfo fi = townsman.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
             if (fi != null) fi.SetValue(townsman, name);
-#endif
+
             townsman.StringId = prostituteStrings.GetRandomElement();
 
             string actionSetCode;
@@ -886,11 +859,8 @@ namespace CaptivityEvents.Brothel
             campaignGameStarter.AddDialogLine("ce_assistant_party_00_n", "ce_assistant_party_00", "ce_assistant_response_00", "{=CEBROTHEL1071}Sorry, {?PLAYER.GENDER}milady{?}my lord{\\?} everyone are currently busy.", () => _hasBoughtProstituteToParty, null);
 
             campaignGameStarter.AddDialogLine("ce_assistant_choice_00_r", "ce_assistant_party_00", "ce_assistant_choice_00", "{=CEBROTHEL1073}Who would you like to send first?", () => !_hasBoughtProstituteToParty, CheckInBrothelCaptives);
-#if V165
-            campaignGameStarter.AddRepeatablePlayerLine("ce_assistant_choice_01_r", "ce_assistant_choice_00", "ce_assistant_choice_01", "{=CEBROTHEL1075}Send {HERO.LINK}.", ConditionalSendBrothelCaptive, SendBrothelCaptive);
-#else
+
             campaignGameStarter.AddRepeatablePlayerLine("ce_assistant_choice_01_r", "ce_assistant_choice_00", "ce_assistant_choice_01", "{=CEBROTHEL1075}Send {HERO.LINK}.", "{=UNFE1BeG}I am thinking of a different person", "ce_assistant_party_00", ConditionalSendBrothelCaptive, SendBrothelCaptive);
-#endif
 
             campaignGameStarter.AddPlayerLine("ce_assistant_choice_02_r", "ce_assistant_choice_00", "ce_assistant_choice_01", "{=CEBROTHEL1074}Send {NAME} the regular.", ConditionalRandomName, null);
 
@@ -1111,20 +1081,12 @@ namespace CaptivityEvents.Brothel
         private void CheckInBrothelCaptives()
         {
             List<CharacterObject> brothelPrisoners = FetchBrothelPrisoners(Settlement.CurrentSettlement);
-#if V165
-            ConversationSentence.ObjectsToRepeatOver = brothelPrisoners;
-#else
             ConversationSentence.SetObjectsToRepeatOver(brothelPrisoners);
-#endif
         }
 
         private void SendBrothelCaptive()
         {
-#if V165
-            CharacterObject captive = ((CharacterObject)ConversationSentence.LastSelectedRepeatObject);
-#else
             CharacterObject captive = ((CharacterObject)ConversationSentence.SelectedRepeatObject);
-#endif
 
             if (captive?.HeroObject == null) return;
 

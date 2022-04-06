@@ -14,7 +14,6 @@ using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
 using static CaptivityEvents.Helper.CEHelper;
-
 #if V171
 #else
 using TaleWorlds.CampaignSystem.Encounters;

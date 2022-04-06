@@ -14,7 +14,6 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
-
 #if V171
 #else
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
@@ -900,11 +899,7 @@ namespace CaptivityEvents.Events
 
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
-#if V165
-                                        customParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-#else
                                         customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-#endif
 
                                         customParty.MemberRoster.Clear();
                                         customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
@@ -974,11 +969,8 @@ namespace CaptivityEvents.Events
 
                                         MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false);
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
-#if V165
-                                        customParty.InitializeMobileParty(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-#else
+
                                         customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-#endif
 
                                         customParty.MemberRoster.Clear();
                                         customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
@@ -1016,13 +1008,9 @@ namespace CaptivityEvents.Events
                                         PlayerEncounter.StartBattle();
                                         PlayerEncounter.Update();
                                         //EncounterAttackConsequence
-#if V165
-                                        MissionInitializerRecord rec = new MissionInitializerRecord(PlayerEncounter.GetBattleSceneForMapPosition(MobileParty.MainParty.Position2D))
-#else
                                         MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position2D);
                                         string battleSceneForMapPatch = PlayerEncounter.GetBattleSceneForMapPatch(mapPatchAtPosition);
                                         MissionInitializerRecord rec = new MissionInitializerRecord(battleSceneForMapPatch)
-#endif
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
@@ -1214,7 +1202,7 @@ namespace CaptivityEvents.Events
 
                             if (prisonerCharacter.PartyBelongedToAsPrisoner != null)
                             {
-                                prisonerCharacter.PartyBelongedToAsPrisoner.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                                prisonerCharacter.PartyBelongedToAsPrisoner.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
                             }
                             prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
                             prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);

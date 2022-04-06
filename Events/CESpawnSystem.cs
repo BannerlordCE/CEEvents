@@ -6,7 +6,6 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
 using TaleWorlds.ObjectSystem;
-
 #if V171
 #else
 using TaleWorlds.CampaignSystem.Party;

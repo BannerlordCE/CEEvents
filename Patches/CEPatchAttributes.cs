@@ -3,7 +3,6 @@ using HarmonyLib;
 using System.Linq;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
-
 #if V171
 using TaleWorlds.CampaignSystem;
 #else

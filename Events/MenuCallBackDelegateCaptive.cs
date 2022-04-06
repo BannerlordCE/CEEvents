@@ -326,10 +326,8 @@ namespace CaptivityEvents.Events
             try
             {
                 if (PlayerCaptivity.CaptorParty.LeaderHero != null) KillCharacterAction.ApplyByMurder(PlayerCaptivity.CaptorParty.LeaderHero, Hero.MainHero);
-#if V165
-                else PlayerCaptivity.CaptorParty.MemberRoster.AddToCounts(PlayerCaptivity.CaptorParty.Leader, -1);
-#else
-#endif
+                else PlayerCaptivity.CaptorParty.MemberRoster.AddToCounts(PlayerCaptivity.CaptorParty.MemberRoster.GetCharacterAtIndex(0), -1);
+
 
                 if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MemberRoster.Count == 0 && PlayerCaptivity.CaptorParty.MobileParty.ActualClan != null)
                 {
@@ -1860,16 +1858,6 @@ namespace CaptivityEvents.Events
                          ? 1
                          : 0);
 
-#if V165
-            if (PlayerCaptivity.CaptorParty.Leader != null)
-            {
-                text.SetTextVariable("CAPTOR_NAME", PlayerCaptivity.CaptorParty.Leader.Name);
-
-                text.SetTextVariable("ISCAPTORFEMALE", PlayerCaptivity.CaptorParty.Leader.IsFemale
-                                         ? 1
-                                         : 0);
-            }
-#else
             if (PlayerCaptivity.CaptorParty.LeaderHero != null)
             {
                 text.SetTextVariable("CAPTOR_NAME", PlayerCaptivity.CaptorParty.LeaderHero.Name);
@@ -1878,7 +1866,6 @@ namespace CaptivityEvents.Events
                                          ? 1
                                          : 0);
             }
-#endif
             else
             {
                 text.SetTextVariable("CAPTOR_NAME", new TextObject("{=CESETTINGS0099}captor"));

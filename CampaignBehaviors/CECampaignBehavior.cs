@@ -14,7 +14,6 @@ using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.LogEntries;
 using TaleWorlds.CampaignSystem.MapNotificationTypes;
 using TaleWorlds.Core;
@@ -22,10 +21,9 @@ using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
 using static CaptivityEvents.Helper.CEHelper;
-
 #if V171
-
 #else
+using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
@@ -575,11 +573,8 @@ namespace CaptivityEvents.CampaignBehaviors
                         {
                             CECustomHandler.ForceLogToFile("Bad pregnancy " + (isOffspringFemale ? "Female" : "Male"));
                             CECustomHandler.ForceLogToFile(e.Message + " : " + e);
-#if V165
-                            Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, !isOffspringFemale, null, 0);
-#else
+
                             Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, !isOffspringFemale, null);
-#endif
                             aliveOffsprings.Add(item);
                         }
                     }

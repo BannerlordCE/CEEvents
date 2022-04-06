@@ -1104,12 +1104,8 @@ namespace CaptivityEvents
                     case CEPersistence.DungeonState.FadeIn:
                         if (brothelTimerOne < missionStateDungeon.CurrentMission.CurrentTime)
                         {
-#if V165
-                            CEPersistence.agentTalkingTo.ResetAI();
-#else
                             CEPersistence.agentTalkingTo.ResetLookAgent();
                             CEPersistence.agentTalkingTo.ResetAgentProperties();
-#endif
                             CEPersistence.dungeonState = CEPersistence.DungeonState.Normal;
                             Mission.Current.EndMission();
                         }
@@ -1177,12 +1173,9 @@ namespace CaptivityEvents
                             brothelTimerThree = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
                             Hero.MainHero.HitPoints += 10;
 
-#if V165
-                            CEPersistence.agentTalkingTo.ResetAI();
-#else
                             CEPersistence.agentTalkingTo.ResetLookAgent();
                             CEPersistence.agentTalkingTo.ResetAgentProperties();
-#endif
+
                             if (CEPersistence.gameEntity != null)
                             {
                                 Mission.Current.MainAgent.TeleportToPosition(CEPersistence.gameEntity.GlobalPosition);

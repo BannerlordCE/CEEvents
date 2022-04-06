@@ -15,15 +15,12 @@ namespace CaptivityEvents.Events
         /// <returns>MenuAndOptionType</returns>
         private static GameMenu.MenuAndOptionType CEProgressMode(int state)
         {
-            switch (state)
+            return state switch
             {
-                case 1:
-                    return GameMenu.MenuAndOptionType.WaitMenuShowProgressAndHoursOption;
-                case 2:
-                    return GameMenu.MenuAndOptionType.WaitMenuHideProgressAndHoursOption;
-                default:
-                    return GameMenu.MenuAndOptionType.WaitMenuShowOnlyProgressOption;
-            }
+                1 => GameMenu.MenuAndOptionType.WaitMenuShowProgressAndHoursOption,
+                2 => GameMenu.MenuAndOptionType.WaitMenuHideProgressAndHoursOption,
+                _ => GameMenu.MenuAndOptionType.WaitMenuShowOnlyProgressOption,
+            };
         }
 
         #region Event Loader
