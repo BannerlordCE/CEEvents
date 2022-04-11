@@ -1,4 +1,4 @@
-﻿#define V171
+﻿#define V172
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;

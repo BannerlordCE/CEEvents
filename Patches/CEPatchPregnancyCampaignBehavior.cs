@@ -1,4 +1,4 @@
-﻿#define V171
+﻿#define V172
 using CaptivityEvents.Helper;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;

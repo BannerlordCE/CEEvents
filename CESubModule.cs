@@ -1,4 +1,5 @@
-#define V171
+#define V172
+
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -20,7 +21,6 @@ using TaleWorlds.Core;
 using TaleWorlds.Core.ViewModelCollection;
 using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
-using TaleWorlds.Engine.Screens;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
@@ -29,10 +29,14 @@ using TaleWorlds.MountAndBlade.View.Missions;
 using TaleWorlds.TwoDimension;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
+
 #if V171
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors.BarterBehaviors;
+using TaleWorlds.Engine.Screens;
 #else
+
+using TaleWorlds.ScreenSystem;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.BarterSystem;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
@@ -42,6 +46,7 @@ using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
+
 #endif
 
 namespace CaptivityEvents
@@ -83,12 +88,14 @@ namespace CaptivityEvents
 
         // Events
         public static List<CEEvent> CEEvents = new List<CEEvent>();
+
         public static List<CEEvent> CEEventList = new List<CEEvent>();
         public static List<CEEvent> CEWaitingList = new List<CEEvent>();
         public static List<CEEvent> CECallableEvents = new List<CEEvent>();
 
         // Captive Variables
         public static bool captivePlayEvent;
+
         public static CharacterObject captiveToPlay;
 
         public static int captiveInventoryStage = 0;
@@ -104,6 +111,7 @@ namespace CaptivityEvents
 
         // Animation Variables
         public static bool animationPlayEvent;
+
         public static List<string> animationImageList = new List<string>();
         public static int animationIndex;
         public static float animationSpeed = 0.03f;
@@ -123,6 +131,7 @@ namespace CaptivityEvents
 
         // Fade out for Brothel
         public static float brothelFadeIn = 2f;
+
         public static float brothelBlack = 10f;
         public static float brothelFadeOut = 2f;
 
@@ -136,6 +145,7 @@ namespace CaptivityEvents
 
         // Sound
         public static SoundEvent soundEvent = null;
+
         public static bool soundLoop = false;
     }
 
@@ -143,10 +153,12 @@ namespace CaptivityEvents
     {
         // Loaded Variables
         private static bool _isLoaded;
+
         private static bool _isLoadedInGame;
 
         // Harmony
         private Harmony _harmony;
+
         public const string HarmonyId = "com.CE.captivityEvents";
 
         // Last Check on Animation Loop
@@ -157,14 +169,16 @@ namespace CaptivityEvents
 
         // Timer for Brothel
         private static float brothelTimerOne;
+
         private static float brothelTimerTwo;
         private static float brothelTimerThree;
 
         // Max Brothel Sound
         private static readonly float brothelSoundMin = 1f;
+
         private static readonly float brothelSoundMax = 3f;
 
-        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml 
+        // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml
         // Mount & Blade II Bannerlord\Modules\Native\GUI\NativeSpriteData.xml
 #if V171
         private static readonly int[] sprite_index = new int[] { 3, 4, 5, 6 };
@@ -172,10 +186,8 @@ namespace CaptivityEvents
         private static readonly int[] sprite_index = new int[] { 2, 3, 4, 5 };
 #endif
 
-
         // Sounds for Brothel
         private static readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
-
 
         public void LoadTexture(string name, bool swap = false, bool forcelog = false)
         {
@@ -196,7 +208,6 @@ namespace CaptivityEvents
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
                           ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
                         : CEPersistence.CEEventImageList[name];
-
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
                         ? CESettings.Instance.SexualContent && CESettings.Instance.CustomBackgrounds ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
@@ -266,8 +277,6 @@ namespace CaptivityEvents
 
             ApplicationVersion modversion = ceModule.Version;
             ApplicationVersion gameversion = nativeModule.Version;
-
-
 
             if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor || modversion.Revision != gameversion.Revision)
             {
@@ -360,7 +369,6 @@ namespace CaptivityEvents
             // Captivity Location Image Load
             try
             {
-
                 foreach (string file in files)
                 {
                     if (requiredImages.Contains(file)) continue;
@@ -432,6 +440,7 @@ namespace CaptivityEvents
                             propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
                             spritePart.UpdateInitValues();
                             break;
+
                         case "wait_prisoner_male":
 #if V171
                             spritePart.SheetID = 6;
@@ -444,6 +453,7 @@ namespace CaptivityEvents
                             propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
                             spritePart.UpdateInitValues();
                             break;
+
                         case "wait_captive_female":
 #if V171
                             spritePart.SheetID = 5;
@@ -456,6 +466,7 @@ namespace CaptivityEvents
                             propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
                             spritePart.UpdateInitValues();
                             break;
+
                         case "wait_captive_male":
 #if V171
                             spritePart.SheetID = 4;
@@ -468,6 +479,7 @@ namespace CaptivityEvents
                             propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
                             spritePart.UpdateInitValues();
                             break;
+
                         default:
                             break;
                     }
@@ -701,7 +713,6 @@ namespace CaptivityEvents
             {
                 return;
             }
-
         }
 
         private void ResetHelper()
@@ -738,7 +749,6 @@ namespace CaptivityEvents
 
             return base.DoLoading(game);
         }
-
 
         private void InitalizeAttributes(Game game) => CESkills.RegisterAll(game);
 
@@ -902,7 +912,6 @@ namespace CaptivityEvents
             BattleStateCheck();
         }
 
-
         private void SoundStateCheck()
         {
             if (CEPersistence.soundLoop && CEPersistence.soundEvent != null && Game.Current.GameStateManager.ActiveState is MapState)
@@ -951,12 +960,14 @@ namespace CaptivityEvents
             {
                 case 0:
                     break;
+
                 case 1:
                     if (Game.Current.GameStateManager.ActiveState is InventoryState inventoryState)
                     {
                         CEPersistence.captiveInventoryStage = 2;
                     }
                     break;
+
                 case 2:
                     if (Game.Current.GameStateManager.ActiveState is MapState mapState)
                     {
@@ -975,6 +986,7 @@ namespace CaptivityEvents
                     break;
             }
         }
+
         private void CaptiveStateCheck()
         {
             // CaptiveState
@@ -1017,11 +1029,9 @@ namespace CaptivityEvents
                         {
                             mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
                         }
-
                     }
                     else
                     {
-
                         CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale
                             ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu")
                             : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
@@ -1101,6 +1111,7 @@ namespace CaptivityEvents
                         }
 
                         break;
+
                     case CEPersistence.DungeonState.FadeIn:
                         if (brothelTimerOne < missionStateDungeon.CurrentMission.CurrentTime)
                         {
@@ -1111,6 +1122,7 @@ namespace CaptivityEvents
                         }
 
                         break;
+
                     case CEPersistence.DungeonState.Normal:
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -1225,6 +1237,7 @@ namespace CaptivityEvents
                         }
 
                         break;
+
                     case CEPersistence.BrothelState.Normal:
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -1282,6 +1295,7 @@ namespace CaptivityEvents
                             }
 
                             break;
+
                         case CEPersistence.HuntState.Normal:
                         case CEPersistence.HuntState.Hunting:
                         case CEPersistence.HuntState.AfterBattle:
