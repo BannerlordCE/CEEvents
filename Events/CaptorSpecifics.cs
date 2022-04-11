@@ -1,4 +1,5 @@
 ﻿#define V172
+
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -14,14 +15,17 @@ using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
 using static CaptivityEvents.Helper.CEHelper;
+
 #if V171
 #else
+
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Map;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Party.PartyComponents;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
+
 #endif
 
 namespace CaptivityEvents.Events
@@ -30,7 +34,6 @@ namespace CaptivityEvents.Events
     {
         internal void CECaptorContinue(MenuCallbackArgs args)
         {
-
             CEPersistence.animationPlayEvent = false;
 
             try
@@ -133,6 +136,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't release any prisoners.");
             }
         }
+
         internal void CECaptorWoundPrisoners(MenuCallbackArgs args, int amount = 10)
         {
             try
@@ -150,6 +154,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't wound any prisoners.");
             }
         }
+
         internal void CECaptorKillPrisoners(MenuCallbackArgs args, int amount = 10, bool killHeroes = false)
         {
             try
@@ -167,6 +172,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Couldn't kill any prisoners.");
             }
         }
+
         internal void CECaptorPrisonerRebel(MenuCallbackArgs args)
         {
             CEPersistence.animationPlayEvent = false;
@@ -223,7 +229,6 @@ namespace CaptivityEvents.Events
                     prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
                     prisonerParty.IsActive = true;
 
-
                     prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
                                        ? nearest.GatePosition
                                        : nearest.Position2D);
@@ -260,6 +265,7 @@ namespace CaptivityEvents.Events
                 CECaptorContinue(args);
             }
         }
+
         internal void CECaptorHuntPrisoners(MenuCallbackArgs args, int amount = 20)
         {
             CEPersistence.animationPlayEvent = false;
@@ -329,7 +335,7 @@ namespace CaptivityEvents.Events
 
                     MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position2D);
                     string battleSceneForMapPatch = PlayerEncounter.GetBattleSceneForMapPatch(mapPatchAtPosition);
-                    MissionInitializerRecord rec = new MissionInitializerRecord(battleSceneForMapPatch)
+                    MissionInitializerRecord rec = new(battleSceneForMapPatch)
                     {
                         TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                         DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
@@ -356,6 +362,7 @@ namespace CaptivityEvents.Events
                 CECaptorContinue(args);
             }
         }
+
         internal void CECaptorMakeHeroCompanion(Hero captive)
         {
             if (captive == null) return;
@@ -381,21 +388,20 @@ namespace CaptivityEvents.Events
             }
             AddCompanionAction.Apply(Clan.PlayerClan, captive);
         }
+
         internal void CECaptorStripVictim(Hero captive)
         {
             if (captive == null) return;
-            Equipment randomElement = new Equipment(false);
+            Equipment randomElement = new(false);
 
             ItemObject itemObjectBody = captive.IsFemale
                 ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
                 : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
             randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
-            Equipment randomElement2 = new Equipment(true);
+            Equipment randomElement2 = new(true);
             randomElement2.FillFrom(randomElement, false);
 
             if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captive, captive.BattleEquipment, captive.CivilianEquipment);
-
-
 
             foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
             {

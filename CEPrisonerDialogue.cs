@@ -1,4 +1,5 @@
 ﻿#define V172
+
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -13,18 +14,21 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
+
 #if V171
 #else
+
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
+
 #endif
 
 namespace CaptivityEvents
 {
     internal class CEPrisonerDialogue
     {
-        private readonly Dynamics _dynamics = new Dynamics();
+        private readonly Dynamics _dynamics = new();
 
         public void AddPrisonerLines(CampaignGameStarter campaignGameStarter)
         {
@@ -33,7 +37,6 @@ namespace CaptivityEvents
             campaignGameStarter.AddPlayerLine("CELordDefeatedLordAnswerCapture", "CELordDefeatedLordAnswer", "defeat_lord_answer_1", "{=g5G8AJ5n}You are my prisoner now.", null, null, 100, null, null);
             campaignGameStarter.AddPlayerLine("CELordDefeatedLordAnswerRelease", "CELordDefeatedLordAnswer", "defeat_lord_answer_2", "{=vHKkVkAF}You have fought well. You are free to go.", null, new ConversationSentence.OnConsequenceDelegate(LCELordDefeatedLordAnswerReleaseOnConsequence), 100, null, null);
             campaignGameStarter.AddPlayerLine("CELordDefeatedLordAnswerStrip", "CELordDefeatedLordAnswer", "LordDefeatedCaptureCEModAnswer", "{=CEEVENTS1107}Time to strip you of your belongings.", null, ConversationCEEventLordCaptureOnConsequence);
-
 
             campaignGameStarter.AddPlayerLine("LordDefeatedCaptureCEMod", "defeated_lord_answer", "LordDefeatedCaptureCEModAnswer", "{=CEEVENTS1107}Time to strip you of your belongings.", null, ConversationCEEventLordCaptureOnConsequence);
             campaignGameStarter.AddDialogLine("LordDefeatedReturn", "LordDefeatedCaptureCEModAnswer", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, null);
@@ -58,12 +61,10 @@ namespace CaptivityEvents
             campaignGameStarter.AddDialogLine("CEPrisonerInCell_02_r", "CEPrisonerInCell_02_response", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, ConversationCEEventBrothelOnConsequence);
 
             campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "close_window", "{=CEEVENTS1051}Nevermind.", null, null);
-
         }
 
         public void AddCustomLines(CampaignGameStarter campaignGameStarter, List<CEScene> CECustomScenes)
         {
-
             try
             {
                 foreach (CEScene CustomScene in CECustomScenes)
@@ -72,7 +73,6 @@ namespace CaptivityEvents
                     {
                         if (CustomLine.Ref != null && CustomLine.Ref.ToLower() == "ai")
                         {
-
                             campaignGameStarter.AddDialogLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, () => { return ConversationCECustomScenes(CustomScene.Name); }, () =>
                             {
                                 if (CustomLine.OutputToken == "close_window")
@@ -94,17 +94,15 @@ namespace CaptivityEvents
                             );
                         }
                     }
-
                 }
             }
             catch (Exception e)
             {
-                TextObject textObject = new TextObject("{=CEEVENTS0999}Error: failed to initialize scenes");
+                TextObject textObject = new("{=CEEVENTS0999}Error: failed to initialize scenes");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
                 CECustomHandler.ForceLogToFile("Error: failed to initialize scenes");
                 CECustomHandler.ForceLogToFile(e.Message + " : " + e);
             }
-
         }
 
         private bool ConversationCECustomScenes(string SceneName)

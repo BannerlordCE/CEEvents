@@ -1,4 +1,5 @@
 ﻿#define V172
+
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using HarmonyLib;
@@ -6,9 +7,12 @@ using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories;
 using TaleWorlds.Core;
+
 #if V171
 #else
+
 using TaleWorlds.CampaignSystem.Settlements.Workshops;
+
 #endif
 
 namespace CaptivityEvents.Patches
@@ -26,21 +30,18 @@ namespace CaptivityEvents.Patches
         [HarmonyPostfix]
         public static void RefreshList(ClanIncomeVM __instance)
         {
-
-
             foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
             {
-                Workshop workshop = new Workshop(brothel.Settlement, brothel.Name.ToString());
+                Workshop workshop = new(brothel.Settlement, brothel.Name.ToString());
                 WorkshopType workshopType = WorkshopType.Find("brewery");
 
                 workshop.SetWorkshop(brothel.Owner, workshopType, brothel.Capital, true, 0, 1, brothel.Name);
 
-                CEBrothelClanFinanceItemVM brothelFinanceItemVM = new CEBrothelClanFinanceItemVM(brothel, workshop, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh);
+                CEBrothelClanFinanceItemVM brothelFinanceItemVM = new(brothel, workshop, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh);
                 __instance.Incomes.Add(brothelFinanceItemVM);
 
                 Hero.MainHero.RemoveOwnedWorkshop(workshop);
             }
-
 
             // For Nice Purposes of Workshop Number being 1 don't really care about the limit
             int count = CEBrothelBehavior.GetPlayerBrothels().Count;
@@ -57,8 +58,6 @@ namespace CaptivityEvents.Patches
             __instance.RefreshTotalIncome();
             OnIncomeSelection.Invoke(__instance, new[] { GetDefaultIncome.Invoke(__instance, null) });
             __instance.RefreshValues();
-
-            
         }
     }
 }

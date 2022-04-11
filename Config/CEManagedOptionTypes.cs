@@ -4,7 +4,6 @@ using TaleWorlds.Engine.Options;
 
 namespace CaptivityEvents.Config
 {
-
     public interface ICEOptionData
     {
         float GetDefaultValue();
@@ -66,12 +65,12 @@ namespace CaptivityEvents.Config
         {
             if (forceRefresh)
             {
-
             }
             return _value;
         }
 
-        public bool SetValue(float value) {
+        public bool SetValue(float value)
+        {
             float oldValue = _value;
             _value = _onChange(value);
             return oldValue != _value;
@@ -89,7 +88,7 @@ namespace CaptivityEvents.Config
         private float _value;
         private readonly float _defaultValue;
 
-        private readonly Func<float,float> _onChange;
+        private readonly Func<float, float> _onChange;
     }
 
     public class CEActionOptionData : ICEOptionData
@@ -170,6 +169,4 @@ namespace CaptivityEvents.Config
 
         private readonly IEnumerable<SelectionData> _selectableOptionNames;
     }
-
-
 }

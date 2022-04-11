@@ -10,7 +10,6 @@ using TaleWorlds.MountAndBlade.ViewModelCollection.GameOptions;
 
 namespace CaptivityEvents.Config
 {
-
     public abstract class CEGenericOptionDataVM : ViewModel
     {
         protected CEGenericOptionDataVM(CESettingsVM optionsVM, ICEOptionData option, TextObject name, TextObject description, OptionsVM.OptionsDataType typeID)
@@ -331,7 +330,7 @@ namespace CaptivityEvents.Config
             {
                 if (selectableOptionNames.All((SelectionData n) => n.IsLocalizationId))
                 {
-                    List<TextObject> list = new List<TextObject>();
+                    List<TextObject> list = new();
                     foreach (SelectionData selectionData in selectableOptionNames)
                     {
                         TextObject item = Module.CurrentModule.GlobalTextManager.FindText(selectionData.Data, null);
@@ -341,7 +340,7 @@ namespace CaptivityEvents.Config
                     goto IL_183;
                 }
             }
-            List<string> list2 = new List<string>();
+            List<string> list2 = new();
             foreach (SelectionData selectionData2 in selectableOptionNames)
             {
                 if (selectionData2.IsLocalizationId)
@@ -495,5 +494,4 @@ namespace CaptivityEvents.Config
 
         private string _actionName;
     }
-
 }

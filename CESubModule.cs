@@ -87,11 +87,11 @@ namespace CaptivityEvents
         }
 
         // Events
-        public static List<CEEvent> CEEvents = new List<CEEvent>();
+        public static List<CEEvent> CEEvents = new();
 
-        public static List<CEEvent> CEEventList = new List<CEEvent>();
-        public static List<CEEvent> CEWaitingList = new List<CEEvent>();
-        public static List<CEEvent> CECallableEvents = new List<CEEvent>();
+        public static List<CEEvent> CEEventList = new();
+        public static List<CEEvent> CEWaitingList = new();
+        public static List<CEEvent> CECallableEvents = new();
 
         // Captive Variables
         public static bool captivePlayEvent;
@@ -103,7 +103,7 @@ namespace CaptivityEvents
 
         public static string victoryEvent;
         public static string defeatEvent;
-        public static List<TroopRosterElement> playerTroops = new List<TroopRosterElement>();
+        public static List<TroopRosterElement> playerTroops = new();
         public static bool removePlayer = false;
         public static bool destroyParty = false;
         public static bool surrenderParty = false;
@@ -112,7 +112,7 @@ namespace CaptivityEvents
         // Animation Variables
         public static bool animationPlayEvent;
 
-        public static List<string> animationImageList = new List<string>();
+        public static List<string> animationImageList = new();
         public static int animationIndex;
         public static float animationSpeed = 0.03f;
 
@@ -135,13 +135,13 @@ namespace CaptivityEvents
         public static float brothelBlack = 10f;
         public static float brothelFadeOut = 2f;
 
-        public static List<CECustom> CECustomFlags = new List<CECustom>();
-        public static List<CEScene> CECustomScenes = new List<CEScene>();
+        public static List<CECustom> CECustomFlags = new();
+        public static List<CEScene> CECustomScenes = new();
 
-        public static List<CECustomModule> CECustomModules = new List<CECustomModule>();
+        public static List<CECustomModule> CECustomModules = new();
 
         // Images
-        public static Dictionary<string, Texture> CEEventImageList = new Dictionary<string, Texture>();
+        public static Dictionary<string, Texture> CEEventImageList = new();
 
         // Sound
         public static SoundEvent soundEvent = null;
@@ -187,7 +187,7 @@ namespace CaptivityEvents
 #endif
 
         // Sounds for Brothel
-        private static readonly Dictionary<string, int> brothelSounds = new Dictionary<string, int>();
+        private static readonly Dictionary<string, int> brothelSounds = new();
 
         public void LoadTexture(string name, bool swap = false, bool forcelog = false)
         {
@@ -348,7 +348,7 @@ namespace CaptivityEvents
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                     texture.PreloadTexture(false);
-                                    Texture texture2D = new Texture(new EngineTexture(texture));
+                                    Texture texture2D = new(new EngineTexture(texture));
                                     CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
                                 catch (Exception e)
@@ -379,7 +379,7 @@ namespace CaptivityEvents
                         {
                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                             texture.PreloadTexture(false);
-                            Texture texture2D = new Texture(new EngineTexture(texture));
+                            Texture texture2D = new(new EngineTexture(texture));
                             CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                         }
                         catch (Exception e)
@@ -401,7 +401,7 @@ namespace CaptivityEvents
                     {
                         TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                         texture.PreloadTexture(false);
-                        Texture texture2D = new Texture(new EngineTexture(texture));
+                        Texture texture2D = new(new EngineTexture(texture));
                         CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                     }
                     catch (Exception e)
@@ -498,7 +498,7 @@ namespace CaptivityEvents
             {
                 // Load theMount & Blade II Bannerlord\Modules\SandBox\GUI\Brushes
                 // MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.7)
-                SpriteData loadedData = new SpriteData("CESpriteData");
+                SpriteData loadedData = new("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
                 string categoryName = "ce_notification_icons";
@@ -657,7 +657,7 @@ namespace CaptivityEvents
 
                 try
                 {
-                    TextObject textObject = new TextObject("{=CEEVENTS1000}Captivity Events Loaded with {EVENT_COUNT} Events and {IMAGE_COUNT} Images.\n^o^ Enjoy your events. Remember to endorse!");
+                    TextObject textObject = new("{=CEEVENTS1000}Captivity Events Loaded with {EVENT_COUNT} Events and {IMAGE_COUNT} Images.\n^o^ Enjoy your events. Remember to endorse!");
                     textObject.SetTextVariable("EVENT_COUNT", CEPersistence.CEEvents.Count);
                     textObject.SetTextVariable("IMAGE_COUNT", CEPersistence.CEEventImageList.Count);
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
@@ -677,7 +677,7 @@ namespace CaptivityEvents
 
             if (!_isLoaded)
             {
-                TextObject textObject = new TextObject("{=CEEVENTS1005}Error: Captivity Events failed to load events. Please refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs. Mod is disabled.");
+                TextObject textObject = new("{=CEEVENTS1005}Error: Captivity Events failed to load events. Please refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs. Mod is disabled.");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
             }
         }
@@ -761,7 +761,7 @@ namespace CaptivityEvents
             campaignStarter.AddBehavior(new CECampaignBehavior());
             if (CESettings.Instance.ProstitutionControl)
             {
-                CEBrothelBehavior brothelBehavior = new CEBrothelBehavior();
+                CEBrothelBehavior brothelBehavior = new();
                 brothelBehavior.OnSessionLaunched(campaignStarter);
                 campaignStarter.AddBehavior(brothelBehavior);
             }
@@ -771,7 +771,7 @@ namespace CaptivityEvents
                 campaignStarter.AddBehavior(new CESetPrisonerFreeBarterBehavior());
             }
             if (CESettings.Instance.EventCaptiveOn) ReplaceModel<PlayerCaptivityModel, CEPlayerCaptivityModel>(campaignStarter);
-            CEPrisonerDialogue prisonerDialogue = new CEPrisonerDialogue();
+            CEPrisonerDialogue prisonerDialogue = new();
             if (CESettings.Instance.EventCaptorOn && CESettings.Instance.EventCaptorDialogue) prisonerDialogue.AddPrisonerLines(campaignStarter);
             if (CEPersistence.CECustomScenes.Count > 0) prisonerDialogue.AddCustomLines(campaignStarter, CEPersistence.CECustomScenes);
             //if (CESettings.Instance.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
@@ -849,7 +849,7 @@ namespace CaptivityEvents
                 else
                 {
                     CECustomHandler.ForceLogToFile("Failed to load " + _listedEvent.Name + " contains no category flag (Captor, Captive, Random)");
-                    TextObject textObject = new TextObject("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
+                    TextObject textObject = new("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
                     textObject.SetTextVariable("NAME", _listedEvent.Name);
                     textObject.SetTextVariable("TEST", "TEST");
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
@@ -861,7 +861,7 @@ namespace CaptivityEvents
 
                 if (!_isLoadedInGame)
                 {
-                    TextObject textObject = new TextObject("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
+                    TextObject textObject = new("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
                     textObject.SetTextVariable("NAME", _listedEvent.Name);
                     textObject.SetTextVariable("ERROR", e.Message);
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
@@ -1085,7 +1085,7 @@ namespace CaptivityEvents
 
                                 Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
 
-                                WorldPosition worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
+                                WorldPosition worldPosition = new(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
 
                                 if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
                                 {
@@ -1149,7 +1149,7 @@ namespace CaptivityEvents
 
                                 if (CEPersistence.gameEntity != null)
                                 {
-                                    WorldPosition worldPosition = new WorldPosition(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
+                                    WorldPosition worldPosition = new(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
 
                                     if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
                                     {

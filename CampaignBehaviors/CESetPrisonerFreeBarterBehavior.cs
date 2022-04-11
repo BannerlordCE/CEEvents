@@ -1,12 +1,16 @@
 ﻿#define V172
+
 using CaptivityEvents.Config;
 using TaleWorlds.CampaignSystem;
+
 #if V171
 using TaleWorlds.CampaignSystem.Barterables;
 #else
+
 using TaleWorlds.CampaignSystem.BarterSystem;
 using TaleWorlds.CampaignSystem.BarterSystem.Barterables;
 using TaleWorlds.CampaignSystem.Party;
+
 #endif
 
 namespace CaptivityEvents.CampaignBehaviors
@@ -15,7 +19,8 @@ namespace CaptivityEvents.CampaignBehaviors
     {
         public override void RegisterEvents() => CampaignEvents.BarterablesRequested.AddNonSerializedListener(this, CheckForBarters);
 
-        public override void SyncData(IDataStore dataStore) { }
+        public override void SyncData(IDataStore dataStore)
+        { }
 
         public void CheckForBarters(BarterData args)
         {

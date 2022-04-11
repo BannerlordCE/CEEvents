@@ -11,7 +11,7 @@ namespace CaptivityEvents.Events
     {
         public static string CEWaitingList()
         {
-            List<string> eventNames = new List<string>();
+            List<string> eventNames = new();
             int CurrentOrder = 0;
 
             if (CEPersistence.CEWaitingList != null && CEPersistence.CEWaitingList.Count > 0)

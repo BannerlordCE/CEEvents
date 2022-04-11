@@ -1,4 +1,5 @@
 ﻿#define V172
+
 using CaptivityEvents.Config;
 using Helpers;
 using System;
@@ -11,8 +12,10 @@ using static CaptivityEvents.Helper.CEHelper;
 
 #if V171
 #else
+
 using TaleWorlds.CampaignSystem.Issues;
 using TaleWorlds.CampaignSystem.Party;
+
 #endif
 
 namespace CaptivityEvents.Issues
@@ -20,10 +23,11 @@ namespace CaptivityEvents.Issues
     // Quest Reference TaleWorlds.CampaignSystem.SandBox.Issues
     public class CEWhereAreMyThingsIssueBehavior : CampaignBehaviorBase
     {
-        public override void RegisterEvents() { }
+        public override void RegisterEvents()
+        { }
 
-        public override void SyncData(IDataStore dataStore) { }
-
+        public override void SyncData(IDataStore dataStore)
+        { }
 
         public static IssueBase OnStartIssue(in PotentialIssueData potentialIssueData, Hero issueOwner) => new CEWhereAreMyThingsIssue(issueOwner);
 
@@ -33,19 +37,23 @@ namespace CaptivityEvents.Issues
 
             public override bool IsThereAlternativeSolution => false;
             public override bool IsThereLordSolution => false;
-            public override TextObject IssueBriefByIssueGiver => new TextObject("{=CEEVENTS1087}Been looking at this equipment someone left here.");
-            public override TextObject IssueAcceptByPlayer => new TextObject("{=CEEVENTS1086}Hey, that looks like my equipment!");
-            public override TextObject IssueQuestSolutionExplanationByIssueGiver => new TextObject("{=CEEVENTS1085}Well you can pay for it.");
-            public override TextObject IssueQuestSolutionAcceptByPlayer => new TextObject("{=CEEVENTS1084}Are you serious?");
+            public override TextObject IssueBriefByIssueGiver => new("{=CEEVENTS1087}Been looking at this equipment someone left here.");
+            public override TextObject IssueAcceptByPlayer => new("{=CEEVENTS1086}Hey, that looks like my equipment!");
+            public override TextObject IssueQuestSolutionExplanationByIssueGiver => new("{=CEEVENTS1085}Well you can pay for it.");
+            public override TextObject IssueQuestSolutionAcceptByPlayer => new("{=CEEVENTS1084}Are you serious?");
 
-            public override TextObject Title => new TextObject("{=CEEVENTS1089}Missing Equipment");
-            public override TextObject Description => new TextObject("{=CEEVENTS1088}Someone found some equipment that looks like yours.");
+            public override TextObject Title => new("{=CEEVENTS1089}Missing Equipment");
+            public override TextObject Description => new("{=CEEVENTS1088}Someone found some equipment that looks like yours.");
 
-            public CEWhereAreMyThingsIssue(Hero issueOwner) : base(issueOwner, CampaignTime.DaysFromNow(25f)) { }
+            public CEWhereAreMyThingsIssue(Hero issueOwner) : base(issueOwner, CampaignTime.DaysFromNow(25f))
+            {
+            }
 
-            protected override void AfterIssueCreation() { }
+            protected override void AfterIssueCreation()
+            { }
 
-            protected override void OnGameLoad() { }
+            protected override void OnGameLoad()
+            { }
 
             protected override QuestBase GenerateIssueQuest(string questId)
             {
@@ -59,7 +67,8 @@ namespace CaptivityEvents.Issues
 
             public override bool IssueStayAliveConditions() => true;
 
-            protected override void CompleteIssueWithTimedOutConsequences() { }
+            protected override void CompleteIssueWithTimedOutConsequences()
+            { }
 
             protected override bool CanPlayerTakeQuestConditions(Hero issueGiver, out PreconditionFlags flag, out Hero relationHero, out SkillObject skill)
             {
@@ -120,7 +129,8 @@ namespace CaptivityEvents.Issues
                 SetDialogs();
             }
 
-            protected override void RegisterEvents() { }
+            protected override void RegisterEvents()
+            { }
 
             protected override void SetDialogs()
             {
@@ -180,7 +190,7 @@ namespace CaptivityEvents.Issues
             {
                 get
                 {
-                    TextObject textObject = new TextObject("{=CEEVENTS1077}{QUEST_GIVER.LINK} of {QUEST_SETTLEMENT.LINK} has found your equipment you must find {?QUEST_GIVER.GENDER}her{?}him{\\?}. Otherwise they will sell it.");
+                    TextObject textObject = new("{=CEEVENTS1077}{QUEST_GIVER.LINK} of {QUEST_SETTLEMENT.LINK} has found your equipment you must find {?QUEST_GIVER.GENDER}her{?}him{\\?}. Otherwise they will sell it.");
                     StringHelpers.SetCharacterProperties("QUEST_GIVER", QuestGiver.CharacterObject, textObject);
                     StringHelpers.SetSettlementProperties("QUEST_SETTLEMENT", QuestGiver.CurrentSettlement, textObject);
 
@@ -192,7 +202,7 @@ namespace CaptivityEvents.Issues
             {
                 get
                 {
-                    TextObject textObject = new TextObject("{=CEEVENTS1076}You have recovered your equipment back from {QUEST_GIVER.LINK}.");
+                    TextObject textObject = new("{=CEEVENTS1076}You have recovered your equipment back from {QUEST_GIVER.LINK}.");
                     StringHelpers.SetCharacterProperties("QUEST_GIVER", QuestGiver.CharacterObject, textObject);
 
                     return textObject;
@@ -203,7 +213,7 @@ namespace CaptivityEvents.Issues
             {
                 get
                 {
-                    TextObject textObject = new TextObject("{=CEEVENTS1075}You have failed to recover your equipment.");
+                    TextObject textObject = new("{=CEEVENTS1075}You have failed to recover your equipment.");
 
                     return textObject;
                 }
@@ -213,7 +223,7 @@ namespace CaptivityEvents.Issues
             {
                 get
                 {
-                    TextObject textObject = new TextObject("{=CEEVENTS1074}You have failed to recover your equipment in time.");
+                    TextObject textObject = new("{=CEEVENTS1074}You have failed to recover your equipment in time.");
 
                     return textObject;
                 }

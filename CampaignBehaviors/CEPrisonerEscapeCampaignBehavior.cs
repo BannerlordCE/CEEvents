@@ -1,4 +1,5 @@
 #define V172
+
 using CaptivityEvents.Config;
 using System;
 using System.Collections.Generic;
@@ -9,10 +10,12 @@ using TaleWorlds.Core;
 #if V171
 using TaleWorlds.CampaignSystem.Barterables;
 #else
+
 using TaleWorlds.CampaignSystem.BarterSystem;
 using TaleWorlds.CampaignSystem.BarterSystem.Barterables;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
+
 #endif
 
 namespace CaptivityEvents.CampaignBehaviors
@@ -20,31 +23,30 @@ namespace CaptivityEvents.CampaignBehaviors
     // PrisonerReleaseCampaignBehavior
     public class CEPrisonerEscapeCampaignBehavior : CampaignBehaviorBase
     {
-
         public override void RegisterEvents()
         {
             CampaignEvents.DailyTickHeroEvent.AddNonSerializedListener(this, DailyHeroTick);
             CampaignEvents.HourlyTickPartyEvent.AddNonSerializedListener(this, HourlyPartyTick);
         }
 
-        public override void SyncData(IDataStore dataStore) { }
+        public override void SyncData(IDataStore dataStore)
+        { }
 
         // DailyHeroTick
         public void DailyHeroTick(Hero hero)
         {
-
             if (!hero.IsPrisoner || hero.PartyBelongedToAsPrisoner == null || hero == Hero.MainHero) return;
 
             if (CESettings.Instance.EscapeAutoRansom.SelectedIndex == 1 && hero.Clan != null && hero.PartyBelongedToAsPrisoner.MapFaction != null && MBRandom.RandomFloat < 0.1f)
             {
                 // DiplomaticBartersBehavior
                 IFaction mapFaction = hero.PartyBelongedToAsPrisoner.MapFaction;
-                SetPrisonerFreeBarterable setPrisonerFreeBarterable = new SetPrisonerFreeBarterable(hero, mapFaction.Leader, hero.PartyBelongedToAsPrisoner, hero.Clan.Leader);
+                SetPrisonerFreeBarterable setPrisonerFreeBarterable = new(hero, mapFaction.Leader, hero.PartyBelongedToAsPrisoner, hero.Clan.Leader);
                 if (setPrisonerFreeBarterable.GetValueForFaction(mapFaction) + setPrisonerFreeBarterable.GetValueForFaction(hero.Clan) > 0)
                 {
                     IEnumerable<Barterable> baseBarterables = new Barterable[] { setPrisonerFreeBarterable };
 
-                    BarterData barterData = new BarterData(mapFaction.Leader, hero.Clan.Leader, null, null, null, 0, true);
+                    BarterData barterData = new(mapFaction.Leader, hero.Clan.Leader, null, null, null, 0, true);
                     barterData.AddBarterGroup(new DefaultsBarterGroup());
                     foreach (Barterable barterable in baseBarterables)
                     {
@@ -172,7 +174,6 @@ namespace CaptivityEvents.CampaignBehaviors
                 if (!customCheck) return false;
                 int numEscapeChance = isHeroParty ? CESettings.Instance.PrisonerNonHeroEscapeChanceParty : CESettings.Instance.PrisonerNonHeroEscapeChanceOther;
                 if (MBRandom.RandomInt(100) < numEscapeChance) capturerParty.PrisonRoster.AddToCounts(character, -1);
-
             }
 
             return true;

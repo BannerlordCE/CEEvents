@@ -1,4 +1,5 @@
 ﻿#define V172
+
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -10,10 +11,13 @@ using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+
 #if V171
 #else
+
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
+
 #endif
 
 namespace CaptivityEvents.Notifications
@@ -70,7 +74,7 @@ namespace CaptivityEvents.Notifications
                 {
                     if (Game.Current.GameStateManager.ActiveState is not MapState mapState)
                     {
-                        TextObject textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
+                        TextObject textObject = new("{=CEEVENTS1058}Event conditions are no longer met.");
                         InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
                         return;
                     }
@@ -98,13 +102,13 @@ namespace CaptivityEvents.Notifications
                 }
                 else
                 {
-                    TextObject textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
+                    TextObject textObject = new("{=CEEVENTS1058}Event conditions are no longer met.");
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
                 }
             }
             else
             {
-                TextObject textObject = new TextObject("{=CEEVENTS1058}Event conditions are no longer met.");
+                TextObject textObject = new("{=CEEVENTS1058}Event conditions are no longer met.");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
             }
         }

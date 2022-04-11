@@ -1,4 +1,5 @@
 ﻿#define V172
+
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -14,8 +15,10 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
+
 #if V171
 #else
+
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Encounters;
@@ -26,6 +29,7 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Party.PartyComponents;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
+
 #endif
 
 namespace CaptivityEvents.Events
@@ -36,8 +40,8 @@ namespace CaptivityEvents.Events
         private readonly List<CEEvent> _eventList;
         private readonly Option _option;
 
-        private readonly Dynamics _dynamics = new Dynamics();
-        private readonly ScoresCalculation _score = new ScoresCalculation();
+        private readonly Dynamics _dynamics = new();
+        private readonly ScoresCalculation _score = new();
 
         public SharedCallBackHelper(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
@@ -46,7 +50,8 @@ namespace CaptivityEvents.Events
             _eventList = eventList;
         }
 
-#region Consequences
+        #region Consequences
+
         internal void ConsequenceXP()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveXP))
@@ -64,10 +69,12 @@ namespace CaptivityEvents.Events
                 catch (Exception) { CECustomHandler.LogToFile("GiveXP Failed"); }
             }
         }
+
         internal void ConsequenceLeaveSpouse()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveLeaveSpouse)) _dynamics.ChangeSpouse(Hero.MainHero, null);
         }
+
         internal void ConsequenceGold()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) return;
@@ -78,6 +85,7 @@ namespace CaptivityEvents.Events
             content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveGold);
             GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, content);
         }
+
         internal void ConsequenceChangeGold()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) return;
@@ -94,11 +102,11 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
         }
+
         internal void ConsequenceChangeTrait()
         {
             try
             {
-
                 if (_option.TraitsToLevel != null && _option.TraitsToLevel.Count(TraitToLevel => TraitToLevel.Ref.ToLower() == "hero") != 0)
                 {
                     foreach (TraitToLevel traitToLevel in _option.TraitsToLevel)
@@ -147,11 +155,11 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
         }
+
         internal void ConsequenceChangeSkill()
         {
             try
             {
-
                 if (_option.SkillsToLevel != null && _option.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref.ToLower() == "hero") != 0)
                 {
                     foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
@@ -197,10 +205,10 @@ namespace CaptivityEvents.Events
                     else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillToLevel)) new Dynamics().SkillModifier(Hero.MainHero, _listedEvent.SkillToLevel, level, xp);
                     else CECustomHandler.LogToFile("Missing SkillToLevel");
                 }
-
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }
+
         internal void ConsequenceSlaveryLevel()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSlaveryLevel)) return;
@@ -217,6 +225,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid SlaveryTotal"); }
         }
+
         internal void ConsequenceSlaveryFlags()
         {
             bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
@@ -225,6 +234,7 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddSlaveryFlag)) _dynamics.VictimSlaveryModifier(1, Hero.MainHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveSlaveryFlag)) _dynamics.VictimSlaveryModifier(0, Hero.MainHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
         }
+
         internal void ConsequenceProstitutionLevel()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeProstitutionLevel)) return;
@@ -241,6 +251,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid ProstitutionTotal"); }
         }
+
         internal void ConsequenceProstitutionFlags()
         {
             bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
@@ -249,6 +260,7 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag)) _dynamics.VictimProstitutionModifier(1, Hero.MainHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) _dynamics.VictimProstitutionModifier(0, Hero.MainHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
         }
+
         internal void ConsequenceSpawnTroop()
         {
             if (_option.SpawnTroops != null)
@@ -256,6 +268,7 @@ namespace CaptivityEvents.Events
                 new CESpawnSystem().SpawnTheTroops(_option.SpawnTroops, PartyBase.MainParty);
             }
         }
+
         internal void ConsequenceSpawnHero()
         {
             if (_option.SpawnHeroes != null)
@@ -263,6 +276,7 @@ namespace CaptivityEvents.Events
                 new CESpawnSystem().SpawnTheHero(_option.SpawnHeroes, PartyBase.MainParty);
             }
         }
+
         internal void ConsequenceRenown()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRenown)) return;
@@ -279,6 +293,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid RenownTotal"); }
         }
+
         internal void ConsequenceChangeHealth()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeHealth)) return;
@@ -295,12 +310,13 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Missing HealthTotal"); }
         }
+
         internal void ConsequenceChangeMorale()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
 
             PartyBase party = PlayerCaptivity.IsCaptive
-                ? PlayerCaptivity.CaptorParty //captive         
+                ? PlayerCaptivity.CaptorParty //captive
                 : PartyBase.MainParty; //random, captor
 
             try
@@ -315,6 +331,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid MoralTotal"); }
         }
+
         internal void ConsequenceStripPlayer()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StripPlayer)) return;
@@ -352,11 +369,10 @@ namespace CaptivityEvents.Events
                 if (CESettingsIntegrations.Instance == null && clothingLevel == "slave" || !CESettingsIntegrations.Instance.ActivateKLBShackles && clothingLevel == "slave") return;
 
                 if (CESettings.Instance != null && !CESettings.Instance.StolenGear && !forced) return;
-                Equipment randomElement = new Equipment(false);
+                Equipment randomElement = new(false);
 
                 if (clothingLevel != "nude")
                 {
-
                     if (MBRandom.Random.Next(100) < CESettings.Instance.BetterOutFitChance && clothingLevel == "default" || clothingLevel == "advanced")
                     {
                         string bodyString = "";
@@ -380,6 +396,7 @@ namespace CaptivityEvents.Events
                                     : "rough_tied_boots";
                                 glovesString = "armwraps";
                                 break;
+
                             case CultureCode.Aserai:
                                 headString = Hero.MainHero.IsFemale
                                     ? ""
@@ -394,6 +411,7 @@ namespace CaptivityEvents.Events
                                 capeString = "wrapped_scarf";
                                 glovesString = "armwraps";
                                 break;
+
                             case CultureCode.Khuzait:
                                 headString = "fur_hat";
                                 capeString = "wrapped_scarf";
@@ -405,6 +423,7 @@ namespace CaptivityEvents.Events
                                     : "rough_tied_boots";
                                 glovesString = "armwraps";
                                 break;
+
                             case CultureCode.Empire:
                                 headString = Hero.MainHero.IsFemale
                                     ? "female_head_wrap"
@@ -418,6 +437,7 @@ namespace CaptivityEvents.Events
                                 capeString = "wrapped_scarf";
                                 glovesString = "armwraps";
                                 break;
+
                             case CultureCode.Battania:
                                 headString = Hero.MainHero.IsFemale
                                     ? "female_head_wrap"
@@ -431,6 +451,7 @@ namespace CaptivityEvents.Events
                                     : "burlap_waistcoat";
                                 legString = "ragged_boots";
                                 break;
+
                             case CultureCode.Vlandia:
                                 headString = Hero.MainHero.IsFemale
                                     ? "female_head_wrap"
@@ -444,6 +465,7 @@ namespace CaptivityEvents.Events
                                 capeString = "wrapped_scarf";
                                 glovesString = "armwraps";
                                 break;
+
                             case CultureCode.Invalid:
                             case CultureCode.Nord:
                             case CultureCode.Darshi:
@@ -506,7 +528,7 @@ namespace CaptivityEvents.Events
                         ItemObject itemObjectGloves = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth1a");
                         randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Gloves, new EquipmentElement(itemObjectGloves));
                     }
-                    else if(clothingLevel == "custom")
+                    else if (clothingLevel == "custom")
                     {
                         ItemObject itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(customBody);
                         ItemObject itemObjectCape = MBObjectManager.Instance.GetObject<ItemObject>(customCape);
@@ -580,21 +602,26 @@ namespace CaptivityEvents.Events
                                 rangedItem = "nordic_shortbow";
                                 rangedAmmo = "default_arrows";
                                 break;
+
                             case CultureCode.Vlandia:
                                 rangedItem = "crossbow_a";
                                 rangedAmmo = "tournament_bolts";
                                 break;
+
                             case CultureCode.Aserai:
                                 rangedItem = "tribal_bow";
                                 rangedAmmo = "default_arrows";
                                 break;
+
                             case CultureCode.Empire:
                                 rangedItem = "hunting_bow";
                                 rangedAmmo = "default_arrows";
                                 break;
+
                             case CultureCode.Battania:
                                 rangedItem = "northern_javelin_2_t3";
                                 break;
+
                             case CultureCode.Invalid:
                             case CultureCode.Khuzait:
                             case CultureCode.Nord:
@@ -623,9 +650,8 @@ namespace CaptivityEvents.Events
                     }
                 }
 
-                Equipment randomElement2 = new Equipment(true);
+                Equipment randomElement2 = new(true);
                 randomElement2.FillFrom(randomElement, false);
-
 
                 if (CESettings.Instance != null && MBRandom.Random.Next(100)
                     < (CESettings.Instance.HorseSkill
@@ -633,16 +659,15 @@ namespace CaptivityEvents.Events
                         : CESettings.Instance.HorseChance) && mountLevel == "default" || mountLevel == "basic")
                 {
                     ItemObject poorHorse = MBObjectManager.Instance.GetObject<ItemObject>("sumpter_horse");
-                    EquipmentElement horseEquipment = new EquipmentElement(poorHorse);
+                    EquipmentElement horseEquipment = new(poorHorse);
 
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Horse, horseEquipment);
                 }
 
-
                 if (CESettings.Instance != null && (CESettings.Instance.StolenGearQuest && MBRandom.Random.Next(100) < CESettings.Instance.StolenGearChance) && questEnabled)
                 {
                     Hero issueOwner = null;
-                    List<TextObject> listOfSettlements = new List<TextObject>();
+                    List<TextObject> listOfSettlements = new();
 
                     while (issueOwner == null)
                     {
@@ -655,7 +680,7 @@ namespace CaptivityEvents.Events
 
                         if (issueOwner == null) continue;
 
-                        PotentialIssueData potentialIssueData = new PotentialIssueData(CEWhereAreMyThingsIssueBehavior.OnStartIssue, typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), IssueBase.IssueFrequency.Rare);
+                        PotentialIssueData potentialIssueData = new(CEWhereAreMyThingsIssueBehavior.OnStartIssue, typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), IssueBase.IssueFrequency.Rare);
 
                         Campaign.Current.IssueManager.CreateNewIssue(potentialIssueData, issueOwner);
                         Campaign.Current.IssueManager.StartIssueQuest(issueOwner);
@@ -664,14 +689,13 @@ namespace CaptivityEvents.Events
 
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(Hero.MainHero, randomElement);
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(Hero.MainHero, randomElement2);
-
             }
             catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("ConsequenceStripPlayer : " + e.ToString());
             }
-
         }
+
         internal void ConsequenceStartBattle(Action callback, int type)
         {
             try
@@ -721,7 +745,6 @@ namespace CaptivityEvents.Events
                         {
                             foreach (SpawnTroop troop in _option.BattleSettings.SpawnTroops)
                             {
-
                                 try
                                 {
                                     int num = new CEVariablesLoader().GetIntFromXML(troop.Number);
@@ -815,7 +838,7 @@ namespace CaptivityEvents.Events
 
                             if (!CEPersistence.playerTroops.IsEmpty())
                             {
-                                List<CharacterObject> list = new List<CharacterObject>();
+                                List<CharacterObject> list = new();
                                 int num = new CEVariablesLoader().GetIntFromXML(_option.BattleSettings.PlayerTroops);
                                 foreach (TroopRosterElement troopRosterElement in from t in CEPersistence.playerTroops
                                                                                   orderby t.Character.Level descending
@@ -863,14 +886,13 @@ namespace CaptivityEvents.Events
                                         Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
-
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
                                         customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
                                         customParty.MemberRoster.Clear();
                                         customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
 
-                                        TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
+                                        TextObject textObject = new(_option.BattleSettings.EnemyName ?? "Bandits", null);
                                         customParty.SetCustomName(textObject);
 
                                         EnterSettlementAction.ApplyForParty(customParty, Settlement.CurrentSettlement);
@@ -883,12 +905,11 @@ namespace CaptivityEvents.Events
 
                                         PlayerEncounter.Current.ForceAlleyFight = true;
                                         PlayerEncounter.StartBattle();
-                                        PlayerEncounter.StartAlleyFightMission();                    
+                                        PlayerEncounter.StartAlleyFightMission();
                                         break;
                                     }
                                 case "regularspawn":
                                     {
-
                                         //SpawnAPartyInFaction
                                         Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
@@ -904,7 +925,7 @@ namespace CaptivityEvents.Events
                                         customParty.MemberRoster.Clear();
                                         customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
 
-                                        TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
+                                        TextObject textObject = new(_option.BattleSettings.EnemyName ?? "Bandits", null);
                                         customParty.SetCustomName(textObject);
 
                                         // InitBanditParty
@@ -940,7 +961,7 @@ namespace CaptivityEvents.Events
 
                                         MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position2D);
                                         string battleSceneForMapPatch = PlayerEncounter.GetBattleSceneForMapPatch(mapPatchAtPosition);
-                                        MissionInitializerRecord rec = new MissionInitializerRecord(battleSceneForMapPatch)
+                                        MissionInitializerRecord rec = new(battleSceneForMapPatch)
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
@@ -960,7 +981,6 @@ namespace CaptivityEvents.Events
                                     }
                                 case "regular":
                                     {
-
                                         //SpawnAPartyInFaction
                                         Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
@@ -975,7 +995,7 @@ namespace CaptivityEvents.Events
                                         customParty.MemberRoster.Clear();
                                         customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
 
-                                        TextObject textObject = new TextObject(_option.BattleSettings.EnemyName ?? "Bandits", null);
+                                        TextObject textObject = new(_option.BattleSettings.EnemyName ?? "Bandits", null);
                                         customParty.SetCustomName(textObject);
 
                                         // InitBanditParty
@@ -1010,7 +1030,7 @@ namespace CaptivityEvents.Events
                                         //EncounterAttackConsequence
                                         MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position2D);
                                         string battleSceneForMapPatch = PlayerEncounter.GetBattleSceneForMapPatch(mapPatchAtPosition);
-                                        MissionInitializerRecord rec = new MissionInitializerRecord(battleSceneForMapPatch)
+                                        MissionInitializerRecord rec = new(battleSceneForMapPatch)
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
                                             DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
@@ -1032,7 +1052,6 @@ namespace CaptivityEvents.Events
                                     CECustomHandler.ForceLogToFile("ConsequenceStartBattle : no battle type set");
                                     break;
                             }
-
                         }
                         catch (Exception e)
                         {
@@ -1056,8 +1075,8 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("ConsequenceStartBattle Failed: " + e);
                 callback();
             }
-
         }
+
         internal void ConsequencePlaySound(bool isListedEvent = false)
         {
             try
@@ -1084,7 +1103,6 @@ namespace CaptivityEvents.Events
                     CEPersistence.soundEvent = SoundEvent.CreateEvent(soundIndex, _mapScene);
                     CEPersistence.soundEvent.Play();
                 }
-
             }
             catch (Exception e)
             {
@@ -1110,7 +1128,7 @@ namespace CaptivityEvents.Events
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.TeleportPlayer)) return;
             try
             {
-                TeleportSettings teleportSettings = new TeleportSettings();
+                TeleportSettings teleportSettings = new();
                 if (_option.TeleportSettings != null)
                 {
                     teleportSettings = _option.TeleportSettings;
@@ -1150,6 +1168,7 @@ namespace CaptivityEvents.Events
                                }),
                             };
                             break;
+
                         case "castle":
                             nearest = distance switch
                             {
@@ -1163,6 +1182,7 @@ namespace CaptivityEvents.Events
                                }),
                             };
                             break;
+
                         case "hideout":
                             nearest = distance switch
                             {
@@ -1177,6 +1197,7 @@ namespace CaptivityEvents.Events
                             };
                             nearest.Hideout.IsSpotted = true;
                             break;
+
                         default:
                             nearest = distance switch
                             {
@@ -1191,7 +1212,6 @@ namespace CaptivityEvents.Events
                             };
                             break;
                     }
-
 
                     if (Hero.MainHero.IsPrisoner)
                     {
@@ -1235,7 +1255,7 @@ namespace CaptivityEvents.Events
             {
                 if (_option.SceneSettings != null)
                 {
-                    ConversationCharacterData data1 = new ConversationCharacterData(Hero.MainHero.CharacterObject);
+                    ConversationCharacterData data1 = new(Hero.MainHero.CharacterObject);
 
                     CharacterObject character2 = null;
 
@@ -1243,13 +1263,14 @@ namespace CaptivityEvents.Events
                     {
                         case "none":
                             break;
+
                         default:
                             character2 = Hero.MainHero.IsPrisoner ? Hero.MainHero.PartyBelongedToAsPrisoner.LeaderHero?.CharacterObject ?? Hero.MainHero.PartyBelongedToAsPrisoner.MemberRoster.GetCharacterAtIndex(0) : _listedEvent.Captive;
                             break;
                     }
 
                     character2.StringId = "CECustomStringId_" + _option.SceneSettings.SceneName;
-                    ConversationCharacterData data2 = new ConversationCharacterData(character2);
+                    ConversationCharacterData data2 = new(character2);
 
                     CampaignMission.OpenConversationMission(data1, data2);
                 }
@@ -1259,7 +1280,8 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("ConsequenceMission Failed: " + e);
             }
         }
-#endregion
+
+        #endregion Consequences
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {
@@ -1274,7 +1296,7 @@ namespace CaptivityEvents.Events
 
                 if (_listedEvent.Backgrounds != null)
                 {
-                    List<string> backgroundNames = new List<string>();
+                    List<string> backgroundNames = new();
                     foreach (Background background in _listedEvent.Backgrounds)
                     {
                         try
@@ -1290,7 +1312,6 @@ namespace CaptivityEvents.Events
                                     CECustomHandler.ForceLogToFile("Couldn't find " + background.UseConditions + " in events.");
                                     continue;
                                 }
-
 
                                 string conditionMatched = null;
                                 if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
@@ -1409,6 +1430,5 @@ namespace CaptivityEvents.Events
                 new CESubModule().LoadTexture(textureFlag);
             }
         }
-
     }
 }

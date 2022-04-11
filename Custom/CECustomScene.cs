@@ -4,7 +4,6 @@ using System.Xml.Serialization;
 
 namespace CaptivityEvents.Custom
 {
-
     [DebuggerStepThrough]
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = "", IsNullable = true)]
@@ -25,7 +24,6 @@ namespace CaptivityEvents.Custom
 
         [XmlAttribute()]
         public string Text { get; set; }
-
     }
 
     [DebuggerStepThrough]
@@ -36,7 +34,6 @@ namespace CaptivityEvents.Custom
     {
         [XmlElement("Line")]
         public Line[] Lines { get; set; }
-
     }
 
     [DebuggerStepThrough]
@@ -45,7 +42,6 @@ namespace CaptivityEvents.Custom
     [Serializable]
     public class CEScene
     {
-
         public string Name { get; set; }
 
         [XmlElement("Dialogue", IsNullable = true)]

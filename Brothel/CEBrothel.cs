@@ -1,13 +1,17 @@
 ﻿#define V172
+
 using System;
 using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
+
 #if V171
 #else
+
 using TaleWorlds.CampaignSystem.Settlements;
+
 #endif
 
 namespace CaptivityEvents.Brothel
@@ -44,7 +48,7 @@ namespace CaptivityEvents.Brothel
         public int NotRunnedDays = 0;
 
         [SaveableField(7)]
-        public readonly TextObject Name = new TextObject("{=CEEVENTS1099}Brothel");
+        public readonly TextObject Name = new("{=CEEVENTS1099}Brothel");
 
         [SaveableField(8)]
         public int Capital;

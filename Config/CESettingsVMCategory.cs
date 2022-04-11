@@ -5,7 +5,6 @@ using TaleWorlds.MountAndBlade;
 
 namespace CaptivityEvents.Config
 {
-
     public class CESettingsVMCategory : ViewModel
     {
         public CESettingsVMCategory(CESettingsVM options, TextObject name, IEnumerable<ICEOptionData> targetList, bool isNative)
@@ -16,13 +15,13 @@ namespace CaptivityEvents.Config
             foreach (ICEOptionData optionData in targetList)
             {
                 string text = optionData.GetName().ToString();
-                TextObject name2 = new TextObject(text);
-                TextObject textObject = new TextObject(text);
+                TextObject name2 = new(text);
+                TextObject textObject = new(text);
                 textObject.SetTextVariable("newline", "\n");
                 CEActionOptionData actionOptionData;
                 if (optionData is ICEBooleanOptionData)
                 {
-                    CEBooleanOptionDataVM booleanOptionDataVM = new CEBooleanOptionDataVM(options, optionData as ICEBooleanOptionData, name2, textObject)
+                    CEBooleanOptionDataVM booleanOptionDataVM = new(options, optionData as ICEBooleanOptionData, name2, textObject)
                     {
                         ImageIDs = new string[]
                     {
@@ -34,13 +33,13 @@ namespace CaptivityEvents.Config
                 }
                 else if (optionData is ICENumericOptionData)
                 {
-                    CENumericOptionDataVM item = new CENumericOptionDataVM(options, optionData as ICENumericOptionData, name2, textObject);
+                    CENumericOptionDataVM item = new(options, optionData as ICENumericOptionData, name2, textObject);
                     _options.Add(item);
                 }
                 else if (optionData is ICESelectionOptionData)
                 {
                     ICESelectionOptionData selectionOptionData = optionData as ICESelectionOptionData;
-                    CEStringOptionDataVM stringOptionDataVM = new CEStringOptionDataVM(options, selectionOptionData, name2, textObject);
+                    CEStringOptionDataVM stringOptionDataVM = new(options, selectionOptionData, name2, textObject);
                     string[] array = new string[selectionOptionData.GetSelectableOptionsLimit()];
                     for (int i = 0; i < array.Length; i++)
                     {
@@ -52,7 +51,7 @@ namespace CaptivityEvents.Config
                 else if ((actionOptionData = (optionData as CEActionOptionData)) != null)
                 {
                     TextObject optionActionName = Module.CurrentModule.GlobalTextManager.FindText("str_options_type_action", text);
-                    CEActionOptionDataVM item2 = new CEActionOptionDataVM(actionOptionData.OnAction, options, actionOptionData, name2, optionActionName, textObject);
+                    CEActionOptionDataVM item2 = new(actionOptionData.OnAction, options, actionOptionData, name2, optionActionName, textObject);
                     _options.Add(item2);
                 }
             }

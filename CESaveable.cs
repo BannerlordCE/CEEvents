@@ -9,7 +9,9 @@ namespace CaptivityEvents
 {
     public class CESaveable : SaveableTypeDefiner
     {
-        public CESaveable() : base(82185785) { }
+        public CESaveable() : base(82185785)
+        {
+        }
 
         protected override void DefineClassTypes()
         {

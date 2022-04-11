@@ -1,4 +1,5 @@
 ﻿#define V172
+
 using CaptivityEvents.Custom;
 using System;
 using System.Linq;
@@ -6,10 +7,13 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
 using TaleWorlds.ObjectSystem;
+
 #if V171
 #else
+
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
+
 #endif
 
 namespace CaptivityEvents.Events
@@ -59,9 +63,9 @@ namespace CaptivityEvents.Events
                 }
             }
         }
+
         public void SpawnTheHero(SpawnHero[] variables, PartyBase party)
         {
-
             foreach (SpawnHero heroVariables in variables)
             {
                 try
@@ -91,7 +95,6 @@ namespace CaptivityEvents.Events
                     CharacterObject wanderer = cultureObject.NotableAndWandererTemplates.GetRandomElementWithPredicate((CharacterObject x) => x.Occupation == Occupation.Wanderer && (heroVariables.Gender == null || x.IsFemale == isFemale));
                     Settlement randomElement = Settlement.All.GetRandomElementWithPredicate((Settlement settlement) => settlement.Culture == wanderer.Culture && settlement.IsTown);
 
-
                     Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElementInefficiently(), null, -1);
 
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);
@@ -104,9 +107,11 @@ namespace CaptivityEvents.Events
                             case "captor":
                                 AddCompanionAction.Apply(party.Owner.Clan, hero);
                                 break;
+
                             case "player":
                                 AddCompanionAction.Apply(Clan.PlayerClan, hero);
                                 break;
+
                             default:
                                 break;
                         }
@@ -149,7 +154,6 @@ namespace CaptivityEvents.Events
                 {
                     CECustomHandler.ForceLogToFile("Failed to SpawnTheHero : " + e);
                 }
-
             }
         }
     }

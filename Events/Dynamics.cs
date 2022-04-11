@@ -1,4 +1,5 @@
 ﻿#define V172
+
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -14,12 +15,15 @@ using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+
 #if V171
 #else
+
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
+
 #endif
 
 namespace CaptivityEvents.Events
@@ -47,7 +51,6 @@ namespace CaptivityEvents.Events
             //textObject.SetTextVariable("SKILL_AMOUNT", amount);
             //InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
         }
-
 
         internal void RemoveFactionLeader(Hero hero)
         {
@@ -131,7 +134,6 @@ namespace CaptivityEvents.Events
 
         private void TraitObjectModifier(TraitObject traitObject, Color color, Hero hero, string trait, int amount, int xp, bool display)
         {
-
             if (xp == 0)
             {
                 int currentTraitLevel = hero.GetTraitLevel(traitObject);
@@ -168,8 +170,6 @@ namespace CaptivityEvents.Events
                     CECustomHandler.ForceLogToFile("Failed TraitObjectModifier " + e);
                 }
             }
-
-
         }
 
         internal void TraitModifier(Hero hero, string trait, int amount, int xp, bool display = true, string color = "gray")
@@ -211,7 +211,6 @@ namespace CaptivityEvents.Events
             //#endif
 
             if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + trait);
-
         }
 
         private void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp, bool display = true, bool resetSkill = false)
@@ -303,8 +302,6 @@ namespace CaptivityEvents.Events
             {
                 hero.HeroDeveloper.AddSkillXp(skillObject, xp, true, display);
             }
-
-
         }
 
         internal Color PickColor(string color)
@@ -334,7 +331,6 @@ namespace CaptivityEvents.Events
         {
             bool found = false;
 
-
             foreach (SkillObject skillObjectCustom in CESkills.CustomSkills)
             {
                 if (skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill)
@@ -346,7 +342,6 @@ namespace CaptivityEvents.Events
             }
 
             if (found) return;
-
 
             foreach (SkillObject skillObject in Skills.All)
             {
@@ -360,7 +355,6 @@ namespace CaptivityEvents.Events
 
             if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + skill);
         }
-
 
         private void SetModifier(int amount, Hero hero, SkillObject skill, SkillObject flag, bool displayMessage = true, bool quickInformation = false)
         //Warning: SkillObject flag never used.
@@ -612,7 +606,6 @@ namespace CaptivityEvents.Events
                     Banner banner = null;
                     Hero leader = null;
 
-
                     if (clanOption.Clan != null)
                     {
                         switch (clanOption.Clan.ToLower())
@@ -622,9 +615,11 @@ namespace CaptivityEvents.Events
                                 banner = Banner.CreateRandomClanBanner();
                                 leader = clanOption.Ref.ToLower() == "captor" ? captor : hero;
                                 break;
+
                             case "random":
                                 clan = Clan.All.GetRandomElement();
                                 break;
+
                             case "hero":
                                 clan = hero?.Clan;
                                 if (clan == null)
@@ -634,6 +629,7 @@ namespace CaptivityEvents.Events
                                     leader = hero;
                                 }
                                 break;
+
                             case "captor":
                                 clan = captor?.Clan;
                                 if (clan == null)
@@ -643,6 +639,7 @@ namespace CaptivityEvents.Events
                                     leader = captor;
                                 }
                                 break;
+
                             case "settlement":
                                 clan = clanOption.Ref.ToLower() == "captor" ? captor.CurrentSettlement.OwnerClan : hero.CurrentSettlement.OwnerClan;
                                 break;
@@ -676,7 +673,6 @@ namespace CaptivityEvents.Events
                         text.SetTextVariable("CLAN", clanName);
                         InformationManager.DisplayMessage(new InformationMessage(text.ToString(), Colors.Magenta));
 
-
                         CECustomHandler.ForceLogToFile("Failed ClanChange : clan is null ");
                         return;
                     }
@@ -694,19 +690,19 @@ namespace CaptivityEvents.Events
                         case "join":
                             ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan);
                             break;
+
                         case "joinasleader":
                             ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, true);
                             break;
+
                         case "adopted":
                             ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, false, true);
                             break;
+
                         case "adoptedasleader":
                             ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, false, true);
                             break;
-
                     }
-
-
                 }
                 catch (Exception e)
                 {
@@ -730,12 +726,15 @@ namespace CaptivityEvents.Events
                             case "random":
                                 kingdom = Kingdom.All.GetRandomElement();
                                 break;
+
                             case "hero":
                                 kingdom = hero.Clan.Kingdom;
                                 break;
+
                             case "captor":
                                 kingdom = captor.Clan.Kingdom;
                                 break;
+
                             case "settlement":
                                 kingdom = kingdomOption.Ref.ToLower() == "captor" ? captor.CurrentSettlement.OwnerClan.Kingdom : hero.CurrentSettlement.OwnerClan.Kingdom;
                                 break;
@@ -747,9 +746,11 @@ namespace CaptivityEvents.Events
                         case "leave":
                             ChangeKingdomAction.ApplyByLeaveKingdom(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, !kingdomOption.HideNotification);
                             break;
+
                         case "join":
                             ChangeKingdomAction.ApplyByJoinToKingdom(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, kingdom, !kingdomOption.HideNotification);
                             break;
+
                         case "joinasmercenary":
                             ChangeKingdomAction.ApplyByJoinFactionAsMercenary(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, kingdom, 50, !kingdomOption.HideNotification);
                             break;
@@ -761,6 +762,7 @@ namespace CaptivityEvents.Events
                 }
             }
         }
+
         internal void CEWoundTroops(PartyBase party, int amount = 10)
         {
             try
@@ -778,6 +780,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("CEWoundTroops Couldn't wound any troops.");
             }
         }
+
         internal void CEKillTroops(PartyBase party, int amount = 10, bool killHeroes = false)
         {
             try
@@ -795,6 +798,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("CEKillTroops Couldn't kill any troops.");
             }
         }
+
         internal void CEGainRandomPrisoners(PartyBase party)
         {
             Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.IsVillage);
@@ -832,15 +836,16 @@ namespace CaptivityEvents.Events
                     case 1:
                         min = CESettings.Instance.RenownMin;
                         break;
+
                     case 2:
                         min = Campaign.Current.Models.ClanTierModel.GetRequiredRenownForTier(hero.Clan.Tier);
                         break;
+
                     default:
                         break;
                 }
 
                 if (renown < min) renown = min;
-
 
                 if (renown < 0)
                 {

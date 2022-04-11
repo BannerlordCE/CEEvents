@@ -1,4 +1,5 @@
 ﻿#define V172
+
 using CaptivityEvents.Custom;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,9 @@ using TaleWorlds.Localization;
 #if V171
 using TaleWorlds.CampaignSystem;
 #else
+
 using TaleWorlds.CampaignSystem.Extensions;
+
 #endif
 
 namespace CaptivityEvents
@@ -32,15 +35,15 @@ namespace CaptivityEvents
 
         private static int _StartDefaultSkillNode = 0;
 
-        private static readonly List<CESkillNode> _Skills = new List<CESkillNode>();
+        private static readonly List<CESkillNode> _Skills = new();
 
-        public static void AddCustomSkill(CESkillNode skillNode) {
-
+        public static void AddCustomSkill(CESkillNode skillNode)
+        {
             int index = _Skills.FindIndex((item) => item.Id == skillNode.Id);
             if (index == -1)
             {
                 _Skills.Add(skillNode);
-            } 
+            }
             else
             {
                 _Skills[index].MaxLevel = skillNode.MaxLevel;
@@ -48,8 +51,6 @@ namespace CaptivityEvents
                 _Skills[index].Name = skillNode.Name;
             }
         }
-            
-
 
         public static CESkillNode FindSkillNode(string skill)
         {
@@ -85,7 +86,6 @@ namespace CaptivityEvents
             return null;
         }
 
-
         public static void RegisterAll(Game game)
         {
             CustomSkills = new List<SkillObject>();
@@ -111,7 +111,6 @@ namespace CaptivityEvents
         {
             try
             {
-
                 foreach (SkillObject skill in CustomSkills)
                 {
                     game.ObjectManager.UnregisterObject(skill);
@@ -119,8 +118,7 @@ namespace CaptivityEvents
 
                 game.ObjectManager.UnregisterObject(CEAttribute);
                 return true;
-
-            } 
+            }
             catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("Uninstall Error: " + e.ToString());
@@ -128,7 +126,6 @@ namespace CaptivityEvents
 
                 return false;
             }
-
         }
 
         public static void InitializeAll()

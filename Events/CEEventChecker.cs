@@ -1,4 +1,5 @@
 ﻿#define V172
+
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -12,14 +13,17 @@ using TaleWorlds.Library;
 using static CaptivityEvents.Helper.CEHelper;
 using CETerrainType = CaptivityEvents.Custom.TerrainType;
 using TerrainType = TaleWorlds.Core.TerrainType;
+
 #if V171
 using TaleWorlds.CampaignSystem.SandBox;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
 #else
+
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.CampaignSystem.Party;
+
 #endif
 
 namespace CaptivityEvents.Events
@@ -306,7 +310,7 @@ namespace CaptivityEvents.Events
             return null;
         }
 
-#region private
+        #region private
 
         private bool CompanionsCheck(CharacterObject hero, PartyBase party)
         {
@@ -326,10 +330,12 @@ namespace CaptivityEvents.Events
                                     if (!hero.IsHero) { return LogError("Skipping event " + _listEvent.Name + " it does not match the hero conditions."); }
                                     referenceHero = hero.HeroObject;
                                     break;
+
                                 case "captor":
                                     if (party.LeaderHero != null) { return LogError("Skipping event " + _listEvent.Name + " it does not match the captor conditions."); }
                                     referenceHero = party.LeaderHero;
                                     break;
+
                                 default:
                                     referenceHero = Hero.MainHero;
                                     break;
@@ -339,17 +345,17 @@ namespace CaptivityEvents.Events
                         {
                             referenceHero = Hero.MainHero;
                         }
-                        List<Hero> heroes = new List<Hero>();
+                        List<Hero> heroes = new();
 
                         if (companion.Type != null)
                         {
-
                             switch (companion.Type.ToLower())
                             {
                                 case "spouse":
                                     if (referenceHero.Spouse == null) return LogError("Skipping event " + _listEvent.Name + " it does not match the spouse conditions.");
                                     heroes.Add(referenceHero.Spouse);
                                     break;
+
                                 case "companion":
                                     if (referenceHero.Clan == null) return LogError("Skipping event " + _listEvent.Name + " it does not match the companion conditions.");
                                     foreach (Hero companionHero in referenceHero.Clan.Companions)
@@ -357,6 +363,7 @@ namespace CaptivityEvents.Events
                                         heroes.Add(companionHero);
                                     }
                                     break;
+
                                 default:
                                     if (referenceHero.Spouse != null)
                                     {
@@ -396,18 +403,23 @@ namespace CaptivityEvents.Events
                                 case "prisoner":
                                     heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedToAsPrisoner != party && companionHero.IsPrisoner; });
                                     break;
+
                                 case "party":
                                     heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedTo?.Party != null && companionHero.PartyBelongedTo.Party != party && !companionHero.PartyBelongedTo.IsGarrison; });
                                     break;
+
                                 case "settlement":
                                     heroes = heroes.FindAll((companionHero) => { return companionHero?.CurrentSettlement != null; });
                                     break;
+
                                 case "current prisoner":
                                     heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedToAsPrisoner == party; });
                                     break;
+
                                 case "current":
                                     heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedTo?.Party == party; });
                                     break;
+
                                 default:
                                     break;
                             }
@@ -445,7 +457,6 @@ namespace CaptivityEvents.Events
                             if (heroes.Count == 0) return LogError("Skipping event " + _listEvent.Name + " it does not match the CompanionsCheck conditions.");
                         }
 
-
                         if (companion.Id != null)
                         {
                             _listEvent.SavedCompanions.Add(companion.Id, heroes.GetRandomElement());
@@ -469,7 +480,7 @@ namespace CaptivityEvents.Events
                 if (party.MobileParty.IsCaravan) type = 1;
                 if (party.MobileParty.IsBandit || party.MobileParty.IsBanditBossParty) type = 2;
                 if (party.MobileParty.IsLordParty) type = 3;
-            } 
+            }
             else if (party.IsSettlement)
             {
                 if (party.Settlement.IsHideout) type = 2;
@@ -479,7 +490,6 @@ namespace CaptivityEvents.Events
             bool hasCaravanFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaravanParty);
             bool hasBanditFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BanditParty);
             bool hasLordParty = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LordParty);
-
 
             if (hasDefaultFlag || hasCaravanFlag || hasBanditFlag || hasLordParty)
             {
@@ -494,7 +504,6 @@ namespace CaptivityEvents.Events
 
         private bool WorldMapCheck(PartyBase party, ref bool eventMatchingCondition)
         {
-
             if (_listEvent.TerrainTypesRequirements == null) return true;
 
             foreach (CETerrainType[] terrainTypes in _listEvent.TerrainTypesRequirements)
@@ -1364,7 +1373,6 @@ namespace CaptivityEvents.Events
 
         private bool PlayerCheck()
         {
-
             try
             {
                 if (!string.IsNullOrEmpty(_listEvent.ReqGoldAbove))
@@ -1427,7 +1435,6 @@ namespace CaptivityEvents.Events
             {
                 Hero captiveHero = captive.HeroObject;
                 return HeroChecks(captiveHero) && (nonRandomBehaviour && CaptiveHaveItemCheck(captiveHero) && RelationCheck(captorParty, captiveHero) && HeroOwnerFlagsCheck(captiveHero, captorParty) || !nonRandomBehaviour && HeroHaveItemCheck(captorParty));
-
             }
             else if (captive.IsHero && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptiveIsNonHero) && captive.HeroObject != null)
             {
@@ -1596,7 +1603,6 @@ namespace CaptivityEvents.Events
 
         private bool CaptorOwnerFlagsCheck(PartyBase captorParty)
         {
-
             if (!captorParty.IsMobile || captorParty.MobileParty.CurrentSettlement == null) return true;
 
             if (captorParty.MobileParty.CurrentSettlement.OwnerClan != captorParty.MobileParty.ActualClan && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorOwnsCurrentSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorOwnsCurrentPartySettlement.");
@@ -1633,7 +1639,6 @@ namespace CaptivityEvents.Events
             {
                 Hero captorHero = captorParty.LeaderHero;
                 return CaptorChecks(captorHero);
-
             }
             else if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorIsNonHero) && captorParty.LeaderHero != null)
             {
@@ -1714,7 +1719,6 @@ namespace CaptivityEvents.Events
                     {
                         if (!string.IsNullOrWhiteSpace(skillRequired.Max))
                         {
-
                             if (skillLevel > new CEVariablesLoader().GetIntFromXML(skillRequired.Max))
                                 return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (captor ? "ReqCaptorSkillLevelBelow" : "ReqHeroSkillLevelBelow") + ".");
                         }
@@ -1815,7 +1819,6 @@ namespace CaptivityEvents.Events
                     {
                         if (!string.IsNullOrWhiteSpace(traitRequired.Max))
                         {
-
                             if (traitLevel > new CEVariablesLoader().GetIntFromXML(traitRequired.Max))
                                 return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (captor ? "ReqCaptorTraitLevelBelow" : "ReqHeroTraitLevelBelow") + ".");
                         }
@@ -2076,7 +2079,6 @@ namespace CaptivityEvents.Events
                             }
                             else
                             {
-
                                 if (_listEvent.OldWeightedChanceOfOccuring != null) _listEvent.WeightedChanceOfOccuring = _listEvent.OldWeightedChanceOfOccuring;
                             }
 
@@ -2131,7 +2133,6 @@ namespace CaptivityEvents.Events
 
         private bool ForceLogError(string message)
         {
-
             CECustomHandler.ForceLogToFile(message);
 
             return Error(message);
@@ -2151,6 +2152,6 @@ namespace CaptivityEvents.Events
             return false;
         }
 
-#endregion
+        #endregion private
     }
 }

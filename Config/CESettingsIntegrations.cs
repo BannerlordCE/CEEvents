@@ -6,10 +6,8 @@ using TaleWorlds.ModuleManager;
 
 namespace CaptivityEvents.Config
 {
-
     public class CESettingsIntegrations
     {
-
         private FluentGlobalSettings _settings;
 
         private static CESettingsIntegrations _instance = null;
