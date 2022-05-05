@@ -1,10 +1,20 @@
-﻿using CaptivityEvents.Brothel;
+﻿#define V172
+
+using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using HarmonyLib;
 using System;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Localization;
+
+#if V171
+using TaleWorlds.CampaignSystem.SandBox.GameComponents;
+#else
+
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.GameComponents;
+
+#endif
 
 namespace CaptivityEvents.Patches
 {

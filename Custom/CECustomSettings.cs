@@ -4,7 +4,6 @@ using System.Xml.Serialization;
 
 namespace CaptivityEvents
 {
-
     [DebuggerStepThrough]
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = null, IsNullable = false)]
@@ -76,6 +75,5 @@ namespace CaptivityEvents
         public int RenownChoice { get; set; } = 1;
         public float RenownMin { get; set; } = -150f;
         public bool LogToggle { get; set; } = true;
-
     }
 }

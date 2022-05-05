@@ -1,4 +1,5 @@
-﻿
+﻿#define V172
+
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using System;
@@ -12,11 +13,17 @@ using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
 
+#if V171
+#else
+
+using TaleWorlds.CampaignSystem.Settlements;
+
+#endif
+
 namespace CaptivityEvents.Helper
 {
     public class CEHelper
     {
-
         public enum EquipmentCustomIndex
         {
             Weapon0 = 0,
@@ -47,7 +54,7 @@ namespace CaptivityEvents.Helper
         public static bool progressEventExists = false;
         public static bool progressEventCheck = false;
 
-        public static List<CEDelayedEvent> delayedEvents = new List<CEDelayedEvent>();
+        public static List<CEDelayedEvent> delayedEvents = new();
 
         internal static void SetSkillValue(Hero hero, SkillObject skillObject, int value)
         {
@@ -72,9 +79,9 @@ namespace CaptivityEvents.Helper
 
         internal static List<string> GetModulePaths(string[] modulesFound, out List<ModuleInfo> modules)
         {
-            List<string> modulePaths = new List<string>();
+            List<string> modulePaths = new();
 
-            List<ModuleInfo> findingModules = new List<ModuleInfo>();
+            List<ModuleInfo> findingModules = new();
 
             foreach (string moduleID in modulesFound)
             {
@@ -128,12 +135,14 @@ namespace CaptivityEvents.Helper
                             ChangeMenu(3);
                         }
                         break;
+
                     case 3:
                         if (current.IsUnderSiege || current.IsUnderRaid)
                         {
                             ChangeMenu(2);
                         }
                         break;
+
                     default:
                         ChangeMenu(3);
                         break;
@@ -151,12 +160,14 @@ namespace CaptivityEvents.Helper
                             ChangeMenu(3);
                         }
                         break;
+
                     case 3:
                         if (current.IsUnderSiege || current.IsUnderRaid)
                         {
                             ChangeMenu(2);
                         }
                         break;
+
                     default:
                         ChangeMenu(3);
                         break;

@@ -1,4 +1,6 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿#define V172
+
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using Helpers;
@@ -11,19 +13,25 @@ using TaleWorlds.Core;
 using TaleWorlds.ObjectSystem;
 using static CaptivityEvents.Helper.CEHelper;
 
+#if V171
+#else
+
+using TaleWorlds.CampaignSystem.Party;
+
+#endif
+
 namespace CaptivityEvents.Events
 {
     internal class CECompanionSystem
     {
-
         private readonly CEEvent _listedEvent;
         private readonly List<CEEvent> _eventList;
         private readonly Option _option;
 
-        private readonly Dynamics _dynamics = new Dynamics();
-        private readonly ScoresCalculation _score = new ScoresCalculation();
-        private readonly CEImpregnationSystem _impregnation = new CEImpregnationSystem();
-        private readonly CEVariablesLoader _variableLoader = new CEVariablesLoader();
+        private readonly Dynamics _dynamics = new();
+        private readonly ScoresCalculation _score = new();
+        private readonly CEImpregnationSystem _impregnation = new();
+        private readonly CEVariablesLoader _variableLoader = new();
 
         public CECompanionSystem(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
@@ -41,7 +49,7 @@ namespace CaptivityEvents.Events
                     foreach (Companion companion in _option.Companions)
                     {
                         Hero referenceHero;
-                        List<Hero> heroes = new List<Hero>();
+                        List<Hero> heroes = new();
 
                         if (companion.Ref != null)
                         {
@@ -51,15 +59,12 @@ namespace CaptivityEvents.Events
                                     if (!hero.IsHero) { continue; }
                                     referenceHero = hero.HeroObject;
                                     break;
+
                                 case "captor":
-#if V165
-                                    if (!party.Leader.IsHero) { continue; }
-                                    referenceHero = party.Leader.HeroObject;
-#else
                                     if (party.LeaderHero != null) { continue; }
                                     referenceHero = party.LeaderHero;
-#endif
                                     break;
+
                                 default:
                                     referenceHero = Hero.MainHero;
                                     break;
@@ -67,13 +72,13 @@ namespace CaptivityEvents.Events
 
                             if (companion.Type != null)
                             {
-
                                 switch (companion.Type.ToLower())
                                 {
                                     case "spouse":
                                         if (referenceHero.Spouse == null) continue;
                                         heroes.Add(referenceHero.Spouse);
                                         break;
+
                                     case "companion":
                                         if (referenceHero.Clan == null) continue;
                                         foreach (Hero companionHero in referenceHero.Clan.Companions)
@@ -81,6 +86,7 @@ namespace CaptivityEvents.Events
                                             heroes.Add(companionHero);
                                         }
                                         break;
+
                                     default:
                                         if (referenceHero.Spouse != null)
                                         {
@@ -126,18 +132,23 @@ namespace CaptivityEvents.Events
                                 case "prisoner":
                                     heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedToAsPrisoner != party && companionHero.IsPrisoner; });
                                     break;
+
                                 case "party":
                                     heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedTo?.Party != null && companionHero.PartyBelongedTo.Party != party && !companionHero.PartyBelongedTo.IsGarrison; });
                                     break;
+
                                 case "settlement":
                                     heroes = heroes.FindAll((companionHero) => { return companionHero?.CurrentSettlement != null; });
                                     break;
+
                                 case "current prisoner":
                                     heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedToAsPrisoner == party; });
                                     break;
+
                                 case "current":
                                     heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedTo?.Party == party; });
                                     break;
+
                                 default:
                                     break;
                             }
@@ -196,7 +207,6 @@ namespace CaptivityEvents.Events
                             ConsequenceKillPrisoner(companion, heroSelected);
                             ConsequenceStrip(companion, heroSelected);
                             ConsequenceGainRandomPrisoners(companion, heroSelected);
-
                         }
                         catch (Exception e)
                         {
@@ -320,7 +330,6 @@ namespace CaptivityEvents.Events
         {
             try
             {
-
                 if (companion.TraitsToLevel != null && companion.TraitsToLevel.Count(TraitToLevel => TraitToLevel.Ref.ToLower() == "hero") != 0)
                 {
                     foreach (TraitToLevel traitToLevel in companion.TraitsToLevel)
@@ -357,7 +366,6 @@ namespace CaptivityEvents.Events
                         new Dynamics().SkillModifier(skillToLevel.Ref.ToLower() != "hero" ? hero.PartyBelongedToAsPrisoner.LeaderHero : hero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }
                 }
-
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }
@@ -385,7 +393,7 @@ namespace CaptivityEvents.Events
             if (!companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
 
             PartyBase party = hero.IsPrisoner
-                ? hero.PartyBelongedToAsPrisoner //captive         
+                ? hero.PartyBelongedToAsPrisoner //captive
                 : hero.PartyBelongedTo?.Party; //random, captor
 
             try
@@ -405,7 +413,6 @@ namespace CaptivityEvents.Events
             if (!companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRelation)) return;
             bool InformationMessage = !companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
             bool NoMessages = companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoMessages);
-
 
             try
             {
@@ -552,13 +559,13 @@ namespace CaptivityEvents.Events
             if (companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip))
             {
                 if (hero == null) return;
-                Equipment randomElement = new Equipment(false);
+                Equipment randomElement = new(false);
 
                 ItemObject itemObjectBody = hero.IsFemale
                     ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
                     : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
                 randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
-                Equipment randomElement2 = new Equipment(true);
+                Equipment randomElement2 = new(true);
                 randomElement2.FillFrom(randomElement, false);
 
                 if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(hero, hero.BattleEquipment, hero.CivilianEquipment);
@@ -584,6 +591,5 @@ namespace CaptivityEvents.Events
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, randomElement2);
             }
         }
-
     }
 }

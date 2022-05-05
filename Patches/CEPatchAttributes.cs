@@ -1,8 +1,17 @@
-﻿using HarmonyLib;
+﻿#define V172
+
+using HarmonyLib;
 using System.Linq;
-using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
+
+#if V171
+using TaleWorlds.CampaignSystem;
+#else
+
+using TaleWorlds.CampaignSystem.Extensions;
+
+#endif
 
 namespace CaptivityEvents.Patches
 {
@@ -17,8 +26,6 @@ namespace CaptivityEvents.Patches
             {
                 __result = new MBReadOnlyList<CharacterAttribute>(__result.Where((CharacterAttribute item) => item.StringId != "CEAttribute").ToList());
             }
-  
         }
-
     }
 }

@@ -1,4 +1,5 @@
-﻿#define V170
+﻿#define V172
+
 using CaptivityEvents.Custom;
 using System;
 using System.Linq;
@@ -6,6 +7,14 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
 using TaleWorlds.ObjectSystem;
+
+#if V171
+#else
+
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
+
+#endif
 
 namespace CaptivityEvents.Events
 {
@@ -54,9 +63,9 @@ namespace CaptivityEvents.Events
                 }
             }
         }
+
         public void SpawnTheHero(SpawnHero[] variables, PartyBase party)
         {
-
             foreach (SpawnHero heroVariables in variables)
             {
                 try
@@ -66,32 +75,18 @@ namespace CaptivityEvents.Events
                     string culture = null;
                     if (heroVariables.Culture != null)
                     {
-                        switch (heroVariables.Culture.ToLower())
+                        culture = heroVariables.Culture.ToLower() switch
                         {
-                            case "player":
-                                culture = Hero.MainHero.Culture.StringId;
-                                break;
-                            case "captor":
-                                culture = party.Culture.StringId;
-                                break;
-                            default:
-                                culture = heroVariables.Culture;
-                                break;
-                        }
+                            "player" => Hero.MainHero.Culture.StringId,
+                            "captor" => party.Culture.StringId,
+                            _ => heroVariables.Culture,
+                        };
                     }
                     else
                     {
                         culture = heroVariables.Culture;
                     }
 
-#if V165
-                    CharacterObject wanderer = (from x in CharacterObject.Templates
-                                                where x.Occupation == Occupation.Wanderer && (culture == null || x.Culture != null && x.Culture.StringId == culture.ToLower()) && (heroVariables.Gender == null || x.IsFemale == isFemale)
-                                                select x).GetRandomElementInefficiently();
-                    Settlement randomElement = (from settlement in Settlement.All
-                                                where settlement.Culture == wanderer.Culture && settlement.IsTown
-                                                select settlement).GetRandomElementInefficiently();
-#else
                     CultureObject cultureObject = MBObjectManager.Instance.GetObjectTypeList<CultureObject>().Where(x => (culture == null && x.IsMainCulture || x.StringId == culture.ToLower())).FirstOrDefault();
                     if (cultureObject == null)
                     {
@@ -99,7 +94,6 @@ namespace CaptivityEvents.Events
                     }
                     CharacterObject wanderer = cultureObject.NotableAndWandererTemplates.GetRandomElementWithPredicate((CharacterObject x) => x.Occupation == Occupation.Wanderer && (heroVariables.Gender == null || x.IsFemale == isFemale));
                     Settlement randomElement = Settlement.All.GetRandomElementWithPredicate((Settlement settlement) => settlement.Culture == wanderer.Culture && settlement.IsTown);
-#endif
 
                     Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElementInefficiently(), null, -1);
 
@@ -113,9 +107,11 @@ namespace CaptivityEvents.Events
                             case "captor":
                                 AddCompanionAction.Apply(party.Owner.Clan, hero);
                                 break;
+
                             case "player":
                                 AddCompanionAction.Apply(Clan.PlayerClan, hero);
                                 break;
+
                             default:
                                 break;
                         }
@@ -158,7 +154,6 @@ namespace CaptivityEvents.Events
                 {
                     CECustomHandler.ForceLogToFile("Failed to SpawnTheHero : " + e);
                 }
-
             }
         }
     }

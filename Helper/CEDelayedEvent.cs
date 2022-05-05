@@ -6,7 +6,7 @@
         public float eventTime;
         public bool hasBeenFired = false;
         public bool conditions;
-        public string heroName; 
+        public string heroName;
 
         public CEDelayedEvent(string eventName, float eventTime = -1, bool conditions = false, string heroName = null)
         {

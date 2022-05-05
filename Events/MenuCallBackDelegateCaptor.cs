@@ -1,4 +1,5 @@
-﻿
+﻿#define V172
+
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -13,6 +14,16 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
+#if V171
+#else
+
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.Encounters;
+using TaleWorlds.CampaignSystem.Inventory;
+using TaleWorlds.CampaignSystem.Party;
+
+#endif
+
 namespace CaptivityEvents.Events
 {
     public class MenuCallBackDelegateCaptor
@@ -22,15 +33,15 @@ namespace CaptivityEvents.Events
         private readonly Option _option;
         private readonly SharedCallBackHelper _sharedCallBackHelper;
         private readonly CECompanionSystem _companionSystem;
-        private readonly Dynamics _dynamics = new Dynamics();
-        private readonly ScoresCalculation _score = new ScoresCalculation();
-        private readonly CEImpregnationSystem _impregnation = new CEImpregnationSystem();
-        private readonly CEVariablesLoader _variableLoader = new CEVariablesLoader();
+        private readonly Dynamics _dynamics = new();
+        private readonly ScoresCalculation _score = new();
+        private readonly CEImpregnationSystem _impregnation = new();
+        private readonly CEVariablesLoader _variableLoader = new();
 
         private float _timer = 0;
         private float _max = 0;
 
-        private readonly CaptorSpecifics _captor = new CaptorSpecifics();
+        private readonly CaptorSpecifics _captor = new();
 
         internal MenuCallBackDelegateCaptor(CEEvent listedEvent, List<CEEvent> eventList)
         {
@@ -50,6 +61,7 @@ namespace CaptivityEvents.Events
         }
 
         #region Progress Event
+
         internal void CaptorProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
             if (args.MenuContext != null)
@@ -108,11 +120,13 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Missing Progress Event Settings in " + _listedEvent.Name);
             }
         }
+
         internal bool CaptorProgressConditionWaitGameMenu(MenuCallbackArgs args)
         {
             args.optionLeaveType = GameMenuOption.LeaveType.Wait;
             return true;
         }
+
         internal void CaptorProgressConsequenceWaitGameMenu(MenuCallbackArgs args)
         {
             if (_listedEvent.ProgressEvent.TriggerEvents != null && _listedEvent.ProgressEvent.TriggerEvents.Length > 0)
@@ -124,6 +138,7 @@ namespace CaptivityEvents.Events
                 ConsequenceSingleEventTriggerProgress(ref args);
             }
         }
+
         internal void CaptorProgressTickWaitGameMenu(MenuCallbackArgs args, CampaignTime dt)
         {
             _timer += dt.CurrentHourInDay;
@@ -137,15 +152,18 @@ namespace CaptivityEvents.Events
 
             PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
-        #endregion
+
+        #endregion Progress Event
 
         #region Regular Event
+
         internal void CaptorEventWaitGameMenu(MenuCallbackArgs args)
         {
             InitSetNames(ref args);
             _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
             _sharedCallBackHelper.ConsequencePlaySound(true);
         }
+
         internal bool CaptorEventOptionGameMenu(MenuCallbackArgs args)
         {
             PlayerIsNotBusy(ref args);
@@ -170,6 +188,7 @@ namespace CaptivityEvents.Events
             ReqGold(ref args);
             return true;
         }
+
         internal void CaptorConsequenceGameMenu(MenuCallbackArgs args)
         {
             Hero captiveHero = null;
@@ -242,7 +261,6 @@ namespace CaptivityEvents.Events
 
                     MobileParty.MainParty.MemberRoster.AddToCounts(captiveHero.CharacterObject, 1, false);
 
-                    // WORK ON THIS
                     InventoryManager.OpenScreenAsInventoryOf(MobileParty.MainParty, captiveHero.CharacterObject);
 
                     CEPersistence.removeHero = captiveHero;
@@ -269,7 +287,8 @@ namespace CaptivityEvents.Events
             }
             else { _captor.CECaptorContinue(args); }
         }
-        #endregion
+
+        #endregion Regular Event
 
         #region Consequences
 
@@ -284,9 +303,10 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("ConsequenceCompanions. Failed" + e.ToString());
             }
         }
+
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
         {
-            List<CEEvent> eventNames = new List<CEEvent>();
+            List<CEEvent> eventNames = new();
 
             try
             {
@@ -359,6 +379,7 @@ namespace CaptivityEvents.Events
                 _captor.CECaptorContinue(args);
             }
         }
+
         private void ConsequenceSingleEventTriggerProgress(ref MenuCallbackArgs args)
         {
             try
@@ -375,9 +396,10 @@ namespace CaptivityEvents.Events
                 _captor.CECaptorContinue(args);
             }
         }
+
         private void ConsequenceRandomEventTrigger(ref MenuCallbackArgs args)
         {
-            List<CEEvent> eventNames = new List<CEEvent>();
+            List<CEEvent> eventNames = new();
 
             try
             {
@@ -450,6 +472,7 @@ namespace CaptivityEvents.Events
                 _captor.CECaptorContinue(args);
             }
         }
+
         private void ConsequenceSingleEventTrigger(ref MenuCallbackArgs args)
         {
             try
@@ -466,6 +489,7 @@ namespace CaptivityEvents.Events
                 _captor.CECaptorContinue(args);
             }
         }
+
         private void ConsequenceJoinParty()
         {
             if (!(_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.JoinCaptor))) return;
@@ -488,6 +512,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Failure of JoinParty: " + e.ToString());
             }
         }
+
         private void ConsequenceWoundPrisoner(ref MenuCallbackArgs args)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundPrisoner))
@@ -510,6 +535,7 @@ namespace CaptivityEvents.Events
             // Wound Random
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomPrisoners)) _captor.CECaptorWoundPrisoners(args);
         }
+
         private void ConsequenceKillPrisoner(ref MenuCallbackArgs args)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner))
@@ -525,24 +551,29 @@ namespace CaptivityEvents.Events
             // Kill Random
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomPrisoners)) _captor.CECaptorKillPrisoners(args);
         }
+
         private void ConsequenceWoundTroops(ref MenuCallbackArgs args)
         {
-           if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomTroops)) _dynamics.CEWoundTroops(PartyBase.MainParty);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundRandomTroops)) _dynamics.CEWoundTroops(PartyBase.MainParty);
         }
+
         private void ConsequenceKillTroops(ref MenuCallbackArgs args)
         {
             // Kill Random
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomTroops)) _dynamics.CEKillTroops(PartyBase.MainParty);
         }
+
         private void ConsequenceGainRandomPrisoners()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GainRandomPrisoners)) _dynamics.CEGainRandomPrisoners(PartyBase.MainParty);
         }
+
         private void ConsequenceRelease(ref MenuCallbackArgs args)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseRandomPrisoners)) _captor.CECaptorReleasePrisoners(args);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseAllPrisoners)) _captor.CECaptorReleasePrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
         }
+
         private void ConsequenceEscape()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) return;
@@ -557,14 +588,17 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Failure of Captor Escape: " + e.ToString());
             }
         }
+
         private void ConsequenceStrip(Hero captiveHero)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip)) _captor.CECaptorStripVictim(captiveHero);
         }
+
         private void ConsequenceMakeHeroCompanion(Hero captiveHero)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.MakeHeroCompanion)) _captor.CECaptorMakeHeroCompanion(captiveHero);
         }
+
         private void ConsequenceImpregnation(Hero captiveHero)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationHero))
@@ -610,6 +644,7 @@ namespace CaptivityEvents.Events
                 }
             }
         }
+
         private void ConsequenceChangeHealth(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeHealth)) return;
@@ -626,6 +661,7 @@ namespace CaptivityEvents.Events
                 captiveHero.HitPoints += MBRandom.RandomInt(-20, 20);
             }
         }
+
         private void ConsequenceRenown(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRenown)) return;
@@ -642,11 +678,11 @@ namespace CaptivityEvents.Events
                 _dynamics.RenownModifier(MBRandom.RandomInt(-5, 5), captiveHero);
             }
         }
+
         private void ConsequenceSkill(Hero captiveHero)
         {
             try
             {
-
                 if (_option.SkillsToLevel != null && _option.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref.ToLower() == "hero") != 0)
                 {
                     foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
@@ -695,11 +731,11 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }
+
         internal void ConsequenceTrait(Hero captiveHero)
         {
             try
             {
-
                 if (_option.TraitsToLevel != null && _option.TraitsToLevel.Count(TraitToLevel => TraitToLevel.Ref.ToLower() == "hero") != 0)
                 {
                     foreach (TraitToLevel traitToLevel in _option.TraitsToLevel)
@@ -748,6 +784,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
         }
+
         private void ConsequenceChangeGold(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) return;
@@ -764,6 +801,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
         }
+
         private void ConsequenceGold(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) return;
@@ -774,6 +812,7 @@ namespace CaptivityEvents.Events
             content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveGold);
             GiveGoldAction.ApplyBetweenCharacters(null, captiveHero, content);
         }
+
         private void ConsequenceRelations(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRelation)) return;
@@ -791,6 +830,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.LogToFile("Missing RelationTotal");
             }
         }
+
         private void ConsequenceProstitutionLevel(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeProstitutionLevel)) return;
@@ -807,6 +847,7 @@ namespace CaptivityEvents.Events
                 _dynamics.VictimProstitutionModifier(1, captiveHero);
             }
         }
+
         private void ConsequenceProstitutionFlags(Hero captiveHero)
         {
             bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
@@ -815,6 +856,7 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag)) _dynamics.VictimProstitutionModifier(1, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) _dynamics.VictimProstitutionModifier(0, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
         }
+
         private void ConsequenceSlaveryLevel(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSlaveryLevel)) return;
@@ -831,15 +873,16 @@ namespace CaptivityEvents.Events
                 _dynamics.VictimSlaveryModifier(1, captiveHero);
             }
         }
+
         private void ConsequenceSlaveryFlags(Hero captiveHero)
         {
-
             bool InformationMessage = !_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
             bool NoMessages = _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoMessages);
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddSlaveryFlag)) _dynamics.VictimSlaveryModifier(1, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveSlaveryFlag)) _dynamics.VictimSlaveryModifier(0, captiveHero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
         }
+
         private void ConsequenceSpawnTroop()
         {
             if (_option.SpawnTroops != null)
@@ -847,6 +890,7 @@ namespace CaptivityEvents.Events
                 new CESpawnSystem().SpawnTheTroops(_option.SpawnTroops, PartyBase.MainParty);
             }
         }
+
         private void ConsequenceSpawnHero()
         {
             if (_option.SpawnHeroes != null)
@@ -854,22 +898,27 @@ namespace CaptivityEvents.Events
                 new CESpawnSystem().SpawnTheHero(_option.SpawnHeroes, PartyBase.MainParty);
             }
         }
+
         private void ConsequenceChangeKingdom(Hero captiveHero)
         {
             if (_option.KingdomOptions != null) _dynamics.KingdomChange(_option.KingdomOptions, captiveHero, Hero.MainHero);
         }
+
         private void ConsequenceChangeClan(Hero captiveHero)
         {
             if (_option.ClanOptions != null) _dynamics.ClanChange(_option.ClanOptions, captiveHero, Hero.MainHero);
         }
+
         private void ConsequenceForceMarry(Hero captiveHero)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveMarryCaptor)) _dynamics.ChangeSpouse(captiveHero, Hero.MainHero);
         }
+
         private void ConsequenceLeaveSpouse(Hero captiveHero)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveLeaveSpouse)) _dynamics.ChangeSpouse(captiveHero, null);
         }
+
         private void ConsequenceChangeMorale()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeMorale)) return;
@@ -886,6 +935,7 @@ namespace CaptivityEvents.Events
                 _dynamics.MoraleChange(MBRandom.RandomInt(-5, 5), PlayerCaptivity.CaptorParty);
             }
         }
+
         private void ConsequenceCaptorRenown()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorRenown)) return;
@@ -902,9 +952,9 @@ namespace CaptivityEvents.Events
                 _dynamics.RenownModifier(MBRandom.RandomInt(-5, 5), Hero.MainHero);
             }
         }
+
         private void ConsequenceCaptorTrait()
         {
-
             try
             {
                 if (_option.TraitsToLevel != null && _option.TraitsToLevel.Count(TraitToLevel => TraitToLevel.Ref.ToLower() == "captor") != 0)
@@ -955,11 +1005,11 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
         }
+
         private void ConsequenceCaptorSkill()
         {
             try
             {
-
                 if (_option.SkillsToLevel != null && _option.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref.ToLower() == "captor") != 0)
                 {
                     foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
@@ -1008,6 +1058,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
         }
+
         private void ConsequenceCaptorChangeGold()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorGold)) return;
@@ -1024,6 +1075,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid CaptorGoldTotal"); }
         }
+
         private void ConsequenceCaptorGold(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveCaptorGold)) return;
@@ -1033,12 +1085,14 @@ namespace CaptivityEvents.Events
             content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveCaptorGold);
             GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, content);
         }
+
         private void ConsequenceCaptorLeaveSpouse()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptorLeaveSpouse)) return;
             _dynamics.ChangeSpouse(Hero.MainHero, null);
         }
-        #endregion
+
+        #endregion Consequences
 
         #region Requirements
 
@@ -1077,7 +1131,7 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion
+        #endregion ReqGold
 
         #region ReqSkills
 
@@ -1110,7 +1164,6 @@ namespace CaptivityEvents.Events
                     if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_level")) break;
                 }
                 catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
-
             }
         }
 
@@ -1143,7 +1196,6 @@ namespace CaptivityEvents.Events
                     if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_captive_level")) break;
                 }
                 catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
-
             }
         }
 
@@ -1173,7 +1225,7 @@ namespace CaptivityEvents.Events
             return true;
         }
 
-        #endregion
+        #endregion ReqSkills
 
         #region ReqCaptorSkill
 
@@ -1239,7 +1291,7 @@ namespace CaptivityEvents.Events
             return skillLevel;
         }
 
-        #endregion
+        #endregion ReqCaptorSkill
 
         #region ReqHeroSkill
 
@@ -1288,10 +1340,8 @@ namespace CaptivityEvents.Events
         {
             int skillLevel = 0;
 
-
             try
             {
-
                 SkillObject foundSkill = CESkills.FindSkill(_option.ReqHeroSkill);
                 if (foundSkill == null)
                     CECustomHandler.LogToFile("Invalid Skill Captive");
@@ -1307,9 +1357,10 @@ namespace CaptivityEvents.Events
             return skillLevel;
         }
 
-        #endregion
+        #endregion ReqHeroSkill
 
         #region CaptorTrait
+
         private void ReqCaptorTrait(ref MenuCallbackArgs args)
         {
             if (string.IsNullOrWhiteSpace(_option.ReqCaptorTrait)) return;
@@ -1368,7 +1419,7 @@ namespace CaptivityEvents.Events
             return traitLevel;
         }
 
-        #endregion
+        #endregion CaptorTrait
 
         #region CaptiveTrait
 
@@ -1430,7 +1481,7 @@ namespace CaptivityEvents.Events
             return traitLevel;
         }
 
-        #endregion
+        #endregion CaptiveTrait
 
         #region ReqFemaleCaptives
 
@@ -1495,7 +1546,8 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
             args.IsEnabled = false;
         }
-        #endregion
+
+        #endregion ReqFemaleCaptives
 
         #region ReqMaleCaptives
 
@@ -1561,7 +1613,7 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion
+        #endregion ReqMaleCaptives
 
         #region ReqCaptives
 
@@ -1628,7 +1680,7 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion
+        #endregion ReqCaptives
 
         #region ReqFemaleTroops
 
@@ -1695,7 +1747,7 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion
+        #endregion ReqFemaleTroops
 
         #region ReqMaleTroops
 
@@ -1762,7 +1814,7 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion
+        #endregion ReqMaleTroops
 
         #region ReqTroops
 
@@ -1816,7 +1868,6 @@ namespace CaptivityEvents.Events
             if (string.IsNullOrWhiteSpace(_option.ReqTroopsAbove)) return;
             if ((PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return troopRosterElement.Number; })) >= _variableLoader.GetIntFromXML(_option.ReqTroopsAbove)) return;
 
-
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
         }
@@ -1829,7 +1880,8 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
         }
-        #endregion
+
+        #endregion ReqTroops
 
         #region ReqMorale
 
@@ -1866,9 +1918,10 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion
+        #endregion ReqMorale
 
         #region ReqHeroCaptorRelation
+
         private void ReqHeroCaptorRelation(ref MenuCallbackArgs args)
         {
             if (_listedEvent?.Captive?.HeroObject == null) return;
@@ -1909,9 +1962,10 @@ namespace CaptivityEvents.Events
             args.Tooltip = textResponse4;
             args.IsEnabled = false;
         }
-        #endregion
 
-        #endregion
+        #endregion ReqHeroCaptorRelation
+
+        #endregion Requirements
 
         #region Icons
 
@@ -1955,9 +2009,10 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Wait)) args.optionLeaveType = GameMenuOption.LeaveType.Wait;
         }
 
-        #endregion
+        #endregion Icons
 
         #region Init Options
+
         private void InitCaptorGoldTotal()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorGold)) return;
@@ -1973,6 +2028,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid CaptorGoldTotal"); }
         }
+
         private void InitGiveCaptorGold()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveCaptorGold)) return;
@@ -1982,6 +2038,7 @@ namespace CaptivityEvents.Events
             content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveCaptorGold);
             MBTextManager.SetTextVariable("CAPTOR_MONEY_AMOUNT", content);
         }
+
         private void InitSetNames(ref MenuCallbackArgs args)
         {
             try
@@ -1993,7 +2050,6 @@ namespace CaptivityEvents.Events
                     MBTextManager.SetTextVariable("CAPTIVE_NAME", _listedEvent.Captive?.Name);
                     MBTextManager.SetTextVariable("ISCAPTIVEFEMALE", _listedEvent.Captive?.IsFemale == true ? 1 : 0);
                 }
-
             }
             catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
 
@@ -2025,9 +2081,11 @@ namespace CaptivityEvents.Events
                                                            : "wait_prisoner_male");
             }
         }
-        #endregion
+
+        #endregion Init Options
 
         #region CustomConsequencesReq
+
         private void PlayerIsNotBusy(ref MenuCallbackArgs args)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerIsNotBusy)) return;
@@ -2045,6 +2103,7 @@ namespace CaptivityEvents.Events
             args.Tooltip = GameTexts.FindText("str_CE_companions_too_many");
             args.IsEnabled = false;
         }
-        #endregion
+
+        #endregion CustomConsequencesReq
     }
 }

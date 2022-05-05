@@ -1,4 +1,6 @@
-﻿using CaptivityEvents.Config;
+﻿#define V172
+
+using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
@@ -6,15 +8,23 @@ using Helpers;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
+
+#if V171
+using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
+#else
+
+using TaleWorlds.CampaignSystem.GameComponents;
+using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.CampaignSystem.Party;
+
+#endif
 
 namespace CaptivityEvents.Models
 {
     public class CEPlayerCaptivityModel : DefaultPlayerCaptivityModel
     {
-
         private bool CheckTimeElapsedMoreThanHours(CampaignTime eventBeginTime, float hoursToWait)
         {
             float elapsedHoursUntilNow = eventBeginTime.ElapsedHoursUntilNow;
@@ -28,11 +38,8 @@ namespace CaptivityEvents.Models
             if (PlayerCaptivity.CaptorParty == null) return false;
             float gameProcess = MiscHelper.GetGameProcess();
             bool isInSettlement = PlayerCaptivity.CaptorParty.IsSettlement;
-#if V165
-            bool isInLordParty = !isInSettlement && PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.Leader != null && PlayerCaptivity.CaptorParty.Leader.IsHero;
-#else
             bool isInLordParty = !isInSettlement && PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.LeaderHero != null;
-#endif
+
             float eventOccurence =
                 isInSettlement ?
                 CESettings.Instance.EventOccurrenceSettlement :
@@ -41,7 +48,6 @@ namespace CaptivityEvents.Models
                 CESettings.Instance.EventOccurrenceOther;
             float num = (1f + gameProcess * 1f) * eventOccurence;
             return CheckTimeElapsedMoreThanHours(PlayerCaptivity.LastCheckTime, num);
-
         }
 
         /// <summary>
@@ -78,12 +84,15 @@ namespace CaptivityEvents.Models
                                 case "$FAILEDTOFIND":
                                     CECustomHandler.LogToFile("Failed to load event list.");
                                     break;
+
                                 case "$EVENTNOTFOUND":
                                     CECustomHandler.LogToFile("Event not found.");
                                     break;
+
                                 case "$EVENTCONDITIONSNOTMET":
                                     CECustomHandler.LogToFile("Event conditions are not met.");
                                     break;
+
                                 default:
                                     if (result.StartsWith("$"))
                                     {
@@ -120,12 +129,10 @@ namespace CaptivityEvents.Models
                     PlayerCaptivity.LastCheckTime = CampaignTime.Now;
                     return eventToFire;
                 }
-
             }
 
             if (PlayerCaptivity.CaptorParty != null && !PlayerCaptivity.CaptorParty.IsSettlement)
             {
-
                 if (!CheckEvent()) return DefaultOverridenCheckCaptivityChange(dt);
                 PlayerCaptivity.LastCheckTime = CampaignTime.Now;
 

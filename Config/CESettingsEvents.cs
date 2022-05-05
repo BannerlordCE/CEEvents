@@ -16,7 +16,6 @@ namespace CaptivityEvents.Config
 
     public class CESettingsEvents
     {
-
         private FluentGlobalSettings _settings;
 
         private static CESettingsEvents _instance = null;
@@ -69,7 +68,6 @@ namespace CaptivityEvents.Config
                             else if (currentEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                             {
                                 folderName = module.CEModuleName + "/{=CESETTINGS0099}Captor";
-
                             }
                             else if (currentEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                             {
@@ -99,7 +97,6 @@ namespace CaptivityEvents.Config
 
                             builder.CreateGroup(folderName, groupBuilder =>
                             {
-
                                 EventToggle.Add(currentEvent.Name, true);
                                 EventSettings.Add(currentEvent.Name, new CESettingsEvent());
 
@@ -110,7 +107,6 @@ namespace CaptivityEvents.Config
                                 groupBuilder.AddText(currentEvent.Name + "_" + eventModuleId + "_" + eventId + "_weight", "{=CESETTINGS1124}Custom Event Frequency", new ProxyRef<string>(() => EventSettings[currentEvent.Name].WeightedChanceOfOccuring, o => EventSettings[currentEvent.Name].WeightedChanceOfOccuring = o), stringBuilder => stringBuilder.SetHintText("{=CESETTINGS1126}Default is " + currentEvent.WeightedChanceOfOccuring).SetRequireRestart(false).SetOrder(1));
 
                                 groupBuilder.AddText(currentEvent.Name + "_" + eventModuleId + "_" + eventId + "_image", "{=CESETTINGS1125}Custom Event Image", new ProxyRef<string>(() => EventSettings[currentEvent.Name].BackgroundName, o => EventSettings[currentEvent.Name].BackgroundName = o), stringBuilder => stringBuilder.SetHintText("{=CESETTINGS1126}Default is " + (currentEvent.Backgrounds != null ? currentEvent.Backgrounds.ToString() : currentEvent.BackgroundName)).SetRequireRestart(false).SetOrder(2));
-
                             });
                         }
                     }

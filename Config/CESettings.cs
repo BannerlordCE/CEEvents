@@ -34,7 +34,7 @@ namespace CaptivityEvents.Config
         bool PrisonerHeroEscapeSettlement { get; set; }
         bool PrisonerHeroEscapeOther { get; set; }
         bool PrisonerNonHeroEscapeParty { get; set; }
-        bool PrisonerNonHeroEscapeSettlement { get; set; } 
+        bool PrisonerNonHeroEscapeSettlement { get; set; }
         bool PrisonerNonHeroEscapeOther { get; set; }
         int PrisonerHeroEscapeChanceParty { get; set; }
         int PrisonerHeroEscapeChanceSettlement { get; set; }
@@ -112,11 +112,13 @@ namespace CaptivityEvents.Config
         public int PrisonerNonHeroEscapeChanceParty { get; set; } = 0;
         public int PrisonerNonHeroEscapeChanceSettlement { get; set; } = 0;
         public int PrisonerNonHeroEscapeChanceOther { get; set; } = 0;
+
         public DropdownDefault<string> EscapeAutoRansom { get; set; } = new DropdownDefault<string>(new string[] {
             "{=CESETTINGS1115}Off",
             "{=CESETTINGS1114}Disabled For Player",
             "{=CESETTINGS1116}On"
         }, 0);
+
         public DropdownDefault<string> BrothelOption { get; set; } = new DropdownDefault<string>(new string[]
         {
             "{=CESETTINGS1117}Any",
@@ -156,19 +158,20 @@ namespace CaptivityEvents.Config
         public bool UsePregnancyModifiers { get; set; } = true;
         public float PregnancyDurationInDays { get; set; } = 14f;
         public bool PregnancyMessages { get; set; } = true;
+
         public DropdownDefault<string> RenownChoice { get; set; } = new DropdownDefault<string>(new string[]
         {
             "{=CESETTINGS1115}Off",
             "{=CESETTINGS1022}Decrease/Increase Clan Level",
             "{=CESETTINGS1023}Keep/Increase Clan Level"
         }, 1);
+
         public float RenownMin { get; set; } = -150f;
         public bool LogToggle { get; set; } = false;
     }
 
     public class CESettingsCustom : AttributeGlobalSettings<CESettingsCustom>, ICustomSettingsProvider
     {
-
         public override string Id => "CaptivityEventsSettings";
         public override string DisplayName => "Captivity Events";
         public override string FolderName => "zCaptivityEvents";
@@ -228,7 +231,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0098}Captive/{=CESETTINGS0094}Gear/{=CESETTINGS1090}Outfit", GroupOrder = 1)]
         public int BetterOutFitChance { get; set; } = 25;
 
-        #endregion
+        #endregion Outfit
 
         #region Weapons
 
@@ -252,7 +255,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0098}Captive/{=CESETTINGS0094}Gear/{=CESETTINGS1091}Weapons")]
         public bool RangedSkill { get; set; } = true;
 
-        #endregion
+        #endregion Weapons
 
         #region Horse
 
@@ -280,7 +283,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0098}Captive/{=CESETTINGS0094}Gear/{=CESETTINGS1093}Quest")]
         public float StolenGearChance { get; set; } = 99.9f;
 
-        #endregion
+        #endregion Quest
 
         #endregion Gear
 
@@ -318,9 +321,9 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0099}Captor/{=CESETTINGS1127}Hunt")]
         public int AmountOfTroopsForHunt { get; set; } = 15;
 
-        #endregion
+        #endregion Hunt
 
-        #endregion
+        #endregion Captor
 
         #region Notification
 
@@ -332,7 +335,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS1129}Notifications")]
         public bool EventCaptorCustomTextureNotifications { get; set; } = true;
 
-        #endregion
+        #endregion Notification
 
         #region Brothel
 
@@ -361,7 +364,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0099}Brothel/{=CESETTINGS0097}Escape")]
         public int BrothelNonHeroEscapeChance { get; set; } = 0;
 
-        #endregion
+        #endregion Brothel
 
         #region Random
 
@@ -377,8 +380,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0088}Random")]
         public float EventOccurrenceRandom { get; set; } = 12f;
 
-
-        #endregion
+        #endregion Random
 
         #region Escape
 
@@ -394,12 +396,11 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0097}Escape/{=CESETTINGS1131}Hero/{=CESETTINGS1132}Prisoner Escape (Party)", GroupOrder = 1)]
         public bool PrisonerHeroEscapeParty { get; set; } = true;
 
-
         [SettingPropertyInteger("{=CESETTINGS1135}Prisoner Escape Chance", 0, 100, RequireRestart = false, HintText = "{=CESETTINGS1137}Chance to escape between 0 and 100")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape/{=CESETTINGS1131}Hero/{=CESETTINGS1132}Prisoner Escape (Party)")]
         public int PrisonerHeroEscapeChanceParty { get; set; } = 0;
 
-        #endregion
+        #endregion Escape Hero Party
 
         #region Escape Hero Settlement
 
@@ -411,7 +412,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0097}Escape/{=CESETTINGS1131}Hero/{=CESETTINGS1133}Prisoner Escape (Settlement)")]
         public int PrisonerHeroEscapeChanceSettlement { get; set; } = 0;
 
-        #endregion
+        #endregion Escape Hero Settlement
 
         #region Escape Hero Other
 
@@ -423,9 +424,9 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0097}Escape/{=CESETTINGS1131}Hero/{=CESETTINGS1134}Prisoner Escape (Other)")]
         public int PrisonerHeroEscapeChanceOther { get; set; } = 0;
 
-        #endregion
+        #endregion Escape Hero Other
 
-        #endregion
+        #endregion Escape Hero
 
         #region Escape Regular
 
@@ -439,7 +440,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0097}Escape/{=CESETTINGS1130}Regular/{=CESETTINGS1132}Prisoner Escape (Party)")]
         public int PrisonerNonHeroEscapeChanceParty { get; set; } = 0;
 
-        #endregion
+        #endregion Escape Regular Party
 
         #region Escape Regular Settlement
 
@@ -451,7 +452,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0097}Escape/{=CESETTINGS1130}Regular/{=CESETTINGS1133}Prisoner Escape (Settlement)")]
         public int PrisonerNonHeroEscapeChanceSettlement { get; set; } = 0;
 
-        #endregion
+        #endregion Escape Regular Settlement
 
         #region Escape Regular Other
 
@@ -463,9 +464,9 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0097}Escape/{=CESETTINGS1130}Regular/{=CESETTINGS1134}Prisoner Escape (Other)")]
         public int PrisonerNonHeroEscapeChanceOther { get; set; } = 0;
 
-        #endregion
+        #endregion Escape Regular Other
 
-        #endregion
+        #endregion Escape Regular
 
         [SettingPropertyDropdown("{=CESETTINGS1026}Games Default Auto Ransom Behavior", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behavior regarding auto-ransom")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
@@ -479,7 +480,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
         public bool PrisonerExceeded { get; set; } = false;
 
-        #endregion
+        #endregion Escape
 
         #region Pictures
 
@@ -487,7 +488,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0085}Pictures", GroupOrder = 7)]
         public bool CustomBackgrounds { get; set; } = true;
 
-        #endregion
+        #endregion Pictures
 
         #region Events
 
@@ -547,7 +548,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
         public bool PregnancyMessages { get; set; } = true;
 
-        #endregion
+        #endregion Pregnancy
 
         #region Other
 
@@ -567,7 +568,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0095}Other")]
         public bool LogToggle { get; set; } = false;
 
-        #endregion
+        #endregion Other
     }
 
     public class CESettings

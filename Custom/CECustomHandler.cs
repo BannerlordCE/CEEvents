@@ -20,10 +20,10 @@ namespace CaptivityEvents.Custom
         public static int Lines;
         public static string TestLog = "FC";
 
-        private static readonly List<CECustomModule> AllModules = new List<CECustomModule>();
-        private static readonly List<CEEvent> AllEvents = new List<CEEvent>();
-        private static readonly List<CECustom> AllCustom = new List<CECustom>();
-        private static readonly List<CEScene> AllScenes = new List<CEScene>();
+        private static readonly List<CECustomModule> AllModules = new();
+        private static readonly List<CEEvent> AllEvents = new();
+        private static readonly List<CECustom> AllCustom = new();
+        private static readonly List<CEScene> AllScenes = new();
 
         public static List<CECustom> GetCustom() => AllCustom;
 
@@ -37,7 +37,7 @@ namespace CaptivityEvents.Custom
             //TestWrite();
 #endif
             string errorPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedFlagXML.txt";
-            FileInfo file = new FileInfo(errorPath);
+            FileInfo file = new(errorPath);
             if (file.Exists) file.Delete();
             ErrorLines = 0;
             Lines = 0;
@@ -48,7 +48,7 @@ namespace CaptivityEvents.Custom
                 {
                     ForceLogToFile("Found new module path to be checked " + fullPath);
 
-                    List<CEEvent> TempEvents = new List<CEEvent>();
+                    List<CEEvent> TempEvents = new();
 
                     try
                     {
@@ -101,7 +101,7 @@ namespace CaptivityEvents.Custom
                             ForceLogToFile("Added: " + text);
                         }
 
-                        CECustomModule item = new CECustomModule(Path.GetFileNameWithoutExtension(fullPath), TempEvents);
+                        CECustomModule item = new(Path.GetFileNameWithoutExtension(fullPath), TempEvents);
                         AllModules.Add(item);
                     }
                     catch (Exception e)
@@ -118,7 +118,7 @@ namespace CaptivityEvents.Custom
                 ForceLogToFile("Found new module path to be checked " + fullPath);
                 string[] files = Directory.GetFiles(fullPath, "*.xml", SearchOption.AllDirectories);
 
-                List<CEEvent> TempEvents = new List<CEEvent>();
+                List<CEEvent> TempEvents = new();
 
                 foreach (string text in files)
                 {
@@ -161,7 +161,7 @@ namespace CaptivityEvents.Custom
                     ForceLogToFile("Added: " + text);
                 }
 
-                CECustomModule item = new CECustomModule(Path.GetFileNameWithoutExtension(fullPath), TempEvents);
+                CECustomModule item = new(Path.GetFileNameWithoutExtension(fullPath), TempEvents);
                 AllModules.Add(item);
 
                 return AllEvents;
@@ -188,7 +188,7 @@ namespace CaptivityEvents.Custom
                 return null;
             }
         }
-        
+
         // Setting XML
         public static CECustomSettings DeserializeXMLFileToSettings(string XmlFilename)
         {
@@ -197,14 +197,14 @@ namespace CaptivityEvents.Custom
             try
             {
                 if (string.IsNullOrEmpty(XmlFilename)) return null;
-                StreamReader textReader = new StreamReader(XmlFilename);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(CECustomSettings));
+                StreamReader textReader = new(XmlFilename);
+                XmlSerializer xmlSerializer = new(typeof(CECustomSettings));
                 CECustomSettings xsefsevents = (CECustomSettings)xmlSerializer.Deserialize(textReader);
                 _CESettings = xsefsevents;
             }
             catch (Exception innerException)
             {
-                TextObject textObject = new TextObject("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
+                TextObject textObject = new("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
                 textObject.SetTextVariable("FILE", XmlFilename);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
 
@@ -215,10 +215,11 @@ namespace CaptivityEvents.Custom
         }
 
         #region Scenes
+
         private static bool XMLFileCompliesWithSceneXSD(string file)
         {
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CECustomScenes.xsd";
-            XmlSchemaSet xmlSchemaSet = new XmlSchemaSet();
+            XmlSchemaSet xmlSchemaSet = new();
             string msg = "";
 
             try
@@ -233,7 +234,7 @@ namespace CaptivityEvents.Custom
             }
             catch (Exception innerException)
             {
-                TextObject textObject = new TextObject("{=CEEVENTS1002}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
+                TextObject textObject = new("{=CEEVENTS1002}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
                 textObject.SetTextVariable("FILE", file);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
                 msg = "ERROR XMLFileCompliesWithSceneXSD:  -- filename: " + file + " : " + innerException;
@@ -256,19 +257,19 @@ namespace CaptivityEvents.Custom
 
         public static List<CEScene> DeserializeXMLFileToScene(string XmlFilename)
         {
-            List<CEScene> list = new List<CEScene>();
+            List<CEScene> list = new();
 
             try
             {
                 if (string.IsNullOrEmpty(XmlFilename)) return null;
-                StreamReader textReader = new StreamReader(XmlFilename);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(CECustomScenes));
+                StreamReader textReader = new(XmlFilename);
+                XmlSerializer xmlSerializer = new(typeof(CECustomScenes));
                 CECustomScenes xsefsevents = (CECustomScenes)xmlSerializer.Deserialize(textReader);
                 list.AddRange(xsefsevents.CEScene);
             }
             catch (Exception innerException)
             {
-                TextObject textObject = new TextObject("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedSceneXML.txt");
+                TextObject textObject = new("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedSceneXML.txt");
                 textObject.SetTextVariable("FILE", XmlFilename);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
 
@@ -278,14 +279,14 @@ namespace CaptivityEvents.Custom
             return list;
         }
 
-        #endregion
+        #endregion Scenes
 
         #region Custom Settings
 
         private static bool XMLFileCompliesWithCustomXSD(string file)
         {
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CECustomModal.xsd";
-            XmlSchemaSet xmlSchemaSet = new XmlSchemaSet();
+            XmlSchemaSet xmlSchemaSet = new();
             string msg = "";
 
             try
@@ -300,7 +301,7 @@ namespace CaptivityEvents.Custom
             }
             catch (Exception innerException)
             {
-                TextObject textObject = new TextObject("{=CEEVENTS1002}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
+                TextObject textObject = new("{=CEEVENTS1002}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
                 textObject.SetTextVariable("FILE", file);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
                 msg = "ERROR XMLFileCompliesWithFlagXSD:  -- filename: " + file + " : " + innerException;
@@ -323,19 +324,19 @@ namespace CaptivityEvents.Custom
 
         public static List<CECustom> DeserializeXMLFileToFlags(string XmlFilename)
         {
-            List<CECustom> list = new List<CECustom>();
+            List<CECustom> list = new();
 
             try
             {
                 if (string.IsNullOrEmpty(XmlFilename)) return null;
-                StreamReader textReader = new StreamReader(XmlFilename);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(CECustom));
+                StreamReader textReader = new(XmlFilename);
+                XmlSerializer xmlSerializer = new(typeof(CECustom));
                 CECustom xsefsevents = (CECustom)xmlSerializer.Deserialize(textReader);
                 list.Add(xsefsevents);
             }
             catch (Exception innerException)
             {
-                TextObject textObject = new TextObject("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
+                TextObject textObject = new("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
                 textObject.SetTextVariable("FILE", XmlFilename);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
 
@@ -343,16 +344,16 @@ namespace CaptivityEvents.Custom
             }
 
             return list;
-        }  
+        }
 
-        #endregion
+        #endregion Custom Settings
 
         #region Events
 
         private static bool XMLFileCompliesWithStandardXSD(string file)
         {
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CEEventsModal.xsd";
-            XmlSchemaSet xmlSchemaSet = new XmlSchemaSet();
+            XmlSchemaSet xmlSchemaSet = new();
             string msg = "";
 
             try
@@ -368,7 +369,7 @@ namespace CaptivityEvents.Custom
             }
             catch (Exception innerException)
             {
-                TextObject textObject = new TextObject("{=CEEVENTS1002}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
+                TextObject textObject = new("{=CEEVENTS1002}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
                 textObject.SetTextVariable("FILE", file);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
                 msg = "ERROR XMLFileCompliesWithStandardXSD:  -- filename: " + file + " : " + innerException;
@@ -391,19 +392,19 @@ namespace CaptivityEvents.Custom
 
         public static List<CEEvent> DeserializeXMLFileToObject(string XmlFilename)
         {
-            List<CEEvent> list = new List<CEEvent>();
+            List<CEEvent> list = new();
 
             try
             {
                 if (string.IsNullOrEmpty(XmlFilename)) return null;
-                StreamReader textReader = new StreamReader(XmlFilename);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(CEEvents));
+                StreamReader textReader = new(XmlFilename);
+                XmlSerializer xmlSerializer = new(typeof(CEEvents));
                 CEEvents xsefsevents = (CEEvents)xmlSerializer.Deserialize(textReader);
                 list.AddRange(xsefsevents.CEEvent);
             }
             catch (Exception innerException)
             {
-                TextObject textObject = new TextObject("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
+                TextObject textObject = new("{=CEEVENTS1001}Failed to load {FILE} for more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt");
                 textObject.SetTextVariable("FILE", XmlFilename);
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
 
@@ -413,7 +414,7 @@ namespace CaptivityEvents.Custom
             return list;
         }
 
-        #endregion
+        #endregion Events
 
         #region Logs
 
@@ -429,6 +430,7 @@ namespace CaptivityEvents.Custom
                     location = "LoadingFailedSceneXML.txt";
                     errorMessage = " does not comply to CEScene format described in CECustomScenes.xsd ";
                     break;
+
                 default:
                     location = "LoadingFailedFlagXML.txt";
                     errorMessage = " does not comply to CEFlagsModal format described in CECustomModal.xsd ";
@@ -436,7 +438,7 @@ namespace CaptivityEvents.Custom
             }
 
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/" + location;
-            FileInfo file = new FileInfo(fullPath);
+            FileInfo file = new(fullPath);
             file.Directory?.Create();
             if (Lines == 0) File.WriteAllText(BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/" + location, "");
             string contents = xmlFile + errorMessage + msg + Environment.NewLine;
@@ -448,7 +450,7 @@ namespace CaptivityEvents.Custom
         private static void LogXMLIssueToFile(string msg, string xmlFile = "")
         {
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedXML.txt";
-            FileInfo file = new FileInfo(fullPath);
+            FileInfo file = new(fullPath);
             file.Directory?.Create();
             string contents = xmlFile + " does not comply to CEEventsModal format described in CEEventsModal.xsd : " + msg + Environment.NewLine;
             if (ErrorLines == 0) File.WriteAllText(BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedXML.txt", contents);
@@ -477,24 +479,17 @@ namespace CaptivityEvents.Custom
         {
             if (Lines >= 1000)
             {
-                switch (TestLog)
+                TestLog = TestLog switch
                 {
-                    case "FC":
-                        TestLog = "RT";
-                        break;
-                    case "RT":
-                        TestLog = "LT";
-                        break;
-                    default:
-                        TestLog = "FC";
-                        break;
-                }
-
+                    "FC" => "RT",
+                    "RT" => "LT",
+                    _ => "FC",
+                };
                 Lines = 0;
             }
 
             string fullPath = (BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LogFile{0}.txt").Replace("{0}", TestLog);
-            FileInfo file = new FileInfo(fullPath);
+            FileInfo file = new(fullPath);
             file.Directory?.Create();
             if (Lines == 0) File.WriteAllText((BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LogFile{0}.txt").Replace("{0}", TestLog), "");
 
@@ -503,9 +498,10 @@ namespace CaptivityEvents.Custom
             Lines++;
         }
 
-        #endregion
+        #endregion Logs
 
 #if DEBUG
+
         public static string GetEventXml(CEEvents obj, XmlSerializer serializer = null, bool omitStandardNamespaces = false)
         {
             XmlSerializerNamespaces ns = null;
@@ -514,18 +510,16 @@ namespace CaptivityEvents.Custom
                 ns = new XmlSerializerNamespaces();
                 ns.Add("", ""); // Disable the xmlns:xsi and xmlns:xsd lines.
             }
-            using (System.IO.StringWriter textWriter = new System.IO.StringWriter())
-            {
-                XmlWriterSettings settings = new XmlWriterSettings() { Indent = true }; // For cosmetic purposes.
-                using (XmlWriter xmlWriter = XmlWriter.Create(textWriter, settings))
-                    (serializer ?? new XmlSerializer(obj.GetType())).Serialize(xmlWriter, obj, ns);
-                return textWriter.ToString();
-            }
+            using System.IO.StringWriter textWriter = new();
+            XmlWriterSettings settings = new() { Indent = true }; // For cosmetic purposes.
+            using (XmlWriter xmlWriter = XmlWriter.Create(textWriter, settings))
+                (serializer ?? new XmlSerializer(obj.GetType())).Serialize(xmlWriter, obj, ns);
+            return textWriter.ToString();
         }
 
         public static void TestWrite()
         {
-            CEEvents ceEvents = new CEEvents
+            CEEvents ceEvents = new()
             {
                 CEEvent = new CEEvent[]
                 {
@@ -543,11 +537,11 @@ namespace CaptivityEvents.Custom
 
             string xml = GetEventXml(ceEvents, omitStandardNamespaces: true);
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/TESTXML.xml";
-            FileInfo file = new FileInfo(fullPath);
+            FileInfo file = new(fullPath);
             file.Directory?.Create();
             File.WriteAllText(BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/TESTXML.xml", xml);
         }
-#endif
 
+#endif
     }
 }

@@ -306,10 +306,13 @@ namespace CaptivityEvents.Custom
     {
         [XmlAttribute()]
         public string Location { get; set; }
+
         [XmlAttribute()]
         public string LocationName { get; set; }
+
         [XmlAttribute()]
         public string Distance { get; set; }
+
         [XmlAttribute()]
         public string Faction { get; set; }
     }
@@ -321,7 +324,7 @@ namespace CaptivityEvents.Custom
     public class SceneSettings
     {
         [XmlAttribute()]
-        public string  TalkTo { get; set; }
+        public string TalkTo { get; set; }
 
         [XmlAttribute()]
         public string SceneName { get; set; }
@@ -398,7 +401,6 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("ClanOption", IsNullable = true)]
         public ClanOption[] ClanOptions { get; set; }
-
     }
 
     public class TraitToLevel
@@ -436,7 +438,6 @@ namespace CaptivityEvents.Custom
         [XmlAttribute()]
         public string Id { get; set; }
     }
-
 
     public class SkillToLevel
     {
@@ -548,7 +549,6 @@ namespace CaptivityEvents.Custom
         [XmlAttribute()]
         public string UseConditions { get; set; }
     }
-
 
     [DebuggerStepThrough]
     [XmlType(AnonymousType = true)]
@@ -771,7 +771,6 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("CustomFlag")]
         public List<string> MultipleListOfCustomFlags { get; set; }
-
 
         [XmlArrayItem("RestrictedListOfFlags", IsNullable = false)]
         public RestrictedListOfFlags[] MultipleRestrictedListOfFlags { get; set; }

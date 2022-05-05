@@ -1,3 +1,5 @@
+#define V172
+
 using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
@@ -9,6 +11,14 @@ using TaleWorlds.Core;
 using TaleWorlds.Core.ViewModelCollection;
 using TaleWorlds.Localization;
 
+#if V171
+#else
+
+using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.CampaignSystem.Settlements.Workshops;
+
+#endif
+
 namespace CaptivityEvents.Brothel
 {
     // TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance ClanFinanceWorkshopItemVM
@@ -16,13 +26,12 @@ namespace CaptivityEvents.Brothel
     {
         public CEBrothelClanFinanceItemVM(CEBrothel brothel, Workshop workshop, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh) : base(workshop, onSelection, onRefresh)
         {
-        _brothel = brothel;
+            _brothel = brothel;
 
             IncomeTypeAsEnum = IncomeTypes.Workshop;
             SettlementComponent component = _brothel.Settlement.GetComponent<SettlementComponent>();
             ImageName = component != null ? component.WaitMeshName : "";
             RefreshValues();
-
         }
 
         public override void RefreshValues()
@@ -79,7 +88,7 @@ namespace CaptivityEvents.Brothel
 
             if (_brothel.NotRunnedDays > 0)
             {
-                TextObject textObject = new TextObject("{=*}{DAYS} days ago");
+                TextObject textObject = new("{=*}{DAYS} days ago");
                 textObject.SetTextVariable("DAYS", _brothel.NotRunnedDays);
                 ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=*}Last Run").ToString(), textObject.ToString()));
             }
@@ -97,19 +106,17 @@ namespace CaptivityEvents.Brothel
 
         private new void ExecuteEndHint() => InformationManager.HideInformations();
 
-
         private static TextObject GetBrothelRunningHintText(bool isRunning, int costToStart)
         {
-            TextObject textObject = new TextObject("The brothel is currently {?ISRUNNING}open{?}closed, you will need {AMOUNT} denars to begin operations again{\\?}.");
+            TextObject textObject = new("The brothel is currently {?ISRUNNING}open{?}closed, you will need {AMOUNT} denars to begin operations again{\\?}.");
 
             textObject.SetTextVariable("ISRUNNING", isRunning ? 1 : 0);
             if (!isRunning) textObject.SetTextVariable("AMOUNT", costToStart);
 
-
             return textObject;
         }
 
-    private void ExecuteToggleBrothel(object identifier)
+        private void ExecuteToggleBrothel(object identifier)
         {
             if (_brothel == null) return;
             if (!_brothel.IsRunning) GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, _brothel.Expense);
@@ -119,10 +126,9 @@ namespace CaptivityEvents.Brothel
             onRefresh?.Invoke();
         }
 
-
         private static TextObject GetBrothelSellHintText(int sellCost)
         {
-            TextObject textObject = new TextObject("{=CEBROTHEL1000}You can sell this brothel for {AMOUNT} denars.");
+            TextObject textObject = new("{=CEBROTHEL1000}You can sell this brothel for {AMOUNT} denars.");
             textObject.SetTextVariable("AMOUNT", sellCost);
 
             return textObject;
@@ -138,7 +144,6 @@ namespace CaptivityEvents.Brothel
 
             onRefresh?.Invoke();
         }
-
 
         public new string WorkshopTypeId
         {

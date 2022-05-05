@@ -1,4 +1,5 @@
-#define V170
+#define V172
+
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -21,6 +22,16 @@ using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
 using static CaptivityEvents.Helper.CEHelper;
+
+#if V171
+#else
+
+using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.CampaignSystem.ComponentInterfaces;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
+
+#endif
 
 namespace CaptivityEvents.CampaignBehaviors
 {
@@ -87,7 +98,6 @@ namespace CaptivityEvents.CampaignBehaviors
 
                     GameMenu.SwitchToMenu(returnedEvent.Name);
                 }
-
             }
 
             return true;
@@ -172,12 +182,15 @@ namespace CaptivityEvents.CampaignBehaviors
                             case "$FAILEDTOFIND":
                                 CECustomHandler.LogToFile("Failed to load event list.");
                                 break;
+
                             case "$EVENTNOTFOUND":
                                 CECustomHandler.LogToFile("Event not found.");
                                 break;
+
                             case "$EVENTCONDITIONSNOTMET":
                                 CECustomHandler.LogToFile("Event conditions are not met.");
                                 break;
+
                             default:
                                 if (result.StartsWith("$"))
                                 {
@@ -231,12 +244,15 @@ namespace CaptivityEvents.CampaignBehaviors
                             case "$FAILEDTOFIND":
                                 CECustomHandler.LogToFile("Failed to load event list.");
                                 break;
+
                             case "$EVENTNOTFOUND":
                                 CECustomHandler.LogToFile("Event not found.");
                                 break;
+
                             case "$EVENTCONDITIONSNOTMET":
                                 CECustomHandler.LogToFile("Event conditions are not met.");
                                 break;
+
                             default:
                                 if (result.StartsWith("$"))
                                 {
@@ -277,7 +293,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private bool CheckEventHourly()
         {
-            if (CEHelper.progressEventExists) return false;
+            if (progressEventExists) return false;
             _hoursPassed++;
             if (CESettings.Instance == null) return false;
 
@@ -302,8 +318,7 @@ namespace CaptivityEvents.CampaignBehaviors
             return true;
         }
 
-
-        #endregion
+        #endregion Events
 
         #region Pregnancy
 
@@ -332,7 +347,6 @@ namespace CaptivityEvents.CampaignBehaviors
         /// <param name="hero"></param>
         private void ChangeWeight(Hero hero, int stage, float weight = 0.3f)
         {
-
             if (stage != 0) weight = hero.Weight;
 
             switch (stage)
@@ -340,12 +354,15 @@ namespace CaptivityEvents.CampaignBehaviors
                 case 1:
                     weight = MBMath.ClampFloat(weight + 0.01f, 0.3f, 0.7f);
                     break;
+
                 case 2:
                     weight = MBMath.ClampFloat(weight + 0.01f, 0.3f, 0.95f);
                     break;
+
                 case 3:
                     weight = 1f;
                     break;
+
                 default:
                     break;
             }
@@ -419,7 +436,7 @@ namespace CaptivityEvents.CampaignBehaviors
         }
 
         /// <summary>
-        /// Behavior Duplicate found In PregnancyCampaignBehavior 
+        /// Behavior Duplicate found In PregnancyCampaignBehavior
         /// </summary>
         /// <param name="mother"></param>
         /// <param name="father"></param>
@@ -433,28 +450,23 @@ namespace CaptivityEvents.CampaignBehaviors
 
             // Reflection One
             MethodInfo mi = typeof(HeroCreator).GetMethod("CreateNewHero", BindingFlags.NonPublic | BindingFlags.Static);
-#if V165
-            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null, 0);
-#else
+
             if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null);
-#endif
+
             Hero hero = (Hero)mi.Invoke(null, new object[] { characterObject, 0 });
 
             // For Wanderer Pregnancy
             hero.SetBirthDay(CampaignTime.Now);
 
             int becomeChildAge = Campaign.Current.Models.AgeModel.BecomeChildAge;
-#if V165
-            CharacterObject characterObject2 = CharacterObject.ChildTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
-#else
-            culture = (culture ?? mother.Culture);
+
+            culture ??= mother.Culture;
             CharacterObject characterObject2 = culture.ChildCharacterTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
-#endif
 
             if (characterObject2 != null)
             {
                 Equipment equipment = characterObject2.FirstCivilianEquipment.Clone(false);
-                Equipment equipment2 = new Equipment(false);
+                Equipment equipment2 = new(false);
                 // TaleWorld's Bug
                 if (hero.BattleEquipment == null)
                 {
@@ -471,14 +483,8 @@ namespace CaptivityEvents.CampaignBehaviors
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment2);
             }
 
-
-#if V165
-            hero.SetName(NameGenerator.Current.GenerateHeroFirstName(hero, true), null);
-            hero.CharacterObject.Name = hero.FirstName;
-#else
             TextObject name = NameGenerator.Current.GenerateHeroFirstName(hero, true);
             hero.SetName(name, name);
-#endif
 
             // Reflection Two
             mi = hero.HeroDeveloper.GetType().GetMethod("CheckInitialLevel", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -508,11 +514,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
             // Reflection Two
             MethodInfo mi2 = typeof(HeroCreator).GetMethod("DecideBornSettlement", BindingFlags.NonPublic | BindingFlags.Static);
-#if V165
-            if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null, 0);
-#else
             if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null);
-#endif
             hero.BornSettlement = (Settlement)mi2.Invoke(null, new object[] { hero });
 
             hero.IsNoble = true;
@@ -528,11 +530,11 @@ namespace CaptivityEvents.CampaignBehaviors
             }
             CampaignEventDispatcher.Instance.OnHeroCreated(hero, true);
             int heroComesOfAge = Campaign.Current.Models.AgeModel.HeroComesOfAge;
-            if (hero.Age > (float)becomeChildAge || (hero.Age == (float)becomeChildAge && hero.BirthDay.GetDayOfYear < CampaignTime.Now.GetDayOfYear))
+            if (hero.Age > becomeChildAge || (hero.Age == becomeChildAge && hero.BirthDay.GetDayOfYear < CampaignTime.Now.GetDayOfYear))
             {
                 CampaignEventDispatcher.Instance.OnHeroGrowsOutOfInfancy(hero);
             }
-            if (hero.Age > (float)heroComesOfAge || (hero.Age == (float)heroComesOfAge && hero.BirthDay.GetDayOfYear < CampaignTime.Now.GetDayOfYear))
+            if (hero.Age > heroComesOfAge || (hero.Age == heroComesOfAge && hero.BirthDay.GetDayOfYear < CampaignTime.Now.GetDayOfYear))
             {
                 CampaignEventDispatcher.Instance.OnHeroComesOfAge(hero);
             }
@@ -541,7 +543,7 @@ namespace CaptivityEvents.CampaignBehaviors
         }
 
         /// <summary>
-        /// Behavior Duplicate found In PregnancyCampaignBehavior 
+        /// Behavior Duplicate found In PregnancyCampaignBehavior
         /// </summary>
         /// <param name="pregnancy"></param>
         private void CheckOffspringsToDeliver(Pregnancy pregnancy)
@@ -561,7 +563,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
                 Hero mother = pregnancy.Mother;
                 bool flag = MBRandom.RandomFloat <= pregnancyModel.DeliveringTwinsProbability;
-                List<Hero> aliveOffsprings = new List<Hero>();
+                List<Hero> aliveOffsprings = new();
 
                 int num = flag ? 2 : 1;
                 int stillbornCount = 0;
@@ -581,11 +583,8 @@ namespace CaptivityEvents.CampaignBehaviors
                         {
                             CECustomHandler.ForceLogToFile("Bad pregnancy " + (isOffspringFemale ? "Female" : "Male"));
                             CECustomHandler.ForceLogToFile(e.Message + " : " + e);
-#if V165
-                            Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, !isOffspringFemale, null, 0);
-#else
+
                             Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, !isOffspringFemale, null);
-#endif
                             aliveOffsprings.Add(item);
                         }
                     }
@@ -593,7 +592,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     {
                         if (mother == Hero.MainHero)
                         {
-                            TextObject textObject = new TextObject("{=pw4cUPEn}{MOTHER.LINK} has delivered stillborn.");
+                            TextObject textObject = new("{=pw4cUPEn}{MOTHER.LINK} has delivered stillborn.");
                             StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, textObject);
                             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString()));
                         }
@@ -613,15 +612,19 @@ namespace CaptivityEvents.CampaignBehaviors
                         case 2:
                             textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=Sn9a1Aba}two stillborn babies"));
                             break;
+
                         case 1 when aliveOffsprings.Count == 0:
                             textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=qWLq2y84}a stillborn baby"));
                             break;
+
                         case 1 when aliveOffsprings.Count == 1:
                             textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=CEEVENTS1168}one healthy and one stillborn baby"));
                             break;
+
                         case 0 when aliveOffsprings.Count == 1:
                             textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=CEEVENTS1169}a healthy baby"));
                             break;
+
                         case 0 when aliveOffsprings.Count == 2:
                             textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=CEEVENTS1170}two healthy babies"));
                             break;
@@ -634,13 +637,13 @@ namespace CaptivityEvents.CampaignBehaviors
                 {
                     for (int i = 0; i < stillbornCount; i++)
                     {
-                        ChildbirthLogEntry childbirthLogEntry = new ChildbirthLogEntry(mother, null);
+                        ChildbirthLogEntry childbirthLogEntry = new(mother, null);
                         LogEntry.AddLogEntry(childbirthLogEntry);
                         Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText()));
                     }
                     foreach (Hero newbornHero in aliveOffsprings)
                     {
-                        ChildbirthLogEntry childbirthLogEntry2 = new ChildbirthLogEntry(mother, newbornHero);
+                        ChildbirthLogEntry childbirthLogEntry2 = new(mother, newbornHero);
                         LogEntry.AddLogEntry(childbirthLogEntry2);
                         Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText()));
                     }
@@ -655,7 +658,7 @@ namespace CaptivityEvents.CampaignBehaviors
             {
                 CECustomHandler.ForceLogToFile("Bad pregnancy");
                 CECustomHandler.ForceLogToFile(e.Message + " : " + e);
-                TextObject textObject = new TextObject("{=CEEVENTS1008}Error: bad pregnancy in CE pregnancy list");
+                TextObject textObject = new("{=CEEVENTS1008}Error: bad pregnancy in CE pregnancy list");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Black));
                 pregnancy.AlreadyOccured = true;
             }
@@ -681,9 +684,10 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
-#endregion
+        #endregion Pregnancy
 
-#region Equipment
+        #region Equipment
+
         private void CheckEquipmentToReturn(ReturnEquipment returnEquipment)
         {
             try
@@ -715,7 +719,7 @@ namespace CaptivityEvents.CampaignBehaviors
             {
                 CECustomHandler.ForceLogToFile("Bad Equipment");
                 CECustomHandler.ForceLogToFile(e.Message + " : " + e);
-                TextObject textObject = new TextObject("{=CEEVENTS1009}Error: bad equipment in return equipment list");
+                TextObject textObject = new("{=CEEVENTS1009}Error: bad equipment in return equipment list");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Black));
                 returnEquipment.AlreadyOccured = true;
             }
@@ -726,7 +730,7 @@ namespace CaptivityEvents.CampaignBehaviors
             if (!_returnEquipment.Exists(item => item.Captive == captive)) _returnEquipment.Add(new ReturnEquipment(captive, battleEquipment, civilianEquipment));
         }
 
-#endregion
+        #endregion Equipment
 
         public void OnHeroKilled(Hero victim, Hero killer, KillCharacterAction.KillCharacterActionDetail detail, bool showNotification)
         {
@@ -766,7 +770,6 @@ namespace CaptivityEvents.CampaignBehaviors
 
                     if (shouldEventsFire)
                     {
-
                         if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
                         {
                             if (CESettings.Instance.EventRandomEnabled)
@@ -780,7 +783,6 @@ namespace CaptivityEvents.CampaignBehaviors
                             {
                                 LaunchCaptorEvent();
                             }
-
                         }
                         else if (CESettings.Instance.EventRandomEnabled)
                         {
@@ -815,7 +817,7 @@ namespace CaptivityEvents.CampaignBehaviors
             }
             catch (Exception e)
             {
-                TextObject textObject = new TextObject("{=CEEVENTS1007}Error: resetting the CE pregnancy list");
+                TextObject textObject = new("{=CEEVENTS1007}Error: resetting the CE pregnancy list");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Black));
                 _heroPregnancies = new List<Pregnancy>();
                 CECustomHandler.ForceLogToFile("Failed _heroPregnancies ForEach");
@@ -833,7 +835,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 }
                 catch (Exception e)
                 {
-                    TextObject textObject = new TextObject("{=CEEVENTS1006}Error: resetting the return equipment list");
+                    TextObject textObject = new("{=CEEVENTS1006}Error: resetting the return equipment list");
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Black));
                     _returnEquipment = new List<ReturnEquipment>();
                     CECustomHandler.ForceLogToFile("Failed _returnEquipment ForEach");
@@ -873,13 +875,13 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private int _hoursPassed;
 
-        private static List<Pregnancy> _heroPregnancies = new List<Pregnancy>();
+        private static List<Pregnancy> _heroPregnancies = new();
 
-        private static List<ReturnEquipment> _returnEquipment = new List<ReturnEquipment>();
+        private static List<ReturnEquipment> _returnEquipment = new();
 
         public static ExtraVariables ExtraProps => _extraVariables;
 
-        private static ExtraVariables _extraVariables = new ExtraVariables();
+        private static ExtraVariables _extraVariables = new();
 
         internal class Pregnancy
         {
@@ -909,10 +911,10 @@ namespace CaptivityEvents.CampaignBehaviors
             public ReturnEquipment(Hero captive, Equipment battleEquipment, Equipment civilianEquipment)
             {
                 Captive = captive;
-                Equipment randomElement = new Equipment(false);
+                Equipment randomElement = new(false);
                 randomElement.FillFrom(battleEquipment, false);
                 BattleEquipment = randomElement;
-                Equipment randomElement2 = new Equipment(true);
+                Equipment randomElement2 = new(true);
                 randomElement2.FillFrom(civilianEquipment, false);
                 CivilianEquipment = randomElement2;
                 AlreadyOccured = false;

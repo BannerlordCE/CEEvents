@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\NUnit.3.12.0\build\NUnit.props" Condition="Exists('packages\NUnit.3.12.0\build\NUnit.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -13,7 +14,6 @@
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <LangVersion>latestMajor</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -85,6 +85,54 @@
     <Compile Include="Config\CESettingsVM.cs" />
     <Compile Include="Config\CESettingsVMCategory.cs" />
     <Compile Include="Config\CEManagedOptionTypes.cs" />
+    <Compile Include="cs\net5\Bannerlord.ModuleManager\AlphanumComparatorFast.cs" />
+    <Compile Include="cs\net5\Bannerlord.ModuleManager\ApplicationVersion.cs" />
+    <Compile Include="cs\net5\Bannerlord.ModuleManager\ApplicationVersionComparer.cs" />
+    <Compile Include="cs\net5\Bannerlord.ModuleManager\ApplicationVersionRange.cs" />
+    <Compile Include="cs\net5\Bannerlord.ModuleManager\ApplicationVersionType.cs" />
+    <Compile Include="cs\net5\Bannerlord.ModuleManager\DependentModule.cs" />
+    <Compile Include="cs\net5\Bannerlord.ModuleManager\DependentModuleMetadata.cs" />
+    <Compile Include="cs\net5\Bannerlord.ModuleManager\LoadType.cs" />
+    <Compile Include="cs\net5\Bannerlord.ModuleManager\ModuleInfoExtended.cs" />
+    <Compile Include="cs\net5\Bannerlord.ModuleManager\ModuleSorter.cs" />
+    <Compile Include="cs\net5\Bannerlord.ModuleManager\SubModuleInfoExtended.cs" />
+    <Compile Include="cs\net5\Bannerlord.ModuleManager\SubModuleTags.cs" />
+    <Compile Include="cs\net6\Bannerlord.ModuleManager\AlphanumComparatorFast.cs" />
+    <Compile Include="cs\net6\Bannerlord.ModuleManager\ApplicationVersion.cs" />
+    <Compile Include="cs\net6\Bannerlord.ModuleManager\ApplicationVersionComparer.cs" />
+    <Compile Include="cs\net6\Bannerlord.ModuleManager\ApplicationVersionRange.cs" />
+    <Compile Include="cs\net6\Bannerlord.ModuleManager\ApplicationVersionType.cs" />
+    <Compile Include="cs\net6\Bannerlord.ModuleManager\DependentModule.cs" />
+    <Compile Include="cs\net6\Bannerlord.ModuleManager\DependentModuleMetadata.cs" />
+    <Compile Include="cs\net6\Bannerlord.ModuleManager\LoadType.cs" />
+    <Compile Include="cs\net6\Bannerlord.ModuleManager\ModuleInfoExtended.cs" />
+    <Compile Include="cs\net6\Bannerlord.ModuleManager\ModuleSorter.cs" />
+    <Compile Include="cs\net6\Bannerlord.ModuleManager\SubModuleInfoExtended.cs" />
+    <Compile Include="cs\net6\Bannerlord.ModuleManager\SubModuleTags.cs" />
+    <Compile Include="cs\netstandard2.0\Bannerlord.ModuleManager\AlphanumComparatorFast.cs" />
+    <Compile Include="cs\netstandard2.0\Bannerlord.ModuleManager\ApplicationVersion.cs" />
+    <Compile Include="cs\netstandard2.0\Bannerlord.ModuleManager\ApplicationVersionComparer.cs" />
+    <Compile Include="cs\netstandard2.0\Bannerlord.ModuleManager\ApplicationVersionRange.cs" />
+    <Compile Include="cs\netstandard2.0\Bannerlord.ModuleManager\ApplicationVersionType.cs" />
+    <Compile Include="cs\netstandard2.0\Bannerlord.ModuleManager\DependentModule.cs" />
+    <Compile Include="cs\netstandard2.0\Bannerlord.ModuleManager\DependentModuleMetadata.cs" />
+    <Compile Include="cs\netstandard2.0\Bannerlord.ModuleManager\LoadType.cs" />
+    <Compile Include="cs\netstandard2.0\Bannerlord.ModuleManager\ModuleInfoExtended.cs" />
+    <Compile Include="cs\netstandard2.0\Bannerlord.ModuleManager\ModuleSorter.cs" />
+    <Compile Include="cs\netstandard2.0\Bannerlord.ModuleManager\SubModuleInfoExtended.cs" />
+    <Compile Include="cs\netstandard2.0\Bannerlord.ModuleManager\SubModuleTags.cs" />
+    <Compile Include="cs\netstandard2.1\Bannerlord.ModuleManager\AlphanumComparatorFast.cs" />
+    <Compile Include="cs\netstandard2.1\Bannerlord.ModuleManager\ApplicationVersion.cs" />
+    <Compile Include="cs\netstandard2.1\Bannerlord.ModuleManager\ApplicationVersionComparer.cs" />
+    <Compile Include="cs\netstandard2.1\Bannerlord.ModuleManager\ApplicationVersionRange.cs" />
+    <Compile Include="cs\netstandard2.1\Bannerlord.ModuleManager\ApplicationVersionType.cs" />
+    <Compile Include="cs\netstandard2.1\Bannerlord.ModuleManager\DependentModule.cs" />
+    <Compile Include="cs\netstandard2.1\Bannerlord.ModuleManager\DependentModuleMetadata.cs" />
+    <Compile Include="cs\netstandard2.1\Bannerlord.ModuleManager\LoadType.cs" />
+    <Compile Include="cs\netstandard2.1\Bannerlord.ModuleManager\ModuleInfoExtended.cs" />
+    <Compile Include="cs\netstandard2.1\Bannerlord.ModuleManager\ModuleSorter.cs" />
+    <Compile Include="cs\netstandard2.1\Bannerlord.ModuleManager\SubModuleInfoExtended.cs" />
+    <Compile Include="cs\netstandard2.1\Bannerlord.ModuleManager\SubModuleTags.cs" />
     <Compile Include="Custom\CECustomModule.cs" />
     <Compile Include="Custom\CECustomSettings.cs" />
     <Compile Include="Custom\CECustomScene.cs" />
@@ -142,8 +190,38 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="0Harmony, Version=2.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Lib.Harmony.2.2.1\lib\net48\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="MCMv4, Version=4.5.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>packages\Bannerlord.MCM.4.5.0\lib\net472\MCMv4.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Bcl.HashCode.1.1.1\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp">
       <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.DependencyInjection.2.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.DependencyInjection.Abstractions.2.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Logging.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Logging.Abstractions.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Options, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Options.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Options.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Primitives.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SandBox">
       <HintPath>..\..\SandBox\bin\Win64_Shipping_Client\SandBox.dll</HintPath>
@@ -164,6 +242,15 @@
       <HintPath>..\..\SandBox\bin\Win64_Shipping_Client\SandBox.ViewModelCollection.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>packages\Serilog.2.10.0\lib\net46\Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.Extensions.Logging, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>packages\Serilog.Extensions.Logging.3.1.0\lib\netstandard2.0\Serilog.Extensions.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.Sinks.File, Version=5.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>packages\Serilog.Sinks.File.5.0.0\lib\net45\Serilog.Sinks.File.dll</HintPath>
+    </Reference>
     <Reference Include="StoryMode">
       <HintPath>..\..\StoryMode\bin\Win64_Shipping_Client\StoryMode.dll</HintPath>
       <Private>False</Private>
@@ -181,9 +268,33 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Collections.Immutable.5.0.0\lib\net461\System.Collections.Immutable.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Reflection.Metadata, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Reflection.Metadata.5.0.0\lib\net461\System.Reflection.Metadata.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
       <HintPath>C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\Common7\IDE\Extensions\Microsoft\LiveShare\Agent\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
     </Reference>
@@ -409,6 +520,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -416,76 +528,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="SubModule.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Bannerlord.MCM">
-      <Version>4.5.0</Version>
-    </PackageReference>
-    <PackageReference Include="Bannerlord.ModuleManager.Source">
-      <Version>3.0.94</Version>
-    </PackageReference>
-    <PackageReference Include="IsExternalInit">
-      <Version>1.0.2</Version>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Lib.Harmony">
-      <Version>2.2.1</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Bcl.HashCode">
-      <Version>1.1.1</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection">
-      <Version>2.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-      <Version>2.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Logging">
-      <Version>2.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions">
-      <Version>2.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Options">
-      <Version>2.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Primitives">
-      <Version>2.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>11.0.2</Version>
-    </PackageReference>
-    <PackageReference Include="NUnit">
-      <Version>3.12.0</Version>
-    </PackageReference>
-    <PackageReference Include="Serilog">
-      <Version>2.10.0</Version>
-    </PackageReference>
-    <PackageReference Include="Serilog.Extensions.Logging">
-      <Version>3.1.0</Version>
-    </PackageReference>
-    <PackageReference Include="Serilog.Sinks.File">
-      <Version>5.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="System.Buffers">
-      <Version>4.5.1</Version>
-    </PackageReference>
-    <PackageReference Include="System.Collections.Immutable">
-      <Version>5.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="System.Memory">
-      <Version>4.5.4</Version>
-    </PackageReference>
-    <PackageReference Include="System.Numerics.Vectors">
-      <Version>4.5.0</Version>
-    </PackageReference>
-    <PackageReference Include="System.Reflection.Metadata">
-      <Version>5.0.0</Version>
-    </PackageReference>
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
-      <Version>4.5.3</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -495,4 +537,10 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\NUnit.3.12.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\NUnit.3.12.0\build\NUnit.props'))" />
+  </Target>
 </Project>

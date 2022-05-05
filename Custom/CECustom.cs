@@ -5,8 +5,6 @@ using System.Xml.Serialization;
 
 namespace CaptivityEvents
 {
-
-
     [DebuggerStepThrough]
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = null, IsNullable = true)]
@@ -75,6 +73,5 @@ namespace CaptivityEvents
 
         [XmlArrayItem("CESkill")]
         public List<CESkillNode> CESkills { get; set; }
-
     }
 }

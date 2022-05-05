@@ -1,4 +1,6 @@
-﻿using CaptivityEvents.Custom;
+﻿#define V172
+
+using CaptivityEvents.Custom;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +9,14 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
+#if V171
+#else
+
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Roster;
+
+#endif
+
 namespace CaptivityEvents.Events
 {
     internal class CEEventManager
@@ -14,14 +24,15 @@ namespace CaptivityEvents.Events
         // Flags and Conditions
         public static void PrintDebugInGameTextMessage(string v)
         {
-            TextObject textObject = new TextObject(v);
+            TextObject textObject = new(v);
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
         }
 
         #region Return Specifics Events
+
         public static string FireSpecificEvent(string specificEvent, bool force = false)
         {
-            List<string> eventNames = new List<string>();
+            List<string> eventNames = new();
 
             string flag = "$FAILEDTOFIND";
 
@@ -55,9 +66,10 @@ namespace CaptivityEvents.Events
 
             return flag;
         }
+
         public static string FireSpecificEventRandom(string specificEvent, out CEEvent ceEvent, bool force = false)
         {
-            List<string> eventNames = new List<string>();
+            List<string> eventNames = new();
 
             string flag = "$FAILEDTOFIND";
             ceEvent = null;
@@ -94,9 +106,10 @@ namespace CaptivityEvents.Events
 
             return flag;
         }
+
         public static string FireSpecificEventPartyLeader(string specificEvent, out CEEvent ceEvent, bool force = false, string heroname = null)
         {
-            List<string> eventNames = new List<string>();
+            List<string> eventNames = new();
 
             string flag = "$FAILEDTOFIND";
             ceEvent = null;
@@ -157,13 +170,14 @@ namespace CaptivityEvents.Events
 
             return flag;
         }
-        #endregion
 
+        #endregion Return Specifics Events
 
         #region Return Random Events
+
         public static CEEvent ReturnWeightedChoiceOfEventsRandom()
         {
-            List<CEEvent> events = new List<CEEvent>();
+            List<CEEvent> events = new();
             int CurrentOrder = 0;
 
             if (CEPersistence.CECallableEvents != null && CEPersistence.CECallableEvents.Count > 0)
@@ -238,9 +252,10 @@ namespace CaptivityEvents.Events
 
             return null;
         }
+
         public static CEEvent ReturnWeightedChoiceOfEvents()
         {
-            List<CEEvent> events = new List<CEEvent>();
+            List<CEEvent> events = new();
             int CurrentOrder = 0;
 
             if (CEPersistence.CECallableEvents != null && CEPersistence.CECallableEvents.Count > 0)
@@ -315,9 +330,10 @@ namespace CaptivityEvents.Events
 
             return null;
         }
+
         public static CEEvent ReturnWeightedChoiceOfEventsPartyLeader(CharacterObject captive)
         {
-            List<CEEvent> events = new List<CEEvent>();
+            List<CEEvent> events = new();
 
             int CurrentOrder = 0;
             CECustomHandler.LogToFile("Number of Filitered events is " + events.Count);
@@ -395,7 +411,7 @@ namespace CaptivityEvents.Events
 
             return null;
         }
-        #endregion
 
+        #endregion Return Random Events
     }
 }

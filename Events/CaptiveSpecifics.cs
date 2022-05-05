@@ -1,4 +1,5 @@
-﻿
+﻿#define V172
+
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -8,6 +9,15 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+
+#if V171
+#else
+
+using TaleWorlds.CampaignSystem.Encounters;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
+
+#endif
 
 namespace CaptivityEvents.Events
 {
@@ -47,6 +57,7 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Critical Error: CECaptivityContinue : " + e);
             }
         }
+
         internal void CECaptivityEscapeAttempt(ref MenuCallbackArgs args, int escapeChance = 10)
         {
             if (MBRandom.Random.Next(100) > escapeChance + new ScoresCalculation().EscapeProwessScore(Hero.MainHero))
@@ -104,9 +115,7 @@ namespace CaptivityEvents.Events
                     PlayerEncounter.ProtectPlayerSide();
                     MobileParty.MainParty.IsDisorganized = false;
                     PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, 1, true);
-#if V170
                     MobileParty.MainParty.ChangePartyLeader(Hero.MainHero);
-#endif
                 }
 
                 MobileParty.MainParty.CurrentSettlement = PlayerCaptivity.CaptorParty.Settlement;
@@ -134,6 +143,7 @@ namespace CaptivityEvents.Events
                 PlayerCaptivity.EndCaptivity();
             }
         }
+
         internal void CECaptivityEscape(ref MenuCallbackArgs args)
         {
             CECampaignBehavior.ExtraProps.Owner = null;
@@ -157,6 +167,7 @@ namespace CaptivityEvents.Events
             new CESubModule().LoadTexture("default");
             PlayerCaptivity.EndCaptivity();
         }
+
         internal void CECaptivityChange(ref MenuCallbackArgs args, PartyBase party)
         {
             try

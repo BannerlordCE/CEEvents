@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using TaleWorlds.Engine.Options;
-using TaleWorlds.Engine.Screens;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+using TaleWorlds.ScreenSystem;
 
 namespace CaptivityEvents.Config
 {
-
     [AttributeUsage(AttributeTargets.Property)]
     internal class MappedAttribute : Attribute
     {
@@ -18,7 +17,6 @@ namespace CaptivityEvents.Config
 
     public class CESettingsVM : ViewModel
     {
-
         public CESettingsVM()
         {
             GeneralOptions = new CESettingsVMCategory(this, new TextObject("General", null), GeneralList, false);
@@ -88,7 +86,6 @@ namespace CaptivityEvents.Config
                     return value;
                 });
 
-
                 yield return new CEManagedBooleanOptionData("EventRandomEnabled", "Random Events Enabled", "Random events are events that do not require captives.", CESettings.Instance.EventRandomEnabled ? 1f : 0f, (value) =>
                 {
                     CESettings.Instance.EventRandomEnabled = value == 1f;
@@ -101,7 +98,7 @@ namespace CaptivityEvents.Config
                     return value;
                 }, 1f, 100f);
 
-                List<SelectionData> selectedDataBrothel = new List<SelectionData>
+                List<SelectionData> selectedDataBrothel = new()
                 {
                     new SelectionData(false, new TextObject("{=CESETTINGS1117}Any").ToString()),
                     new SelectionData(false, new TextObject("{=CESETTINGS1118}Female").ToString()),
@@ -152,13 +149,11 @@ namespace CaptivityEvents.Config
 
         public void SetConfig(ICEOptionData data, float value)
         {
-
         }
 
         private void ExecuteDone() => ScreenManager.PopScreen();
 
         private void ExecuteCancel() => ScreenManager.PopScreen();
-
 
         public CESettingsVMCategory GeneralOptions { get; }
 
@@ -173,7 +168,5 @@ namespace CaptivityEvents.Config
         public CESettingsVMCategory CustomFlagsOptions { get; }
 
         public CESettingsVMCategory IntegrationsOptions { get; }
-
-
     }
 }

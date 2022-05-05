@@ -1,4 +1,5 @@
-﻿#define V170
+﻿#define V172
+
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -24,6 +25,15 @@ using TaleWorlds.MountAndBlade;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
 
+#if V171
+#else
+
+using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements.Locations;
+
+#endif
+
 namespace CaptivityEvents.Helper
 {
     internal class CEConsole
@@ -37,7 +47,7 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.reload_settings\".\n\n";
 
-                HardcodedCustomSettings _provider = new HardcodedCustomSettings();
+                HardcodedCustomSettings _provider = new();
 
                 CECustomSettings customSettings = CECustomHandler.LoadCustomSettings();
                 if (customSettings != null)
@@ -384,7 +394,6 @@ namespace CaptivityEvents.Helper
                     }
                 }
 
-
                 result = CEEventManager.FireSpecificEventRandom(eventName, out CEEvent returnedEvent);
 
                 switch (result)
@@ -446,7 +455,6 @@ namespace CaptivityEvents.Helper
 
                         if (Game.Current.GameStateManager.ActiveState is MapState mapStateRandom)
                         {
-
                             if (CESettings.Instance.EventCaptorNotifications)
                             {
                                 LaunchRandomEvent(returnedEvent);
@@ -507,7 +515,6 @@ namespace CaptivityEvents.Helper
                 }
 
                 return text;
-
             }
             catch (Exception e)
             {
@@ -524,7 +531,7 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.impregnant [HERO]\".";
 
-                CEImpregnationSystem _impregnation = new CEImpregnationSystem();
+                CEImpregnationSystem _impregnation = new();
                 string searchTerm = null;
 
                 if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
@@ -617,7 +624,6 @@ namespace CaptivityEvents.Helper
                     index++;
                 });
 
-
                 return debug;
             }
             catch (Exception e)
@@ -646,7 +652,7 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
-                    Dynamics d = new Dynamics();
+                    Dynamics d = new();
                     d.ResetCustomSkills(hero);
                     d.VictimProstitutionModifier(0, hero, true);
                     d.VictimProstitutionModifier(0, hero, false, false);
@@ -718,7 +724,6 @@ namespace CaptivityEvents.Helper
                         successful = CESkills.Uninstall(Game.Current);
                     }
 
-
                     return successful
                         ? "Successfully cleaned save of captivity events data. Save & Exit the game now."
                         : "Failed to Clean";
@@ -735,6 +740,7 @@ namespace CaptivityEvents.Helper
         }
 
 #if DEBUG
+
         [CommandLineFunctionality.CommandLineArgumentFunction("run_CETests", "debug")]
         public static string RunTests(List<string> strings)
         {
@@ -752,22 +758,13 @@ namespace CaptivityEvents.Helper
                 {
                     if (specificTest != null)
                     {
-
-                        switch (specificTest)
+                        test += specificTest switch
                         {
-                            case "1":
-                                test += "\n" + CETests.RunTestOne();
-                                break;
-                            case "2":
-                                test += "\n" + CETests.RunTestTwo();
-                                break;
-                            case "3":
-                                test += "\n" + CETests.RunTestThree();
-                                break;
-                            default:
-                                test += "\nNot Found";
-                                break;
-                        }
+                            "1" => "\n" + CETests.RunTestOne(),
+                            "2" => "\n" + CETests.RunTestTwo(),
+                            "3" => "\n" + CETests.RunTestThree(),
+                            _ => "\nNot Found",
+                        };
                     }
                     else
                     {
@@ -791,6 +788,7 @@ namespace CaptivityEvents.Helper
                 return "Sosig\n" + e;
             }
         }
+
 #endif
 
         [CommandLineFunctionality.CommandLineArgumentFunction("fire_fix", "captivity")]
@@ -865,7 +863,6 @@ namespace CaptivityEvents.Helper
                     // Get All in ModuleLoader
                     string[] files = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
-
                     CEPersistence.CEEventImageList.Clear();
 
                     // Module Image Load
@@ -885,7 +882,7 @@ namespace CaptivityEvents.Helper
                                         {
                                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                             texture.PreloadTexture(false);
-                                            Texture texture2D = new Texture(new EngineTexture(texture));
+                                            Texture texture2D = new(new EngineTexture(texture));
                                             CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                         }
                                         catch (Exception e)
@@ -906,7 +903,6 @@ namespace CaptivityEvents.Helper
                     // Captivity Location Image Load
                     try
                     {
-
                         foreach (string file in files)
                         {
                             if (requiredImages.Contains(file)) continue;
@@ -917,7 +913,7 @@ namespace CaptivityEvents.Helper
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                     texture.PreloadTexture(false);
-                                    Texture texture2D = new Texture(new EngineTexture(texture));
+                                    Texture texture2D = new(new EngineTexture(texture));
                                     CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
                                 catch (Exception e)
@@ -939,7 +935,7 @@ namespace CaptivityEvents.Helper
                             {
                                 TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                 texture.PreloadTexture(false);
-                                Texture texture2D = new Texture(new EngineTexture(texture));
+                                Texture texture2D = new(new EngineTexture(texture));
                                 CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                             }
                             catch (Exception e)
@@ -991,7 +987,10 @@ namespace CaptivityEvents.Helper
                     {
                         // Events Removing
                         MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
-                        if (mi != null) mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
+                        if (mi != null)
+                        {
+                            mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
+                        }
                         else { Campaign.Current.GameMenuManager.RemoveRelatedGameMenus("CEEVENTS"); }
                     }
                     else
@@ -999,7 +998,7 @@ namespace CaptivityEvents.Helper
                         return "Cannot reload in the current campaign.";
                     }
 
-                    // Unload 
+                    // Unload
                     CEPersistence.CEEvents.Clear();
                     CEPersistence.CEEventList.Clear();
                     CEPersistence.CEWaitingList.Clear();
@@ -1130,7 +1129,7 @@ namespace CaptivityEvents.Helper
                                         {
                                             TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                             texture.PreloadTexture(false);
-                                            Texture texture2D = new Texture(new EngineTexture(texture));
+                                            Texture texture2D = new(new EngineTexture(texture));
                                             CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                         }
                                         catch (Exception e)
@@ -1151,7 +1150,6 @@ namespace CaptivityEvents.Helper
                     // Captivity Location Image Load
                     try
                     {
-
                         foreach (string file in files)
                         {
                             if (requiredImages.Contains(file)) continue;
@@ -1162,7 +1160,7 @@ namespace CaptivityEvents.Helper
                                 {
                                     TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                     texture.PreloadTexture(false);
-                                    Texture texture2D = new Texture(new EngineTexture(texture));
+                                    Texture texture2D = new(new EngineTexture(texture));
                                     CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                                 }
                                 catch (Exception e)
@@ -1184,7 +1182,7 @@ namespace CaptivityEvents.Helper
                             {
                                 TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
                                 texture.PreloadTexture(false);
-                                Texture texture2D = new Texture(new EngineTexture(texture));
+                                Texture texture2D = new(new EngineTexture(texture));
                                 CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
                             }
                             catch (Exception e)
@@ -1221,7 +1219,6 @@ namespace CaptivityEvents.Helper
             try
             {
                 Thread.Sleep(500);
-
 
                 if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.clear_parties [PARTY_ID]\".";
 
@@ -1281,14 +1278,13 @@ namespace CaptivityEvents.Helper
                         Mission.Current.MakeSound(id, Agent.Main.Frame.origin, true, false, -1, -1);
 
                         string text = "";
-                        List<GameEntity> entities = new List<GameEntity>();
+                        List<GameEntity> entities = new();
                         Mission.Current.Scene.GetEntities(ref entities);
                         foreach (GameEntity test in entities)
                         {
                             text += test.Name + " : " + test.ToString() + "\n";
                         }
                         CECustomHandler.ForceLogToFile(text);
-
 
                         return string.Empty;
                     }

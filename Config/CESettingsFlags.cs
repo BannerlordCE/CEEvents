@@ -7,7 +7,6 @@ namespace CaptivityEvents.Config
 {
     public class CESettingsFlags
     {
-
         private FluentGlobalSettings _settings;
 
         private static CESettingsFlags _instance = null;
@@ -37,7 +36,6 @@ namespace CaptivityEvents.Config
 
                 foreach (CECustom module in moduleCustoms)
                 {
-
                     builder.CreateGroup("{=CESETTINGS0090}Custom Flags of " + module.CEModuleName, groupBuilder =>
                     {
                         foreach (CEFlagNode flag in module.CEFlags)
@@ -56,7 +54,6 @@ namespace CaptivityEvents.Config
                 }
                 _settings = builder.BuildAsGlobal();
                 _settings.Register();
-
             }
             else
             {

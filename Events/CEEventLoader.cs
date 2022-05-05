@@ -15,22 +15,20 @@ namespace CaptivityEvents.Events
         /// <returns>MenuAndOptionType</returns>
         private static GameMenu.MenuAndOptionType CEProgressMode(int state)
         {
-            switch (state)
+            return state switch
             {
-                case 1:
-                    return GameMenu.MenuAndOptionType.WaitMenuShowProgressAndHoursOption;
-                case 2:
-                    return GameMenu.MenuAndOptionType.WaitMenuHideProgressAndHoursOption;
-                default:
-                    return GameMenu.MenuAndOptionType.WaitMenuShowOnlyProgressOption;
-            }
+                1 => GameMenu.MenuAndOptionType.WaitMenuShowProgressAndHoursOption,
+                2 => GameMenu.MenuAndOptionType.WaitMenuHideProgressAndHoursOption,
+                _ => GameMenu.MenuAndOptionType.WaitMenuShowOnlyProgressOption,
+            };
         }
 
         #region Event Loader
+
         public static void CELoadRandomEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
-            CEVariablesLoader variablesLoader = new CEVariablesLoader();
-            MenuCallBackDelegateRandom rcb = new MenuCallBackDelegateRandom(listedEvent, eventList);
+            CEVariablesLoader variablesLoader = new();
+            MenuCallBackDelegateRandom rcb = new(listedEvent, eventList);
 
             if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
             {
@@ -63,7 +61,7 @@ namespace CaptivityEvents.Events
 
             foreach (Option op in sorted)
             {
-                MenuCallBackDelegateRandom mcb = new MenuCallBackDelegateRandom(listedEvent, op, eventList);
+                MenuCallBackDelegateRandom mcb = new(listedEvent, op, eventList);
                 gameStarter.AddGameMenuOption(
                     listedEvent.Name,
                     listedEvent.Name + op.Order,
@@ -73,10 +71,11 @@ namespace CaptivityEvents.Events
                     false, variablesLoader.GetIntFromXML(op.Order));
             }
         }
+
         public static void CELoadCaptiveEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
-            CEVariablesLoader variablesLoader = new CEVariablesLoader();
-            MenuCallBackDelegateCaptive cb = new MenuCallBackDelegateCaptive(listedEvent, eventList);
+            CEVariablesLoader variablesLoader = new();
+            MenuCallBackDelegateCaptive cb = new(listedEvent, eventList);
 
             if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
             {
@@ -124,7 +123,7 @@ namespace CaptivityEvents.Events
 
             foreach (Option op in sorted)
             {
-                MenuCallBackDelegateCaptive mcb = new MenuCallBackDelegateCaptive(listedEvent, op, eventList);
+                MenuCallBackDelegateCaptive mcb = new(listedEvent, op, eventList);
                 gameStarter.AddGameMenuOption(
                     listedEvent.Name,
                     listedEvent.Name + op.Order,
@@ -135,10 +134,11 @@ namespace CaptivityEvents.Events
                     variablesLoader.GetIntFromXML(op.Order));
             }
         }
+
         public static void CELoadCaptorEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
-            CEVariablesLoader variablesLoader = new CEVariablesLoader();
-            MenuCallBackDelegateCaptor cb = new MenuCallBackDelegateCaptor(listedEvent, eventList);
+            CEVariablesLoader variablesLoader = new();
+            MenuCallBackDelegateCaptor cb = new(listedEvent, eventList);
 
             if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.ProgressMenu))
             {
@@ -169,7 +169,7 @@ namespace CaptivityEvents.Events
 
             foreach (Option op in sorted)
             {
-                MenuCallBackDelegateCaptor mcb = new MenuCallBackDelegateCaptor(listedEvent, op, eventList);
+                MenuCallBackDelegateCaptor mcb = new(listedEvent, op, eventList);
                 gameStarter.AddGameMenuOption(
                     listedEvent.Name,
                     listedEvent.Name + op.Order,
@@ -181,7 +181,7 @@ namespace CaptivityEvents.Events
                     false);
             }
         }
-        #endregion
 
+        #endregion Event Loader
     }
 }

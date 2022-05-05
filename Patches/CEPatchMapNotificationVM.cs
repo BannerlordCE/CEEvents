@@ -24,7 +24,6 @@ namespace CaptivityEvents.Patches
             MapNotificationItemBaseVM mapNotification = null;
             if (type == typeof(CECaptorMapNotification))
             {
-
                 Action<MapNotificationItemBaseVM> onRemove = (MapNotificationItemBaseVM item) =>
                 {
                     CEHelper.notificationCaptorExists = false;
@@ -37,9 +36,7 @@ namespace CaptivityEvents.Patches
                 FieldInfo fi = mapNotification.GetType().BaseType.GetField("OnRemove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
                 if (fi != null) fi.SetValue(mapNotification, onRemove);
 
-
                 __result = mapNotification;
-
             }
             else if (type == typeof(CEEventMapNotification))
             {
@@ -54,7 +51,6 @@ namespace CaptivityEvents.Patches
 
                 FieldInfo fi = mapNotification.GetType().BaseType.GetField("OnRemove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
                 if (fi != null) fi.SetValue(mapNotification, onRemove);
-
 
                 __result = mapNotification;
             }

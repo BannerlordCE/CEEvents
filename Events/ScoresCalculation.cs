@@ -1,5 +1,5 @@
-﻿
-using TaleWorlds.CampaignSystem;
+﻿using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.Core;
 
 namespace CaptivityEvents.Events

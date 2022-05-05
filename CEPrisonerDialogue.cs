@@ -1,4 +1,6 @@
-﻿using CaptivityEvents.Brothel;
+﻿#define V172
+
+using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -13,20 +15,29 @@ using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 
+#if V171
+#else
+
+using TaleWorlds.CampaignSystem.Conversation;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
+
+#endif
+
 namespace CaptivityEvents
 {
     internal class CEPrisonerDialogue
     {
-        private readonly Dynamics _dynamics = new Dynamics();
+        private readonly Dynamics _dynamics = new();
 
         public void AddPrisonerLines(CampaignGameStarter campaignGameStarter)
         {
             campaignGameStarter.AddDialogLine("CELordDefeatedLord", "start", "CELordDefeatedLordAnswer", "{=pURE9lFV}{SURRENDER_OFFER}", ConversationCEEventLordCaptureOnCondition, null, 200, null);
 
             campaignGameStarter.AddPlayerLine("CELordDefeatedLordAnswerCapture", "CELordDefeatedLordAnswer", "defeat_lord_answer_1", "{=g5G8AJ5n}You are my prisoner now.", null, null, 100, null, null);
-            campaignGameStarter.AddPlayerLine("CELordDefeatedLordAnswerRelease", "CELordDefeatedLordAnswer", "defeat_lord_answer_2", "{=vHKkVkAF}You have fought well. You are free to go.", null, new ConversationSentence.OnConsequenceDelegate(LCELordDefeatedLordAnswerReleaseOnConsequence), 100, null, null);
+            campaignGameStarter.AddPlayerLine("CELordDefeatedLordAnswerRelease", "CELordDefeatedLordAnswer", "defeat_lord_answer_2", "{=vHKkVkAF}You have fought well. You are free to go.", new ConversationSentence.OnConditionDelegate(LCELordDefeatedLordAnswerReleaseOnConditionCombatant), new ConversationSentence.OnConsequenceDelegate(LCELordDefeatedLordAnswerReleaseOnConsequence), 100, null, null);
+            campaignGameStarter.AddPlayerLine("CELordDefeatedLordAnswerReleaseNonCom", "CELordDefeatedLordAnswer", "defeat_lord_answer_2", "{=SFWNy76G}As you are not a warrior, you are free to go.", new ConversationSentence.OnConditionDelegate(LCELordDefeatedLordAnswerReleaseOnConditionNoncombatant), new ConversationSentence.OnConsequenceDelegate(LCELordDefeatedLordAnswerReleaseOnConsequence), 100, null, null);
             campaignGameStarter.AddPlayerLine("CELordDefeatedLordAnswerStrip", "CELordDefeatedLordAnswer", "LordDefeatedCaptureCEModAnswer", "{=CEEVENTS1107}Time to strip you of your belongings.", null, ConversationCEEventLordCaptureOnConsequence);
-
 
             campaignGameStarter.AddPlayerLine("LordDefeatedCaptureCEMod", "defeated_lord_answer", "LordDefeatedCaptureCEModAnswer", "{=CEEVENTS1107}Time to strip you of your belongings.", null, ConversationCEEventLordCaptureOnConsequence);
             campaignGameStarter.AddDialogLine("LordDefeatedReturn", "LordDefeatedCaptureCEModAnswer", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, null);
@@ -51,12 +62,20 @@ namespace CaptivityEvents
             campaignGameStarter.AddDialogLine("CEPrisonerInCell_02_r", "CEPrisonerInCell_02_response", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, ConversationCEEventBrothelOnConsequence);
 
             campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "close_window", "{=CEEVENTS1051}Nevermind.", null, null);
+        }
 
+        public bool LCELordDefeatedLordAnswerReleaseOnConditionNoncombatant()
+        {
+            return (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.IsMapFaction || Hero.OneToOneConversationHero.Clan.Leader != Hero.OneToOneConversationHero) && Hero.OneToOneConversationHero.Noncombatant;
+        }
+
+        public bool LCELordDefeatedLordAnswerReleaseOnConditionCombatant()
+        {
+            return (Hero.OneToOneConversationHero.Clan != null && !Hero.OneToOneConversationHero.Clan.IsMapFaction && Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero) || !Hero.OneToOneConversationHero.Noncombatant;
         }
 
         public void AddCustomLines(CampaignGameStarter campaignGameStarter, List<CEScene> CECustomScenes)
         {
-
             try
             {
                 foreach (CEScene CustomScene in CECustomScenes)
@@ -65,7 +84,6 @@ namespace CaptivityEvents
                     {
                         if (CustomLine.Ref != null && CustomLine.Ref.ToLower() == "ai")
                         {
-
                             campaignGameStarter.AddDialogLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, () => { return ConversationCECustomScenes(CustomScene.Name); }, () =>
                             {
                                 if (CustomLine.OutputToken == "close_window")
@@ -87,17 +105,15 @@ namespace CaptivityEvents
                             );
                         }
                     }
-
                 }
             }
             catch (Exception e)
             {
-                TextObject textObject = new TextObject("{=CEEVENTS0999}Error: failed to initialize scenes");
+                TextObject textObject = new("{=CEEVENTS0999}Error: failed to initialize scenes");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
                 CECustomHandler.ForceLogToFile("Error: failed to initialize scenes");
                 CECustomHandler.ForceLogToFile(e.Message + " : " + e);
             }
-
         }
 
         private bool ConversationCECustomScenes(string SceneName)
@@ -119,7 +135,10 @@ namespace CaptivityEvents
 
         private void LCELordDefeatedLordAnswerReleaseOnConsequence()
         {
-            EndCaptivityAction.ApplyByReleasedByPlayerAfterBattle(Hero.OneToOneConversationHero, Hero.MainHero, null);
+            if (Hero.OneToOneConversationHero.IsPrisoner)
+            {
+                EndCaptivityAction.ApplyByReleasedByPlayerAfterBattle(Hero.OneToOneConversationHero, Hero.MainHero, null);
+            }
             _dynamics.RelationsModifier(CharacterObject.OneToOneConversationCharacter.HeroObject, 4, null, true, true);
             DialogHelper.SetDialogString("DEFEAT_LORD_ANSWER", "str_prisoner_released");
         }

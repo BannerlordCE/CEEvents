@@ -19,8 +19,8 @@ namespace CaptivityEvents.Helper
             {
                 return "Test One: Failed - " + e;
             }
-
         }
+
         public static string RunTestThree()
         {
             try
@@ -35,7 +35,6 @@ namespace CaptivityEvents.Helper
             {
                 return "Test One: Failed - " + e;
             }
-
         }
 
         public static string RunTestTwo()
