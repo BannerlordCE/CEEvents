@@ -1335,22 +1335,28 @@ namespace CaptivityEvents
             CEPersistence.battleState = CEPersistence.BattleState.Normal;
             if (CEPersistence.playerWon)
             {
-                GameMenu.ActivateGameMenu(CEPersistence.victoryEvent);
-                if (mapstate.MenuContext != null)
+                if (CEPersistence.victoryEvent != null)
                 {
-                    mapstate.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                           ? "wait_prisoner_female"
-                                                           : "wait_prisoner_male");
+                    GameMenu.ActivateGameMenu(CEPersistence.victoryEvent);
+                    if (mapstate.MenuContext != null)
+                    {
+                        mapstate.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                               ? "wait_prisoner_female"
+                                                               : "wait_prisoner_male");
+                    }
                 }
             }
             else
             {
-                GameMenu.ActivateGameMenu(CEPersistence.defeatEvent);
-                if (mapstate.MenuContext != null)
+                if (CEPersistence.defeatEvent != null)
                 {
-                    mapstate.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                           ? "wait_prisoner_female"
-                                                           : "wait_prisoner_male");
+                    GameMenu.ActivateGameMenu(CEPersistence.defeatEvent);
+                    if (mapstate.MenuContext != null)
+                    {
+                        mapstate.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                                                               ? "wait_prisoner_female"
+                                                               : "wait_prisoner_male");
+                    }
                 }
             }
         }

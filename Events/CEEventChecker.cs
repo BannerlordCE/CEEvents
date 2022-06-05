@@ -853,10 +853,19 @@ namespace CaptivityEvents.Events
             return true;
         }
 
+        private bool OwnerGenderCheck(PartyBase captorParty)
+        {
+            Hero owner = CECampaignBehavior.ExtraProps.Owner;
+            if (owner != null && owner.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsMale.");
+            if (owner != null && !owner.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsFemale.");
+
+            return true;
+        }
+
         private bool CaptorPartyGenderCheck(PartyBase captorParty)
         {
             if (captorParty?.LeaderHero != null && captorParty.LeaderHero.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsMale.");
-            if (captorParty?.LeaderHero != null && !captorParty.LeaderHero.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale/Femdom.");
+            if (captorParty?.LeaderHero != null && !captorParty.LeaderHero.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale.");
 
             return true;
         }

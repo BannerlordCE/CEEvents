@@ -12,6 +12,7 @@ using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using TaleWorlds.ObjectSystem;
 
 #if V171
 #else
@@ -514,6 +515,10 @@ namespace CaptivityEvents.Events
             try
             {
                 TroopRoster enemyTroops = TroopRoster.CreateDummyTroopRoster();
+
+                // Make sure there is atleast one troop
+                CharacterObject characterObject1 = MBObjectManager.Instance.GetObjectTypeList<CharacterObject>().GetRandomElementWithPredicate(item => item.Occupation == Occupation.Soldier || item.Occupation == Occupation.Gangster);
+                enemyTroops.AddToCounts(characterObject1, 1, false, 0, 0, true, -1);
 
                 foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
                 {

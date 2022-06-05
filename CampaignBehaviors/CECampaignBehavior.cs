@@ -450,17 +450,16 @@ namespace CaptivityEvents.CampaignBehaviors
 
             // Reflection One
             MethodInfo mi = typeof(HeroCreator).GetMethod("CreateNewHero", BindingFlags.NonPublic | BindingFlags.Static);
-
             if (mi == null) return HeroCreator.DeliverOffSpring(mother, father, isOffspringFemale, null);
-
             Hero hero = (Hero)mi.Invoke(null, new object[] { characterObject, 0 });
 
             // For Wanderer Pregnancy
             hero.SetBirthDay(CampaignTime.Now);
 
+            hero.SetNewOccupation(isOffspringFemale ? mother.Occupation : father.Occupation);
             int becomeChildAge = Campaign.Current.Models.AgeModel.BecomeChildAge;
-
             culture ??= mother.Culture;
+
             CharacterObject characterObject2 = culture.ChildCharacterTemplates.FirstOrDefault((CharacterObject t) => t.Culture == mother.Culture && t.Age <= becomeChildAge && t.IsFemale == isOffspringFemale && t.Occupation == Occupation.Lord);
 
             if (characterObject2 != null)

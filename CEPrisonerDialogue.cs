@@ -15,6 +15,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.CampaignSystem.GameMenus;
 
 #if V171
 #else
@@ -85,29 +86,12 @@ namespace CaptivityEvents
                     {
                         if (CustomLine.Ref != null && CustomLine.Ref.ToLower() == "ai")
                         {
-                            campaignGameStarter.AddDialogLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, () => { return ConversationCECustomScenes(CustomScene.Name); }, () =>
-                            {
-                                if (CustomLine.OutputToken == "close_window")
-                                {
-                                    CharacterObject.OneToOneConversationCharacter.StringId = "";
-                                    if (CustomLine.NextScene != null)
-                                    {
-                                        CEDelayedEvent delayedEvent = new(CustomLine.NextScene);
-                                        CEHelper.AddDelayedEvent(delayedEvent);
-                                    }
-                                }
-                            }
+                            campaignGameStarter.AddDialogLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, () => { return ConversationCECustomScenesOnCondition(CustomScene.Name, CustomLine.Condition != null && CustomLine.Condition.ToLower() == "true"); }, () => ConversationCECustomScenesOnConsequence(CustomLine)
                             );
                         }
                         else
                         {
-                            campaignGameStarter.AddPlayerLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, null, () =>
-                            {
-                                if (CustomLine.OutputToken == "close_window")
-                                {
-                                    CharacterObject.OneToOneConversationCharacter.StringId = "";
-                                }
-                            }
+                            campaignGameStarter.AddPlayerLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, null, () => ConversationCECustomScenesOnConsequence(CustomLine)
                             );
                         }
                     }
@@ -122,10 +106,40 @@ namespace CaptivityEvents
             }
         }
 
-        private bool ConversationCECustomScenes(string SceneName)
+        private bool ConversationCECustomScenesOnCondition(string SceneName, bool alwaysShow = false)
         {
             CharacterObject conversation = CharacterObject.OneToOneConversationCharacter;
-            return conversation.StringId == "CECustomStringId_" + SceneName;
+            return alwaysShow ? true : conversation.StringId == "CECustomStringId_" + SceneName;
+        }
+
+
+        private void ConversationCECustomScenesOnConsequence(Line CustomLine)
+        {
+            if (CustomLine.Consequence != null)
+            {
+                switch (CustomLine.Consequence.ToLower())
+                {
+                    case "afterbattle":
+                        CEPersistence.battleState = CEPersistence.BattleState.AfterBattle;
+                        break;
+                }
+            }
+
+            if (CustomLine.OutputToken == "close_window")
+            {
+                CharacterObject.OneToOneConversationCharacter.StringId = "";
+                if (CustomLine.NextScene != null)
+                {
+                    try
+                    {
+                        GameMenu.SwitchToMenu(CustomLine.NextScene);
+                    }
+                    catch (Exception)
+                    {
+                        CECustomHandler.LogToFile("NextScene Failed - " + CustomLine.Id);
+                    }
+                }
+            }
         }
 
         private bool ConversationCEEventBrothelOnCondition(out TextObject text)
