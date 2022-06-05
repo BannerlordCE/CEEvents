@@ -103,6 +103,8 @@ namespace CaptivityEvents.Custom
         BanditParty,
         LordParty,
         DefaultParty,
+        NotableFemalesNearby,
+        NotableMalesNearby,
         VisitedByCaravan,
         VisitedByLord,
         DuringSiege,
