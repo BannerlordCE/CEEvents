@@ -240,6 +240,7 @@ namespace CaptivityEvents.Events
             ConsequenceSpawnTroop();
             ConsequenceSpawnHero();
 
+
             ConsequenceGainRandomPrisoners();
 
             ConsequenceEscape();
@@ -250,6 +251,7 @@ namespace CaptivityEvents.Events
             ConsequenceKillTroops(ref args);
             ConsequenceJoinParty();
 
+            _sharedCallBackHelper.ConsequenceDelayedEvent();
             _sharedCallBackHelper.ConsequenceMission();
             _sharedCallBackHelper.ConsequenceTeleportPlayer();
 

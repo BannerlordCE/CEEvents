@@ -4,6 +4,7 @@ using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
+using CaptivityEvents.Helper;
 using Helpers;
 using System;
 using System.Collections.Generic;
@@ -89,6 +90,11 @@ namespace CaptivityEvents
                                 if (CustomLine.OutputToken == "close_window")
                                 {
                                     CharacterObject.OneToOneConversationCharacter.StringId = "";
+                                    if (CustomLine.NextScene != null)
+                                    {
+                                        CEDelayedEvent delayedEvent = new(CustomLine.NextScene);
+                                        CEHelper.AddDelayedEvent(delayedEvent);
+                                    }
                                 }
                             }
                             );

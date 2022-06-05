@@ -734,6 +734,9 @@ namespace CaptivityEvents.Custom
         [XmlElement("SceneSettings", IsNullable = true)]
         public SceneSettings SceneSettings { get; set; }
 
+        [XmlElement("DelayEvent", IsNullable = true)]
+        public DelayEvent DelayEvent { get; set; }
+
         [XmlArrayItem("SpawnTroop", IsNullable = true)]
         public SpawnTroop[] SpawnTroops { get; set; }
 

@@ -1249,6 +1249,34 @@ namespace CaptivityEvents.Events
             }
         }
 
+        internal void ConsequenceDelayedEvent()
+        {
+            try
+            {
+                if (_option.DelayEvent != null)
+                {
+                    if (_option.DelayEvent.TriggerEvents != null)
+                    {
+                        foreach(TriggerEvent trigger in _option.DelayEvent.TriggerEvents)
+                        {
+
+                            CEDelayedEvent delayedEvent = new(trigger.EventName, -1, trigger.EventUseConditions?.ToLower() != "true");
+                            CEHelper.AddDelayedEvent(delayedEvent);
+                        }
+                    }
+                    else
+                    {
+                        CEDelayedEvent delayedEvent = new(_option.DelayEvent.TriggerEventName, _option.DelayEvent.TimeToTake != null ? float.Parse(_option.DelayEvent.TimeToTake) : -1, _option.DelayEvent.UseConditions?.ToLower() != "true");
+                        CEHelper.AddDelayedEvent(delayedEvent);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("ConsequenceDelayedEvent Failed: " + e);
+            }
+}
+
         internal void ConsequenceMission()
         {
             try
