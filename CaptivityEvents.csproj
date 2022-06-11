@@ -419,10 +419,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Bannerlord.MCM">
-      <Version>4.5.0</Version>
+      <Version>4.6.1</Version>
     </PackageReference>
     <PackageReference Include="Bannerlord.ModuleManager.Source">
-      <Version>3.0.94</Version>
+      <Version>3.0.97</Version>
     </PackageReference>
     <PackageReference Include="IsExternalInit">
       <Version>1.0.2</Version>

@@ -188,7 +188,7 @@ namespace CaptivityEvents.Brothel
                 return false;
             }
 
-            return CESettings.Instance.BrothelOption.SelectedIndex switch
+            return CESettings.Instance?.BrothelOption?.SelectedIndex switch
             {
                 0 => true,
                 2 => !character.IsFemale,
@@ -632,7 +632,7 @@ namespace CaptivityEvents.Brothel
             int num2 = (int)(num * 0.2f);
             if (num2 > 0)
             {
-                switch (CESettings.Instance.BrothelOption.SelectedIndex)
+                switch (CESettings.Instance?.BrothelOption?.SelectedIndex)
                 {
                     case 0:
                         LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateTownsManForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num2);
@@ -661,7 +661,7 @@ namespace CaptivityEvents.Brothel
 
             if (num3 > 0)
             {
-                switch (CESettings.Instance.BrothelOption.SelectedIndex)
+                switch (CESettings.Instance?.BrothelOption?.SelectedIndex)
                 {
                     case 0:
                         int num5 = (int)(num3 * 0.5f);
@@ -1463,7 +1463,7 @@ namespace CaptivityEvents.Brothel
                             // Workaround for Missing Bug By Bannerlord Tweaks.
                             _brothelList[i].CaptiveProstitutes[y].HeroObject.CaptivityStartTime = CampaignTime.Now;
 
-                            int numEscapeChance = CESettings.Instance.BrothelHeroEscapeChance;
+                            int numEscapeChance = CESettings.Instance?.BrothelHeroEscapeChance ?? 0;
 
                             if (MBRandom.RandomInt(100) < numEscapeChance)
                             {
@@ -1474,7 +1474,7 @@ namespace CaptivityEvents.Brothel
                         }
                         else
                         {
-                            int numEscapeChance = CESettings.Instance.BrothelNonHeroEscapeChance;
+                            int numEscapeChance = CESettings.Instance?.BrothelNonHeroEscapeChance ?? 0;
 
                             if (MBRandom.RandomInt(100) < numEscapeChance)
                             {
@@ -1734,10 +1734,10 @@ namespace CaptivityEvents.Brothel
                                 new Dynamics().RelationsModifier(troopElement.Character.HeroObject, MBRandom.RandomInt(-10, -1), Hero.MainHero, false, true);
                             }
 
-                            if (CESettings.Instance.EventProstituteGear)
+                            if (CESettings.Instance?.EventProstituteGear ?? true)
                             {
                                 CharacterObject character = troopElement.Character.IsFemale ? HelperCreateFrom(settlement.Culture.FemaleDancer, true) : HelperCreateFrom(settlement.Culture.Musician, true);
-                                if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
+                                if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
 
                                 Equipment randomCivilian = character.CivilianEquipments.GetRandomElementInefficiently();
                                 Equipment randomBattle = new(false);
@@ -1801,11 +1801,11 @@ namespace CaptivityEvents.Brothel
 #if V172
                     prisoner.HeroObject.IsNoble = false;
 #endif
-                    if (CESettings.Instance.EventProstituteGear)
+                    if (CESettings.Instance?.EventProstituteGear ?? true)
                     {
                         CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);
 
-                        if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(prisoner.HeroObject, prisoner.HeroObject.BattleEquipment, prisoner.HeroObject.CivilianEquipment);
+                        if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(prisoner.HeroObject, prisoner.HeroObject.BattleEquipment, prisoner.HeroObject.CivilianEquipment);
 
                         Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElementInefficiently();
                         Equipment randomBattle = new(false);
