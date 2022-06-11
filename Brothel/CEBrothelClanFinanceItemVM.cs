@@ -1,4 +1,4 @@
-#define V172
+#define V180
 
 using System;
 using System.Linq;
@@ -8,15 +8,15 @@ using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance;
 using TaleWorlds.Core;
-using TaleWorlds.Core.ViewModelCollection;
 using TaleWorlds.Localization;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Settlements.Workshops;
+using TaleWorlds.Library;
 
+#if V172
+using TaleWorlds.Core.ViewModelCollection;
+#else
+using TaleWorlds.Core.ViewModelCollection.Generic;
 #endif
 
 namespace CaptivityEvents.Brothel
@@ -24,12 +24,21 @@ namespace CaptivityEvents.Brothel
     // TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance ClanFinanceWorkshopItemVM
     internal class CEBrothelClanFinanceItemVM : ClanFinanceWorkshopItemVM
     {
+#if V172
         public CEBrothelClanFinanceItemVM(CEBrothel brothel, Workshop workshop, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh) : base(workshop, onSelection, onRefresh)
+#else
+        public CEBrothelClanFinanceItemVM(CEBrothel brothel, Workshop workshop, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh, Action<ClanCardSelectionInfo> openCardSelectionPopup) : base(workshop, onSelection, onRefresh, openCardSelectionPopup)
+#endif
         {
             _brothel = brothel;
 
             IncomeTypeAsEnum = IncomeTypes.Workshop;
+#if V172
             SettlementComponent component = _brothel.Settlement.GetComponent<SettlementComponent>();
+#else
+            _openCardSelectionPopup = openCardSelectionPopup;
+            SettlementComponent component = _brothel.Settlement.SettlementComponent;
+#endif
             ImageName = component != null ? component.WaitMeshName : "";
             RefreshValues();
         }
@@ -50,7 +59,10 @@ namespace CaptivityEvents.Brothel
             IncomeValueText = DetermineIncomeText(Income);
             InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
             OutputsText = new TextObject("{=CEBROTHEL0994}Notable Prostitutes").ToString();
+
+#if V172
             ActionList.Clear();
+#endif
             ItemProperties.Clear();
             PopulateActionList();
             PopulateStatsList();
@@ -63,17 +75,19 @@ namespace CaptivityEvents.Brothel
             int sellingCost = _brothel.Capital;
 
             TextObject hint = GetBrothelSellHintText(sellingCost);
-
+#if V172
             ActionList.Add(new StringItemWithEnabledAndHintVM(ExecuteSellBrothel, new TextObject("{=PHkC8Gia}Sell").ToString(), true, null, hint));
-
+#endif
             bool isCurrentlyActive = _brothel.IsRunning;
             int costToStart = _brothel.Expense;
 
             TextObject hint2 = GetBrothelSellHintText(sellingCost);
-
+#if V172
             ActionList.Add(isCurrentlyActive
                                ? new StringItemWithEnabledAndHintVM(ExecuteToggleBrothel, new TextObject("{=CEBROTHEL0995}Stop Operations").ToString(), true, null, hint2)
                                : new StringItemWithEnabledAndHintVM(ExecuteToggleBrothel, new TextObject("{=CEBROTHEL0996}Start Operations").ToString(), Hero.MainHero.Gold >= costToStart, null, hint2));
+#endif
+
         }
 
         protected override void PopulateStatsList()
@@ -99,12 +113,22 @@ namespace CaptivityEvents.Brothel
             OutputProducts = string.Join(",", _brothel.CaptiveProstitutes.Where(c => c.IsHero).Select(c => c.HeroObject.Name.ToString()).ToArray());
         }
 
+#if V172
         private new void ExecuteBeginWorkshopHint()
         {
             if (_brothel != null) InformationManager.AddTooltipInformation(typeof(CEBrothel), _brothel);
         }
 
         private new void ExecuteEndHint() => InformationManager.HideInformations();
+
+#else
+        private new void ExecuteBeginWorkshopHint()
+        {
+            if (_brothel != null) InformationManager.ShowTooltip(typeof(CEBrothel), _brothel);
+        }
+
+        private new void ExecuteEndHint() => MBInformationManager.HideInformations();
+#endif
 
         private static TextObject GetBrothelRunningHintText(bool isRunning, int costToStart)
         {
@@ -211,5 +235,9 @@ namespace CaptivityEvents.Brothel
         private string _inputProducts;
 
         private string _outputProducts;
+
+#if !V172
+        private readonly Action<ClanCardSelectionInfo> _openCardSelectionPopup;
+#endif
     }
 }

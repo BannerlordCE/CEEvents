@@ -1,4 +1,6 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿#define V180
+
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -6,10 +8,15 @@ using CaptivityEvents.Helper;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.GameState;
-using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+
+#if V172
+using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
+#else
+using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
+#endif
 
 namespace CaptivityEvents.Notifications
 {

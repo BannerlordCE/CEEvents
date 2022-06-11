@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -14,9 +14,6 @@ using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
 
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Extensions;
@@ -25,7 +22,6 @@ using TaleWorlds.CampaignSystem.Party.PartyComponents;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
 
-#endif
 
 namespace CaptivityEvents.Events
 {
@@ -353,7 +349,7 @@ namespace CaptivityEvents.Events
 
                 if (eventNames.Count > 0)
                 {
-                    int number = MBRandom.Random.Next(0, eventNames.Count);
+                    int number = CEHelper.HelperMBRandom(0, eventNames.Count);
 
                     try
                     {
@@ -463,7 +459,7 @@ namespace CaptivityEvents.Events
 
                 if (eventNames.Count > 0)
                 {
-                    int number = MBRandom.Random.Next(0, eventNames.Count);
+                    int number = CEHelper.HelperMBRandom(0, eventNames.Count);
 
                     try
                     {
@@ -526,7 +522,15 @@ namespace CaptivityEvents.Events
                     {
                         if (troopRosterElement.Character.IsHero && troopRosterElement.Character.HeroObject.IsPlayerCompanion)
                         {
+#if V172
                             ScatterCompanionAction.ApplyInPrison(troopRosterElement.Character.HeroObject);
+#else
+                            troopRosterElement.Character.HeroObject.ChangeState(Hero.CharacterStates.Fugitive);
+                            if (troopRosterElement.Character.HeroObject.PartyBelongedToAsPrisoner != null)
+                            {
+                                EndCaptivityAction.ApplyByEscape(troopRosterElement.Character.HeroObject, null);
+                            }
+#endif
                         }
                         else
                         {
@@ -736,11 +740,11 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid PregnancyRiskModifier"); }
         }
 
-        #endregion Consequences
+#endregion Consequences
 
-        #region Requirements
+#region Requirements
 
-        #region ReqGold
+#region ReqGold
 
         private void ReqGold(ref MenuCallbackArgs args)
         {
@@ -773,9 +777,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqGold
+#endregion ReqGold
 
-        #region ReqTrait
+#region ReqTrait
 
         private void ReqTrait(ref MenuCallbackArgs args)
         {
@@ -823,9 +827,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqTrait
+#endregion ReqTrait
 
-        #region ReqHeroSkills
+#region ReqHeroSkills
 
         private void ReqHeroSkills(ref MenuCallbackArgs args)
         {
@@ -885,9 +889,9 @@ namespace CaptivityEvents.Events
             return true;
         }
 
-        #endregion ReqHeroSkills
+#endregion ReqHeroSkills
 
-        #region ReqHeroSkill
+#region ReqHeroSkill
 
         private void ReqHeroSkill(ref MenuCallbackArgs args)
         {
@@ -939,9 +943,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqHeroSkill
+#endregion ReqHeroSkill
 
-        #region ReqProstitute
+#region ReqProstitute
 
         private void ReqProstitute(ref MenuCallbackArgs args)
         {
@@ -974,9 +978,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqProstitute
+#endregion ReqProstitute
 
-        #region ReqSlavery
+#region ReqSlavery
 
         private void ReqSlavery(ref MenuCallbackArgs args)
         {
@@ -1009,9 +1013,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqSlavery
+#endregion ReqSlavery
 
-        #region ReqHeroHealthPercentage
+#region ReqHeroHealthPercentage
 
         private void ReqHeroHealthPercentage(ref MenuCallbackArgs args)
         {
@@ -1042,9 +1046,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqHeroHealthPercentage
+#endregion ReqHeroHealthPercentage
 
-        #region ReqFemaleCaptives
+#region ReqFemaleCaptives
 
         private void ReqFemaleCaptives(ref MenuCallbackArgs args)
         {
@@ -1109,9 +1113,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqFemaleCaptives
+#endregion ReqFemaleCaptives
 
-        #region ReqMaleCaptives
+#region ReqMaleCaptives
 
         private void ReqMaleCaptives(ref MenuCallbackArgs args)
         {
@@ -1176,9 +1180,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqMaleCaptives
+#endregion ReqMaleCaptives
 
-        #region ReqCaptives
+#region ReqCaptives
 
         private void ReqCaptives(ref MenuCallbackArgs args)
         {
@@ -1243,9 +1247,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqCaptives
+#endregion ReqCaptives
 
-        #region ReqFemaleTroops
+#region ReqFemaleTroops
 
         private void ReqFemaleTroops(ref MenuCallbackArgs args)
         {
@@ -1310,9 +1314,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqFemaleTroops
+#endregion ReqFemaleTroops
 
-        #region ReqMaleTroops
+#region ReqMaleTroops
 
         private void ReqMaleTroops(ref MenuCallbackArgs args)
         {
@@ -1377,9 +1381,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqMaleTroops
+#endregion ReqMaleTroops
 
-        #region ReqTroops
+#region ReqTroops
 
         private void ReqTroops(ref MenuCallbackArgs args)
         {
@@ -1444,9 +1448,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqTroops
+#endregion ReqTroops
 
-        #region ReqMorale
+#region ReqMorale
 
         private void ReqMorale(ref MenuCallbackArgs args)
         {
@@ -1477,11 +1481,11 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqMorale
+#endregion ReqMorale
 
-        #endregion Requirements
+#endregion Requirements
 
-        #region Icons
+#region Icons
 
         private void EmptyIcon(ref MenuCallbackArgs args)
         {
@@ -1528,9 +1532,9 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape) || _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) args.optionLeaveType = GameMenuOption.LeaveType.Escape;
         }
 
-        #endregion Icons
+#endregion Icons
 
-        #region Init Options
+#region Init Options
 
         private void InitChangeGold()
         {
@@ -1592,9 +1596,9 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
         }
 
-        #endregion Init Options
+#endregion Init Options
 
-        #region CustomConsequencesReq
+#region CustomConsequencesReq
 
         private void PlayerHasOpenSpaceForCompanions(ref MenuCallbackArgs args)
         {
@@ -1614,6 +1618,6 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion CustomConsequencesReq
+#endregion CustomConsequencesReq
     }
 }

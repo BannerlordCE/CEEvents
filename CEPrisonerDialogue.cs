@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
@@ -16,15 +16,9 @@ using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.CampaignSystem.GameMenus;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
-
-#endif
 
 namespace CaptivityEvents
 {
@@ -68,12 +62,22 @@ namespace CaptivityEvents
 
         public bool LCELordDefeatedLordAnswerReleaseOnConditionNoncombatant()
         {
-            return (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.IsMapFaction || Hero.OneToOneConversationHero.Clan.Leader != Hero.OneToOneConversationHero) && Hero.OneToOneConversationHero.Noncombatant;
+            return (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.IsMapFaction || Hero.OneToOneConversationHero.Clan.Leader != Hero.OneToOneConversationHero) &&
+#if V172
+            Hero.OneToOneConversationHero.Noncombatant;
+#else
+            Hero.OneToOneConversationHero.IsNoncombatant;
+#endif
         }
 
         public bool LCELordDefeatedLordAnswerReleaseOnConditionCombatant()
         {
-            return (Hero.OneToOneConversationHero.Clan != null && !Hero.OneToOneConversationHero.Clan.IsMapFaction && Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero) || !Hero.OneToOneConversationHero.Noncombatant;
+            return (Hero.OneToOneConversationHero.Clan != null && !Hero.OneToOneConversationHero.Clan.IsMapFaction && Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero) || !
+#if V172
+            Hero.OneToOneConversationHero.Noncombatant;
+#else
+            Hero.OneToOneConversationHero.IsNoncombatant;
+#endif
         }
 
         public void AddCustomLines(CampaignGameStarter campaignGameStarter, List<CEScene> CECustomScenes)

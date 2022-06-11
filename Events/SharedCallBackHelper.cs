@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -15,10 +15,6 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Encounters;
@@ -30,7 +26,6 @@ using TaleWorlds.CampaignSystem.Party.PartyComponents;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
 
-#endif
 
 namespace CaptivityEvents.Events
 {
@@ -373,7 +368,7 @@ namespace CaptivityEvents.Events
 
                 if (clothingLevel != "nude")
                 {
-                    if (MBRandom.Random.Next(100) < CESettings.Instance.BetterOutFitChance && clothingLevel == "default" || clothingLevel == "advanced")
+                    if (CEHelper.HelperMBRandom(100) < CESettings.Instance.BetterOutFitChance && clothingLevel == "default" || clothingLevel == "advanced")
                     {
                         string bodyString = "";
                         string legString = "";
@@ -551,11 +546,11 @@ namespace CaptivityEvents.Events
                     }
                 }
 
-                if (meleeLevel != "none" || meleeLevel == "default" && MBRandom.Random.Next(100) < CESettings.Instance.WeaponChance)
+                if (meleeLevel != "none" || meleeLevel == "default" && CEHelper.HelperMBRandom(100) < CESettings.Instance.WeaponChance)
                 {
                     string item;
 
-                    if (MBRandom.Random.Next(100)
+                    if (CEHelper.HelperMBRandom(100)
                         < (CESettings.Instance.WeaponSkill
                             ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.OneHanded) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.TwoHanded) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Polearm) / 275 * 100))
                             : CESettings.Instance.WeaponChance) && meleeLevel == "Default" || meleeLevel == "Advanced")
@@ -587,8 +582,8 @@ namespace CaptivityEvents.Events
 
                 if (rangedLevel != "none")
                 {
-                    if (CESettings.Instance != null && MBRandom.Random.Next(100) < CESettings.Instance.WeaponChance
-                                                        && MBRandom.Random.Next(100)
+                    if (CESettings.Instance != null && CEHelper.HelperMBRandom(100) < CESettings.Instance.WeaponChance
+                                                        && CEHelper.HelperMBRandom(100)
                                                         < (CESettings.Instance.RangedSkill
                                                             ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.Bow) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.Crossbow) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Throwing) / 275 * 100))
                                                             : CESettings.Instance.RangedBetterChance) && rangedLevel == "default" || rangedLevel == "advanced")
@@ -653,7 +648,7 @@ namespace CaptivityEvents.Events
                 Equipment randomElement2 = new(true);
                 randomElement2.FillFrom(randomElement, false);
 
-                if (CESettings.Instance != null && MBRandom.Random.Next(100)
+                if (CESettings.Instance != null && CEHelper.HelperMBRandom(100)
                     < (CESettings.Instance.HorseSkill
                         ? Hero.MainHero.GetSkillValue(DefaultSkills.Riding) / 275 * 100
                         : CESettings.Instance.HorseChance) && mountLevel == "default" || mountLevel == "basic")
@@ -664,7 +659,7 @@ namespace CaptivityEvents.Events
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Horse, horseEquipment);
                 }
 
-                if (CESettings.Instance != null && (CESettings.Instance.StolenGearQuest && MBRandom.Random.Next(100) < CESettings.Instance.StolenGearChance) && questEnabled)
+                if (CESettings.Instance != null && (CESettings.Instance.StolenGearQuest && CEHelper.HelperMBRandom(100) < CESettings.Instance.StolenGearChance) && questEnabled)
                 {
                     Hero issueOwner = null;
                     List<TextObject> listOfSettlements = new();
@@ -1399,7 +1394,7 @@ namespace CaptivityEvents.Events
                     CEPersistence.animationPlayEvent = false;
                     if (backgroundNames.Count > 0)
                     {
-                        int number = MBRandom.Random.Next(0, backgroundNames.Count);
+                        int number = CEHelper.HelperMBRandom(0, backgroundNames.Count);
 
                         try
                         {

@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -12,18 +12,49 @@ using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.Settlements;
-
-#endif
+using TaleWorlds.Library;
 
 namespace CaptivityEvents.Helper
 {
     public class CEHelper
     {
+
+        public static void AddQuickInformation(TextObject message, int priorty = 0, BasicCharacterObject announcerCharacter = null, string soundEventPath = "") {
+#if V172
+            InformationManager.AddQuickInformation(message, priorty, announcerCharacter, soundEventPath);
+#else
+            MBInformationManager.AddQuickInformation(message, priorty, announcerCharacter, soundEventPath);
+#endif
+        }
+
+        public static int HelperMBRandom()
+        {
+#if V172
+            return MBRandom.Random.Next();
+#else
+            return MBRandom.RandomInt();
+#endif
+        }
+
+        public static int HelperMBRandom(int maxValue)
+        {
+#if V172
+            return MBRandom.Random.Next(maxValue);
+#else
+            return MBRandom.RandomInt(maxValue);
+#endif
+        }
+
+        public static int HelperMBRandom(int minValue, int maxValue)
+        {
+#if V172
+            return MBRandom.Random.Next(minValue, maxValue);
+#else
+            return MBRandom.RandomInt(maxValue);
+#endif
+        }
+
         public enum EquipmentCustomIndex
         {
             Weapon0 = 0,

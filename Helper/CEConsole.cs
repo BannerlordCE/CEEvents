@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;

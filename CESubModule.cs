@@ -1,4 +1,4 @@
-#define V172
+#define V180
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -18,24 +18,15 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
-using TaleWorlds.Core.ViewModelCollection;
 using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
 using TaleWorlds.MountAndBlade;
-using TaleWorlds.MountAndBlade.View.Missions;
 using TaleWorlds.TwoDimension;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
-
-#if V171
-using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
-using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors.BarterBehaviors;
-using TaleWorlds.Engine.Screens;
-#else
-
 using TaleWorlds.ScreenSystem;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.BarterSystem;
@@ -47,6 +38,13 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
 
+
+#if V172
+using TaleWorlds.Core.ViewModelCollection;
+using TaleWorlds.MountAndBlade.View.Missions;
+#else
+using TaleWorlds.MountAndBlade.View.MissionViews;
+using TaleWorlds.Core.ViewModelCollection.Information;
 #endif
 
 namespace CaptivityEvents
@@ -180,11 +178,7 @@ namespace CaptivityEvents
 
         // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml
         // Mount & Blade II Bannerlord\Modules\Native\GUI\NativeSpriteData.xml
-#if V171
-        private static readonly int[] sprite_index = new int[] { 3, 4, 5, 6 };
-#else
         private static readonly int[] sprite_index = new int[] { 2, 3, 4, 5 };
-#endif
 
         // Sounds for Brothel
         private static readonly Dictionary<string, int> brothelSounds = new();
@@ -412,15 +406,9 @@ namespace CaptivityEvents
 
                 SpriteCategory spriteCategory = UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"];
                 spriteCategory.SpriteSheets.AddRange(new Texture[] { CEPersistence.CEEventImageList["default_female_prison"], CEPersistence.CEEventImageList["default_male_prison"], CEPersistence.CEEventImageList["default_female"], CEPersistence.CEEventImageList["default_male"] });
-#if V171
-                spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray(new Vec2i[] { new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805) });
-                spriteCategory.SpriteSheetCount = 7;
-                CECustomHandler.ForceLogToFile("Loading Textures 1.7.1");
-#else
                 spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray(new Vec2i[] { new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805) });
                 spriteCategory.SpriteSheetCount = 6;
                 CECustomHandler.ForceLogToFile("Loading Textures 1.7.2");
-#endif
 
                 PropertyInfo propertyWidth = typeof(SpritePart).GetProperty("Width");
                 PropertyInfo propertyHeight = typeof(SpritePart).GetProperty("Height");
@@ -429,11 +417,7 @@ namespace CaptivityEvents
                     switch (spritePart.Name)
                     {
                         case "wait_prisoner_female":
-#if V171
-                            spritePart.SheetID = 7;
-#else
                             spritePart.SheetID = 6;
-#endif
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
                             propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
@@ -442,11 +426,7 @@ namespace CaptivityEvents
                             break;
 
                         case "wait_prisoner_male":
-#if V171
-                            spritePart.SheetID = 6;
-#else
                             spritePart.SheetID = 5;
-#endif
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
                             propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
@@ -455,11 +435,7 @@ namespace CaptivityEvents
                             break;
 
                         case "wait_captive_female":
-#if V171
-                            spritePart.SheetID = 5;
-#else
                             spritePart.SheetID = 4;
-#endif
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
                             propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
@@ -468,11 +444,7 @@ namespace CaptivityEvents
                             break;
 
                         case "wait_captive_male":
-#if V171
-                            spritePart.SheetID = 4;
-#else
                             spritePart.SheetID = 3;
-#endif
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
                             propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
@@ -694,7 +666,11 @@ namespace CaptivityEvents
             CheckBugIssue();
             ResetHelper();
             if (!_isLoaded) return;
+#if V172
             game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings.xml");
+#else
+            game.GameTextManager.LoadGameTexts();
+#endif
             InitalizeAttributes(game);
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
             AddBehaviours(campaignStarter);
@@ -780,7 +756,11 @@ namespace CaptivityEvents
             else AddCustomEvents(campaignStarter);
 
             if (_isLoadedInGame) return;
+#if V172
             TooltipVM.AddTooltipType(typeof(CEBrothel), CEBrothelToolTip.BrothelTypeTooltipAction);
+#else
+            PropertyBasedTooltipVM.AddTooltipType(typeof(CEBrothel), CEBrothelToolTip.BrothelTypeTooltipAction);
+#endif
             LoadBrothelSounds();
             _isLoadedInGame = true;
         }
@@ -1270,7 +1250,7 @@ namespace CaptivityEvents
                                 // 1.5.1
                                 missionState.CurrentMission.ClearCorpses(false);
 
-                                InformationManager.AddQuickInformation(new TextObject("{=CEEVENTS1069}Let's give them a headstart."), 100, CharacterObject.PlayerCharacter);
+                                CEHelper.AddQuickInformation(new TextObject("{=CEEVENTS1069}Let's give them a headstart."), 100, CharacterObject.PlayerCharacter);
                                 CEPersistence.huntState = CEPersistence.HuntState.HeadStart;
                             }
 
@@ -1287,8 +1267,7 @@ namespace CaptivityEvents
                                     component?.Panic();
                                     agent2.DestinationSpeed = 0.5f;
                                 }
-
-                                InformationManager.AddQuickInformation(new TextObject("{=CEEVENTS1068}Hunt them down!"), 100, CharacterObject.PlayerCharacter, CharacterObject.PlayerCharacter.IsFemale
+                                CEHelper.AddQuickInformation(new TextObject("{=CEEVENTS1068}Hunt them down!"), 100, CharacterObject.PlayerCharacter, CharacterObject.PlayerCharacter.IsFemale
                                                                            ? "event:/voice/combat/female/01/victory"
                                                                            : "event:/voice/combat/male/01/victory");
                                 CEPersistence.huntState = CEPersistence.HuntState.Hunting;

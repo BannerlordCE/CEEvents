@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -13,14 +13,10 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 
-#endif
 
 namespace CaptivityEvents.Events
 {
@@ -410,7 +406,7 @@ namespace CaptivityEvents.Events
 
                 if (eventNames.Count > 0)
                 {
-                    int number = MBRandom.Random.Next(0, eventNames.Count);
+                    int number = CEHelper.HelperMBRandom(0, eventNames.Count);
 
                     try
                     {
@@ -502,7 +498,7 @@ namespace CaptivityEvents.Events
 
                 if (eventNames.Count > 0)
                 {
-                    int number = MBRandom.Random.Next(0, eventNames.Count);
+                    int number = CEHelper.HelperMBRandom(0, eventNames.Count);
 
                     try
                     {

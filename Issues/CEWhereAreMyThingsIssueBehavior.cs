@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Config;
 using Helpers;
@@ -10,13 +10,8 @@ using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
 using static CaptivityEvents.Helper.CEHelper;
 
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.Issues;
 using TaleWorlds.CampaignSystem.Party;
-
-#endif
 
 namespace CaptivityEvents.Issues
 {

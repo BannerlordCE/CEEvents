@@ -1,11 +1,18 @@
-﻿using CaptivityEvents.Config;
+﻿#define V180
+
+using CaptivityEvents.Config;
 using CaptivityEvents.Helper;
 using CaptivityEvents.Notifications;
 using HarmonyLib;
 using System;
 using System.Reflection;
-using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.Core;
+using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
+
+#if V172
+#else
+using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
+#endif
 
 namespace CaptivityEvents.Patches
 {

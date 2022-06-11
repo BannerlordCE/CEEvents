@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using System;
 using System.Collections.Generic;
@@ -6,13 +6,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.Settlements;
-
-#endif
 
 namespace CaptivityEvents.Brothel
 {

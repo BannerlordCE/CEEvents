@@ -1,4 +1,5 @@
 ﻿using CaptivityEvents.Custom;
+using CaptivityEvents.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,7 +73,7 @@ namespace CaptivityEvents.Events
                 {
                     if (eventNames.Count > 0)
                     {
-                        int test = MBRandom.Random.Next(0, eventNames.Count);
+                        int test = CEHelper.HelperMBRandom(0, eventNames.Count);
                         string randomWeightedChoice = eventNames[test];
                         CECustomHandler.LogToFile("CEWaitingList Choice is " + randomWeightedChoice);
                         return randomWeightedChoice;

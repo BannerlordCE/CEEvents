@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -9,15 +9,10 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 
-#endif
 
 namespace CaptivityEvents.Events
 {
@@ -60,7 +55,7 @@ namespace CaptivityEvents.Events
 
         internal void CECaptivityEscapeAttempt(ref MenuCallbackArgs args, int escapeChance = 10)
         {
-            if (MBRandom.Random.Next(100) > escapeChance + new ScoresCalculation().EscapeProwessScore(Hero.MainHero))
+            if (CEHelper.HelperMBRandom(100) > escapeChance + new ScoresCalculation().EscapeProwessScore(Hero.MainHero))
             {
                 if (CESettings.Instance != null && !CESettings.Instance.SexualContent)
                 {
@@ -113,7 +108,11 @@ namespace CaptivityEvents.Events
                     if (Hero.MainHero.IsWounded) Hero.MainHero.HitPoints = 20;
 
                     PlayerEncounter.ProtectPlayerSide();
+#if V172
                     MobileParty.MainParty.IsDisorganized = false;
+#else
+                    MobileParty.MainParty.SetDisorganized(false);
+#endif
                     PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, 1, true);
                     MobileParty.MainParty.ChangePartyLeader(Hero.MainHero);
                 }
