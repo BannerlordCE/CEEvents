@@ -26,14 +26,14 @@ namespace CaptivityEvents.Events
 
             if (targetHero != null && targetHero.IsFemale && !targetHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(targetHero))
             {
-                if (CESettings.Instance != null && !forcePreg && (IsHeroAgeSuitableForPregnancy(targetHero) && CESettings.Instance.PregnancyToggle))
+                if (CESettings.Instance != null && !forcePreg && (IsHeroAgeSuitableForPregnancy(targetHero) && (CESettings.Instance?.PregnancyToggle ?? true)))
                 {
-                    if (!CESettings.Instance.UsePregnancyModifiers) modifier = 0;
+                    if (!(CESettings.Instance?.UsePregnancyModifiers ?? true)) modifier = 0;
 
                     if (CEHelper.HelperMBRandom(100)
-                        >= (CESettings.Instance.AttractivenessSkill
+                        >= ((CESettings.Instance?.AttractivenessSkill ?? true)
                             ? score.AttractivenessScore(targetHero) / 20 + modifier
-                            : CESettings.Instance.PregnancyChance + modifier))
+                            : CESettings.Instance?.PregnancyChance + modifier))
                     {
                         return;
                     }
@@ -100,14 +100,14 @@ namespace CaptivityEvents.Events
             }
             else if (targetHero != null && !targetHero.IsFemale)
             {
-                if (CESettings.Instance != null && !CESettings.Instance.PregnancyToggle) return;
-                if (CESettings.Instance != null && !CESettings.Instance.UsePregnancyModifiers) modifier = 0;
+                if (!(CESettings.Instance?.PregnancyToggle ?? true)) return;
+                if (!(CESettings.Instance?.UsePregnancyModifiers ?? true)) modifier = 0;
 
                 if (CESettings.Instance != null
                     && !forcePreg && CEHelper.HelperMBRandom(100)
-                    >= (CESettings.Instance.AttractivenessSkill
+                    >= ((CESettings.Instance?.AttractivenessSkill ?? true)
                         ? score.AttractivenessScore(targetHero) / 20 + modifier
-                        : CESettings.Instance.PregnancyChance + modifier))
+                        : CESettings.Instance?.PregnancyChance + modifier))
                 {
                     return;
                 }
@@ -173,14 +173,14 @@ namespace CaptivityEvents.Events
 
             if (targetHero != null && targetHero.IsFemale && !targetHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(targetHero))
             {
-                if (CESettings.Instance != null && IsHeroAgeSuitableForPregnancy(targetHero) && CESettings.Instance.PregnancyToggle)
+                if (IsHeroAgeSuitableForPregnancy(targetHero) && (CESettings.Instance?.PregnancyToggle ?? true))
                 {
-                    if (!CESettings.Instance.UsePregnancyModifiers) modifier = 0;
+                    if (!(CESettings.Instance?.UsePregnancyModifiers ?? true)) modifier = 0;
 
                     if (CEHelper.HelperMBRandom(100)
-                        >= (CESettings.Instance.AttractivenessSkill
+                        >= ((CESettings.Instance?.AttractivenessSkill ?? true)
                             ? scoresCalculation.AttractivenessScore(targetHero) / 20 + modifier
-                            : CESettings.Instance.PregnancyChance + modifier))
+                            : CESettings.Instance?.PregnancyChance + modifier))
                     {
                         return;
                     }
@@ -255,14 +255,14 @@ namespace CaptivityEvents.Events
             }
             else if (targetHero != null && !targetHero.IsFemale)
             {
-                if (CESettings.Instance != null && !CESettings.Instance.PregnancyToggle) return;
-                if (CESettings.Instance != null && !CESettings.Instance.UsePregnancyModifiers) modifier = 0;
+                if (!(CESettings.Instance?.PregnancyToggle ?? true)) return;
+                if (!(CESettings.Instance?.UsePregnancyModifiers ?? true)) modifier = 0;
 
                 if (CESettings.Instance != null
                     && CEHelper.HelperMBRandom(100)
-                    >= (CESettings.Instance.AttractivenessSkill
+                    >= ((CESettings.Instance?.AttractivenessSkill ?? true)
                         ? scoresCalculation.AttractivenessScore(targetHero) / 20 + modifier
-                        : CESettings.Instance.PregnancyChance + modifier))
+                        : CESettings.Instance?.PregnancyChance + modifier))
                 {
                     return;
                 }

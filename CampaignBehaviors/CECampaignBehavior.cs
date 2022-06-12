@@ -41,7 +41,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private bool LaunchCaptorEvent(CEEvent OverrideEvent = null)
         {
-            if (CESettings.Instance.EventCaptorNotifications)
+            if (CESettings.Instance?.EventCaptorNotifications ?? true)
             {
                 if (notificationCaptorExists || progressEventExists) return false;
             }
@@ -60,7 +60,7 @@ namespace CaptivityEvents.CampaignBehaviors
             if (returnedEvent == null) return false;
             notificationCaptorExists = true;
 
-            if (CESettings.Instance.EventCaptorNotifications)
+            if (CESettings.Instance?.EventCaptorNotifications ?? true)
             {
                 try
                 {
@@ -105,7 +105,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private bool LaunchRandomEvent(CEEvent OverrideEvent = null)
         {
-            if (CESettings.Instance.EventCaptorNotifications)
+            if (CESettings.Instance?.EventCaptorNotifications ?? true)
             {
                 if (notificationEventExists || progressEventExists) return false;
             }
@@ -123,7 +123,7 @@ namespace CaptivityEvents.CampaignBehaviors
             if (returnedEvent == null) return false;
             notificationEventExists = true;
 
-            if (CESettings.Instance.EventCaptorNotifications)
+            if (CESettings.Instance?.EventCaptorNotifications ?? true)
             {
                 try
                 {
@@ -297,18 +297,18 @@ namespace CaptivityEvents.CampaignBehaviors
             _hoursPassed++;
             if (CESettings.Instance == null) return false;
 
-            float value = CESettings.Instance.EventOccurrenceRandom;
+            float value = CESettings.Instance?.EventOccurrenceRandom ?? 12f;
 
             try
             {
-                if (CESettings.Instance.EventCaptorOn && PartyBase.MainParty.NumberOfPrisoners > 0)
+                if ((CESettings.Instance?.EventCaptorOn ?? true) && PartyBase.MainParty.NumberOfPrisoners > 0)
                 {
-                    value = CESettings.Instance.EventOccurrenceCaptor;
+                    value = CESettings.Instance?.EventOccurrenceCaptor ?? 12f;
                 }
             }
             catch (Exception)
             {
-                value = CESettings.Instance.EventOccurrenceRandom;
+                value = CESettings.Instance?.EventOccurrenceRandom ?? 12f;
             }
 
             if (!(_hoursPassed > value)) return false;
@@ -331,7 +331,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     ? CEHelper.spouseTwo
                     : CEHelper.spouseOne;
                 CECustomHandler.ForceLogToFile("Added " + hero.Name + "'s Pregnancy");
-                if (CESettings.Instance != null) _heroPregnancies.Add(new Pregnancy(hero, father, CampaignTime.DaysFromNow(CESettings.Instance.PregnancyDurationInDays)));
+                if (CESettings.Instance != null) _heroPregnancies.Add(new Pregnancy(hero, father, CampaignTime.DaysFromNow(CESettings.Instance?.PregnancyDurationInDays ?? 14f)));
             }
             catch (Exception e)
             {
@@ -426,7 +426,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancydue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
                 }
 
-                if (CESettings.Instance != null && CESettings.Instance.PregnancyMessages) InformationManager.DisplayMessage(new InformationMessage(textObject40.ToString(), Colors.Gray));
+                if (CESettings.Instance?.PregnancyMessages ?? true) InformationManager.DisplayMessage(new InformationMessage(textObject40.ToString(), Colors.Gray));
             }
             catch (Exception e)
             {
@@ -786,7 +786,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private void OnHourlyTick()
         {
-            if (CESettings.Instance.EventCaptorOn && Hero.MainHero.IsPartyLeader && CheckEventHourly())
+            if ((CESettings.Instance?.EventCaptorOn ?? true) && Hero.MainHero.IsPartyLeader && CheckEventHourly())
             {
                 CECustomHandler.LogToFile("Checking Campaign Events");
 
@@ -819,19 +819,19 @@ namespace CaptivityEvents.CampaignBehaviors
                     {
                         if (MobileParty.MainParty.Party.PrisonRoster.Count > 0)
                         {
-                            if (CESettings.Instance.EventRandomEnabled)
+                            if (CESettings.Instance?.EventRandomEnabled ?? true)
                             {
                                 int randomNumber = MBRandom.RandomInt(100);
 
-                                if (randomNumber < CESettings.Instance.EventRandomFireChance && !LaunchRandomEvent()) LaunchCaptorEvent();
-                                if (randomNumber > CESettings.Instance.EventRandomFireChance && !LaunchCaptorEvent()) LaunchRandomEvent();
+                                if (randomNumber < CESettings.Instance?.EventRandomFireChance && !LaunchRandomEvent()) LaunchCaptorEvent();
+                                if (randomNumber > CESettings.Instance?.EventRandomFireChance && !LaunchCaptorEvent()) LaunchRandomEvent();
                             }
                             else
                             {
                                 LaunchCaptorEvent();
                             }
                         }
-                        else if (CESettings.Instance.EventRandomEnabled)
+                        else if (CESettings.Instance?.EventRandomEnabled ?? true)
                         {
                             LaunchRandomEvent();
                         }
@@ -872,7 +872,7 @@ namespace CaptivityEvents.CampaignBehaviors
             }
 
             // Gear
-            if (CESettings.Instance.EventCaptorGearCaptives)
+            if (CESettings.Instance?.EventCaptorGearCaptives ?? true)
             {
                 try
                 {

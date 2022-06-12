@@ -426,7 +426,7 @@ namespace CaptivityEvents.Helper
 
                                     if (Game.Current.GameStateManager.ActiveState is MapState mapStateCaptor)
                                     {
-                                        if (CESettings.Instance.EventCaptorNotifications)
+                                        if (CESettings.Instance?.EventCaptorNotifications ?? true)
                                         {
                                             LaunchCaptorEvent(returnedEvent);
                                         }
@@ -455,7 +455,7 @@ namespace CaptivityEvents.Helper
 
                         if (Game.Current.GameStateManager.ActiveState is MapState mapStateRandom)
                         {
-                            if (CESettings.Instance.EventCaptorNotifications)
+                            if (CESettings.Instance?.EventCaptorNotifications ?? true)
                             {
                                 LaunchRandomEvent(returnedEvent);
                             }
@@ -1082,7 +1082,7 @@ namespace CaptivityEvents.Helper
                             CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomFlags);
                         }
                         CECustomHandler.ForceLogToFile("Loaded CESettings: "
-                                                       + (CESettings.Instance != null && CESettings.Instance.LogToggle
+                                                       + ((CESettings.Instance?.LogToggle ?? false)
                                                            ? "Logs are enabled."
                                                            : "Extra Event Logs are disabled enable them through settings."));
 

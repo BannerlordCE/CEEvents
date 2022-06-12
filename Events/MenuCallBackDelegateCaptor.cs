@@ -253,7 +253,7 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
+                    if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
 
                     MobileParty.MainParty.MemberRoster.AddToCounts(captiveHero.CharacterObject, 1, false);
 

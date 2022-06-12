@@ -564,7 +564,7 @@ namespace CaptivityEvents.Events
                 Equipment randomElement2 = new(true);
                 randomElement2.FillFrom(randomElement, false);
 
-                if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(hero, hero.BattleEquipment, hero.CivilianEquipment);
+                if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(hero, hero.BattleEquipment, hero.CivilianEquipment);
 
                 foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                 {

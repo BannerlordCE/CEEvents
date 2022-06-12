@@ -51,7 +51,7 @@ namespace CaptivityEvents
 
             campaignGameStarter.AddPlayerLine("CEPrisonerInCell_01", "CEPrisonerInCell", "CEPrisonerInCell_01_response", "{=CEEVENTS1052}You are coming with me.", null, null);
 
-            if (CESettings.Instance.ProstitutionControl) campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "CEPrisonerInCell_02_response", "{=CEBROTHEL0979}Time to make you work at the brothel.", null, null, 100, ConversationCEEventBrothelOnCondition);
+            if (CESettings.Instance?.ProstitutionControl ?? true) campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "CEPrisonerInCell_02_response", "{=CEBROTHEL0979}Time to make you work at the brothel.", null, null, 100, ConversationCEEventBrothelOnCondition);
 
             campaignGameStarter.AddDialogLine("CEPrisonerInCell_01_r", "CEPrisonerInCell_01_response", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, ConversationCEEventInCellOnConsequence);
 

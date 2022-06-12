@@ -32,12 +32,13 @@ namespace CaptivityEvents.Models
             bool isInSettlement = PlayerCaptivity.CaptorParty.IsSettlement;
             bool isInLordParty = !isInSettlement && PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.LeaderHero != null;
 
-            float eventOccurence =
+            float eventOccurence = CESettings.Instance != null ?
                 isInSettlement ?
                 CESettings.Instance.EventOccurrenceSettlement :
                 isInLordParty ?
                 CESettings.Instance.EventOccurrenceLord :
-                CESettings.Instance.EventOccurrenceOther;
+                CESettings.Instance.EventOccurrenceOther :
+                6f;
             return CheckTimeElapsedMoreThanHours(PlayerCaptivity.LastCheckTime, eventOccurence);
         }
 
@@ -173,12 +174,12 @@ namespace CaptivityEvents.Models
                 }
             }
 
-            if (CESettings.Instance != null && (!CESettings.Instance.SlaveryToggle && !FactionManager.IsAtWarAgainstFaction(PlayerCaptivity.CaptorParty.MapFaction, MobileParty.MainParty.MapFaction) && (PlayerCaptivity.CaptorParty.MapFaction == MobileParty.MainParty.MapFaction || !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingModerate(PlayerCaptivity.CaptorParty.MapFaction) && !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingSevere(PlayerCaptivity.CaptorParty.MapFaction)))) return "menu_captivity_end_no_more_enemies";
+            if (CESettings.Instance != null && (!(CESettings.Instance?.SlaveryToggle ?? true) && !FactionManager.IsAtWarAgainstFaction(PlayerCaptivity.CaptorParty.MapFaction, MobileParty.MainParty.MapFaction) && (PlayerCaptivity.CaptorParty.MapFaction == MobileParty.MainParty.MapFaction || !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingModerate(PlayerCaptivity.CaptorParty.MapFaction) && !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingSevere(PlayerCaptivity.CaptorParty.MapFaction)))) return "menu_captivity_end_no_more_enemies";
 
             if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement != null)
             {
                 // Default event transfer disabled if slavery is enabled override or if it is garrison
-                if (PlayerCaptivity.CaptorParty.MapFaction != PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.MapFaction || (CESettings.Instance.SlaveryToggle && !PlayerCaptivity.CaptorParty.MobileParty.IsGarrison && !PlayerCaptivity.CaptorParty.MobileParty.IsMilitia)) return null;
+                if (PlayerCaptivity.CaptorParty.MapFaction != PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.MapFaction || ((CESettings.Instance?.SlaveryToggle ?? true) && !PlayerCaptivity.CaptorParty.MobileParty.IsGarrison && !PlayerCaptivity.CaptorParty.MobileParty.IsMilitia)) return null;
                 PlayerCaptivity.LastCheckTime = CampaignTime.Now;
                 if (Game.Current.GameStateManager.ActiveState is MapState) Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
 

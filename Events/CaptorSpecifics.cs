@@ -267,7 +267,7 @@ namespace CaptivityEvents.Events
 
             TroopRoster releasedPrisoners = TroopRoster.CreateDummyTroopRoster();
 
-            if (CESettings.Instance != null) amount = CESettings.Instance.AmountOfTroopsForHunt;
+            if (CESettings.Instance != null) amount = CESettings.Instance?.AmountOfTroopsForHunt ?? 15;
 
             try
             {
@@ -396,7 +396,7 @@ namespace CaptivityEvents.Events
             Equipment randomElement2 = new(true);
             randomElement2.FillFrom(randomElement, false);
 
-            if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captive, captive.BattleEquipment, captive.CivilianEquipment);
+            if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captive, captive.BattleEquipment, captive.CivilianEquipment);
 
             foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
             {

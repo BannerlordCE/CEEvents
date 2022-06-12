@@ -20,15 +20,15 @@ namespace CaptivityEvents.Patches
         public static MethodInfo GetDefaultIncome = AccessTools.Method(typeof(ClanIncomeVM), "GetDefaultIncome");
         public static MethodInfo OnIncomeSelection = AccessTools.Method(typeof(ClanIncomeVM), "OnIncomeSelection");
 
+#if !V172
+        public static AccessTools.FieldRef<ClanIncomeVM, Action<ClanCardSelectionInfo>> _openCardSelectionPopup = AccessTools.FieldRefAccess<ClanIncomeVM, Action<ClanCardSelectionInfo>>("_openCardSelectionPopup");
+#endif
+
         [HarmonyPrepare]
-        private static bool ShouldPatch() => CESettings.Instance != null && CESettings.Instance.ProstitutionControl;
+        private static bool ShouldPatch() => CESettings.Instance?.ProstitutionControl ?? true;
 
         [HarmonyPostfix]
-#if V172
         public static void RefreshList(ClanIncomeVM __instance)
-#else
-        public static void RefreshList(ClanIncomeVM __instance, Action<ClanCardSelectionInfo> ___openCardSelectionPopup)
-#endif
         {
             foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
             {
@@ -40,7 +40,7 @@ namespace CaptivityEvents.Patches
 #if V172
                 CEBrothelClanFinanceItemVM brothelFinanceItemVM = new(brothel, workshop, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh);
 #else
-                CEBrothelClanFinanceItemVM brothelFinanceItemVM = new(brothel, workshop, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh, ___openCardSelectionPopup);
+                CEBrothelClanFinanceItemVM brothelFinanceItemVM = new(brothel, workshop, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh, _openCardSelectionPopup.Invoke(__instance));
 #endif
                 __instance.Incomes.Add(brothelFinanceItemVM);
 

@@ -2102,19 +2102,19 @@ namespace CaptivityEvents.Events
         private bool SettingsCheck()
         {
             // Settings
-            if (!CESettings.Instance.SexualContent && _listEvent.SexualContent) return Error("Skipping event " + _listEvent.Name + " SexualContent events disabled.");
-            if (!CESettings.Instance.NonSexualContent && !_listEvent.SexualContent) return Error("Skipping event " + _listEvent.Name + " NonSexualContent events disabled.");
+            if (!(CESettings.Instance?.SexualContent ?? true) && _listEvent.SexualContent) return Error("Skipping event " + _listEvent.Name + " SexualContent events disabled.");
+            if (!(CESettings.Instance?.NonSexualContent ?? true) && !_listEvent.SexualContent) return Error("Skipping event " + _listEvent.Name + " NonSexualContent events disabled.");
 
             // Default Flags
-            if (!CESettings.Instance.FemdomControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Femdom)) return Error("Skipping event " + _listEvent.Name + " Femdom events disabled.");
-            if (!CESettings.Instance.CommonControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Common)) return Error("Skipping event " + _listEvent.Name + " Common events disabled.");
-            if (!CESettings.Instance.SlaveryToggle && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Slavery)) return Error("Skipping event " + _listEvent.Name + " Slavery events disabled.");
-            if (!CESettings.Instance.BestialityControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Bestiality)) return Error("Skipping event " + _listEvent.Name + " Bestiality events disabled.");
-            if (!CESettings.Instance.ProstitutionControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution)) return Error("Skipping event " + _listEvent.Name + " Prostitution events disabled.");
-            if (!CESettings.Instance.RomanceControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Romance)) return Error("Skipping event " + _listEvent.Name + " Romance events disabled.");
+            if (!(CESettings.Instance?.FemdomControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Femdom)) return Error("Skipping event " + _listEvent.Name + " Femdom events disabled.");
+            if (!(CESettings.Instance?.CommonControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Common)) return Error("Skipping event " + _listEvent.Name + " Common events disabled.");
+            if (!(CESettings.Instance?.SlaveryToggle ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Slavery)) return Error("Skipping event " + _listEvent.Name + " Slavery events disabled.");
+            if (!(CESettings.Instance?.BestialityControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Bestiality)) return Error("Skipping event " + _listEvent.Name + " Bestiality events disabled.");
+            if (!(CESettings.Instance?.ProstitutionControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution)) return Error("Skipping event " + _listEvent.Name + " Prostitution events disabled.");
+            if (!(CESettings.Instance?.RomanceControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Romance)) return Error("Skipping event " + _listEvent.Name + " Romance events disabled.");
 
-            if (!CESettings.Instance.StolenGear && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripEnabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear disabled.");
-            if (CESettings.Instance.StolenGear && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripDisabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear enabled.");
+            if (!(CESettings.Instance?.StolenGear ?? true)&& _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripEnabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear disabled.");
+            if ((CESettings.Instance?.StolenGear ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripDisabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear enabled.");
 
             // Custom Flags
             if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) return Error("Skipping event " + _listEvent.Name + " Player is busy.");

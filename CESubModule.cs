@@ -37,6 +37,7 @@ using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
+using System.Xml;
 
 
 #if V172
@@ -659,7 +660,8 @@ namespace CaptivityEvents
             CEConsole.CleanSave(new List<string>());
             base.OnNewGameCreated(game, initializerObject);
         }
-
+        
+        
         protected override void OnGameStart(Game game, IGameStarter gameStarter)
         {
             if (!(game.GameType is Campaign)) return;
@@ -669,7 +671,16 @@ namespace CaptivityEvents
 #if V172
             game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings.xml");
 #else
-            game.GameTextManager.LoadGameTexts();
+            // GameTextManager LoadDefaultTexts
+            string text = ModuleHelper.GetModuleFullPath("zCaptivityEvents") + "ModuleData/module_strings.xml";
+            XmlDocument xmlDocument = new();
+            StreamReader streamReader = new(text);
+            string text2 = streamReader.ReadToEnd();
+            xmlDocument.LoadXml(text2);
+            streamReader.Close();
+
+            MethodInfo mi = typeof(GameTextManager).GetMethod("LoadFromXML", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+            if (mi != null) mi.Invoke(game.GameTextManager, new object[] { xmlDocument });
 #endif
             InitalizeAttributes(game);
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
@@ -748,7 +759,7 @@ namespace CaptivityEvents
             CEPrisonerDialogue prisonerDialogue = new();
             if ((CESettings.Instance?.EventCaptorOn ?? true) && (CESettings.Instance?.EventCaptorDialogue ?? true)) prisonerDialogue.AddPrisonerLines(campaignStarter);
             if (CEPersistence.CECustomScenes.Count > 0) prisonerDialogue.AddCustomLines(campaignStarter, CEPersistence.CECustomScenes);
-            //if (CESettings.Instance.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
+            //if (CESettings.Instance?.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
 
             if (_isLoadedInGame) CEConsole.ReloadEvents(new List<string>());
             else AddCustomEvents(campaignStarter);
@@ -1256,7 +1267,7 @@ namespace CaptivityEvents
 
                         case CEPersistence.HuntState.HeadStart:
                             if (Mission.Current != null && Mission.Current.Agents != null && (            
-                                (CESettings.Instance != null && Mission.Current.CurrentTime > CESettings.Instance.HuntBegins) || 
+                                (CESettings.Instance != null && Mission.Current.CurrentTime > CESettings.Instance?.HuntBegins) || 
                                 (CESettings.Instance == null && Mission.Current.CurrentTime > 7f)
                                 ))
                             {
@@ -1293,7 +1304,7 @@ namespace CaptivityEvents
             {
                 CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
                 PlayerEncounter.SetPlayerVictorious();
-                if (CESettings.Instance == null || CESettings.Instance != null && CESettings.Instance.HuntLetPrisonersEscape) PlayerEncounter.EnemySurrender = true;
+                if (CESettings.Instance?.HuntLetPrisonersEscape ?? false) PlayerEncounter.EnemySurrender = true;
                 PlayerEncounter.Update();
             }
             else if (CEPersistence.huntState == CEPersistence.HuntState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState)

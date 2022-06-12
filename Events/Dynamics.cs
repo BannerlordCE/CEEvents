@@ -867,15 +867,15 @@ namespace CaptivityEvents.Events
             {
                 if (hero == null || amount == 0) return;
 
-                if (CESettings.Instance == null || CESettings.Instance.RenownChoice.SelectedIndex == 0) return;
+                if (CESettings.Instance == null || CESettings.Instance?.RenownChoice.SelectedIndex == 0) return;
 
                 float renown = hero.Clan.Renown + amount;
                 float min = 0;
 
-                switch (CESettings.Instance.RenownChoice.SelectedIndex)
+                switch (CESettings.Instance?.RenownChoice.SelectedIndex)
                 {
                     case 1:
-                        min = CESettings.Instance.RenownMin;
+                        min = CESettings.Instance?.RenownMin ?? -150f;
                         break;
 
                     case 2:
