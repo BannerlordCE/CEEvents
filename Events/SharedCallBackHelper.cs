@@ -368,7 +368,7 @@ namespace CaptivityEvents.Events
 
                 if (clothingLevel != "nude")
                 {
-                    if (CEHelper.HelperMBRandom(100) < CESettings.Instance?.BetterOutFitChance && clothingLevel == "default" || clothingLevel == "advanced")
+                    if (CEHelper.HelperMBRandom(100) < (CESettings.Instance?.BetterOutFitChance ?? 25) && clothingLevel == "default" || clothingLevel == "advanced")
                     {
                         string bodyString = "";
                         string legString = "";
@@ -586,7 +586,7 @@ namespace CaptivityEvents.Events
                                                         && CEHelper.HelperMBRandom(100)
                                                         < ((CESettings.Instance?.RangedSkill ?? true)
                                                             ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.Bow) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.Crossbow) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Throwing) / 275 * 100))
-                                                            : CESettings.Instance?.RangedBetterChance) && rangedLevel == "default" || rangedLevel == "advanced")
+                                                            : (CESettings.Instance?.RangedBetterChance ?? 5)) && rangedLevel == "default" || rangedLevel == "advanced")
                     {
                         string rangedItem;
                         string rangedAmmo = null;
@@ -651,7 +651,7 @@ namespace CaptivityEvents.Events
                 if (CESettings.Instance != null && CEHelper.HelperMBRandom(100)
                     < ((CESettings.Instance?.HorseSkill ?? true)
                         ? Hero.MainHero.GetSkillValue(DefaultSkills.Riding) / 275 * 100
-                        : CESettings.Instance?.HorseChance) && mountLevel == "default" || mountLevel == "basic")
+                        : (CESettings.Instance?.HorseChance ?? 10)) && mountLevel == "default" || mountLevel == "basic")
                 {
                     ItemObject poorHorse = MBObjectManager.Instance.GetObject<ItemObject>("sumpter_horse");
                     EquipmentElement horseEquipment = new(poorHorse);

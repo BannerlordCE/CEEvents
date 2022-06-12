@@ -30,7 +30,7 @@ namespace CaptivityEvents.CampaignBehaviors
         {
             if (!hero.IsPrisoner || hero.PartyBelongedToAsPrisoner == null || hero == Hero.MainHero) return;
 
-            if (CESettings.Instance?.EscapeAutoRansom.SelectedIndex == 1 && hero.Clan != null && hero.PartyBelongedToAsPrisoner.MapFaction != null && MBRandom.RandomFloat < 0.1f)
+            if ((CESettings.Instance?.EscapeAutoRansom?.SelectedIndex ?? 0) == 1 && hero.Clan != null && hero.PartyBelongedToAsPrisoner.MapFaction != null && MBRandom.RandomFloat < 0.1f)
             {
                 // DiplomaticBartersBehavior
                 IFaction mapFaction = hero.PartyBelongedToAsPrisoner.MapFaction;
@@ -72,8 +72,6 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private bool CEApplyHeroChanceToEscape(Hero hero)
         {
-            if (CESettings.Instance == null) return false;
-
             bool inSettlement = hero.PartyBelongedToAsPrisoner.IsSettlement;
             if (hero.PartyBelongedToAsPrisoner.LeaderHero == Hero.MainHero || inSettlement && hero.PartyBelongedToAsPrisoner.Settlement.OwnerClan == Clan.PlayerClan)
             {

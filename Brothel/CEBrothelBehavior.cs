@@ -636,11 +636,9 @@ namespace CaptivityEvents.Brothel
                     case 0:
                         LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateTownsManForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num2);
                         break;
-
                     case 2:
                         LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateTownsWomanForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num2);
                         break;
-
                     default:
                         LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateTownsManForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, num2);
                         break;
@@ -668,11 +666,9 @@ namespace CaptivityEvents.Brothel
                         LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateFemalesForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, Math.Max(num6, num5));
                         LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateMalesForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, Math.Max(num6, num5));
                         break;
-
                     case 2:
                         LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateMalesForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, Math.Max(num4, num3));
                         break;
-
                     default:
                         LocationComplex.Current.GetLocationWithId("brothel").AddLocationCharacters(CreateFemalesForTavern, settlement.Culture, LocationCharacter.CharacterRelations.Neutral, Math.Max(num4, num3));
                         break;

@@ -725,7 +725,7 @@ namespace CaptivityEvents
             if (dailyTickHeroEvent != null)
             {
                 dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerReleaseCampaignBehavior>());
-                if (CESettings.Instance?.EscapeAutoRansom?.SelectedIndex != 2) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
+                if ((CESettings.Instance?.EscapeAutoRansom?.SelectedIndex ?? 0)  != 2) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
             }
 
             IMbEvent<MobileParty> hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
@@ -1266,10 +1266,9 @@ namespace CaptivityEvents
                             break;
 
                         case CEPersistence.HuntState.HeadStart:
-                            if (Mission.Current != null && Mission.Current.Agents != null && (            
-                                (CESettings.Instance != null && Mission.Current.CurrentTime > CESettings.Instance?.HuntBegins) || 
-                                (CESettings.Instance == null && Mission.Current.CurrentTime > 7f)
-                                ))
+                            if (Mission.Current != null && Mission.Current.Agents != null && 
+                                CESettings.Instance != null && Mission.Current.CurrentTime > (CESettings.Instance?.HuntBegins ?? 7f)
+                                )
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents.ToList()
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)

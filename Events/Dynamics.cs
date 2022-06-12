@@ -867,26 +867,17 @@ namespace CaptivityEvents.Events
             {
                 if (hero == null || amount == 0) return;
 
-                if (CESettings.Instance == null || CESettings.Instance?.RenownChoice.SelectedIndex == 0) return;
+                if ((CESettings.Instance?.RenownChoice?.SelectedIndex ?? 1) == 0) return;
 
                 float renown = hero.Clan.Renown + amount;
-                float min = 0;
-
-                switch (CESettings.Instance?.RenownChoice.SelectedIndex)
+                float min = (CESettings.Instance?.RenownChoice?.SelectedIndex) switch
                 {
-                    case 1:
-                        min = CESettings.Instance?.RenownMin ?? -150f;
-                        break;
-
-                    case 2:
-                        min = Campaign.Current.Models.ClanTierModel.GetRequiredRenownForTier(hero.Clan.Tier);
-                        break;
-
-                    default:
-                        break;
-                }
-
+                    0 => 0,
+                    2 => Campaign.Current.Models.ClanTierModel.GetRequiredRenownForTier(hero.Clan.Tier),
+                    _ => CESettings.Instance?.RenownMin ?? -150f,
+                };
                 if (renown < min) renown = min;
+
 
                 if (renown < 0)
                 {

@@ -295,7 +295,6 @@ namespace CaptivityEvents.CampaignBehaviors
         {
             if (progressEventExists) return false;
             _hoursPassed++;
-            if (CESettings.Instance == null) return false;
 
             float value = CESettings.Instance?.EventOccurrenceRandom ?? 12f;
 
@@ -823,8 +822,8 @@ namespace CaptivityEvents.CampaignBehaviors
                             {
                                 int randomNumber = MBRandom.RandomInt(100);
 
-                                if (randomNumber < CESettings.Instance?.EventRandomFireChance && !LaunchRandomEvent()) LaunchCaptorEvent();
-                                if (randomNumber > CESettings.Instance?.EventRandomFireChance && !LaunchCaptorEvent()) LaunchRandomEvent();
+                                if (randomNumber < (CESettings.Instance?.EventRandomFireChance ?? 20f)&& !LaunchRandomEvent()) LaunchCaptorEvent();
+                                if (randomNumber > (CESettings.Instance?.EventRandomFireChance ?? 20f) && !LaunchCaptorEvent()) LaunchRandomEvent();
                             }
                             else
                             {
