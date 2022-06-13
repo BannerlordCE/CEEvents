@@ -582,7 +582,7 @@ namespace CaptivityEvents.Events
 
                 if (rangedLevel != "none")
                 {
-                    if (CESettings.Instance != null && CEHelper.HelperMBRandom(100) < (CESettings.Instance?.WeaponChance ?? 75)
+                    if (CEHelper.HelperMBRandom(100) < (CESettings.Instance?.WeaponChance ?? 75)
                                                         && CEHelper.HelperMBRandom(100)
                                                         < ((CESettings.Instance?.RangedSkill ?? true)
                                                             ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.Bow) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.Crossbow) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Throwing) / 275 * 100))
@@ -648,7 +648,7 @@ namespace CaptivityEvents.Events
                 Equipment randomElement2 = new(true);
                 randomElement2.FillFrom(randomElement, false);
 
-                if (CESettings.Instance != null && CEHelper.HelperMBRandom(100)
+                if (CEHelper.HelperMBRandom(100)
                     < ((CESettings.Instance?.HorseSkill ?? true)
                         ? Hero.MainHero.GetSkillValue(DefaultSkills.Riding) / 275 * 100
                         : (CESettings.Instance?.HorseChance ?? 10)) && mountLevel == "default" || mountLevel == "basic")
@@ -659,7 +659,7 @@ namespace CaptivityEvents.Events
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Horse, horseEquipment);
                 }
 
-                if (CESettings.Instance != null && ((CESettings.Instance?.StolenGearQuest ?? true) && CEHelper.HelperMBRandom(100) < (CESettings.Instance?.StolenGearChance ?? 99)) && questEnabled)
+                if ((CESettings.Instance?.StolenGearQuest ?? true) && CEHelper.HelperMBRandom(100) < (CESettings.Instance?.StolenGearChance ?? 99) && questEnabled)
                 {
                     Hero issueOwner = null;
                     List<TextObject> listOfSettlements = new();

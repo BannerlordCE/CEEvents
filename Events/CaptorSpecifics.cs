@@ -267,7 +267,7 @@ namespace CaptivityEvents.Events
 
             TroopRoster releasedPrisoners = TroopRoster.CreateDummyTroopRoster();
 
-            if (CESettings.Instance != null) amount = CESettings.Instance?.AmountOfTroopsForHunt ?? 15;
+            amount = CESettings.Instance?.AmountOfTroopsForHunt ?? 15;
 
             try
             {

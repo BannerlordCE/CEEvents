@@ -1266,8 +1266,7 @@ namespace CaptivityEvents
                             break;
 
                         case CEPersistence.HuntState.HeadStart:
-                            if (Mission.Current != null && Mission.Current.Agents != null && 
-                                CESettings.Instance != null && Mission.Current.CurrentTime > (CESettings.Instance?.HuntBegins ?? 7f)
+                            if (Mission.Current != null && Mission.Current.Agents != null && Mission.Current.CurrentTime > (CESettings.Instance?.HuntBegins ?? 7f)
                                 )
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents.ToList()
