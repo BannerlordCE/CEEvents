@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -13,16 +13,10 @@ using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Inventory;
 using TaleWorlds.CampaignSystem.Party;
-
-#endif
 
 namespace CaptivityEvents.Events
 {
@@ -168,7 +162,9 @@ namespace CaptivityEvents.Events
         {
             PlayerIsNotBusy(ref args);
             PlayerHasOpenSpaceForCompanions(ref args);
-            LeaveTypes(ref args);
+
+            _sharedCallBackHelper.InitIcons(ref args);
+
             InitGiveCaptorGold();
             InitCaptorGoldTotal();
             ReqHeroCaptorRelation(ref args);
@@ -240,6 +236,7 @@ namespace CaptivityEvents.Events
             ConsequenceSpawnTroop();
             ConsequenceSpawnHero();
 
+
             ConsequenceGainRandomPrisoners();
 
             ConsequenceEscape();
@@ -250,6 +247,7 @@ namespace CaptivityEvents.Events
             ConsequenceKillTroops(ref args);
             ConsequenceJoinParty();
 
+            _sharedCallBackHelper.ConsequenceDelayedEvent();
             _sharedCallBackHelper.ConsequenceMission();
             _sharedCallBackHelper.ConsequenceTeleportPlayer();
 
@@ -257,7 +255,7 @@ namespace CaptivityEvents.Events
             {
                 try
                 {
-                    if (CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
+                    if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
 
                     MobileParty.MainParty.MemberRoster.AddToCounts(captiveHero.CharacterObject, 1, false);
 
@@ -355,7 +353,7 @@ namespace CaptivityEvents.Events
 
                 if (eventNames.Count > 0)
                 {
-                    int number = MBRandom.Random.Next(0, eventNames.Count);
+                    int number = CEHelper.HelperMBRandom(0, eventNames.Count);
 
                     try
                     {
@@ -448,7 +446,7 @@ namespace CaptivityEvents.Events
 
                 if (eventNames.Count > 0)
                 {
-                    int number = MBRandom.Random.Next(0, eventNames.Count);
+                    int number = CEHelper.HelperMBRandom(0, eventNames.Count);
 
                     try
                     {
@@ -1966,50 +1964,6 @@ namespace CaptivityEvents.Events
         #endregion ReqHeroCaptorRelation
 
         #endregion Requirements
-
-        #region Icons
-
-        private void LeaveTypes(ref MenuCallbackArgs args)
-        {
-            Wait(ref args);
-            Trade(ref args);
-            RansomAndBribe(ref args);
-            Submenu(ref args);
-            Continue(ref args);
-            Default(ref args);
-        }
-
-        private void Default(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.EmptyIcon)) args.optionLeaveType = GameMenuOption.LeaveType.Default;
-        }
-
-        private void Continue(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Continue)) args.optionLeaveType = GameMenuOption.LeaveType.Continue;
-        }
-
-        private void Submenu(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Submenu)) args.optionLeaveType = GameMenuOption.LeaveType.Submenu;
-        }
-
-        private void RansomAndBribe(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RansomAndBribe)) args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
-        }
-
-        private void Trade(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Trade)) args.optionLeaveType = GameMenuOption.LeaveType.Trade;
-        }
-
-        private void Wait(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Wait)) args.optionLeaveType = GameMenuOption.LeaveType.Wait;
-        }
-
-        #endregion Icons
 
         #region Init Options
 

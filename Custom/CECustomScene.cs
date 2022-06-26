@@ -24,6 +24,15 @@ namespace CaptivityEvents.Custom
 
         [XmlAttribute()]
         public string Text { get; set; }
+
+        [XmlAttribute()]
+        public string Condition { get; set; }
+
+        [XmlAttribute()]
+        public string Consequence { get; set; }
+
+        [XmlAttribute()]
+        public string NextScene { get; set; }
     }
 
     [DebuggerStepThrough]

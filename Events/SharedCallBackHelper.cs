@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -15,10 +15,6 @@ using TaleWorlds.Core;
 using TaleWorlds.Engine;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Encounters;
@@ -29,8 +25,7 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Party.PartyComponents;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
-
-#endif
+using TaleWorlds.CampaignSystem.GameMenus;
 
 namespace CaptivityEvents.Events
 {
@@ -368,12 +363,12 @@ namespace CaptivityEvents.Events
 
                 if (CESettingsIntegrations.Instance == null && clothingLevel == "slave" || !CESettingsIntegrations.Instance.ActivateKLBShackles && clothingLevel == "slave") return;
 
-                if (CESettings.Instance != null && !CESettings.Instance.StolenGear && !forced) return;
+                if (!(CESettings.Instance?.StolenGear ?? true) && !forced) return;
                 Equipment randomElement = new(false);
 
                 if (clothingLevel != "nude")
                 {
-                    if (MBRandom.Random.Next(100) < CESettings.Instance.BetterOutFitChance && clothingLevel == "default" || clothingLevel == "advanced")
+                    if (CEHelper.HelperMBRandom(100) < (CESettings.Instance?.BetterOutFitChance ?? 25) && clothingLevel == "default" || clothingLevel == "advanced")
                     {
                         string bodyString = "";
                         string legString = "";
@@ -551,14 +546,14 @@ namespace CaptivityEvents.Events
                     }
                 }
 
-                if (meleeLevel != "none" || meleeLevel == "default" && MBRandom.Random.Next(100) < CESettings.Instance.WeaponChance)
+                if (meleeLevel != "none" || meleeLevel == "default" && CEHelper.HelperMBRandom(100) < (CESettings.Instance?.WeaponChance ?? 75))
                 {
                     string item;
 
-                    if (MBRandom.Random.Next(100)
-                        < (CESettings.Instance.WeaponSkill
+                    if (CEHelper.HelperMBRandom(100)
+                        < ((CESettings.Instance?.WeaponSkill ?? true)
                             ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.OneHanded) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.TwoHanded) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Polearm) / 275 * 100))
-                            : CESettings.Instance.WeaponChance) && meleeLevel == "Default" || meleeLevel == "Advanced")
+                            : (CESettings.Instance?.WeaponChance ?? 75)) && meleeLevel == "Default" || meleeLevel == "Advanced")
                     {
                         item = PlayerCaptivity.CaptorParty.Culture.GetCultureCode() switch
                         {
@@ -587,11 +582,11 @@ namespace CaptivityEvents.Events
 
                 if (rangedLevel != "none")
                 {
-                    if (CESettings.Instance != null && MBRandom.Random.Next(100) < CESettings.Instance.WeaponChance
-                                                        && MBRandom.Random.Next(100)
-                                                        < (CESettings.Instance.RangedSkill
+                    if (CEHelper.HelperMBRandom(100) < (CESettings.Instance?.WeaponChance ?? 75)
+                                                        && CEHelper.HelperMBRandom(100)
+                                                        < ((CESettings.Instance?.RangedSkill ?? true)
                                                             ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.Bow) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.Crossbow) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Throwing) / 275 * 100))
-                                                            : CESettings.Instance.RangedBetterChance) && rangedLevel == "default" || rangedLevel == "advanced")
+                                                            : (CESettings.Instance?.RangedBetterChance ?? 5)) && rangedLevel == "default" || rangedLevel == "advanced")
                     {
                         string rangedItem;
                         string rangedAmmo = null;
@@ -653,10 +648,10 @@ namespace CaptivityEvents.Events
                 Equipment randomElement2 = new(true);
                 randomElement2.FillFrom(randomElement, false);
 
-                if (CESettings.Instance != null && MBRandom.Random.Next(100)
-                    < (CESettings.Instance.HorseSkill
+                if (CEHelper.HelperMBRandom(100)
+                    < ((CESettings.Instance?.HorseSkill ?? true)
                         ? Hero.MainHero.GetSkillValue(DefaultSkills.Riding) / 275 * 100
-                        : CESettings.Instance.HorseChance) && mountLevel == "default" || mountLevel == "basic")
+                        : (CESettings.Instance?.HorseChance ?? 10)) && mountLevel == "default" || mountLevel == "basic")
                 {
                     ItemObject poorHorse = MBObjectManager.Instance.GetObject<ItemObject>("sumpter_horse");
                     EquipmentElement horseEquipment = new(poorHorse);
@@ -664,7 +659,7 @@ namespace CaptivityEvents.Events
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Horse, horseEquipment);
                 }
 
-                if (CESettings.Instance != null && (CESettings.Instance.StolenGearQuest && MBRandom.Random.Next(100) < CESettings.Instance.StolenGearChance) && questEnabled)
+                if ((CESettings.Instance?.StolenGearQuest ?? true) && CEHelper.HelperMBRandom(100) < (CESettings.Instance?.StolenGearChance ?? 99) && questEnabled)
                 {
                     Hero issueOwner = null;
                     List<TextObject> listOfSettlements = new();
@@ -1249,6 +1244,34 @@ namespace CaptivityEvents.Events
             }
         }
 
+        internal void ConsequenceDelayedEvent()
+        {
+            try
+            {
+                if (_option.DelayEvent != null)
+                {
+                    if (_option.DelayEvent.TriggerEvents != null)
+                    {
+                        foreach(TriggerEvent trigger in _option.DelayEvent.TriggerEvents)
+                        {
+
+                            CEDelayedEvent delayedEvent = new(trigger.EventName, -1, trigger.EventUseConditions?.ToLower() != "true");
+                            CEHelper.AddDelayedEvent(delayedEvent);
+                        }
+                    }
+                    else
+                    {
+                        CEDelayedEvent delayedEvent = new(_option.DelayEvent.TriggerEventName, _option.DelayEvent.TimeToTake != null ? float.Parse(_option.DelayEvent.TimeToTake) : -1, _option.DelayEvent.UseConditions?.ToLower() != "true");
+                        CEHelper.AddDelayedEvent(delayedEvent);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("ConsequenceDelayedEvent Failed: " + e);
+            }
+}
+
         internal void ConsequenceMission()
         {
             try
@@ -1283,11 +1306,73 @@ namespace CaptivityEvents.Events
 
         #endregion Consequences
 
+        #region Icons
+
+        internal void InitIcons(ref MenuCallbackArgs args)
+        {
+            Escaping(ref args);
+            Leave(ref args);
+            Wait(ref args);
+            Trade(ref args);
+            RansomAndBribe(ref args);
+            BribeAndEscape(ref args);
+            SubMenu(ref args);
+            Continue(ref args);
+            EmptyIcon(ref args);
+        }
+
+        private void EmptyIcon(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.EmptyIcon)) args.optionLeaveType = GameMenuOption.LeaveType.Default;
+        }
+
+        private void Continue(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Continue)) args.optionLeaveType = GameMenuOption.LeaveType.Continue;
+        }
+
+        private void SubMenu(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Submenu)) args.optionLeaveType = GameMenuOption.LeaveType.Submenu;
+        }
+
+        private void BribeAndEscape(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.BribeAndEscape)) args.optionLeaveType = GameMenuOption.LeaveType.BribeAndEscape;
+        }
+
+        private void RansomAndBribe(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RansomAndBribe)) args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
+        }
+
+        private void Trade(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Trade)) args.optionLeaveType = GameMenuOption.LeaveType.Trade;
+        }
+
+        private void Wait(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Wait)) args.optionLeaveType = GameMenuOption.LeaveType.Wait;
+        }
+
+        private void Leave(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Leave)) args.optionLeaveType = GameMenuOption.LeaveType.Leave;
+        }
+
+        private void Escaping(ref MenuCallbackArgs args)
+        {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape) || _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape) || _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.EscapeIcon)) args.optionLeaveType = GameMenuOption.LeaveType.Escape;
+        }
+
+        #endregion Icons
+
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {
             try
             {
-                if (!CESettings.Instance.CustomBackgrounds)
+                if (!(CESettings.Instance?.CustomBackgrounds ?? true))
                 {
                     CEPersistence.animationPlayEvent = false;
                     new CESubModule().LoadTexture(textureFlag);
@@ -1371,7 +1456,7 @@ namespace CaptivityEvents.Events
                     CEPersistence.animationPlayEvent = false;
                     if (backgroundNames.Count > 0)
                     {
-                        int number = MBRandom.Random.Next(0, backgroundNames.Count);
+                        int number = CEHelper.HelperMBRandom(0, backgroundNames.Count);
 
                         try
                         {

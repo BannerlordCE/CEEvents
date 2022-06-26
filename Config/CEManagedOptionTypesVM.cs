@@ -1,12 +1,18 @@
-﻿using System;
+﻿#define V180
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using TaleWorlds.Core.ViewModelCollection;
 using TaleWorlds.Engine.Options;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.ViewModelCollection.GameOptions;
+
+#if V172
+using TaleWorlds.Core.ViewModelCollection;
+#else
+using TaleWorlds.Core.ViewModelCollection.Selector;
+#endif
 
 namespace CaptivityEvents.Config
 {

@@ -20,7 +20,7 @@ namespace CaptivityEvents.Patches
             switch (menuId)
             {
                 case "defeated_and_taken_prisoner":
-                    if (CESettings.Instance.SexualContent)
+                    if (CESettings.Instance?.SexualContent ?? true)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner_sexual" : "CE_defeated_and_taken_prisoner_sexual_male");
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner" : "CE_defeated_and_taken_prisoner_male");
@@ -30,7 +30,7 @@ namespace CaptivityEvents.Patches
                     break;
 
                 case "taken_prisoner":
-                    if (CESettings.Instance.SexualContent)
+                    if (CESettings.Instance?.SexualContent ?? true)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner_sexual" : "CE_taken_prisoner_sexual_male");
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner" : "CE_taken_prisoner_male");
@@ -40,7 +40,7 @@ namespace CaptivityEvents.Patches
                     break;
 
                 case "menu_captivity_castle_taken_prisoner":
-                    if (CESettings.Instance.SexualContent)
+                    if (CESettings.Instance?.SexualContent ?? true)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner_sexual" : "CE_menu_captivity_castle_taken_prisoner_sexual_male");
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner" : "CE_menu_captivity_castle_taken_prisoner_male");
@@ -73,7 +73,7 @@ namespace CaptivityEvents.Patches
             switch (menuId)
             {
                 case "defeated_and_taken_prisoner":
-                    if (CESettings.Instance.SexualContent)
+                    if (CESettings.Instance?.SexualContent ?? true)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner_sexual" : "CE_defeated_and_taken_prisoner_sexual_male");
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner" : "CE_defeated_and_taken_prisoner_male");
@@ -83,7 +83,7 @@ namespace CaptivityEvents.Patches
                     break;
 
                 case "taken_prisoner":
-                    if (CESettings.Instance.SexualContent)
+                    if (CESettings.Instance?.SexualContent ?? true)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner_sexual" : "CE_taken_prisoner_sexual_male");
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner" : "CE_taken_prisoner_male");
@@ -93,7 +93,7 @@ namespace CaptivityEvents.Patches
                     break;
 
                 case "menu_captivity_castle_taken_prisoner":
-                    if (CESettings.Instance.SexualContent)
+                    if (CESettings.Instance?.SexualContent ?? true)
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner_sexual" : "CE_menu_captivity_castle_taken_prisoner_sexual_male");
                     else
                         GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner" : "CE_menu_captivity_castle_taken_prisoner_male");

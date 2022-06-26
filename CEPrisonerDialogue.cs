@@ -1,9 +1,10 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
+using CaptivityEvents.Helper;
 using Helpers;
 using System;
 using System.Collections.Generic;
@@ -14,15 +15,10 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
-
-#if V171
-#else
-
+using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
-
-#endif
 
 namespace CaptivityEvents
 {
@@ -55,7 +51,7 @@ namespace CaptivityEvents
 
             campaignGameStarter.AddPlayerLine("CEPrisonerInCell_01", "CEPrisonerInCell", "CEPrisonerInCell_01_response", "{=CEEVENTS1052}You are coming with me.", null, null);
 
-            if (CESettings.Instance.ProstitutionControl) campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "CEPrisonerInCell_02_response", "{=CEBROTHEL0979}Time to make you work at the brothel.", null, null, 100, ConversationCEEventBrothelOnCondition);
+            if (CESettings.Instance?.ProstitutionControl ?? true) campaignGameStarter.AddPlayerLine("CEPrisonerInCell_02", "CEPrisonerInCell", "CEPrisonerInCell_02_response", "{=CEBROTHEL0979}Time to make you work at the brothel.", null, null, 100, ConversationCEEventBrothelOnCondition);
 
             campaignGameStarter.AddDialogLine("CEPrisonerInCell_01_r", "CEPrisonerInCell_01_response", "close_window", "{=!}{RESPONSE_STRING}", ConversationCEEventResponseInPartyOnCondition, ConversationCEEventInCellOnConsequence);
 
@@ -66,12 +62,22 @@ namespace CaptivityEvents
 
         public bool LCELordDefeatedLordAnswerReleaseOnConditionNoncombatant()
         {
-            return (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.IsMapFaction || Hero.OneToOneConversationHero.Clan.Leader != Hero.OneToOneConversationHero) && Hero.OneToOneConversationHero.Noncombatant;
+            return (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.IsMapFaction || Hero.OneToOneConversationHero.Clan.Leader != Hero.OneToOneConversationHero) &&
+#if V172
+            Hero.OneToOneConversationHero.Noncombatant;
+#else
+            Hero.OneToOneConversationHero.IsNoncombatant;
+#endif
         }
 
         public bool LCELordDefeatedLordAnswerReleaseOnConditionCombatant()
         {
-            return (Hero.OneToOneConversationHero.Clan != null && !Hero.OneToOneConversationHero.Clan.IsMapFaction && Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero) || !Hero.OneToOneConversationHero.Noncombatant;
+            return (Hero.OneToOneConversationHero.Clan != null && !Hero.OneToOneConversationHero.Clan.IsMapFaction && Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero) || !
+#if V172
+            Hero.OneToOneConversationHero.Noncombatant;
+#else
+            Hero.OneToOneConversationHero.IsNoncombatant;
+#endif
         }
 
         public void AddCustomLines(CampaignGameStarter campaignGameStarter, List<CEScene> CECustomScenes)
@@ -84,24 +90,12 @@ namespace CaptivityEvents
                     {
                         if (CustomLine.Ref != null && CustomLine.Ref.ToLower() == "ai")
                         {
-                            campaignGameStarter.AddDialogLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, () => { return ConversationCECustomScenes(CustomScene.Name); }, () =>
-                            {
-                                if (CustomLine.OutputToken == "close_window")
-                                {
-                                    CharacterObject.OneToOneConversationCharacter.StringId = "";
-                                }
-                            }
+                            campaignGameStarter.AddDialogLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, () => { return ConversationCECustomScenesOnCondition(CustomScene.Name, CustomLine.Condition != null && CustomLine.Condition.ToLower() == "true"); }, () => ConversationCECustomScenesOnConsequence(CustomLine)
                             );
                         }
                         else
                         {
-                            campaignGameStarter.AddPlayerLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, null, () =>
-                            {
-                                if (CustomLine.OutputToken == "close_window")
-                                {
-                                    CharacterObject.OneToOneConversationCharacter.StringId = "";
-                                }
-                            }
+                            campaignGameStarter.AddPlayerLine(CustomLine.Id, CustomLine.InputToken, CustomLine.OutputToken, CustomLine.Text, null, () => ConversationCECustomScenesOnConsequence(CustomLine)
                             );
                         }
                     }
@@ -116,10 +110,40 @@ namespace CaptivityEvents
             }
         }
 
-        private bool ConversationCECustomScenes(string SceneName)
+        private bool ConversationCECustomScenesOnCondition(string SceneName, bool alwaysShow = false)
         {
             CharacterObject conversation = CharacterObject.OneToOneConversationCharacter;
-            return conversation.StringId == "CECustomStringId_" + SceneName;
+            return alwaysShow ? true : conversation.StringId == "CECustomStringId_" + SceneName;
+        }
+
+
+        private void ConversationCECustomScenesOnConsequence(Line CustomLine)
+        {
+            if (CustomLine.Consequence != null)
+            {
+                switch (CustomLine.Consequence.ToLower())
+                {
+                    case "afterbattle":
+                        CEPersistence.battleState = CEPersistence.BattleState.AfterBattle;
+                        break;
+                }
+            }
+
+            if (CustomLine.OutputToken == "close_window")
+            {
+                CharacterObject.OneToOneConversationCharacter.StringId = "";
+                if (CustomLine.NextScene != null)
+                {
+                    try
+                    {
+                        GameMenu.SwitchToMenu(CustomLine.NextScene);
+                    }
+                    catch (Exception)
+                    {
+                        CECustomHandler.LogToFile("NextScene Failed - " + CustomLine.Id);
+                    }
+                }
+            }
         }
 
         private bool ConversationCEEventBrothelOnCondition(out TextObject text)

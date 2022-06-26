@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -16,15 +16,11 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 
-#endif
 
 namespace CaptivityEvents.Events
 {
@@ -32,7 +28,7 @@ namespace CaptivityEvents.Events
     {
         internal void GainSkills(SkillObject skillObject, int amount, int chance, Hero hero = null)
         {
-            if (MBRandom.Random.Next(30) >= chance) return;
+            if (CEHelper.HelperMBRandom(30) >= chance) return;
             if (hero == null) hero = Hero.MainHero;
 
             try
@@ -52,24 +48,39 @@ namespace CaptivityEvents.Events
             //InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
         }
 
+        /// <summary>
+        /// Duplicate Code from TaleWorlds.CampaignSystem.Actions KillCharacterAction
+        /// </summary>
+        /// <param name="hero"></param>
         internal void RemoveFactionLeader(Hero hero)
         {
             if (hero.Clan == null) return;
 
             if ((hero.Clan?.Leader) == hero)
             {
+#if V172
                 if (hero != Hero.MainHero && hero.Clan.Heroes.Any((Hero x) => !x.IsChild && x != hero && x.IsAlive && (x.IsNoble || x.IsMinorFactionHero)))
+#else
+                if (hero != Hero.MainHero && hero.Clan.Heroes.Any((Hero x) => !x.IsChild && x != hero && x.IsAlive && x.IsLord))
+#endif
                 {
                     ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(hero.Clan);
                 }
                 if (hero.Clan.Kingdom != null && hero.Clan.Kingdom.RulingClan == hero.Clan)
                 {
                     List<Clan> list = (from t in hero.Clan.Kingdom.Clans
-                                       where !t.IsEliminated && t.Leader != hero
-                                       select t).ToList();
-                    if (list.IsEmpty())
+                                       where !t.IsEliminated && t.Leader != hero && !t.IsUnderMercenaryService
+                                       select t).ToList<Clan>();
+                    if (list.IsEmpty<Clan>())
                     {
+#if V172
                         DestroyKingdomAction.Apply(hero.Clan.Kingdom);
+#else
+                        if (!hero.Clan.Kingdom.IsEliminated)
+                        {
+                            DestroyKingdomAction.ApplyByKingdomLeaderDeath(hero.Clan.Kingdom);
+                        }
+#endif
                     }
                     else if (list.Count > 1)
                     {
@@ -78,7 +89,8 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        hero.Clan.Kingdom.RulingClan = list.First<Clan>();
+                        hero.Clan.Kingdom.RulingClan = list.First();
+                        CampaignEventDispatcher.Instance.OnRulingClanChanged(hero.Clan.Kingdom, hero.Clan.Kingdom.RulingClan);
                     }
                 }
             }
@@ -140,7 +152,11 @@ namespace CaptivityEvents.Events
                 int newNumber = currentTraitLevel + amount;
                 if (newNumber < (traitObject?.MinValue ?? 0)) newNumber = traitObject?.MinValue ?? 0;
 
+#if V172
                 hero.SetTraitLevelInternal(traitObject, newNumber);
+#else
+                hero.SetTraitLevel(traitObject, newNumber);
+#endif
 
                 if (!display) return;
                 TextObject textObject = GameTexts.FindText("str_CE_trait_level");
@@ -253,12 +269,12 @@ namespace CaptivityEvents.Events
                 }
 
                 float xpToSet = Campaign.Current.Models.CharacterDevelopmentModel.GetXpRequiredForSkillLevel(newNumber);
+#if V172
                 Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet, out int levels);
-#if V171
-                hero.HeroDeveloper.SetPropertyValue(skillObject, xpToSet);
 #else
-                hero.HeroDeveloper.SetInitialSkillLevel(skillObject, newNumber);
+                int levels = Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet);
 #endif
+                hero.HeroDeveloper.SetInitialSkillLevel(skillObject, newNumber);
 
                 if (levels > 0)
                 {
@@ -370,7 +386,7 @@ namespace CaptivityEvents.Events
                     if (hero.GetSkillValue(skill) > 1)
                     {
                         if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
-                        if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
+                        if (quickInformation) CEHelper.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
                     }
                 }
                 CEHelper.SetSkillValue(hero, skill, 0);
@@ -394,9 +410,9 @@ namespace CaptivityEvents.Events
 
                 textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
                 textObject.SetTextVariable("TOTAL_AMOUNT", valueToSet);
-                if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
 
-                if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
+                if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+                if (quickInformation) CEHelper.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
             }
         }
 
@@ -419,7 +435,7 @@ namespace CaptivityEvents.Events
                         textObject.SetTextVariable("OCCUPATION", slaveryFlag.Name);
                         if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
 
-                        if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
+                        if (quickInformation) CEHelper.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
                     }
                 }
                 else
@@ -431,7 +447,7 @@ namespace CaptivityEvents.Events
                         textObject.SetTextVariable("OCCUPATION", slaveryFlag.Name);
                         if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
 
-                        if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
+                        if (quickInformation) CEHelper.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
                     }
                 }
                 CEHelper.SetSkillValue(hero, slaveryFlag, amount);
@@ -461,7 +477,7 @@ namespace CaptivityEvents.Events
                         textObject.SetTextVariable("OCCUPATION", prostitutionFlag.Name);
                         if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
 
-                        if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
+                        if (quickInformation) CEHelper.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
                     }
                 }
                 else
@@ -473,7 +489,7 @@ namespace CaptivityEvents.Events
                         textObject.SetTextVariable("OCCUPATION", prostitutionFlag.Name);
                         if (displayMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
 
-                        if (quickInformation) InformationManager.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
+                        if (quickInformation) CEHelper.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
                     }
                 }
 
@@ -530,23 +546,39 @@ namespace CaptivityEvents.Events
                             FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(firstHero, kingdom ?? newClan);
                         }
 
-                        DisbandPartyAction.ApplyDisband(firstHero.PartyBelongedTo);
+                        if (firstHero.GovernorOf != null)
+                        {
+#if V172
+                            ChangeGovernorAction.ApplyByGiveUpCurrent(firstHero);
+#else
+                            ChangeGovernorAction.RemoveGovernorOf(firstHero);
+#endif
+                        }
 
                         if (firstHero.PartyBelongedTo != null)
                         {
-                            firstHero.PartyBelongedTo.Party.SetCustomOwner(null);
-                        }
-                        firstHero.ChangeState(Hero.CharacterStates.Fugitive);
-                        MobileParty partyBelongedTo = firstHero.PartyBelongedTo;
-                        if (partyBelongedTo != null)
-                        {
-                            partyBelongedTo.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default, 0);
-                        }
-                    }
+                            MobileParty partyBelongedTo = firstHero.PartyBelongedTo;
+#if V172
+                            if (partyBelongedTo.Party.IsActive && partyBelongedTo.Party.Owner == firstHero)
+					        {
+                                DisbandPartyAction.ApplyDisband(partyBelongedTo);
+                                firstHero.PartyBelongedTo.Party.SetCustomOwner(null);
+					        }
+#else
+                            if (partyBelongedTo.Party.IsActive && partyBelongedTo.Party.Owner == firstHero)
+                            {
+                                DisbandPartyAction.StartDisband(partyBelongedTo);
+                                partyBelongedTo.Party.SetCustomOwner(null);
+                            }
+#endif
 
-                    if (firstHero.GovernorOf != null)
-                    {
-                        ChangeGovernorAction.ApplyByGiveUpCurrent(firstHero);
+                            firstHero.ChangeState(Hero.CharacterStates.Fugitive);
+                            MobileParty partyBelongedTo2 = firstHero.PartyBelongedTo;
+                            if (partyBelongedTo2 != null)
+                            {
+                                partyBelongedTo2.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                            }
+                        }
                     }
 
                     firstHero.Clan = newClan;
@@ -593,6 +625,17 @@ namespace CaptivityEvents.Events
                     if (pi != null && firstHero.IsHumanPlayerCharacter) pi.SetValue(Campaign.Current, clan);
                 }
             }
+        }
+
+        private Clan ChangeClanName(Clan clan, TextObject clanName, TextObject informalName)
+        {
+#if V172
+            clan.ChangeClanName(clanName);
+            clan.InformalName = informalName;
+#else
+            clan.ChangeClanName(clanName, informalName);
+#endif
+            return clan;
         }
 
         internal void ClanChange(ClanOption[] clanOptions, Hero hero = null, Hero captor = null)
@@ -653,8 +696,7 @@ namespace CaptivityEvents.Events
                             if (captor?.Clan != null)
                             {
                                 PropertyInfo pi = captor.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                                captor.Clan.ChangeClanName(clanName);
-                                captor.Clan.InformalName = clanName;
+                                ChangeClanName(captor.Clan, clanName, clanName);
                                 if (pi != null) pi.SetValue(captor.Clan, banner);
                                 captor.Clan.SetLeader(leader);
                             }
@@ -662,8 +704,7 @@ namespace CaptivityEvents.Events
                         else if (hero?.Clan != null)
                         {
                             PropertyInfo pi = hero.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                            hero.Clan.ChangeClanName(clanName);
-                            hero.Clan.InformalName = clanName;
+                            ChangeClanName(hero.Clan, clanName, clanName);
                             if (pi != null) pi.SetValue(hero.Clan, banner);
                             hero.Clan.SetLeader(leader);
                         }
@@ -826,26 +867,17 @@ namespace CaptivityEvents.Events
             {
                 if (hero == null || amount == 0) return;
 
-                if (CESettings.Instance == null || CESettings.Instance.RenownChoice.SelectedIndex == 0) return;
+                if ((CESettings.Instance?.RenownChoice?.SelectedIndex ?? 1) == 0) return;
 
                 float renown = hero.Clan.Renown + amount;
-                float min = 0;
-
-                switch (CESettings.Instance.RenownChoice.SelectedIndex)
+                float min = (CESettings.Instance?.RenownChoice?.SelectedIndex) switch
                 {
-                    case 1:
-                        min = CESettings.Instance.RenownMin;
-                        break;
-
-                    case 2:
-                        min = Campaign.Current.Models.ClanTierModel.GetRequiredRenownForTier(hero.Clan.Tier);
-                        break;
-
-                    default:
-                        break;
-                }
-
+                    0 => 0,
+                    2 => Campaign.Current.Models.ClanTierModel.GetRequiredRenownForTier(hero.Clan.Tier),
+                    _ => CESettings.Instance?.RenownMin ?? -150f,
+                };
                 if (renown < min) renown = min;
+
 
                 if (renown < 0)
                 {
@@ -895,7 +927,7 @@ namespace CaptivityEvents.Events
             textObject.SetTextVariable("POSITIVE", relationChange >= 0 ? 1 : 0);
             textObject.SetTextVariable("AMOUNT", Math.Abs(relationChange));
             textObject.SetTextVariable("TOTAL", value);
-            if (quickInformationMessage) InformationManager.AddQuickInformation(textObject, 0, hero1.CharacterObject, "event:/ui/notification/relation");
+            if (quickInformationMessage) CEHelper.AddQuickInformation(textObject, 0, hero1.CharacterObject, "event:/ui/notification/relation");
             if (regularMessage) InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
         }
     }

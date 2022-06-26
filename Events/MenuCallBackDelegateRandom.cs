@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -12,9 +12,7 @@ using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
-
-#if V171
-#else
+using TaleWorlds.ObjectSystem;
 
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
@@ -24,7 +22,6 @@ using TaleWorlds.CampaignSystem.Party.PartyComponents;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
 
-#endif
 
 namespace CaptivityEvents.Events
 {
@@ -189,15 +186,7 @@ namespace CaptivityEvents.Events
             PlayerIsNotBusy(ref args);
             PlayerHasOpenSpaceForCompanions(ref args);
 
-            Escaping(ref args);
-            Leave(ref args);
-            Wait(ref args);
-            Trade(ref args);
-            RansomAndBribe(ref args);
-            BribeAndEscape(ref args);
-            SubMenu(ref args);
-            Continue(ref args);
-            EmptyIcon(ref args);
+            _sharedCallBackHelper.InitIcons(ref args);
 
             InitSoldToSettlement();
             InitSoldToCaravan();
@@ -254,6 +243,7 @@ namespace CaptivityEvents.Events
             ConsequenceWoundTroops();
             ConsequenceKillTroops();
 
+            _sharedCallBackHelper.ConsequenceDelayedEvent();
             _sharedCallBackHelper.ConsequenceMission();
             _sharedCallBackHelper.ConsequenceTeleportPlayer();
 
@@ -351,7 +341,7 @@ namespace CaptivityEvents.Events
 
                 if (eventNames.Count > 0)
                 {
-                    int number = MBRandom.Random.Next(0, eventNames.Count);
+                    int number = CEHelper.HelperMBRandom(0, eventNames.Count);
 
                     try
                     {
@@ -461,7 +451,7 @@ namespace CaptivityEvents.Events
 
                 if (eventNames.Count > 0)
                 {
-                    int number = MBRandom.Random.Next(0, eventNames.Count);
+                    int number = CEHelper.HelperMBRandom(0, eventNames.Count);
 
                     try
                     {
@@ -514,13 +504,25 @@ namespace CaptivityEvents.Events
             {
                 TroopRoster enemyTroops = TroopRoster.CreateDummyTroopRoster();
 
+                // Make sure there is atleast one troop
+                CharacterObject characterObject1 = MBObjectManager.Instance.GetObjectTypeList<CharacterObject>().GetRandomElementWithPredicate(item => item.Occupation == Occupation.Soldier || item.Occupation == Occupation.Gangster);
+                enemyTroops.AddToCounts(characterObject1, 1, false, 0, 0, true, -1);
+
                 foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
                 {
                     if (!troopRosterElement.Character.IsPlayerCharacter)
                     {
                         if (troopRosterElement.Character.IsHero && troopRosterElement.Character.HeroObject.IsPlayerCompanion)
                         {
+#if V172
                             ScatterCompanionAction.ApplyInPrison(troopRosterElement.Character.HeroObject);
+#else
+                            troopRosterElement.Character.HeroObject.ChangeState(Hero.CharacterStates.Fugitive);
+                            if (troopRosterElement.Character.HeroObject.PartyBelongedToAsPrisoner != null)
+                            {
+                                EndCaptivityAction.ApplyByEscape(troopRosterElement.Character.HeroObject, null);
+                            }
+#endif
                         }
                         else
                         {
@@ -730,11 +732,11 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid PregnancyRiskModifier"); }
         }
 
-        #endregion Consequences
+#endregion Consequences
 
-        #region Requirements
+#region Requirements
 
-        #region ReqGold
+#region ReqGold
 
         private void ReqGold(ref MenuCallbackArgs args)
         {
@@ -767,9 +769,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqGold
+#endregion ReqGold
 
-        #region ReqTrait
+#region ReqTrait
 
         private void ReqTrait(ref MenuCallbackArgs args)
         {
@@ -817,9 +819,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqTrait
+#endregion ReqTrait
 
-        #region ReqHeroSkills
+#region ReqHeroSkills
 
         private void ReqHeroSkills(ref MenuCallbackArgs args)
         {
@@ -879,9 +881,9 @@ namespace CaptivityEvents.Events
             return true;
         }
 
-        #endregion ReqHeroSkills
+#endregion ReqHeroSkills
 
-        #region ReqHeroSkill
+#region ReqHeroSkill
 
         private void ReqHeroSkill(ref MenuCallbackArgs args)
         {
@@ -933,9 +935,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqHeroSkill
+#endregion ReqHeroSkill
 
-        #region ReqProstitute
+#region ReqProstitute
 
         private void ReqProstitute(ref MenuCallbackArgs args)
         {
@@ -968,9 +970,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqProstitute
+#endregion ReqProstitute
 
-        #region ReqSlavery
+#region ReqSlavery
 
         private void ReqSlavery(ref MenuCallbackArgs args)
         {
@@ -1003,9 +1005,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqSlavery
+#endregion ReqSlavery
 
-        #region ReqHeroHealthPercentage
+#region ReqHeroHealthPercentage
 
         private void ReqHeroHealthPercentage(ref MenuCallbackArgs args)
         {
@@ -1036,9 +1038,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqHeroHealthPercentage
+#endregion ReqHeroHealthPercentage
 
-        #region ReqFemaleCaptives
+#region ReqFemaleCaptives
 
         private void ReqFemaleCaptives(ref MenuCallbackArgs args)
         {
@@ -1103,9 +1105,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqFemaleCaptives
+#endregion ReqFemaleCaptives
 
-        #region ReqMaleCaptives
+#region ReqMaleCaptives
 
         private void ReqMaleCaptives(ref MenuCallbackArgs args)
         {
@@ -1170,9 +1172,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqMaleCaptives
+#endregion ReqMaleCaptives
 
-        #region ReqCaptives
+#region ReqCaptives
 
         private void ReqCaptives(ref MenuCallbackArgs args)
         {
@@ -1237,9 +1239,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqCaptives
+#endregion ReqCaptives
 
-        #region ReqFemaleTroops
+#region ReqFemaleTroops
 
         private void ReqFemaleTroops(ref MenuCallbackArgs args)
         {
@@ -1304,9 +1306,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqFemaleTroops
+#endregion ReqFemaleTroops
 
-        #region ReqMaleTroops
+#region ReqMaleTroops
 
         private void ReqMaleTroops(ref MenuCallbackArgs args)
         {
@@ -1371,9 +1373,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqMaleTroops
+#endregion ReqMaleTroops
 
-        #region ReqTroops
+#region ReqTroops
 
         private void ReqTroops(ref MenuCallbackArgs args)
         {
@@ -1438,9 +1440,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqTroops
+#endregion ReqTroops
 
-        #region ReqMorale
+#region ReqMorale
 
         private void ReqMorale(ref MenuCallbackArgs args)
         {
@@ -1471,60 +1473,11 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion ReqMorale
+#endregion ReqMorale
 
-        #endregion Requirements
+#endregion Requirements
 
-        #region Icons
-
-        private void EmptyIcon(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.EmptyIcon)) args.optionLeaveType = GameMenuOption.LeaveType.Default;
-        }
-
-        private void Continue(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Continue)) args.optionLeaveType = GameMenuOption.LeaveType.Continue;
-        }
-
-        private void SubMenu(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Submenu)) args.optionLeaveType = GameMenuOption.LeaveType.Submenu;
-        }
-
-        private void BribeAndEscape(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.BribeAndEscape)) args.optionLeaveType = GameMenuOption.LeaveType.BribeAndEscape;
-        }
-
-        private void RansomAndBribe(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RansomAndBribe)) args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
-        }
-
-        private void Trade(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Trade)) args.optionLeaveType = GameMenuOption.LeaveType.Trade;
-        }
-
-        private void Wait(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Wait)) args.optionLeaveType = GameMenuOption.LeaveType.Wait;
-        }
-
-        private void Leave(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Leave)) args.optionLeaveType = GameMenuOption.LeaveType.Leave;
-        }
-
-        private void Escaping(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape) || _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) args.optionLeaveType = GameMenuOption.LeaveType.Escape;
-        }
-
-        #endregion Icons
-
-        #region Init Options
+#region Init Options
 
         private void InitChangeGold()
         {
@@ -1586,9 +1539,9 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
         }
 
-        #endregion Init Options
+#endregion Init Options
 
-        #region CustomConsequencesReq
+#region CustomConsequencesReq
 
         private void PlayerHasOpenSpaceForCompanions(ref MenuCallbackArgs args)
         {
@@ -1608,6 +1561,6 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-        #endregion CustomConsequencesReq
+#endregion CustomConsequencesReq
     }
 }

@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -13,12 +13,8 @@ using TaleWorlds.Core;
 using TaleWorlds.ObjectSystem;
 using static CaptivityEvents.Helper.CEHelper;
 
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.Party;
 
-#endif
 
 namespace CaptivityEvents.Events
 {
@@ -568,7 +564,7 @@ namespace CaptivityEvents.Events
                 Equipment randomElement2 = new(true);
                 randomElement2.FillFrom(randomElement, false);
 
-                if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(hero, hero.BattleEquipment, hero.CivilianEquipment);
+                if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(hero, hero.BattleEquipment, hero.CivilianEquipment);
 
                 foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
                 {

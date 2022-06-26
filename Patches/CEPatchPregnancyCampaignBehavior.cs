@@ -1,16 +1,9 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Helper;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
-
-#if V171
-using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
-#else
-
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
-
-#endif
 
 namespace CaptivityEvents.Patches
 {

@@ -1,4 +1,4 @@
-#define V172
+#define V180
 
 using CaptivityEvents.Config;
 using System;
@@ -6,17 +6,10 @@ using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
-
-#if V171
-using TaleWorlds.CampaignSystem.Barterables;
-#else
-
 using TaleWorlds.CampaignSystem.BarterSystem;
 using TaleWorlds.CampaignSystem.BarterSystem.Barterables;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
-
-#endif
 
 namespace CaptivityEvents.CampaignBehaviors
 {
@@ -37,7 +30,7 @@ namespace CaptivityEvents.CampaignBehaviors
         {
             if (!hero.IsPrisoner || hero.PartyBelongedToAsPrisoner == null || hero == Hero.MainHero) return;
 
-            if (CESettings.Instance.EscapeAutoRansom.SelectedIndex == 1 && hero.Clan != null && hero.PartyBelongedToAsPrisoner.MapFaction != null && MBRandom.RandomFloat < 0.1f)
+            if ((CESettings.Instance?.EscapeAutoRansom?.SelectedIndex ?? 0) == 1 && hero.Clan != null && hero.PartyBelongedToAsPrisoner.MapFaction != null && MBRandom.RandomFloat < 0.1f)
             {
                 // DiplomaticBartersBehavior
                 IFaction mapFaction = hero.PartyBelongedToAsPrisoner.MapFaction;
@@ -79,21 +72,19 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private bool CEApplyHeroChanceToEscape(Hero hero)
         {
-            if (CESettings.Instance == null) return false;
-
             bool inSettlement = hero.PartyBelongedToAsPrisoner.IsSettlement;
             if (hero.PartyBelongedToAsPrisoner.LeaderHero == Hero.MainHero || inSettlement && hero.PartyBelongedToAsPrisoner.Settlement.OwnerClan == Clan.PlayerClan)
             {
-                bool customCheck = inSettlement ? CESettings.Instance.PrisonerHeroEscapeSettlement : CESettings.Instance.PrisonerHeroEscapeParty;
+                bool customCheck = inSettlement ? CESettings.Instance?.PrisonerHeroEscapeSettlement ?? true : CESettings.Instance?.PrisonerHeroEscapeParty ?? true;
                 if (!customCheck) return false;
-                int numEscapeChance = inSettlement ? CESettings.Instance.PrisonerHeroEscapeChanceSettlement : CESettings.Instance.PrisonerHeroEscapeChanceParty;
+                int numEscapeChance = inSettlement ? CESettings.Instance?.PrisonerHeroEscapeChanceSettlement ?? 0 : CESettings.Instance?.PrisonerHeroEscapeChanceParty ?? 0;
                 if (MBRandom.RandomInt(100) < numEscapeChance) EndCaptivityAction.ApplyByEscape(hero);
             }
             else
             {
-                bool customCheck = CESettings.Instance.PrisonerHeroEscapeOther;
+                bool customCheck = CESettings.Instance?.PrisonerHeroEscapeOther ?? false;
                 if (!customCheck) return false;
-                int numEscapeChance = CESettings.Instance.PrisonerHeroEscapeChanceOther;
+                int numEscapeChance = CESettings.Instance?.PrisonerHeroEscapeChanceOther ?? 0;
                 if (MBRandom.RandomInt(100) < numEscapeChance) EndCaptivityAction.ApplyByEscape(hero);
             }
             return true;
@@ -155,24 +146,22 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private bool CEApplyExceedChanceToEscape(CharacterObject character, MobileParty capturerParty)
         {
-            if (CESettings.Instance == null) return false;
-
-            if (!CESettings.Instance.PrisonerExceeded) return true;
+            if (!(CESettings.Instance?.PrisonerExceeded ?? false)) return true;
 
             bool isHeroParty = capturerParty.LeaderHero == Hero.MainHero;
 
             if (character.IsHero)
             {
-                bool customCheck = isHeroParty ? CESettings.Instance.PrisonerHeroEscapeParty : CESettings.Instance.PrisonerHeroEscapeOther;
+                bool customCheck = isHeroParty ? CESettings.Instance?.PrisonerHeroEscapeParty ?? true: CESettings.Instance?.PrisonerHeroEscapeOther ?? true;
                 if (!customCheck) return false;
-                int numEscapeChance = isHeroParty ? CESettings.Instance.PrisonerHeroEscapeChanceParty : CESettings.Instance.PrisonerHeroEscapeChanceOther;
+                int numEscapeChance = isHeroParty ? CESettings.Instance?.PrisonerHeroEscapeChanceParty ?? 0 : CESettings.Instance?.PrisonerHeroEscapeChanceOther ?? 0;
                 if (MBRandom.RandomInt(100) < numEscapeChance) EndCaptivityAction.ApplyByEscape(character.HeroObject);
             }
             else
             {
-                bool customCheck = isHeroParty ? CESettings.Instance.PrisonerNonHeroEscapeParty : CESettings.Instance.PrisonerNonHeroEscapeOther;
+                bool customCheck = isHeroParty ? CESettings.Instance?.PrisonerNonHeroEscapeParty ?? true : CESettings.Instance?.PrisonerNonHeroEscapeOther ?? true;
                 if (!customCheck) return false;
-                int numEscapeChance = isHeroParty ? CESettings.Instance.PrisonerNonHeroEscapeChanceParty : CESettings.Instance.PrisonerNonHeroEscapeChanceOther;
+                int numEscapeChance = isHeroParty ? CESettings.Instance?.PrisonerNonHeroEscapeChanceParty ?? 0 : CESettings.Instance?.PrisonerNonHeroEscapeChanceOther ?? 0;
                 if (MBRandom.RandomInt(100) < numEscapeChance) capturerParty.PrisonRoster.AddToCounts(character, -1);
             }
 

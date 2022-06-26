@@ -575,84 +575,100 @@ namespace CaptivityEvents.Config
     {
         internal static ICustomSettingsProvider _provider = null;
 
+        internal static bool _hasFailed = false;
+
         public static ICustomSettingsProvider Instance
         {
             get
             {
+                if (_hasFailed) return null;
+
                 try
                 {
                     if (CESettingsCustom.Instance != null) return CESettingsCustom.Instance;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    CECustomHandler.ForceLogToFile("ICustomSettingsProvider Instance \n" + e);
                 }
-                if (_provider != null) return _provider;
-                _provider = new HardcodedCustomSettings();
 
-                CECustomSettings customSettings = CECustomHandler.LoadCustomSettings();
-                if (customSettings != null)
+                try
                 {
-                    _provider.EventCaptiveOn = customSettings.EventCaptiveOn;
-                    _provider.EventOccurrenceOther = customSettings.EventOccurrenceOther;
-                    _provider.EventOccurrenceSettlement = customSettings.EventOccurrenceSettlement;
-                    _provider.EventOccurrenceLord = customSettings.EventOccurrenceLord;
-                    _provider.EventCaptorOn = customSettings.EventCaptorOn;
-                    _provider.EventOccurrenceCaptor = customSettings.EventOccurrenceCaptor;
-                    _provider.EventCaptorDialogue = customSettings.EventCaptorDialogue;
-                    _provider.EventCaptorNotifications = customSettings.EventCaptorNotifications;
-                    _provider.EventCaptorCustomTextureNotifications = customSettings.EventCaptorCustomTextureNotifications;
-                    _provider.EventRandomEnabled = customSettings.EventRandomEnabled;
-                    _provider.EventRandomFireChance = customSettings.EventRandomFireChance;
-                    _provider.EventOccurrenceRandom = customSettings.EventOccurrenceRandom;
-                    _provider.EventCaptorGearCaptives = customSettings.EventCaptorGearCaptives;
-                    _provider.EventProstituteGear = customSettings.EventProstituteGear;
-                    _provider.HuntLetPrisonersEscape = customSettings.HuntLetPrisonersEscape;
-                    _provider.HuntBegins = customSettings.HuntBegins;
-                    _provider.AmountOfTroopsForHunt = customSettings.AmountOfTroopsForHunt;
-                    _provider.PrisonerEscapeBehavior = customSettings.PrisonerEscapeBehavior;
-                    _provider.PrisonerHeroEscapeChanceParty = customSettings.PrisonerHeroEscapeChanceParty;
-                    _provider.PrisonerHeroEscapeChanceSettlement = customSettings.PrisonerHeroEscapeChanceSettlement;
-                    _provider.PrisonerHeroEscapeChanceOther = customSettings.PrisonerHeroEscapeChanceOther;
-                    _provider.PrisonerNonHeroEscapeChanceParty = customSettings.PrisonerNonHeroEscapeChanceParty;
-                    _provider.PrisonerNonHeroEscapeChanceSettlement = customSettings.PrisonerNonHeroEscapeChanceSettlement;
-                    _provider.PrisonerNonHeroEscapeChanceOther = customSettings.PrisonerNonHeroEscapeChanceOther;
-                    _provider.EscapeAutoRansom.SelectedIndex = customSettings.EscapeAutoRansom;
-                    _provider.BrothelOption.SelectedIndex = customSettings.BrothelOption;
-                    _provider.BrothelHeroEscapeChance = customSettings.BrothelHeroEscapeChance;
-                    _provider.BrothelNonHeroEscapeChance = customSettings.BrothelNonHeroEscapeChance;
-                    _provider.PrisonerExceeded = customSettings.PrisonerExceeded;
-                    _provider.NonSexualContent = customSettings.NonSexualContent;
-                    _provider.SexualContent = customSettings.SexualContent;
-                    _provider.CustomBackgrounds = customSettings.CustomBackgrounds;
-                    _provider.CommonControl = customSettings.CommonControl;
-                    _provider.ProstitutionControl = customSettings.ProstitutionControl;
-                    _provider.SlaveryToggle = customSettings.SlaveryToggle;
-                    _provider.FemdomControl = customSettings.FemdomControl;
-                    _provider.BestialityControl = customSettings.BestialityControl;
-                    _provider.RomanceControl = customSettings.RomanceControl;
-                    _provider.StolenGear = customSettings.StolenGear;
-                    _provider.StolenGearQuest = customSettings.StolenGearQuest;
-                    _provider.StolenGearDuration = customSettings.StolenGearDuration;
-                    _provider.StolenGearChance = customSettings.StolenGearChance;
-                    _provider.BetterOutFitChance = customSettings.BetterOutFitChance;
-                    _provider.WeaponChance = customSettings.WeaponChance;
-                    _provider.WeaponBetterChance = customSettings.WeaponBetterChance;
-                    _provider.WeaponSkill = customSettings.WeaponSkill;
-                    _provider.RangedBetterChance = customSettings.RangedBetterChance;
-                    _provider.RangedSkill = customSettings.RangedSkill;
-                    _provider.HorseChance = customSettings.HorseChance;
-                    _provider.HorseSkill = customSettings.HorseSkill;
-                    _provider.PregnancyToggle = customSettings.PregnancyToggle;
-                    _provider.AttractivenessSkill = customSettings.AttractivenessSkill;
-                    _provider.PregnancyChance = customSettings.PregnancyChance;
-                    _provider.UsePregnancyModifiers = customSettings.UsePregnancyModifiers;
-                    _provider.PregnancyDurationInDays = customSettings.PregnancyDurationInDays;
-                    _provider.PregnancyMessages = customSettings.PregnancyMessages;
-                    _provider.RenownMin = customSettings.RenownMin;
-                    _provider.RenownChoice.SelectedIndex = customSettings.RenownChoice;
-                    _provider.LogToggle = customSettings.LogToggle;
+                    if (_provider != null) return _provider;
+                    _provider = new HardcodedCustomSettings();
+
+                    CECustomSettings customSettings = CECustomHandler.LoadCustomSettings();
+                    if (customSettings != null)
+                    {
+                        _provider.EventCaptiveOn = customSettings.EventCaptiveOn;
+                        _provider.EventOccurrenceOther = customSettings.EventOccurrenceOther;
+                        _provider.EventOccurrenceSettlement = customSettings.EventOccurrenceSettlement;
+                        _provider.EventOccurrenceLord = customSettings.EventOccurrenceLord;
+                        _provider.EventCaptorOn = customSettings.EventCaptorOn;
+                        _provider.EventOccurrenceCaptor = customSettings.EventOccurrenceCaptor;
+                        _provider.EventCaptorDialogue = customSettings.EventCaptorDialogue;
+                        _provider.EventCaptorNotifications = customSettings.EventCaptorNotifications;
+                        _provider.EventCaptorCustomTextureNotifications = customSettings.EventCaptorCustomTextureNotifications;
+                        _provider.EventRandomEnabled = customSettings.EventRandomEnabled;
+                        _provider.EventRandomFireChance = customSettings.EventRandomFireChance;
+                        _provider.EventOccurrenceRandom = customSettings.EventOccurrenceRandom;
+                        _provider.EventCaptorGearCaptives = customSettings.EventCaptorGearCaptives;
+                        _provider.EventProstituteGear = customSettings.EventProstituteGear;
+                        _provider.HuntLetPrisonersEscape = customSettings.HuntLetPrisonersEscape;
+                        _provider.HuntBegins = customSettings.HuntBegins;
+                        _provider.AmountOfTroopsForHunt = customSettings.AmountOfTroopsForHunt;
+                        _provider.PrisonerEscapeBehavior = customSettings.PrisonerEscapeBehavior;
+                        _provider.PrisonerHeroEscapeChanceParty = customSettings.PrisonerHeroEscapeChanceParty;
+                        _provider.PrisonerHeroEscapeChanceSettlement = customSettings.PrisonerHeroEscapeChanceSettlement;
+                        _provider.PrisonerHeroEscapeChanceOther = customSettings.PrisonerHeroEscapeChanceOther;
+                        _provider.PrisonerNonHeroEscapeChanceParty = customSettings.PrisonerNonHeroEscapeChanceParty;
+                        _provider.PrisonerNonHeroEscapeChanceSettlement = customSettings.PrisonerNonHeroEscapeChanceSettlement;
+                        _provider.PrisonerNonHeroEscapeChanceOther = customSettings.PrisonerNonHeroEscapeChanceOther;
+                        _provider.EscapeAutoRansom.SelectedIndex = customSettings.EscapeAutoRansom;
+                        _provider.BrothelOption.SelectedIndex = customSettings.BrothelOption;
+                        _provider.BrothelHeroEscapeChance = customSettings.BrothelHeroEscapeChance;
+                        _provider.BrothelNonHeroEscapeChance = customSettings.BrothelNonHeroEscapeChance;
+                        _provider.PrisonerExceeded = customSettings.PrisonerExceeded;
+                        _provider.NonSexualContent = customSettings.NonSexualContent;
+                        _provider.SexualContent = customSettings.SexualContent;
+                        _provider.CustomBackgrounds = customSettings.CustomBackgrounds;
+                        _provider.CommonControl = customSettings.CommonControl;
+                        _provider.ProstitutionControl = customSettings.ProstitutionControl;
+                        _provider.SlaveryToggle = customSettings.SlaveryToggle;
+                        _provider.FemdomControl = customSettings.FemdomControl;
+                        _provider.BestialityControl = customSettings.BestialityControl;
+                        _provider.RomanceControl = customSettings.RomanceControl;
+                        _provider.StolenGear = customSettings.StolenGear;
+                        _provider.StolenGearQuest = customSettings.StolenGearQuest;
+                        _provider.StolenGearDuration = customSettings.StolenGearDuration;
+                        _provider.StolenGearChance = customSettings.StolenGearChance;
+                        _provider.BetterOutFitChance = customSettings.BetterOutFitChance;
+                        _provider.WeaponChance = customSettings.WeaponChance;
+                        _provider.WeaponBetterChance = customSettings.WeaponBetterChance;
+                        _provider.WeaponSkill = customSettings.WeaponSkill;
+                        _provider.RangedBetterChance = customSettings.RangedBetterChance;
+                        _provider.RangedSkill = customSettings.RangedSkill;
+                        _provider.HorseChance = customSettings.HorseChance;
+                        _provider.HorseSkill = customSettings.HorseSkill;
+                        _provider.PregnancyToggle = customSettings.PregnancyToggle;
+                        _provider.AttractivenessSkill = customSettings.AttractivenessSkill;
+                        _provider.PregnancyChance = customSettings.PregnancyChance;
+                        _provider.UsePregnancyModifiers = customSettings.UsePregnancyModifiers;
+                        _provider.PregnancyDurationInDays = customSettings.PregnancyDurationInDays;
+                        _provider.PregnancyMessages = customSettings.PregnancyMessages;
+                        _provider.RenownMin = customSettings.RenownMin;
+                        _provider.RenownChoice.SelectedIndex = customSettings.RenownChoice;
+                        _provider.LogToggle = customSettings.LogToggle;
+                    }
+                    return _provider;
                 }
-                return _provider;
+                catch (Exception e)
+                {
+                    _hasFailed = true;
+                    CECustomHandler.ForceLogToFile("HardcodedCustomSettings Instance \n" + e);
+                    return null;
+                }
+
             }
         }
     }

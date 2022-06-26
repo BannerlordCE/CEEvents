@@ -61,6 +61,7 @@ namespace CaptivityEvents.Custom
         EmptyIcon,
         Wait,
         BribeAndEscape,
+        EscapeIcon,
         Submenu,
         RansomAndBribe,
         Trade,
@@ -103,6 +104,8 @@ namespace CaptivityEvents.Custom
         BanditParty,
         LordParty,
         DefaultParty,
+        NotableFemalesNearby,
+        NotableMalesNearby,
         VisitedByCaravan,
         VisitedByLord,
         DuringSiege,
@@ -127,7 +130,10 @@ namespace CaptivityEvents.Custom
         Captive,
         CaptiveIsHero,
         CaptiveIsNonHero,
+        OwnerGenderIsFemale,
+        OwnerGenderIsMale,
         CaptorIsHero,
+        CaptorIsNonHero,
         CaptorGenderIsFemale,
         CaptorGenderIsMale,
         CaptorHaveOffspring,
@@ -186,7 +192,6 @@ namespace CaptivityEvents.Custom
         StripEnabled,
         StripDisabled,
         IgnoreAllOther,
-        CaptorIsNonHero,
         CaptorIsNotPregnant,
         CaptorIsPregnant,
         CaptorOwnsNoFief,
@@ -731,6 +736,9 @@ namespace CaptivityEvents.Custom
 
         [XmlElement("SceneSettings", IsNullable = true)]
         public SceneSettings SceneSettings { get; set; }
+
+        [XmlElement("DelayEvent", IsNullable = true)]
+        public DelayEvent DelayEvent { get; set; }
 
         [XmlArrayItem("SpawnTroop", IsNullable = true)]
         public SpawnTroop[] SpawnTroops { get; set; }

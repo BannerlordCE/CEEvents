@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -7,17 +7,16 @@ using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
 
+#if V172
+using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
+#else
+using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
 #endif
 
 namespace CaptivityEvents.Notifications
@@ -29,7 +28,7 @@ namespace CaptivityEvents.Notifications
 
         public CECaptorMapNotificationItemVM(InformationData data) : base(data)
         {
-            NotificationIdentifier = CESettings.Instance != null && CESettings.Instance.EventCaptorCustomTextureNotifications
+            NotificationIdentifier = (CESettings.Instance?.EventCaptorCustomTextureNotifications ?? true)
              ? "cecaptor"
              : "death";
             _captorEvent = ((CECaptorMapNotification)data).CaptorEvent;
@@ -40,7 +39,7 @@ namespace CaptivityEvents.Notifications
         {
             base.ManualRefreshRelevantStatus();
 
-            if (MobileParty.MainParty.Party.PrisonRoster.Count == 0 || PlayerCaptivity.IsCaptive || !CEHelper.notificationCaptorExists || !CESettings.Instance.EventCaptorNotifications)
+            if (MobileParty.MainParty.Party.PrisonRoster.Count == 0 || PlayerCaptivity.IsCaptive || !CEHelper.notificationCaptorExists || !(CESettings.Instance?.EventCaptorNotifications ?? true))
             {
                 CEHelper.notificationCaptorExists = false;
                 ExecuteRemove();

@@ -12,6 +12,8 @@ namespace CaptivityEvents.Events
 
             int num = 0;
 
+            if (targetHero.GetPerkValue(DefaultPerks.Charm.Virile)) num += 15;
+
             if (targetHero.GetPerkValue(DefaultPerks.Medicine.PerfectHealth)) num += 10;
 
             if (targetHero.GetPerkValue(DefaultPerks.Charm.InBloom)) num += 15;

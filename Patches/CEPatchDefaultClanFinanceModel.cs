@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
@@ -6,15 +6,9 @@ using HarmonyLib;
 using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Localization;
-
-#if V171
-using TaleWorlds.CampaignSystem.SandBox.GameComponents;
-#else
-
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.GameComponents;
 
-#endif
 
 namespace CaptivityEvents.Patches
 {
@@ -22,7 +16,7 @@ namespace CaptivityEvents.Patches
     internal class CEPatchDefaultClanFinanceModel
     {
         [HarmonyPrepare]
-        private static bool ShouldPatch() => CESettings.Instance != null && CESettings.Instance.ProstitutionControl;
+        private static bool ShouldPatch() => CESettings.Instance?.ProstitutionControl ?? true;
 
         [HarmonyPostfix]
         private static void CalculateClanIncomeInternal(Clan clan, ref ExplainedNumber goldChange, bool applyWithdrawals = false)

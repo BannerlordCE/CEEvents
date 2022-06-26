@@ -1,11 +1,18 @@
-﻿using CaptivityEvents.Config;
+﻿#define V180
+
+using CaptivityEvents.Config;
 using CaptivityEvents.Helper;
 using CaptivityEvents.Notifications;
 using HarmonyLib;
 using System;
 using System.Reflection;
-using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.Core;
+using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
+
+#if V172
+#else
+using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
+#endif
 
 namespace CaptivityEvents.Patches
 {
@@ -15,7 +22,7 @@ namespace CaptivityEvents.Patches
         public static readonly MethodInfo RemoveNotificationItem = AccessTools.Method(typeof(MapNotificationVM), "RemoveNotificationItem");
 
         [HarmonyPrepare]
-        private static bool ShouldPatch() => CESettings.Instance != null && CESettings.Instance.EventCaptorNotifications;
+        private static bool ShouldPatch() => CESettings.Instance?.EventCaptorNotifications ?? true;
 
         [HarmonyPostfix]
         private static void GetNotificationFromData(MapNotificationVM __instance, ref MapNotificationItemBaseVM __result, InformationData data)

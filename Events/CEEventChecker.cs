@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -14,17 +14,11 @@ using static CaptivityEvents.Helper.CEHelper;
 using CETerrainType = CaptivityEvents.Custom.TerrainType;
 using TerrainType = TaleWorlds.Core.TerrainType;
 
-#if V171
-using TaleWorlds.CampaignSystem.SandBox;
-using TaleWorlds.CampaignSystem.SandBox.GameComponents.Map;
-#else
-
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.CampaignSystem.Party;
 
-#endif
 
 namespace CaptivityEvents.Events
 {
@@ -277,6 +271,7 @@ namespace CaptivityEvents.Events
             if (!PlayerCheck()) return LatestMessage;
             if (!PlayerItemCheck()) return LatestMessage;
             if (!IsOwnedByNotableCheck()) return LatestMessage;
+            if (!OwnerGenderCheck()) return LatestMessage;
             if (!CaptorCheck(captorParty)) return LatestMessage;
             if (!PartyCheck(captorParty)) return LatestMessage;
             if (!CaptivesOutNumberCheck(captorParty)) return LatestMessage;
@@ -634,6 +629,8 @@ namespace CaptivityEvents.Events
             bool hasPartyInVillageFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInVillage);
             bool hasPartyInCastleFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInCastle);
             bool hasTravelingFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationTravellingParty);
+            bool hasNotableFemalesNearby = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.NotableFemalesNearby);
+            bool hasNotableMalesNearby = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.NotableMalesNearby);
             bool visitedByCaravanFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByCaravan);
             bool visitedByLordFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByLord);
             bool duringSiegeFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DuringSiege);
@@ -641,7 +638,7 @@ namespace CaptivityEvents.Events
 
             eventMatchingCondition = true;
 
-            if (hasCityFlag || hasDungeonFlag || hasVillageFlag || hasHideoutFlag || hasTravelingFlag || hasCastleFlag || hasPartyInTownFlag || visitedByCaravanFlag || duringSiegeFlag || duringRaidFlag)
+            if (hasCityFlag || hasDungeonFlag || hasVillageFlag || hasHideoutFlag || hasTravelingFlag || hasCastleFlag || hasPartyInTownFlag || visitedByCaravanFlag || visitedByLordFlag || duringSiegeFlag || duringRaidFlag || hasNotableFemalesNearby || hasNotableMalesNearby)
             {
                 eventMatchingCondition = false;
 
@@ -649,6 +646,17 @@ namespace CaptivityEvents.Events
                 {
                     if (captorParty.Settlement.IsTown && (hasDungeonFlag || hasCityFlag))
                     {
+                        if (hasNotableFemalesNearby && !hasNotableMalesNearby)
+                        {
+                            eventMatchingCondition = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
+                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                        }
+                        else if (hasNotableMalesNearby && !hasNotableFemalesNearby)
+                        {
+                            eventMatchingCondition = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
+                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                        }
+
                         if (visitedByCaravanFlag)
                         {
                             try
@@ -679,7 +687,23 @@ namespace CaptivityEvents.Events
                         }
                     }
 
-                    if (hasVillageFlag && captorParty.Settlement.IsVillage) eventMatchingCondition = true;
+                    if (hasVillageFlag && captorParty.Settlement.IsVillage)
+                    {
+                        if (hasNotableFemalesNearby && !hasNotableMalesNearby)
+                        {
+                            eventMatchingCondition = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
+                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                        }
+                        else if (hasNotableMalesNearby && !hasNotableFemalesNearby)
+                        {
+                            eventMatchingCondition = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
+                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                        }
+                        else
+                        {
+                            eventMatchingCondition = true;
+                        }
+                    }
 
                     if (hasHideoutFlag && captorParty.Settlement.IsHideout) eventMatchingCondition = true;
 
@@ -711,6 +735,17 @@ namespace CaptivityEvents.Events
                 {
                     if (hasPartyInTownFlag && captorParty.MobileParty.CurrentSettlement.IsTown)
                     {
+                        if (hasNotableFemalesNearby && !hasNotableMalesNearby)
+                        {
+                            eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
+                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                        }
+                        else if (hasNotableMalesNearby && !hasNotableFemalesNearby)
+                        {
+                            eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
+                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                        }
+
                         if (visitedByCaravanFlag)
                         {
                             try
@@ -741,10 +776,37 @@ namespace CaptivityEvents.Events
                         }
                     }
 
-                    if (hasPartyInVillageFlag && captorParty.MobileParty.CurrentSettlement.IsVillage) eventMatchingCondition = true;
+                    if (hasPartyInVillageFlag && captorParty.MobileParty.CurrentSettlement.IsVillage)
+                    {
+                        if (hasNotableFemalesNearby && !hasNotableMalesNearby)
+                        {
+                            eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
+                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                        }
+                        else if (hasNotableMalesNearby && !hasNotableFemalesNearby)
+                        {
+                            eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
+                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                        }
+
+
+                        eventMatchingCondition = true;
+                    }
 
                     if (hasPartyInCastleFlag && captorParty.MobileParty.CurrentSettlement.IsCastle)
                     {
+                        if (hasNotableFemalesNearby && !hasNotableMalesNearby)
+                        {
+                            eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
+                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                        }
+                        else if (hasNotableMalesNearby && !hasNotableFemalesNearby)
+                        {
+                            eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
+                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                        }
+
+
                         if (visitedByLordFlag)
                         {
                             try
@@ -786,10 +848,19 @@ namespace CaptivityEvents.Events
             return true;
         }
 
+        private bool OwnerGenderCheck()
+        {
+            Hero owner = CECampaignBehavior.ExtraProps.Owner;
+            if (owner != null && owner.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsMale.");
+            if (owner != null && !owner.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsFemale.");
+
+            return true;
+        }
+
         private bool CaptorPartyGenderCheck(PartyBase captorParty)
         {
             if (captorParty?.LeaderHero != null && captorParty.LeaderHero.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsMale.");
-            if (captorParty?.LeaderHero != null && !captorParty.LeaderHero.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale/Femdom.");
+            if (captorParty?.LeaderHero != null && !captorParty.LeaderHero.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale.");
 
             return true;
         }
@@ -2032,19 +2103,19 @@ namespace CaptivityEvents.Events
         private bool SettingsCheck()
         {
             // Settings
-            if (!CESettings.Instance.SexualContent && _listEvent.SexualContent) return Error("Skipping event " + _listEvent.Name + " SexualContent events disabled.");
-            if (!CESettings.Instance.NonSexualContent && !_listEvent.SexualContent) return Error("Skipping event " + _listEvent.Name + " NonSexualContent events disabled.");
+            if (!(CESettings.Instance?.SexualContent ?? true) && _listEvent.SexualContent) return Error("Skipping event " + _listEvent.Name + " SexualContent events disabled.");
+            if (!(CESettings.Instance?.NonSexualContent ?? true) && !_listEvent.SexualContent) return Error("Skipping event " + _listEvent.Name + " NonSexualContent events disabled.");
 
             // Default Flags
-            if (!CESettings.Instance.FemdomControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Femdom)) return Error("Skipping event " + _listEvent.Name + " Femdom events disabled.");
-            if (!CESettings.Instance.CommonControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Common)) return Error("Skipping event " + _listEvent.Name + " Common events disabled.");
-            if (!CESettings.Instance.SlaveryToggle && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Slavery)) return Error("Skipping event " + _listEvent.Name + " Slavery events disabled.");
-            if (!CESettings.Instance.BestialityControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Bestiality)) return Error("Skipping event " + _listEvent.Name + " Bestiality events disabled.");
-            if (!CESettings.Instance.ProstitutionControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution)) return Error("Skipping event " + _listEvent.Name + " Prostitution events disabled.");
-            if (!CESettings.Instance.RomanceControl && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Romance)) return Error("Skipping event " + _listEvent.Name + " Romance events disabled.");
+            if (!(CESettings.Instance?.FemdomControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Femdom)) return Error("Skipping event " + _listEvent.Name + " Femdom events disabled.");
+            if (!(CESettings.Instance?.CommonControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Common)) return Error("Skipping event " + _listEvent.Name + " Common events disabled.");
+            if (!(CESettings.Instance?.SlaveryToggle ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Slavery)) return Error("Skipping event " + _listEvent.Name + " Slavery events disabled.");
+            if (!(CESettings.Instance?.BestialityControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Bestiality)) return Error("Skipping event " + _listEvent.Name + " Bestiality events disabled.");
+            if (!(CESettings.Instance?.ProstitutionControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution)) return Error("Skipping event " + _listEvent.Name + " Prostitution events disabled.");
+            if (!(CESettings.Instance?.RomanceControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Romance)) return Error("Skipping event " + _listEvent.Name + " Romance events disabled.");
 
-            if (!CESettings.Instance.StolenGear && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripEnabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear disabled.");
-            if (CESettings.Instance.StolenGear && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripDisabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear enabled.");
+            if (!(CESettings.Instance?.StolenGear ?? true)&& _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripEnabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear disabled.");
+            if ((CESettings.Instance?.StolenGear ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripDisabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear enabled.");
 
             // Custom Flags
             if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) return Error("Skipping event " + _listEvent.Name + " Player is busy.");

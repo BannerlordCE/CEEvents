@@ -1,16 +1,10 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Helper;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Party;
-
-#endif
 
 namespace CaptivityEvents.Patches
 {

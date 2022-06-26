@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -10,16 +10,9 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
-
-#if V171
-using TaleWorlds.CampaignSystem.SandBox.GameComponents.Party;
-#else
-
 using TaleWorlds.CampaignSystem.GameComponents;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
-
-#endif
 
 namespace CaptivityEvents.Models
 {
@@ -36,18 +29,17 @@ namespace CaptivityEvents.Models
         private bool CheckEvent()
         {
             if (PlayerCaptivity.CaptorParty == null) return false;
-            float gameProcess = MiscHelper.GetGameProcess();
             bool isInSettlement = PlayerCaptivity.CaptorParty.IsSettlement;
             bool isInLordParty = !isInSettlement && PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.LeaderHero != null;
 
-            float eventOccurence =
+            float eventOccurence = CESettings.Instance != null ?
                 isInSettlement ?
                 CESettings.Instance.EventOccurrenceSettlement :
                 isInLordParty ?
                 CESettings.Instance.EventOccurrenceLord :
-                CESettings.Instance.EventOccurrenceOther;
-            float num = (1f + gameProcess * 1f) * eventOccurence;
-            return CheckTimeElapsedMoreThanHours(PlayerCaptivity.LastCheckTime, num);
+                CESettings.Instance.EventOccurrenceOther :
+                6f;
+            return CheckTimeElapsedMoreThanHours(PlayerCaptivity.LastCheckTime, eventOccurence);
         }
 
         /// <summary>
@@ -182,12 +174,12 @@ namespace CaptivityEvents.Models
                 }
             }
 
-            if (CESettings.Instance != null && (!CESettings.Instance.SlaveryToggle && !FactionManager.IsAtWarAgainstFaction(PlayerCaptivity.CaptorParty.MapFaction, MobileParty.MainParty.MapFaction) && (PlayerCaptivity.CaptorParty.MapFaction == MobileParty.MainParty.MapFaction || !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingModerate(PlayerCaptivity.CaptorParty.MapFaction) && !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingSevere(PlayerCaptivity.CaptorParty.MapFaction)))) return "menu_captivity_end_no_more_enemies";
+            if (!(CESettings.Instance?.SlaveryToggle ?? true) && !FactionManager.IsAtWarAgainstFaction(PlayerCaptivity.CaptorParty.MapFaction, MobileParty.MainParty.MapFaction) && (PlayerCaptivity.CaptorParty.MapFaction == MobileParty.MainParty.MapFaction || !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingModerate(PlayerCaptivity.CaptorParty.MapFaction) && !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingSevere(PlayerCaptivity.CaptorParty.MapFaction))) return "menu_captivity_end_no_more_enemies";
 
             if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement != null)
             {
                 // Default event transfer disabled if slavery is enabled override or if it is garrison
-                if (PlayerCaptivity.CaptorParty.MapFaction != PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.MapFaction || (CESettings.Instance.SlaveryToggle && !PlayerCaptivity.CaptorParty.MobileParty.IsGarrison && !PlayerCaptivity.CaptorParty.MobileParty.IsMilitia)) return null;
+                if (PlayerCaptivity.CaptorParty.MapFaction != PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.MapFaction || ((CESettings.Instance?.SlaveryToggle ?? true) && !PlayerCaptivity.CaptorParty.MobileParty.IsGarrison && !PlayerCaptivity.CaptorParty.MobileParty.IsMilitia)) return null;
                 PlayerCaptivity.LastCheckTime = CampaignTime.Now;
                 if (Game.Current.GameStateManager.ActiveState is MapState) Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
 
@@ -196,9 +188,9 @@ namespace CaptivityEvents.Models
 
             if (!CheckEvent()) return null;
             PlayerCaptivity.LastCheckTime = CampaignTime.Now;
-            Hero.MainHero.HitPoints += MBRandom.Random.Next(10);
+            Hero.MainHero.HitPoints += CEHelper.HelperMBRandom(10);
 
-            if (MBRandom.Random.Next(100) >= (Hero.MainHero.GetSkillValue(DefaultSkills.Tactics) / 4 + Hero.MainHero.GetSkillValue(DefaultSkills.Roguery) / 4) / 4) return null;
+            if (CEHelper.HelperMBRandom(100) >= (Hero.MainHero.GetSkillValue(DefaultSkills.Tactics) / 4 + Hero.MainHero.GetSkillValue(DefaultSkills.Roguery) / 4) / 4) return null;
 
             if (!PlayerCaptivity.CaptorParty.IsMobile || PlayerCaptivity.CaptorParty.MapEvent == null) return null;
 

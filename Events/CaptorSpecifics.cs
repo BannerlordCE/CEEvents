@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -14,11 +14,6 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
-using static CaptivityEvents.Helper.CEHelper;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Map;
 using TaleWorlds.CampaignSystem.Party;
@@ -26,7 +21,7 @@ using TaleWorlds.CampaignSystem.Party.PartyComponents;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
 
-#endif
+using static CaptivityEvents.Helper.CEHelper;
 
 namespace CaptivityEvents.Events
 {
@@ -272,7 +267,7 @@ namespace CaptivityEvents.Events
 
             TroopRoster releasedPrisoners = TroopRoster.CreateDummyTroopRoster();
 
-            if (CESettings.Instance != null) amount = CESettings.Instance.AmountOfTroopsForHunt;
+            amount = CESettings.Instance?.AmountOfTroopsForHunt ?? 15;
 
             try
             {
@@ -401,7 +396,7 @@ namespace CaptivityEvents.Events
             Equipment randomElement2 = new(true);
             randomElement2.FillFrom(randomElement, false);
 
-            if (CESettings.Instance != null && CESettings.Instance.EventCaptorGearCaptives) CECampaignBehavior.AddReturnEquipment(captive, captive.BattleEquipment, captive.CivilianEquipment);
+            if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captive, captive.BattleEquipment, captive.CivilianEquipment);
 
             foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
             {

@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Config;
 using Helpers;
@@ -10,13 +10,8 @@ using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
 using static CaptivityEvents.Helper.CEHelper;
 
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.Issues;
 using TaleWorlds.CampaignSystem.Party;
-
-#endif
 
 namespace CaptivityEvents.Issues
 {
@@ -57,8 +52,7 @@ namespace CaptivityEvents.Issues
 
             protected override QuestBase GenerateIssueQuest(string questId)
             {
-                float stolenGearDuration = 3.0f; // Set default duration here if needed.
-                if (CESettings.Instance != null) stolenGearDuration = CESettings.Instance.StolenGearDuration;
+                float stolenGearDuration = CESettings.Instance?.StolenGearDuration ?? 10f;
 
                 return new CEWhereAreMyThingsIssueQuest(questId, IssueOwner, CampaignTime.DaysFromNow(stolenGearDuration), RewardGold, new Equipment(Hero.MainHero.BattleEquipment), new Equipment(Hero.MainHero.CivilianEquipment));
             }

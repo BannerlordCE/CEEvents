@@ -1,4 +1,4 @@
-﻿#define V172
+﻿#define V180
 
 using CaptivityEvents.Custom;
 using System;
@@ -6,14 +6,8 @@ using System.Collections.Generic;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-
-#if V171
-using TaleWorlds.CampaignSystem;
-#else
-
 using TaleWorlds.CampaignSystem.Extensions;
 
-#endif
 
 namespace CaptivityEvents
 {
@@ -88,6 +82,8 @@ namespace CaptivityEvents
 
         public static void RegisterAll(Game game)
         {
+            if (IsInitialized) return;
+
             CustomSkills = new List<SkillObject>();
 
             CEAttribute = game.ObjectManager.RegisterPresumedObject(new CharacterAttribute("CEAttribute"));

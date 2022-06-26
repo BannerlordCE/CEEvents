@@ -1,4 +1,6 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+﻿#define V180
+
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -6,10 +8,15 @@ using CaptivityEvents.Helper;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.GameState;
-using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+
+#if V172
+using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
+#else
+using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
+#endif
 
 namespace CaptivityEvents.Notifications
 {
@@ -20,7 +27,7 @@ namespace CaptivityEvents.Notifications
 
         public CEEventMapNotificationItemVM(InformationData data) : base(data)
         {
-            NotificationIdentifier = CESettings.Instance != null && CESettings.Instance.EventCaptorCustomTextureNotifications
+            NotificationIdentifier = (CESettings.Instance?.EventCaptorCustomTextureNotifications ?? true)
                 ? "ceevent"
                 : "vote";
             _randomEvent = ((CEEventMapNotification)data).RandomEvent;
@@ -31,7 +38,7 @@ namespace CaptivityEvents.Notifications
         {
             base.ManualRefreshRelevantStatus();
 
-            if (PlayerCaptivity.IsCaptive || !CEHelper.notificationEventExists || !CESettings.Instance.EventCaptorNotifications)
+            if (PlayerCaptivity.IsCaptive || !CEHelper.notificationEventExists || !(CESettings.Instance?.EventCaptorNotifications ?? true))
             {
                 CEHelper.notificationEventExists = false;
                 ExecuteRemove();

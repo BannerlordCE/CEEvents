@@ -1,15 +1,8 @@
-﻿#define V172
+﻿#define V180
 
 using TaleWorlds.Engine.GauntletUI;
 using TaleWorlds.Library;
-
-#if V171
-using TaleWorlds.Engine.Screens;
-#else
-
 using TaleWorlds.ScreenSystem;
-
-#endif
 
 namespace CaptivityEvents.Config
 {
