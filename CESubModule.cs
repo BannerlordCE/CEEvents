@@ -630,7 +630,7 @@ namespace CaptivityEvents
 
                 try
                 {
-                    TextObject textObject = new("{=CEEVENTS1000}Captivity Events Loaded with {EVENT_COUNT} Events and {IMAGE_COUNT} Images.\n^o^ Enjoy your events. Remember to endorse!");
+                    TextObject textObject = new("{=CEEVENTS1000}Captivity Events loaded with {EVENT_COUNT} Events and {IMAGE_COUNT} Images.\n^o^ Enjoy your events. Remember to endorse!");
                     textObject.SetTextVariable("EVENT_COUNT", CEPersistence.CEEvents.Count);
                     textObject.SetTextVariable("IMAGE_COUNT", CEPersistence.CEEventImageList.Count);
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
@@ -671,16 +671,6 @@ namespace CaptivityEvents
 #if V172
             game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings.xml");
 #else
-            // GameTextManager LoadDefaultTexts
-            string text = ModuleHelper.GetModuleFullPath("zCaptivityEvents") + "ModuleData/module_strings.xml";
-            XmlDocument xmlDocument = new();
-            StreamReader streamReader = new(text);
-            string text2 = streamReader.ReadToEnd();
-            xmlDocument.LoadXml(text2);
-            streamReader.Close();
-
-            MethodInfo mi = typeof(GameTextManager).GetMethod("LoadFromXML", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-            if (mi != null) mi.Invoke(game.GameTextManager, new object[] { xmlDocument });
 #endif
             InitalizeAttributes(game);
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;

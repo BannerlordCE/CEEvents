@@ -11,7 +11,9 @@
     <DependedModule Id="Sandbox" DependentVersion="e1.8.0" />
     <DependedModule Id="CustomBattle" DependentVersion="e1.8.0" />
     <DependedModule Id="StoryMode" DependentVersion="e1.8.0" />
+    <DependedModule Id="Bannerlord.MBOptionScreen" DependentVersion="v4.7.3" Optional="true"/>
   </DependedModules>
+
   <SubModules>
     <SubModule>
       <Name value="Captivity Events" />
@@ -23,4 +25,13 @@
       </Tags>
     </SubModule>
   </SubModules>
+  <Xmls>
+    <XmlNode>
+      <XmlName id="GameText" path="module_strings"/>
+      <IncludedGameTypes>
+        <GameType value = "Campaign"/>
+        <GameType value = "CampaignStoryMode"/>
+      </IncludedGameTypes>
+    </XmlNode>
+  </Xmls>
 </Module>
