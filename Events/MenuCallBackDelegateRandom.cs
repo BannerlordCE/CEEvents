@@ -186,15 +186,7 @@ namespace CaptivityEvents.Events
             PlayerIsNotBusy(ref args);
             PlayerHasOpenSpaceForCompanions(ref args);
 
-            Escaping(ref args);
-            Leave(ref args);
-            Wait(ref args);
-            Trade(ref args);
-            RansomAndBribe(ref args);
-            BribeAndEscape(ref args);
-            SubMenu(ref args);
-            Continue(ref args);
-            EmptyIcon(ref args);
+            _sharedCallBackHelper.InitIcons(ref args);
 
             InitSoldToSettlement();
             InitSoldToCaravan();
@@ -1484,55 +1476,6 @@ namespace CaptivityEvents.Events
 #endregion ReqMorale
 
 #endregion Requirements
-
-#region Icons
-
-        private void EmptyIcon(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.EmptyIcon)) args.optionLeaveType = GameMenuOption.LeaveType.Default;
-        }
-
-        private void Continue(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Continue)) args.optionLeaveType = GameMenuOption.LeaveType.Continue;
-        }
-
-        private void SubMenu(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Submenu)) args.optionLeaveType = GameMenuOption.LeaveType.Submenu;
-        }
-
-        private void BribeAndEscape(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.BribeAndEscape)) args.optionLeaveType = GameMenuOption.LeaveType.BribeAndEscape;
-        }
-
-        private void RansomAndBribe(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RansomAndBribe)) args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
-        }
-
-        private void Trade(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Trade)) args.optionLeaveType = GameMenuOption.LeaveType.Trade;
-        }
-
-        private void Wait(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Wait)) args.optionLeaveType = GameMenuOption.LeaveType.Wait;
-        }
-
-        private void Leave(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Leave)) args.optionLeaveType = GameMenuOption.LeaveType.Leave;
-        }
-
-        private void Escaping(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AttemptEscape) || _option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape)) args.optionLeaveType = GameMenuOption.LeaveType.Escape;
-        }
-
-#endregion Icons
 
 #region Init Options
 

@@ -162,7 +162,9 @@ namespace CaptivityEvents.Events
         {
             PlayerIsNotBusy(ref args);
             PlayerHasOpenSpaceForCompanions(ref args);
-            LeaveTypes(ref args);
+
+            _sharedCallBackHelper.InitIcons(ref args);
+
             InitGiveCaptorGold();
             InitCaptorGoldTotal();
             ReqHeroCaptorRelation(ref args);
@@ -1962,50 +1964,6 @@ namespace CaptivityEvents.Events
         #endregion ReqHeroCaptorRelation
 
         #endregion Requirements
-
-        #region Icons
-
-        private void LeaveTypes(ref MenuCallbackArgs args)
-        {
-            Wait(ref args);
-            Trade(ref args);
-            RansomAndBribe(ref args);
-            Submenu(ref args);
-            Continue(ref args);
-            Default(ref args);
-        }
-
-        private void Default(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.EmptyIcon)) args.optionLeaveType = GameMenuOption.LeaveType.Default;
-        }
-
-        private void Continue(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Continue)) args.optionLeaveType = GameMenuOption.LeaveType.Continue;
-        }
-
-        private void Submenu(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Submenu)) args.optionLeaveType = GameMenuOption.LeaveType.Submenu;
-        }
-
-        private void RansomAndBribe(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RansomAndBribe)) args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
-        }
-
-        private void Trade(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Trade)) args.optionLeaveType = GameMenuOption.LeaveType.Trade;
-        }
-
-        private void Wait(ref MenuCallbackArgs args)
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Wait)) args.optionLeaveType = GameMenuOption.LeaveType.Wait;
-        }
-
-        #endregion Icons
 
         #region Init Options
 

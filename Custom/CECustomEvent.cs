@@ -61,6 +61,7 @@ namespace CaptivityEvents.Custom
         EmptyIcon,
         Wait,
         BribeAndEscape,
+        EscapeIcon,
         Submenu,
         RansomAndBribe,
         Trade,
