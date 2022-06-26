@@ -271,6 +271,7 @@ namespace CaptivityEvents.Events
             if (!PlayerCheck()) return LatestMessage;
             if (!PlayerItemCheck()) return LatestMessage;
             if (!IsOwnedByNotableCheck()) return LatestMessage;
+            if (!OwnerGenderCheck()) return LatestMessage;
             if (!CaptorCheck(captorParty)) return LatestMessage;
             if (!PartyCheck(captorParty)) return LatestMessage;
             if (!CaptivesOutNumberCheck(captorParty)) return LatestMessage;
@@ -847,7 +848,7 @@ namespace CaptivityEvents.Events
             return true;
         }
 
-        private bool OwnerGenderCheck(PartyBase captorParty)
+        private bool OwnerGenderCheck()
         {
             Hero owner = CECampaignBehavior.ExtraProps.Owner;
             if (owner != null && owner.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsMale.");
