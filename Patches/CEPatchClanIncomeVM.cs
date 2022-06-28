@@ -10,6 +10,7 @@ using TaleWorlds.Core;
 using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement;
 using System;
+using CaptivityEvents.Custom;
 
 namespace CaptivityEvents.Patches
 {
@@ -30,34 +31,41 @@ namespace CaptivityEvents.Patches
         [HarmonyPostfix]
         public static void RefreshList(ClanIncomeVM __instance)
         {
-            foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
+            try
             {
-                Workshop workshop = new(brothel.Settlement, brothel.Name.ToString());
-                WorkshopType workshopType = WorkshopType.Find("brewery");
+                foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
+                {
+                    Workshop workshop = new(brothel.Settlement, brothel.Name.ToString());
+                    WorkshopType workshopType = WorkshopType.Find("brewery");
 
-                workshop.SetWorkshop(brothel.Owner, workshopType, brothel.Capital, true, 0, 1, brothel.Name);
+                    workshop.SetWorkshop(brothel.Owner, workshopType, brothel.Capital, true, 0, 1, brothel.Name);
 
 #if V172
                 CEBrothelClanFinanceItemVM brothelFinanceItemVM = new(brothel, workshop, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh);
 #else
-                CEBrothelClanFinanceItemVM brothelFinanceItemVM = new(brothel, workshop, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh, _openCardSelectionPopup.Invoke(__instance));
+                    CEBrothelClanFinanceItemVM brothelFinanceItemVM = new(brothel, workshop, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh, _openCardSelectionPopup.Invoke(__instance));
 #endif
-                __instance.Incomes.Add(brothelFinanceItemVM);
+                    __instance.Incomes.Add(brothelFinanceItemVM);
 
-                Hero.MainHero.RemoveOwnedWorkshop(workshop);
+                    Hero.MainHero.RemoveOwnedWorkshop(workshop);
+                }
+
+                // For Nice Purposes of Workshop Number being 1 don't really care about the limit
+                int count = CEBrothelBehavior.GetPlayerBrothels().Count;
+                GameTexts.SetVariable("STR1", GameTexts.FindText("str_CE_properties", null));
+                GameTexts.SetVariable("LEFT", Hero.MainHero.OwnedWorkshops.Count + count);
+                GameTexts.SetVariable("RIGHT", Campaign.Current.Models.WorkshopModel.GetMaxWorkshopCountForTier(Clan.PlayerClan.Tier) + count);
+                GameTexts.SetVariable("STR2", GameTexts.FindText("str_LEFT_over_RIGHT_in_paranthesis", null));
+                __instance.WorkshopText = GameTexts.FindText("str_STR1_space_STR2", null).ToString();
+
+                __instance.RefreshTotalIncome();
+                OnIncomeSelection.Invoke(__instance, new[] { GetDefaultIncome.Invoke(__instance, null) });
+                __instance.RefreshValues();
+            } 
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("CEPatchClanIncomeVM RefreshList: " + e);
             }
-
-            // For Nice Purposes of Workshop Number being 1 don't really care about the limit
-            int count = CEBrothelBehavior.GetPlayerBrothels().Count;
-            GameTexts.SetVariable("STR1", GameTexts.FindText("str_CE_properties", null));
-            GameTexts.SetVariable("LEFT", Hero.MainHero.OwnedWorkshops.Count + count);
-            GameTexts.SetVariable("RIGHT", Campaign.Current.Models.WorkshopModel.GetMaxWorkshopCountForTier(Clan.PlayerClan.Tier) + count);
-            GameTexts.SetVariable("STR2", GameTexts.FindText("str_LEFT_over_RIGHT_in_paranthesis", null));
-            __instance.WorkshopText = GameTexts.FindText("str_STR1_space_STR2", null).ToString();
-
-            __instance.RefreshTotalIncome();
-            OnIncomeSelection.Invoke(__instance, new[] { GetDefaultIncome.Invoke(__instance, null) });
-            __instance.RefreshValues();
         }
     }
 }

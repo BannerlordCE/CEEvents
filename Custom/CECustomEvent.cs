@@ -791,6 +791,8 @@ namespace CaptivityEvents.Custom
 
         public bool ReqCustomCode { get; set; }
 
+        public string SceneToPlay { get; set; }
+
         public string OrderToCall { get; set; }
 
         public bool SexualContent { get; set; }

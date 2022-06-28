@@ -12,6 +12,8 @@ using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.Library;
+using TaleWorlds.Core.ViewModelCollection.Information;
+using System.Collections.Generic;
 
 #if V172
 using TaleWorlds.Core.ViewModelCollection;
@@ -35,12 +37,24 @@ namespace CaptivityEvents.Brothel
             IncomeTypeAsEnum = IncomeTypes.Workshop;
 #if V172
             SettlementComponent component = _brothel.Settlement.GetComponent<SettlementComponent>();
+            ImageName = component != null ? component.WaitMeshName : "";
 #else
+            _onSelection = new Action<ClanFinanceIncomeItemBaseVM>(tempOnSelection);
+            _onSelectionT = onSelection;
             _openCardSelectionPopup = openCardSelectionPopup;
             SettlementComponent component = _brothel.Settlement.SettlementComponent;
-#endif
             ImageName = component != null ? component.WaitMeshName : "";
+            ManageWorkshopHint = new HintViewModel(new TextObject("{=CEBROTHEL0975}Manage Brothel", null), null);
+#endif
+
+
+
             RefreshValues();
+        }
+
+        private void tempOnSelection(ClanFinanceIncomeItemBaseVM temp)
+        {
+            _onSelectionT(this);
         }
 
         public override void RefreshValues()
@@ -68,6 +82,7 @@ namespace CaptivityEvents.Brothel
             PopulateStatsList();
         }
 
+#if V172
         protected override void PopulateActionList()
         {
             if (_brothel == null) _brothel = new CEBrothel(Workshop.Settlement);
@@ -75,23 +90,80 @@ namespace CaptivityEvents.Brothel
             int sellingCost = _brothel.Capital;
 
             TextObject hint = GetBrothelSellHintText(sellingCost);
-#if V172
             ActionList.Add(new StringItemWithEnabledAndHintVM(ExecuteSellBrothel, new TextObject("{=PHkC8Gia}Sell").ToString(), true, null, hint));
-#endif
+
             bool isCurrentlyActive = _brothel.IsRunning;
             int costToStart = _brothel.Expense;
 
             TextObject hint2 = GetBrothelSellHintText(sellingCost);
-#if V172
             ActionList.Add(isCurrentlyActive
                                ? new StringItemWithEnabledAndHintVM(ExecuteToggleBrothel, new TextObject("{=CEBROTHEL0995}Stop Operations").ToString(), true, null, hint2)
                                : new StringItemWithEnabledAndHintVM(ExecuteToggleBrothel, new TextObject("{=CEBROTHEL0996}Start Operations").ToString(), Hero.MainHero.Gold >= costToStart, null, hint2));
-#endif
 
         }
+#else
+
+        public new void ExecuteManageWorkshop()
+        {
+            TextObject title = new("{=CEBROTHEL0975}Manage Brothel", null);
+            ClanCardSelectionInfo obj = new(title, GetManageWorkshopItems(), new Action<List<object>, Action>(OnManageWorkshopDone), false);
+            Action<ClanCardSelectionInfo> openCardSelectionPopup = this._openCardSelectionPopup;
+            openCardSelectionPopup?.Invoke(obj);
+        }
+
+        private IEnumerable<ClanCardSelectionItemInfo> GetManageWorkshopItems()
+        {
+            int sellingCost = _brothel.Capital;
+            TextObject disabledReason = TextObject.Empty;
+            bool flag = true;
+            TextObject textObject = new TextObject("{=CEBROTHEL0974}Sell this Brothel for {GOLD_AMOUNT}{GOLD_ICON}", null);
+            textObject.SetTextVariable("GOLD_AMOUNT", sellingCost);
+            textObject.SetTextVariable("GOLD_ICON", "{=!}<img src=\"General\\Icons\\Coin@2x\" extend=\"8\">");
+
+            yield return new ClanCardSelectionItemInfo(textObject, !flag, disabledReason, ClanCardSelectionItemPropertyInfo.CreateActionGoldChangeText(sellingCost));
+
+
+            bool isCurrentlyActive = _brothel.IsRunning;
+            int costToStart = _brothel.Expense;
+
+            bool flag2 = isCurrentlyActive ? true : Hero.MainHero.Gold >= costToStart;
+            TextObject disabledTextObject = new("You will need {AMOUNT} denars to begin operations again{\\?}.");
+            textObject.SetTextVariable("AMOUNT", costToStart);
+
+   
+
+            TextObject disabledReason2 = Hero.MainHero.Gold < costToStart && !isCurrentlyActive ? disabledTextObject : TextObject.Empty;
+            TextObject textObject2 = isCurrentlyActive  ? new TextObject("{=CEBROTHEL0995}Stop Operations") : new TextObject("{=CEBROTHEL0996}Start Operations");
+            CharacterObject townswoman = CharacterObject.CreateFrom(_brothel.Settlement.Culture.TavernWench);
+            townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
+            ImageIdentifier image2 = new(CampaignUIHelper.GetCharacterCode(townswoman, true));
+
+            yield return new ClanCardSelectionItemInfo("operations", textObject2, image2, CardSelectionItemSpriteType.None, null, null, GetText(GetBrothelRunningHintText(_brothel.IsRunning, _brothel.Expense)), !flag2, disabledReason2, ClanCardSelectionItemPropertyInfo.CreateActionGoldChangeText(isCurrentlyActive ? 0 : -costToStart));
+        }
+
+        private IEnumerable<ClanCardSelectionItemPropertyInfo> GetText(TextObject textObject)
+        {
+            yield return new ClanCardSelectionItemPropertyInfo(textObject);
+        }
+
+        private void OnManageWorkshopDone(List<object> selectedItems, Action closePopup)
+        {
+            closePopup?.Invoke();
+            if (selectedItems.Count == 1)
+            {
+                if (selectedItems[0].ToString() == "operations") {
+                    ExecuteToggleBrothel(selectedItems);
+                } else {
+                    ExecuteSellBrothel(selectedItems);
+                }
+            }
+        }
+#endif
 
         protected override void PopulateStatsList()
         {
+            if (_brothel == null) _brothel = new CEBrothel(Workshop.Settlement);
+
             ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0976}Level").ToString(), _brothel.Level.ToString()));
             ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0988}State").ToString(), _brothel.IsRunning
                                                                     ? new TextObject("{=CEBROTHEL0992}Normal").ToString()
@@ -110,6 +182,8 @@ namespace CaptivityEvents.Brothel
             InputProducts = GameTexts.FindText("str_CE_brothel_description", _brothel.IsRunning
                                                    ? null
                                                    : "inactive").ToString();
+  
+
             OutputProducts = string.Join(",", _brothel.CaptiveProstitutes.Where(c => c.IsHero).Select(c => c.HeroObject.Name.ToString()).ToArray());
         }
 
@@ -132,10 +206,14 @@ namespace CaptivityEvents.Brothel
 
         private static TextObject GetBrothelRunningHintText(bool isRunning, int costToStart)
         {
-            TextObject textObject = new("The brothel is currently {?ISRUNNING}open{?}closed, you will need {AMOUNT} denars to begin operations again{\\?}.");
+            TextObject textObject = new("The brothel is currently {?ISRUNNING}open{?}closed, you will need {GOLD_AMOUNT}{GOLD_ICON} to begin operations again{\\?}.");
 
             textObject.SetTextVariable("ISRUNNING", isRunning ? 1 : 0);
-            if (!isRunning) textObject.SetTextVariable("AMOUNT", costToStart);
+            if (!isRunning)
+            {
+                textObject.SetTextVariable("GOLD_AMOUNT", costToStart);
+                textObject.SetTextVariable("GOLD_ICON", "{=!}<img src=\"General\\Icons\\Coin@2x\" extend=\"8\">");
+            }
 
             return textObject;
         }
@@ -146,7 +224,6 @@ namespace CaptivityEvents.Brothel
             if (!_brothel.IsRunning) GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, _brothel.Expense);
             _brothel.IsRunning = !_brothel.IsRunning;
             Action onRefresh = _onRefresh;
-
             onRefresh?.Invoke();
         }
 
@@ -165,7 +242,6 @@ namespace CaptivityEvents.Brothel
             CEBrothelBehavior.BrothelInteraction(_brothel.Settlement, false);
 
             Action onRefresh = _onRefresh;
-
             onRefresh?.Invoke();
         }
 
@@ -238,6 +314,8 @@ namespace CaptivityEvents.Brothel
 
 #if !V172
         private readonly Action<ClanCardSelectionInfo> _openCardSelectionPopup;
+
+        private Action<ClanFinanceWorkshopItemVM> _onSelectionT;
 #endif
     }
 }
