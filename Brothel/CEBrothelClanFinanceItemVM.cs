@@ -39,7 +39,7 @@ namespace CaptivityEvents.Brothel
             SettlementComponent component = _brothel.Settlement.GetComponent<SettlementComponent>();
             ImageName = component != null ? component.WaitMeshName : "";
 #else
-            _onSelection = new Action<ClanFinanceIncomeItemBaseVM>(tempOnSelection);
+            _onSelection = new Action<ClanFinanceIncomeItemBaseVM>(TempOnSelection);
             _onSelectionT = onSelection;
             _openCardSelectionPopup = openCardSelectionPopup;
             SettlementComponent component = _brothel.Settlement.SettlementComponent;
@@ -52,7 +52,7 @@ namespace CaptivityEvents.Brothel
             RefreshValues();
         }
 
-        private void tempOnSelection(ClanFinanceIncomeItemBaseVM temp)
+        private void TempOnSelection(ClanFinanceIncomeItemBaseVM temp)
         {
             _onSelectionT(this);
         }
@@ -116,7 +116,7 @@ namespace CaptivityEvents.Brothel
             int sellingCost = _brothel.Capital;
             TextObject disabledReason = TextObject.Empty;
             bool flag = true;
-            TextObject textObject = new TextObject("{=CEBROTHEL0974}Sell this Brothel for {GOLD_AMOUNT}{GOLD_ICON}", null);
+            TextObject textObject = new("{=CEBROTHEL0974}Sell this Brothel for {GOLD_AMOUNT}{GOLD_ICON}", null);
             textObject.SetTextVariable("GOLD_AMOUNT", sellingCost);
             textObject.SetTextVariable("GOLD_ICON", "{=!}<img src=\"General\\Icons\\Coin@2x\" extend=\"8\">");
 
@@ -126,7 +126,7 @@ namespace CaptivityEvents.Brothel
             bool isCurrentlyActive = _brothel.IsRunning;
             int costToStart = _brothel.Expense;
 
-            bool flag2 = isCurrentlyActive ? true : Hero.MainHero.Gold >= costToStart;
+            bool flag2 = isCurrentlyActive || Hero.MainHero.Gold >= costToStart;
             TextObject disabledTextObject = new("You will need {AMOUNT} denars to begin operations again{\\?}.");
             textObject.SetTextVariable("AMOUNT", costToStart);
 

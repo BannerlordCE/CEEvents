@@ -89,5 +89,40 @@ namespace CaptivityEvents.Notifications
             }
         }
 
+        public CESceneNotification(CharacterObject maleHero, CharacterObject femaleHero, string sceneID)
+        {
+            SceneID = sceneID;
+            try
+            {
+                if (maleHero == null)
+                {
+                    CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+                    MaleHero = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, CEHelper.HelperMBRandom(20) + 20);
+                    MaleHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
+                }
+                else
+                {
+                    MaleHero = HeroCreator.CreateSpecialHero(maleHero, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == maleHero.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, CEHelper.HelperMBRandom(20) + 20);
+                    MaleHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
+                }
+
+                if (femaleHero == null)
+                {
+                    CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale != false && characterObject.Occupation == Occupation.Wanderer);
+                    FemaleHero = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, CEHelper.HelperMBRandom(20) + 20);
+                    FemaleHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
+                }
+                else
+                {
+                    FemaleHero = HeroCreator.CreateSpecialHero(femaleHero, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == femaleHero.Culture), CampaignData.NeutralFaction, CampaignData.NeutralFaction, CEHelper.HelperMBRandom(20) + 20);
+                    FemaleHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
+                }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Invalid Scene CESceneNotification: " + e);
+            }
+        }
+
     }
 }

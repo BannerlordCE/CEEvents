@@ -28,6 +28,7 @@ using TaleWorlds.CampaignSystem.AgentOrigins;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Encounters;
+using CaptivityEvents.Notifications;
 
 namespace CaptivityEvents.Brothel
 {

@@ -92,6 +92,7 @@ namespace CaptivityEvents
 
             _Skills.Add(new CESkillNode("Prostitution", "{=CEEVENTS1106}Prostitution", "0"));
             _Skills.Add(new CESkillNode("IsProstitute", "{=CEEVENTS1104}prostitute", "0", "1"));
+
             _Skills.Add(new CESkillNode("Slavery", "{=CEEVENTS1105}Slavery", "0"));
             _Skills.Add(new CESkillNode("IsSlave", "{=CEEVENTS1103}slave", "0", "1"));
 
