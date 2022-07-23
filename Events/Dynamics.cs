@@ -576,7 +576,7 @@ namespace CaptivityEvents.Events
                             MobileParty partyBelongedTo2 = firstHero.PartyBelongedTo;
                             if (partyBelongedTo2 != null)
                             {
-                                partyBelongedTo2.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                                partyBelongedTo2.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default, 0);
                             }
                         }
                     }
@@ -804,10 +804,49 @@ namespace CaptivityEvents.Events
             }
         }
 
+        internal void CEWoundPrisoners(PartyBase party, int amount = 10)
+        {
+            try
+            {
+                if (amount == 0) return;
+                int prisonerCount = party.PrisonRoster.Count;
+                if (prisonerCount < amount) amount = prisonerCount;
+                party.PrisonRoster.WoundNumberOfTroopsRandomly(amount);
+                TextObject textObject = GameTexts.FindText("str_CE_wound_prisoners");
+                textObject.SetTextVariable("HERO", party.Name);
+                textObject.SetTextVariable("AMOUNT", amount);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Couldn't wound any prisoners.");
+            }
+        }
+
+        internal void CEKillPrisoners(PartyBase party, int amount = 10, bool killHeroes = false)
+        {
+            try
+            {
+                if (amount == 0) return;
+                int prisonerCount = party.PrisonRoster.Count;
+                if (prisonerCount < amount) amount = prisonerCount;
+                party.PrisonRoster.KillNumberOfMenRandomly(amount, killHeroes);
+                TextObject textObject = GameTexts.FindText("str_CE_kill_prisoners");
+                textObject.SetTextVariable("HERO", party.Name);
+                textObject.SetTextVariable("AMOUNT", amount);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Couldn't kill any prisoners.");
+            }
+        }
+
         internal void CEWoundTroops(PartyBase party, int amount = 10)
         {
             try
             {
+                if (amount == 0) return;
                 int prisonerCount = party.MemberRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
                 party.MemberRoster.WoundNumberOfTroopsRandomly(amount);
@@ -826,6 +865,7 @@ namespace CaptivityEvents.Events
         {
             try
             {
+                if (amount == 0) return;
                 int prisonerCount = party.MemberRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
                 party.MemberRoster.KillNumberOfMenRandomly(amount, killHeroes);

@@ -220,7 +220,7 @@ namespace CaptivityEvents.Brothel
         // Brothel District Menu
         private static bool CheckAndOpenNextLocation(MenuCallbackArgs args)
         {
-            if (Campaign.Current.GameMenuManager.NextLocation == null || !(GameStateManager.Current.ActiveState is MapState)) return false;
+            if (Campaign.Current.GameMenuManager.NextLocation == null || GameStateManager.Current.ActiveState is not MapState) return false;
 
             try
             {
@@ -1690,7 +1690,7 @@ namespace CaptivityEvents.Brothel
                                 captive.HeroObject.IsNoble = true;
 #endif
                                 MobileParty.MainParty.PrisonRoster.AddToCounts(captive, 1, true);
-                                EndCaptivityAction.ApplyByReleasing(captive.HeroObject, heroReleased);
+                                EndCaptivityAction.ApplyByReleasedByChoice(captive.HeroObject, heroReleased);
                             }
                         }
                     }

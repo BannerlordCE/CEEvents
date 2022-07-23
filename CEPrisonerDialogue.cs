@@ -113,7 +113,7 @@ namespace CaptivityEvents
         private bool ConversationCECustomScenesOnCondition(string SceneName, bool alwaysShow = false)
         {
             CharacterObject conversation = CharacterObject.OneToOneConversationCharacter;
-            return alwaysShow ? true : conversation.StringId == "CECustomStringId_" + SceneName;
+            return alwaysShow || conversation.StringId == "CECustomStringId_" + SceneName;
         }
 
 
@@ -161,7 +161,7 @@ namespace CaptivityEvents
         {
             if (Hero.OneToOneConversationHero.IsPrisoner)
             {
-                EndCaptivityAction.ApplyByReleasedByPlayerAfterBattle(Hero.OneToOneConversationHero, Hero.MainHero, null);
+                EndCaptivityAction.ApplyByReleasedAfterBattle(Hero.OneToOneConversationHero);
             }
             _dynamics.RelationsModifier(CharacterObject.OneToOneConversationCharacter.HeroObject, 4, null, true, true);
             DialogHelper.SetDialogString("DEFEAT_LORD_ANSWER", "str_prisoner_released");

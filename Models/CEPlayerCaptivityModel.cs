@@ -53,7 +53,7 @@ namespace CaptivityEvents.Models
 
             if (Hero.MainHero.Age < 18f)
             {
-                EndCaptivityAction.ApplyByReleasing(Hero.MainHero);
+                EndCaptivityAction.ApplyByReleasedByChoice(Hero.MainHero);
                 InformationManager.DisplayMessage(new InformationMessage(("Invalid Age: " + Hero.MainHero.Age), Colors.Gray));
                 CECustomHandler.ForceLogToFile("Underaged Player Detected. Age: " + Hero.MainHero.Age);
                 return "menu_captivity_end_by_party_removed";

@@ -276,6 +276,7 @@ namespace CaptivityEvents.Events
             _sharedCallBackHelper.ConsequenceDelayedEvent();
             _sharedCallBackHelper.ConsequenceMission();
             _sharedCallBackHelper.ConsequenceTeleportPlayer();
+            _sharedCallBackHelper.ConsequenceDamageParty(PlayerCaptivity.CaptorParty);
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor) && PlayerCaptivity.CaptorParty.NumberOfAllMembers == 1)
             {

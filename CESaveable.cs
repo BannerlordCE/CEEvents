@@ -15,19 +15,19 @@ namespace CaptivityEvents
 
         protected override void DefineClassTypes()
         {
-            AddClassDefinition(typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), 1);
-            AddClassDefinition(typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssueQuest), 2);
-            AddClassDefinition(typeof(CECampaignBehavior.Pregnancy), 3);
-            AddClassDefinition(typeof(CESkills), 4);
-            AddClassDefinition(typeof(CECaptorMapNotification), 5);
+            AddClassDefinition(typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), 1, null);
+            AddClassDefinition(typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssueQuest), 2, null);
+            AddClassDefinition(typeof(CECampaignBehavior.Pregnancy), 3, null);
+            AddClassDefinition(typeof(CESkills), 4, null);
+            AddClassDefinition(typeof(CECaptorMapNotification), 5, null);
             // VM ONCE SAVEDATA CRASHES REFER TO TALEWORLD'S SAVE DEFINER ISSUE
-            AddClassDefinition(typeof(CECaptorMapNotificationItemVM), 6);
-            AddClassDefinition(typeof(CECampaignBehavior.ReturnEquipment), 7);
-            AddClassDefinition(typeof(CEEventMapNotification), 8);
+            AddClassDefinition(typeof(CECaptorMapNotificationItemVM), 6, null);
+            AddClassDefinition(typeof(CECampaignBehavior.ReturnEquipment), 7, null);
+            AddClassDefinition(typeof(CEEventMapNotification), 8, null);
             // VM ONCE SAVEDATA CRASHES REFER TO TALEWORLD'S SAVE DEFINER ISSUE
-            AddClassDefinition(typeof(CEEventMapNotificationItemVM), 9);
-            AddClassDefinition(typeof(CECampaignBehavior.ExtraVariables), 10);
-            AddClassDefinition(typeof(CEBrothel), 11);
+            AddClassDefinition(typeof(CEEventMapNotificationItemVM), 9, null);
+            AddClassDefinition(typeof(CECampaignBehavior.ExtraVariables), 10, null);
+            AddClassDefinition(typeof(CEBrothel), 11, null);
         }
 
         protected override void DefineContainerDefinitions()

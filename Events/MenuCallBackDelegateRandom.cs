@@ -246,10 +246,11 @@ namespace CaptivityEvents.Events
             _sharedCallBackHelper.ConsequenceDelayedEvent();
             _sharedCallBackHelper.ConsequenceMission();
             _sharedCallBackHelper.ConsequenceTeleportPlayer();
+            _sharedCallBackHelper.ConsequenceDamageParty(PartyBase.MainParty);
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor))
             {
-                _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
+                _dynamics.CEKillPlayer(null);
             }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
             {

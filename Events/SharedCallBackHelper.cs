@@ -37,6 +37,7 @@ namespace CaptivityEvents.Events
 
         private readonly Dynamics _dynamics = new();
         private readonly ScoresCalculation _score = new();
+        private readonly CEVariablesLoader _variableLoader = new();
 
         public SharedCallBackHelper(CEEvent listedEvent, Option option, List<CEEvent> eventList)
         {
@@ -89,8 +90,8 @@ namespace CaptivityEvents.Events
             {
                 int level = 0;
 
-                if (!string.IsNullOrEmpty(_option.GoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.GoldTotal);
-                else if (!string.IsNullOrEmpty(_listedEvent.GoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.GoldTotal);
+                if (!string.IsNullOrEmpty(_option.GoldTotal)) level = _variableLoader.GetIntFromXML(_option.GoldTotal);
+                else if (!string.IsNullOrEmpty(_listedEvent.GoldTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.GoldTotal);
                 else CECustomHandler.LogToFile("Missing GoldTotal");
 
                 GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, level);
@@ -110,8 +111,8 @@ namespace CaptivityEvents.Events
                         int xp = 0;
 
                         if (traitToLevel.Ref.ToLower() != "hero") continue;
-                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = _variableLoader.GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(traitToLevel.ByXP);
 
                         _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                     }
@@ -124,8 +125,8 @@ namespace CaptivityEvents.Events
                         int xp = 0;
 
                         if (traitToLevel.Ref.ToLower() != "hero") continue;
-                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = _variableLoader.GetIntFromXML(traitToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(traitToLevel.ByXP);
 
                         _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                     }
@@ -137,10 +138,10 @@ namespace CaptivityEvents.Events
                     int level = 0;
                     int xp = 0;
 
-                    if (!string.IsNullOrEmpty(_option.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.TraitTotal);
-                    else if (!string.IsNullOrEmpty(_option.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.TraitXPTotal);
-                    else if (!string.IsNullOrEmpty(_listedEvent.TraitTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitTotal);
-                    else if (!string.IsNullOrEmpty(_listedEvent.TraitXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.TraitXPTotal);
+                    if (!string.IsNullOrEmpty(_option.TraitTotal)) level = _variableLoader.GetIntFromXML(_option.TraitTotal);
+                    else if (!string.IsNullOrEmpty(_option.TraitXPTotal)) xp = _variableLoader.GetIntFromXML(_option.TraitXPTotal);
+                    else if (!string.IsNullOrEmpty(_listedEvent.TraitTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.TraitTotal);
+                    else if (!string.IsNullOrEmpty(_listedEvent.TraitXPTotal)) xp = _variableLoader.GetIntFromXML(_listedEvent.TraitXPTotal);
                     else CECustomHandler.LogToFile("Missing Trait TraitTotal");
 
                     if (!string.IsNullOrEmpty(_option.TraitToLevel)) _dynamics.TraitModifier(Hero.MainHero, _option.TraitToLevel, level, xp);
@@ -163,8 +164,8 @@ namespace CaptivityEvents.Events
                         int xp = 0;
 
                         if (skillToLevel.Ref.ToLower() != "hero") continue;
-                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
 
                         new Dynamics().SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }
@@ -177,8 +178,8 @@ namespace CaptivityEvents.Events
                         int xp = 0;
 
                         if (skillToLevel.Ref.ToLower() != "hero") continue;
-                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
+                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
 
                         new Dynamics().SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }
@@ -190,10 +191,10 @@ namespace CaptivityEvents.Events
                     int level = 0;
                     int xp = 0;
 
-                    if (!string.IsNullOrWhiteSpace(_option.SkillTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.SkillTotal);
-                    else if (!string.IsNullOrWhiteSpace(_option.SkillXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_option.SkillXPTotal);
-                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.SkillTotal);
-                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillXPTotal)) xp = new CEVariablesLoader().GetIntFromXML(_listedEvent.SkillXPTotal);
+                    if (!string.IsNullOrWhiteSpace(_option.SkillTotal)) level = _variableLoader.GetIntFromXML(_option.SkillTotal);
+                    else if (!string.IsNullOrWhiteSpace(_option.SkillXPTotal)) xp = _variableLoader.GetIntFromXML(_option.SkillXPTotal);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.SkillTotal);
+                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillXPTotal)) xp = _variableLoader.GetIntFromXML(_listedEvent.SkillXPTotal);
                     else CECustomHandler.LogToFile("Missing Skill SkillTotal");
 
                     if (!string.IsNullOrWhiteSpace(_option.SkillToLevel)) new Dynamics().SkillModifier(Hero.MainHero, _option.SkillToLevel, level, xp);
@@ -210,8 +211,8 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (!string.IsNullOrEmpty(_option.SlaveryTotal)) { _dynamics.VictimSlaveryModifier(new CEVariablesLoader().GetIntFromXML(_option.SlaveryTotal), Hero.MainHero); }
-                else if (!string.IsNullOrEmpty(_listedEvent.SlaveryTotal)) { _dynamics.VictimSlaveryModifier(new CEVariablesLoader().GetIntFromXML(_listedEvent.SlaveryTotal), Hero.MainHero); }
+                if (!string.IsNullOrEmpty(_option.SlaveryTotal)) { _dynamics.VictimSlaveryModifier(_variableLoader.GetIntFromXML(_option.SlaveryTotal), Hero.MainHero); }
+                else if (!string.IsNullOrEmpty(_listedEvent.SlaveryTotal)) { _dynamics.VictimSlaveryModifier(_variableLoader.GetIntFromXML(_listedEvent.SlaveryTotal), Hero.MainHero); }
                 else
                 {
                     CECustomHandler.LogToFile("Missing SlaveryTotal");
@@ -236,8 +237,8 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (!string.IsNullOrEmpty(_option.ProstitutionTotal)) { _dynamics.VictimProstitutionModifier(new CEVariablesLoader().GetIntFromXML(_option.ProstitutionTotal), Hero.MainHero); }
-                else if (!string.IsNullOrEmpty(_listedEvent.ProstitutionTotal)) { _dynamics.VictimProstitutionModifier(new CEVariablesLoader().GetIntFromXML(_listedEvent.ProstitutionTotal), Hero.MainHero); }
+                if (!string.IsNullOrEmpty(_option.ProstitutionTotal)) { _dynamics.VictimProstitutionModifier(_variableLoader.GetIntFromXML(_option.ProstitutionTotal), Hero.MainHero); }
+                else if (!string.IsNullOrEmpty(_listedEvent.ProstitutionTotal)) { _dynamics.VictimProstitutionModifier(_variableLoader.GetIntFromXML(_listedEvent.ProstitutionTotal), Hero.MainHero); }
                 else
                 {
                     CECustomHandler.LogToFile("Missing ProstitutionTotal");
@@ -278,8 +279,8 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (!string.IsNullOrEmpty(_option.RenownTotal)) { _dynamics.RenownModifier(new CEVariablesLoader().GetIntFromXML(_option.RenownTotal), Hero.MainHero); }
-                else if (!string.IsNullOrEmpty(_listedEvent.RenownTotal)) { _dynamics.RenownModifier(new CEVariablesLoader().GetIntFromXML(_listedEvent.RenownTotal), Hero.MainHero); }
+                if (!string.IsNullOrEmpty(_option.RenownTotal)) { _dynamics.RenownModifier(_variableLoader.GetIntFromXML(_option.RenownTotal), Hero.MainHero); }
+                else if (!string.IsNullOrEmpty(_listedEvent.RenownTotal)) { _dynamics.RenownModifier(_variableLoader.GetIntFromXML(_listedEvent.RenownTotal), Hero.MainHero); }
                 else
                 {
                     CECustomHandler.LogToFile("Missing RenownTotal");
@@ -295,8 +296,8 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (!string.IsNullOrEmpty(_option.HealthTotal)) { Hero.MainHero.HitPoints += new CEVariablesLoader().GetIntFromXML(_option.HealthTotal); }
-                else if (!string.IsNullOrEmpty(_listedEvent.HealthTotal)) { Hero.MainHero.HitPoints += new CEVariablesLoader().GetIntFromXML(_listedEvent.HealthTotal); }
+                if (!string.IsNullOrEmpty(_option.HealthTotal)) { Hero.MainHero.HitPoints += _variableLoader.GetIntFromXML(_option.HealthTotal); }
+                else if (!string.IsNullOrEmpty(_listedEvent.HealthTotal)) { Hero.MainHero.HitPoints += _variableLoader.GetIntFromXML(_listedEvent.HealthTotal); }
                 else
                 {
                     CECustomHandler.LogToFile("Invalid HealthTotal");
@@ -316,8 +317,8 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (!string.IsNullOrEmpty(_option.MoraleTotal)) { _dynamics.MoraleChange(new CEVariablesLoader().GetIntFromXML(_option.MoraleTotal), party); }
-                else if (!string.IsNullOrEmpty(_listedEvent.MoraleTotal)) { _dynamics.MoraleChange(new CEVariablesLoader().GetIntFromXML(_listedEvent.MoraleTotal), party); }
+                if (!string.IsNullOrEmpty(_option.MoraleTotal)) { _dynamics.MoraleChange(_variableLoader.GetIntFromXML(_option.MoraleTotal), party); }
+                else if (!string.IsNullOrEmpty(_listedEvent.MoraleTotal)) { _dynamics.MoraleChange(_variableLoader.GetIntFromXML(_listedEvent.MoraleTotal), party); }
                 else
                 {
                     CECustomHandler.LogToFile("Missing MoralTotal");
@@ -742,8 +743,8 @@ namespace CaptivityEvents.Events
                             {
                                 try
                                 {
-                                    int num = new CEVariablesLoader().GetIntFromXML(troop.Number);
-                                    int numWounded = new CEVariablesLoader().GetIntFromXML(troop.WoundedNumber);
+                                    int num = _variableLoader.GetIntFromXML(troop.Number);
+                                    int numWounded = _variableLoader.GetIntFromXML(troop.WoundedNumber);
                                     CharacterObject characterObject = null;
 
                                     if (troop.Id != null && troop.Id.ToLower() == "random")
@@ -834,7 +835,7 @@ namespace CaptivityEvents.Events
                             if (!CEPersistence.playerTroops.IsEmpty())
                             {
                                 List<CharacterObject> list = new();
-                                int num = new CEVariablesLoader().GetIntFromXML(_option.BattleSettings.PlayerTroops);
+                                int num = _variableLoader.GetIntFromXML(_option.BattleSettings.PlayerTroops);
                                 foreach (TroopRosterElement troopRosterElement in from t in CEPersistence.playerTroops
                                                                                   orderby t.Character.Level descending
                                                                                   select t)
@@ -1118,6 +1119,33 @@ namespace CaptivityEvents.Events
             };
         }
 
+        internal void ConsequenceDamageParty(PartyBase party)
+        {
+            if (_option.DamageParty != null) return;
+
+            try
+            {
+                DamageParty DamageParty = _option.DamageParty;
+
+                if (DamageParty.Ref == "Troop")
+                {
+                    _dynamics.CEWoundTroops(party, _variableLoader.GetIntFromXML(DamageParty.WoundedNumber));
+                    _dynamics.CEKillTroops(party, _variableLoader.GetIntFromXML(DamageParty.Number), DamageParty.IncludeHeroes.ToLower() == "true");
+                }
+                else if (DamageParty.Ref == "Prisoner")
+                {
+                    _dynamics.CEWoundPrisoners(party, _variableLoader.GetIntFromXML(DamageParty.WoundedNumber));
+                    _dynamics.CEKillPrisoners(party, _variableLoader.GetIntFromXML(DamageParty.Number), DamageParty.IncludeHeroes.ToLower() == "true");
+                }
+
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("ConsquenceDamageParty Failed: " + e);
+            }
+
+        }
+
         internal void ConsequenceTeleportPlayer()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.TeleportPlayer)) return;
@@ -1127,6 +1155,10 @@ namespace CaptivityEvents.Events
                 if (_option.TeleportSettings != null)
                 {
                     teleportSettings = _option.TeleportSettings;
+                } 
+                else
+                {
+                    CECustomHandler.ForceLogToFile("ConsequenceTeleportPlayer Failed: Missing TeleportSettings");
                 }
 
                 Settlement nearest;
@@ -1427,7 +1459,7 @@ namespace CaptivityEvents.Events
 
                                 try
                                 {
-                                    weightedChance = new CEVariablesLoader().GetIntFromXML(!string.IsNullOrWhiteSpace(background.Weight)
+                                    weightedChance = _variableLoader.GetIntFromXML(!string.IsNullOrWhiteSpace(background.Weight)
                                                                                   ? background.Weight
                                                                                   : triggeredEvent.WeightedChanceOfOccuring);
                                 }
@@ -1437,7 +1469,7 @@ namespace CaptivityEvents.Events
                             {
                                 try
                                 {
-                                    weightedChance = new CEVariablesLoader().GetIntFromXML(background.Weight);
+                                    weightedChance = _variableLoader.GetIntFromXML(background.Weight);
                                 }
                                 catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
                             }
@@ -1492,7 +1524,7 @@ namespace CaptivityEvents.Events
 
                         try
                         {
-                            if (!string.IsNullOrWhiteSpace(_listedEvent.BackgroundAnimationSpeed)) speed = new CEVariablesLoader().GetFloatFromXML(_listedEvent.BackgroundAnimationSpeed);
+                            if (!string.IsNullOrWhiteSpace(_listedEvent.BackgroundAnimationSpeed)) speed = _variableLoader.GetFloatFromXML(_listedEvent.BackgroundAnimationSpeed);
                         }
                         catch (Exception e)
                         {

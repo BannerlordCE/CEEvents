@@ -542,7 +542,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-                EndCaptivityAction.ApplyByReleasing(hero);
+                EndCaptivityAction.ApplyByReleasedByChoice(hero);
             }
             catch (Exception e)
             {

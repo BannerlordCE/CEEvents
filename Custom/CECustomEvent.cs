@@ -307,6 +307,25 @@ namespace CaptivityEvents.Custom
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = "", IsNullable = true)]
     [Serializable]
+    public class DamageParty
+    {
+        [XmlAttribute()]
+        public string Number { get; set; }
+
+        [XmlAttribute()]
+        public string WoundedNumber { get; set; }
+
+        [XmlAttribute()]
+        public string IncludeHeroes { get; set; }
+
+        [XmlAttribute()]
+        public string Ref { get; set; }
+    }
+
+    [DebuggerStepThrough]
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = true)]
+    [Serializable]
     public class TeleportSettings
     {
         [XmlAttribute()]
@@ -736,6 +755,8 @@ namespace CaptivityEvents.Custom
 
         [XmlElement("SceneSettings", IsNullable = true)]
         public SceneSettings SceneSettings { get; set; }
+
+        public DamageParty DamageParty { get; set; }
 
         [XmlElement("DelayEvent", IsNullable = true)]
         public DelayEvent DelayEvent { get; set; }
