@@ -1176,6 +1176,9 @@ namespace CaptivityEvents
 
                             if (CESettingsIntegrations.Instance != null && CESettingsIntegrations.Instance.ActivateHotButter)
                             {
+                                brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelFadeOut;
+                                Mission.Current.MainAgentServer.Controller = Agent.ControllerType.Player;
+                                CEPersistence.brothelState = CEPersistence.BrothelState.FadeOut;
                                 try
                                 {
                                     string sceneToPlay = CEHelper.CustomSceneToPlay("scn_pompa_$location_culture_$location_$randomize", PartyBase.MainParty);
