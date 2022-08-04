@@ -425,10 +425,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Bannerlord.MCM">
-      <Version>4.7.3</Version>
+      <Version>4.7.7</Version>
     </PackageReference>
     <PackageReference Include="Lib.Harmony">
-      <Version>2.2.1</Version>
+      <Version>2.2.2</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

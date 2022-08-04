@@ -723,6 +723,8 @@ namespace CaptivityEvents.Custom
 
         public string SkillXPTotal { get; set; }
 
+        public string SceneToPlay { get; set; }
+
         [XmlElement(Form = XmlSchemaForm.Unqualified)]
         public string TriggerEventName { get; set; }
 

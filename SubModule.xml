@@ -11,7 +11,7 @@
     <DependedModule Id="Sandbox" DependentVersion="e1.8.0" />
     <DependedModule Id="CustomBattle" DependentVersion="e1.8.0" />
     <DependedModule Id="StoryMode" DependentVersion="e1.8.0" />
-    <DependedModule Id="Bannerlord.MBOptionScreen" DependentVersion="v4.7.3" Optional="true"/>
+    <DependedModule Id="Bannerlord.MBOptionScreen" DependentVersion="v4.7.7" Optional="true"/>
   </DependedModules>
 
   <SubModules>

@@ -11,7 +11,6 @@ using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-using TaleWorlds.CampaignSystem.SceneInformationPopupTypes;
 
 #if V172
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
@@ -58,7 +57,7 @@ namespace CaptivityEvents.Notifications
                 }
             }
         }
-
+             
         private void OnRandomNotificationInspect()
         {
             CEHelper.notificationEventExists = false;
@@ -75,12 +74,6 @@ namespace CaptivityEvents.Notifications
                 }
 
                 Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-
-                if (_randomEvent.SceneToPlay != null)
-                {
-                    CESceneNotification data = new(null, Hero.MainHero, _randomEvent.SceneToPlay);
-                    MBInformationManager.ShowSceneNotification(data);
-                }
 
                 if (!mapState.AtMenu)
                 {

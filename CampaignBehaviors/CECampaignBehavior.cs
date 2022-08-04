@@ -331,6 +331,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     : CEHelper.spouseOne;
                 CECustomHandler.ForceLogToFile("Added " + hero.Name + "'s Pregnancy");
                 _heroPregnancies.Add(new Pregnancy(hero, father, CampaignTime.DaysFromNow(CESettings.Instance?.PregnancyDurationInDays ?? 14f)));
+                ChangeMenu(0);
             }
             catch (Exception e)
             {
@@ -856,6 +857,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     else
                     {
                         item.AlreadyOccured = true;
+                        ChangeMenu(0);
                     }
                 });
 

@@ -26,6 +26,7 @@ using TaleWorlds.CampaignSystem.Party.PartyComponents;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.GameMenus;
+using CaptivityEvents.Notifications;
 
 namespace CaptivityEvents.Events
 {
@@ -47,6 +48,46 @@ namespace CaptivityEvents.Events
         }
 
         #region Consequences
+
+        internal void ConsequencePlayScene()
+        {
+            if (_listedEvent.SceneToPlay != null || _option.SceneToPlay != null)
+            {
+                bool isCaptive = _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive);
+                bool isRandom = _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random);
+                bool isCaptor = _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor);
+
+                PartyBase party = isCaptive
+                     ? PlayerCaptivity.CaptorParty //captive
+                     : PartyBase.MainParty; //random, captor
+
+                CharacterObject character1 = (isCaptive || isRandom) ? Hero.MainHero.IsFemale ? Hero.MainHero.CharacterObject : null : _listedEvent.Captive?.IsFemale ?? false ? _listedEvent.Captive : null;
+                CharacterObject character2 = (isCaptive || isRandom) ? !Hero.MainHero.IsFemale ? Hero.MainHero.CharacterObject : null : !_listedEvent.Captive?.IsFemale ?? false ? _listedEvent.Captive : null;
+
+                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationByPlayer))
+                {
+                    character1 ??= Hero.MainHero.CharacterObject;
+                    character2 = character1 != Hero.MainHero.CharacterObject ? Hero.MainHero.CharacterObject : character2;
+                }
+
+                if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationHero))
+                {
+                    character1 ??= party.LeaderHero.CharacterObject;
+                    character2 = character1 != party.LeaderHero.CharacterObject ? party.LeaderHero.CharacterObject : character2;
+                }
+
+                try
+                {
+                    string sceneToPlay = CEHelper.CustomSceneToPlay(_option.SceneToPlay ?? _listedEvent.SceneToPlay, party);
+                    CESceneNotification data = new(character2, character1, sceneToPlay);
+                    MBInformationManager.ShowSceneNotification(data);
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Invalid ConsequencePlayScene");
+                }
+            }
+        }
 
         internal void ConsequenceXP()
         {
@@ -1121,7 +1162,7 @@ namespace CaptivityEvents.Events
 
         internal void ConsequenceDamageParty(PartyBase party)
         {
-            if (_option.DamageParty != null) return;
+            if (_option.DamageParty == null) return;
 
             try
             {

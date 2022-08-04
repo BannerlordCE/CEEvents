@@ -38,6 +38,7 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
 using System.Xml;
+using CaptivityEvents.Notifications;
 
 
 #if V172
@@ -1172,6 +1173,19 @@ namespace CaptivityEvents
                                 Mission.Current.MainAgent.TeleportToPosition(CEPersistence.gameEntity.GlobalPosition);
                             }
                             CEPersistence.brothelState = CEPersistence.BrothelState.Black;
+
+                            if (CESettingsIntegrations.Instance != null && CESettingsIntegrations.Instance.ActivateHotButter)
+                            {
+                                try
+                                {
+                                    string sceneToPlay = CEHelper.CustomSceneToPlay("scn_pompa_$location_culture_$location_$randomize", PartyBase.MainParty);
+                                    CESceneNotification data = new(Hero.MainHero.IsFemale ? CharacterObject.Find(CEPersistence.agentTalkingTo.Character.StringId) : Hero.MainHero.CharacterObject, !Hero.MainHero.IsFemale ? CharacterObject.Find(CEPersistence.agentTalkingTo.Character.StringId) : Hero.MainHero.CharacterObject, sceneToPlay);
+                                    MBInformationManager.ShowSceneNotification(data);
+                                } catch (Exception e)
+                                {
+                                    CECustomHandler.ForceLogToFile("FadeIn: " + e);
+                                }
+                            }
                         }
 
                         break;
@@ -1183,7 +1197,7 @@ namespace CaptivityEvents
                             Mission.Current.MainAgentServer.Controller = Agent.ControllerType.Player;
                             CEPersistence.brothelState = CEPersistence.BrothelState.FadeOut;
                         }
-                        else if (brothelTimerTwo < missionStateBrothel.CurrentMission.CurrentTime)
+                        else if (brothelTimerTwo < missionStateBrothel.CurrentMission.CurrentTime && (CESettingsIntegrations.Instance == null || !CESettingsIntegrations.Instance.ActivateHotButter))
                         {
                             brothelTimerTwo = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
 
@@ -1194,7 +1208,7 @@ namespace CaptivityEvents
                             }
                             catch (Exception) { }
                         }
-                        else if (brothelTimerThree < missionStateBrothel.CurrentMission.CurrentTime)
+                        else if (brothelTimerThree < missionStateBrothel.CurrentMission.CurrentTime && (CESettingsIntegrations.Instance == null || !CESettingsIntegrations.Instance.ActivateHotButter))
                         {
                             brothelTimerThree = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
 
