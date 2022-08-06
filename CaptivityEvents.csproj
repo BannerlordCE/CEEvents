@@ -117,6 +117,8 @@
     <Compile Include="Helper\CEHelper.cs" />
     <Compile Include="Notifications\CESceneNotification.cs" />
     <Compile Include="Patches\CEPatchAttributes.cs" />
+    <Compile Include="Patches\CEPatchBasicCharacterObject.cs" />
+    <Compile Include="Patches\CEPatchCharacterObject.cs" />
     <Compile Include="Patches\CEPatchClanIncomeVM.cs" />
     <Compile Include="Patches\CEPatchDefaultClanFinanceModel.cs" />
     <Compile Include="Patches\CEPatchGameMenu.cs" />

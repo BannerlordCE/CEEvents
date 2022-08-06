@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using TaleWorlds.CampaignSystem;
+using static CaptivityEvents.CampaignBehaviors.CECampaignBehavior;
 
 namespace CaptivityEvents.Custom
 {
@@ -79,7 +80,9 @@ namespace CaptivityEvents.Custom
         CaptorLeaveSpouse,
         TeleportPlayer,
         KillRandomTroops,
-        WoundRandomTroops
+        WoundRandomTroops,
+        GiveBirth,
+        Abort
     }
 
     [XmlType(AnonymousType = true)]
@@ -90,6 +93,7 @@ namespace CaptivityEvents.Custom
         WaitingMenu,
         ProgressMenu,
         CanOnlyBeTriggeredByOtherEvent,
+        BirthAlternative,
         Common,
         Femdom,
         Bestiality,
@@ -989,6 +993,9 @@ namespace CaptivityEvents.Custom
 
         [XmlIgnore]
         public string OldWeightedChanceOfOccuring { get; set; }
+
+        [XmlIgnore]
+        public Pregnancy Pregnancy { get; set; }
     }
 
     [DebuggerStepThrough]

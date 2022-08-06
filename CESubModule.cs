@@ -90,6 +90,7 @@ namespace CaptivityEvents
         public static List<CEEvent> CEEvents = new();
 
         public static List<CEEvent> CEEventList = new();
+        public static List<CEEvent> CEAlternativePregnancyEvents = new();
         public static List<CEEvent> CEWaitingList = new();
         public static List<CEEvent> CECallableEvents = new();
 
@@ -581,7 +582,11 @@ namespace CaptivityEvents
                         CEHelper.brothelFlagMale = true;
                 }
 
-                if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
+                if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BirthAlternative))
+                {
+                    CEPersistence.CEAlternativePregnancyEvents.Add(_listedEvent);
+                }
+                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
                 {
                     CEPersistence.CEWaitingList.Add(_listedEvent);
                 }
@@ -661,12 +666,12 @@ namespace CaptivityEvents
             CEConsole.CleanSave(new List<string>());
             base.OnNewGameCreated(game, initializerObject);
         }
-        
-        
+
+
         protected override void OnGameStart(Game game, IGameStarter gameStarter)
         {
-            if (!(game.GameType is Campaign)) return;
-            CheckBugIssue();
+            if (game.GameType is not Campaign) return;
+            CleanBugs();
             ResetHelper();
             if (!_isLoaded) return;
 #if V172
@@ -678,13 +683,18 @@ namespace CaptivityEvents
             AddBehaviours(campaignStarter);
         }
 
-        private void CheckBugIssue()
+        private void CleanBugs()
+        {
+            CheckEncounterIssue();
+        }
+
+        private void CheckEncounterIssue()
         {
             try
             {
                 if (PlayerEncounter.Current == null) return;
                 if (PlayerEncounter.EncounteredMobileParty == null) return;
-                if (!PlayerEncounter.EncounteredMobileParty.StringId.StartsWith("CustomPartyHuntCE_")) return;
+                if (!PlayerEncounter.EncounteredMobileParty.StringId.StartsWith("CustomPartyCE_Hunt_")) return;
                 CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
             }
             catch (Exception)
@@ -716,7 +726,7 @@ namespace CaptivityEvents
             if (dailyTickHeroEvent != null)
             {
                 dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerReleaseCampaignBehavior>());
-                if ((CESettings.Instance?.EscapeAutoRansom?.SelectedIndex ?? 0)  != 2) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
+                if ((CESettings.Instance?.EscapeAutoRansom?.SelectedIndex ?? 0) != 2) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
             }
 
             IMbEvent<MobileParty> hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
@@ -775,7 +785,7 @@ namespace CaptivityEvents
                 if (list[i] is TBaseType)
                 {
                     flag = true;
-                    if (!(list[i] is TChildType)) list[i] = Activator.CreateInstance<TChildType>();
+                    if (list[i] is not TChildType) list[i] = Activator.CreateInstance<TChildType>();
                 }
             }
 
@@ -792,7 +802,7 @@ namespace CaptivityEvents
                 if (list[i] is TBaseType)
                 {
                     flag = true;
-                    if (!(list[i] is TChildType)) list[i] = Activator.CreateInstance<TChildType>();
+                    if (list[i] is not TChildType) list[i] = Activator.CreateInstance<TChildType>();
                 }
             }
 
@@ -803,6 +813,9 @@ namespace CaptivityEvents
         {
             // Waiting Menu Load
             foreach (CEEvent waitingEvent in CEPersistence.CEWaitingList) AddEvent(gameStarter, waitingEvent, CEPersistence.CEEvents);
+
+            // Alternative Event Load 
+            foreach (CEEvent alternativeEvent in CEPersistence.CEAlternativePregnancyEvents) AddEvent(gameStarter, alternativeEvent, CEPersistence.CEEvents);
 
             // Listed Event Load
             foreach (CEEvent listedEvent in CEPersistence.CEEventList) AddEvent(gameStarter, listedEvent, CEPersistence.CEEvents);
@@ -1184,7 +1197,8 @@ namespace CaptivityEvents
                                     string sceneToPlay = CEHelper.CustomSceneToPlay("scn_pompa_$location_culture_$location_$randomize", PartyBase.MainParty);
                                     CESceneNotification data = new(Hero.MainHero.IsFemale ? CharacterObject.Find(CEPersistence.agentTalkingTo.Character.StringId) : Hero.MainHero.CharacterObject, !Hero.MainHero.IsFemale ? CharacterObject.Find(CEPersistence.agentTalkingTo.Character.StringId) : Hero.MainHero.CharacterObject, sceneToPlay);
                                     MBInformationManager.ShowSceneNotification(data);
-                                } catch (Exception e)
+                                }
+                                catch (Exception e)
                                 {
                                     CECustomHandler.ForceLogToFile("FadeIn: " + e);
                                 }

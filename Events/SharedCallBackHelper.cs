@@ -27,6 +27,7 @@ using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.GameMenus;
 using CaptivityEvents.Notifications;
+using static CaptivityEvents.CampaignBehaviors.CECampaignBehavior;
 
 namespace CaptivityEvents.Events
 {
@@ -80,7 +81,12 @@ namespace CaptivityEvents.Events
                 {
                     string sceneToPlay = CEHelper.CustomSceneToPlay(_option.SceneToPlay ?? _listedEvent.SceneToPlay, party);
                     CESceneNotification data = new(character2, character1, sceneToPlay);
+                    
                     MBInformationManager.ShowSceneNotification(data);
+                }
+                catch (System.Reflection.TargetInvocationException)
+                {
+                    CECustomHandler.LogToFile("Invalid ConsequencePlayScene");
                 }
                 catch (Exception)
                 {
@@ -138,6 +144,32 @@ namespace CaptivityEvents.Events
                 GiveGoldAction.ApplyBetweenCharacters(null, Hero.MainHero, level);
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
+        }
+
+        internal void ConsequenceGiveBirth()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveBirth)) return;
+
+            try
+            {
+                CheckOffspringsToDeliver(_listedEvent.Pregnancy);
+            }
+            catch (Exception e) { CECustomHandler.LogToFile("Invalid ConsequenceGiveBirth : " + e); }
+
+        }
+
+        internal void ConsequenceAbort()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Abort)) return;
+
+            try
+            {
+                _listedEvent.Pregnancy.Mother.IsPregnant = false;
+                _listedEvent.Pregnancy.AlreadyOccured = true;
+
+                ChangeWeight(_listedEvent.Pregnancy.Mother, 0, MBRandom.RandomFloatRanged(0.4025f, 0.6025f));
+            }
+            catch (Exception e) { CECustomHandler.LogToFile("Invalid ConsequenceAbort : " + e); }
         }
 
         internal void ConsequenceChangeTrait()
@@ -1196,7 +1228,7 @@ namespace CaptivityEvents.Events
                 if (_option.TeleportSettings != null)
                 {
                     teleportSettings = _option.TeleportSettings;
-                } 
+                }
                 else
                 {
                     CECustomHandler.ForceLogToFile("ConsequenceTeleportPlayer Failed: Missing TeleportSettings");
@@ -1325,7 +1357,7 @@ namespace CaptivityEvents.Events
                 {
                     if (_option.DelayEvent.TriggerEvents != null)
                     {
-                        foreach(TriggerEvent trigger in _option.DelayEvent.TriggerEvents)
+                        foreach (TriggerEvent trigger in _option.DelayEvent.TriggerEvents)
                         {
 
                             CEDelayedEvent delayedEvent = new(trigger.EventName, -1, trigger.EventUseConditions?.ToLower() != "true");
@@ -1343,7 +1375,7 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.ForceLogToFile("ConsequenceDelayedEvent Failed: " + e);
             }
-}
+        }
 
         internal void ConsequenceMission()
         {

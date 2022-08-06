@@ -243,6 +243,8 @@ namespace CaptivityEvents.Events
             ConsequenceWoundTroops();
             ConsequenceKillTroops();
 
+            _sharedCallBackHelper.ConsequenceGiveBirth();
+            _sharedCallBackHelper.ConsequenceAbort();
             _sharedCallBackHelper.ConsequencePlayScene();
             _sharedCallBackHelper.ConsequenceDelayedEvent();
             _sharedCallBackHelper.ConsequenceMission();
