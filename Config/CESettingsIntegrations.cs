@@ -32,6 +32,8 @@ namespace CaptivityEvents.Config
         {
             bool shouldRegister = false;
 
+
+
             ModuleInfo KLBShackles = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "KLBShackles"; });
             ModuleInfo HotButter = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "hotbutterscenes" || searchInfo.Id == "hotbutter"; });
             ModuleInfo PrimaeNoctisBLord = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "PrimaeNoctisBLord"; });
@@ -49,20 +51,18 @@ namespace CaptivityEvents.Config
                 {
                     if (KLBShackles != null)
                     {
-                        groupBuilder.AddBool("KLBShackles", "KLBShackles (Slave Gear)", new ProxyRef<bool>(() => ActivateKLBShackles, o => ActivateKLBShackles = o), boolBuilder => boolBuilder.SetHintText("Enables equipment of slave gear on player-as-captive.").SetRequireRestart(false));
+                        groupBuilder.AddBool("KLBShackles", "KLBShackles (Slave Gear)", new ProxyRef<bool>(() => ActivateKLBShackles, o => ActivateKLBShackles = o), boolBuilder => boolBuilder.SetHintText("Enables equipment of slave gear on player-as-captive. (Make sure to double check if the extension is turned on in the launcher)").SetRequireRestart(false));
                     }
 
                     if (PrimaeNoctisBLord != null)
                     {
-                        groupBuilder.AddBool("PrimaeNoctisBLord", "Primae Noctis (Laws and Stats)", new ProxyRef<bool>(() => ActivatePrimaeNoctisBLord, o => ActivatePrimaeNoctisBLord = o), boolBuilder => boolBuilder.SetHintText("Enables Laws to have a effect on the captivity and stats for sex.").SetRequireRestart(false));
-                    }
+                        groupBuilder.AddBool("PrimaeNoctisBLord", "Primae Noctis (Laws and Stats)", new ProxyRef<bool>(() => ActivatePrimaeNoctisBLord, o => ActivatePrimaeNoctisBLord = o), boolBuilder => boolBuilder.SetHintText("Enables Laws to have a effect on the captivity and stats for sex. (Make sure to double check if the extension is turned on in the launcher)").SetRequireRestart(false));
+                    } 
 
                     if (HotButter != null)
                     {
-
-                        groupBuilder.AddBool("HotButter", "Hot Butter (Animated Scenes)", new ProxyRef<bool>(() => ActivateHotButter, o => ActivateHotButter = o), boolBuilder => boolBuilder.SetHintText("Enables Custom Sex Scenes in Brothel/Other.").SetRequireRestart(false));
-
-                    }
+                        groupBuilder.AddBool("HotButter", "Hot Butter (Animated Scenes)", new ProxyRef<bool>(() => ActivateHotButter, o => ActivateHotButter = o), boolBuilder => boolBuilder.SetHintText("Enables Custom Sex Scenes in Brothel/Other.  (Make sure to double check if the extension is turned on in the launcher)").SetRequireRestart(false));
+                    } 
                 });
 
                 if (_settings != null) _settings.Unregister();
