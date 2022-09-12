@@ -496,6 +496,7 @@ namespace CaptivityEvents.Events
             {
                 _dynamics.CEKillTroops(PartyBase.MainParty);
             }
+
             else
             {
             }
@@ -509,7 +510,7 @@ namespace CaptivityEvents.Events
                 TroopRoster enemyTroops = TroopRoster.CreateDummyTroopRoster();
 
                 // Make sure there is atleast one troop
-                CharacterObject characterObject1 = MBObjectManager.Instance.GetObjectTypeList<CharacterObject>().GetRandomElementWithPredicate(item => item.Occupation == Occupation.Soldier || item.Occupation == Occupation.Gangster);
+                CharacterObject characterObject1 = MBObjectManager.Instance.GetObjectTypeList<CharacterObject>().GetRandomElementWithPredicate(item => item.Occupation == Occupation.Soldier);
                 enemyTroops.AddToCounts(characterObject1, 1, false, 0, 0, true, -1);
 
                 foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())

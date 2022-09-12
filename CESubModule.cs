@@ -165,12 +165,14 @@ namespace CaptivityEvents
         // Last Check on Animation Loop
         private static float lastCheck;
 
+        // Timer for Hunting
+        private static float huntingTimerOne;
+
         // Fade out for Dungeon
         private static float dungeonFadeOut = 2f;
 
         // Timer for Brothel
         private static float brothelTimerOne;
-
         private static float brothelTimerTwo;
         private static float brothelTimerThree;
 
@@ -1268,7 +1270,7 @@ namespace CaptivityEvents
                     switch (CEPersistence.huntState)
                     {
                         case CEPersistence.HuntState.StartHunt:
-                            if (Mission.Current != null && Mission.Current.IsLoadingFinished && Mission.Current.CurrentTime > 2f && Mission.Current.Agents != null)
+                            if (Mission.Current != null && Mission.Current.IsLoadingFinished && Mission.Current.CurrentTime > 2f && Mission.Current.Agents != null && !Mission.Current.Agents.Any((item) => item.IsPaused))
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents.ToList()
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
@@ -1276,19 +1278,21 @@ namespace CaptivityEvents
                                 {
                                     ForceAgentDropEquipment(agent2);
                                 }
+                               
 
                                 // 1.5.1
                                 missionState.CurrentMission.ClearCorpses(false);
 
                                 CEHelper.AddQuickInformation(new TextObject("{=CEEVENTS1069}Let's give them a headstart."), 100, CharacterObject.PlayerCharacter);
+
                                 CEPersistence.huntState = CEPersistence.HuntState.HeadStart;
+                                huntingTimerOne = Mission.Current.CurrentTime + (CESettings.Instance?.HuntBegins ?? 7f);
                             }
 
                             break;
 
                         case CEPersistence.HuntState.HeadStart:
-                            if (Mission.Current != null && Mission.Current.Agents != null && Mission.Current.CurrentTime > (CESettings.Instance?.HuntBegins ?? 7f)
-                                )
+                            if (Mission.Current != null && Mission.Current.Agents != null && Mission.Current.CurrentTime > huntingTimerOne)
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents.ToList()
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
