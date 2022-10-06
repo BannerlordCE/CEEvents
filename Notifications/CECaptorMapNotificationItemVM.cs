@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V190
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -13,11 +13,8 @@ using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
 
-#if V172
-using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
-#else
+
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
-#endif
 
 namespace CaptivityEvents.Notifications
 {

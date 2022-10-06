@@ -1,4 +1,4 @@
-#define V180
+#define V190
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -40,14 +40,8 @@ using TaleWorlds.CampaignSystem.Settlements;
 using System.Xml;
 using CaptivityEvents.Notifications;
 
-
-#if V172
-using TaleWorlds.Core.ViewModelCollection;
-using TaleWorlds.MountAndBlade.View.Missions;
-#else
 using TaleWorlds.MountAndBlade.View.MissionViews;
 using TaleWorlds.Core.ViewModelCollection.Information;
-#endif
 
 namespace CaptivityEvents
 {
@@ -676,10 +670,6 @@ namespace CaptivityEvents
             CleanBugs();
             ResetHelper();
             if (!_isLoaded) return;
-#if V172
-            game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings.xml");
-#else
-#endif
             InitalizeAttributes(game);
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
             AddBehaviours(campaignStarter);
@@ -768,11 +758,7 @@ namespace CaptivityEvents
             else AddCustomEvents(campaignStarter);
 
             if (_isLoadedInGame) return;
-#if V172
-            TooltipVM.AddTooltipType(typeof(CEBrothel), CEBrothelToolTip.BrothelTypeTooltipAction);
-#else
             PropertyBasedTooltipVM.AddTooltipType(typeof(CEBrothel), CEBrothelToolTip.BrothelTypeTooltipAction);
-#endif
             LoadBrothelSounds();
             _isLoadedInGame = true;
         }
@@ -1300,7 +1286,11 @@ namespace CaptivityEvents
                                 {
                                     CommonAIComponent component = agent2.GetComponent<CommonAIComponent>();
                                     component?.Panic();
+#if V180
                                     agent2.DestinationSpeed = 0.5f;
+#else
+                                    agent2.SetMaximumSpeedLimit(0.5f, false);
+#endif
                                 }
                                 CEHelper.AddQuickInformation(new TextObject("{=CEEVENTS1068}Hunt them down!"), 100, CharacterObject.PlayerCharacter, CharacterObject.PlayerCharacter.IsFemale
                                                                            ? "event:/voice/combat/female/01/victory"
@@ -1492,7 +1482,9 @@ namespace CaptivityEvents
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon1);
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon2);
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon3);
+#if V180
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon4);
+#endif
                 if (agent.HasMount) agent.MountAgent.Die(new Blow(), Agent.KillInfo.Musket);
             }
             catch (Exception) { }

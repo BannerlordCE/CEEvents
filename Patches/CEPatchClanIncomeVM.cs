@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V190
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
@@ -21,9 +21,7 @@ namespace CaptivityEvents.Patches
         public static MethodInfo GetDefaultIncome = AccessTools.Method(typeof(ClanIncomeVM), "GetDefaultIncome");
         public static MethodInfo OnIncomeSelection = AccessTools.Method(typeof(ClanIncomeVM), "OnIncomeSelection");
 
-#if !V172
         public static AccessTools.FieldRef<ClanIncomeVM, Action<ClanCardSelectionInfo>> _openCardSelectionPopup = AccessTools.FieldRefAccess<ClanIncomeVM, Action<ClanCardSelectionInfo>>("_openCardSelectionPopup");
-#endif
 
         [HarmonyPrepare]
         private static bool ShouldPatch() => CESettings.Instance?.ProstitutionControl ?? true;
@@ -40,11 +38,8 @@ namespace CaptivityEvents.Patches
 
                     workshop.SetWorkshop(brothel.Owner, workshopType, brothel.Capital, true, 0, 1, brothel.Name);
 
-#if V172
-                CEBrothelClanFinanceItemVM brothelFinanceItemVM = new(brothel, workshop, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh);
-#else
                     CEBrothelClanFinanceItemVM brothelFinanceItemVM = new(brothel, workshop, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh, _openCardSelectionPopup.Invoke(__instance));
-#endif
+
                     __instance.Incomes.Add(brothelFinanceItemVM);
 
                     Hero.MainHero.RemoveOwnedWorkshop(workshop);

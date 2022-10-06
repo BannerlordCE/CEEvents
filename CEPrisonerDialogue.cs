@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V190
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
@@ -63,21 +63,13 @@ namespace CaptivityEvents
         public bool LCELordDefeatedLordAnswerReleaseOnConditionNoncombatant()
         {
             return (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.IsMapFaction || Hero.OneToOneConversationHero.Clan.Leader != Hero.OneToOneConversationHero) &&
-#if V172
-            Hero.OneToOneConversationHero.Noncombatant;
-#else
             Hero.OneToOneConversationHero.IsNoncombatant;
-#endif
         }
 
         public bool LCELordDefeatedLordAnswerReleaseOnConditionCombatant()
         {
             return (Hero.OneToOneConversationHero.Clan != null && !Hero.OneToOneConversationHero.Clan.IsMapFaction && Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero) || !
-#if V172
-            Hero.OneToOneConversationHero.Noncombatant;
-#else
             Hero.OneToOneConversationHero.IsNoncombatant;
-#endif
         }
 
         public void AddCustomLines(CampaignGameStarter campaignGameStarter, List<CEScene> CECustomScenes)

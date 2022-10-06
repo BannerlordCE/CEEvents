@@ -4,9 +4,6 @@
 			"path": "..\\..\\zCEDefaults"
 		},
 		{
-			"path": "..\\..\\zModules"
-		},
-		{
 			"path": "..\\..\\zTBCaptivityEvents"
 		},
 		{
@@ -23,6 +20,15 @@
 		},
 		{
 			"path": "..\\..\\zCEDevelopment"
+		},
+		{
+			"path": "../../zCEBanditExpansion"
+		},
+		{
+			"path": "../../zCEConcubineExpansion"
+		},
+		{
+			"path": "../../zCEArenaFighterExpansion"
 		}
 	]
 }

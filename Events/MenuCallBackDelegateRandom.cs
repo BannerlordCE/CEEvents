@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V190
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -519,15 +519,11 @@ namespace CaptivityEvents.Events
                     {
                         if (troopRosterElement.Character.IsHero && troopRosterElement.Character.HeroObject.IsPlayerCompanion)
                         {
-#if V172
-                            ScatterCompanionAction.ApplyInPrison(troopRosterElement.Character.HeroObject);
-#else
                             troopRosterElement.Character.HeroObject.ChangeState(Hero.CharacterStates.Fugitive);
                             if (troopRosterElement.Character.HeroObject.PartyBelongedToAsPrisoner != null)
                             {
                                 EndCaptivityAction.ApplyByEscape(troopRosterElement.Character.HeroObject, null);
                             }
-#endif
                         }
                         else
                         {

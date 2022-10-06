@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V190
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +8,7 @@ using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.ViewModelCollection.GameOptions;
 
-#if V172
-using TaleWorlds.Core.ViewModelCollection;
-#else
 using TaleWorlds.Core.ViewModelCollection.Selector;
-#endif
 
 namespace CaptivityEvents.Config
 {

@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V190
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -108,10 +108,10 @@ namespace CaptivityEvents.Events
                     if (Hero.MainHero.IsWounded) Hero.MainHero.HitPoints = 20;
 
                     PlayerEncounter.ProtectPlayerSide();
-#if V172
-                    MobileParty.MainParty.IsDisorganized = false;
-#else
+#if V180
                     MobileParty.MainParty.SetDisorganized(false);
+#else
+                    MobileParty.MainParty.SetIsDisorganized(false);
 #endif
                     PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, 1, true);
                     MobileParty.MainParty.ChangePartyLeader(Hero.MainHero);

@@ -1,4 +1,4 @@
-#define V180
+#define V190
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -414,17 +414,9 @@ namespace CaptivityEvents.Brothel
             _isBrothelInitialized = true;
         }
 
-#if V172
-        public static CharacterObject HelperCreateFrom(CharacterObject character, bool traitsAndSkills) => CharacterObject.CreateFrom(character, traitsAndSkills);
-#else
         public static CharacterObject HelperCreateFrom(CharacterObject character, bool traitsAndSkills) => CharacterObject.CreateFrom(character);
-#endif
 
-#if V172
-        public static Monster HelperGetMonster(BasicCharacterObject character, bool slow) => Campaign.Current.HumanMonsterSettlement;
-#else
         public static Monster HelperGetMonster(BasicCharacterObject character, bool slow) => TaleWorlds.Core.FaceGen.GetMonsterWithSuffix(character.Race, !slow ? "_settlement" : "_settlement_slow");
-#endif
 
         private static LocationCharacter CreateTavernkeeper(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
@@ -1559,9 +1551,6 @@ namespace CaptivityEvents.Brothel
                             {
                                 if (victim == _brothelList[i].CaptiveProstitutes[y].HeroObject)
                                 {
-#if V172
-                                    _brothelList[i].CaptiveProstitutes[y].HeroObject.IsNoble = true;
-#endif
                                     _brothelList[i].CaptiveProstitutes.RemoveAt(y);
                                     return;
                                 }
@@ -1666,12 +1655,6 @@ namespace CaptivityEvents.Brothel
                     {
                         if (!releasePrisoners)
                         {
-#if V172
-                            if (captive.IsHero)
-                            {
-                                captive.HeroObject.IsNoble = true;
-                            }
-#endif
                             MobileParty.MainParty.PrisonRoster.AddToCounts(captive, 1, captive.IsHero);
                         }
                         else
@@ -1686,9 +1669,6 @@ namespace CaptivityEvents.Brothel
                                         continue;
                                     }
                                 }
-#if V172
-                                captive.HeroObject.IsNoble = true;
-#endif
                                 MobileParty.MainParty.PrisonRoster.AddToCounts(captive, 1, true);
                                 EndCaptivityAction.ApplyByReleasedByChoice(captive.HeroObject, heroReleased);
                             }
@@ -1734,9 +1714,6 @@ namespace CaptivityEvents.Brothel
                 {
                     if (captive.IsHero)
                     {
-#if V172
-                        captive.HeroObject.IsNoble = true;
-#endif
                         captivesFreed.Add(captive.HeroObject.StringId);
                     }
                 }
@@ -1747,9 +1724,6 @@ namespace CaptivityEvents.Brothel
                 {
                     if (troopElement.Character.IsHero)
                     {
-#if V172
-                            troopElement.Character.HeroObject.IsNoble = false;
-#endif
                         if (!captivesFreed.Contains(troopElement.Character.HeroObject.StringId))
                         {
                             if (troopElement.Character.HeroObject.GetSkillValue(CESkills.Slavery) < 50)
@@ -1794,13 +1768,6 @@ namespace CaptivityEvents.Brothel
                 int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == settlement.StringId);
                 _brothelList[index].CaptiveProstitutes.Remove(prisoner);
 
-#if V172
-                if (prisoner.IsHero)
-                {
-                    prisoner.HeroObject.IsNoble = true;
-                }
-#endif
-
                 MobileParty.MainParty.PrisonRoster.AddToCounts(prisoner, 1, prisoner.IsHero);
             }
             catch (Exception)
@@ -1821,9 +1788,6 @@ namespace CaptivityEvents.Brothel
 
                 if (prisoner.IsHero)
                 {
-#if V172
-                    prisoner.HeroObject.IsNoble = false;
-#endif
                     if (CESettings.Instance?.EventProstituteGear ?? true)
                     {
                         CharacterObject femaleDancer = HelperCreateFrom(settlement.Culture.FemaleDancer, true);

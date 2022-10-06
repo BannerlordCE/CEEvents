@@ -1,4 +1,4 @@
-#define V180
+#define V190
 
 using System;
 using System.Linq;
@@ -15,39 +15,24 @@ using TaleWorlds.Library;
 using TaleWorlds.Core.ViewModelCollection.Information;
 using System.Collections.Generic;
 
-#if V172
-using TaleWorlds.Core.ViewModelCollection;
-#else
 using TaleWorlds.Core.ViewModelCollection.Generic;
-#endif
 
 namespace CaptivityEvents.Brothel
 {
     // TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance ClanFinanceWorkshopItemVM
     internal class CEBrothelClanFinanceItemVM : ClanFinanceWorkshopItemVM
     {
-#if V172
-        public CEBrothelClanFinanceItemVM(CEBrothel brothel, Workshop workshop, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh) : base(workshop, onSelection, onRefresh)
-#else
         public CEBrothelClanFinanceItemVM(CEBrothel brothel, Workshop workshop, Action<ClanFinanceIncomeItemBaseVM> onSelection, Action onRefresh, Action<ClanCardSelectionInfo> openCardSelectionPopup) : base(workshop, onSelection, onRefresh, openCardSelectionPopup)
-#endif
         {
             _brothel = brothel;
 
             IncomeTypeAsEnum = IncomeTypes.Workshop;
-#if V172
-            SettlementComponent component = _brothel.Settlement.GetComponent<SettlementComponent>();
-            ImageName = component != null ? component.WaitMeshName : "";
-#else
             _onSelection = new Action<ClanFinanceIncomeItemBaseVM>(TempOnSelection);
             _onSelectionT = onSelection;
             _openCardSelectionPopup = openCardSelectionPopup;
             SettlementComponent component = _brothel.Settlement.SettlementComponent;
             ImageName = component != null ? component.WaitMeshName : "";
             ManageWorkshopHint = new HintViewModel(new TextObject("{=CEBROTHEL0975}Manage Brothel", null), null);
-#endif
-
-
 
             RefreshValues();
         }
@@ -74,34 +59,12 @@ namespace CaptivityEvents.Brothel
             InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
             OutputsText = new TextObject("{=CEBROTHEL0994}Notable Prostitutes").ToString();
 
-#if V172
-            ActionList.Clear();
-#endif
             ItemProperties.Clear();
             PopulateActionList();
             PopulateStatsList();
         }
 
-#if V172
-        protected override void PopulateActionList()
-        {
-            if (_brothel == null) _brothel = new CEBrothel(Workshop.Settlement);
 
-            int sellingCost = _brothel.Capital;
-
-            TextObject hint = GetBrothelSellHintText(sellingCost);
-            ActionList.Add(new StringItemWithEnabledAndHintVM(ExecuteSellBrothel, new TextObject("{=PHkC8Gia}Sell").ToString(), true, null, hint));
-
-            bool isCurrentlyActive = _brothel.IsRunning;
-            int costToStart = _brothel.Expense;
-
-            TextObject hint2 = GetBrothelSellHintText(sellingCost);
-            ActionList.Add(isCurrentlyActive
-                               ? new StringItemWithEnabledAndHintVM(ExecuteToggleBrothel, new TextObject("{=CEBROTHEL0995}Stop Operations").ToString(), true, null, hint2)
-                               : new StringItemWithEnabledAndHintVM(ExecuteToggleBrothel, new TextObject("{=CEBROTHEL0996}Start Operations").ToString(), Hero.MainHero.Gold >= costToStart, null, hint2));
-
-        }
-#else
 
         public new void ExecuteManageWorkshop()
         {
@@ -158,7 +121,6 @@ namespace CaptivityEvents.Brothel
                 }
             }
         }
-#endif
 
         protected override void PopulateStatsList()
         {
@@ -187,22 +149,12 @@ namespace CaptivityEvents.Brothel
             OutputProducts = string.Join(",", _brothel.CaptiveProstitutes.Where(c => c.IsHero).Select(c => c.HeroObject.Name.ToString()).ToArray());
         }
 
-#if V172
-        private new void ExecuteBeginWorkshopHint()
-        {
-            if (_brothel != null) InformationManager.AddTooltipInformation(typeof(CEBrothel), _brothel);
-        }
-
-        private new void ExecuteEndHint() => InformationManager.HideInformations();
-
-#else
         private new void ExecuteBeginWorkshopHint()
         {
             if (_brothel != null) InformationManager.ShowTooltip(typeof(CEBrothel), _brothel);
         }
 
         private new void ExecuteEndHint() => MBInformationManager.HideInformations();
-#endif
 
         private static TextObject GetBrothelRunningHintText(bool isRunning, int costToStart)
         {
@@ -312,10 +264,9 @@ namespace CaptivityEvents.Brothel
 
         private string _outputProducts;
 
-#if !V172
         private readonly Action<ClanCardSelectionInfo> _openCardSelectionPopup;
 
         private Action<ClanFinanceWorkshopItemVM> _onSelectionT;
-#endif
+
     }
 }

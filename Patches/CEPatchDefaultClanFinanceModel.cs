@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V190
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;

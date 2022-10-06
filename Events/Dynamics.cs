@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V190
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -57,11 +57,7 @@ namespace CaptivityEvents.Events
 
             if ((hero.Clan?.Leader) == hero)
             {
-#if V172
-                if (hero != Hero.MainHero && hero.Clan.Heroes.Any((Hero x) => !x.IsChild && x != hero && x.IsAlive && (x.IsNoble || x.IsMinorFactionHero)))
-#else
                 if (hero != Hero.MainHero && hero.Clan.Heroes.Any((Hero x) => !x.IsChild && x != hero && x.IsAlive && x.IsLord))
-#endif
                 {
                     ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(hero.Clan);
                 }
@@ -72,14 +68,10 @@ namespace CaptivityEvents.Events
                                        select t).ToList<Clan>();
                     if (list.IsEmpty<Clan>())
                     {
-#if V172
-                        DestroyKingdomAction.Apply(hero.Clan.Kingdom);
-#else
                         if (!hero.Clan.Kingdom.IsEliminated)
                         {
                             DestroyKingdomAction.ApplyByKingdomLeaderDeath(hero.Clan.Kingdom);
                         }
-#endif
                     }
                     else if (list.Count > 1)
                     {
@@ -151,11 +143,7 @@ namespace CaptivityEvents.Events
                 int newNumber = currentTraitLevel + amount;
                 if (newNumber < (traitObject?.MinValue ?? 0)) newNumber = traitObject?.MinValue ?? 0;
 
-#if V172
-                hero.SetTraitLevelInternal(traitObject, newNumber);
-#else
                 hero.SetTraitLevel(traitObject, newNumber);
-#endif
 
                 if (!display) return;
                 TextObject textObject = GameTexts.FindText("str_CE_trait_level");
@@ -268,11 +256,9 @@ namespace CaptivityEvents.Events
                 }
 
                 float xpToSet = Campaign.Current.Models.CharacterDevelopmentModel.GetXpRequiredForSkillLevel(newNumber);
-#if V172
-                Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet, out int levels);
-#else
+
                 int levels = Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet);
-#endif
+
                 hero.HeroDeveloper.SetInitialSkillLevel(skillObject, newNumber);
 
                 if (levels > 0)
@@ -547,29 +533,17 @@ namespace CaptivityEvents.Events
 
                         if (firstHero.GovernorOf != null)
                         {
-#if V172
-                            ChangeGovernorAction.ApplyByGiveUpCurrent(firstHero);
-#else
                             ChangeGovernorAction.RemoveGovernorOf(firstHero);
-#endif
                         }
 
                         if (firstHero.PartyBelongedTo != null)
                         {
                             MobileParty partyBelongedTo = firstHero.PartyBelongedTo;
-#if V172
-                            if (partyBelongedTo.Party.IsActive && partyBelongedTo.Party.Owner == firstHero)
-					        {
-                                DisbandPartyAction.ApplyDisband(partyBelongedTo);
-                                firstHero.PartyBelongedTo.Party.SetCustomOwner(null);
-					        }
-#else
                             if (partyBelongedTo.Party.IsActive && partyBelongedTo.Party.Owner == firstHero)
                             {
                                 DisbandPartyAction.StartDisband(partyBelongedTo);
                                 partyBelongedTo.Party.SetCustomOwner(null);
                             }
-#endif
 
                             firstHero.ChangeState(Hero.CharacterStates.Fugitive);
                             MobileParty partyBelongedTo2 = firstHero.PartyBelongedTo;
@@ -628,12 +602,7 @@ namespace CaptivityEvents.Events
 
         private Clan ChangeClanName(Clan clan, TextObject clanName, TextObject informalName)
         {
-#if V172
-            clan.ChangeClanName(clanName);
-            clan.InformalName = informalName;
-#else
             clan.ChangeClanName(clanName, informalName);
-#endif
             return clan;
         }
 

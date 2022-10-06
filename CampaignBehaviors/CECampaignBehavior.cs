@@ -1,4 +1,4 @@
-#define V180
+#define V190
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -26,11 +26,7 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using static CaptivityEvents.Helper.CEHelper;
 
-#if V172
-using MountAndBlade.CampaignBehaviors;
-#else
 using TaleWorlds.CampaignSystem.Extensions;
-#endif
 
 
 namespace CaptivityEvents.CampaignBehaviors

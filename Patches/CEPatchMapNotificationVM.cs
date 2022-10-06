@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V190
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Helper;
@@ -8,11 +8,7 @@ using System;
 using System.Reflection;
 using TaleWorlds.Core;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
-
-#if V172
-#else
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
-#endif
 
 namespace CaptivityEvents.Patches
 {

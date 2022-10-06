@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V190
 
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -91,38 +91,22 @@ namespace CaptivityEvents.Helper
         }
 
         public static void AddQuickInformation(TextObject message, int priorty = 0, BasicCharacterObject announcerCharacter = null, string soundEventPath = "") {
-#if V172
-            InformationManager.AddQuickInformation(message, priorty, announcerCharacter, soundEventPath);
-#else
             MBInformationManager.AddQuickInformation(message, priorty, announcerCharacter, soundEventPath);
-#endif
         }
 
         public static int HelperMBRandom()
         {
-#if V172
-            return MBRandom.Random.Next();
-#else
             return MBRandom.RandomInt();
-#endif
         }
 
         public static int HelperMBRandom(int maxValue)
         {
-#if V172
-            return MBRandom.Random.Next(maxValue);
-#else
             return MBRandom.RandomInt(maxValue);
-#endif
         }
 
         public static int HelperMBRandom(int minValue, int maxValue)
         {
-#if V172
-            return MBRandom.Random.Next(minValue, maxValue);
-#else
             return MBRandom.RandomInt(maxValue);
-#endif
         }
 
         public enum EquipmentCustomIndex
