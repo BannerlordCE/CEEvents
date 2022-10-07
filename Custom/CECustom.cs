@@ -17,14 +17,16 @@ namespace CaptivityEvents
             MaxLevel = null;
             Name = null;
             Id = null;
+            SetZeroOnEscape = false;
         }
 
-        public CESkillNode(string Id, string Name, string MinLevel = "0", string MaxLevel = null)
+        public CESkillNode(string Id, string Name, string MinLevel = "0", string MaxLevel = null, bool SetZeroOnEscape = false)
         {
             this.MinLevel = MinLevel;
             this.MaxLevel = MaxLevel;
             this.Name = Name;
             this.Id = Id;
+            this.SetZeroOnEscape = SetZeroOnEscape;
         }
 
         [XmlAttribute()]
@@ -38,6 +40,9 @@ namespace CaptivityEvents
 
         [XmlAttribute()]
         public string Id { get; set; }
+
+        [XmlAttribute()]
+        public bool SetZeroOnEscape { get; set; }
     }
 
     [DebuggerStepThrough]

@@ -33,6 +33,8 @@ namespace CaptivityEvents.CampaignBehaviors
 {
     public class CECampaignBehavior : CampaignBehaviorBase
     {
+        private readonly Dynamics _dynamics = new();
+
         #region Events
 
         private bool LaunchCaptorEvent(CEEvent OverrideEvent = null)
@@ -843,11 +845,23 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
+        private void OnHeroPrisonerReleased(Hero prisoner, PartyBase party, IFaction capturerFaction, EndCaptivityDetail detail)
+        {
+            CESkills.NodeSkills.ForEach((CESkillNode skillNode) =>
+            {
+                if (skillNode.SetZeroOnEscape)
+                {
+                    _dynamics.ResetCustomSkill(prisoner, skillNode.Id, false);
+                }
+            });
+        }
+
         public override void RegisterEvents()
         {
             CampaignEvents.OnChildConceivedEvent.AddNonSerializedListener(this, OnChildConceived);
 
             CampaignEvents.HourlyTickEvent.AddNonSerializedListener(this, OnHourlyTick);
+            CampaignEvents.HeroPrisonerReleased.AddNonSerializedListener(this, OnHeroPrisonerReleased);
             CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, OnDailyTick);
 
             CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, OnHeroKilled);

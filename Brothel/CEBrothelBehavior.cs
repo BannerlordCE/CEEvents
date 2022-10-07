@@ -1511,9 +1511,6 @@ namespace CaptivityEvents.Brothel
             _hasBoughtTunToParty = false;
             _hasBoughtProstituteToParty = false;
 
-            if (Hero.MainHero.GetSkillValue(prostitutionSkill) > 500) new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(-300, -200), Hero.MainHero, false, false);
-            else if (Hero.MainHero.GetSkillValue(prostitutionSkill) > 100) new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(-40, -10), Hero.MainHero, false, false);
-
             try
             {
                 // Renown Modifier

@@ -190,37 +190,37 @@ namespace CaptivityEvents
             {
                 if (!swap)
                 {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
                           ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
                         : CEPersistence.CEEventImageList[name];
                 }
                 else
                 {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
                         : CEPersistence.CEEventImageList[name];
                 }

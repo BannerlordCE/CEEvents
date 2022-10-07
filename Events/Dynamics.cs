@@ -236,7 +236,7 @@ namespace CaptivityEvents.Events
                         isToggle = true;
                     }
 
-                    wasPositive = amount >= 0;
+                    wasPositive = amount > 0 || amount == 0 && !isToggle;
 
                     if (maxLevel != 0 && newNumber > maxLevel)
                     {
@@ -318,6 +318,35 @@ namespace CaptivityEvents.Events
                 "Cyan" or "cyan" => Colors.Cyan,
                 _ => Colors.Gray,
             };
+        }
+
+        internal void ResetCustomSkill(Hero hero, string skill, bool display = true, string color = "gray")
+        {
+            bool found = false;
+
+            foreach (SkillObject skillObjectCustom in CESkills.CustomSkills)
+            {
+                if (skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill)
+                {
+                    found = true;
+                    SkillObjectModifier(skillObjectCustom, PickColor(color), hero, skill, 0, 0, display, true);
+                    break;
+                }
+            }
+
+            if (found) return;
+
+            foreach (SkillObject skillObject in Skills.All)
+            {
+                if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
+                {
+                    found = true;
+                    SkillObjectModifier(skillObject, PickColor(color), hero, skill, 0, 0, display, true);
+                    break;
+                }
+            }
+
+            if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + skill);
         }
 
         internal void ResetCustomSkills(Hero hero)
