@@ -1,4 +1,4 @@
-#define V190
+#define V181
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -23,10 +22,14 @@ using TaleWorlds.SaveSystem;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.CampaignSystem.Party;
-using TaleWorlds.CampaignSystem.Settlements;
+
 using static CaptivityEvents.Helper.CEHelper;
 
+#if !V181
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Extensions;
+using System.Reflection;
+#endif
 
 
 namespace CaptivityEvents.CampaignBehaviors

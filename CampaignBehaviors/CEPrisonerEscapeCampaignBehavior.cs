@@ -1,4 +1,4 @@
-#define V190
+#define V181
 
 using CaptivityEvents.Config;
 using System;

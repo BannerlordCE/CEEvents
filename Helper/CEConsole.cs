@@ -1,4 +1,4 @@
-﻿#define V190
+﻿#define V181
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -24,15 +24,9 @@ using TaleWorlds.ModuleManager;
 using TaleWorlds.MountAndBlade;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements.Locations;
-
-#endif
 
 namespace CaptivityEvents.Helper
 {

@@ -1,4 +1,4 @@
-#define V190
+#define V181
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -37,11 +37,14 @@ using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
-using System.Xml;
 using CaptivityEvents.Notifications;
 
 using TaleWorlds.MountAndBlade.View.MissionViews;
 using TaleWorlds.Core.ViewModelCollection.Information;
+
+#if V181
+using System.Xml;
+#endif
 
 namespace CaptivityEvents
 {
@@ -1286,7 +1289,7 @@ namespace CaptivityEvents
                                 {
                                     CommonAIComponent component = agent2.GetComponent<CommonAIComponent>();
                                     component?.Panic();
-#if V180
+#if V181
                                     agent2.DestinationSpeed = 0.5f;
 #else
                                     agent2.SetMaximumSpeedLimit(0.5f, false);
@@ -1482,8 +1485,10 @@ namespace CaptivityEvents
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon1);
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon2);
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon3);
-#if V180
+#if V181
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon4);
+#else
+                agent.RemoveEquippedWeapon(EquipmentIndex.ExtraWeaponSlot);
 #endif
                 if (agent.HasMount) agent.MountAgent.Die(new Blow(), Agent.KillInfo.Musket);
             }
