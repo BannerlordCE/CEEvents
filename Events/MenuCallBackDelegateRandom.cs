@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V100
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -243,13 +243,17 @@ namespace CaptivityEvents.Events
             ConsequenceWoundTroops();
             ConsequenceKillTroops();
 
+            _sharedCallBackHelper.ConsequenceGiveBirth();
+            _sharedCallBackHelper.ConsequenceAbort();
+            _sharedCallBackHelper.ConsequencePlayScene();
             _sharedCallBackHelper.ConsequenceDelayedEvent();
             _sharedCallBackHelper.ConsequenceMission();
             _sharedCallBackHelper.ConsequenceTeleportPlayer();
+            _sharedCallBackHelper.ConsequenceDamageParty(PartyBase.MainParty);
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor))
             {
-                _dynamics.CEKillPlayer(PlayerCaptivity.CaptorParty.LeaderHero);
+                _dynamics.CEKillPlayer(null);
             }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StartBattle))
             {
@@ -492,6 +496,7 @@ namespace CaptivityEvents.Events
             {
                 _dynamics.CEKillTroops(PartyBase.MainParty);
             }
+
             else
             {
             }
@@ -505,7 +510,7 @@ namespace CaptivityEvents.Events
                 TroopRoster enemyTroops = TroopRoster.CreateDummyTroopRoster();
 
                 // Make sure there is atleast one troop
-                CharacterObject characterObject1 = MBObjectManager.Instance.GetObjectTypeList<CharacterObject>().GetRandomElementWithPredicate(item => item.Occupation == Occupation.Soldier || item.Occupation == Occupation.Gangster);
+                CharacterObject characterObject1 = MBObjectManager.Instance.GetObjectTypeList<CharacterObject>().GetRandomElementWithPredicate(item => item.Occupation == Occupation.Soldier);
                 enemyTroops.AddToCounts(characterObject1, 1, false, 0, 0, true, -1);
 
                 foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.MemberRoster.GetTroopRoster())
@@ -514,15 +519,11 @@ namespace CaptivityEvents.Events
                     {
                         if (troopRosterElement.Character.IsHero && troopRosterElement.Character.HeroObject.IsPlayerCompanion)
                         {
-#if V172
-                            ScatterCompanionAction.ApplyInPrison(troopRosterElement.Character.HeroObject);
-#else
                             troopRosterElement.Character.HeroObject.ChangeState(Hero.CharacterStates.Fugitive);
                             if (troopRosterElement.Character.HeroObject.PartyBelongedToAsPrisoner != null)
                             {
                                 EndCaptivityAction.ApplyByEscape(troopRosterElement.Character.HeroObject, null);
                             }
-#endif
                         }
                         else
                         {

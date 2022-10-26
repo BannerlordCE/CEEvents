@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V100
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -136,6 +136,7 @@ namespace CaptivityEvents.Events
         {
             try
             {
+                if (amount == 0) return;
                 int prisonerCount = MobileParty.MainParty.PrisonRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
                 MobileParty.MainParty.PrisonRoster.WoundNumberOfTroopsRandomly(amount);
@@ -154,6 +155,7 @@ namespace CaptivityEvents.Events
         {
             try
             {
+                if (amount == 0) return;
                 int prisonerCount = MobileParty.MainParty.PrisonRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
                 MobileParty.MainParty.PrisonRoster.KillNumberOfMenRandomly(amount, killHeroes);

@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V100
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -11,12 +11,7 @@ using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-
-#if V172
-using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
-#else
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
-#endif
 
 namespace CaptivityEvents.Notifications
 {
@@ -57,7 +52,7 @@ namespace CaptivityEvents.Notifications
                 }
             }
         }
-
+             
         private void OnRandomNotificationInspect()
         {
             CEHelper.notificationEventExists = false;

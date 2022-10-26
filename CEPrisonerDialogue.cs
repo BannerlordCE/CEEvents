@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V100
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
@@ -63,21 +63,13 @@ namespace CaptivityEvents
         public bool LCELordDefeatedLordAnswerReleaseOnConditionNoncombatant()
         {
             return (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.IsMapFaction || Hero.OneToOneConversationHero.Clan.Leader != Hero.OneToOneConversationHero) &&
-#if V172
-            Hero.OneToOneConversationHero.Noncombatant;
-#else
             Hero.OneToOneConversationHero.IsNoncombatant;
-#endif
         }
 
         public bool LCELordDefeatedLordAnswerReleaseOnConditionCombatant()
         {
             return (Hero.OneToOneConversationHero.Clan != null && !Hero.OneToOneConversationHero.Clan.IsMapFaction && Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero) || !
-#if V172
-            Hero.OneToOneConversationHero.Noncombatant;
-#else
             Hero.OneToOneConversationHero.IsNoncombatant;
-#endif
         }
 
         public void AddCustomLines(CampaignGameStarter campaignGameStarter, List<CEScene> CECustomScenes)
@@ -113,7 +105,7 @@ namespace CaptivityEvents
         private bool ConversationCECustomScenesOnCondition(string SceneName, bool alwaysShow = false)
         {
             CharacterObject conversation = CharacterObject.OneToOneConversationCharacter;
-            return alwaysShow ? true : conversation.StringId == "CECustomStringId_" + SceneName;
+            return alwaysShow || conversation.StringId == "CECustomStringId_" + SceneName;
         }
 
 
@@ -161,7 +153,7 @@ namespace CaptivityEvents
         {
             if (Hero.OneToOneConversationHero.IsPrisoner)
             {
-                EndCaptivityAction.ApplyByReleasedByPlayerAfterBattle(Hero.OneToOneConversationHero, Hero.MainHero, null);
+                EndCaptivityAction.ApplyByReleasedAfterBattle(Hero.OneToOneConversationHero);
             }
             _dynamics.RelationsModifier(CharacterObject.OneToOneConversationCharacter.HeroObject, 4, null, true, true);
             DialogHelper.SetDialogString("DEFEAT_LORD_ANSWER", "str_prisoner_released");

@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V100
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -247,9 +247,11 @@ namespace CaptivityEvents.Events
             ConsequenceKillTroops(ref args);
             ConsequenceJoinParty();
 
+            _sharedCallBackHelper.ConsequencePlayScene();
             _sharedCallBackHelper.ConsequenceDelayedEvent();
             _sharedCallBackHelper.ConsequenceMission();
             _sharedCallBackHelper.ConsequenceTeleportPlayer();
+            _sharedCallBackHelper.ConsequenceDamageParty(PartyBase.MainParty);
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.StripHero) && captiveHero != null)
             {
@@ -496,7 +498,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listedEvent.Captive.IsHero)
                 {
-                    EndCaptivityAction.ApplyByReleasing(_listedEvent.Captive.HeroObject);
+                    EndCaptivityAction.ApplyByReleasedByChoice(_listedEvent.Captive.HeroObject);
                     AddHeroToPartyAction.Apply(_listedEvent.Captive.HeroObject, PartyBase.MainParty.MobileParty, true);
                 }
                 else

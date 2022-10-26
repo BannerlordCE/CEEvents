@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V100
 
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -14,45 +14,99 @@ using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Library;
+using TaleWorlds.CampaignSystem.Party;
+using Helpers;
 
 namespace CaptivityEvents.Helper
 {
     public class CEHelper
     {
 
+        private static string CurrentLocation(Settlement settlement)
+        {
+            return settlement.IsCastle ? "castle" : settlement.IsTown ? "town" : "village";
+        }
+
+        public static string CustomSceneToPlay(string sceneToPlay, PartyBase partyBase)
+        {
+            if (sceneToPlay.Contains("$location_culture"))
+            {
+
+                sceneToPlay = sceneToPlay.Replace("$location_culture", partyBase.Settlement?.Culture.ToString() ?? SettlementHelper.FindNearestSettlementToPoint(partyBase.Position2D).Culture.ToString());
+            }
+
+            if (sceneToPlay.Contains("$party_culture"))
+            {
+                sceneToPlay = sceneToPlay.Replace("$party_culture", partyBase.Culture.ToString());
+            }
+
+            if (sceneToPlay.Contains("$location"))
+            {
+                sceneToPlay = sceneToPlay.Replace("$location", CurrentLocation(partyBase.Settlement ?? SettlementHelper.FindNearestSettlementToPoint(partyBase.Position2D)));
+            }
+
+            string[] e = new string[]
+            {
+                "01",
+                "02",
+                "03"
+            };
+
+            if (sceneToPlay.Contains("$randomize"))
+            {
+                sceneToPlay = sceneToPlay.Replace("$randomize", e.GetRandomElement());
+            }
+
+            return sceneToPlay.ToLower();
+
+        }
+
+        public static string CustomSceneToPlay(string sceneToPlay, Settlement settlement)
+        {
+            if (sceneToPlay.Contains("$location_culture"))
+            {
+
+                sceneToPlay = sceneToPlay.Replace("$location_culture", settlement.Culture.ToString());
+            }
+
+            if (sceneToPlay.Contains("$location"))
+            {
+                sceneToPlay = sceneToPlay.Replace("$location", CurrentLocation(settlement));
+            }
+
+            string[] e = new string[]
+            {
+                "01",
+                "02",
+                "03"
+            };
+
+            if (sceneToPlay.Contains("$randomize"))
+            {
+                sceneToPlay = sceneToPlay.Replace("$randomize", e.GetRandomElement());
+            }
+
+            return sceneToPlay.ToLower();
+
+        }
+
         public static void AddQuickInformation(TextObject message, int priorty = 0, BasicCharacterObject announcerCharacter = null, string soundEventPath = "") {
-#if V172
-            InformationManager.AddQuickInformation(message, priorty, announcerCharacter, soundEventPath);
-#else
             MBInformationManager.AddQuickInformation(message, priorty, announcerCharacter, soundEventPath);
-#endif
         }
 
         public static int HelperMBRandom()
         {
-#if V172
-            return MBRandom.Random.Next();
-#else
             return MBRandom.RandomInt();
-#endif
         }
 
         public static int HelperMBRandom(int maxValue)
         {
-#if V172
-            return MBRandom.Random.Next(maxValue);
-#else
             return MBRandom.RandomInt(maxValue);
-#endif
         }
 
         public static int HelperMBRandom(int minValue, int maxValue)
         {
-#if V172
-            return MBRandom.Random.Next(minValue, maxValue);
-#else
             return MBRandom.RandomInt(maxValue);
-#endif
         }
 
         public enum EquipmentCustomIndex

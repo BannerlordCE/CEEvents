@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using TaleWorlds.CampaignSystem;
+using static CaptivityEvents.CampaignBehaviors.CECampaignBehavior;
 
 namespace CaptivityEvents.Custom
 {
@@ -79,7 +80,9 @@ namespace CaptivityEvents.Custom
         CaptorLeaveSpouse,
         TeleportPlayer,
         KillRandomTroops,
-        WoundRandomTroops
+        WoundRandomTroops,
+        GiveBirth,
+        Abort
     }
 
     [XmlType(AnonymousType = true)]
@@ -90,6 +93,7 @@ namespace CaptivityEvents.Custom
         WaitingMenu,
         ProgressMenu,
         CanOnlyBeTriggeredByOtherEvent,
+        BirthAlternative,
         Common,
         Femdom,
         Bestiality,
@@ -301,6 +305,25 @@ namespace CaptivityEvents.Custom
         public string EventWeight { get; set; }
 
         public string EventUseConditions { get; set; }
+    }
+
+    [DebuggerStepThrough]
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = true)]
+    [Serializable]
+    public class DamageParty
+    {
+        [XmlAttribute()]
+        public string Number { get; set; }
+
+        [XmlAttribute()]
+        public string WoundedNumber { get; set; }
+
+        [XmlAttribute()]
+        public string IncludeHeroes { get; set; }
+
+        [XmlAttribute()]
+        public string Ref { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -704,6 +727,8 @@ namespace CaptivityEvents.Custom
 
         public string SkillXPTotal { get; set; }
 
+        public string SceneToPlay { get; set; }
+
         [XmlElement(Form = XmlSchemaForm.Unqualified)]
         public string TriggerEventName { get; set; }
 
@@ -736,6 +761,8 @@ namespace CaptivityEvents.Custom
 
         [XmlElement("SceneSettings", IsNullable = true)]
         public SceneSettings SceneSettings { get; set; }
+
+        public DamageParty DamageParty { get; set; }
 
         [XmlElement("DelayEvent", IsNullable = true)]
         public DelayEvent DelayEvent { get; set; }
@@ -790,6 +817,8 @@ namespace CaptivityEvents.Custom
         public ProgressEvent ProgressEvent { get; set; }
 
         public bool ReqCustomCode { get; set; }
+
+        public string SceneToPlay { get; set; }
 
         public string OrderToCall { get; set; }
 
@@ -964,6 +993,9 @@ namespace CaptivityEvents.Custom
 
         [XmlIgnore]
         public string OldWeightedChanceOfOccuring { get; set; }
+
+        [XmlIgnore]
+        public Pregnancy Pregnancy { get; set; }
     }
 
     [DebuggerStepThrough]

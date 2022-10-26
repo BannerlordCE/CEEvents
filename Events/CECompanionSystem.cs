@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V100
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -542,7 +542,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-                EndCaptivityAction.ApplyByReleasing(hero);
+                EndCaptivityAction.ApplyByReleasedByChoice(hero);
             }
             catch (Exception e)
             {

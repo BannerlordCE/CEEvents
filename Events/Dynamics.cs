@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V100
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -15,7 +15,6 @@ using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.CampaignSystem.Party;
@@ -58,11 +57,7 @@ namespace CaptivityEvents.Events
 
             if ((hero.Clan?.Leader) == hero)
             {
-#if V172
-                if (hero != Hero.MainHero && hero.Clan.Heroes.Any((Hero x) => !x.IsChild && x != hero && x.IsAlive && (x.IsNoble || x.IsMinorFactionHero)))
-#else
                 if (hero != Hero.MainHero && hero.Clan.Heroes.Any((Hero x) => !x.IsChild && x != hero && x.IsAlive && x.IsLord))
-#endif
                 {
                     ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(hero.Clan);
                 }
@@ -73,14 +68,10 @@ namespace CaptivityEvents.Events
                                        select t).ToList<Clan>();
                     if (list.IsEmpty<Clan>())
                     {
-#if V172
-                        DestroyKingdomAction.Apply(hero.Clan.Kingdom);
-#else
                         if (!hero.Clan.Kingdom.IsEliminated)
                         {
                             DestroyKingdomAction.ApplyByKingdomLeaderDeath(hero.Clan.Kingdom);
                         }
-#endif
                     }
                     else if (list.Count > 1)
                     {
@@ -152,11 +143,7 @@ namespace CaptivityEvents.Events
                 int newNumber = currentTraitLevel + amount;
                 if (newNumber < (traitObject?.MinValue ?? 0)) newNumber = traitObject?.MinValue ?? 0;
 
-#if V172
-                hero.SetTraitLevelInternal(traitObject, newNumber);
-#else
                 hero.SetTraitLevel(traitObject, newNumber);
-#endif
 
                 if (!display) return;
                 TextObject textObject = GameTexts.FindText("str_CE_trait_level");
@@ -249,7 +236,7 @@ namespace CaptivityEvents.Events
                         isToggle = true;
                     }
 
-                    wasPositive = amount >= 0;
+                    wasPositive = amount > 0 || amount == 0 && !isToggle;
 
                     if (maxLevel != 0 && newNumber > maxLevel)
                     {
@@ -269,11 +256,9 @@ namespace CaptivityEvents.Events
                 }
 
                 float xpToSet = Campaign.Current.Models.CharacterDevelopmentModel.GetXpRequiredForSkillLevel(newNumber);
-#if V172
-                Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet, out int levels);
-#else
+
                 int levels = Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet);
-#endif
+
                 hero.HeroDeveloper.SetInitialSkillLevel(skillObject, newNumber);
 
                 if (levels > 0)
@@ -333,6 +318,35 @@ namespace CaptivityEvents.Events
                 "Cyan" or "cyan" => Colors.Cyan,
                 _ => Colors.Gray,
             };
+        }
+
+        internal void ResetCustomSkill(Hero hero, string skill, bool display = true, string color = "gray")
+        {
+            bool found = false;
+
+            foreach (SkillObject skillObjectCustom in CESkills.CustomSkills)
+            {
+                if (skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill)
+                {
+                    found = true;
+                    SkillObjectModifier(skillObjectCustom, PickColor(color), hero, skill, 0, 0, display, true);
+                    break;
+                }
+            }
+
+            if (found) return;
+
+            foreach (SkillObject skillObject in Skills.All)
+            {
+                if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
+                {
+                    found = true;
+                    SkillObjectModifier(skillObject, PickColor(color), hero, skill, 0, 0, display, true);
+                    break;
+                }
+            }
+
+            if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + skill);
         }
 
         internal void ResetCustomSkills(Hero hero)
@@ -548,35 +562,23 @@ namespace CaptivityEvents.Events
 
                         if (firstHero.GovernorOf != null)
                         {
-#if V172
-                            ChangeGovernorAction.ApplyByGiveUpCurrent(firstHero);
-#else
                             ChangeGovernorAction.RemoveGovernorOf(firstHero);
-#endif
                         }
 
                         if (firstHero.PartyBelongedTo != null)
                         {
                             MobileParty partyBelongedTo = firstHero.PartyBelongedTo;
-#if V172
-                            if (partyBelongedTo.Party.IsActive && partyBelongedTo.Party.Owner == firstHero)
-					        {
-                                DisbandPartyAction.ApplyDisband(partyBelongedTo);
-                                firstHero.PartyBelongedTo.Party.SetCustomOwner(null);
-					        }
-#else
                             if (partyBelongedTo.Party.IsActive && partyBelongedTo.Party.Owner == firstHero)
                             {
                                 DisbandPartyAction.StartDisband(partyBelongedTo);
                                 partyBelongedTo.Party.SetCustomOwner(null);
                             }
-#endif
 
                             firstHero.ChangeState(Hero.CharacterStates.Fugitive);
                             MobileParty partyBelongedTo2 = firstHero.PartyBelongedTo;
                             if (partyBelongedTo2 != null)
                             {
-                                partyBelongedTo2.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                                partyBelongedTo2.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default, 0);
                             }
                         }
                     }
@@ -629,12 +631,7 @@ namespace CaptivityEvents.Events
 
         private Clan ChangeClanName(Clan clan, TextObject clanName, TextObject informalName)
         {
-#if V172
-            clan.ChangeClanName(clanName);
-            clan.InformalName = informalName;
-#else
             clan.ChangeClanName(clanName, informalName);
-#endif
             return clan;
         }
 
@@ -804,10 +801,49 @@ namespace CaptivityEvents.Events
             }
         }
 
+        internal void CEWoundPrisoners(PartyBase party, int amount = 10)
+        {
+            try
+            {
+                if (amount == 0) return;
+                int prisonerCount = party.PrisonRoster.Count;
+                if (prisonerCount < amount) amount = prisonerCount;
+                party.PrisonRoster.WoundNumberOfTroopsRandomly(amount);
+                TextObject textObject = GameTexts.FindText("str_CE_wound_prisoners");
+                textObject.SetTextVariable("HERO", party.Name);
+                textObject.SetTextVariable("AMOUNT", amount);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Couldn't wound any prisoners.");
+            }
+        }
+
+        internal void CEKillPrisoners(PartyBase party, int amount = 10, bool killHeroes = false)
+        {
+            try
+            {
+                if (amount == 0) return;
+                int prisonerCount = party.PrisonRoster.Count;
+                if (prisonerCount < amount) amount = prisonerCount;
+                party.PrisonRoster.KillNumberOfMenRandomly(amount, killHeroes);
+                TextObject textObject = GameTexts.FindText("str_CE_kill_prisoners");
+                textObject.SetTextVariable("HERO", party.Name);
+                textObject.SetTextVariable("AMOUNT", amount);
+                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
+            }
+            catch (Exception)
+            {
+                CECustomHandler.LogToFile("Couldn't kill any prisoners.");
+            }
+        }
+
         internal void CEWoundTroops(PartyBase party, int amount = 10)
         {
             try
             {
+                if (amount == 0) return;
                 int prisonerCount = party.MemberRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
                 party.MemberRoster.WoundNumberOfTroopsRandomly(amount);
@@ -826,6 +862,7 @@ namespace CaptivityEvents.Events
         {
             try
             {
+                if (amount == 0) return;
                 int prisonerCount = party.MemberRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
                 party.MemberRoster.KillNumberOfMenRandomly(amount, killHeroes);

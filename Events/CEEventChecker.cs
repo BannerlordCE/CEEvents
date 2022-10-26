@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V100
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -638,7 +638,7 @@ namespace CaptivityEvents.Events
 
             eventMatchingCondition = true;
 
-            if (hasCityFlag || hasDungeonFlag || hasVillageFlag || hasHideoutFlag || hasTravelingFlag || hasCastleFlag || hasPartyInTownFlag || visitedByCaravanFlag || visitedByLordFlag || duringSiegeFlag || duringRaidFlag || hasNotableFemalesNearby || hasNotableMalesNearby)
+            if (hasCityFlag || hasDungeonFlag || hasVillageFlag || hasHideoutFlag || hasTravelingFlag || hasCastleFlag || hasPartyInTownFlag || hasPartyInVillageFlag || hasPartyInCastleFlag || visitedByCaravanFlag || visitedByLordFlag || duringSiegeFlag || duringRaidFlag || hasNotableFemalesNearby || hasNotableMalesNearby)
             {
                 eventMatchingCondition = false;
 
@@ -704,12 +704,33 @@ namespace CaptivityEvents.Events
                             eventMatchingCondition = true;
                         }
                     }
-
                     if (hasHideoutFlag && captorParty.Settlement.IsHideout) eventMatchingCondition = true;
-
                     if ((hasCastleFlag || hasDungeonFlag) && captorParty.Settlement.IsCastle)
                     {
-                        if (visitedByLordFlag)
+                        if (hasNotableFemalesNearby && !hasNotableMalesNearby)
+                        {
+                            eventMatchingCondition = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
+                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                        }
+                        else if (hasNotableMalesNearby && !hasNotableFemalesNearby)
+                        {
+                            eventMatchingCondition = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
+                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                        }
+
+                        if (visitedByCaravanFlag)
+                        {
+                            try
+                            {
+                                eventMatchingCondition = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan) != null;
+                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
+                            }
+                            catch (Exception)
+                            {
+                                return LogError("Failed to get Caravan");
+                            }
+                        }
+                        else if (visitedByLordFlag)
                         {
                             try
                             {
@@ -790,7 +811,34 @@ namespace CaptivityEvents.Events
                         }
 
 
-                        eventMatchingCondition = true;
+                        if (visitedByCaravanFlag)
+                        {
+                            try
+                            {
+                                eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan) != null;
+                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
+                            }
+                            catch (Exception)
+                            {
+                                return LogError("Failed to get Caravan");
+                            }
+                        }
+                        else if (visitedByLordFlag)
+                        {
+                            try
+                            {
+                                eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty) != null;
+                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByLordFlag conditions.");
+                            }
+                            catch (Exception)
+                            {
+                                return LogError("Failed to get Lord Party");
+                            }
+                        }
+                        else
+                        {
+                            eventMatchingCondition = true;
+                        }
                     }
 
                     if (hasPartyInCastleFlag && captorParty.MobileParty.CurrentSettlement.IsCastle)
@@ -807,7 +855,19 @@ namespace CaptivityEvents.Events
                         }
 
 
-                        if (visitedByLordFlag)
+                        if (visitedByCaravanFlag)
+                        {
+                            try
+                            {
+                                eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan) != null;
+                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
+                            }
+                            catch (Exception)
+                            {
+                                return LogError("Failed to get Caravan");
+                            }
+                        }
+                        else if (visitedByLordFlag)
                         {
                             try
                             {

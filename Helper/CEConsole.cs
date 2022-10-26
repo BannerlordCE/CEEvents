@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V100
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -24,15 +24,9 @@ using TaleWorlds.ModuleManager;
 using TaleWorlds.MountAndBlade;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
-
-#if V171
-#else
-
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements.Locations;
-
-#endif
 
 namespace CaptivityEvents.Helper
 {
@@ -1001,6 +995,7 @@ namespace CaptivityEvents.Helper
                     // Unload
                     CEPersistence.CEEvents.Clear();
                     CEPersistence.CEEventList.Clear();
+                    CEPersistence.CEAlternativePregnancyEvents.Clear();
                     CEPersistence.CEWaitingList.Clear();
                     CEPersistence.CECallableEvents.Clear();
 
@@ -1042,7 +1037,12 @@ namespace CaptivityEvents.Helper
                                 CEHelper.brothelFlagMale = true;
                         }
 
-                        if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
+
+                        if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BirthAlternative))
+                        {
+                            CEPersistence.CEAlternativePregnancyEvents.Add(_listedEvent);
+                        }
+                        else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
                         {
                             CEPersistence.CEWaitingList.Add(_listedEvent);
                         }

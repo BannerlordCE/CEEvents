@@ -1,4 +1,4 @@
-﻿#define V180
+﻿#define V100
 
 using CaptivityEvents.Custom;
 using System;
@@ -13,13 +13,13 @@ namespace CaptivityEvents
 {
     internal static class CESkills
     {
-        public static SkillObject Prostitution => CustomSkills[_StartDefaultSkillNode];
+        public static SkillObject Prostitution => CustomSkills[0];
 
-        public static SkillObject IsProstitute => CustomSkills[_StartDefaultSkillNode + 1];
+        public static SkillObject IsProstitute => CustomSkills[1];
 
-        public static SkillObject Slavery => CustomSkills[_StartDefaultSkillNode + 2];
+        public static SkillObject Slavery => CustomSkills[2];
 
-        public static SkillObject IsSlave => CustomSkills[_StartDefaultSkillNode + 3];
+        public static SkillObject IsSlave => CustomSkills[3];
 
         public static bool IsInitialized { get; private set; } = false;
 
@@ -27,22 +27,27 @@ namespace CaptivityEvents
 
         internal static CharacterAttribute CEAttribute { get; private set; }
 
-        private static int _StartDefaultSkillNode = 0;
+        internal static readonly List<CESkillNode> NodeSkills = new() {
+           new CESkillNode("Prostitution", "{=CEEVENTS1106}Prostitution", "0"),
+           new CESkillNode("IsProstitute", "{=CEEVENTS1104}prostitute", "0", "1"),
+           new CESkillNode("Slavery", "{=CEEVENTS1105}Slavery", "0"),
+           new CESkillNode("IsSlave", "{=CEEVENTS1103}slave", "0", "1")
+        };
 
-        private static readonly List<CESkillNode> _Skills = new();
 
         public static void AddCustomSkill(CESkillNode skillNode)
         {
-            int index = _Skills.FindIndex((item) => item.Id == skillNode.Id);
+            int index = NodeSkills.FindIndex((item) => item.Id == skillNode.Id);
             if (index == -1)
             {
-                _Skills.Add(skillNode);
+                NodeSkills.Add(skillNode);
             }
             else
             {
-                _Skills[index].MaxLevel = skillNode.MaxLevel;
-                _Skills[index].MinLevel = skillNode.MinLevel;
-                _Skills[index].Name = skillNode.Name;
+                NodeSkills[index].MaxLevel = skillNode.MaxLevel;
+                NodeSkills[index].MinLevel = skillNode.MinLevel;
+                NodeSkills[index].Name = skillNode.Name;
+                NodeSkills[index].SetZeroOnEscape = skillNode.SetZeroOnEscape;
             }
         }
 
@@ -50,7 +55,7 @@ namespace CaptivityEvents
         {
             try
             {
-                return _Skills.Find(skillNode => skillNode.Id == skill);
+                return NodeSkills.Find(skillNode => skillNode.Id == skill);
             }
             catch (Exception e)
             {
@@ -88,14 +93,7 @@ namespace CaptivityEvents
 
             CEAttribute = game.ObjectManager.RegisterPresumedObject(new CharacterAttribute("CEAttribute"));
 
-            _StartDefaultSkillNode = _Skills.Count;
-
-            _Skills.Add(new CESkillNode("Prostitution", "{=CEEVENTS1106}Prostitution", "0"));
-            _Skills.Add(new CESkillNode("IsProstitute", "{=CEEVENTS1104}prostitute", "0", "1"));
-            _Skills.Add(new CESkillNode("Slavery", "{=CEEVENTS1105}Slavery", "0"));
-            _Skills.Add(new CESkillNode("IsSlave", "{=CEEVENTS1103}slave", "0", "1"));
-
-            foreach (CESkillNode skill in _Skills)
+            foreach (CESkillNode skill in NodeSkills)
             {
                 CustomSkills.Add(game.ObjectManager.RegisterPresumedObject(new SkillObject(skill.Id)));
             }
@@ -130,7 +128,7 @@ namespace CaptivityEvents
 
             for (int i = 0; i < CustomSkills.Count; i++)
             {
-                CustomSkills[i].Initialize(new TextObject(_Skills[i].Name), new TextObject(_Skills[i].Name), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEAttribute);
+                CustomSkills[i].Initialize(new TextObject(NodeSkills[i].Name), new TextObject(NodeSkills[i].Name), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEAttribute);
             }
 
             IsInitialized = true;

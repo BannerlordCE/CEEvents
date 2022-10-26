@@ -1,4 +1,4 @@
-#define V180
+#define V100
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -37,16 +37,11 @@ using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
-using System.Xml;
+using CaptivityEvents.Notifications;
 
-
-#if V172
-using TaleWorlds.Core.ViewModelCollection;
-using TaleWorlds.MountAndBlade.View.Missions;
-#else
 using TaleWorlds.MountAndBlade.View.MissionViews;
 using TaleWorlds.Core.ViewModelCollection.Information;
-#endif
+
 
 namespace CaptivityEvents
 {
@@ -89,6 +84,7 @@ namespace CaptivityEvents
         public static List<CEEvent> CEEvents = new();
 
         public static List<CEEvent> CEEventList = new();
+        public static List<CEEvent> CEAlternativePregnancyEvents = new();
         public static List<CEEvent> CEWaitingList = new();
         public static List<CEEvent> CECallableEvents = new();
 
@@ -163,12 +159,14 @@ namespace CaptivityEvents
         // Last Check on Animation Loop
         private static float lastCheck;
 
+        // Timer for Hunting
+        private static float huntingTimerOne;
+
         // Fade out for Dungeon
         private static float dungeonFadeOut = 2f;
 
         // Timer for Brothel
         private static float brothelTimerOne;
-
         private static float brothelTimerTwo;
         private static float brothelTimerThree;
 
@@ -192,37 +190,37 @@ namespace CaptivityEvents
             {
                 if (!swap)
                 {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
                           ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
                         : CEPersistence.CEEventImageList[name];
                 }
                 else
                 {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
                         : CEPersistence.CEEventImageList[name];
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
                         : CEPersistence.CEEventImageList[name];
                 }
@@ -580,7 +578,11 @@ namespace CaptivityEvents
                         CEHelper.brothelFlagMale = true;
                 }
 
-                if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
+                if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BirthAlternative))
+                {
+                    CEPersistence.CEAlternativePregnancyEvents.Add(_listedEvent);
+                }
+                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
                 {
                     CEPersistence.CEWaitingList.Add(_listedEvent);
                 }
@@ -660,30 +662,31 @@ namespace CaptivityEvents
             CEConsole.CleanSave(new List<string>());
             base.OnNewGameCreated(game, initializerObject);
         }
-        
-        
+
+
         protected override void OnGameStart(Game game, IGameStarter gameStarter)
         {
-            if (!(game.GameType is Campaign)) return;
-            CheckBugIssue();
+            if (game.GameType is not Campaign) return;
+            CleanBugs();
             ResetHelper();
             if (!_isLoaded) return;
-#if V172
-            game.GameTextManager.LoadGameTexts(BasePath.Name + "Modules/zCaptivityEvents/ModuleData/module_strings.xml");
-#else
-#endif
             InitalizeAttributes(game);
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
             AddBehaviours(campaignStarter);
         }
 
-        private void CheckBugIssue()
+        private void CleanBugs()
+        {
+            CheckEncounterIssue();
+        }
+
+        private void CheckEncounterIssue()
         {
             try
             {
                 if (PlayerEncounter.Current == null) return;
                 if (PlayerEncounter.EncounteredMobileParty == null) return;
-                if (!PlayerEncounter.EncounteredMobileParty.StringId.StartsWith("CustomPartyHuntCE_")) return;
+                if (!PlayerEncounter.EncounteredMobileParty.StringId.StartsWith("CustomPartyCE_Hunt_")) return;
                 CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
             }
             catch (Exception)
@@ -715,7 +718,7 @@ namespace CaptivityEvents
             if (dailyTickHeroEvent != null)
             {
                 dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<PrisonerReleaseCampaignBehavior>());
-                if ((CESettings.Instance?.EscapeAutoRansom?.SelectedIndex ?? 0)  != 2) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
+                if ((CESettings.Instance?.EscapeAutoRansom?.SelectedIndex ?? 0) != 2) dailyTickHeroEvent.ClearListeners(Campaign.Current.GetCampaignBehavior<DiplomaticBartersBehavior>());
             }
 
             IMbEvent<MobileParty> hourlyPartyTick = CampaignEvents.HourlyTickPartyEvent;
@@ -755,11 +758,7 @@ namespace CaptivityEvents
             else AddCustomEvents(campaignStarter);
 
             if (_isLoadedInGame) return;
-#if V172
-            TooltipVM.AddTooltipType(typeof(CEBrothel), CEBrothelToolTip.BrothelTypeTooltipAction);
-#else
             PropertyBasedTooltipVM.AddTooltipType(typeof(CEBrothel), CEBrothelToolTip.BrothelTypeTooltipAction);
-#endif
             LoadBrothelSounds();
             _isLoadedInGame = true;
         }
@@ -774,7 +773,7 @@ namespace CaptivityEvents
                 if (list[i] is TBaseType)
                 {
                     flag = true;
-                    if (!(list[i] is TChildType)) list[i] = Activator.CreateInstance<TChildType>();
+                    if (list[i] is not TChildType) list[i] = Activator.CreateInstance<TChildType>();
                 }
             }
 
@@ -791,7 +790,7 @@ namespace CaptivityEvents
                 if (list[i] is TBaseType)
                 {
                     flag = true;
-                    if (!(list[i] is TChildType)) list[i] = Activator.CreateInstance<TChildType>();
+                    if (list[i] is not TChildType) list[i] = Activator.CreateInstance<TChildType>();
                 }
             }
 
@@ -802,6 +801,9 @@ namespace CaptivityEvents
         {
             // Waiting Menu Load
             foreach (CEEvent waitingEvent in CEPersistence.CEWaitingList) AddEvent(gameStarter, waitingEvent, CEPersistence.CEEvents);
+
+            // Alternative Event Load 
+            foreach (CEEvent alternativeEvent in CEPersistence.CEAlternativePregnancyEvents) AddEvent(gameStarter, alternativeEvent, CEPersistence.CEEvents);
 
             // Listed Event Load
             foreach (CEEvent listedEvent in CEPersistence.CEEventList) AddEvent(gameStarter, listedEvent, CEPersistence.CEEvents);
@@ -1172,6 +1174,23 @@ namespace CaptivityEvents
                                 Mission.Current.MainAgent.TeleportToPosition(CEPersistence.gameEntity.GlobalPosition);
                             }
                             CEPersistence.brothelState = CEPersistence.BrothelState.Black;
+
+                            if (CESettingsIntegrations.Instance != null && CESettingsIntegrations.Instance.ActivateHotButter)
+                            {
+                                brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelFadeOut;
+                                Mission.Current.MainAgentServer.Controller = Agent.ControllerType.Player;
+                                CEPersistence.brothelState = CEPersistence.BrothelState.FadeOut;
+                                try
+                                {
+                                    string sceneToPlay = CEHelper.CustomSceneToPlay("scn_pompa_$location_culture_$location_$randomize", PartyBase.MainParty);
+                                    CESceneNotification data = new(Hero.MainHero.IsFemale ? CharacterObject.Find(CEPersistence.agentTalkingTo.Character.StringId) : Hero.MainHero.CharacterObject, !Hero.MainHero.IsFemale ? CharacterObject.Find(CEPersistence.agentTalkingTo.Character.StringId) : Hero.MainHero.CharacterObject, sceneToPlay);
+                                    MBInformationManager.ShowSceneNotification(data);
+                                }
+                                catch (Exception e)
+                                {
+                                    CECustomHandler.ForceLogToFile("FadeIn: " + e);
+                                }
+                            }
                         }
 
                         break;
@@ -1183,7 +1202,7 @@ namespace CaptivityEvents
                             Mission.Current.MainAgentServer.Controller = Agent.ControllerType.Player;
                             CEPersistence.brothelState = CEPersistence.BrothelState.FadeOut;
                         }
-                        else if (brothelTimerTwo < missionStateBrothel.CurrentMission.CurrentTime)
+                        else if (brothelTimerTwo < missionStateBrothel.CurrentMission.CurrentTime && (CESettingsIntegrations.Instance == null || !CESettingsIntegrations.Instance.ActivateHotButter))
                         {
                             brothelTimerTwo = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
 
@@ -1194,7 +1213,7 @@ namespace CaptivityEvents
                             }
                             catch (Exception) { }
                         }
-                        else if (brothelTimerThree < missionStateBrothel.CurrentMission.CurrentTime)
+                        else if (brothelTimerThree < missionStateBrothel.CurrentMission.CurrentTime && (CESettingsIntegrations.Instance == null || !CESettingsIntegrations.Instance.ActivateHotButter))
                         {
                             brothelTimerThree = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
 
@@ -1237,7 +1256,7 @@ namespace CaptivityEvents
                     switch (CEPersistence.huntState)
                     {
                         case CEPersistence.HuntState.StartHunt:
-                            if (Mission.Current != null && Mission.Current.IsLoadingFinished && Mission.Current.CurrentTime > 2f && Mission.Current.Agents != null)
+                            if (Mission.Current != null && Mission.Current.IsLoadingFinished && Mission.Current.CurrentTime > 2f && Mission.Current.Agents != null && !Mission.Current.Agents.Any((item) => item.IsPaused))
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents.ToList()
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
@@ -1245,19 +1264,21 @@ namespace CaptivityEvents
                                 {
                                     ForceAgentDropEquipment(agent2);
                                 }
+                               
 
                                 // 1.5.1
                                 missionState.CurrentMission.ClearCorpses(false);
 
                                 CEHelper.AddQuickInformation(new TextObject("{=CEEVENTS1069}Let's give them a headstart."), 100, CharacterObject.PlayerCharacter);
+
                                 CEPersistence.huntState = CEPersistence.HuntState.HeadStart;
+                                huntingTimerOne = Mission.Current.CurrentTime + (CESettings.Instance?.HuntBegins ?? 7f);
                             }
 
                             break;
 
                         case CEPersistence.HuntState.HeadStart:
-                            if (Mission.Current != null && Mission.Current.Agents != null && Mission.Current.CurrentTime > (CESettings.Instance?.HuntBegins ?? 7f)
-                                )
+                            if (Mission.Current != null && Mission.Current.Agents != null && Mission.Current.CurrentTime > huntingTimerOne)
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents.ToList()
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
@@ -1265,7 +1286,7 @@ namespace CaptivityEvents
                                 {
                                     CommonAIComponent component = agent2.GetComponent<CommonAIComponent>();
                                     component?.Panic();
-                                    agent2.DestinationSpeed = 0.5f;
+                                    agent2.SetMaximumSpeedLimit(0.5f, false);
                                 }
                                 CEHelper.AddQuickInformation(new TextObject("{=CEEVENTS1068}Hunt them down!"), 100, CharacterObject.PlayerCharacter, CharacterObject.PlayerCharacter.IsFemale
                                                                            ? "event:/voice/combat/female/01/victory"
@@ -1457,7 +1478,8 @@ namespace CaptivityEvents
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon1);
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon2);
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon3);
-                agent.RemoveEquippedWeapon(EquipmentIndex.Weapon4);
+                agent.RemoveEquippedWeapon(EquipmentIndex.ExtraWeaponSlot);
+
                 if (agent.HasMount) agent.MountAgent.Die(new Blow(), Agent.KillInfo.Musket);
             }
             catch (Exception) { }
