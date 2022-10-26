@@ -1,4 +1,4 @@
-﻿#define V181
+﻿#define V100
 
 using CaptivityEvents.Custom;
 using HarmonyLib;
@@ -28,19 +28,11 @@ namespace CaptivityEvents.Patches
                 CharacterObject characterObject = CharacterObject.All.GetRandomElement();
                 BodyProperties bodyProperties = characterObject.GetBodyProperties(null, -1);
                 FaceGenerationParams faceGenerationParams = FaceGenerationParams.Create();
-#if V181
-                MBBodyProperties.GetParamsFromKey(ref faceGenerationParams, bodyProperties, false);
-                faceGenerationParams._heightMultiplier = 0.5f;
-                MBBodyProperties.ProduceNumericKeyWithParams(faceGenerationParams, false, ref bodyProperties);
-                character.UpdatePlayerCharacterBodyProperties(bodyProperties, characterObject.Race, characterObject.IsFemale);
-                character.Culture = new CultureObject();
-#else
                 MBBodyProperties.GetParamsFromKey(ref faceGenerationParams, bodyProperties, false, false);
                 faceGenerationParams._heightMultiplier = 0.5f;
                 MBBodyProperties.ProduceNumericKeyWithParams(faceGenerationParams, false, false, ref bodyProperties);
                 character.UpdatePlayerCharacterBodyProperties(bodyProperties, characterObject.Race, characterObject.IsFemale);
                 character.Culture = new CultureObject();
-#endif
             }
             catch (Exception) { }
         }

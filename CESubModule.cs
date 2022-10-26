@@ -1,4 +1,4 @@
-#define V181
+#define V100
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -42,9 +42,6 @@ using CaptivityEvents.Notifications;
 using TaleWorlds.MountAndBlade.View.MissionViews;
 using TaleWorlds.Core.ViewModelCollection.Information;
 
-#if V181
-using System.Xml;
-#endif
 
 namespace CaptivityEvents
 {
@@ -1289,11 +1286,7 @@ namespace CaptivityEvents
                                 {
                                     CommonAIComponent component = agent2.GetComponent<CommonAIComponent>();
                                     component?.Panic();
-#if V181
-                                    agent2.DestinationSpeed = 0.5f;
-#else
                                     agent2.SetMaximumSpeedLimit(0.5f, false);
-#endif
                                 }
                                 CEHelper.AddQuickInformation(new TextObject("{=CEEVENTS1068}Hunt them down!"), 100, CharacterObject.PlayerCharacter, CharacterObject.PlayerCharacter.IsFemale
                                                                            ? "event:/voice/combat/female/01/victory"
@@ -1485,11 +1478,8 @@ namespace CaptivityEvents
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon1);
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon2);
                 agent.RemoveEquippedWeapon(EquipmentIndex.Weapon3);
-#if V181
-                agent.RemoveEquippedWeapon(EquipmentIndex.Weapon4);
-#else
                 agent.RemoveEquippedWeapon(EquipmentIndex.ExtraWeaponSlot);
-#endif
+
                 if (agent.HasMount) agent.MountAgent.Die(new Blow(), Agent.KillInfo.Musket);
             }
             catch (Exception) { }
