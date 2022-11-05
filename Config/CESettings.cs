@@ -1,9 +1,10 @@
 using CaptivityEvents.Custom;
+using MCM.Abstractions;
 using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
-using MCM.Abstractions.Dropdown;
-using MCM.Abstractions.Settings.Base;
-using MCM.Abstractions.Settings.Base.Global;
+using MCM.Abstractions.Base;
+using MCM.Abstractions.Base.Global;
+using MCM.Common;
 using System;
 using System.Collections.Generic;
 
@@ -44,8 +45,8 @@ namespace CaptivityEvents.Config
         int PrisonerNonHeroEscapeChanceOther { get; set; }
         int BrothelHeroEscapeChance { get; set; }
         int BrothelNonHeroEscapeChance { get; set; }
-        DropdownDefault<string> EscapeAutoRansom { get; set; }
-        DropdownDefault<string> BrothelOption { get; set; }
+        Dropdown<string> EscapeAutoRansom { get; set; }
+        Dropdown<string> BrothelOption { get; set; }
         bool PrisonerExceeded { get; set; }
         bool NonSexualContent { get; set; }
         bool SexualContent { get; set; }
@@ -74,7 +75,7 @@ namespace CaptivityEvents.Config
         bool UsePregnancyModifiers { get; set; }
         float PregnancyDurationInDays { get; set; }
         bool PregnancyMessages { get; set; }
-        DropdownDefault<string> RenownChoice { get; set; }
+        Dropdown<string> RenownChoice { get; set; }
         float RenownMin { get; set; }
         bool LogToggle { get; set; }
     }
@@ -113,13 +114,13 @@ namespace CaptivityEvents.Config
         public int PrisonerNonHeroEscapeChanceSettlement { get; set; } = 0;
         public int PrisonerNonHeroEscapeChanceOther { get; set; } = 0;
 
-        public DropdownDefault<string> EscapeAutoRansom { get; set; } = new DropdownDefault<string>(new string[] {
+        public Dropdown<string> EscapeAutoRansom { get; set; } = new Dropdown<string>(new string[] {
             "{=CESETTINGS1115}Off",
             "{=CESETTINGS1114}Disabled For Player",
             "{=CESETTINGS1116}On"
         }, 0);
 
-        public DropdownDefault<string> BrothelOption { get; set; } = new DropdownDefault<string>(new string[]
+        public Dropdown<string> BrothelOption { get; set; } = new Dropdown<string>(new string[]
         {
             "{=CESETTINGS1117}Any",
             "{=CESETTINGS1118}Female",
@@ -159,7 +160,7 @@ namespace CaptivityEvents.Config
         public float PregnancyDurationInDays { get; set; } = 14f;
         public bool PregnancyMessages { get; set; } = true;
 
-        public DropdownDefault<string> RenownChoice { get; set; } = new DropdownDefault<string>(new string[]
+        public Dropdown<string> RenownChoice { get; set; } = new Dropdown<string>(new string[]
         {
             "{=CESETTINGS1115}Off",
             "{=CESETTINGS1022}Decrease/Increase Clan Level",
@@ -177,26 +178,31 @@ namespace CaptivityEvents.Config
         public override string FolderName => "zCaptivityEvents";
         public override string FormatType => "json2";
 
-        public override IDictionary<string, Func<BaseSettings>> GetAvailablePresets()
+        public override IEnumerable<ISettingsPreset> GetBuiltInPresets()
         {
-            IDictionary<string, Func<BaseSettings>> basePresets = base.GetAvailablePresets(); // include the 'Default' preset that MCM provides
-            basePresets.Add("Developer Mode", () => new CESettingsCustom()
+            foreach (var preset in base.GetBuiltInPresets())
+            {
+                yield return preset;
+            }
+
+            yield return new MemorySettingsPreset(Id, "developerMode", "Developer Mode", () => new CESettingsCustom()
             {
                 LogToggle = true
             });
-            basePresets.Add("Hard Mode", () => new CESettingsCustom()
+
+            yield return new MemorySettingsPreset(Id, "hard", "Hard Mode", () => new CESettingsCustom()
             {
                 StolenGear = true,
                 StolenGearChance = 30f,
                 BetterOutFitChance = 10,
                 RenownMin = -300f
             });
-            basePresets.Add("Easy Mode", () => new CESettingsCustom()
+
+            yield return new MemorySettingsPreset(Id, "easy", "Easy Mode", () => new CESettingsCustom()
             {
                 StolenGear = false,
                 RenownMin = 0f
             });
-            return basePresets;
         }
 
         public bool IsHardCoded { get; } = false;
@@ -345,7 +351,7 @@ namespace CaptivityEvents.Config
 
         [SettingPropertyDropdown("{=CESETTINGS1120}Brothel Prisoners Allowed", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1121}Allows the gender to be prisoners in the brothel")]
         [SettingPropertyGroup("{=CESETTINGS1128}Brothel")]
-        public DropdownDefault<string> BrothelOption { get; set; } = new DropdownDefault<string>(new string[]
+        public Dropdown<string> BrothelOption { get; set; } = new Dropdown<string>(new string[]
         {
             "{=CESETTINGS1117}Any",
             "{=CESETTINGS1118}Female",
@@ -470,7 +476,7 @@ namespace CaptivityEvents.Config
 
         [SettingPropertyDropdown("{=CESETTINGS1026}Games Default Auto Ransom Behavior", Order = 8, RequireRestart = true, HintText = "{=CESETTINGS1027}Allow the games default behavior regarding auto-ransom")]
         [SettingPropertyGroup("{=CESETTINGS0097}Escape")]
-        public DropdownDefault<string> EscapeAutoRansom { get; set; } = new DropdownDefault<string>(new string[] {
+        public Dropdown<string> EscapeAutoRansom { get; set; } = new Dropdown<string>(new string[] {
             "{=CESETTINGS1115}Off",
             "{=CESETTINGS1114}Disabled For Player",
             "{=CESETTINGS1116}On"
@@ -554,7 +560,7 @@ namespace CaptivityEvents.Config
 
         [SettingPropertyDropdown("{=CESETTINGS1024}Renown Choice", Order = 1, RequireRestart = false, HintText = "{=CESETTINGS1025}Keeps minimum at current clan level or allows to decrease or disables renown changes.")]
         [SettingPropertyGroup("{=CESETTINGS0095}Other", GroupOrder = 10)]
-        public DropdownDefault<string> RenownChoice { get; set; } = new DropdownDefault<string>(new string[] {
+        public Dropdown<string> RenownChoice { get; set; } = new Dropdown<string>(new string[] {
             "{=CESETTINGS1115}Off",
             "{=CESETTINGS1022}Decrease/Increase Clan Level",
             "{=CESETTINGS1023}Keep/Increase Clan Level"
