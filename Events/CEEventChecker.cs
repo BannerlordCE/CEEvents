@@ -1734,13 +1734,19 @@ namespace CaptivityEvents.Events
 
         private bool CaptorOwnerFlagsCheck(PartyBase captorParty)
         {
-            if (!captorParty.IsMobile || captorParty.MobileParty.CurrentSettlement == null) return true;
+            try
+            {
+                if (!captorParty.IsMobile || captorParty.MobileParty.CurrentSettlement == null) return true;
 
-            if (captorParty.MobileParty.CurrentSettlement.OwnerClan != captorParty.MobileParty.ActualClan && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorOwnsCurrentSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorOwnsCurrentPartySettlement.");
-            if (captorParty.MobileParty.CurrentSettlement.OwnerClan == captorParty.MobileParty.ActualClan && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorOwnsNotCurrentSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorOwnsNotCurrentPartySettlement.");
-            if (captorParty.MobileParty.CurrentSettlement.MapFaction != captorParty.MapFaction && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorFactionOwnsSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorFactionOwnsSettlement.");
-            if ((captorParty.MobileParty.CurrentSettlement.MapFaction == captorParty.MapFaction || captorParty.MobileParty.CurrentSettlement.MapFaction.IsAtWarWith(captorParty.MapFaction)) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorNeutralFactionOwnsSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorNeutralFactionOwnsSettlement.");
-            if ((captorParty.MobileParty.CurrentSettlement.MapFaction == captorParty.MapFaction || !captorParty.MobileParty.CurrentSettlement.MapFaction.IsAtWarWith(captorParty.MapFaction)) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorEnemyFactionOwnsSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorEnemyFactionOwnsSettlement.");
+                if (captorParty.MobileParty.CurrentSettlement.OwnerClan != captorParty.MobileParty.ActualClan && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorOwnsCurrentSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorOwnsCurrentPartySettlement.");
+                if (captorParty.MobileParty.CurrentSettlement.OwnerClan == captorParty.MobileParty.ActualClan && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorOwnsNotCurrentSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorOwnsNotCurrentPartySettlement.");
+                if (captorParty.MobileParty.CurrentSettlement.MapFaction != captorParty.MapFaction && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorFactionOwnsSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorFactionOwnsSettlement.");
+                if ((captorParty.MobileParty.CurrentSettlement.MapFaction == captorParty.MapFaction || captorParty.MobileParty.CurrentSettlement.MapFaction.IsAtWarWith(captorParty.MapFaction)) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorNeutralFactionOwnsSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorNeutralFactionOwnsSettlement.");
+                if ((captorParty.MobileParty.CurrentSettlement.MapFaction == captorParty.MapFaction || !captorParty.MobileParty.CurrentSettlement.MapFaction.IsAtWarWith(captorParty.MapFaction)) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorEnemyFactionOwnsSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorEnemyFactionOwnsSettlement.");
+            } catch (Exception e)
+            {
+                return ForceLogError("Failure in CaptorOwnerFlagsCheck: " + _listEvent.Name + " " + e);
+            }
 
             return true;
         }
