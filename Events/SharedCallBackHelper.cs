@@ -948,6 +948,9 @@ namespace CaptivityEvents.Events
                                         if (Settlement.CurrentSettlement == null)
                                         {
                                             CECustomHandler.ForceLogToFile("ConsequenceStartBattle : city required. ");
+                                            CEPersistence.victoryEvent = null;
+                                            CEPersistence.defeatEvent = null;
+                                            return;
                                         }
                                         // StartCommonAreaBattle RivalGangMovingInIssueBehavior
                                         MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), null, null);

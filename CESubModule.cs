@@ -1344,6 +1344,8 @@ namespace CaptivityEvents
                                                                ? "wait_prisoner_female"
                                                                : "wait_prisoner_male");
                     }
+                    CEPersistence.victoryEvent = null;
+                    CEPersistence.defeatEvent = null;
                 }
             }
             else
@@ -1357,6 +1359,8 @@ namespace CaptivityEvents
                                                                ? "wait_prisoner_female"
                                                                : "wait_prisoner_male");
                     }
+                    CEPersistence.victoryEvent = null;
+                    CEPersistence.defeatEvent = null;
                 }
             }
         }
