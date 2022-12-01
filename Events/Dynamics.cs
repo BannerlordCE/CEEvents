@@ -263,8 +263,8 @@ namespace CaptivityEvents.Events
 
                 if (levels > 0)
                 {
-                    MethodInfo mi = hero.HeroDeveloper.GetType().GetMethod("ChangeSkillLevelFromXpChange", BindingFlags.Instance | BindingFlags.NonPublic);
-                    if (mi != null) mi.Invoke(hero.HeroDeveloper, new object[] { skillObject, levels, false });
+                    //MethodInfo mi = hero.HeroDeveloper.GetType().GetMethod("ChangeSkillLevelFromXpChange", BindingFlags.Instance | BindingFlags.NonPublic);
+                    //if (mi != null) mi.Invoke(hero.HeroDeveloper, new object[] { skillObject, levels, false });
                 }
                 else
                 {
