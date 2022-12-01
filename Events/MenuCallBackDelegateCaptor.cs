@@ -591,7 +591,7 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceStrip(Hero captiveHero)
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip)) _captor.CECaptorStripVictim(captiveHero);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip)) _captor.CECaptorStripVictim(captiveHero, _option.StripSettings);
         }
 
         private void ConsequenceMakeHeroCompanion(Hero captiveHero)
