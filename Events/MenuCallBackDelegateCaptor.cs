@@ -1,4 +1,4 @@
-﻿#define V100
+﻿#define V102
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -259,7 +259,7 @@ namespace CaptivityEvents.Events
                 {
                     if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
 
-                    MobileParty.MainParty.MemberRoster.AddToCounts(captiveHero.CharacterObject, 1, false);
+                    MobileParty.MainParty.AddElementToMemberRoster(captiveHero.CharacterObject, 1, false);
 
                     InventoryManager.OpenScreenAsInventoryOf(MobileParty.MainParty, captiveHero.CharacterObject);
 

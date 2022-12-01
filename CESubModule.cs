@@ -1,4 +1,4 @@
-#define V100
+#define V102
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -266,7 +266,7 @@ namespace CaptivityEvents
             base.OnSubModuleLoad();
 
             ModuleInfo ceModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
-            ModuleInfo nativeModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative(); });
+            ModuleInfo nativeModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative; });
 
             ApplicationVersion modversion = ceModule.Version;
             ApplicationVersion gameversion = nativeModule.Version;
