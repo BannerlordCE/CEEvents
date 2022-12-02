@@ -29,6 +29,9 @@
 		},
 		{
 			"path": "../../zCEArenaFighterExpansion"
+		},
+		{
+			"path": "../../zCEAnimationExpansion"
 		}
 	]
 }
