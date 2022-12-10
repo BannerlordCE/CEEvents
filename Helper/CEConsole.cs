@@ -560,7 +560,7 @@ namespace CaptivityEvents.Helper
                 ////
                 //Input Validation
                 ////
-                if ((CampaignCheats.CheckParameters(strings, 0) && (CampaignCheats.CheckHelp(strings))) return "Format is \"captivity.ImpregnateBy [HERO] [HERO]\".");
+                if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.ImpregnateBy [HERO] [HERO]\".";
                 
                 bool flagValid = false;
 
