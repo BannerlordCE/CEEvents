@@ -581,7 +581,7 @@ namespace CaptivityEvents.Helper
                     flagValid = true;
                 }
 
-                if (!flag) return "Wrong input.\nFormat is \"captivity.ImpregnateBy [HERO] [HERO]\".";
+                if (!flagValid) return "Wrong input.\nFormat is \"captivity.ImpregnateBy [HERO] [HERO]\".";
                 //End of Validation
                     
                 CEImpregnationSystem _impregnation = new();
