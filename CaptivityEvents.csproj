@@ -135,6 +135,7 @@
     <Compile Include="CESubModule.cs" />
     <Compile Include="Issues\CEWhereAreMyThingsIssueBehavior.cs" />
     <Compile Include="Patches\CEPatchPlayerCaptivity.cs" />
+    <Compile Include="Patches\CEPatchRansomOfferCampaignBehavior.cs" />
     <Compile Include="Patches\CEPatchPregnancyCampaignBehavior.cs" />
     <Compile Include="Patches\CEPatchSettlementMusiciansCampaignBehavior.cs" />
     <Compile Include="Patches\CEPatchSkills.cs" />
@@ -427,7 +428,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Bannerlord.MCM">
-      <Version>5.3.2</Version>
+      <Version>5.4.2</Version>
     </PackageReference>
     <PackageReference Include="Lib.Harmony">
       <Version>2.2.2</Version>

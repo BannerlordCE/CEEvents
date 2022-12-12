@@ -1183,19 +1183,23 @@ namespace CaptivityEvents.Events
                     return;
                 }
 
-                int skillLevel = _listedEvent.Captive.GetSkillValue(foundSkill);
-
                 try
                 {
-                    if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min, "str_CE_skill_captive_level")) break;
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredAbove"); }
+                    int skillLevel = _listedEvent.Captive.GetSkillValue(foundSkill);
 
-                try
-                {
-                    if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_captive_level")) break;
+                    try
+                    {
+                        if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min, "str_CE_skill_captive_level")) break;
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredAbove"); }
+
+                    try
+                    {
+                        if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_captive_level")) break;
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
                 }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid GetSkillValue"); }
             }
         }
 

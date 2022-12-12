@@ -537,7 +537,7 @@ namespace CaptivityEvents
 
                 if (CESettingsIntegrations.Instance == null)
                 {
-                    CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsIntegrations missing MCMv4");
+                    CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsIntegrations missing MCMv5");
                 }
                 else
                 {
@@ -546,7 +546,7 @@ namespace CaptivityEvents
 
                 if (CESettingsFlags.Instance == null)
                 {
-                    CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsFlags missing MCMv4");
+                    CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsFlags missing MCMv5");
                 }
                 else
                 {
@@ -618,7 +618,7 @@ namespace CaptivityEvents
                 {
                     if (CESettingsEvents.Instance == null)
                     {
-                        CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsEvents missing MCMv4");
+                        CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettingsEvents missing MCMv5");
                     }
                     else
                     {
