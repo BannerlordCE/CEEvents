@@ -89,7 +89,7 @@ namespace CaptivityEvents.Events
                     CharacterObject wanderer = cultureObject.NotableAndWandererTemplates.GetRandomElementWithPredicate((CharacterObject x) => x.Occupation == Occupation.Wanderer && (heroVariables.Gender == null || x.IsFemale == isFemale));
                     Settlement randomElement = Settlement.All.GetRandomElementWithPredicate((Settlement settlement) => settlement.Culture == wanderer.Culture && settlement.IsTown);
 
-                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElementInefficiently(), null, -1);
+                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, null, null, -1);
 
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);
                     hero.HasMet = true;
@@ -104,6 +104,10 @@ namespace CaptivityEvents.Events
 
                             case "player":
                                 AddCompanionAction.Apply(Clan.PlayerClan, hero);
+                                break;
+
+                            case "bandit":
+                                AddCompanionAction.Apply(Clan.BanditFactions.GetRandomElementInefficiently(), hero);
                                 break;
 
                             default:
