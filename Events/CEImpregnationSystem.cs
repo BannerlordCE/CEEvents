@@ -42,7 +42,7 @@ namespace CaptivityEvents.Events
 
                     if (senderHero != null)
                     {
-                        if (!senderHero.IsFemale) randomSoldier = senderHero;
+                        if (!senderHero.IsFemale || (senderHero.IsFemale && CESettings.Instance?.PregnancyToggleFemalexFemale)) randomSoldier = senderHero;
                         else return;
                     }
                     else if (targetHero.CurrentSettlement?.Party != null && !targetHero.CurrentSettlement.Party.MemberRoster.GetTroopRoster().IsEmpty())
@@ -188,7 +188,7 @@ namespace CaptivityEvents.Events
 
                     if (captorHero != null)
                     {
-                        if (!captorHero.IsFemale) randomSoldier = captorHero;
+                        if (!captorHero.IsFemale || (captorHero.IsFemale && CESettings.Instance?.PregnancyToggleFemalexFemale)) randomSoldier = captorHero;
                         else return;
                     }
                     else if (lord && CECampaignBehavior.ExtraProps.Owner != null)
