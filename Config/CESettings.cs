@@ -70,6 +70,7 @@ namespace CaptivityEvents.Config
         int HorseChance { get; set; }
         bool HorseSkill { get; set; }
         bool PregnancyToggle { get; set; }
+        bool PregnancyToggleFemalexFemale { get; set; }
         bool AttractivenessSkill { get; set; }
         int PregnancyChance { get; set; }
         bool UsePregnancyModifiers { get; set; }
@@ -154,6 +155,7 @@ namespace CaptivityEvents.Config
         public int HorseChance { get; set; } = 10;
         public bool HorseSkill { get; set; } = true;
         public bool PregnancyToggle { get; set; } = true;
+        public bool PregnancyToggleFemalexFemale { get; set; } = true;
         public bool AttractivenessSkill { get; set; } = true;
         public int PregnancyChance { get; set; } = 20;
         public bool UsePregnancyModifiers { get; set; } = true;
@@ -553,6 +555,10 @@ namespace CaptivityEvents.Config
         [SettingPropertyBool("{=CESETTINGS1078}Pregnancy Messages", Order = 6, RequireRestart = false, HintText = "{=CESETTINGS1079}Allows daily pregnancy messages by Captivity Events.")]
         [SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
         public bool PregnancyMessages { get; set; } = true;
+        
+        [SettingPropertyBool("{=CESETTINGS1100}Pregnancy Toggle - FemalexFemale", Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1100}Allows females to impregnate females. (Only if events account for it; Alternatively, use captivity.ImpregnateBy console command to attempt it manually)")]
+		[SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
+		public bool PregnancyToggleFemalexFemale { get; set; } = true;
 
         #endregion Pregnancy
 
@@ -657,6 +663,7 @@ namespace CaptivityEvents.Config
                         _provider.HorseChance = customSettings.HorseChance;
                         _provider.HorseSkill = customSettings.HorseSkill;
                         _provider.PregnancyToggle = customSettings.PregnancyToggle;
+                        _provider.PregnancyToggleFemalexFemale = cecustomSettings.PregnancyToggleFemalexFemale;
                         _provider.AttractivenessSkill = customSettings.AttractivenessSkill;
                         _provider.PregnancyChance = customSettings.PregnancyChance;
                         _provider.UsePregnancyModifiers = customSettings.UsePregnancyModifiers;
