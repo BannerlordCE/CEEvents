@@ -595,8 +595,8 @@ namespace CaptivityEvents.Helper
                 }
                 else
                 {
-                    _impregnation.ImpregnationChance(targetHero, 0, true, fromHero);
-                    return ("Done. " + targetName + " is now carrying the child of " + fromName);
+                    _impregnation.ImpregnationChance(targetHero, 0, false, fromHero);
+                    return ("Done. If allowed, " + targetName + " is now carrying the child of " + fromName);
                 }   
             }
             catch (Exception e)
