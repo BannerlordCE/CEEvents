@@ -187,6 +187,7 @@ namespace CaptivityEvents.Events
             PlayerHasOpenSpaceForCompanions(ref args);
 
             _sharedCallBackHelper.InitIcons(ref args);
+            _sharedCallBackHelper.InitGiveItem();
 
             InitSoldToSettlement();
             InitSoldToCaravan();
@@ -215,6 +216,7 @@ namespace CaptivityEvents.Events
         internal void RandomEventConsequenceMenuOption(MenuCallbackArgs args)
         {
             CaptorSpecifics captorSpecifics = new();
+            _sharedCallBackHelper.ConsequenceGiveItem();
             _sharedCallBackHelper.ConsequenceXP();
             _sharedCallBackHelper.ConsequenceLeaveSpouse();
             _sharedCallBackHelper.ConsequenceGold();

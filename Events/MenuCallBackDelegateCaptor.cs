@@ -17,6 +17,7 @@ using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Inventory;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events
 {
@@ -167,6 +168,9 @@ namespace CaptivityEvents.Events
 
             InitGiveCaptorGold();
             InitCaptorGoldTotal();
+            InitGiveGold();
+            InitChangeGold();
+            _sharedCallBackHelper.InitGiveItem();
             ReqHeroCaptorRelation(ref args);
             ReqMorale(ref args);
             ReqTroops(ref args);
@@ -247,6 +251,7 @@ namespace CaptivityEvents.Events
             ConsequenceKillTroops(ref args);
             ConsequenceJoinParty();
 
+            _sharedCallBackHelper.ConsequenceGiveItem();
             _sharedCallBackHelper.ConsequencePlayScene();
             _sharedCallBackHelper.ConsequenceDelayedEvent();
             _sharedCallBackHelper.ConsequenceMission();
@@ -1997,6 +2002,30 @@ namespace CaptivityEvents.Events
             if (_listedEvent.Captive.HeroObject != null) content += _listedEvent.Captive.HeroObject.GetSkillValue(CESkills.Prostitution) / 2;
             content *= _option.MultipleRestrictedListOfConsequences.Count(consequence => consequence == RestrictedListOfConsequences.GiveCaptorGold);
             MBTextManager.SetTextVariable("CAPTOR_MONEY_AMOUNT", content);
+        }
+
+        private void InitChangeGold()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) return;
+
+            try
+            {
+                int level = 0;
+
+                if (!string.IsNullOrWhiteSpace(_option.GoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.GoldTotal);
+                else if (!string.IsNullOrWhiteSpace(_listedEvent.GoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.GoldTotal);
+                else CECustomHandler.LogToFile("Missing GoldTotal");
+                MBTextManager.SetTextVariable("MONEY_AMOUNT", level);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
+        }
+
+        private void InitGiveGold()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) return;
+            int content = _score.AttractivenessScore(Hero.MainHero);
+            content *= _option.MultipleRestrictedListOfConsequences.Count(consquence => { return consquence == RestrictedListOfConsequences.GiveGold; });
+            MBTextManager.SetTextVariable("MONEY_AMOUNT", content);
         }
 
         private void InitSetNames(ref MenuCallbackArgs args)

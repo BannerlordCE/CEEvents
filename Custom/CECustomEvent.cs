@@ -14,6 +14,7 @@ namespace CaptivityEvents.Custom
     public enum RestrictedListOfConsequences
     {
         GiveXP,
+        GiveItem,
         GiveGold,
         GiveCaptorGold,
         CaptiveMarryCaptor,
@@ -702,6 +703,8 @@ namespace CaptivityEvents.Custom
         public string ReqCaptorTrait { get; set; }
 
         public string ReqHeroTrait { get; set; }
+
+        public string ItemToGive { get; set; }
 
         public string GoldTotal { get; set; }
 

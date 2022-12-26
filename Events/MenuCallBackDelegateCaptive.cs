@@ -16,7 +16,7 @@ using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
-
+using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events
 {
@@ -208,6 +208,7 @@ namespace CaptivityEvents.Events
         internal bool CaptiveEventOptionGameMenu(MenuCallbackArgs args)
         {
             _sharedCallBackHelper.InitIcons(ref args);
+            _sharedCallBackHelper.InitGiveItem();
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) InitGiveGold();
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) InitChangeGold();
@@ -273,6 +274,7 @@ namespace CaptivityEvents.Events
             ConsequenceWoundTroops();
             ConsequenceKillTroops();
 
+            _sharedCallBackHelper.ConsequenceGiveItem();
             _sharedCallBackHelper.ConsequenceGiveBirth();
             _sharedCallBackHelper.ConsequenceAbort();
             _sharedCallBackHelper.ConsequencePlayScene();

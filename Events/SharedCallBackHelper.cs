@@ -28,6 +28,7 @@ using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.GameMenus;
 using CaptivityEvents.Notifications;
 using static CaptivityEvents.CampaignBehaviors.CECampaignBehavior;
+using TaleWorlds.Library;
 
 namespace CaptivityEvents.Events
 {
@@ -49,6 +50,37 @@ namespace CaptivityEvents.Events
         }
 
         #region Consequences
+
+        internal void ConsequenceGiveItem()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveItem)) return;
+
+            try
+            {
+                string[] items = _variableLoader.GetStringFromXML(_option.ItemToGive);
+
+                foreach (var item in items)
+                {
+                    try
+                    {
+                        ItemObject itemObjectBody = null;
+
+                        if (!string.IsNullOrWhiteSpace(_option.ItemToGive)) itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(_option.ItemToGive);
+                        else CECustomHandler.LogToFile("Missing ConsequenceGiveItem");
+
+                        if (itemObjectBody != null) PartyBase.MainParty.ItemRoster.AddToCounts(itemObjectBody, 1);
+
+                        TextObject textObject = GameTexts.FindText("str_CE_item_received");
+                        textObject.SetTextVariable("ITEM", itemObjectBody.Name.ToString());
+                        InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Invalid ConsequenceGiveItem - " + item); }
+                }
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid ConsequenceGiveItem"); }
+
+
+        }
 
         internal void ConsequencePlayScene()
         {
@@ -1475,6 +1507,21 @@ namespace CaptivityEvents.Events
         }
 
         #endregion Icons
+
+        internal void InitGiveItem()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveItem)) return;
+
+            try
+            {
+                ItemObject itemObjectBody = null;
+
+                if (!string.IsNullOrWhiteSpace(_option.ItemToGive)) itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(_variableLoader.GetStringFromXML(_option.ItemToGive)[0]);
+                else CECustomHandler.LogToFile("Missing GiveItem");
+                MBTextManager.SetTextVariable("ITEM_TO_GIVE", itemObjectBody?.Name?.ToString() ?? "INVALID");
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid GiveItem"); }
+        }
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {
