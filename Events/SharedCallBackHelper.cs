@@ -65,7 +65,7 @@ namespace CaptivityEvents.Events
                     {
                         ItemObject itemObjectBody = null;
 
-                        if (!string.IsNullOrWhiteSpace(_option.ItemToGive)) itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(_option.ItemToGive);
+                        if (!string.IsNullOrWhiteSpace(item)) itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(item);
                         else CECustomHandler.LogToFile("Missing ConsequenceGiveItem");
 
                         if (itemObjectBody != null) PartyBase.MainParty.ItemRoster.AddToCounts(itemObjectBody, 1);
@@ -113,7 +113,7 @@ namespace CaptivityEvents.Events
                 {
                     string sceneToPlay = CEHelper.CustomSceneToPlay(_option.SceneToPlay ?? _listedEvent.SceneToPlay, party);
                     CESceneNotification data = new(character2, character1, sceneToPlay);
-                    
+
                     MBInformationManager.ShowSceneNotification(data);
                 }
                 catch (System.Reflection.TargetInvocationException)
@@ -1514,11 +1514,22 @@ namespace CaptivityEvents.Events
 
             try
             {
-                ItemObject itemObjectBody = null;
+                string[] items = _variableLoader.GetStringFromXML(_option.ItemToGive);
 
-                if (!string.IsNullOrWhiteSpace(_option.ItemToGive)) itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(_variableLoader.GetStringFromXML(_option.ItemToGive)[0]);
-                else CECustomHandler.LogToFile("Missing GiveItem");
-                MBTextManager.SetTextVariable("ITEM_TO_GIVE", itemObjectBody?.Name?.ToString() ?? "INVALID");
+                for (int i = 0; i < items.Length; i++)
+                {
+                    try
+                    {
+                        ItemObject itemObjectBody = null;
+
+                        if (!string.IsNullOrWhiteSpace(items[i])) itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(items[i]);
+                        else CECustomHandler.LogToFile("Missing GiveItem");
+                        if (i == 0) MBTextManager.SetTextVariable("ITEM_TO_GIVE", itemObjectBody?.Name?.ToString() ?? "");
+                        MBTextManager.SetTextVariable("ITEM_TO_GIVE_" + i, itemObjectBody?.Name?.ToString() ?? "");
+
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Invalid GiveItem - " + items[i]); }
+                }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid GiveItem"); }
         }
