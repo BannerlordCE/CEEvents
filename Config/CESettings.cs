@@ -663,7 +663,7 @@ namespace CaptivityEvents.Config
                         _provider.HorseChance = customSettings.HorseChance;
                         _provider.HorseSkill = customSettings.HorseSkill;
                         _provider.PregnancyToggle = customSettings.PregnancyToggle;
-                        _provider.PregnancyToggleFemalexFemale = cecustomSettings.PregnancyToggleFemalexFemale;
+                        _provider.PregnancyToggleFemalexFemale = customSettings.PregnancyToggleFemalexFemale;
                         _provider.AttractivenessSkill = customSettings.AttractivenessSkill;
                         _provider.PregnancyChance = customSettings.PregnancyChance;
                         _provider.UsePregnancyModifiers = customSettings.UsePregnancyModifiers;
