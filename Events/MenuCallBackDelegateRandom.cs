@@ -136,7 +136,7 @@ namespace CaptivityEvents.Events
 
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
 
-            PartyBase.MainParty.MobileParty.SetMoveModeHold();
+            PartyBase.MainParty.MobileParty.Ai.SetMoveModeHold();
         }
 
         #endregion Progress Event
@@ -589,7 +589,7 @@ namespace CaptivityEvents.Events
                     }
 
                     customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
-                    customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
+                    customParty.Ai.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
                     ConsequenceRandomCaptivityChange(ref args, customParty.Party);
                 }

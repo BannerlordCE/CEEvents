@@ -82,17 +82,14 @@ namespace CaptivityEvents.Events
                     }
 
                     CultureObject cultureObject = MBObjectManager.Instance.GetObjectTypeList<CultureObject>().Where(x => (culture == null && x.IsMainCulture || x.StringId == culture.ToLower())).FirstOrDefault();
-                    if (cultureObject == null)
-                    {
-                        cultureObject = Hero.MainHero.Culture;
-                    }
+                    cultureObject ??= Hero.MainHero.Culture;
                     CharacterObject wanderer = cultureObject.NotableAndWandererTemplates.GetRandomElementWithPredicate((CharacterObject x) => x.Occupation == Occupation.Wanderer && (heroVariables.Gender == null || x.IsFemale == isFemale));
                     Settlement randomElement = Settlement.All.GetRandomElementWithPredicate((Settlement settlement) => settlement.Culture == wanderer.Culture && settlement.IsTown);
 
                     Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, -1);
 
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);
-                    hero.HasMet = true;
+                    hero.SetHasMet();
                     hero.ChangeState(Hero.CharacterStates.Active);
                     if (heroVariables.Clan != null)
                     {

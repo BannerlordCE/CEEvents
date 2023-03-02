@@ -59,12 +59,9 @@ namespace CaptivityEvents.Events
 
         internal void CaptorProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
-            if (args.MenuContext != null)
-            {
-                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+            args.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                            ? "wait_captive_female"
                                            : "wait_captive_male");
-            }
 
             _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -145,7 +142,7 @@ namespace CaptivityEvents.Events
 
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
 
-            PartyBase.MainParty.MobileParty.SetMoveModeHold();
+            PartyBase.MainParty.MobileParty.Ai.SetMoveModeHold();
         }
 
         #endregion Progress Event
@@ -2063,12 +2060,9 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Failed to SetNames for " + _listedEvent.Name);
             }
 
-            if (args.MenuContext != null)
-            {
-                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+            args.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                            ? "wait_prisoner_female"
                                                            : "wait_prisoner_male");
-            }
         }
 
         #endregion Init Options

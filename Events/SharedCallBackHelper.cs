@@ -29,6 +29,8 @@ using TaleWorlds.CampaignSystem.GameMenus;
 using CaptivityEvents.Notifications;
 using static CaptivityEvents.CampaignBehaviors.CECampaignBehavior;
 using TaleWorlds.Library;
+using SandBox.Missions.MissionLogics;
+using TaleWorlds.MountAndBlade;
 
 namespace CaptivityEvents.Events
 {
@@ -1007,9 +1009,8 @@ namespace CaptivityEvents.Events
                                         CEPersistence.destroyParty = true;
                                         CEPersistence.surrenderParty = false;
 
-                                        PlayerEncounter.Current.ForceAlleyFight = true;
                                         PlayerEncounter.StartBattle();
-                                        PlayerEncounter.StartAlleyFightMission();
+                                        
                                         break;
                                     }
                                 case "regularspawn":
@@ -1053,7 +1054,7 @@ namespace CaptivityEvents.Events
                                         }
 
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
-                                        customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
+                                        customParty.Ai.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, true);
                                         CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
@@ -1123,7 +1124,7 @@ namespace CaptivityEvents.Events
                                         }
 
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
-                                        customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
+                                        customParty.Ai.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, true);
                                         CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
@@ -1355,10 +1356,7 @@ namespace CaptivityEvents.Events
                             Hero prisonerCharacter = Hero.MainHero;
                             PartyBase party = nearest.Party;
 
-                            if (prisonerCharacter.PartyBelongedToAsPrisoner != null)
-                            {
-                                prisonerCharacter.PartyBelongedToAsPrisoner.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
-                            }
+                            prisonerCharacter.PartyBelongedToAsPrisoner?.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
                             prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
                             prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
                             party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
@@ -1483,7 +1481,7 @@ namespace CaptivityEvents.Events
 
         private void RansomAndBribe(ref MenuCallbackArgs args)
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RansomAndBribe)) args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RansomAndBribe)) args.optionLeaveType = GameMenuOption.LeaveType.Ransom;
         }
 
         private void Trade(ref MenuCallbackArgs args)

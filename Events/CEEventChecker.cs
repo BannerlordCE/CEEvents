@@ -44,7 +44,7 @@ namespace CaptivityEvents.Events
         public static string CheckFlags(CharacterObject captive, PartyBase captorParty = null)
         {
             string returnString = "";
-            if (captorParty == null) captorParty = PartyBase.MainParty;
+            captorParty ??= PartyBase.MainParty;
 
             returnString += "\n------- " + captive.Name + "'s Status -------\n";
 
@@ -1722,8 +1722,8 @@ namespace CaptivityEvents.Events
             if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotPregnant) && (captiveHero.IsPregnant || CECampaignBehavior.CheckIfPregnancyExists(captiveHero))) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsNotPregnant.");
             if (captiveHero.Spouse == null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroHaveSpouse)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroHaveSpouse.");
             if (captiveHero.Spouse != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroNotHaveSpouse)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroNotHaveSpouse.");
-            if (captiveHero.OwnedCommonAreas.Count == 0 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnsFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroOwnsFief.");
-            if (captiveHero.OwnedCommonAreas.Count > 1 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnsNoFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroOwnsNoFief.");
+            if (captiveHero.Clan == null || captiveHero.Clan.Fiefs.Count == 0 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnsFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroOwnsFief.");
+            if (captiveHero.Clan != null && captiveHero.Clan.Fiefs.Count >= 1 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnsNoFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroOwnsNoFief.");
             if ((captiveHero.Clan == null || captiveHero != captiveHero.Clan.Leader) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsClanLeader)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsClanLeader.");
             if (captiveHero.Clan != null && captiveHero == captiveHero.Clan.Leader && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotClanLeader)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsNotClanLeader.");
             if (!captiveHero.IsFactionLeader && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsFactionLeader)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsFactionLeader.");
@@ -1743,7 +1743,8 @@ namespace CaptivityEvents.Events
                 if (captorParty.MobileParty.CurrentSettlement.MapFaction != captorParty.MapFaction && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorFactionOwnsSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorFactionOwnsSettlement.");
                 if ((captorParty.MobileParty.CurrentSettlement.MapFaction == captorParty.MapFaction || captorParty.MobileParty.CurrentSettlement.MapFaction.IsAtWarWith(captorParty.MapFaction)) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorNeutralFactionOwnsSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorNeutralFactionOwnsSettlement.");
                 if ((captorParty.MobileParty.CurrentSettlement.MapFaction == captorParty.MapFaction || !captorParty.MobileParty.CurrentSettlement.MapFaction.IsAtWarWith(captorParty.MapFaction)) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorEnemyFactionOwnsSettlement)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorEnemyFactionOwnsSettlement.");
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return ForceLogError("Failure in CaptorOwnerFlagsCheck: " + _listEvent.Name + " " + e);
             }
@@ -1760,8 +1761,8 @@ namespace CaptivityEvents.Events
             if ((captorHero.IsPregnant || CECampaignBehavior.CheckIfPregnancyExists(captorHero)) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorIsNotPregnant)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorIsNotPregnant.");
             if (captorHero.Spouse == null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorHaveSpouse)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorHaveSpouse.");
             if (captorHero.Spouse != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorNotHaveSpouse)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorNotHaveSpouse.");
-            if (captorHero.OwnedCommonAreas.Count == 0 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorOwnsFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorOwnsFief.");
-            if (captorHero.OwnedCommonAreas.Count > 1 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorOwnsNoFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorOwnsNoFief.");
+            if (captorHero.Clan == null || captorHero.Clan.Fiefs.Count == 0 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorOwnsFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorOwnsFief.");
+            if (captorHero.Clan != null && captorHero.Clan.Fiefs.Count >= 1 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorOwnsNoFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorOwnsNoFief.");
             if ((captorHero.Clan == null || captorHero != captorHero.Clan.Leader) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorIsClanLeader)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorIsClanLeader.");
             if (captorHero.Clan != null && captorHero == captorHero.Clan.Leader && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorIsNotClanLeader)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorIsNotClanLeader.");
             if (!captorHero.IsFactionLeader && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorIsFactionLeader)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorIsFactionLeader.");
@@ -2180,7 +2181,7 @@ namespace CaptivityEvents.Events
             if (!(CESettings.Instance?.ProstitutionControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution)) return Error("Skipping event " + _listEvent.Name + " Prostitution events disabled.");
             if (!(CESettings.Instance?.RomanceControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Romance)) return Error("Skipping event " + _listEvent.Name + " Romance events disabled.");
 
-            if (!(CESettings.Instance?.StolenGear ?? true)&& _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripEnabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear disabled.");
+            if (!(CESettings.Instance?.StolenGear ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripEnabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear disabled.");
             if ((CESettings.Instance?.StolenGear ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.StripDisabled)) return Error("Skipping event " + _listEvent.Name + " StolenGear enabled.");
 
             // Custom Flags

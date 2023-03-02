@@ -17,6 +17,7 @@ using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.ObjectSystem;
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
 
 namespace CaptivityEvents.Events
 {
@@ -109,13 +110,13 @@ namespace CaptivityEvents.Events
 
             if (PlayerCaptivity.CaptorParty.IsMobile)
             {
-                PlayerCaptivity.CaptorParty.MobileParty.SetMoveModeHold();
+                PlayerCaptivity.CaptorParty.MobileParty.Ai.SetMoveModeHold();
             }
 
             if (_timer / _max == 1)
             {
                 CEHelper.progressEventExists = false;
-                PlayerCaptivity.CaptorParty.MobileParty.RecalculateShortTermAi();
+                PlayerCaptivity.CaptorParty.MobileParty.Ai.RecalculateShortTermAi();
             }
 
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
@@ -190,8 +191,12 @@ namespace CaptivityEvents.Events
             else if (PlayerCaptivity.CaptorParty.IsSettlement) PartyBase.MainParty.MobileParty.Position2D = PlayerCaptivity.CaptorParty.Settlement.GatePosition;
             PlayerCaptivity.CaptorParty.SetAsCameraFollowParty();
 
-            string eventToRun = Campaign.Current.Models.PlayerCaptivityModel.CheckCaptivityChange(Campaign.Current.CampaignDt);
-            if (!string.IsNullOrWhiteSpace(eventToRun)) GameMenu.SwitchToMenu(eventToRun);
+            ICaptivityCampaignBehavior captivityCampaignBehavior = Campaign.Current.GetCampaignBehavior<ICaptivityCampaignBehavior>();
+            if (captivityCampaignBehavior == null)
+            {
+                return;
+            }
+            captivityCampaignBehavior.CheckCaptivityChange(Campaign.Current.CampaignDt);
         }
 
         #endregion Wait Menu

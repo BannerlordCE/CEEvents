@@ -6,7 +6,6 @@ using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
-using CaptivityEvents.Models;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -727,6 +726,7 @@ namespace CaptivityEvents
             IMbEvent<BarterData> barterablesRequested = CampaignEvents.BarterablesRequested;
             barterablesRequested?.ClearListeners(Campaign.Current.GetCampaignBehavior<SetPrisonerFreeBarterBehavior>());
 
+
             return base.DoLoading(game);
         }
 
@@ -748,7 +748,10 @@ namespace CaptivityEvents
                 campaignStarter.AddBehavior(new CEPrisonerEscapeCampaignBehavior());
                 campaignStarter.AddBehavior(new CESetPrisonerFreeBarterBehavior());
             }
-            if (CESettings.Instance?.EventCaptiveOn ?? true) ReplaceModel<PlayerCaptivityModel, CEPlayerCaptivityModel>(campaignStarter);
+            if (CESettings.Instance?.EventCaptiveOn ?? true)
+            {
+                campaignStarter.AddBehavior(new PlayerCaptivityCampaignBehavior());
+            }
             CEPrisonerDialogue prisonerDialogue = new();
             if ((CESettings.Instance?.EventCaptorOn ?? true) && (CESettings.Instance?.EventCaptorDialogue ?? true)) prisonerDialogue.AddPrisonerLines(campaignStarter);
             if (CEPersistence.CECustomScenes.Count > 0) prisonerDialogue.AddCustomLines(campaignStarter, CEPersistence.CECustomScenes);

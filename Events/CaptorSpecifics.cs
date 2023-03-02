@@ -226,7 +226,7 @@ namespace CaptivityEvents.Events
                     prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
                     prisonerParty.IsActive = true;
 
-                    prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
+                    prisonerParty.Ai.SetMovePatrolAroundPoint(nearest.IsTown
                                        ? nearest.GatePosition
                                        : nearest.Position2D);
 
@@ -365,7 +365,7 @@ namespace CaptivityEvents.Events
             if (captive == null) return;
             if (captive.IsFactionLeader)
             {
-                if (captive.Clan != null && captive.Clan.IsKingdomFaction)
+                if (captive.Clan != null && captive.Clan.Kingdom != null)
                 {
                     Kingdom kingdom = captive.Clan.Kingdom;
                     Clan result = null;
