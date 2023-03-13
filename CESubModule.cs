@@ -135,7 +135,10 @@ namespace CaptivityEvents
         public static List<CECustomModule> CECustomModules = new();
 
         // Images
-        public static Dictionary<string, Texture> CEEventImageList = new();
+        public static Dictionary<string, string> CEEventImageList = new();
+
+        public static Dictionary<string, Texture> CELoadedTextures = new();
+
 
         // Sound
         public static SoundEvent soundEvent = null;
@@ -181,6 +184,40 @@ namespace CaptivityEvents
         // Sounds for Brothel
         private static readonly Dictionary<string, int> brothelSounds = new();
 
+        public Texture QuickLoadCampaignTexture(string path)
+        {
+            try
+            {
+                string name = Path.GetFileName(path);
+                Texture texture2D = CEPersistence.CELoadedTextures.ContainsKey(name) ? CEPersistence.CELoadedTextures[name] : null;
+
+                if (texture2D == null)
+                {
+
+                    TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{name}", $"{Path.GetDirectoryName(path)}");
+                    texture.PreloadTexture(true);
+                    texture2D = new(new EngineTexture(texture));
+                    CEPersistence.CELoadedTextures.Add(name, texture2D);
+
+                    if (CEPersistence.CELoadedTextures.Count == 40)
+                    {
+                        KeyValuePair<string, Texture> textureToRemove = CEPersistence.CELoadedTextures.First();
+                        CEPersistence.CELoadedTextures.Remove(textureToRemove.Key);
+                        textureToRemove.Value.PlatformTexture.Release();
+                    }
+                }
+
+                return texture2D;
+
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failure to load " + path + " - exception : " + e);
+                return null;
+            }
+        }
+
+
         public void LoadTexture(string name, bool swap = false, bool forcelog = false)
         {
             if (string.IsNullOrWhiteSpace(name)) return;
@@ -190,38 +227,38 @@ namespace CaptivityEvents
                 if (!swap)
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
-                        : CEPersistence.CEEventImageList[name];
+                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison_sfw"])
+                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
-                        : CEPersistence.CEEventImageList[name];
+                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison_sfw"])
+                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
-                          ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
-                        : CEPersistence.CEEventImageList[name];
+                          ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sfw"])
+                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
-                        : CEPersistence.CEEventImageList[name];
+                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sfw"])
+                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
                 }
                 else
                 {
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_female_prison"] : CEPersistence.CEEventImageList["default_female_prison_sfw"]
-                        : CEPersistence.CEEventImageList[name];
+                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison_sfw"])
+                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_male_prison"] : CEPersistence.CEEventImageList["default_male_prison_sfw"]
-                        : CEPersistence.CEEventImageList[name];
+                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison_sfw"])
+                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_female"] : CEPersistence.CEEventImageList["default_female_sfw"]
-                        : CEPersistence.CEEventImageList[name];
+                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sfw"])
+                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? CEPersistence.CEEventImageList["default_male"] : CEPersistence.CEEventImageList["default_male_sfw"]
-                        : CEPersistence.CEEventImageList[name];
+                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sfw"])
+                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
                 }
             }
             catch (Exception e)
@@ -243,8 +280,8 @@ namespace CaptivityEvents
             try
             {
                 UIResourceManager.SpriteData.SpriteCategories["ce_notification_icons"].SpriteSheets[sheet] = name == "default"
-                    ? CEPersistence.CEEventImageList["CE_default_notification"]
-                    : CEPersistence.CEEventImageList[name];
+                    ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["CE_default_notification"])
+                    : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
             }
             catch (Exception e)
             {
@@ -338,10 +375,7 @@ namespace CaptivityEvents
                             {
                                 try
                                 {
-                                    TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-                                    texture.PreloadTexture(false);
-                                    Texture texture2D = new(new EngineTexture(texture));
-                                    CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                    CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), file);
                                 }
                                 catch (Exception e)
                                 {
@@ -369,10 +403,7 @@ namespace CaptivityEvents
                     {
                         try
                         {
-                            TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-                            texture.PreloadTexture(false);
-                            Texture texture2D = new(new EngineTexture(texture));
-                            CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                            CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), file);
                         }
                         catch (Exception e)
                         {
@@ -391,10 +422,7 @@ namespace CaptivityEvents
 
                     try
                     {
-                        TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-                        texture.PreloadTexture(false);
-                        Texture texture2D = new(new EngineTexture(texture));
-                        CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                        CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), file);
                     }
                     catch (Exception e)
                     {
@@ -403,10 +431,10 @@ namespace CaptivityEvents
                 }
 
                 SpriteCategory spriteCategory = UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"];
-                spriteCategory.SpriteSheets.AddRange(new Texture[] { CEPersistence.CEEventImageList["default_female_prison"], CEPersistence.CEEventImageList["default_male_prison"], CEPersistence.CEEventImageList["default_female"], CEPersistence.CEEventImageList["default_male"] });
+                spriteCategory.SpriteSheets.AddRange(new Texture[] { QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"]) });
                 spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray(new Vec2i[] { new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805) });
                 spriteCategory.SpriteSheetCount = 6;
-                CECustomHandler.ForceLogToFile("Loading Textures 1.7.2");
+                CECustomHandler.ForceLogToFile("Loading Textures 1.1.1");
 
                 PropertyInfo propertyWidth = typeof(SpritePart).GetProperty("Width");
                 PropertyInfo propertyHeight = typeof(SpritePart).GetProperty("Height");
@@ -467,7 +495,7 @@ namespace CaptivityEvents
             try
             {
                 // Load theMount & Blade II Bannerlord\Modules\SandBox\GUI\Brushes
-                // MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.5.7)
+                // MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.1.1)
                 SpriteData loadedData = new("CESpriteData");
                 loadedData.Load(UIResourceManager.UIResourceDepot);
 
@@ -475,8 +503,8 @@ namespace CaptivityEvents
                 SpriteData spriteData = UIResourceManager.SpriteData;
 
                 SpriteCategory spriteCategory = spriteData.SpriteCategories[categoryName];
-                spriteCategory.SpriteSheets.Add(CEPersistence.CEEventImageList["CE_default_notification"]);
-                spriteCategory.SpriteSheets.Add(CEPersistence.CEEventImageList["CE_default_notification"]);
+                spriteCategory.SpriteSheets.Add(QuickLoadCampaignTexture(CEPersistence.CEEventImageList["CE_default_notification"]));
+                spriteCategory.SpriteSheets.Add(QuickLoadCampaignTexture(CEPersistence.CEEventImageList["CE_default_notification"]));
                 spriteCategory.Load(UIResourceManager.ResourceContext, UIResourceManager.UIResourceDepot);
 
                 UIResourceManager.BrushFactory.Initialize();
@@ -1267,7 +1295,7 @@ namespace CaptivityEvents
                                 {
                                     ForceAgentDropEquipment(agent2);
                                 }
-                               
+
 
                                 // 1.5.1
                                 missionState.CurrentMission.ClearCorpses(false);
