@@ -1,4 +1,4 @@
-﻿#define V100
+﻿#define V102
 
 using CaptivityEvents.Custom;
 using HarmonyLib;
@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -33,23 +34,37 @@ namespace CaptivityEvents.Patches
                 MBBodyProperties.ProduceNumericKeyWithParams(faceGenerationParams, false, false, ref bodyProperties);
                 character.UpdatePlayerCharacterBodyProperties(bodyProperties, characterObject.Race, characterObject.IsFemale);
                 character.Culture = new CultureObject();
+
+                if (character?.HeroObject != null) DisableHeroAction.Apply(character.HeroObject);
             }
-            catch (Exception) { }
+            catch (Exception e) { CECustomHandler.LogToFile("Failed RestartCharacter " + e); }
         }
 
         public static void RemoveParty()
         {
-            List<MobileParty> mobileParties = MobileParty.All
+            try
+            {
+               
+
+                List<MobileParty> mobileParties = MobileParty.All
                 .Where((mobileParty) =>
                 {
                     return mobileParty.StringId.StartsWith("CustomPartyCE_");
                 }
                 ).ToList();
 
-            foreach (MobileParty mobile in mobileParties)
-            {
-                mobile.RemoveParty();
+                if (mobileParties.Count != 0)
+                {
+                    CECustomHandler.ForceLogToFile("Removing Parties");
+                    InformationManager.DisplayMessage(new InformationMessage("Removing CustomPartyCE_ Parties", Colors.Red));
+                }
+
+                foreach (MobileParty mobile in mobileParties)
+                {
+                    mobile.RemoveParty();
+                }
             }
+            catch (Exception e) { CECustomHandler.LogToFile("Failed RemoveParty " + e); }
         }
 
 
@@ -64,15 +79,15 @@ namespace CaptivityEvents.Patches
                     if (!ms.Contains(__instance.Id))
                     {
                         ms.Add(__instance.Id);
-                        CECustomHandler.ForceLogToFile("CharacterObject is null on " + __instance.Id);
-                        InformationManager.DisplayMessage(new InformationMessage("Invalid CharacterObject Detected of " + __instance.Id + ".", Colors.Red));
+                        CECustomHandler.ForceLogToFile("CharacterObject UpgradeTargets is null on " + __instance.Id);
+                        InformationManager.DisplayMessage(new InformationMessage("Invalid CharacterObject UpgradeTargets Detected of " + __instance.Id + ".", Colors.Red));
                         Campaign.Current.TimeControlMode = CampaignTimeControlMode.Stop;
 
                         RestartCharacter(__instance);
                         RemoveParty();
                     }
                 }
-                catch (Exception) { }
+                catch (Exception e) { CECustomHandler.LogToFile("Failed UpgradeTargets " + e); }
                 __result = new CharacterObject[0];
             }
         }
@@ -88,15 +103,15 @@ namespace CaptivityEvents.Patches
                     if (!ms.Contains(__instance.Id))
                     {
                         ms.Add(__instance.Id);
-                        CECustomHandler.ForceLogToFile("CharacterObject is null on " + __instance.Id);
-                        InformationManager.DisplayMessage(new InformationMessage("Invalid CharacterObject Detected of " + __instance.Id + ".", Colors.Red));
+                        CECustomHandler.ForceLogToFile("CharacterObject Culture is null on " + __instance.Id);
+                        InformationManager.DisplayMessage(new InformationMessage("Invalid CharacterObject Culture Detected of " + __instance.Id + ".", Colors.Red));
                         Campaign.Current.TimeControlMode = CampaignTimeControlMode.Stop;
 
                         RestartCharacter(__instance);
                         RemoveParty();
                     }
                 }
-                catch (Exception) { }
+                catch (Exception e) { CECustomHandler.LogToFile("Failed Culture " + e); }
                 __result = new CultureObject();
             }
         }
@@ -112,15 +127,15 @@ namespace CaptivityEvents.Patches
                     if (!ms.Contains(__instance.Id))
                     {
                         ms.Add(__instance.Id);
-                        CECustomHandler.ForceLogToFile("CharacterObject is null on " + __instance.Id);
-                        InformationManager.DisplayMessage(new InformationMessage("Invalid CharacterObject Detected of " + __instance.Id + ".", Colors.Red));
+                        CECustomHandler.ForceLogToFile("CharacterObject FirstBattleEquipment is null on " + __instance.Id);
+                        InformationManager.DisplayMessage(new InformationMessage("Invalid CharacterObject FirstBattleEquipment Detected of " + __instance.Id + ".", Colors.Red));
                         Campaign.Current.TimeControlMode = CampaignTimeControlMode.Stop;
 
                         RestartCharacter(__instance);
                         RemoveParty();
                     }
                 }
-                catch (Exception) { }
+                catch (Exception e) { CECustomHandler.LogToFile("Failed FirstBattleEquipment " + e); }
                 __result = new Equipment();
             }
         }

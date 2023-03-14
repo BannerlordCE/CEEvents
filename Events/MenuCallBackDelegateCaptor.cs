@@ -1,4 +1,4 @@
-﻿#define V100
+﻿#define V102
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -17,6 +17,7 @@ using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Inventory;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events
 {
@@ -58,12 +59,9 @@ namespace CaptivityEvents.Events
 
         internal void CaptorProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
-            if (args.MenuContext != null)
-            {
-                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+            args.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                            ? "wait_captive_female"
                                            : "wait_captive_male");
-            }
 
             _sharedCallBackHelper.LoadBackgroundImage("captor_default", _listedEvent.Captive);
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -144,7 +142,7 @@ namespace CaptivityEvents.Events
 
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
 
-            PartyBase.MainParty.MobileParty.SetMoveModeHold();
+            PartyBase.MainParty.MobileParty.Ai.SetMoveModeHold();
         }
 
         #endregion Progress Event
@@ -167,6 +165,9 @@ namespace CaptivityEvents.Events
 
             InitGiveCaptorGold();
             InitCaptorGoldTotal();
+            InitGiveGold();
+            InitChangeGold();
+            _sharedCallBackHelper.InitGiveItem();
             ReqHeroCaptorRelation(ref args);
             ReqMorale(ref args);
             ReqTroops(ref args);
@@ -247,6 +248,7 @@ namespace CaptivityEvents.Events
             ConsequenceKillTroops(ref args);
             ConsequenceJoinParty();
 
+            _sharedCallBackHelper.ConsequenceGiveItem();
             _sharedCallBackHelper.ConsequencePlayScene();
             _sharedCallBackHelper.ConsequenceDelayedEvent();
             _sharedCallBackHelper.ConsequenceMission();
@@ -259,7 +261,7 @@ namespace CaptivityEvents.Events
                 {
                     if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
 
-                    MobileParty.MainParty.MemberRoster.AddToCounts(captiveHero.CharacterObject, 1, false);
+                    MobileParty.MainParty.AddElementToMemberRoster(captiveHero.CharacterObject, 1, false);
 
                     InventoryManager.OpenScreenAsInventoryOf(MobileParty.MainParty, captiveHero.CharacterObject);
 
@@ -591,7 +593,7 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceStrip(Hero captiveHero)
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip)) _captor.CECaptorStripVictim(captiveHero);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip)) _captor.CECaptorStripVictim(captiveHero, _option.StripSettings);
         }
 
         private void ConsequenceMakeHeroCompanion(Hero captiveHero)
@@ -1183,19 +1185,23 @@ namespace CaptivityEvents.Events
                     return;
                 }
 
-                int skillLevel = _listedEvent.Captive.GetSkillValue(foundSkill);
-
                 try
                 {
-                    if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min, "str_CE_skill_captive_level")) break;
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredAbove"); }
+                    int skillLevel = _listedEvent.Captive.GetSkillValue(foundSkill);
 
-                try
-                {
-                    if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_captive_level")) break;
+                    try
+                    {
+                        if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min, "str_CE_skill_captive_level")) break;
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredAbove"); }
+
+                    try
+                    {
+                        if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_captive_level")) break;
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
                 }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid GetSkillValue"); }
             }
         }
 
@@ -1995,6 +2001,30 @@ namespace CaptivityEvents.Events
             MBTextManager.SetTextVariable("CAPTOR_MONEY_AMOUNT", content);
         }
 
+        private void InitChangeGold()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) return;
+
+            try
+            {
+                int level = 0;
+
+                if (!string.IsNullOrWhiteSpace(_option.GoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_option.GoldTotal);
+                else if (!string.IsNullOrWhiteSpace(_listedEvent.GoldTotal)) level = new CEVariablesLoader().GetIntFromXML(_listedEvent.GoldTotal);
+                else CECustomHandler.LogToFile("Missing GoldTotal");
+                MBTextManager.SetTextVariable("MONEY_AMOUNT", level);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid GoldTotal"); }
+        }
+
+        private void InitGiveGold()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) return;
+            int content = _score.AttractivenessScore(Hero.MainHero);
+            content *= _option.MultipleRestrictedListOfConsequences.Count(consquence => { return consquence == RestrictedListOfConsequences.GiveGold; });
+            MBTextManager.SetTextVariable("MONEY_AMOUNT", content);
+        }
+
         private void InitSetNames(ref MenuCallbackArgs args)
         {
             try
@@ -2030,12 +2060,9 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Failed to SetNames for " + _listedEvent.Name);
             }
 
-            if (args.MenuContext != null)
-            {
-                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+            args.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                            ? "wait_prisoner_female"
                                                            : "wait_prisoner_male");
-            }
         }
 
         #endregion Init Options

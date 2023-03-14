@@ -1,4 +1,4 @@
-﻿#define V100
+﻿#define V102
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -28,6 +28,9 @@ using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.GameMenus;
 using CaptivityEvents.Notifications;
 using static CaptivityEvents.CampaignBehaviors.CECampaignBehavior;
+using TaleWorlds.Library;
+using SandBox.Missions.MissionLogics;
+using TaleWorlds.MountAndBlade;
 
 namespace CaptivityEvents.Events
 {
@@ -49,6 +52,37 @@ namespace CaptivityEvents.Events
         }
 
         #region Consequences
+
+        internal void ConsequenceGiveItem()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveItem)) return;
+
+            try
+            {
+                string[] items = _variableLoader.GetStringFromXML(_option.ItemToGive);
+
+                foreach (var item in items)
+                {
+                    try
+                    {
+                        ItemObject itemObjectBody = null;
+
+                        if (!string.IsNullOrWhiteSpace(item)) itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(item);
+                        else CECustomHandler.LogToFile("Missing ConsequenceGiveItem");
+
+                        if (itemObjectBody != null) PartyBase.MainParty.ItemRoster.AddToCounts(itemObjectBody, 1);
+
+                        TextObject textObject = GameTexts.FindText("str_CE_item_received");
+                        textObject.SetTextVariable("ITEM", itemObjectBody.Name.ToString());
+                        InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Invalid ConsequenceGiveItem - " + item); }
+                }
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid ConsequenceGiveItem"); }
+
+
+        }
 
         internal void ConsequencePlayScene()
         {
@@ -81,7 +115,7 @@ namespace CaptivityEvents.Events
                 {
                     string sceneToPlay = CEHelper.CustomSceneToPlay(_option.SceneToPlay ?? _listedEvent.SceneToPlay, party);
                     CESceneNotification data = new(character2, character1, sceneToPlay);
-                    
+
                     MBInformationManager.ShowSceneNotification(data);
                 }
                 catch (System.Reflection.TargetInvocationException)
@@ -428,11 +462,11 @@ namespace CaptivityEvents.Events
                     meleeLevel = string.IsNullOrWhiteSpace(_option.StripSettings.Melee) ? "default" : _option.StripSettings.Melee.ToLower();
                     rangedLevel = string.IsNullOrWhiteSpace(_option.StripSettings.Ranged) ? "default" : _option.StripSettings.Ranged.ToLower();
 
-                    customBody = string.IsNullOrWhiteSpace(_option.StripSettings.CustomBody) ? "default" : _option.StripSettings.CustomBody;
-                    customCape = string.IsNullOrWhiteSpace(_option.StripSettings.CustomCape) ? "default" : _option.StripSettings.CustomCape;
-                    customGloves = string.IsNullOrWhiteSpace(_option.StripSettings.CustomGloves) ? "default" : _option.StripSettings.CustomGloves;
-                    customLegs = string.IsNullOrWhiteSpace(_option.StripSettings.CustomLegs) ? "default" : _option.StripSettings.CustomLegs;
-                    customHead = string.IsNullOrWhiteSpace(_option.StripSettings.CustomHead) ? "default" : _option.StripSettings.CustomHead;
+                    customBody = string.IsNullOrWhiteSpace(_option.StripSettings.CustomBody) ? "" : _option.StripSettings.CustomBody;
+                    customCape = string.IsNullOrWhiteSpace(_option.StripSettings.CustomCape) ? "" : _option.StripSettings.CustomCape;
+                    customGloves = string.IsNullOrWhiteSpace(_option.StripSettings.CustomGloves) ? "" : _option.StripSettings.CustomGloves;
+                    customLegs = string.IsNullOrWhiteSpace(_option.StripSettings.CustomLegs) ? "" : _option.StripSettings.CustomLegs;
+                    customHead = string.IsNullOrWhiteSpace(_option.StripSettings.CustomHead) ? "" : _option.StripSettings.CustomHead;
                 }
 
                 if (CESettingsIntegrations.Instance == null && clothingLevel == "slave" || !CESettingsIntegrations.Instance.ActivateKLBShackles && clothingLevel == "slave") return;
@@ -599,11 +633,11 @@ namespace CaptivityEvents.Events
                     }
                     else if (clothingLevel == "custom")
                     {
-                        ItemObject itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(customBody);
-                        ItemObject itemObjectCape = MBObjectManager.Instance.GetObject<ItemObject>(customCape);
-                        ItemObject itemObjectGloves = MBObjectManager.Instance.GetObject<ItemObject>(customGloves);
-                        ItemObject itemObjectLeg = MBObjectManager.Instance.GetObject<ItemObject>(customLegs);
-                        ItemObject itemObjectHead = MBObjectManager.Instance.GetObject<ItemObject>(customHead);
+                        ItemObject itemObjectBody = customBody != "" ? MBObjectManager.Instance.GetObject<ItemObject>(customBody) : null;
+                        ItemObject itemObjectCape = customCape != "" ? MBObjectManager.Instance.GetObject<ItemObject>(customCape) : null;
+                        ItemObject itemObjectGloves = customGloves != "" ? MBObjectManager.Instance.GetObject<ItemObject>(customGloves) : null;
+                        ItemObject itemObjectLeg = customLegs != "" ? MBObjectManager.Instance.GetObject<ItemObject>(customLegs) : null;
+                        ItemObject itemObjectHead = customHead != "" ? MBObjectManager.Instance.GetObject<ItemObject>(customHead) : null;
 
                         if (itemObjectBody != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
                         if (itemObjectCape != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Cape, new EquipmentElement(itemObjectCape));
@@ -948,6 +982,9 @@ namespace CaptivityEvents.Events
                                         if (Settlement.CurrentSettlement == null)
                                         {
                                             CECustomHandler.ForceLogToFile("ConsequenceStartBattle : city required. ");
+                                            CEPersistence.victoryEvent = null;
+                                            CEPersistence.defeatEvent = null;
+                                            return;
                                         }
                                         // StartCommonAreaBattle RivalGangMovingInIssueBehavior
                                         MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), null, null);
@@ -972,9 +1009,8 @@ namespace CaptivityEvents.Events
                                         CEPersistence.destroyParty = true;
                                         CEPersistence.surrenderParty = false;
 
-                                        PlayerEncounter.Current.ForceAlleyFight = true;
                                         PlayerEncounter.StartBattle();
-                                        PlayerEncounter.StartAlleyFightMission();
+                                        
                                         break;
                                     }
                                 case "regularspawn":
@@ -1018,7 +1054,7 @@ namespace CaptivityEvents.Events
                                         }
 
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
-                                        customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
+                                        customParty.Ai.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, true);
                                         CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
@@ -1088,7 +1124,7 @@ namespace CaptivityEvents.Events
                                         }
 
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
-                                        customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
+                                        customParty.Ai.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, true);
                                         CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
@@ -1320,10 +1356,7 @@ namespace CaptivityEvents.Events
                             Hero prisonerCharacter = Hero.MainHero;
                             PartyBase party = nearest.Party;
 
-                            if (prisonerCharacter.PartyBelongedToAsPrisoner != null)
-                            {
-                                prisonerCharacter.PartyBelongedToAsPrisoner.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
-                            }
+                            prisonerCharacter.PartyBelongedToAsPrisoner?.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
                             prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
                             prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
                             party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
@@ -1448,7 +1481,7 @@ namespace CaptivityEvents.Events
 
         private void RansomAndBribe(ref MenuCallbackArgs args)
         {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RansomAndBribe)) args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RansomAndBribe)) args.optionLeaveType = GameMenuOption.LeaveType.Ransom;
         }
 
         private void Trade(ref MenuCallbackArgs args)
@@ -1472,6 +1505,32 @@ namespace CaptivityEvents.Events
         }
 
         #endregion Icons
+
+        internal void InitGiveItem()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveItem)) return;
+
+            try
+            {
+                string[] items = _variableLoader.GetStringFromXML(_option.ItemToGive);
+
+                for (int i = 0; i < items.Length; i++)
+                {
+                    try
+                    {
+                        ItemObject itemObjectBody = null;
+
+                        if (!string.IsNullOrWhiteSpace(items[i])) itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(items[i]);
+                        else CECustomHandler.LogToFile("Missing GiveItem");
+                        if (i == 0) MBTextManager.SetTextVariable("ITEM_TO_GIVE", itemObjectBody?.Name?.ToString() ?? "");
+                        MBTextManager.SetTextVariable("ITEM_TO_GIVE_" + i, itemObjectBody?.Name?.ToString() ?? "");
+
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Invalid GiveItem - " + items[i]); }
+                }
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Invalid GiveItem"); }
+        }
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {

@@ -1,4 +1,4 @@
-#define V100
+#define V102
 
 using CaptivityEvents.Config;
 using System;

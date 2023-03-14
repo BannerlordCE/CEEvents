@@ -1,4 +1,4 @@
-﻿#define V100
+﻿#define V102
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -549,6 +549,61 @@ namespace CaptivityEvents.Helper
                 return "Sosig\n" + e;
             }
         }
+        
+        [CommandLineFunctionality.CommandLineArgumentFunction("ImpregnateBy", "captivity")]
+        public static string ImpregnateHeroBy(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+                
+                ////
+                //Input Validation
+                ////
+                if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.ImpregnateBy [HERO] [HERO]\".";
+                
+                bool flagValid = false;
+
+                string targetName = null;
+                string fromName = null;
+
+                if (CampaignCheats.CheckParameters(strings, 1))
+                {
+                    return "Wrong input.\nFormat is \"captivity.ImpregnateBy [TargetName] [FromName]\". Only 1 String detected.";
+                }
+                else if (CampaignCheats.CheckParameters(strings, 2))
+                {
+                    targetName = strings[0];
+                    fromName = strings[1];
+
+                    if (string.IsNullOrEmpty(targetName) || string.IsNullOrEmpty(fromName)) return "Wrong input.\nFormat is \"captivity.ImpregnateBy [TargetName] [FromName]\".";
+
+                    flagValid = true;
+                }
+
+                if (!flagValid) return "Wrong input.\nFormat is \"captivity.ImpregnateBy [HERO] [HERO]\".";
+                //End of Validation
+                    
+                CEImpregnationSystem _impregnation = new();
+                    
+                Hero targetHero = Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == targetName);
+                Hero fromHero = Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == fromName);
+                    
+                if (targetHero == null || fromHero == null)
+                {
+                    return "Hero(es) not found.";
+                }
+                else
+                {
+                    _impregnation.ImpregnationChance(targetHero, 0, false, fromHero);
+                    return ("Done. If allowed, " + targetName + " is now carrying the child of " + fromName);
+                }   
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }         
+        }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("current_status", "captivity")]
         public static string CurrentStatus(List<string> strings)
@@ -874,10 +929,7 @@ namespace CaptivityEvents.Helper
                                     {
                                         try
                                         {
-                                            TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-                                            texture.PreloadTexture(false);
-                                            Texture texture2D = new(new EngineTexture(texture));
-                                            CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                            CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), file);
                                         }
                                         catch (Exception e)
                                         {
@@ -905,10 +957,7 @@ namespace CaptivityEvents.Helper
                             {
                                 try
                                 {
-                                    TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-                                    texture.PreloadTexture(false);
-                                    Texture texture2D = new(new EngineTexture(texture));
-                                    CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                    CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), file);
                                 }
                                 catch (Exception e)
                                 {
@@ -927,10 +976,7 @@ namespace CaptivityEvents.Helper
 
                             try
                             {
-                                TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-                                texture.PreloadTexture(false);
-                                Texture texture2D = new(new EngineTexture(texture));
-                                CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), file);
                             }
                             catch (Exception e)
                             {
@@ -1127,10 +1173,7 @@ namespace CaptivityEvents.Helper
                                     {
                                         try
                                         {
-                                            TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-                                            texture.PreloadTexture(false);
-                                            Texture texture2D = new(new EngineTexture(texture));
-                                            CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                            CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), file);
                                         }
                                         catch (Exception e)
                                         {
@@ -1158,10 +1201,7 @@ namespace CaptivityEvents.Helper
                             {
                                 try
                                 {
-                                    TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-                                    texture.PreloadTexture(false);
-                                    Texture texture2D = new(new EngineTexture(texture));
-                                    CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                    CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), file);
                                 }
                                 catch (Exception e)
                                 {
@@ -1180,10 +1220,7 @@ namespace CaptivityEvents.Helper
 
                             try
                             {
-                                TaleWorlds.Engine.Texture texture = TaleWorlds.Engine.Texture.LoadTextureFromPath($"{Path.GetFileName(file)}", $"{Path.GetDirectoryName(file)}");
-                                texture.PreloadTexture(false);
-                                Texture texture2D = new(new EngineTexture(texture));
-                                CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), texture2D);
+                                CEPersistence.CEEventImageList.Add(Path.GetFileNameWithoutExtension(file), file);
                             }
                             catch (Exception e)
                             {

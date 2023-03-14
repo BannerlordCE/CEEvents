@@ -1,24 +1,29 @@
-﻿#define V100
+﻿#define V102
 
+using HarmonyLib;
+using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
+using CaptivityEvents.Helper;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
-using CaptivityEvents.Helper;
-using Helpers;
 using System.Linq;
-using TaleWorlds.CampaignSystem;
+using System;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.Core;
-using TaleWorlds.Library;
-using TaleWorlds.CampaignSystem.GameComponents;
+using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.Core;
+using TaleWorlds.Library;
 
-namespace CaptivityEvents.Models
+namespace CaptivityEvents.Patches
 {
-    public class CEPlayerCaptivityModel : DefaultPlayerCaptivityModel
+    // TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories ClanIncomeVM
+    [HarmonyPatch(typeof(PlayerCaptivityCampaignBehavior))]
+    internal class CEPlayerCaptivityCampaignBehavior
     {
-        private bool CheckTimeElapsedMoreThanHours(CampaignTime eventBeginTime, float hoursToWait)
+
+        private static bool CheckTimeElapsedMoreThanHours(CampaignTime eventBeginTime, float hoursToWait)
         {
             float elapsedHoursUntilNow = eventBeginTime.ElapsedHoursUntilNow;
             float randomNumber = PlayerCaptivity.RandomNumber;
@@ -26,7 +31,7 @@ namespace CaptivityEvents.Models
             return hoursToWait * (0.5 + randomNumber) < elapsedHoursUntilNow;
         }
 
-        private bool CheckEvent()
+        private static bool CheckEvent()
         {
             if (PlayerCaptivity.CaptorParty == null) return false;
             bool isInSettlement = PlayerCaptivity.CaptorParty.IsSettlement;
@@ -42,12 +47,49 @@ namespace CaptivityEvents.Models
             return CheckTimeElapsedMoreThanHours(PlayerCaptivity.LastCheckTime, eventOccurence);
         }
 
-        /// <summary>
-        /// Custom CheckCaptivityChange Function
-        /// </summary>
-        /// <param name="dt"></param>
-        /// <returns>EventName</returns>
-        public override string CheckCaptivityChange(float dt)
+        private static string DefaultOverridenCheckCaptivityChange(float dt)
+        {
+            if (PlayerCaptivity.CaptorParty.IsMobile && !PlayerCaptivity.CaptorParty.MobileParty.IsActive)
+            {
+                return "menu_captivity_end_by_party_removed";
+            }
+
+            if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MapFaction == Hero.MainHero.Clan.MapFaction)
+            {
+                return "menu_captivity_end_by_ally_party_saved";
+            }
+
+            if (PlayerCaptivity.CaptorParty.IsSettlement && PlayerCaptivity.CaptorParty.MapFaction == Hero.MainHero.Clan.MapFaction)
+            {
+                int IsSlave = Hero.MainHero.GetSkillValue(CESkills.IsSlave);
+
+                if (IsSlave == 1)
+                {
+                    return "menu_captivity_end_by_ally_party_saved";
+                }
+            }
+
+            if (!(CESettings.Instance?.SlaveryToggle ?? true) && !FactionManager.IsAtWarAgainstFaction(PlayerCaptivity.CaptorParty.MapFaction, MobileParty.MainParty.MapFaction) && (PlayerCaptivity.CaptorParty.MapFaction == MobileParty.MainParty.MapFaction || !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingModerate(PlayerCaptivity.CaptorParty.MapFaction) && !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingSevere(PlayerCaptivity.CaptorParty.MapFaction)))
+            {
+                return "menu_captivity_end_no_more_enemies";
+            }
+
+            if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement != null)
+            {
+                // Default event transfer disabled if slavery is enabled override or if it is garrison
+                if (PlayerCaptivity.CaptorParty.MapFaction != PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.MapFaction || ((CESettings.Instance?.SlaveryToggle ?? true) && !PlayerCaptivity.CaptorParty.MobileParty.IsGarrison && !PlayerCaptivity.CaptorParty.MobileParty.IsMilitia)) return null;
+
+                PlayerCaptivity.LastCheckTime = CampaignTime.Now;
+                if (Game.Current.GameStateManager.ActiveState is MapState) Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+
+                return "menu_captivity_transfer_to_town";
+            }
+
+            return null;
+
+        }
+
+        public static string CheckCaptivityChangeOld(float dt)
         {
             if (!PlayerCaptivity.IsCaptive) return DefaultOverridenCheckCaptivityChange(dt);
 
@@ -147,51 +189,23 @@ namespace CaptivityEvents.Models
             return DefaultOverridenCheckCaptivityChange(dt);
         }
 
-        /// <summary>
-        /// Modified Default
-        /// </summary>
-        /// <param name="dt"></param>
-        /// <returns></returns>
-        private string DefaultOverridenCheckCaptivityChange(float dt)
+        [HarmonyPatch("CheckCaptivityChange")]
+        [HarmonyPrefix]
+        public static bool CheckCaptivityChange(float dt)
         {
-            if (PlayerCaptivity.CaptorParty.IsMobile && !PlayerCaptivity.CaptorParty.MobileParty.IsActive)
+            try
             {
-                return "menu_captivity_end_by_party_removed";
-            }
-
-            if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MapFaction == Hero.MainHero.Clan.MapFaction)
-            {
-                return "menu_captivity_end_by_ally_party_saved";
-            }
-
-            if (PlayerCaptivity.CaptorParty.IsSettlement && PlayerCaptivity.CaptorParty.MapFaction == Hero.MainHero.Clan.MapFaction)
-            {
-                int IsSlave = Hero.MainHero.GetSkillValue(CESkills.IsSlave);
-
-                if (IsSlave == 1)
+                string name = CheckCaptivityChangeOld(dt);
+                if (name != null)
                 {
-                    return "menu_captivity_end_by_ally_party_saved";
+                    GameMenu.SwitchToMenu(name);
                 }
             }
-
-            if (!(CESettings.Instance?.SlaveryToggle ?? true) && !FactionManager.IsAtWarAgainstFaction(PlayerCaptivity.CaptorParty.MapFaction, MobileParty.MainParty.MapFaction) && (PlayerCaptivity.CaptorParty.MapFaction == MobileParty.MainParty.MapFaction || !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingModerate(PlayerCaptivity.CaptorParty.MapFaction) && !Campaign.Current.Models.CrimeModel.IsPlayerCrimeRatingSevere(PlayerCaptivity.CaptorParty.MapFaction)))
+            catch (Exception e)
             {
-                return "menu_captivity_end_no_more_enemies";
+                CECustomHandler.ForceLogToFile("CheckCaptivityChange Failure : " + e);
             }
-
-            if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement != null)
-            {
-                // Default event transfer disabled if slavery is enabled override or if it is garrison
-                if (PlayerCaptivity.CaptorParty.MapFaction != PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.MapFaction || ((CESettings.Instance?.SlaveryToggle ?? true) && !PlayerCaptivity.CaptorParty.MobileParty.IsGarrison && !PlayerCaptivity.CaptorParty.MobileParty.IsMilitia)) return null;
-
-                PlayerCaptivity.LastCheckTime = CampaignTime.Now;
-                if (Game.Current.GameStateManager.ActiveState is MapState) Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-
-                return "menu_captivity_transfer_to_town";
-            }
-
-            return null;
-
+            return false;
         }
     }
 }

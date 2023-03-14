@@ -1,4 +1,4 @@
-﻿#define V100
+﻿#define V102
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -226,7 +226,7 @@ namespace CaptivityEvents.Events
                     prisonerParty.MemberRoster.Add(releasedPrisoners.ToFlattenedRoster());
                     prisonerParty.IsActive = true;
 
-                    prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
+                    prisonerParty.Ai.SetMovePatrolAroundPoint(nearest.IsTown
                                        ? nearest.GatePosition
                                        : nearest.Position2D);
 
@@ -365,7 +365,7 @@ namespace CaptivityEvents.Events
             if (captive == null) return;
             if (captive.IsFactionLeader)
             {
-                if (captive.Clan != null && captive.Clan.IsKingdomFaction)
+                if (captive.Clan != null && captive.Clan.Kingdom != null)
                 {
                     Kingdom kingdom = captive.Clan.Kingdom;
                     Clan result = null;
@@ -386,39 +386,350 @@ namespace CaptivityEvents.Events
             AddCompanionAction.Apply(Clan.PlayerClan, captive);
         }
 
-        internal void CECaptorStripVictim(Hero captive)
+        internal void CECaptorStripVictim(Hero captive, StripSettings stripSettings = null)
         {
             if (captive == null) return;
-            Equipment randomElement = new(false);
 
-            ItemObject itemObjectBody = captive.IsFemale
-                ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
-                : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
-            randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
-            Equipment randomElement2 = new(true);
-            randomElement2.FillFrom(randomElement, false);
-
-            if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captive, captive.BattleEquipment, captive.CivilianEquipment);
-
-            foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
+            try
             {
-                EquipmentIndex i = (EquipmentIndex)index;
+                string clothingLevel = "default";
+                string mountLevel = "none";
+                string meleeLevel = "none";
+                string rangedLevel = "none";
 
-                try
-                {
-                    if (!captive.BattleEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(captive.BattleEquipment.GetEquipmentFromSlot(i).Item, 1);
-                }
-                catch (Exception) { }
+                string customBody = "";
+                string customCape = "";
+                string customGloves = "";
+                string customLegs = "";
+                string customHead = "";
 
-                try
+                if (stripSettings != null)
                 {
-                    if (!captive.CivilianEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(captive.CivilianEquipment.GetEquipmentFromSlot(i).Item, 1);
+                    clothingLevel = string.IsNullOrWhiteSpace(stripSettings.Clothing) ? "default" : stripSettings.Clothing.ToLower();
+                    mountLevel = string.IsNullOrWhiteSpace(stripSettings.Mount) ? "none" : stripSettings.Mount.ToLower();
+                    meleeLevel = string.IsNullOrWhiteSpace(stripSettings.Melee) ? "none" : stripSettings.Melee.ToLower();
+                    rangedLevel = string.IsNullOrWhiteSpace(stripSettings.Ranged) ? "none" : stripSettings.Ranged.ToLower();
+
+                    customBody = string.IsNullOrWhiteSpace(stripSettings.CustomBody) ? "" : stripSettings.CustomBody;
+                    customCape = string.IsNullOrWhiteSpace(stripSettings.CustomCape) ? "" : stripSettings.CustomCape;
+                    customGloves = string.IsNullOrWhiteSpace(stripSettings.CustomGloves) ? "" : stripSettings.CustomGloves;
+                    customLegs = string.IsNullOrWhiteSpace(stripSettings.CustomLegs) ? "" : stripSettings.CustomLegs;
+                    customHead = string.IsNullOrWhiteSpace(stripSettings.CustomHead) ? "" : stripSettings.CustomHead;
                 }
-                catch (Exception) { }
+
+                if (CESettingsIntegrations.Instance == null && clothingLevel == "slave" || !CESettingsIntegrations.Instance.ActivateKLBShackles && clothingLevel == "slave") return;
+
+                Equipment randomElement = new(false);
+
+                if (clothingLevel != "nude")
+                {
+                    if (clothingLevel == "advanced")
+                    {
+                        string bodyString = "";
+                        string legString = "";
+                        string headString = "";
+                        string capeString = "";
+                        string glovesString = "";
+
+                        switch (PlayerCaptivity.CaptorParty?.Culture?.GetCultureCode())
+                        {
+                            case CultureCode.Sturgia:
+                                headString = "nordic_fur_cap";
+                                capeString = Hero.MainHero.IsFemale
+                                    ? "female_hood"
+                                    : "";
+                                bodyString = Hero.MainHero.IsFemale
+                                    ? "cut_dress"
+                                    : "heavy_nordic_tunic";
+                                legString = Hero.MainHero.IsFemale
+                                    ? "ladys_shoe"
+                                    : "rough_tied_boots";
+                                glovesString = "armwraps";
+                                break;
+
+                            case CultureCode.Aserai:
+                                headString = Hero.MainHero.IsFemale
+                                    ? ""
+                                    : "turban";
+                                bodyString = Hero.MainHero.IsFemale
+                                    ? "aserai_villager_female_dress"
+                                    : "aserai_tunic_waistcoat";
+
+                                legString = Hero.MainHero.IsFemale
+                                    ? "southern_moccasins"
+                                    : "wrapped_shoes";
+                                capeString = "wrapped_scarf";
+                                glovesString = "armwraps";
+                                break;
+
+                            case CultureCode.Khuzait:
+                                headString = "fur_hat";
+                                capeString = "wrapped_scarf";
+                                bodyString = Hero.MainHero.IsFemale
+                                    ? "khuzait_dress"
+                                    : "steppe_armor";
+                                legString = Hero.MainHero.IsFemale
+                                    ? "ladys_shoe"
+                                    : "rough_tied_boots";
+                                glovesString = "armwraps";
+                                break;
+
+                            case CultureCode.Empire:
+                                headString = Hero.MainHero.IsFemale
+                                    ? "female_head_wrap"
+                                    : "arming_cap";
+                                bodyString = Hero.MainHero.IsFemale
+                                    ? "vlandian_corset_dress"
+                                    : "padded_leather_shirt";
+                                legString = Hero.MainHero.IsFemale
+                                    ? "ladys_shoe"
+                                    : "rough_tied_boots";
+                                capeString = "wrapped_scarf";
+                                glovesString = "armwraps";
+                                break;
+
+                            case CultureCode.Battania:
+                                headString = Hero.MainHero.IsFemale
+                                    ? "female_head_wrap"
+                                    : "wrapped_headcloth";
+                                capeString = Hero.MainHero.IsFemale
+                                    ? "wrapped_scarf"
+                                    : "battania_shoulder_strap";
+                                glovesString = "armwraps";
+                                bodyString = Hero.MainHero.IsFemale
+                                    ? "battania_dress_c"
+                                    : "burlap_waistcoat";
+                                legString = "ragged_boots";
+                                break;
+
+                            case CultureCode.Vlandia:
+                                headString = Hero.MainHero.IsFemale
+                                    ? "female_head_wrap"
+                                    : "arming_cap";
+                                bodyString = Hero.MainHero.IsFemale
+                                    ? "vlandian_corset_dress"
+                                    : "padded_leather_shirt";
+                                legString = Hero.MainHero.IsFemale
+                                    ? "ladys_shoe"
+                                    : "ragged_boots";
+                                capeString = "wrapped_scarf";
+                                glovesString = "armwraps";
+                                break;
+
+                            case CultureCode.Invalid:
+                            case CultureCode.Nord:
+                            case CultureCode.Darshi:
+                            case CultureCode.Vakken:
+                            case CultureCode.AnyOtherCulture:
+                            default:
+                                headString = Hero.MainHero.IsFemale
+                                    ? "female_head_wrap"
+                                    : "wrapped_headcloth";
+                                capeString = Hero.MainHero.IsFemale
+                                    ? "female_scarf"
+                                    : "battania_shoulder_strap";
+                                bodyString = Hero.MainHero.IsFemale
+                                    ? "plain_dress"
+                                    : "padded_leather_shirt";
+                                legString = Hero.MainHero.IsFemale
+                                    ? "ladys_shoe"
+                                    : "ragged_boots";
+                                break;
+                        }
+
+                        if (bodyString != "")
+                        {
+                            ItemObject itemObjectBody = MBObjectManager.Instance.GetObject<ItemObject>(bodyString);
+                            randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
+                        }
+
+                        if (legString != "")
+                        {
+                            ItemObject itemObjectLeg = MBObjectManager.Instance.GetObject<ItemObject>(legString);
+                            randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Leg, new EquipmentElement(itemObjectLeg));
+                        }
+
+                        if (capeString != "")
+                        {
+                            ItemObject itemObjectCape = MBObjectManager.Instance.GetObject<ItemObject>(capeString);
+                            randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Cape, new EquipmentElement(itemObjectCape));
+                        }
+
+                        if (headString != "")
+                        {
+                            ItemObject itemObjectHead = MBObjectManager.Instance.GetObject<ItemObject>(headString);
+                            randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Head, new EquipmentElement(itemObjectHead));
+                        }
+
+                        if (glovesString != "")
+                        {
+                            ItemObject itemObjectGloves = MBObjectManager.Instance.GetObject<ItemObject>(glovesString);
+                            randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Gloves, new EquipmentElement(itemObjectGloves));
+                        }
+                    }
+                    else if (clothingLevel == "slave")
+                    {
+                        ItemObject itemObjectLeg = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth2a");
+                        randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Leg, new EquipmentElement(itemObjectLeg));
+
+                        ItemObject itemObjectCape = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth3a");
+                        randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Cape, new EquipmentElement(itemObjectCape));
+
+                        ItemObject itemObjectGloves = MBObjectManager.Instance.GetObject<ItemObject>("klbcloth1a");
+                        randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Gloves, new EquipmentElement(itemObjectGloves));
+                    }
+                    else if (clothingLevel == "custom")
+                    {
+                        ItemObject itemObjectBody = customBody != "" ? MBObjectManager.Instance.GetObject<ItemObject>(customBody) : null;
+                        ItemObject itemObjectCape = customCape != "" ? MBObjectManager.Instance.GetObject<ItemObject>(customCape) : null;
+                        ItemObject itemObjectGloves = customGloves != "" ? MBObjectManager.Instance.GetObject<ItemObject>(customGloves) : null;
+                        ItemObject itemObjectLeg = customLegs != "" ? MBObjectManager.Instance.GetObject<ItemObject>(customLegs) : null;
+                        ItemObject itemObjectHead = customHead != "" ? MBObjectManager.Instance.GetObject<ItemObject>(customHead) : null;
+
+                        if (itemObjectBody != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
+                        if (itemObjectCape != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Cape, new EquipmentElement(itemObjectCape));
+                        if (itemObjectGloves != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Gloves, new EquipmentElement(itemObjectGloves));
+                        if (itemObjectLeg != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Leg, new EquipmentElement(itemObjectLeg));
+                        if (itemObjectHead != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Head, new EquipmentElement(itemObjectHead));
+                    }
+                    else
+                    {
+                        ItemObject itemObjectBody = Hero.MainHero.IsFemale
+                            ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
+                            : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
+                        randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
+                    }
+                }
+
+                if (meleeLevel != "none")
+                {
+                    string item;
+
+                    if (meleeLevel == "Advanced")
+                    {
+                        item = PlayerCaptivity.CaptorParty.Culture.GetCultureCode() switch
+                        {
+                            CultureCode.Sturgia => "sturgia_axe_3_t3",
+                            CultureCode.Aserai => "eastern_spear_1_t2",
+                            CultureCode.Empire => "northern_spear_1_t2",
+                            CultureCode.Battania => "aserai_sword_1_t2",
+                            _ => "vlandia_sword_1_t2",
+                        };
+                    }
+                    else
+                    {
+                        item = (PlayerCaptivity.CaptorParty?.Culture?.GetCultureCode()) switch
+                        {
+                            CultureCode.Sturgia => "seax",
+                            CultureCode.Aserai => "celtic_dagger",
+                            CultureCode.Empire => "gladius_b",
+                            CultureCode.Battania => "hooked_cleaver",
+                            _ => "seax",
+                        };
+                    }
+
+                    ItemObject itemObjectWeapon0 = MBObjectManager.Instance.GetObject<ItemObject>(item);
+                    randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Weapon0, new EquipmentElement(itemObjectWeapon0));
+                }
+
+                if (rangedLevel != "none")
+                {
+                    if (rangedLevel == "advanced")
+                    {
+                        string rangedItem;
+                        string rangedAmmo = null;
+
+                        switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
+                        {
+                            case CultureCode.Sturgia:
+                                rangedItem = "nordic_shortbow";
+                                rangedAmmo = "default_arrows";
+                                break;
+
+                            case CultureCode.Vlandia:
+                                rangedItem = "crossbow_a";
+                                rangedAmmo = "tournament_bolts";
+                                break;
+
+                            case CultureCode.Aserai:
+                                rangedItem = "tribal_bow";
+                                rangedAmmo = "default_arrows";
+                                break;
+
+                            case CultureCode.Empire:
+                                rangedItem = "hunting_bow";
+                                rangedAmmo = "default_arrows";
+                                break;
+
+                            case CultureCode.Battania:
+                                rangedItem = "northern_javelin_2_t3";
+                                break;
+
+                            case CultureCode.Invalid:
+                            case CultureCode.Khuzait:
+                            case CultureCode.Nord:
+                            case CultureCode.Darshi:
+                            case CultureCode.Vakken:
+                            case CultureCode.AnyOtherCulture:
+                            default:
+                                rangedItem = "hunting_bow";
+                                rangedAmmo = "default_arrows";
+                                break;
+                        }
+
+                        ItemObject itemObjectWeapon2 = MBObjectManager.Instance.GetObject<ItemObject>(rangedItem);
+                        randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Weapon2, new EquipmentElement(itemObjectWeapon2));
+
+                        if (rangedAmmo != null)
+                        {
+                            ItemObject itemObjectWeapon3 = MBObjectManager.Instance.GetObject<ItemObject>(rangedAmmo);
+                            randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Weapon3, new EquipmentElement(itemObjectWeapon3));
+                        }
+                    }
+                    else
+                    {
+                        ItemObject itemObjectWeapon2 = MBObjectManager.Instance.GetObject<ItemObject>("throwing_stone");
+                        randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Weapon2, new EquipmentElement(itemObjectWeapon2));
+                    }
+                }
+
+                Equipment randomElement2 = new(true);
+                randomElement2.FillFrom(randomElement, false);
+
+                if (mountLevel == "basic")
+                {
+                    ItemObject poorHorse = MBObjectManager.Instance.GetObject<ItemObject>("sumpter_horse");
+                    EquipmentElement horseEquipment = new(poorHorse);
+
+                    randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Horse, horseEquipment);
+                }
+
+                if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captive, captive.BattleEquipment, captive.CivilianEquipment);
+
+                foreach (EquipmentCustomIndex index in Enum.GetValues(typeof(EquipmentCustomIndex)))
+                {
+                    EquipmentIndex i = (EquipmentIndex)index;
+
+                    try
+                    {
+                        if (!captive.BattleEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(captive.BattleEquipment.GetEquipmentFromSlot(i).Item, 1);
+                    }
+                    catch (Exception) { }
+
+                    try
+                    {
+                        if (!captive.CivilianEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(captive.CivilianEquipment.GetEquipmentFromSlot(i).Item, 1);
+                    }
+                    catch (Exception) { }
+                }
+
+                EquipmentHelper.AssignHeroEquipmentFromEquipment(captive, randomElement);
+                EquipmentHelper.AssignHeroEquipmentFromEquipment(captive, randomElement2);
             }
-
-            EquipmentHelper.AssignHeroEquipmentFromEquipment(captive, randomElement);
-            EquipmentHelper.AssignHeroEquipmentFromEquipment(captive, randomElement2);
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("CECaptorStripVictim: " + e.ToString());
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-#define V100
+#define V102
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -92,7 +92,7 @@ namespace CaptivityEvents.Brothel
 
             int ransomValueOfAllPrisoners = GetRansomValueOfAllPrisoners();
             MBTextManager.SetTextVariable("RANSOM_AMOUNT", ransomValueOfAllPrisoners);
-            args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
+            args.optionLeaveType = GameMenuOption.LeaveType.Ransom;
 
             return true;
         }
@@ -100,7 +100,7 @@ namespace CaptivityEvents.Brothel
         private static bool SellPrisonerOneStackOnCondition(MenuCallbackArgs args)
         {
             if (PartyBase.MainParty.PrisonRoster.Count <= 0) return false;
-            args.optionLeaveType = GameMenuOption.LeaveType.RansomAndBribe;
+            args.optionLeaveType = GameMenuOption.LeaveType.Ransom;
             return true;
         }
 
@@ -139,7 +139,7 @@ namespace CaptivityEvents.Brothel
             {
                 // Reflection
                 FieldInfo fi = PartyScreenManager.Instance.GetType().GetField("_currentMode", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (fi != null) fi.SetValue(PartyScreenManager.Instance, PartyScreenMode.PrisonerManage);
+                fi?.SetValue(PartyScreenManager.Instance, PartyScreenMode.PrisonerManage);
 
                 TroopRoster prisonRoster = TroopRoster.CreateDummyTroopRoster();
                 List<CharacterObject> prisoners = FetchBrothelPrisoners(Hero.MainHero.CurrentSettlement);
@@ -170,7 +170,7 @@ namespace CaptivityEvents.Brothel
                 partyState.InitializeLogic(_partyScreenLogic);
 
                 fi = PartyScreenManager.Instance.GetType().GetField("_partyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (fi != null) fi.SetValue(PartyScreenManager.Instance, _partyScreenLogic);
+                fi?.SetValue(PartyScreenManager.Instance, _partyScreenLogic);
 
                 Game.Current.GameStateManager.PushState(partyState, 0);
             }
@@ -306,7 +306,7 @@ namespace CaptivityEvents.Brothel
                 }
 
                 _locations.Add("brothel", _brothel);
-                if (fi != null) fi.SetValue(LocationComplex.Current, _locations);
+                fi?.SetValue(LocationComplex.Current, _locations);
 
                 Campaign.Current.GameMenuManager.MenuLocations.Add(LocationComplex.Current.GetLocationWithId("brothel"));
             }
@@ -337,12 +337,6 @@ namespace CaptivityEvents.Brothel
         {
             try
             {
-                if (((TownEncounter)PlayerEncounter.LocationEncounter).IsAmbush)
-                {
-                    GameMenu.ActivateGameMenu("menu_town_thugs_start");
-                    return;
-                }
-
                 Campaign.Current.GameMenuManager.NextLocation = LocationComplex.Current.GetLocationWithId("brothel");
                 Campaign.Current.GameMenuManager.PreviousLocation = LocationComplex.Current.GetLocationWithId("center");
                 PlayerEncounter.LocationEncounter.CreateAndOpenMissionController(Campaign.Current.GameMenuManager.NextLocation);
@@ -431,7 +425,7 @@ namespace CaptivityEvents.Brothel
 
                 TextObject name = new("{=CEEVENTS1050}Brothel Assistant");
                 FieldInfo fi = owner.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (fi != null) fi.SetValue(owner, name);
+                fi?.SetValue(owner, name);
                 owner.StringId = "brothel_assistant";
             }
             else
@@ -443,7 +437,7 @@ namespace CaptivityEvents.Brothel
 
                 TextObject name = new("{=CEEVENTS1066}Brothel Owner");
                 FieldInfo fi = owner.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (fi != null) fi.SetValue(owner, name);
+                fi?.SetValue(owner, name);
                 owner.StringId = "brothel_owner";
             }
 
@@ -459,7 +453,7 @@ namespace CaptivityEvents.Brothel
 
             TextObject name = new("{=CEEVENTS1065}Slave Trader");
             FieldInfo fi = owner.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (fi != null) fi.SetValue(owner, name);
+            fi?.SetValue(owner, name);
             owner.StringId = "brothel_slaver";
 
             Monster monster = HelperGetMonster(owner, false);
@@ -519,7 +513,7 @@ namespace CaptivityEvents.Brothel
 
             TextObject name = new("{=CEEVENTS1093}Server");
             FieldInfo fi = townswoman.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (fi != null) fi.SetValue(townswoman, name);
+            fi?.SetValue(townswoman, name);
             townswoman.StringId = "bar_maid";
 
 
@@ -537,7 +531,7 @@ namespace CaptivityEvents.Brothel
 
             TextObject name = new("{=CEEVENTS1095}Prostitute");
             FieldInfo fi = townswoman.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (fi != null) fi.SetValue(townswoman, name);
+            fi?.SetValue(townswoman, name);
 
             townswoman.StringId = prostituteStrings.GetRandomElement();
 
@@ -554,7 +548,7 @@ namespace CaptivityEvents.Brothel
 
             TextObject name = new("{=CEEVENTS1095}Prostitute");
             FieldInfo fi = townswoman.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (fi != null) fi.SetValue(townswoman, name);
+            fi?.SetValue(townswoman, name);
 
             townswoman.StringId = prostituteStrings.GetRandomElement();
 
@@ -577,7 +571,7 @@ namespace CaptivityEvents.Brothel
 
             TextObject name = new("{=CEEVENTS1095}Prostitute");
             FieldInfo fi = townsman.GetType().GetField("_basicName", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (fi != null) fi.SetValue(townsman, name);
+            fi?.SetValue(townsman, name);
 
             townsman.StringId = prostituteStrings.GetRandomElement();
 
@@ -1347,7 +1341,7 @@ namespace CaptivityEvents.Brothel
                     }
 
                     _locations.Add("brothel", _brothel);
-                    if (fi != null) fi.SetValue(LocationComplex.Current, _locations);
+                    fi?.SetValue(LocationComplex.Current, _locations);
 
                     Campaign.Current.GameMenuManager.MenuLocations.Add(LocationComplex.Current.GetLocationWithId("brothel"));
                 }
@@ -1396,7 +1390,7 @@ namespace CaptivityEvents.Brothel
             }
         }
 
-        private void OnWarDeclared(IFaction faction1, IFaction faction2)
+        private void OnWarDeclared(IFaction faction1, IFaction faction2, DeclareWarAction.DeclareWarDetail det)
         {
             try
             {

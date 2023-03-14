@@ -1,6 +1,6 @@
+using MCM.Abstractions.Base.Global;
 using MCM.Abstractions.FluentBuilder;
-using MCM.Abstractions.Ref;
-using MCM.Abstractions.Settings.Base.Global;
+using MCM.Common;
 using System.Collections.Generic;
 
 namespace CaptivityEvents.Config

@@ -1,4 +1,4 @@
-﻿#define V100
+﻿#define V102
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -28,7 +28,7 @@ namespace CaptivityEvents.Events
         internal void GainSkills(SkillObject skillObject, int amount, int chance, Hero hero = null)
         {
             if (CEHelper.HelperMBRandom(30) >= chance) return;
-            if (hero == null) hero = Hero.MainHero;
+            hero ??= Hero.MainHero;
 
             try
             {
@@ -162,10 +162,7 @@ namespace CaptivityEvents.Events
                     {
                         // Reflection One
                         MethodInfo mi = typeof(CampaignEventDispatcher).GetMethod("OnPlayerTraitChanged", BindingFlags.Instance | BindingFlags.NonPublic);
-                        if (mi != null)
-                        {
-                            mi.Invoke(CampaignEventDispatcher.Instance, new object[] { traitObject, traitLevel });
-                        }
+                        mi?.Invoke(CampaignEventDispatcher.Instance, new object[] { traitObject, traitLevel });
                     }
                 }
                 catch (Exception e)
@@ -199,19 +196,6 @@ namespace CaptivityEvents.Events
                     }
                 }
             }
-
-            if (found) return;
-
-            //#if STABLE
-            //            foreach (TraitObject traitObject in DefaultTraits.All)
-            //            {
-            //                if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
-            //                {
-            //                    found = true;
-            //                    TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
-            //                }
-            //            }
-            //#endif
 
             if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + trait);
         }
@@ -263,8 +247,8 @@ namespace CaptivityEvents.Events
 
                 if (levels > 0)
                 {
-                    MethodInfo mi = hero.HeroDeveloper.GetType().GetMethod("ChangeSkillLevelFromXpChange", BindingFlags.Instance | BindingFlags.NonPublic);
-                    if (mi != null) mi.Invoke(hero.HeroDeveloper, new object[] { skillObject, levels, false });
+                    //MethodInfo mi = hero.HeroDeveloper.GetType().GetMethod("ChangeSkillLevelFromXpChange", BindingFlags.Instance | BindingFlags.NonPublic);
+                    //if (mi != null) mi.Invoke(hero.HeroDeveloper, new object[] { skillObject, levels, false });
                 }
                 else
                 {
@@ -386,8 +370,7 @@ namespace CaptivityEvents.Events
             if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + skill);
         }
 
-        private void SetModifier(int amount, Hero hero, SkillObject skill, SkillObject flag, bool displayMessage = true, bool quickInformation = false)
-        //Warning: SkillObject flag never used.
+        private void SetModifier(int amount, Hero hero, SkillObject skill, bool displayMessage = true, bool quickInformation = false)
         {
             if (amount == 0)
             {
@@ -468,7 +451,7 @@ namespace CaptivityEvents.Events
             }
             else
             {
-                SetModifier(amount, hero, slaverySkill, slaveryFlag);
+                SetModifier(amount, hero, slaverySkill);
             }
         }
 
@@ -511,7 +494,7 @@ namespace CaptivityEvents.Events
             }
             else
             {
-                SetModifier(amount, hero, prostitutionSkill, prostitutionFlag, displayMessage, quickInformation);
+                SetModifier(amount, hero, prostitutionSkill, displayMessage, quickInformation);
             }
         }
 
@@ -549,7 +532,7 @@ namespace CaptivityEvents.Events
                             {
                                 if (firstHero.PartyBelongedTo.Army.LeaderParty == firstHero.PartyBelongedTo)
                                 {
-                                    firstHero.PartyBelongedTo.Army.DisperseArmy(Army.ArmyDispersionReason.Unknown);
+                                    DisbandArmyAction.ApplyByArmyLeaderIsDead(firstHero.PartyBelongedTo.Army);
                                 }
                                 else
                                 {
@@ -576,10 +559,7 @@ namespace CaptivityEvents.Events
 
                             firstHero.ChangeState(Hero.CharacterStates.Fugitive);
                             MobileParty partyBelongedTo2 = firstHero.PartyBelongedTo;
-                            if (partyBelongedTo2 != null)
-                            {
-                                partyBelongedTo2.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default, 0);
-                            }
+                            partyBelongedTo2?.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default, 0);
                         }
                     }
 
@@ -694,7 +674,7 @@ namespace CaptivityEvents.Events
                             {
                                 PropertyInfo pi = captor.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                                 ChangeClanName(captor.Clan, clanName, clanName);
-                                if (pi != null) pi.SetValue(captor.Clan, banner);
+                                pi?.SetValue(captor.Clan, banner);
                                 captor.Clan.SetLeader(leader);
                             }
                         }
@@ -702,7 +682,7 @@ namespace CaptivityEvents.Events
                         {
                             PropertyInfo pi = hero.Clan.GetType().GetProperty("Banner", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                             ChangeClanName(hero.Clan, clanName, clanName);
-                            if (pi != null) pi.SetValue(hero.Clan, banner);
+                            pi?.SetValue(hero.Clan, banner);
                             hero.Clan.SetLeader(leader);
                         }
 
@@ -945,7 +925,7 @@ namespace CaptivityEvents.Events
         internal void RelationsModifier(Hero hero1, int relationChange, Hero hero2 = null, bool quickInformationMessage = true, bool regularMessage = false)
         {
             if (hero1 == null || relationChange == 0) return;
-            if (hero2 == null) hero2 = Hero.MainHero;
+            hero2 ??= Hero.MainHero;
 
             Campaign.Current.Models.DiplomacyModel.GetHeroesForEffectiveRelation(hero1, hero2, out Hero hero3, out Hero hero4);
             if (hero3 == null || hero4 == null)

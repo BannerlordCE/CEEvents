@@ -4,9 +4,6 @@
 			"path": "..\\..\\zCEDefaults"
 		},
 		{
-			"path": "..\\..\\zTBCaptivityEvents"
-		},
-		{
 			"path": "..\\GUI"
 		},
 		{
@@ -29,6 +26,12 @@
 		},
 		{
 			"path": "../../zCEArenaFighterExpansion"
+		},
+		{
+			"path": "../../zCEAnimationExpansion"
+		},
+		{
+			"path": "../../zCEHolidayEvents"
 		}
 	]
 }

@@ -1,4 +1,4 @@
-#define V100
+#define V102
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -456,7 +456,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
                         try
                         {
-                            Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, isOffspringFemale, null);
+                            Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, isOffspringFemale);
                             aliveOffsprings.Add(item);
                         }
                         catch (Exception e)
@@ -464,7 +464,7 @@ namespace CaptivityEvents.CampaignBehaviors
                             CECustomHandler.ForceLogToFile("Bad pregnancy " + (isOffspringFemale ? "Female" : "Male"));
                             CECustomHandler.ForceLogToFile(e.Message + " : " + e);
 
-                            Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, !isOffspringFemale, null);
+                            Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, !isOffspringFemale);
                             aliveOffsprings.Add(item);
                         }
                     }

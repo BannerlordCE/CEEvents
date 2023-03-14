@@ -1,4 +1,4 @@
-﻿#define V100
+﻿#define V102
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -136,7 +136,7 @@ namespace CaptivityEvents.Events
 
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
 
-            PartyBase.MainParty.MobileParty.SetMoveModeHold();
+            PartyBase.MainParty.MobileParty.Ai.SetMoveModeHold();
         }
 
         #endregion Progress Event
@@ -187,6 +187,7 @@ namespace CaptivityEvents.Events
             PlayerHasOpenSpaceForCompanions(ref args);
 
             _sharedCallBackHelper.InitIcons(ref args);
+            _sharedCallBackHelper.InitGiveItem();
 
             InitSoldToSettlement();
             InitSoldToCaravan();
@@ -215,6 +216,7 @@ namespace CaptivityEvents.Events
         internal void RandomEventConsequenceMenuOption(MenuCallbackArgs args)
         {
             CaptorSpecifics captorSpecifics = new();
+            _sharedCallBackHelper.ConsequenceGiveItem();
             _sharedCallBackHelper.ConsequenceXP();
             _sharedCallBackHelper.ConsequenceLeaveSpouse();
             _sharedCallBackHelper.ConsequenceGold();
@@ -587,7 +589,7 @@ namespace CaptivityEvents.Events
                     }
 
                     customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
-                    customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
+                    customParty.Ai.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
 
                     ConsequenceRandomCaptivityChange(ref args, customParty.Party);
                 }
@@ -733,11 +735,11 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid PregnancyRiskModifier"); }
         }
 
-#endregion Consequences
+        #endregion Consequences
 
-#region Requirements
+        #region Requirements
 
-#region ReqGold
+        #region ReqGold
 
         private void ReqGold(ref MenuCallbackArgs args)
         {
@@ -770,9 +772,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqGold
+        #endregion ReqGold
 
-#region ReqTrait
+        #region ReqTrait
 
         private void ReqTrait(ref MenuCallbackArgs args)
         {
@@ -820,9 +822,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqTrait
+        #endregion ReqTrait
 
-#region ReqHeroSkills
+        #region ReqHeroSkills
 
         private void ReqHeroSkills(ref MenuCallbackArgs args)
         {
@@ -840,19 +842,24 @@ namespace CaptivityEvents.Events
                     return;
                 }
 
-                int skillLevel = Hero.MainHero.GetSkillValue(foundSkill);
-
                 try
                 {
-                    if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min)) break;
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredAbove"); }
 
-                try
-                {
-                    if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max)) break;
+                    int skillLevel = Hero.MainHero.GetSkillValue(foundSkill);
+
+                    try
+                    {
+                        if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min)) break;
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredAbove"); }
+
+                    try
+                    {
+                        if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max)) break;
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
                 }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid GetSkillValue"); }
             }
         }
 
@@ -882,9 +889,9 @@ namespace CaptivityEvents.Events
             return true;
         }
 
-#endregion ReqHeroSkills
+        #endregion ReqHeroSkills
 
-#region ReqHeroSkill
+        #region ReqHeroSkill
 
         private void ReqHeroSkill(ref MenuCallbackArgs args)
         {
@@ -936,9 +943,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqHeroSkill
+        #endregion ReqHeroSkill
 
-#region ReqProstitute
+        #region ReqProstitute
 
         private void ReqProstitute(ref MenuCallbackArgs args)
         {
@@ -971,9 +978,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqProstitute
+        #endregion ReqProstitute
 
-#region ReqSlavery
+        #region ReqSlavery
 
         private void ReqSlavery(ref MenuCallbackArgs args)
         {
@@ -1006,9 +1013,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqSlavery
+        #endregion ReqSlavery
 
-#region ReqHeroHealthPercentage
+        #region ReqHeroHealthPercentage
 
         private void ReqHeroHealthPercentage(ref MenuCallbackArgs args)
         {
@@ -1039,9 +1046,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqHeroHealthPercentage
+        #endregion ReqHeroHealthPercentage
 
-#region ReqFemaleCaptives
+        #region ReqFemaleCaptives
 
         private void ReqFemaleCaptives(ref MenuCallbackArgs args)
         {
@@ -1106,9 +1113,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqFemaleCaptives
+        #endregion ReqFemaleCaptives
 
-#region ReqMaleCaptives
+        #region ReqMaleCaptives
 
         private void ReqMaleCaptives(ref MenuCallbackArgs args)
         {
@@ -1173,9 +1180,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqMaleCaptives
+        #endregion ReqMaleCaptives
 
-#region ReqCaptives
+        #region ReqCaptives
 
         private void ReqCaptives(ref MenuCallbackArgs args)
         {
@@ -1240,9 +1247,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqCaptives
+        #endregion ReqCaptives
 
-#region ReqFemaleTroops
+        #region ReqFemaleTroops
 
         private void ReqFemaleTroops(ref MenuCallbackArgs args)
         {
@@ -1307,9 +1314,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqFemaleTroops
+        #endregion ReqFemaleTroops
 
-#region ReqMaleTroops
+        #region ReqMaleTroops
 
         private void ReqMaleTroops(ref MenuCallbackArgs args)
         {
@@ -1374,9 +1381,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqMaleTroops
+        #endregion ReqMaleTroops
 
-#region ReqTroops
+        #region ReqTroops
 
         private void ReqTroops(ref MenuCallbackArgs args)
         {
@@ -1441,9 +1448,9 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqTroops
+        #endregion ReqTroops
 
-#region ReqMorale
+        #region ReqMorale
 
         private void ReqMorale(ref MenuCallbackArgs args)
         {
@@ -1474,11 +1481,11 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion ReqMorale
+        #endregion ReqMorale
 
-#endregion Requirements
+        #endregion Requirements
 
-#region Init Options
+        #region Init Options
 
         private void InitChangeGold()
         {
@@ -1540,9 +1547,9 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
         }
 
-#endregion Init Options
+        #endregion Init Options
 
-#region CustomConsequencesReq
+        #region CustomConsequencesReq
 
         private void PlayerHasOpenSpaceForCompanions(ref MenuCallbackArgs args)
         {
@@ -1562,6 +1569,6 @@ namespace CaptivityEvents.Events
             args.IsEnabled = false;
         }
 
-#endregion CustomConsequencesReq
+        #endregion CustomConsequencesReq
     }
 }

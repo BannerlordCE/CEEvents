@@ -1,4 +1,4 @@
-﻿#define V100
+﻿#define V102
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -108,7 +108,7 @@ namespace CaptivityEvents.Events
                     if (Hero.MainHero.IsWounded) Hero.MainHero.HitPoints = 20;
 
                     PlayerEncounter.ProtectPlayerSide();
-                    MobileParty.MainParty.SetIsDisorganized(false);
+                    MobileParty.MainParty.SetDisorganized(false);
                     PartyBase.MainParty.AddElementToMemberRoster(CharacterObject.PlayerCharacter, 1, true);
                     MobileParty.MainParty.ChangePartyLeader(Hero.MainHero);
                 }
@@ -127,7 +127,7 @@ namespace CaptivityEvents.Events
                 {
                     MobileParty.MainParty.IsActive = true;
                     PartyBase.MainParty.SetAsCameraFollowParty();
-                    MobileParty.MainParty.SetMoveModeHold();
+                    MobileParty.MainParty.Ai.SetMoveModeHold();
                     PartyBase.MainParty.UpdateVisibilityAndInspected(0f, true);
                 }
 

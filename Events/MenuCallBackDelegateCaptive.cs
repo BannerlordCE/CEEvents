@@ -1,4 +1,4 @@
-﻿#define V100
+﻿#define V102
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -16,7 +16,8 @@ using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
-
+using TaleWorlds.ObjectSystem;
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
 
 namespace CaptivityEvents.Events
 {
@@ -109,13 +110,13 @@ namespace CaptivityEvents.Events
 
             if (PlayerCaptivity.CaptorParty.IsMobile)
             {
-                PlayerCaptivity.CaptorParty.MobileParty.SetMoveModeHold();
+                PlayerCaptivity.CaptorParty.MobileParty.Ai.SetMoveModeHold();
             }
 
             if (_timer / _max == 1)
             {
                 CEHelper.progressEventExists = false;
-                PlayerCaptivity.CaptorParty.MobileParty.RecalculateShortTermAi();
+                PlayerCaptivity.CaptorParty.MobileParty.Ai.RecalculateShortTermAi();
             }
 
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
@@ -190,8 +191,12 @@ namespace CaptivityEvents.Events
             else if (PlayerCaptivity.CaptorParty.IsSettlement) PartyBase.MainParty.MobileParty.Position2D = PlayerCaptivity.CaptorParty.Settlement.GatePosition;
             PlayerCaptivity.CaptorParty.SetAsCameraFollowParty();
 
-            string eventToRun = Campaign.Current.Models.PlayerCaptivityModel.CheckCaptivityChange(Campaign.Current.CampaignDt);
-            if (!string.IsNullOrWhiteSpace(eventToRun)) GameMenu.SwitchToMenu(eventToRun);
+            ICaptivityCampaignBehavior captivityCampaignBehavior = Campaign.Current.GetCampaignBehavior<ICaptivityCampaignBehavior>();
+            if (captivityCampaignBehavior == null)
+            {
+                return;
+            }
+            captivityCampaignBehavior.CheckCaptivityChange(Campaign.Current.CampaignDt);
         }
 
         #endregion Wait Menu
@@ -208,6 +213,7 @@ namespace CaptivityEvents.Events
         internal bool CaptiveEventOptionGameMenu(MenuCallbackArgs args)
         {
             _sharedCallBackHelper.InitIcons(ref args);
+            _sharedCallBackHelper.InitGiveItem();
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveGold)) InitGiveGold();
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) InitChangeGold();
@@ -273,6 +279,7 @@ namespace CaptivityEvents.Events
             ConsequenceWoundTroops();
             ConsequenceKillTroops();
 
+            _sharedCallBackHelper.ConsequenceGiveItem();
             _sharedCallBackHelper.ConsequenceGiveBirth();
             _sharedCallBackHelper.ConsequenceAbort();
             _sharedCallBackHelper.ConsequencePlayScene();
@@ -1010,20 +1017,24 @@ namespace CaptivityEvents.Events
                     CECustomHandler.ForceLogToFile("Could not find " + skillRequired.Id);
                     return;
                 }
-
-                int skillLevel = Hero.MainHero.GetSkillValue(foundSkill);
-
                 try
                 {
-                    if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min, "str_CE_skill_level")) break;
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredAbove"); }
 
-                try
-                {
-                    if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_level")) break;
+                    int skillLevel = Hero.MainHero.GetSkillValue(foundSkill);
+
+                    try
+                    {
+                        if (ReqSkillsLevelAbove(ref args, foundSkill, skillLevel, skillRequired.Min, "str_CE_skill_level")) break;
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredAbove"); }
+
+                    try
+                    {
+                        if (ReqSkillsLevelBelow(ref args, foundSkill, skillLevel, skillRequired.Max, "str_CE_skill_level")) break;
+                    }
+                    catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
                 }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid SkillRequiredBelow"); }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid GetSkillValue"); }
             }
         }
 

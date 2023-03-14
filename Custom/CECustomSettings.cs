@@ -67,6 +67,7 @@ namespace CaptivityEvents
         public int HorseChance { get; set; } = 10;
         public bool HorseSkill { get; set; } = true;
         public bool PregnancyToggle { get; set; } = true;
+        public bool PregnancyToggleFemalexFemale { get; set; } = true;
         public bool AttractivenessSkill { get; set; } = true;
         public int PregnancyChance { get; set; } = 20;
         public bool UsePregnancyModifiers { get; set; } = true;

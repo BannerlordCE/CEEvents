@@ -6,6 +6,26 @@ namespace CaptivityEvents.Events
 {
     public class CEVariablesLoader
     {
+        public string[] GetStringFromXML(string stringpassed)
+        {
+            try
+            {
+                string[] stringArray = stringpassed.Split(',');
+
+                for (int i = 0; i < stringArray.Length; i++)
+                {
+                    stringArray[i] = stringArray[i].Trim();
+                }
+                return stringArray;
+            }
+            catch (Exception)
+            {
+                CECustomHandler.ForceLogToFile("Failed to parse int " + stringpassed);
+
+                return new string[1] { stringpassed };
+            }
+        }
+
         public int GetIntFromXML(string numpassed)
         {
             try

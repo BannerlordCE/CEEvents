@@ -1,4 +1,4 @@
-﻿#define V100
+﻿#define V102
 
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -32,7 +32,7 @@ namespace CaptivityEvents.Helper
             if (sceneToPlay.Contains("$location_culture"))
             {
 
-                sceneToPlay = sceneToPlay.Replace("$location_culture", partyBase.Settlement?.Culture.ToString() ?? SettlementHelper.FindNearestSettlementToPoint(partyBase.Position2D).Culture.ToString());
+                sceneToPlay = sceneToPlay.Replace("$location_culture", partyBase.Settlement?.Culture.ToString() ?? SettlementHelper.FindNearestSettlement((Settlement x) => true, partyBase.IsMobile ? partyBase.MobileParty : MobileParty.MainParty).Culture.ToString());
             }
 
             if (sceneToPlay.Contains("$party_culture"))
@@ -42,7 +42,7 @@ namespace CaptivityEvents.Helper
 
             if (sceneToPlay.Contains("$location"))
             {
-                sceneToPlay = sceneToPlay.Replace("$location", CurrentLocation(partyBase.Settlement ?? SettlementHelper.FindNearestSettlementToPoint(partyBase.Position2D)));
+                sceneToPlay = sceneToPlay.Replace("$location", CurrentLocation(partyBase.Settlement ?? SettlementHelper.FindNearestSettlement((Settlement x) => true, partyBase.IsMobile ? partyBase.MobileParty : MobileParty.MainParty)));
             }
 
             string[] e = new string[]

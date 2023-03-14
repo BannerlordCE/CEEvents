@@ -1,4 +1,4 @@
-#define V100
+#define V102
 
 using System;
 using System.Linq;
@@ -16,6 +16,7 @@ using TaleWorlds.Core.ViewModelCollection.Information;
 using System.Collections.Generic;
 
 using TaleWorlds.Core.ViewModelCollection.Generic;
+using CaptivityEvents.Custom;
 
 namespace CaptivityEvents.Brothel
 {
@@ -111,14 +112,24 @@ namespace CaptivityEvents.Brothel
 
         private void OnManageWorkshopDone(List<object> selectedItems, Action closePopup)
         {
-            closePopup?.Invoke();
-            if (selectedItems.Count == 1)
+            try
             {
-                if (selectedItems[0].ToString() == "operations") {
-                    ExecuteToggleBrothel(selectedItems);
-                } else {
-                    ExecuteSellBrothel(selectedItems);
+                closePopup?.Invoke();
+                if (selectedItems.Count == 1)
+                {
+                    if (selectedItems[0]?.ToString() == "operations")
+                    {
+                        ExecuteToggleBrothel(selectedItems);
+                    }
+                    else
+                    {
+                        ExecuteSellBrothel(selectedItems);
+                    }
                 }
+            } 
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("OnManageWorkshopDone : " + e);
             }
         }
 
