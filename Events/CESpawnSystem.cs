@@ -138,8 +138,6 @@ namespace CaptivityEvents.Events
                         if (!party.IsMobile) AddHeroToPartyAction.Apply(hero, party.Settlement.Party.MobileParty, true);
                         else AddHeroToPartyAction.Apply(hero, party.MobileParty, true);
                     }
-
-                    CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
                 }
                 catch (Exception e)
                 {
