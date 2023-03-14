@@ -92,7 +92,7 @@ namespace CaptivityEvents.Events
                     Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, Clan.BanditFactions.GetRandomElementInefficiently(), null, -1);
 
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);
-                    hero.HasMet = true;
+                    hero.SetHasMet();
                     hero.ChangeState(Hero.CharacterStates.Active);
                     if (heroVariables.Clan != null)
                     {
