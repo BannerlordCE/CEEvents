@@ -86,8 +86,27 @@ namespace CaptivityEvents.Events
                     CharacterObject wanderer = cultureObject.NotableAndWandererTemplates.GetRandomElementWithPredicate((CharacterObject x) => x.Occupation == Occupation.Wanderer && (heroVariables.Gender == null || x.IsFemale == isFemale));
                     Settlement randomElement = Settlement.All.GetRandomElementWithPredicate((Settlement settlement) => settlement.Culture == wanderer.Culture && settlement.IsTown);
 
-                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, CampaignData.NeutralFaction, CampaignData.NeutralFaction, -1);
+                    Clan ceClan = Clan.BanditFactions.Where(x => x.StringId.ToLower() == heroVariables.Clan).FirstOrDefault();
+                    if (heroVariables.Clan != null)
+                    {
+                        switch (heroVariables.Clan.ToLower())
+                        {
+                            case "captor":
+                                ceClan = party.Owner.Clan;
+                                break;
 
+                            case "player":
+                                ceClan = Clan.PlayerClan;
+                                break;
+
+                            default:
+                                if (ceClan.StringId==null){ ceClan = Clan.BanditFactions.GetRandomElementInefficiently(); }
+                                break;
+                        }
+                    } 
+                    else { ceClan = Clan.BanditFactions.GetRandomElementInefficiently(); }
+                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, ceClan, CampaignData.NeutralFaction, -1);
+                    
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);
                     hero.SetHasMet();
                     hero.ChangeState(Hero.CharacterStates.Active);
