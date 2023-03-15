@@ -261,7 +261,7 @@ namespace CaptivityEvents.Events
                 {
                     if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
                     
-                    TextObject leftRosterName = new TextObject("{=02c5bQSM}Your Inventory", null);
+                    TextObject leftRosterName = new TextObject("_", null);
                     ItemRoster itemRoster = new ItemRoster();
                     InventoryManager instance = InventoryManager.Instance;
                     InventoryLogic inventoryLogic = InventoryManager.InventoryLogic;
