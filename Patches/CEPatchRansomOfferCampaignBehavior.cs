@@ -14,10 +14,11 @@ namespace CaptivityEvents.Patches
         [HarmonyPrefix]
         static bool ConsiderRansomPrisoner(Hero hero)
         {
-            if (hero == null || hero.Clan == null)
+            if (hero == null)
             {
                 return false; // skips the original and its expensive calculations
-            }
+            } 
+            else if (hero.Clan == null) {return false;}
             return true; // make sure you only skip if really necessary
         }
 
