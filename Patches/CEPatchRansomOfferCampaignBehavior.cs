@@ -17,8 +17,10 @@ namespace CaptivityEvents.Patches
             if (hero == null)
             {
                 return false; // skips the original and its expensive calculations
-            } 
-            else if (hero.Clan == null) {return false;}
+            }
+            else if (hero.Clan == null){return false;}
+            //below line would return false for any MainParty Captives! Link with Prisoner Override Options?
+            //else if (hero.PartyBelongedToAsPrisoner == TaleWorlds.CampaignSystem.Party.PartyBase.MainParty) {return false;}
             return true; // make sure you only skip if really necessary
         }
 
