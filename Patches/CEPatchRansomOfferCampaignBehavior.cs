@@ -1,5 +1,6 @@
 ﻿#define V102
 
+using System.Linq;
 using CaptivityEvents.Helper;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
