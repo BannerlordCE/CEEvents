@@ -18,6 +18,10 @@ using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Inventory;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.ObjectSystem;
+using TaleWorlds.CampaignSystem.Settlements;
+using System.Reflection;
+using TaleWorlds.CampaignSystem.Roster;
+using TaleWorlds.CampaignSystem.GameState;
 
 namespace CaptivityEvents.Events
 {
@@ -261,8 +265,8 @@ namespace CaptivityEvents.Events
                 {
                     if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
                     
-                    TextObject leftRosterName = new TextObject("_", null);
-                    ItemRoster itemRoster = new ItemRoster();
+                    TextObject leftRosterName = new("_", null);
+                    ItemRoster itemRoster = new();
                     InventoryManager instance = InventoryManager.Instance;
                     InventoryLogic inventoryLogic = InventoryManager.InventoryLogic;
                     MethodInfo method = typeof(InventoryManager).GetMethod("GetCurrentMarketData", BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
