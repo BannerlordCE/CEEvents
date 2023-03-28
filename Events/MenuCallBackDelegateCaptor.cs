@@ -7,21 +7,21 @@ using CaptivityEvents.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.Core;
-using TaleWorlds.Library;
-using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Inventory;
 using TaleWorlds.CampaignSystem.Party;
-using TaleWorlds.ObjectSystem;
 using TaleWorlds.CampaignSystem.Settlements;
-using System.Reflection;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.Core;
+using TaleWorlds.Library;
+using TaleWorlds.Localization;
+using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events
 {
@@ -264,7 +264,7 @@ namespace CaptivityEvents.Events
                 try
                 {
                     if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
-                    
+
                     TextObject leftRosterName = new("_", null);
                     ItemRoster itemRoster = new();
                     InventoryManager instance = InventoryManager.Instance;
