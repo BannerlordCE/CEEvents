@@ -81,7 +81,7 @@ namespace CaptivityEvents.Patches
 
                 PlayerCaptivity.LastCheckTime = CampaignTime.Now;
                 if (Game.Current.GameStateManager.ActiveState is MapState) Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-
+                PlayerCaptivity.CaptorParty = PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Party;
                 return "menu_captivity_transfer_to_town";
             }
 
