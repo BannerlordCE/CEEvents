@@ -591,13 +591,21 @@ namespace CaptivityEvents.Events
                         if (itemObjectGloves != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Gloves, new EquipmentElement(itemObjectGloves));
                         if (itemObjectLeg != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Leg, new EquipmentElement(itemObjectLeg));
                         if (itemObjectHead != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Head, new EquipmentElement(itemObjectHead));
-                    }
+                    }                    
                     else
                     {
-                        ItemObject itemObjectBody = Hero.MainHero.IsFemale
-                            ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
-                            : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
-                        randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
+                        MBEquipmentRoster tryRoster = MBObjectManager.Instance.GetObject<MBEquipmentRoster>(clothingLevel);
+                        if (tryRoster != null) {
+                            Equipment tryEquipSet = tryRoster.AllEquipments.GetRandomElementWithPredicate(e => e.IsCivilian != true);
+                                randomElement.FillFrom(tryEquipSet);
+                        }
+                        else
+                        {
+                            ItemObject itemObjectBody = Hero.MainHero.IsFemale
+                                ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
+                                : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
+                            randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
+                        }
                     }
                 }
 

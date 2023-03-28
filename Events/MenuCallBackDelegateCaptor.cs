@@ -260,13 +260,26 @@ namespace CaptivityEvents.Events
                 try
                 {
                     if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
-
-                    MobileParty.MainParty.AddElementToMemberRoster(captiveHero.CharacterObject, 1, false);
-
-                    InventoryManager.OpenScreenAsInventoryOf(MobileParty.MainParty, captiveHero.CharacterObject);
-
-                    CEPersistence.removeHero = captiveHero;
-                    CEPersistence.captiveInventoryStage = 1;
+                    
+                    TextObject leftRosterName = new TextObject("_", null);
+                    ItemRoster itemRoster = new ItemRoster();
+                    InventoryManager instance = InventoryManager.Instance;
+                    InventoryLogic inventoryLogic = InventoryManager.InventoryLogic;
+                    MethodInfo method = typeof(InventoryManager).GetMethod("GetCurrentMarketData", BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                    IMarketData marketData = (IMarketData)method.Invoke(null, new object[0]);
+                    MobileParty mobileParty = captiveHero.PartyBelongedTo;
+                    bool flag = mobileParty == null;
+                    if (flag)
+                    {
+                        mobileParty = MBObjectManager.Instance.CreateObject<MobileParty>("Temp_party");
+                    }
+                    inventoryLogic = new InventoryLogic(mobileParty, captiveHero.CharacterObject, null);
+                    inventoryLogic.Initialize(MobileParty.MainParty.ItemRoster, mobileParty, false, true, captiveHero.CharacterObject, InventoryManager.InventoryCategoryType.None, marketData, false, leftRosterName, null);
+                    FieldInfo field = typeof(InventoryManager).GetField("_inventoryLogic", BindingFlags.Instance | BindingFlags.NonPublic);
+                    field.SetValue(InventoryManager.Instance, inventoryLogic);
+                    InventoryState inventoryState = Game.Current.GameStateManager.CreateState<InventoryState>();
+                    inventoryState.InitializeLogic(inventoryLogic);
+                    Game.Current.GameStateManager.PushState(inventoryState, 0);
                 }
                 catch (Exception e)
                 {
