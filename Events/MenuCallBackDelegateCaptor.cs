@@ -7,16 +7,20 @@ using CaptivityEvents.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.Core;
-using TaleWorlds.Library;
-using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Inventory;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.CampaignSystem.Roster;
+using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.Core;
+using TaleWorlds.Library;
+using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events
@@ -261,12 +265,25 @@ namespace CaptivityEvents.Events
                 {
                     if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
 
-                    MobileParty.MainParty.AddElementToMemberRoster(captiveHero.CharacterObject, 1, false);
-
-                    InventoryManager.OpenScreenAsInventoryOf(MobileParty.MainParty, captiveHero.CharacterObject);
-
-                    CEPersistence.removeHero = captiveHero;
-                    CEPersistence.captiveInventoryStage = 1;
+                    TextObject leftRosterName = new("_", null);
+                    ItemRoster itemRoster = new();
+                    InventoryManager instance = InventoryManager.Instance;
+                    InventoryLogic inventoryLogic = InventoryManager.InventoryLogic;
+                    MethodInfo method = typeof(InventoryManager).GetMethod("GetCurrentMarketData", BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                    IMarketData marketData = (IMarketData)method.Invoke(null, new object[0]);
+                    MobileParty mobileParty = captiveHero.PartyBelongedTo;
+                    bool flag = mobileParty == null;
+                    if (flag)
+                    {
+                        mobileParty = MBObjectManager.Instance.CreateObject<MobileParty>("Temp_party");
+                    }
+                    inventoryLogic = new InventoryLogic(mobileParty, captiveHero.CharacterObject, null);
+                    inventoryLogic.Initialize(MobileParty.MainParty.ItemRoster, mobileParty, false, true, captiveHero.CharacterObject, InventoryManager.InventoryCategoryType.None, marketData, false, leftRosterName, null);
+                    FieldInfo field = typeof(InventoryManager).GetField("_inventoryLogic", BindingFlags.Instance | BindingFlags.NonPublic);
+                    field.SetValue(InventoryManager.Instance, inventoryLogic);
+                    InventoryState inventoryState = Game.Current.GameStateManager.CreateState<InventoryState>();
+                    inventoryState.InitializeLogic(inventoryLogic);
+                    Game.Current.GameStateManager.PushState(inventoryState, 0);
                 }
                 catch (Exception e)
                 {
