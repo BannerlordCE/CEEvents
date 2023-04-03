@@ -32,6 +32,9 @@
 		},
 		{
 			"path": "../../zCEHolidayEvents"
+		},
+		{
+			"path": "../../zModules"
 		}
 	]
 }
