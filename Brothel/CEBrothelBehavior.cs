@@ -1,4 +1,4 @@
-#define V102
+#define V112
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
