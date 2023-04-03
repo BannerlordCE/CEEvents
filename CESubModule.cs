@@ -388,7 +388,10 @@ namespace CaptivityEvents
                             }
                         }
                     }
-                    catch (Exception) { }
+                    catch (Exception e)
+                    {
+                        CECustomHandler.ForceLogToFile("Failure to load  - exception : " + e);
+                    }
                 }
             }
 

@@ -1017,6 +1017,9 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
+                    CEHelper.notificationCaptorExists = false;
+                    CEHelper.notificationEventExists = false;
+
                     string[] modulesFound = Utilities.GetModulesNames();
 
                     CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
