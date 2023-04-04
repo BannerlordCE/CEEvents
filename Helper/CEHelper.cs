@@ -32,12 +32,12 @@ namespace CaptivityEvents.Helper
             if (sceneToPlay.Contains("$location_culture"))
             {
 
-                sceneToPlay = sceneToPlay.Replace("$location_culture", partyBase.Settlement?.Culture.ToString() ?? SettlementHelper.FindNearestSettlement((Settlement x) => true, partyBase.IsMobile ? partyBase.MobileParty : MobileParty.MainParty).Culture.ToString());
+                sceneToPlay = sceneToPlay.Replace("$location_culture", partyBase.Settlement?.Culture?.StringId ?? SettlementHelper.FindNearestSettlement((Settlement x) => true, partyBase.IsMobile ? partyBase.MobileParty : MobileParty.MainParty).Culture.StringId);
             }
 
             if (sceneToPlay.Contains("$party_culture"))
             {
-                sceneToPlay = sceneToPlay.Replace("$party_culture", partyBase.Culture.ToString());
+                sceneToPlay = sceneToPlay.Replace("$party_culture", partyBase.Culture.StringId);
             }
 
             if (sceneToPlay.Contains("$location"))
@@ -66,7 +66,7 @@ namespace CaptivityEvents.Helper
             if (sceneToPlay.Contains("$location_culture"))
             {
 
-                sceneToPlay = sceneToPlay.Replace("$location_culture", settlement.Culture.ToString());
+                sceneToPlay = sceneToPlay.Replace("$location_culture", settlement.Culture.StringId);
             }
 
             if (sceneToPlay.Contains("$location"))
