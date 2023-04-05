@@ -116,6 +116,7 @@
     <Compile Include="Notifications\CEEventMapNotificationItemVM.cs" />
     <Compile Include="Helper\CEHelper.cs" />
     <Compile Include="Notifications\CESceneNotification.cs" />
+    <Compile Include="Patches\CEBKAttributes.cs" />
     <Compile Include="Patches\CEHeroCreatorPatch.cs" />
     <Compile Include="Patches\CEPatchAttributes.cs" />
     <Compile Include="Patches\CEPatchBasicCharacterObject.cs" />
