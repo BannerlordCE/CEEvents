@@ -698,8 +698,8 @@ namespace CaptivityEvents
             if (game.GameType is not Campaign) return;
             CleanBugs();
             ResetHelper();
-            if (!_isLoaded) return;
             InitalizeAttributes(game);
+            if (!_isLoaded) return;
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
             AddBehaviours(campaignStarter);
         }

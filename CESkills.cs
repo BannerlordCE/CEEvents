@@ -86,7 +86,7 @@ namespace CaptivityEvents
         }
 
         public static void RegisterAll(Game game)
-        {
+        { 
             CustomSkills = new List<SkillObject>();
 
             CEAttribute = game.ObjectManager.RegisterPresumedObject(new CharacterAttribute("CEAttribute"));
