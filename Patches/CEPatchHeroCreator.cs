@@ -6,7 +6,7 @@ using TaleWorlds.ObjectSystem;
 namespace CaptivityEvents.Patches
 {
 	[HarmonyPatch(typeof(HeroCreator), "DeliverOffSpring")]
-	internal static class CEHeroCreatorPatch
+	internal static class CEPatchHeroCreator
 	{
 		[HarmonyPostfix]
 		public static void DeliverOffSpring(ref Hero __result, Hero mother, Hero father, bool isOffspringFemale)
