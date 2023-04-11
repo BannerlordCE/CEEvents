@@ -692,7 +692,6 @@ namespace CaptivityEvents
             base.OnNewGameCreated(game, initializerObject);
         }
 
-
         protected override void OnGameStart(Game game, IGameStarter gameStarter)
         {
             if (game.GameType is not Campaign) return;
@@ -1039,10 +1038,7 @@ namespace CaptivityEvents
 
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
 
-                        if (mapState.MenuContext != null)
-                        {
-                            mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_female");
-                        }
+                        mapState.MenuContext?.SetBackgroundMeshName("wait_prisoner_female");
                     }
                     else
                     {
@@ -1063,10 +1059,7 @@ namespace CaptivityEvents
                         }
 
                         GameMenu.ActivateGameMenu(triggeredEvent.Name);
-                        if (mapState.MenuContext != null)
-                        {
-                            mapState.MenuContext.SetBackgroundMeshName("wait_prisoner_male");
-                        }
+                        mapState.MenuContext?.SetBackgroundMeshName("wait_prisoner_male");
                     }
                 }
                 catch (Exception)
@@ -1371,12 +1364,9 @@ namespace CaptivityEvents
                 if (CEPersistence.victoryEvent != null)
                 {
                     GameMenu.ActivateGameMenu(CEPersistence.victoryEvent);
-                    if (mapstate.MenuContext != null)
-                    {
-                        mapstate.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                    mapstate.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                                ? "wait_prisoner_female"
                                                                : "wait_prisoner_male");
-                    }
                     CEPersistence.victoryEvent = null;
                     CEPersistence.defeatEvent = null;
                 }
@@ -1386,12 +1376,9 @@ namespace CaptivityEvents
                 if (CEPersistence.defeatEvent != null)
                 {
                     GameMenu.ActivateGameMenu(CEPersistence.defeatEvent);
-                    if (mapstate.MenuContext != null)
-                    {
-                        mapstate.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                    mapstate.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                                ? "wait_prisoner_female"
                                                                : "wait_prisoner_male");
-                    }
                     CEPersistence.victoryEvent = null;
                     CEPersistence.defeatEvent = null;
                 }

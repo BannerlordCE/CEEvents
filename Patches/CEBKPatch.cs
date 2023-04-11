@@ -34,7 +34,7 @@ namespace CaptivityEvents.Patches
             [HarmonyPostfix]
             private static void GetItemFromAttribute(CharacterCreationGainedPropertiesVM __instance, ref CharacterCreationGainedAttributeItemVM __result, CharacterAttribute attribute)
             {
-                if (__result == null && attribute.StringId == "wisdom")
+                if (__result == null)
                 {
                     FieldInfo _characterCreation = __instance.GetType().GetField("_characterCreation", BindingFlags.Instance | BindingFlags.NonPublic);
                     FieldInfo _currentIndex = __instance.GetType().GetField("_currentIndex", BindingFlags.Instance | BindingFlags.NonPublic);
