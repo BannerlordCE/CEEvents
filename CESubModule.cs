@@ -362,11 +362,11 @@ namespace CaptivityEvents
             // Module Image Load
             if (modulePaths.Count != 0)
             {
-                foreach (string filepath in modulePaths)
+                foreach (string filePath in modulePaths)
                 {
                     try
                     {
-                        string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+                        string[] moduleFiles = Directory.EnumerateFiles(filePath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
                         foreach (string file in moduleFiles)
                         {
@@ -698,9 +698,9 @@ namespace CaptivityEvents
             CleanBugs();
             ResetHelper();
             if (!_isLoaded) return;
-            InitalizeAttributes(game);
+            InitializeAttributes(game);
             CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
-            AddBehaviours(campaignStarter);
+            AddBehaviors(campaignStarter);
         }
 
         private void CleanBugs()
@@ -759,9 +759,9 @@ namespace CaptivityEvents
             return base.DoLoading(game);
         }
 
-        private void InitalizeAttributes(Game game) => CESkills.RegisterAll(game);
+        private void InitializeAttributes(Game game) => CESkills.RegisterAll(game);
 
-        private void AddBehaviours(CampaignGameStarter campaignStarter)
+        private void AddBehaviors(CampaignGameStarter campaignStarter)
         {
             LoadTexture("default", false, true);
 
@@ -1234,8 +1234,8 @@ namespace CaptivityEvents
 
                             try
                             {
-                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(Agent.Main.GetAgentVoiceDefinition()); }).GetRandomElementInefficiently().Value;
-                                Mission.Current.MakeSound(soundnum, Agent.Main.Frame.origin, true, false, -1, -1);
+                                int soundNumber = brothelSounds.Where(sound => { return sound.Key.StartsWith(Agent.Main.GetAgentVoiceDefinition()); }).GetRandomElementInefficiently().Value;
+                                Mission.Current.MakeSound(soundNumber, Agent.Main.Frame.origin, true, false, -1, -1);
                             }
                             catch (Exception) { }
                         }
@@ -1245,8 +1245,8 @@ namespace CaptivityEvents
 
                             try
                             {
-                                int soundnum = brothelSounds.Where(sound => { return sound.Key.StartsWith(CEPersistence.agentTalkingTo.GetAgentVoiceDefinition()); }).GetRandomElementInefficiently().Value;
-                                Mission.Current.MakeSound(soundnum, Agent.Main.Frame.origin, true, false, -1, -1);
+                                int soundNumber = brothelSounds.Where(sound => { return sound.Key.StartsWith(CEPersistence.agentTalkingTo.GetAgentVoiceDefinition()); }).GetRandomElementInefficiently().Value;
+                                Mission.Current.MakeSound(soundNumber, Agent.Main.Frame.origin, true, false, -1, -1);
                             }
                             catch (Exception) { }
                         }
@@ -1295,7 +1295,7 @@ namespace CaptivityEvents
                                 // 1.5.1
                                 missionState.CurrentMission.ClearCorpses(false);
 
-                                CEHelper.AddQuickInformation(new TextObject("{=CEEVENTS1069}Let's give them a headstart."), 100, CharacterObject.PlayerCharacter);
+                                CEHelper.AddQuickInformation(new TextObject("{=CEEVENTS1069}Let's allow them a brief lead before the pursuit begins."), 100, CharacterObject.PlayerCharacter);
 
                                 CEPersistence.huntState = CEPersistence.HuntState.HeadStart;
                                 huntingTimerOne = Mission.Current.CurrentTime + (CESettings.Instance?.HuntBegins ?? 7f);

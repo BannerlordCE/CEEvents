@@ -192,7 +192,7 @@ namespace CaptivityEvents.Events
 
                             if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
                             {
-                                CECustomHandler.LogToFile("IgnoreAllOther detected - autofire " + listEvent.Name);
+                                CECustomHandler.LogToFile("IgnoreAllOther detected - auto fire " + listEvent.Name);
                                 return listEvent;
                             }
 
@@ -270,7 +270,7 @@ namespace CaptivityEvents.Events
 
                             if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
                             {
-                                CECustomHandler.LogToFile("IgnoreAllOther detected - autofire " + listEvent.Name);
+                                CECustomHandler.LogToFile("IgnoreAllOther detected - auto fire " + listEvent.Name);
                                 return listEvent;
                             }
 
@@ -349,7 +349,7 @@ namespace CaptivityEvents.Events
 
                         if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
                         {
-                            CECustomHandler.LogToFile("IgnoreAllOther detected - autofire " + listEvent.Name);
+                            CECustomHandler.LogToFile("IgnoreAllOther detected - auto fire " + listEvent.Name);
                             return listEvent;
                         }
 

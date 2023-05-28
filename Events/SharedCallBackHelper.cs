@@ -1584,7 +1584,7 @@ namespace CaptivityEvents.Events
 
                                 if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
                                 {
-                                    CECustomHandler.LogToFile("IgnoreAllOther detected - autofire " + triggeredEvent.Name);
+                                    CECustomHandler.LogToFile("IgnoreAllOther detected - auto fire " + triggeredEvent.Name);
                                     backgroundNames.Add(background.Name);
                                     break;
                                 }
