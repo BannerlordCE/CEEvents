@@ -50,13 +50,13 @@ namespace CaptivityEvents.Events
                             CurrentOrder = OrderToCall;
                         }
 
-                        if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccuring))
+                        if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccurring))
                         {
-                            weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                            weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccurring);
                         }
                         else
                         {
-                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring");
+                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring");
                         }
 
                         for (int a = weightedChance; a > 0; a--) eventNames.Add(listEvent.Name);

@@ -2210,14 +2210,14 @@ namespace CaptivityEvents.Events
 
                         if (eventSettingFound.Key != null)
                         {
-                            if (!eventSettingFound.Value.WeightedChanceOfOccuring.Equals(""))
+                            if (!eventSettingFound.Value.WeightedChanceOfOccurring.Equals(""))
                             {
-                                if (_listEvent.OldWeightedChanceOfOccuring != null) _listEvent.OldWeightedChanceOfOccuring = _listEvent.WeightedChanceOfOccuring;
-                                _listEvent.WeightedChanceOfOccuring = eventSettingFound.Value.WeightedChanceOfOccuring;
+                                if (_listEvent.OldWeightedChanceOfOccurring != null) _listEvent.OldWeightedChanceOfOccurring = _listEvent.WeightedChanceOfOccurring;
+                                _listEvent.WeightedChanceOfOccurring = eventSettingFound.Value.WeightedChanceOfOccurring;
                             }
                             else
                             {
-                                if (_listEvent.OldWeightedChanceOfOccuring != null) _listEvent.WeightedChanceOfOccuring = _listEvent.OldWeightedChanceOfOccuring;
+                                if (_listEvent.OldWeightedChanceOfOccurring != null) _listEvent.WeightedChanceOfOccurring = _listEvent.OldWeightedChanceOfOccurring;
                             }
 
                             if (!eventSettingFound.Value.BackgroundName.Equals(""))
@@ -2227,7 +2227,7 @@ namespace CaptivityEvents.Events
                             }
                             else
                             {
-                                if (_listEvent.OldWeightedChanceOfOccuring != null) _listEvent.BackgroundName = _listEvent.OldBackgroundName;
+                                if (_listEvent.OldWeightedChanceOfOccurring != null) _listEvent.BackgroundName = _listEvent.OldBackgroundName;
                             }
                         }
                     }

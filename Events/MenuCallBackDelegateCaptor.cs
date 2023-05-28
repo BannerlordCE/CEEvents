@@ -365,7 +365,7 @@ namespace CaptivityEvents.Events
                     {
                         weightedChance = _variableLoader.GetIntFromXML(!string.IsNullOrWhiteSpace(triggerEvent.EventWeight)
                                                                      ? triggerEvent.EventWeight
-                                                                     : triggeredEvent.WeightedChanceOfOccuring);
+                                                                     : triggeredEvent.WeightedChanceOfOccurring);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
 
@@ -458,7 +458,7 @@ namespace CaptivityEvents.Events
                     {
                         weightedChance = _variableLoader.GetIntFromXML(!string.IsNullOrWhiteSpace(triggerEvent.EventWeight)
                                                                      ? triggerEvent.EventWeight
-                                                                     : triggeredEvent.WeightedChanceOfOccuring);
+                                                                     : triggeredEvent.WeightedChanceOfOccurring);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
 

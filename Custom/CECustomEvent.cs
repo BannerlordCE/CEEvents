@@ -103,7 +103,7 @@ namespace CaptivityEvents.Custom
         Slavery,
         Straight,
         Lesbian,
-        Overwriteable,
+        Overwritable,
         Gay,
         CaravanParty,
         BanditParty,
@@ -827,7 +827,7 @@ namespace CaptivityEvents.Custom
 
         public bool SexualContent { get; set; }
 
-        public string WeightedChanceOfOccuring { get; set; }
+        public string WeightedChanceOfOccurring { get; set; }
 
         public string CanOnlyHappenNrOfTimes { get; set; }
 
@@ -995,7 +995,7 @@ namespace CaptivityEvents.Custom
         public string OldBackgroundName { get; set; }
 
         [XmlIgnore]
-        public string OldWeightedChanceOfOccuring { get; set; }
+        public string OldWeightedChanceOfOccurring { get; set; }
 
         [XmlIgnore]
         public Pregnancy Pregnancy { get; set; }

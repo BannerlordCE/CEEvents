@@ -591,7 +591,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
                     try
                     {
-                        weightedChance = new CEVariablesLoader().GetIntFromXML(triggeredEvent.WeightedChanceOfOccuring);
+                        weightedChance = new CEVariablesLoader().GetIntFromXML(triggeredEvent.WeightedChanceOfOccurring);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
 

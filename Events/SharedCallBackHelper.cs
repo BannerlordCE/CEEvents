@@ -1593,7 +1593,7 @@ namespace CaptivityEvents.Events
                                 {
                                     weightedChance = _variableLoader.GetIntFromXML(!string.IsNullOrWhiteSpace(background.Weight)
                                                                                   ? background.Weight
-                                                                                  : triggeredEvent.WeightedChanceOfOccuring);
+                                                                                  : triggeredEvent.WeightedChanceOfOccurring);
                                 }
                                 catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
                             }
