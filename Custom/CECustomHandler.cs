@@ -418,7 +418,7 @@ namespace CaptivityEvents.Custom
 
         #region Logs
 
-        [DebuggerStepThroughAttribute]
+        [DebuggerStepThrough]
         private static void LogXMLCustomIssueToFile(string msg, string xmlFile = "", int type = 0)
         {
             string location;
@@ -446,7 +446,7 @@ namespace CaptivityEvents.Custom
             Lines++;
         }
 
-        [DebuggerStepThroughAttribute]
+        [DebuggerStepThrough]
         private static void LogXMLIssueToFile(string msg, string xmlFile = "")
         {
             string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLogs/LoadingFailedXML.txt";
@@ -458,7 +458,7 @@ namespace CaptivityEvents.Custom
             ErrorLines++;
         }
 
-        [DebuggerStepThroughAttribute]
+        [DebuggerStepThrough]
         public static void LogToFile(string msg)
         {
             try
@@ -473,7 +473,7 @@ namespace CaptivityEvents.Custom
             }
         }
 
-        [DebuggerStepThroughAttribute]
+        [DebuggerStepThrough]
         public static void ForceLogToFile(string msg)
         {
             if (Lines >= 1000)

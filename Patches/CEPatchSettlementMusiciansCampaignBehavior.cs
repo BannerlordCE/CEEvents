@@ -104,7 +104,7 @@ namespace CaptivityEvents.Patches
                     {
                         List<SettlementMusicData> list = (from x in settlementMusicDatas
                                                           where x.Culture == keyValuePair.Key
-                                                          select x).ToList<SettlementMusicData>();
+                                                          select x).ToList();
                         list.Shuffle();
                         int num11 = 0;
                         while (num11 < num10 && num11 < list.Count)

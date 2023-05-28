@@ -77,7 +77,7 @@ namespace CaptivityEvents.Config
                 if (value != _name)
                 {
                     _name = value;
-                    base.OnPropertyChangedWithValue(value, "Name");
+                    OnPropertyChangedWithValue(value, "Name");
                 }
             }
         }
@@ -91,7 +91,7 @@ namespace CaptivityEvents.Config
                 if (value != _options)
                 {
                     _options = value;
-                    base.OnPropertyChangedWithValue(value, "Options");
+                    OnPropertyChangedWithValue(value, "Options");
                 }
             }
         }

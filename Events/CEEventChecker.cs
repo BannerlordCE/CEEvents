@@ -186,7 +186,7 @@ namespace CaptivityEvents.Events
             }
 
             Vec3? position3D = (captorParty != null && captorParty.IsMobile) ? captorParty?.MobileParty?.GetPosition() : captorParty?.Settlement?.GetPosition();
-            List<TaleWorlds.Core.TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
+            List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
             AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, (Vec3)position3D);
 
             string environmentTerrainTypes = "";
@@ -229,7 +229,7 @@ namespace CaptivityEvents.Events
             returnString += "\nTotal : " + captorParty.PrisonRoster.Count;
 
             returnString += "\n\n--- Other Settings ---";
-            returnString += "\nToo Many Companions : " + (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit);
+            returnString += "\nToo Many Companions : " + (Clan.PlayerClan.Companions.Count() >= Clan.PlayerClan.CompanionLimit);
 
             returnString += "\nWork in progress\n";
 
@@ -2186,7 +2186,7 @@ namespace CaptivityEvents.Events
 
             // Custom Flags
             if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) return Error("Skipping event " + _listEvent.Name + " Player is busy.");
-            if (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerAllowedCompanion)) return Error("Skipping event " + _listEvent.Name + " Player has too many companions.");
+            if (Clan.PlayerClan.Companions.Count() >= Clan.PlayerClan.CompanionLimit && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerAllowedCompanion)) return Error("Skipping event " + _listEvent.Name + " Player has too many companions.");
 
             return true;
         }

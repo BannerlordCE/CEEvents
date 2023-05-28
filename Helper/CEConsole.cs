@@ -316,7 +316,7 @@ namespace CaptivityEvents.Helper
             {
                 Thread.Sleep(500);
 
-                if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.fire_ceevent [EventName] [CaptiveName]\".";
+                if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.fire_event [EventName] [CaptiveName]\".";
 
                 bool flag = false;
 
@@ -340,7 +340,7 @@ namespace CaptivityEvents.Helper
                     flag = true;
                 }
 
-                if (!flag) return "Wrong input.\nFormat is \"captivity.fire_ceevent [EventName] [CaptiveName]\".";
+                if (!flag) return "Wrong input.\nFormat is \"captivity.fire_event [EventName] [CaptiveName]\".";
                 string result;
 
                 if (PlayerCaptivity.IsCaptive)
@@ -467,7 +467,7 @@ namespace CaptivityEvents.Helper
                         }
                 }
 
-                //return "Wrong input.\nFormat is \"captivity.fire_ceevent [EventName] [CaptiveName]\".";  //Warning: unreachable
+                //return "Wrong input.\nFormat is \"captivity.fire_event [EventName] [CaptiveName]\".";  //Warning: unreachable
             }
             catch (Exception e)
             {
@@ -514,14 +514,14 @@ namespace CaptivityEvents.Helper
             }
         }
 
-        [CommandLineFunctionality.CommandLineArgumentFunction("impregnant", "captivity")]
-        public static string ImpregnantHero(List<string> strings)
+        [CommandLineFunctionality.CommandLineArgumentFunction("impregnate", "captivity")]
+        public static string ImpregnateHero(List<string> strings)
         {
             try
             {
                 Thread.Sleep(500);
 
-                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.impregnant [HERO]\".";
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.impregnate [HERO]\".";
 
                 CEImpregnationSystem _impregnation = new();
                 string searchTerm = null;
@@ -658,16 +658,16 @@ namespace CaptivityEvents.Helper
 
                 CECampaignBehavior.HeroPregnancies.ForEach(pregnancy =>
                 {
-                    debug += "Index[" + index + "] - DueDate: " + pregnancy.DueDate + ", Father: " + pregnancy?.Father?.Name + ", Mother: " + pregnancy?.Mother?.Name + ", AlreadyOccured: " + (pregnancy.AlreadyOccured ? "Yes" : "No") + "\n";
+                    debug += "Index[" + index + "] - DueDate: " + pregnancy.DueDate + ", Father: " + pregnancy?.Father?.Name + ", Mother: " + pregnancy?.Mother?.Name + ", AlreadyOccurred: " + (pregnancy.AlreadyOccurred ? "Yes" : "No") + "\n";
                     index++;
                 });
 
                 debug += "\nReturn Equipment Status:\n";
                 index = 0;
 
-                CECampaignBehavior.ReturnEquipments.ForEach(returnEquipment =>
+                CECampaignBehavior.HeroReturnEquipment.ForEach(returnEquipment =>
                 {
-                    debug += "Index[" + index + "] - Name: " + returnEquipment?.Captive?.Name + ", AlreadyOccured: " + (returnEquipment.AlreadyOccured ? "Yes" : "No") + "\n";
+                    debug += "Index[" + index + "] - Name: " + returnEquipment?.Captive?.Name + ", AlreadyOccurred: " + (returnEquipment.AlreadyOccurred ? "Yes" : "No") + "\n";
                     index++;
                 });
 
@@ -855,7 +855,7 @@ namespace CaptivityEvents.Helper
                         if (child.CharacterObject.Occupation != Occupation.Lord)
                         {
                             PropertyInfo fi = child.CharacterObject.GetType().GetProperty("Occupation", BindingFlags.Instance | BindingFlags.Public);
-                            if (fi != null) fi.SetValue(child.CharacterObject, Occupation.Lord);
+                            fi?.SetValue(child.CharacterObject, Occupation.Lord);
                         }
                     });
 
@@ -1162,11 +1162,11 @@ namespace CaptivityEvents.Helper
                     // Module Image Load
                     if (modulePaths.Count != 0)
                     {
-                        foreach (string filepath in modulePaths)
+                        foreach (string filePath in modulePaths)
                         {
                             try
                             {
-                                string[] moduleFiles = Directory.EnumerateFiles(filepath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+                                string[] moduleFiles = Directory.EnumerateFiles(filePath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
 
                                 foreach (string file in moduleFiles)
                                 {

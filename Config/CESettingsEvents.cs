@@ -24,10 +24,7 @@ namespace CaptivityEvents.Config
         {
             get
             {
-                if (_instance == null)
-                {
-                    _instance = new CESettingsEvents();
-                }
+                _instance ??= new CESettingsEvents();
                 return _instance;
             }
         }
@@ -111,7 +108,7 @@ namespace CaptivityEvents.Config
                         }
                     }
                 }
-                if (_settings != null) _settings.Unregister();
+                _settings?.Unregister();
                 _settings = builder.BuildAsGlobal();
                 _settings.Register();
             }

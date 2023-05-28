@@ -59,12 +59,9 @@ namespace CaptivityEvents.Events
 
         internal void CaptiveProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
-            if (args.MenuContext != null)
-            {
-                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+            args.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                            ? "wait_captive_female"
                                            : "wait_captive_male");
-            }
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -148,7 +145,7 @@ namespace CaptivityEvents.Events
 
             if (PlayerCaptivity.IsCaptive) InitCaptiveTextVariables(ref args);
 
-            if (args.MenuContext != null) args.MenuContext.GameMenu.StartWait();
+            args.MenuContext?.GameMenu.StartWait();
         }
 
         internal bool CaptiveConditionWaitGameMenu(MenuCallbackArgs args)

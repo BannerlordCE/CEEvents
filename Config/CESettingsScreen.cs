@@ -15,13 +15,13 @@ namespace CaptivityEvents.Config
             _gauntletLayer = new GauntletLayer(1, "GauntletLayer");
             _gauntletLayer.LoadMovie("CaptivityEventsConfigScreen", _viewModel);
             _gauntletLayer.InputRestrictions.SetInputRestrictions(true, InputUsageMask.All);
-            base.AddLayer(_gauntletLayer);
+            AddLayer(_gauntletLayer);
         }
 
         protected override void OnFinalize()
         {
             base.OnFinalize();
-            base.RemoveLayer(_gauntletLayer);
+            RemoveLayer(_gauntletLayer);
             _gauntletLayer = null;
             _viewModel = null;
         }

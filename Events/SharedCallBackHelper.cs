@@ -199,7 +199,7 @@ namespace CaptivityEvents.Events
             try
             {
                 _listedEvent.Pregnancy.Mother.IsPregnant = false;
-                _listedEvent.Pregnancy.AlreadyOccured = true;
+                _listedEvent.Pregnancy.AlreadyOccurred = true;
 
                 ChangeWeight(_listedEvent.Pregnancy.Mother, 0, MBRandom.RandomFloatRanged(0.4025f, 0.6025f));
             }

@@ -28,7 +28,7 @@ namespace CaptivityEvents.Issues
 
         internal class CEWhereAreMyThingsIssue : IssueBase
         {
-            protected override int RewardGold => 500 + MathF.Round(1200f * base.IssueDifficultyMultiplier);
+            protected override int RewardGold => 500 + MathF.Round(1200f * IssueDifficultyMultiplier);
 
             public override bool IsThereAlternativeSolution => false;
             public override bool IsThereLordSolution => false;
@@ -57,7 +57,7 @@ namespace CaptivityEvents.Issues
                 return new CEWhereAreMyThingsIssueQuest(questId, IssueOwner, CampaignTime.DaysFromNow(stolenGearDuration), RewardGold, new Equipment(Hero.MainHero.BattleEquipment), new Equipment(Hero.MainHero.CivilianEquipment));
             }
 
-            public override IssueBase.IssueFrequency GetFrequency() => IssueBase.IssueFrequency.Rare;
+            public override IssueFrequency GetFrequency() => IssueFrequency.Rare;
 
             public override bool IssueStayAliveConditions() => true;
 

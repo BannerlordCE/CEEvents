@@ -48,7 +48,7 @@ namespace CaptivityEvents.Config
                 if (value != _description)
                 {
                     _description = value;
-                    base.OnPropertyChangedWithValue(value, "Description");
+                    OnPropertyChangedWithValue(value, "Description");
                 }
             }
         }
@@ -62,7 +62,7 @@ namespace CaptivityEvents.Config
                 if (value != _name)
                 {
                     _name = value;
-                    base.OnPropertyChangedWithValue(value, "Name");
+                    OnPropertyChangedWithValue(value, "Name");
                 }
             }
         }
@@ -76,7 +76,7 @@ namespace CaptivityEvents.Config
                 if (value != _imageIDs)
                 {
                     _imageIDs = value;
-                    base.OnPropertyChangedWithValue(value, "ImageIDs");
+                    OnPropertyChangedWithValue(value, "ImageIDs");
                 }
             }
         }
@@ -90,7 +90,7 @@ namespace CaptivityEvents.Config
                 if (value != _optionTypeId)
                 {
                     _optionTypeId = value;
-                    base.OnPropertyChangedWithValue(value, "OptionTypeID");
+                    OnPropertyChangedWithValue(value, "OptionTypeID");
                 }
             }
         }
@@ -140,7 +140,7 @@ namespace CaptivityEvents.Config
                 if (value != _optionValue)
                 {
                     _optionValue = value;
-                    base.OnPropertyChangedWithValue(value, "OptionValueAsBoolean");
+                    OnPropertyChangedWithValue(value, "OptionValueAsBoolean");
                     UpdateValue();
                 }
             }
@@ -196,7 +196,7 @@ namespace CaptivityEvents.Config
                 if (value != _min)
                 {
                     _min = value;
-                    base.OnPropertyChangedWithValue(value, "Min");
+                    OnPropertyChangedWithValue(value, "Min");
                 }
             }
         }
@@ -210,7 +210,7 @@ namespace CaptivityEvents.Config
                 if (value != _max)
                 {
                     _max = value;
-                    base.OnPropertyChangedWithValue(value, "Max");
+                    OnPropertyChangedWithValue(value, "Max");
                 }
             }
         }
@@ -224,8 +224,8 @@ namespace CaptivityEvents.Config
                 if (value != _optionValue)
                 {
                     _optionValue = value;
-                    base.OnPropertyChangedWithValue(value, "OptionValue");
-                    base.OnPropertyChanged("OptionValueAsString");
+                    OnPropertyChangedWithValue(value, "OptionValue");
+                    OnPropertyChanged("OptionValueAsString");
                     UpdateValue();
                 }
             }
@@ -240,7 +240,7 @@ namespace CaptivityEvents.Config
                 if (value != _isDiscrete)
                 {
                     _isDiscrete = value;
-                    base.OnPropertyChangedWithValue(value, "IsDiscrete");
+                    OnPropertyChangedWithValue(value, "IsDiscrete");
                 }
             }
         }
@@ -254,7 +254,7 @@ namespace CaptivityEvents.Config
                 if (value != _updateContinuously)
                 {
                     _updateContinuously = value;
-                    base.OnPropertyChangedWithValue(value, "UpdateContinuously");
+                    OnPropertyChangedWithValue(value, "UpdateContinuously");
                 }
             }
         }
@@ -328,7 +328,7 @@ namespace CaptivityEvents.Config
             {
                 onChange = new Action<SelectorVM<SelectorItemVM>>(UpdateValue);
             }
-            if (selectableOptionNames.Any<SelectionData>())
+            if (selectableOptionNames.Any())
             {
                 if (selectableOptionNames.All((SelectionData n) => n.IsLocalizationId))
                 {
@@ -418,7 +418,7 @@ namespace CaptivityEvents.Config
                 if (value != _selector)
                 {
                     _selector = value;
-                    base.OnPropertyChangedWithValue(value, "Selector");
+                    OnPropertyChangedWithValue(value, "Selector");
                 }
             }
         }
@@ -485,7 +485,7 @@ namespace CaptivityEvents.Config
                 if (value != _actionName)
                 {
                     _actionName = value;
-                    base.OnPropertyChangedWithValue(value, "ActionName");
+                    OnPropertyChangedWithValue(value, "ActionName");
                 }
             }
         }
