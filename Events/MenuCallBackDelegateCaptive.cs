@@ -592,7 +592,7 @@ namespace CaptivityEvents.Events
                 bool checkIfFemale = _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.NotableFemalesNearby);
                 bool checkIfMale = !checkIfFemale || _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.NotableMalesNearby);
 
-                Hero notable = settlement.Notables.GetRandomElementWithPredicate(findFirstNotable => checkIfMale && checkIfFemale ? true : checkIfMale ? !findFirstNotable.IsFemale : findFirstNotable.IsFemale);
+                Hero notable = settlement.Notables.GetRandomElementWithPredicate(findFirstNotable => checkIfMale && checkIfFemale || (checkIfMale ? !findFirstNotable.IsFemale : findFirstNotable.IsFemale));
 
                 CECampaignBehavior.ExtraProps.Owner = notable;
                 _captive.CECaptivityChange(ref args, settlement.Party);

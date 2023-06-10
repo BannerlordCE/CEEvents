@@ -101,6 +101,8 @@ namespace CaptivityEvents
         public static bool destroyParty = false;
         public static bool surrenderParty = false;
         public static bool playerWon = false;
+        public static bool playerDied = false;
+        public static bool playerSurrendered;
 
         // Animation Variables
         public static bool animationPlayEvent;
@@ -755,7 +757,6 @@ namespace CaptivityEvents
             IMbEvent<BarterData> barterablesRequested = CampaignEvents.BarterablesRequested;
             barterablesRequested?.ClearListeners(Campaign.Current.GetCampaignBehavior<SetPrisonerFreeBarterBehavior>());
 
-
             return base.DoLoading(game);
         }
 
@@ -766,6 +767,7 @@ namespace CaptivityEvents
             LoadTexture("default", false, true);
 
             campaignStarter.AddBehavior(new CECampaignBehavior());
+          
             if (CESettings.Instance?.ProstitutionControl ?? true)
             {
                 CEBrothelBehavior brothelBehavior = new();
@@ -1359,6 +1361,14 @@ namespace CaptivityEvents
         private void HandleFinishBattle(MapState mapstate)
         {
             CEPersistence.battleState = CEPersistence.BattleState.Normal;
+
+            PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter || CEPersistence.removePlayer);
+
+            foreach (TroopRosterElement troopRosterElement in CEPersistence.playerTroops)
+            {
+                PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, 0, troopRosterElement.Xp, true, -1);
+            }
+
             if (CEPersistence.playerWon)
             {
                 if (CEPersistence.victoryEvent != null)
@@ -1385,113 +1395,131 @@ namespace CaptivityEvents
             }
         }
 
+
         private void BattleStateCheck()
         {
             if (CEPersistence.battleState == CEPersistence.BattleState.Normal) return;
 
-            if (CEPersistence.battleState == CEPersistence.BattleState.StartBattle && Game.Current.GameStateManager.ActiveState is MissionState missionState && missionState.CurrentMission.IsLoadingFinished)
+            switch (CEPersistence.battleState)
             {
-                CEPersistence.battleState = CEPersistence.BattleState.AfterBattle;
-            }
-            else if (CEPersistence.battleState == CEPersistence.BattleState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState)
-            //TODO: move all of these to their proper listeners and out of the OnApplicationTick
-            {
-                if (PlayerEncounter.Current == null)
-                {
-                    HandleFinishBattle(mapstate2);
-                }
-                else
-                {
-                    try
+                case CEPersistence.BattleState.StartBattle:
+                    if (Game.Current.GameStateManager.ActiveState is MissionState missionState && missionState.CurrentMission.IsLoadingFinished)
                     {
-                        if (PlayerEncounter.Battle == null) return;
-
-                        CEPersistence.playerWon = PlayerEncounter.Battle.WinningSide == PlayerEncounter.Battle.PlayerSide;
-
-                        PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter || CEPersistence.removePlayer);
-
-                        foreach (TroopRosterElement troopRosterElement in CEPersistence.playerTroops)
+                        CEPersistence.battleState = CEPersistence.BattleState.AfterBattle;
+                    }
+                    break;
+                case CEPersistence.BattleState.AfterBattle:
+                    if (CEPersistence.battleState == CEPersistence.BattleState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState)
+                    //TODO: move all of these to their proper listeners and out of the OnApplicationTick
+                    {
+                        if (PlayerEncounter.Current == null)
                         {
-                            PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, 0, troopRosterElement.Xp, true, -1);
-                        }
-
-                        if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.surrenderParty)
-                        {
-                            try
-                            {
-                                if (CEPersistence.playerWon)
-                                {
-                                    PlayerEncounter.EnemySurrender = true;
-                                }
-                                else
-                                {
-                                    PlayerEncounter.PlayerSurrender = true;
-                                }
-                                PlayerEncounter.Update();
-                                CEPersistence.battleState = CEPersistence.BattleState.UpdateBattle;
-                            }
-                            catch (Exception)
-                            {
-                                PlayerEncounter.Finish(true);
-                            }
-                        }
-                        else if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.destroyParty)
-                        {
-                            PlayerEncounter.Current.FinalizeBattle();
-                            try
-                            {
-                                DestroyPartyAction.Apply(PartyBase.MainParty, PlayerEncounter.EncounteredMobileParty);
-                            }
-                            catch (Exception e)
-                            {
-                                CECustomHandler.ForceLogToFile("FinalizeBattle: " + e);
-                            }
-
-                            PlayerEncounter.Finish(false);
-                            if (Settlement.CurrentSettlement != null)
-                            {
-                                EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
-                                HandleFinishBattle(mapstate2);
-                            }
+                            HandleFinishBattle(mapstate2);
                         }
                         else
                         {
-                            PlayerEncounter.Current.FinalizeBattle();
-                            PlayerEncounter.Finish(false);
-                            if (Settlement.CurrentSettlement != null)
+                            try
                             {
-                                EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
-                                HandleFinishBattle(mapstate2);
+                                if (PlayerEncounter.Battle == null)
+                                {
+                                    TroopRoster troopRoster = PartyBase.MainParty.MemberRoster;
+                                    troopRoster.AddToCounts(CharacterObject.PlayerCharacter, -1, true, 0, 0, true, -1);
+                                    CEPersistence.playerWon = !((troopRoster.TotalManCount == 0 && CEPersistence.playerDied) || CEPersistence.playerSurrendered);
+
+                                    CEPersistence.playerSurrendered = false;
+                                    CEPersistence.playerDied = false;
+
+                                    HandleFinishBattle(mapstate2);
+                                    return;
+                                }
+
+                                CEPersistence.playerWon = PlayerEncounter.Battle.WinningSide == PlayerEncounter.Battle.PlayerSide;            
+
+                                if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.surrenderParty)
+                                {
+                                    try
+                                    {
+                                        if (CEPersistence.playerWon)
+                                        {
+                                            PlayerEncounter.EnemySurrender = true;
+                                        }
+                                        else
+                                        {
+                                            PlayerEncounter.PlayerSurrender = true;
+                                        }
+                                        PlayerEncounter.Update();
+                                        CEPersistence.battleState = CEPersistence.BattleState.UpdateBattle;
+                                    }
+                                    catch (Exception)
+                                    {
+                                        PlayerEncounter.Finish(true);
+                                    }
+                                }
+                                else if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.destroyParty)
+                                {
+                                    PlayerEncounter.Current.FinalizeBattle();
+                                    try
+                                    {
+                                        DestroyPartyAction.Apply(PartyBase.MainParty, PlayerEncounter.EncounteredMobileParty);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        CECustomHandler.ForceLogToFile("FinalizeBattle: " + e);
+                                    }
+
+                                    PlayerEncounter.Finish(false);
+                                    if (Settlement.CurrentSettlement != null)
+                                    {
+                                        EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+                                        HandleFinishBattle(mapstate2);
+                                    }
+                                }
+                                else
+                                {
+                                    PlayerEncounter.Current.FinalizeBattle();
+                                    PlayerEncounter.Finish(false);
+                                    if (Settlement.CurrentSettlement != null)
+                                    {
+                                        EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
+                                        HandleFinishBattle(mapstate2);
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                CECustomHandler.ForceLogToFile("BattleStateCheck: " + e);
+                                LoadingWindow.DisableGlobalLoadingWindow();
+                                CEPersistence.battleState = CEPersistence.BattleState.Normal;
                             }
                         }
                     }
-                    catch (Exception e)
+                    break;
+                case CEPersistence.BattleState.UpdateBattle:
+                    if (CEPersistence.battleState == CEPersistence.BattleState.UpdateBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate3 && !mapstate3.IsMenuState)
+                    //TODO: move all of these to their proper listeners and out of the OnApplicationTick
                     {
-                        CECustomHandler.ForceLogToFile("BattleStateCheck: " + e);
-                        LoadingWindow.DisableGlobalLoadingWindow();
-                        CEPersistence.battleState = CEPersistence.BattleState.Normal;
+                        try
+                        {
+                            if (PlayerEncounter.Current == null)
+                            {
+                                HandleFinishBattle(mapstate3);
+                            }
+                            else
+                            {
+                                PlayerEncounter.Update();
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            CEPersistence.battleState = CEPersistence.BattleState.Normal;
+                        }
                     }
-                }
+                    break;
+                default:
+                    break;
             }
-            else if (CEPersistence.battleState == CEPersistence.BattleState.UpdateBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate3 && !mapstate3.IsMenuState)
-            //TODO: move all of these to their proper listeners and out of the OnApplicationTick
-            {
-                try
-                {
-                    if (PlayerEncounter.Current == null)
-                    {
-                        HandleFinishBattle(mapstate3);
-                    }
-                    else
-                    {
-                        PlayerEncounter.Update();
-                    }
-                }
-                catch (Exception)
-                {
-                    CEPersistence.battleState = CEPersistence.BattleState.Normal;
-                }
-            }
+
+
         }
 
         private void ForceAgentDropEquipment(Agent agent)

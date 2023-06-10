@@ -31,6 +31,7 @@ using static CaptivityEvents.CampaignBehaviors.CECampaignBehavior;
 using TaleWorlds.Library;
 using SandBox.Missions.MissionLogics;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.CampaignSystem.Settlements.Locations;
 
 namespace CaptivityEvents.Events
 {
@@ -986,31 +987,17 @@ namespace CaptivityEvents.Events
                                             CEPersistence.defeatEvent = null;
                                             return;
                                         }
-                                        // StartCommonAreaBattle RivalGangMovingInIssueBehavior
-                                        MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), null, null);
-
-                                        Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
-                                        clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
-
-                                        PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
-
-                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
-                                        customParty.MemberRoster.Clear();
-                                        customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
-
-                                        TextObject textObject = new(_option.BattleSettings.EnemyName ?? "Bandits", null);
-                                        customParty.SetCustomName(textObject);
-
-                                        EnterSettlementAction.ApplyForParty(customParty, Settlement.CurrentSettlement);
-
-                                        PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, false);
 
                                         CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
-                                        CEPersistence.destroyParty = true;
+                                        CEPersistence.destroyParty = false;
                                         CEPersistence.surrenderParty = false;
 
-                                        PlayerEncounter.StartBattle();
-                                        
+                                        //PlayerEncounter StartVillageBattleMission
+                                        int wallLevel = Settlement.CurrentSettlement.Town.GetWallLevel();
+                                        string scene = Settlement.CurrentSettlement.LocationComplex.GetScene("center", wallLevel);
+                                        Location locationWithId = LocationComplex.Current.GetLocationWithId("center");
+
+                                        CampaignMission.OpenAlleyFightMission(scene, wallLevel, locationWithId, PartyBase.MainParty.MemberRoster, enemyTroops);
                                         break;
                                     }
                                 case "regularspawn":

@@ -13,7 +13,6 @@ using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
 using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.Library;
 using TaleWorlds.CampaignSystem.Party;
 using Helpers;
 
@@ -27,17 +26,31 @@ namespace CaptivityEvents.Helper
             return settlement.IsCastle ? "castle" : settlement.IsTown ? "town" : "village";
         }
 
+        private static readonly string[] _validCultures = new string[] { "aserai", "battania", "empire", "khuzait", "sturgia", "vlandia"};
+
         public static string CustomSceneToPlay(string sceneToPlay, PartyBase partyBase)
         {
             if (sceneToPlay.Contains("$location_culture"))
             {
+                string locationCulture = "empire";
+                try
+                {
+                    locationCulture = partyBase.Settlement?.Culture?.StringId ?? SettlementHelper.FindNearestSettlement((Settlement x) => true, partyBase.IsMobile ? partyBase.MobileParty : MobileParty.MainParty).Culture.StringId;
 
-                sceneToPlay = sceneToPlay.Replace("$location_culture", partyBase.Settlement?.Culture?.StringId ?? SettlementHelper.FindNearestSettlement((Settlement x) => true, partyBase.IsMobile ? partyBase.MobileParty : MobileParty.MainParty).Culture.StringId);
+                    if (!_validCultures.Contains(locationCulture)) locationCulture = "empire";
+                }
+                catch (Exception ex)
+                {
+                    locationCulture = "empire";
+                }
+                sceneToPlay = sceneToPlay.Replace("$location_culture", locationCulture);          
             }
 
             if (sceneToPlay.Contains("$party_culture"))
             {
-                sceneToPlay = sceneToPlay.Replace("$party_culture", partyBase.Culture.StringId);
+                string partyCulture = partyBase.Culture?.StringId ?? "empire";
+                if (!_validCultures.Contains(partyCulture)) partyCulture = "empire";
+                sceneToPlay = sceneToPlay.Replace("$party_culture", partyCulture);
             }
 
             if (sceneToPlay.Contains("$location"))
@@ -65,8 +78,9 @@ namespace CaptivityEvents.Helper
         {
             if (sceneToPlay.Contains("$location_culture"))
             {
-
-                sceneToPlay = sceneToPlay.Replace("$location_culture", settlement.Culture.StringId);
+                string locationCulture = settlement.Culture?.StringId ?? "empire";
+                if (!_validCultures.Contains(locationCulture)) locationCulture = "empire";
+                sceneToPlay = sceneToPlay.Replace("$location_culture", locationCulture);
             }
 
             if (sceneToPlay.Contains("$location"))
