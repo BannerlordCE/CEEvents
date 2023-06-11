@@ -783,6 +783,21 @@ namespace CaptivityEvents.Custom
         public ClanOption[] ClanOptions { get; set; }
     }
 
+
+    [DebuggerStepThrough]
+    [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = false)]
+    [Serializable]
+    public class MenuOption : Option
+    {
+        [XmlElement(Form = XmlSchemaForm.Unqualified)]
+        public string MenuID { get; set; }
+
+        [XmlElement(Form = XmlSchemaForm.Unqualified)]
+        public string OptionID { get; set; }
+    }
+
+
     [DebuggerStepThrough]
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = "", IsNullable = false)]
@@ -984,6 +999,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("TerrainTypes", IsNullable = true)]
         public TerrainType[][] TerrainTypesRequirements { get; set; }
+
+        [XmlArrayItem("MenuOption", IsNullable = true)]
+        public MenuOption[] MenuOptions { get; set; }
 
         [XmlIgnore]
         public CharacterObject Captive { get; set; }

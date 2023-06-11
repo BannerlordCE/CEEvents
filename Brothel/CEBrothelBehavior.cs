@@ -1829,7 +1829,7 @@ namespace CaptivityEvents.Brothel
             dataStore.SyncData("_hasMetWithRansomBroker", ref _hasMetWithRansomBroker);
             dataStore.SyncData("_hasBoughtTunToParty", ref _hasBoughtTunToParty);
             dataStore.SyncData("_hasBoughtProstituteToParty", ref _hasBoughtProstituteToParty);
-            dataStore.SyncData("_CEbrothelList", ref _brothelList);
+            dataStore.SyncData("_CEBrothelList", ref _brothelList);
         }
 
         public static void CleanList()

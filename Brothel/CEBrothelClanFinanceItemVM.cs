@@ -14,8 +14,6 @@ using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.Library;
 using TaleWorlds.Core.ViewModelCollection.Information;
 using System.Collections.Generic;
-
-using TaleWorlds.Core.ViewModelCollection.Generic;
 using CaptivityEvents.Custom;
 
 namespace CaptivityEvents.Brothel

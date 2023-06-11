@@ -82,6 +82,7 @@ namespace CaptivityEvents
         public static List<CEEvent> CEEvents = new();
 
         public static List<CEEvent> CEEventList = new();
+        public static List<CEEvent> CEMenuOptionEvents = new();
         public static List<CEEvent> CEAlternativePregnancyEvents = new();
         public static List<CEEvent> CEWaitingList = new();
         public static List<CEEvent> CECallableEvents = new();
@@ -609,6 +610,11 @@ namespace CaptivityEvents
                         CEHelper.brothelFlagMale = true;
                 }
 
+                if (_listedEvent?.MenuOptions != null && _listedEvent?.MenuOptions.Length != 0)
+                {
+                    CEPersistence.CEMenuOptionEvents.Add(_listedEvent);
+                }
+
                 if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BirthAlternative))
                 {
                     CEPersistence.CEAlternativePregnancyEvents.Add(_listedEvent);
@@ -671,7 +677,7 @@ namespace CaptivityEvents
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show($"Error Initialising Captivity Events:\n\n{e.GetType()}");
+                    MessageBox.Show($"Error Initializing Captivity Events:\n\n{e.GetType()}");
                     CECustomHandler.ForceLogToFile("Failed to load: " + e);
                     _isLoaded = false;
                 }
@@ -833,6 +839,22 @@ namespace CaptivityEvents
 
         public void AddCustomEvents(CampaignGameStarter gameStarter)
         {
+            CEVariablesLoader variablesLoader = new();
+
+            // Custom Menu Load
+            foreach (CEEvent customEvent in CEPersistence.CEMenuOptionEvents)
+            {
+                foreach (MenuOption menuOption in customEvent.MenuOptions)
+                {
+                    MenuCallBackDelegateRandom mcb = new(customEvent, menuOption, CEPersistence.CEEvents);
+                    gameStarter.AddGameMenuOption(
+                      menuOption.MenuID, menuOption.OptionID, menuOption.OptionText,
+                        mcb.RandomEventConditionMenuOption,
+                        mcb.RandomEventConsequenceMenuOption,
+                        false, variablesLoader.GetIntFromXML(menuOption.Order), false, "CEEVENTS");
+                }
+            }
+
             // Waiting Menu Load
             foreach (CEEvent waitingEvent in CEPersistence.CEWaitingList) AddEvent(gameStarter, waitingEvent, CEPersistence.CEEvents);
 

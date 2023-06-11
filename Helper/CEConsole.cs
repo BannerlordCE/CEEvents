@@ -547,19 +547,19 @@ namespace CaptivityEvents.Helper
                 return "Sosig\n" + e;
             }
         }
-        
+
         [CommandLineFunctionality.CommandLineArgumentFunction("ImpregnateBy", "captivity")]
         public static string ImpregnateHeroBy(List<string> strings)
         {
             try
             {
                 Thread.Sleep(500);
-                
+
                 ////
                 //Input Validation
                 ////
                 if (CampaignCheats.CheckParameters(strings, 0) && CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.ImpregnateBy [HERO] [HERO]\".";
-                
+
                 bool flagValid = false;
 
                 string targetName = null;
@@ -581,12 +581,12 @@ namespace CaptivityEvents.Helper
 
                 if (!flagValid) return "Wrong input.\nFormat is \"captivity.ImpregnateBy [HERO] [HERO]\".";
                 //End of Validation
-                    
+
                 CEImpregnationSystem _impregnation = new();
-                    
+
                 Hero targetHero = Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == targetName);
                 Hero fromHero = Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == fromName);
-                    
+
                 if (targetHero == null || fromHero == null)
                 {
                     return "Hero(es) not found.";
@@ -595,12 +595,12 @@ namespace CaptivityEvents.Helper
                 {
                     _impregnation.ImpregnationChance(targetHero, 0, false, fromHero);
                     return ("Done. If allowed, " + targetName + " is now carrying the child of " + fromName);
-                }   
+                }
             }
             catch (Exception e)
             {
                 return "Sosig\n" + e;
-            }         
+            }
         }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("current_status", "captivity")]
@@ -1027,12 +1027,8 @@ namespace CaptivityEvents.Helper
                     if (Campaign.Current?.GameManager != null)
                     {
                         // Events Removing
-                        MethodInfo mi = Campaign.Current.GameMenuManager.GetType().GetMethod("RemoveRelatedGameMenus", BindingFlags.Instance | BindingFlags.NonPublic);
-                        if (mi != null)
-                        {
-                            mi.Invoke(Campaign.Current.GameMenuManager, new object[] { "CEEVENTS" });
-                        }
-                        else { Campaign.Current.GameMenuManager.RemoveRelatedGameMenus("CEEVENTS"); }
+                        Campaign.Current.GameMenuManager.RemoveRelatedGameMenus("CEEVENTS");
+                        Campaign.Current.GameMenuManager.RemoveRelatedGameMenuOptions("CEEVENTS");
                     }
                     else
                     {
@@ -1045,6 +1041,7 @@ namespace CaptivityEvents.Helper
                     CEPersistence.CEAlternativePregnancyEvents.Clear();
                     CEPersistence.CEWaitingList.Clear();
                     CEPersistence.CECallableEvents.Clear();
+                    CEPersistence.CEMenuOptionEvents.Clear();
 
                     // Load Events
                     CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
@@ -1067,6 +1064,9 @@ namespace CaptivityEvents.Helper
                     CEHelper.brothelFlagFemale = false;
                     CEHelper.brothelFlagMale = false;
 
+                    CampaignGameStarter campaignGameStarter = new(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager);
+                    CEVariablesLoader variablesLoader = new();
+
                     // Go Through Events
                     foreach (CEEvent _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !string.IsNullOrWhiteSpace(_listedEvent.Name)))
                     {
@@ -1084,6 +1084,10 @@ namespace CaptivityEvents.Helper
                                 CEHelper.brothelFlagMale = true;
                         }
 
+                        if (_listedEvent?.MenuOptions != null && _listedEvent?.MenuOptions.Length != 0)
+                        {
+                            CEPersistence.CEMenuOptionEvents.Add(_listedEvent);
+                        }
 
                         if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BirthAlternative))
                         {
@@ -1116,7 +1120,7 @@ namespace CaptivityEvents.Helper
                         }
                     }
 
-                    new CESubModule().AddCustomEvents(new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager));
+                    new CESubModule().AddCustomEvents(campaignGameStarter);
 
                     try
                     {
