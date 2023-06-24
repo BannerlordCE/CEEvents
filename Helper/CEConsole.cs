@@ -53,6 +53,7 @@ namespace CaptivityEvents.Helper
                     _provider.EventCaptorDialogue = customSettings.EventCaptorDialogue;
                     _provider.EventCaptorNotifications = customSettings.EventCaptorNotifications;
                     _provider.EventCaptorCustomTextureNotifications = customSettings.EventCaptorCustomTextureNotifications;
+                    _provider.EventAmountOfImagesToPreload = customSettings.EventAmountOfImagesToPreload;
                     _provider.EventRandomEnabled = customSettings.EventRandomEnabled;
                     _provider.EventRandomFireChance = customSettings.EventRandomFireChance;
                     _provider.EventOccurrenceRandom = customSettings.EventOccurrenceRandom;
@@ -766,10 +767,6 @@ namespace CaptivityEvents.Helper
                     bool successful = CECampaignBehavior.ClearPregnancyList();
                     CEBrothelBehavior.CleanList();
                     ResetStatus(new List<string>());
-                    if (successful)
-                    {
-                        successful = CESkills.Uninstall(Game.Current);
-                    }
 
                     return successful
                         ? "Successfully cleaned save of captivity events data. Save & Exit the game now."

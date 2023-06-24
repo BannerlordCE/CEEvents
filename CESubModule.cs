@@ -201,7 +201,7 @@ namespace CaptivityEvents
                     texture2D = new(new EngineTexture(texture));
                     CEPersistence.CELoadedTextures.Add(name, texture2D);
 
-                    if (CEPersistence.CELoadedTextures.Count == 40)
+                    if (CEPersistence.CELoadedTextures.Count == (CESettings.Instance?.EventAmountOfImagesToPreload ?? 40))
                     {
                         KeyValuePair<string, Texture> textureToRemove = CEPersistence.CELoadedTextures.First();
                         CEPersistence.CELoadedTextures.Remove(textureToRemove.Key);
@@ -743,11 +743,11 @@ namespace CaptivityEvents
             CEHelper.notificationEventCheck = false;
         }
 
-        // Do Loading Investigate
         public override bool DoLoading(Game game)
         {
             if (Campaign.Current == null) return true;
 
+            CEConsole.ReloadEvents(new List<string>());
             if (!(CESettings.Instance?.PrisonerEscapeBehavior ?? true)) return base.DoLoading(game);
             IMbEvent<Hero> dailyTickHeroEvent = CampaignEvents.DailyTickHeroEvent;
 
@@ -773,26 +773,36 @@ namespace CaptivityEvents
             LoadTexture("default", false, true);
 
             campaignStarter.AddBehavior(new CECampaignBehavior());
-          
+
             if (CESettings.Instance?.ProstitutionControl ?? true)
             {
                 CEBrothelBehavior brothelBehavior = new();
                 brothelBehavior.OnSessionLaunched(campaignStarter);
                 campaignStarter.AddBehavior(brothelBehavior);
             }
+
             if (CESettings.Instance?.PrisonerEscapeBehavior ?? true)
             {
                 campaignStarter.AddBehavior(new CEPrisonerEscapeCampaignBehavior());
                 campaignStarter.AddBehavior(new CESetPrisonerFreeBarterBehavior());
             }
+
             if (CESettings.Instance?.EventCaptiveOn ?? true)
             {
                 campaignStarter.AddBehavior(new PlayerCaptivityCampaignBehavior());
             }
+
             CEPrisonerDialogue prisonerDialogue = new();
-            if ((CESettings.Instance?.EventCaptorOn ?? true) && (CESettings.Instance?.EventCaptorDialogue ?? true)) prisonerDialogue.AddPrisonerLines(campaignStarter);
-            if (CEPersistence.CECustomScenes.Count > 0) prisonerDialogue.AddCustomLines(campaignStarter, CEPersistence.CECustomScenes);
-            //if (CESettings.Instance?.PregnancyToggle) ReplaceModel<PregnancyModel, CEDefaultPregnancyModel>(campaignStarter);
+
+            if ((CESettings.Instance?.EventCaptorOn ?? true) && (CESettings.Instance?.EventCaptorDialogue ?? true))
+            {
+                prisonerDialogue.AddPrisonerLines(campaignStarter);
+            }
+
+            if (CEPersistence.CECustomScenes.Count > 0)
+            {
+                prisonerDialogue.AddCustomLines(campaignStarter, CEPersistence.CECustomScenes);
+            }
 
             if (_isLoadedInGame) CEConsole.ReloadEvents(new List<string>());
             else AddCustomEvents(campaignStarter);
@@ -837,11 +847,11 @@ namespace CaptivityEvents
             if (!flag) gameStarter.AddBehavior(Activator.CreateInstance<TChildType>());
         }
 
-        public void AddCustomEvents(CampaignGameStarter gameStarter)
+        public void AddCustomMenuOptions(CampaignGameStarter gameStarter)
         {
             CEVariablesLoader variablesLoader = new();
 
-            // Custom Menu Load
+            // Custom Options Load
             foreach (CEEvent customEvent in CEPersistence.CEMenuOptionEvents)
             {
                 foreach (MenuOption menuOption in customEvent.MenuOptions)
@@ -854,6 +864,12 @@ namespace CaptivityEvents
                         false, variablesLoader.GetIntFromXML(menuOption.Order), false, "CEEVENTS");
                 }
             }
+        }
+
+        public void AddCustomEvents(CampaignGameStarter gameStarter)
+        {
+            // Custom Options Load
+            if (CEPersistence.CEMenuOptionEvents.Count != 0) AddCustomMenuOptions(gameStarter);
 
             // Waiting Menu Load
             foreach (CEEvent waitingEvent in CEPersistence.CEWaitingList) AddEvent(gameStarter, waitingEvent, CEPersistence.CEEvents);
@@ -1455,7 +1471,7 @@ namespace CaptivityEvents
                                     return;
                                 }
 
-                                CEPersistence.playerWon = PlayerEncounter.Battle.WinningSide == PlayerEncounter.Battle.PlayerSide;            
+                                CEPersistence.playerWon = PlayerEncounter.Battle.WinningSide == PlayerEncounter.Battle.PlayerSide;
 
                                 if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.surrenderParty)
                                 {

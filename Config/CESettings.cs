@@ -22,6 +22,7 @@ namespace CaptivityEvents.Config
         bool EventCaptorDialogue { get; set; }
         bool EventCaptorNotifications { get; set; }
         bool EventCaptorCustomTextureNotifications { get; set; }
+        int EventAmountOfImagesToPreload { get; set; }
         bool EventRandomEnabled { get; set; }
         float EventRandomFireChance { get; set; }
         float EventOccurrenceRandom { get; set; }
@@ -93,6 +94,7 @@ namespace CaptivityEvents.Config
         public bool EventCaptorDialogue { get; set; } = true;
         public bool EventCaptorNotifications { get; set; } = true;
         public bool EventCaptorCustomTextureNotifications { get; set; } = true;
+        public int EventAmountOfImagesToPreload { get; set; } = 40;
         public bool EventRandomEnabled { get; set; } = true;
         public float EventRandomFireChance { get; set; } = 20f;
         public float EventOccurrenceRandom { get; set; } = 12f;
@@ -496,6 +498,10 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0085}Pictures", GroupOrder = 7)]
         public bool CustomBackgrounds { get; set; } = true;
 
+        [SettingPropertyInteger("{=CESETTINGS1142}Number of Images Preloaded", 10, 2000, "#0", Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1143}How many images should be preloaded. (increases memory usage)")]
+        [SettingPropertyGroup("{=CESETTINGS0085}Pictures")]
+        public int EventAmountOfImagesToPreload { get; set; } = 40;
+
         #endregion Pictures
 
         #region Events
@@ -621,6 +627,7 @@ namespace CaptivityEvents.Config
                         _provider.EventCaptorDialogue = customSettings.EventCaptorDialogue;
                         _provider.EventCaptorNotifications = customSettings.EventCaptorNotifications;
                         _provider.EventCaptorCustomTextureNotifications = customSettings.EventCaptorCustomTextureNotifications;
+                        _provider.EventAmountOfImagesToPreload = customSettings.EventAmountOfImagesToPreload;
                         _provider.EventRandomEnabled = customSettings.EventRandomEnabled;
                         _provider.EventRandomFireChance = customSettings.EventRandomFireChance;
                         _provider.EventOccurrenceRandom = customSettings.EventOccurrenceRandom;
