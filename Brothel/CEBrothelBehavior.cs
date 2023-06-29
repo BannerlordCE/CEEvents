@@ -1,4 +1,4 @@
-#define V112
+#define V120
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -59,7 +59,7 @@ namespace CaptivityEvents.Brothel
                     {
                         GameMenu.SwitchToMenu("town");
                     }
-                }, false, 1);
+                }, false, 2);
 
             campaignGameStarter.AddGameMenu("town_brothel", "{=CEEVENTS1098}You are in the brothel district", BrothelDistrictOnInit, GameOverlays.MenuOverlayType.SettlementWithBoth);
 

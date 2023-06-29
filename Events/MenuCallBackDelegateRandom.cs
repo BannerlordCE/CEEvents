@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -559,7 +559,11 @@ namespace CaptivityEvents.Events
                     customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
 
                     // InitBanditParty
+#if V120
+                    customParty.Party.SetVisualAsDirty();
+#else
                     customParty.Party.Visuals.SetMapIconAsDirty();
+#endif
                     customParty.ActualClan = clan;
 
                     customParty.IsActive = true;
@@ -723,7 +727,7 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid PregnancyRiskModifier"); }
         }
 
-        #endregion Consequences
+#endregion Consequences
 
         #region Requirements
 

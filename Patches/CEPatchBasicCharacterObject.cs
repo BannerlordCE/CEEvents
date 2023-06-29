@@ -1,4 +1,6 @@
-﻿using CaptivityEvents.Custom;
+﻿#define V120
+
+using CaptivityEvents.Custom;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -15,8 +17,11 @@ namespace CaptivityEvents.Patches
     [HarmonyPatch(typeof(BasicCharacterObject))]
     internal class CEPatchBasicCharacterObject
     {
-
+#if V120
+        public static AccessTools.FieldRef<BasicCharacterObject, MBCharacterSkills> MBCharacterSkills = AccessTools.FieldRefAccess<BasicCharacterObject, MBCharacterSkills>("DefaultCharacterSkills");
+#else
         public static AccessTools.FieldRef<BasicCharacterObject, MBCharacterSkills> MBCharacterSkills = AccessTools.FieldRefAccess<BasicCharacterObject, MBCharacterSkills>("CharacterSkills");
+#endif
 
         static readonly List<MBGUID> ms = new();
 

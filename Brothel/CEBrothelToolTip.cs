@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using TaleWorlds.Localization;
 using TaleWorlds.Core.ViewModelCollection.Information;

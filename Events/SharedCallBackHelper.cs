@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -1021,7 +1021,11 @@ namespace CaptivityEvents.Events
                                         customParty.SetCustomName(textObject);
 
                                         // InitBanditParty
+#if V120
+                                        customParty.Party.SetVisualAsDirty();
+#else
                                         customParty.Party.Visuals.SetMapIconAsDirty();
+#endif
                                         customParty.ActualClan = clan;
 
                                         // CreatePartyTrade
@@ -1061,7 +1065,11 @@ namespace CaptivityEvents.Events
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
+#if V120
+                                            AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.GetLogicalPosition())
+#else
                                             AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, MobileParty.MainParty.GetLogicalPosition())
+#endif
                                         };
                                         float timeOfDay = Campaign.CurrentTime % 24f;
                                         if (Campaign.Current != null)
@@ -1091,7 +1099,11 @@ namespace CaptivityEvents.Events
                                         customParty.SetCustomName(textObject);
 
                                         // InitBanditParty
+#if V120
+                                        customParty.Party.SetVisualAsDirty();
+#else
                                         customParty.Party.Visuals.SetMapIconAsDirty();
+#endif
                                         customParty.ActualClan = clan;
 
                                         // CreatePartyTrade
@@ -1130,7 +1142,11 @@ namespace CaptivityEvents.Events
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
+#if V120
+                                            AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.GetLogicalPosition())
+#else
                                             AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, MobileParty.MainParty.GetLogicalPosition())
+#endif
                                         };
                                         float timeOfDay = Campaign.CurrentTime % 24f;
                                         if (Campaign.Current != null)
@@ -1429,7 +1445,7 @@ namespace CaptivityEvents.Events
             }
         }
 
-        #endregion Consequences
+#endregion Consequences
 
         #region Icons
 

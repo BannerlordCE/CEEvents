@@ -1,4 +1,4 @@
-#define V112
+#define V120
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -39,7 +39,8 @@ using CaptivityEvents.Notifications;
 
 using TaleWorlds.MountAndBlade.View.MissionViews;
 using TaleWorlds.Core.ViewModelCollection.Information;
-
+using TaleWorlds.CampaignSystem.ViewModelCollection;
+using TaleWorlds.CampaignSystem.Settlements.Workshops;
 
 namespace CaptivityEvents
 {
@@ -808,7 +809,12 @@ namespace CaptivityEvents
             else AddCustomEvents(campaignStarter);
 
             if (_isLoadedInGame) return;
+            //TooltipRefresherCollection RefreshWorkshopTooltip
+#if V120
+            InformationManager.RegisterTooltip<CEBrothel, PropertyBasedTooltipVM>(new Action<PropertyBasedTooltipVM, object[]>(CEBrothelToolTip.BrothelTypeTooltipAction), "PropertyBasedTooltip");
+#else
             PropertyBasedTooltipVM.AddTooltipType(typeof(CEBrothel), CEBrothelToolTip.BrothelTypeTooltipAction);
+#endif
             LoadBrothelSounds();
             _isLoadedInGame = true;
         }
@@ -1032,7 +1038,11 @@ namespace CaptivityEvents
                             }
 
                             CEPersistence.removeHero = null;
+#if V120
+                            PartyBase.MainParty.SetVisualAsDirty();
+#else
                             PartyBase.MainParty.Visuals.SetMapIconAsDirty();
+#endif
                         }
                         CEPersistence.captiveInventoryStage = 0;
                     }
@@ -1375,14 +1385,14 @@ namespace CaptivityEvents
                     CEPersistence.huntState = CEPersistence.HuntState.Hunting;
                 }
             }
-            else if ((CEPersistence.huntState == CEPersistence.HuntState.HeadStart || CEPersistence.huntState == CEPersistence.HuntState.Hunting) && Game.Current.GameStateManager.ActiveState is MapState mapstate && mapstate.IsActive)
+            else if ((CEPersistence.huntState == CEPersistence.HuntState.HeadStart || CEPersistence.huntState == CEPersistence.HuntState.Hunting) && Game.Current.GameStateManager.ActiveState is MapState mapState && mapState.IsActive)
             {
                 CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
                 PlayerEncounter.SetPlayerVictorious();
                 if (CESettings.Instance?.HuntLetPrisonersEscape ?? false) PlayerEncounter.EnemySurrender = true;
                 PlayerEncounter.Update();
             }
-            else if (CEPersistence.huntState == CEPersistence.HuntState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState)
+            else if (CEPersistence.huntState == CEPersistence.HuntState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapState2 && !mapState2.IsMenuState)
             //TODO: move all of these to their proper listeners and out of the OnApplicationTick
             {
                 if (PlayerEncounter.Current == null)
@@ -1396,7 +1406,7 @@ namespace CaptivityEvents
             }
         }
 
-        private void HandleFinishBattle(MapState mapstate)
+        private void HandleFinishBattle(MapState mapState)
         {
             CEPersistence.battleState = CEPersistence.BattleState.Normal;
 
@@ -1412,7 +1422,7 @@ namespace CaptivityEvents
                 if (CEPersistence.victoryEvent != null)
                 {
                     GameMenu.ActivateGameMenu(CEPersistence.victoryEvent);
-                    mapstate.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                    mapState.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                                ? "wait_prisoner_female"
                                                                : "wait_prisoner_male");
                     CEPersistence.victoryEvent = null;
@@ -1424,7 +1434,7 @@ namespace CaptivityEvents
                 if (CEPersistence.defeatEvent != null)
                 {
                     GameMenu.ActivateGameMenu(CEPersistence.defeatEvent);
-                    mapstate.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
+                    mapState.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                                ? "wait_prisoner_female"
                                                                : "wait_prisoner_male");
                     CEPersistence.victoryEvent = null;
@@ -1447,12 +1457,21 @@ namespace CaptivityEvents
                     }
                     break;
                 case CEPersistence.BattleState.AfterBattle:
-                    if (CEPersistence.battleState == CEPersistence.BattleState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate2 && !mapstate2.IsMenuState)
+                    if (CEPersistence.battleState == CEPersistence.BattleState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapState2 && !mapState2.IsMenuState)
                     //TODO: move all of these to their proper listeners and out of the OnApplicationTick
                     {
                         if (PlayerEncounter.Current == null)
                         {
-                            HandleFinishBattle(mapstate2);
+                            try
+                            {
+                                HandleFinishBattle(mapState2);
+                            }
+                            catch (Exception e)
+                            {
+                                CECustomHandler.ForceLogToFile("BattleStateCheck: PlayerEncounter.Current == null : " + e);
+                                LoadingWindow.DisableGlobalLoadingWindow();
+                                CEPersistence.battleState = CEPersistence.BattleState.Normal;
+                            }
                         }
                         else
                         {
@@ -1467,7 +1486,9 @@ namespace CaptivityEvents
                                     CEPersistence.playerSurrendered = false;
                                     CEPersistence.playerDied = false;
 
-                                    HandleFinishBattle(mapstate2);
+                                    troopRoster.AddToCounts(CharacterObject.PlayerCharacter, 1, true, 0, 0, true, -1);
+
+                                    HandleFinishBattle(mapState2);
                                     return;
                                 }
 
@@ -1509,7 +1530,7 @@ namespace CaptivityEvents
                                     if (Settlement.CurrentSettlement != null)
                                     {
                                         EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
-                                        HandleFinishBattle(mapstate2);
+                                        HandleFinishBattle(mapState2);
                                     }
                                 }
                                 else
@@ -1519,7 +1540,7 @@ namespace CaptivityEvents
                                     if (Settlement.CurrentSettlement != null)
                                     {
                                         EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
-                                        HandleFinishBattle(mapstate2);
+                                        HandleFinishBattle(mapState2);
                                     }
                                 }
                             }
@@ -1533,14 +1554,14 @@ namespace CaptivityEvents
                     }
                     break;
                 case CEPersistence.BattleState.UpdateBattle:
-                    if (CEPersistence.battleState == CEPersistence.BattleState.UpdateBattle && Game.Current.GameStateManager.ActiveState is MapState mapstate3 && !mapstate3.IsMenuState)
+                    if (CEPersistence.battleState == CEPersistence.BattleState.UpdateBattle && Game.Current.GameStateManager.ActiveState is MapState mapState3 && !mapState3.IsMenuState)
                     //TODO: move all of these to their proper listeners and out of the OnApplicationTick
                     {
                         try
                         {
                             if (PlayerEncounter.Current == null)
                             {
-                                HandleFinishBattle(mapstate3);
+                                HandleFinishBattle(mapState3);
                             }
                             else
                             {

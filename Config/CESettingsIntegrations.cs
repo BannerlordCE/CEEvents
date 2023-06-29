@@ -16,10 +16,7 @@ namespace CaptivityEvents.Config
         {
             get
             {
-                if (_instance == null)
-                {
-                    _instance = new CESettingsIntegrations();
-                }
+                _instance ??= new CESettingsIntegrations();
                 return _instance;
             }
         }

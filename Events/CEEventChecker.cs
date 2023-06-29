@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -187,12 +187,21 @@ namespace CaptivityEvents.Events
 
             Vec3? position3D = (captorParty != null && captorParty.IsMobile) ? captorParty?.MobileParty?.GetPosition() : captorParty?.Settlement?.GetPosition();
             List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
+#if V120
+            AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel((Vec3)position3D);
+
+            string environmentTerrainTypes = "";
+            faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
+
+            //environmentTerrainTypes += "Snow";
+#else
             AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, (Vec3)position3D);
 
             string environmentTerrainTypes = "";
             faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
 
             if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
+#endif
 
             returnString += "\nEnvironment Terrain Types : " + environmentTerrainTypes;
 
@@ -528,7 +537,11 @@ namespace CaptivityEvents.Events
 
                     string environmentTerrainTypes = "";
                     faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
+#if V120
+
+#else
                     if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
+#endif
 
                     eventMatchingCondition = false;
                     if (hasWorldMapWater) eventMatchingCondition = environmentTerrainTypes.Contains("Water");
@@ -565,11 +578,19 @@ namespace CaptivityEvents.Events
 
             if (hasWinterFlag || hasSummerFlag || hasSpringFlag || hasFallFlag)
             {
+#if V120
+                eventMatchingCondition =
+                  hasSummerFlag && CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Summer ||
+                  hasFallFlag && CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Autumn ||
+                  hasWinterFlag && CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Winter ||
+                  hasSpringFlag && (CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Spring);
+#else
                 eventMatchingCondition =
                     hasSummerFlag && CampaignTime.Now.GetSeasonOfYear == 1 ||
                     hasFallFlag && CampaignTime.Now.GetSeasonOfYear == 2 ||
                     hasWinterFlag && CampaignTime.Now.GetSeasonOfYear == 3 ||
                     hasSpringFlag && (CampaignTime.Now.GetSeasonOfYear == 4 || CampaignTime.Now.GetSeasonOfYear == 0);
+#endif
             }
 
             if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the seasons conditions.");
@@ -2290,6 +2311,6 @@ namespace CaptivityEvents.Events
             return false;
         }
 
-        #endregion private
+#endregion private
     }
 }

@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.Config;
 using Helpers;
@@ -49,6 +49,11 @@ namespace CaptivityEvents.Issues
 
             protected override void OnGameLoad()
             { }
+#if V120
+            protected override void HourlyTick()
+            {
+            }
+#endif
 
             protected override QuestBase GenerateIssueQuest(string questId)
             {
@@ -122,6 +127,12 @@ namespace CaptivityEvents.Issues
                 AddTrackedObject(QuestGiver);
                 SetDialogs();
             }
+
+#if V120
+            protected override void HourlyTick()
+            {
+            }
+#endif
 
             protected override void RegisterEvents()
             { }
