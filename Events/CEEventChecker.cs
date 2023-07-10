@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V121
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -187,7 +187,7 @@ namespace CaptivityEvents.Events
 
             Vec3? position3D = (captorParty != null && captorParty.IsMobile) ? captorParty?.MobileParty?.GetPosition() : captorParty?.Settlement?.GetPosition();
             List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
-#if V120
+#if V121
             AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel((Vec3)position3D);
 
             string environmentTerrainTypes = "";
@@ -537,7 +537,7 @@ namespace CaptivityEvents.Events
 
                     string environmentTerrainTypes = "";
                     faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
-#if V120
+#if V121
 
 #else
                     if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
@@ -578,7 +578,7 @@ namespace CaptivityEvents.Events
 
             if (hasWinterFlag || hasSummerFlag || hasSpringFlag || hasFallFlag)
             {
-#if V120
+#if V121
                 eventMatchingCondition =
                   hasSummerFlag && CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Summer ||
                   hasFallFlag && CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Autumn ||
