@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.Custom;
 using System;
@@ -105,7 +105,7 @@ namespace CaptivityEvents.Events
                                 break;
                         }
                     } 
-                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, ceClan, CampaignData.NeutralFaction, -1);
+                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, ceClan, null, -1);
                     
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);
                     hero.SetHasMet();

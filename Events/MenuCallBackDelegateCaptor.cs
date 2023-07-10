@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -365,7 +365,7 @@ namespace CaptivityEvents.Events
                     {
                         weightedChance = _variableLoader.GetIntFromXML(!string.IsNullOrWhiteSpace(triggerEvent.EventWeight)
                                                                      ? triggerEvent.EventWeight
-                                                                     : triggeredEvent.WeightedChanceOfOccuring);
+                                                                     : triggeredEvent.WeightedChanceOfOccurring);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
 
@@ -458,7 +458,7 @@ namespace CaptivityEvents.Events
                     {
                         weightedChance = _variableLoader.GetIntFromXML(!string.IsNullOrWhiteSpace(triggerEvent.EventWeight)
                                                                      ? triggerEvent.EventWeight
-                                                                     : triggeredEvent.WeightedChanceOfOccuring);
+                                                                     : triggeredEvent.WeightedChanceOfOccurring);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
 
@@ -2098,7 +2098,7 @@ namespace CaptivityEvents.Events
         private void PlayerHasOpenSpaceForCompanions(ref MenuCallbackArgs args)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerAllowedCompanion)) return;
-            if (!(Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit)) return;
+            if (!(Clan.PlayerClan.Companions.Count() >= Clan.PlayerClan.CompanionLimit)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_companions_too_many");
             args.IsEnabled = false;

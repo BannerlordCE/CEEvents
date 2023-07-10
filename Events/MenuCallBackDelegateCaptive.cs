@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -59,12 +59,9 @@ namespace CaptivityEvents.Events
 
         internal void CaptiveProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
-            if (args.MenuContext != null)
-            {
-                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+            args.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                            ? "wait_captive_female"
                                            : "wait_captive_male");
-            }
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -148,7 +145,7 @@ namespace CaptivityEvents.Events
 
             if (PlayerCaptivity.IsCaptive) InitCaptiveTextVariables(ref args);
 
-            if (args.MenuContext != null) args.MenuContext.GameMenu.StartWait();
+            args.MenuContext?.GameMenu.StartWait();
         }
 
         internal bool CaptiveConditionWaitGameMenu(MenuCallbackArgs args)
@@ -403,7 +400,7 @@ namespace CaptivityEvents.Events
                     {
                         weightedChance = new CEVariablesLoader().GetIntFromXML(!string.IsNullOrWhiteSpace(triggerEvent.EventWeight)
                                                                       ? triggerEvent.EventWeight
-                                                                      : triggeredEvent.WeightedChanceOfOccuring);
+                                                                      : triggeredEvent.WeightedChanceOfOccurring);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
 
@@ -495,7 +492,7 @@ namespace CaptivityEvents.Events
                     {
                         weightedChance = new CEVariablesLoader().GetIntFromXML(!string.IsNullOrWhiteSpace(triggerEvent.EventWeight)
                                                                       ? triggerEvent.EventWeight
-                                                                      : triggeredEvent.WeightedChanceOfOccuring);
+                                                                      : triggeredEvent.WeightedChanceOfOccurring);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
 
@@ -595,7 +592,7 @@ namespace CaptivityEvents.Events
                 bool checkIfFemale = _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.NotableFemalesNearby);
                 bool checkIfMale = !checkIfFemale || _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.NotableMalesNearby);
 
-                Hero notable = settlement.Notables.GetRandomElementWithPredicate(findFirstNotable => checkIfMale && checkIfFemale ? true : checkIfMale ? !findFirstNotable.IsFemale : findFirstNotable.IsFemale);
+                Hero notable = settlement.Notables.GetRandomElementWithPredicate(findFirstNotable => checkIfMale && checkIfFemale || (checkIfMale ? !findFirstNotable.IsFemale : findFirstNotable.IsFemale));
 
                 CECampaignBehavior.ExtraProps.Owner = notable;
                 _captive.CECaptivityChange(ref args, settlement.Party);

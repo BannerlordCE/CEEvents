@@ -22,6 +22,7 @@ namespace CaptivityEvents.Config
         bool EventCaptorDialogue { get; set; }
         bool EventCaptorNotifications { get; set; }
         bool EventCaptorCustomTextureNotifications { get; set; }
+        int EventAmountOfImagesToPreload { get; set; }
         bool EventRandomEnabled { get; set; }
         float EventRandomFireChance { get; set; }
         float EventOccurrenceRandom { get; set; }
@@ -93,6 +94,7 @@ namespace CaptivityEvents.Config
         public bool EventCaptorDialogue { get; set; } = true;
         public bool EventCaptorNotifications { get; set; } = true;
         public bool EventCaptorCustomTextureNotifications { get; set; } = true;
+        public int EventAmountOfImagesToPreload { get; set; } = 40;
         public bool EventRandomEnabled { get; set; } = true;
         public float EventRandomFireChance { get; set; } = 20f;
         public float EventOccurrenceRandom { get; set; } = 12f;
@@ -215,15 +217,15 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0098}Captive", GroupOrder = 1)]
         public bool EventCaptiveOn { get; set; } = true;
 
-        [SettingPropertyFloatingInteger("{=CESETTINGS1002}Event wait between occurances in Traveling Party", 1f, 24f, "#0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1003}How often should an event occur while in a regular party. (Gametime in between events)")]
+        [SettingPropertyFloatingInteger("{=CESETTINGS1002}Event wait between occurrences in Traveling Party", 1f, 24f, "#0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1003}How often should an event occur while in a regular party. (Game time in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0098}Captive")]
         public float EventOccurrenceOther { get; set; } = 6f;
 
-        [SettingPropertyFloatingInteger("{=CESETTINGS1004}Event wait between occurances in Settlement", 1f, 24f, "#0", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1005}How should an event occur in settlements. (Prostitution affected too) (Gametime in between events)")]
+        [SettingPropertyFloatingInteger("{=CESETTINGS1004}Event wait between occurrences in Settlement", 1f, 24f, "#0", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1005}How should an event occur in settlements. (Prostitution affected too) (Game time in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0098}Captive")]
         public float EventOccurrenceSettlement { get; set; } = 6f;
 
-        [SettingPropertyFloatingInteger("{=CESETTINGS1006}Event wait between occurances in Lord's Party", 1f, 24f, "#0", Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1007}How often should an event occur in a lord's party. (Gametime in between events)")]
+        [SettingPropertyFloatingInteger("{=CESETTINGS1006}Event wait between occurrences in Lord's Party", 1f, 24f, "#0", Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1007}How often should an event occur in a lord's party. (Game time in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0098}Captive")]
         public float EventOccurrenceLord { get; set; } = 6f;
 
@@ -303,7 +305,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0099}Captor", GroupOrder = 2)]
         public bool EventCaptorOn { get; set; } = true;
 
-        [SettingPropertyFloatingInteger("{=CESETTINGS1008}Event wait between occurances while Captor", 1f, 100f, "#0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1009}How often should an event occur while Captor. (Gametime in between events)")]
+        [SettingPropertyFloatingInteger("{=CESETTINGS1008}Event wait between occurrences while Captor", 1f, 100f, "#0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS1009}How often should an event occur while Captor. (Game time in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor")]
         public float EventOccurrenceCaptor { get; set; } = 12f;
 
@@ -384,7 +386,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0088}Random")]
         public float EventRandomFireChance { get; set; } = 20f;
 
-        [SettingPropertyFloatingInteger("{=CESETTINGS0083}Event wait between occurances while Random", 1f, 100f, "#0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS0084}How often should an event occur while Random. (Gametime in between events)")]
+        [SettingPropertyFloatingInteger("{=CESETTINGS0083}Event wait between occurrences while Random", 1f, 100f, "#0", Order = 2, RequireRestart = false, HintText = "{=CESETTINGS0084}How often should an event occur while Random. (Game time in between events)")]
         [SettingPropertyGroup("{=CESETTINGS0088}Random")]
         public float EventOccurrenceRandom { get; set; } = 12f;
 
@@ -495,6 +497,10 @@ namespace CaptivityEvents.Config
         [SettingPropertyBool("{=CESETTINGS0086}Custom Backgrounds", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS0087}Custom backgrounds toggle. (Will not help if default backgrounds are overwritten)")]
         [SettingPropertyGroup("{=CESETTINGS0085}Pictures", GroupOrder = 7)]
         public bool CustomBackgrounds { get; set; } = true;
+
+        [SettingPropertyInteger("{=CESETTINGS1142}Number of Images Preloaded", 10, 2000, "#0", Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1143}How many images should be preloaded. (increases memory usage)")]
+        [SettingPropertyGroup("{=CESETTINGS0085}Pictures")]
+        public int EventAmountOfImagesToPreload { get; set; } = 40;
 
         #endregion Pictures
 
@@ -621,6 +627,7 @@ namespace CaptivityEvents.Config
                         _provider.EventCaptorDialogue = customSettings.EventCaptorDialogue;
                         _provider.EventCaptorNotifications = customSettings.EventCaptorNotifications;
                         _provider.EventCaptorCustomTextureNotifications = customSettings.EventCaptorCustomTextureNotifications;
+                        _provider.EventAmountOfImagesToPreload = customSettings.EventAmountOfImagesToPreload;
                         _provider.EventRandomEnabled = customSettings.EventRandomEnabled;
                         _provider.EventRandomFireChance = customSettings.EventRandomFireChance;
                         _provider.EventOccurrenceRandom = customSettings.EventOccurrenceRandom;

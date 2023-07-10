@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.Config;
 using Helpers;
@@ -28,7 +28,7 @@ namespace CaptivityEvents.Issues
 
         internal class CEWhereAreMyThingsIssue : IssueBase
         {
-            protected override int RewardGold => 500 + MathF.Round(1200f * base.IssueDifficultyMultiplier);
+            protected override int RewardGold => 500 + MathF.Round(1200f * IssueDifficultyMultiplier);
 
             public override bool IsThereAlternativeSolution => false;
             public override bool IsThereLordSolution => false;
@@ -49,6 +49,11 @@ namespace CaptivityEvents.Issues
 
             protected override void OnGameLoad()
             { }
+#if V120
+            protected override void HourlyTick()
+            {
+            }
+#endif
 
             protected override QuestBase GenerateIssueQuest(string questId)
             {
@@ -57,7 +62,7 @@ namespace CaptivityEvents.Issues
                 return new CEWhereAreMyThingsIssueQuest(questId, IssueOwner, CampaignTime.DaysFromNow(stolenGearDuration), RewardGold, new Equipment(Hero.MainHero.BattleEquipment), new Equipment(Hero.MainHero.CivilianEquipment));
             }
 
-            public override IssueBase.IssueFrequency GetFrequency() => IssueBase.IssueFrequency.Rare;
+            public override IssueFrequency GetFrequency() => IssueFrequency.Rare;
 
             public override bool IssueStayAliveConditions() => true;
 
@@ -122,6 +127,12 @@ namespace CaptivityEvents.Issues
                 AddTrackedObject(QuestGiver);
                 SetDialogs();
             }
+
+#if V120
+            protected override void HourlyTick()
+            {
+            }
+#endif
 
             protected override void RegisterEvents()
             { }

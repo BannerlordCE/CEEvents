@@ -1,4 +1,4 @@
-#define V112
+#define V120
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -306,8 +306,8 @@ namespace CaptivityEvents.CampaignBehaviors
             }
 
             if (!(_hoursPassed > value)) return false;
-            CEHelper.notificationEventCheck = true;
-            CEHelper.notificationCaptorCheck = true;
+            notificationEventCheck = true;
+            notificationCaptorCheck = true;
             _hoursPassed = 0;
             return true;
         }
@@ -320,10 +320,10 @@ namespace CaptivityEvents.CampaignBehaviors
         {
             try
             {
-                if (CEHelper.spouseOne == null && CEHelper.spouseTwo == null) return;
-                Hero father = CEHelper.spouseOne == hero
-                    ? CEHelper.spouseTwo
-                    : CEHelper.spouseOne;
+                if (spouseOne == null && spouseTwo == null) return;
+                Hero father = spouseOne == hero
+                    ? spouseTwo
+                    : spouseOne;
                 CECustomHandler.ForceLogToFile("Added " + hero.Name + "'s Pregnancy");
                 _heroPregnancies.Add(new Pregnancy(hero, father, CampaignTime.DaysFromNow(CESettings.Instance?.PregnancyDurationInDays ?? 14f)));
                 ChangeMenu(0);
@@ -369,7 +369,7 @@ namespace CaptivityEvents.CampaignBehaviors
         {
             try
             {
-                if (pregnancy == null || pregnancy.AlreadyOccured) return;
+                if (pregnancy == null || pregnancy.AlreadyOccurred) return;
 
                 if (pregnancy.DueDate.RemainingDaysFromNow < 1f)
                 {
@@ -396,36 +396,36 @@ namespace CaptivityEvents.CampaignBehaviors
             try
             {
                 if (!Hero.MainHero.IsPregnant) return;
-                Pregnancy pregnancydue = _heroPregnancies.Find(pregnancy => pregnancy.Mother == Hero.MainHero);
+                Pregnancy pregnancyDue = _heroPregnancies.Find(pregnancy => pregnancy.Mother == Hero.MainHero);
 
-                if (pregnancydue == null || pregnancydue.AlreadyOccured) return;
+                if (pregnancyDue == null || pregnancyDue.AlreadyOccurred) return;
                 TextObject textObject40;
 
-                if (pregnancydue.DueDate.RemainingDaysFromNow < 1f)
+                if (pregnancyDue.DueDate.RemainingDaysFromNow < 1f)
                 {
                     textObject40 = new TextObject("{=CEEVENTS1061}You are about to give birth...");
                 }
-                else if (pregnancydue.DueDate.RemainingDaysFromNow < 10f)
+                else if (pregnancyDue.DueDate.RemainingDaysFromNow < 10f)
                 {
                     textObject40 = new TextObject("{=CEEVENTS1062}Your baby begins kicking, you have {DAYS_REMAINING} days remaining.");
-                    textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancydue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
+                    textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancyDue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
                 }
-                else if (pregnancydue.DueDate.RemainingDaysFromNow < 20f)
+                else if (pregnancyDue.DueDate.RemainingDaysFromNow < 20f)
                 {
                     textObject40 = new TextObject("{=CEEVENTS1063}Your pregnant belly continues to swell, you have {DAYS_REMAINING} days remaining.");
-                    textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancydue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
+                    textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancyDue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
                 }
                 else
                 {
                     textObject40 = new TextObject("{=CEEVENTS1064}You're pregnant, you have {DAYS_REMAINING} days remaining.");
-                    textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancydue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
+                    textObject40.SetTextVariable("DAYS_REMAINING", Math.Floor(pregnancyDue.DueDate.RemainingDaysFromNow).ToString(CultureInfo.InvariantCulture));
                 }
 
                 if (CESettings.Instance?.PregnancyMessages ?? true) InformationManager.DisplayMessage(new InformationMessage(textObject40.ToString(), Colors.Gray));
             }
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("Failed to handle alerts. pregenancy");
+                CECustomHandler.ForceLogToFile("Failed to handle alerts. Pregnancy.");
                 CECustomHandler.ForceLogToFile(e.Message + " : " + e);
             }
         }
@@ -510,7 +510,7 @@ namespace CaptivityEvents.CampaignBehaviors
                             break;
                     }
                     StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, textObject);
-                    CEHelper.AddQuickInformation(textObject);
+                    AddQuickInformation(textObject);
                 }
 
                 if (mother.IsHumanPlayerCharacter || pregnancy.Father == Hero.MainHero)
@@ -519,18 +519,26 @@ namespace CaptivityEvents.CampaignBehaviors
                     {
                         ChildbirthLogEntry childbirthLogEntry = new(mother, null);
                         LogEntry.AddLogEntry(childbirthLogEntry);
+#if V120
+                        Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText(), CampaignTime.Now));
+#else
                         Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText()));
+#endif
                     }
                     foreach (Hero newbornHero in aliveOffsprings)
                     {
                         ChildbirthLogEntry childbirthLogEntry2 = new(mother, newbornHero);
                         LogEntry.AddLogEntry(childbirthLogEntry2);
+#if V120
+                        Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText(), CampaignTime.Now));
+#else
                         Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText()));
+#endif
                     }
                 }
 
                 mother.IsPregnant = false;
-                pregnancy.AlreadyOccured = true;
+                pregnancy.AlreadyOccurred = true;
 
                 ChangeWeight(pregnancy.Mother, 0, MBRandom.RandomFloatRanged(0.4025f, 0.6025f));
             }
@@ -540,7 +548,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 CECustomHandler.ForceLogToFile(e.Message + " : " + e);
                 TextObject textObject = new("{=CEEVENTS1008}Error: bad pregnancy in CE pregnancy list");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Black));
-                pregnancy.AlreadyOccured = true;
+                pregnancy.AlreadyOccurred = true;
             }
         }
 
@@ -591,7 +599,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
                     try
                     {
-                        weightedChance = new CEVariablesLoader().GetIntFromXML(triggeredEvent.WeightedChanceOfOccuring);
+                        weightedChance = new CEVariablesLoader().GetIntFromXML(triggeredEvent.WeightedChanceOfOccurring);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
 
@@ -602,7 +610,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
                 if (eventNames.Count > 0)
                 {
-                    int number = CEHelper.HelperMBRandom(0, eventNames.Count);
+                    int number = HelperMBRandom(0, eventNames.Count);
 
                     try
                     {
@@ -634,10 +642,10 @@ namespace CaptivityEvents.CampaignBehaviors
             {
                 if (!pregnancy.Mother.IsAlive)
                 {
-                    pregnancy.AlreadyOccured = true;
+                    pregnancy.AlreadyOccurred = true;
                 }
 
-                if (pregnancy.AlreadyOccured) return;
+                if (pregnancy.AlreadyOccurred) return;
 
                 CalculatePregnancyWeight(pregnancy);
 
@@ -658,11 +666,11 @@ namespace CaptivityEvents.CampaignBehaviors
                 CECustomHandler.ForceLogToFile(e.Message + " : " + e);
                 TextObject textObject = new("{=CEEVENTS1008}Error: bad pregnancy in CE pregnancy list");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Black));
-                pregnancy.AlreadyOccured = true;
+                pregnancy.AlreadyOccurred = true;
             }
         }
 
-        public static bool CheckIfPregnancyExists(Hero pregnantHero) => _heroPregnancies.Any(pregnancy => pregnancy.Mother == pregnantHero && !pregnancy.AlreadyOccured);
+        public static bool CheckIfPregnancyExists(Hero pregnantHero) => _heroPregnancies.Any(pregnancy => pregnancy.Mother == pregnantHero && !pregnancy.AlreadyOccurred);
 
         public static bool ClearPregnancyList()
         {
@@ -682,7 +690,7 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
-        #endregion Pregnancy
+#endregion Pregnancy
 
         #region Equipment
 
@@ -711,7 +719,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     catch (Exception) { }
                 }
 
-                returnEquipment.AlreadyOccured = true;
+                returnEquipment.AlreadyOccurred = true;
             }
             catch (Exception e)
             {
@@ -719,7 +727,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 CECustomHandler.ForceLogToFile(e.Message + " : " + e);
                 TextObject textObject = new("{=CEEVENTS1009}Error: bad equipment in return equipment list");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Black));
-                returnEquipment.AlreadyOccured = true;
+                returnEquipment.AlreadyOccurred = true;
             }
         }
 
@@ -800,18 +808,18 @@ namespace CaptivityEvents.CampaignBehaviors
             {
                 _heroPregnancies.ForEach(item =>
                 {
-                    if (item.Mother != null && !item.AlreadyOccured)
+                    if (item.Mother != null && !item.AlreadyOccurred)
                     {
                         item.Mother.IsPregnant = true;
                         CheckPregnancy(item);
                     }
                     else
                     {
-                        item.AlreadyOccured = true;
+                        item.AlreadyOccurred = true;
                         ChangeMenu(0);
                     }
                 });
-                _heroPregnancies.RemoveAll(item => item.AlreadyOccured);
+                _heroPregnancies.RemoveAll(item => item.AlreadyOccurred);
             }
             catch (Exception e)
             {
@@ -829,7 +837,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 {
                     _returnEquipment.ForEach(CheckEquipmentToReturn);
 
-                    _returnEquipment.RemoveAll(item => item.AlreadyOccured);
+                    _returnEquipment.RemoveAll(item => item.AlreadyOccurred);
                 }
                 catch (Exception e)
                 {
@@ -866,9 +874,9 @@ namespace CaptivityEvents.CampaignBehaviors
 
         public override void SyncData(IDataStore dataStore)
         {
-            dataStore.SyncData("_CEheroPregnancies", ref _heroPregnancies);
-            dataStore.SyncData("_CEreturnEquipment", ref _returnEquipment);
-            dataStore.SyncData("_CEextraVariables", ref _extraVariables);
+            dataStore.SyncData("_CEHeroPregnancies", ref _heroPregnancies);
+            dataStore.SyncData("_CEReturnEquipment", ref _returnEquipment);
+            dataStore.SyncData("_CEExtraVariables", ref _extraVariables);
         }
 
         public static void ResetFullData()
@@ -881,7 +889,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         public static List<Pregnancy> HeroPregnancies => _heroPregnancies;
 
-        public static List<ReturnEquipment> ReturnEquipments => _returnEquipment;
+        public static List<ReturnEquipment> HeroReturnEquipment => _returnEquipment;
 
         private int _hoursPassed;
 
@@ -900,7 +908,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 Mother = pregnantHero;
                 Father = father;
                 DueDate = dueDate;
-                AlreadyOccured = false;
+                AlreadyOccurred = false;
             }
 
             [SaveableField(1)]
@@ -913,7 +921,7 @@ namespace CaptivityEvents.CampaignBehaviors
             public readonly CampaignTime DueDate;
 
             [SaveableField(4)]
-            public bool AlreadyOccured;
+            public bool AlreadyOccurred;
         }
 
         public class ReturnEquipment
@@ -927,7 +935,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 Equipment randomElement2 = new(true);
                 randomElement2.FillFrom(civilianEquipment, false);
                 CivilianEquipment = randomElement2;
-                AlreadyOccured = false;
+                AlreadyOccurred = false;
             }
 
             [SaveableField(1)]
@@ -940,7 +948,7 @@ namespace CaptivityEvents.CampaignBehaviors
             public readonly Equipment BattleEquipment;
 
             [SaveableField(4)]
-            public bool AlreadyOccured;
+            public bool AlreadyOccurred;
         }
 
         public class ExtraVariables
@@ -951,12 +959,12 @@ namespace CaptivityEvents.CampaignBehaviors
                 menuToSwitchBackTo = null;
                 currentBackgroundMeshNameToSwitchBackTo = null;
 
-                CEHelper.notificationCaptorCheck = false;
-                CEHelper.notificationEventCheck = false;
-                CEHelper.notificationCaptorExists = false;
-                CEHelper.notificationEventExists = false;
+                notificationCaptorCheck = false;
+                notificationEventCheck = false;
+                notificationCaptorExists = false;
+                notificationEventExists = false;
 
-                CEHelper.progressEventExists = false;
+                progressEventExists = false;
             }
 
             [SaveableField(1)]

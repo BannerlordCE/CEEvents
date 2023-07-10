@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.Custom;
 using HarmonyLib;
@@ -30,7 +30,10 @@ namespace CaptivityEvents.Patches
                 BodyProperties bodyProperties = characterObject.GetBodyProperties(null, -1);
                 FaceGenerationParams faceGenerationParams = FaceGenerationParams.Create();
                 MBBodyProperties.GetParamsFromKey(ref faceGenerationParams, bodyProperties, false, false);
+#if V120
+#else
                 faceGenerationParams._heightMultiplier = 0.5f;
+#endif
                 MBBodyProperties.ProduceNumericKeyWithParams(faceGenerationParams, false, false, ref bodyProperties);
                 character.UpdatePlayerCharacterBodyProperties(bodyProperties, characterObject.Race, characterObject.IsFemale);
                 character.Culture = new CultureObject();

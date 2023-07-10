@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using HarmonyLib;
 using SandBox.CampaignBehaviors;
@@ -80,7 +80,11 @@ namespace CaptivityEvents.Patches
                 {
                     float num7 = (Campaign.MapDiagonal - Campaign.Current.Models.MapDistanceModel.GetDistance(settlement, town2.Settlement)) / Campaign.MapDiagonal;
                     float num8 = num7 * num7 * num7;
+#if V120
+                    num8 *= MathF.Min(town2.Prosperity, 5000f) * 0.0002f;
+#else
                     num8 *= MathF.Min(settlement.Prosperity, 5000f) * 0.0002f;
+#endif
                     dictionary2 = dictionary;
                     culture = town2.Culture;
                     dictionary2[culture] += num8;
@@ -104,7 +108,7 @@ namespace CaptivityEvents.Patches
                     {
                         List<SettlementMusicData> list = (from x in settlementMusicDatas
                                                           where x.Culture == keyValuePair.Key
-                                                          select x).ToList<SettlementMusicData>();
+                                                          select x).ToList();
                         list.Shuffle();
                         int num11 = 0;
                         while (num11 < num10 && num11 < list.Count)

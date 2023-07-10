@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
@@ -36,7 +36,12 @@ namespace CaptivityEvents.Patches
                     Workshop workshop = new(brothel.Settlement, brothel.Name.ToString());
                     WorkshopType workshopType = WorkshopType.Find("brewery");
 
+#if V120
+                    workshop.ChangeOwnerOfWorkshop(brothel.Owner, workshopType, brothel.Capital);
+                    workshop.SetCustomName(brothel.Name);
+#else
                     workshop.SetWorkshop(brothel.Owner, workshopType, brothel.Capital, true, 0, 1, brothel.Name);
+#endif
 
                     CEBrothelClanFinanceItemVM brothelFinanceItemVM = new(brothel, workshop, brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); }, __instance.OnRefresh, _openCardSelectionPopup.Invoke(__instance));
 
@@ -49,7 +54,11 @@ namespace CaptivityEvents.Patches
                 int count = CEBrothelBehavior.GetPlayerBrothels().Count;
                 GameTexts.SetVariable("STR1", GameTexts.FindText("str_CE_properties", null));
                 GameTexts.SetVariable("LEFT", Hero.MainHero.OwnedWorkshops.Count + count);
+#if V120
+                GameTexts.SetVariable("RIGHT", Campaign.Current.Models.WorkshopModel.GetMaxWorkshopCountForClanTier(Clan.PlayerClan.Tier) + count);
+#else
                 GameTexts.SetVariable("RIGHT", Campaign.Current.Models.WorkshopModel.GetMaxWorkshopCountForTier(Clan.PlayerClan.Tier) + count);
+#endif
                 GameTexts.SetVariable("STR2", GameTexts.FindText("str_LEFT_over_RIGHT_in_paranthesis", null));
                 __instance.WorkshopText = GameTexts.FindText("str_STR1_space_STR2", null).ToString();
 
