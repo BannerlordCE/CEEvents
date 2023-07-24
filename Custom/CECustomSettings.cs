@@ -19,6 +19,7 @@ namespace CaptivityEvents
         public bool EventCaptorDialogue { get; set; } = true;
         public bool EventCaptorNotifications { get; set; } = true;
         public bool EventCaptorCustomTextureNotifications { get; set; } = true;
+        public int EventAmountOfImagesToPreload { get; set; } = 40;
         public bool EventRandomEnabled { get; set; } = true;
         public float EventRandomFireChance { get; set; } = 20f;
         public float EventOccurrenceRandom { get; set; } = 12f;

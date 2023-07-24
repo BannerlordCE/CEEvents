@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -61,12 +61,9 @@ namespace CaptivityEvents.Events
 
         internal void RandomProgressInitWaitGameMenu(MenuCallbackArgs args)
         {
-            if (args.MenuContext != null)
-            {
-                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+            args.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                            ? "wait_captive_female"
                                            : "wait_captive_male");
-            }
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -145,12 +142,9 @@ namespace CaptivityEvents.Events
 
         internal void RandomEventGameMenu(MenuCallbackArgs args)
         {
-            if (args.MenuContext != null)
-            {
-                args.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale
+            args.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
                                                                        ? "wait_prisoner_female"
                                                                        : "wait_prisoner_male");
-            }
 
             _sharedCallBackHelper.LoadBackgroundImage("default_random");
             _sharedCallBackHelper.ConsequencePlaySound(true);
@@ -336,7 +330,7 @@ namespace CaptivityEvents.Events
                     {
                         weightedChance = new CEVariablesLoader().GetIntFromXML(!string.IsNullOrWhiteSpace(triggerEvent.EventWeight)
                                                                       ? triggerEvent.EventWeight
-                                                                      : triggeredEvent.WeightedChanceOfOccuring);
+                                                                      : triggeredEvent.WeightedChanceOfOccurring);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
 
@@ -448,7 +442,7 @@ namespace CaptivityEvents.Events
                     {
                         weightedChance = new CEVariablesLoader().GetIntFromXML(!string.IsNullOrWhiteSpace(triggerEvent.EventWeight)
                                                                       ? triggerEvent.EventWeight
-                                                                      : triggeredEvent.WeightedChanceOfOccuring);
+                                                                      : triggeredEvent.WeightedChanceOfOccurring);
                     }
                     catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
 
@@ -565,7 +559,11 @@ namespace CaptivityEvents.Events
                     customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
 
                     // InitBanditParty
+#if V120
+                    customParty.Party.SetVisualAsDirty();
+#else
                     customParty.Party.Visuals.SetMapIconAsDirty();
+#endif
                     customParty.ActualClan = clan;
 
                     customParty.IsActive = true;
@@ -615,10 +613,7 @@ namespace CaptivityEvents.Events
 
                 if (prisonerCharacter.IsPrisoner)
                 {
-                    if (prisonerCharacter.PartyBelongedToAsPrisoner != null)
-                    {
-                        prisonerCharacter.PartyBelongedToAsPrisoner.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
-                    }
+                    prisonerCharacter.PartyBelongedToAsPrisoner?.PrisonRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
                     prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
                     prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
                     party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
@@ -626,10 +621,7 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
-                    if (prisonerCharacter.PartyBelongedTo != null)
-                    {
-                        prisonerCharacter.PartyBelongedTo.MemberRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
-                    }
+                    prisonerCharacter.PartyBelongedTo?.MemberRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
                     prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
                     prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
                     party.AddPrisoner(prisonerCharacter.CharacterObject, 1);
@@ -735,7 +727,7 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid PregnancyRiskModifier"); }
         }
 
-        #endregion Consequences
+#endregion Consequences
 
         #region Requirements
 
@@ -1554,7 +1546,7 @@ namespace CaptivityEvents.Events
         private void PlayerHasOpenSpaceForCompanions(ref MenuCallbackArgs args)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.PlayerAllowedCompanion)) return;
-            if (!(Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit)) return;
+            if (!(Clan.PlayerClan.Companions.Count() >= Clan.PlayerClan.CompanionLimit)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_companions_too_many");
             args.IsEnabled = false;

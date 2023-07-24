@@ -29,7 +29,7 @@ namespace CaptivityEvents.Events
 
                         if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
                         {
-                            CECustomHandler.LogToFile("IgnoreAllOther detected - autofire " + listEvent.Name);
+                            CECustomHandler.LogToFile("IgnoreAllOther detected - auto fire " + listEvent.Name);
                             return listEvent.Name;
                         }
 
@@ -50,13 +50,13 @@ namespace CaptivityEvents.Events
                             CurrentOrder = OrderToCall;
                         }
 
-                        if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccuring))
+                        if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccurring))
                         {
-                            weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccuring);
+                            weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccurring);
                         }
                         else
                         {
-                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccuring");
+                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring");
                         }
 
                         for (int a = weightedChance; a > 0; a--) eventNames.Add(listEvent.Name);

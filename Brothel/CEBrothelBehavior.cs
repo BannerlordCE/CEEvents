@@ -1,4 +1,4 @@
-#define V112
+#define V120
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -59,7 +59,7 @@ namespace CaptivityEvents.Brothel
                     {
                         GameMenu.SwitchToMenu("town");
                     }
-                }, false, 1);
+                }, false, 2);
 
             campaignGameStarter.AddGameMenu("town_brothel", "{=CEEVENTS1098}You are in the brothel district", BrothelDistrictOnInit, GameOverlays.MenuOverlayType.SettlementWithBoth);
 
@@ -1829,7 +1829,7 @@ namespace CaptivityEvents.Brothel
             dataStore.SyncData("_hasMetWithRansomBroker", ref _hasMetWithRansomBroker);
             dataStore.SyncData("_hasBoughtTunToParty", ref _hasBoughtTunToParty);
             dataStore.SyncData("_hasBoughtProstituteToParty", ref _hasBoughtProstituteToParty);
-            dataStore.SyncData("_CEbrothelList", ref _brothelList);
+            dataStore.SyncData("_CEBrothelList", ref _brothelList);
         }
 
         public static void CleanList()

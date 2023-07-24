@@ -36,19 +36,19 @@ namespace CaptivityEvents.Config
                     //return value;
                 });
 
-                yield return new CEManagedNumericOptionData("EventOccurrenceOther", "{=CESETTINGS1002}Event wait between occurances in Traveling Party", "{=CESETTINGS1003}How often should an event occur while in a regular party. (Gametime in between events)", CESettings.Instance.EventOccurrenceOther, (value) =>
+                yield return new CEManagedNumericOptionData("EventOccurrenceOther", "{=CESETTINGS1002}Event wait between occurrences in Traveling Party", "{=CESETTINGS1003}How often should an event occur while in a regular party. (Game time in between events)", CESettings.Instance.EventOccurrenceOther, (value) =>
                 {
                     CESettings.Instance.EventOccurrenceOther = value;
                     return value;
                 }, 1f, 24f);
 
-                yield return new CEManagedNumericOptionData("EventOccurrenceSettlement", "{=CESETTINGS1004}Event wait between occurances in Settlement", "{=CESETTINGS1005}How should an event occur in settlements. (Prostitution affected too) (Gametime in between events)", CESettings.Instance.EventOccurrenceSettlement, (value) =>
+                yield return new CEManagedNumericOptionData("EventOccurrenceSettlement", "{=CESETTINGS1004}Event wait between occurrences in Settlement", "{=CESETTINGS1005}How should an event occur in settlements. (Prostitution affected too) (Game time in between events)", CESettings.Instance.EventOccurrenceSettlement, (value) =>
                 {
                     CESettings.Instance.EventOccurrenceSettlement = value;
                     return value;
                 }, 1f, 100f);
 
-                yield return new CEManagedNumericOptionData("EventOccurrenceLord", "{=CESETTINGS1006}Event wait between occurances in Lord's Party", "{=CESETTINGS1007}How often should an event occur in a lord's party. (Gametime in between events)", CESettings.Instance.EventOccurrenceLord, (value) =>
+                yield return new CEManagedNumericOptionData("EventOccurrenceLord", "{=CESETTINGS1006}Event wait between occurrences in Lord's Party", "{=CESETTINGS1007}How often should an event occur in a lord's party. (Game time in between events)", CESettings.Instance.EventOccurrenceLord, (value) =>
                 {
                     CESettings.Instance.EventOccurrenceLord = value;
                     return value;
@@ -62,7 +62,7 @@ namespace CaptivityEvents.Config
                     //return value;
                 });
 
-                yield return new CEManagedNumericOptionData("EventOccurrenceCaptor", "{=CESETTINGS1008}Event wait between occurances while Captor", "{=CESETTINGS1009}How often should an event occur while Captor. (Gametime in between events)", CESettings.Instance.EventOccurrenceCaptor, (value) =>
+                yield return new CEManagedNumericOptionData("EventOccurrenceCaptor", "{=CESETTINGS1008}Event wait between occurrences while Captor", "{=CESETTINGS1009}How often should an event occur while Captor. (Game time in between events)", CESettings.Instance.EventOccurrenceCaptor, (value) =>
                 {
                     CESettings.Instance.EventOccurrenceCaptor = value;
                     return value;
@@ -92,7 +92,7 @@ namespace CaptivityEvents.Config
                     return value;
                 });
 
-                yield return new CEManagedNumericOptionData("EventOccurrenceRandom", "{=CESETTINGS0083}Event wait between occurances while Random", "{=CESETTINGS0084}How often should an event occur while Random. (Gametime in between events)", CESettings.Instance.EventOccurrenceRandom, (value) =>
+                yield return new CEManagedNumericOptionData("EventOccurrenceRandom", "{=CESETTINGS0083}Event wait between occurrences while Random", "{=CESETTINGS0084}How often should an event occur while Random. (Game time in between events)", CESettings.Instance.EventOccurrenceRandom, (value) =>
                 {
                     CESettings.Instance.EventOccurrenceRandom = value;
                     return value;

@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Helper;
@@ -37,7 +37,7 @@ namespace CaptivityEvents.Patches
                 mapNotification = new CECaptorMapNotificationItemVM(data);
 
                 FieldInfo fi = mapNotification.GetType().BaseType.GetField("OnRemove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
-                if (fi != null) fi.SetValue(mapNotification, onRemove);
+                fi?.SetValue(mapNotification, onRemove);
 
                 __result = mapNotification;
             }
@@ -53,7 +53,7 @@ namespace CaptivityEvents.Patches
                 mapNotification = new CEEventMapNotificationItemVM(data);
 
                 FieldInfo fi = mapNotification.GetType().BaseType.GetField("OnRemove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
-                if (fi != null) fi.SetValue(mapNotification, onRemove);
+                fi?.SetValue(mapNotification, onRemove);
 
                 __result = mapNotification;
             }

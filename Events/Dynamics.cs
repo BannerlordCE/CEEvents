@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -41,8 +41,8 @@ namespace CaptivityEvents.Events
 
             //TextObject textObject = new TextObject("{HERO} has learned {SKILL_AMOUNT} {SKILL} XP.", null);
             //textObject.SetTextVariable("HERO", Hero.MainHero.Name);
-            //Hero.MainHero.AddSkillXp(skilltoget, 1f);
-            //textObject.SetTextVariable("SKILL", skilltoget.Name);
+            //Hero.MainHero.AddSkillXp(skillObject, 1f);
+            //textObject.SetTextVariable("SKILL", skillObject.Name);
             //textObject.SetTextVariable("SKILL_AMOUNT", amount);
             //InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
         }
@@ -65,8 +65,8 @@ namespace CaptivityEvents.Events
                 {
                     List<Clan> list = (from t in hero.Clan.Kingdom.Clans
                                        where !t.IsEliminated && t.Leader != hero && !t.IsUnderMercenaryService
-                                       select t).ToList<Clan>();
-                    if (list.IsEmpty<Clan>())
+                                       select t).ToList();
+                    if (list.IsEmpty())
                     {
                         if (!hero.Clan.Kingdom.IsEliminated)
                         {

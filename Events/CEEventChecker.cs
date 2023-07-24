@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V121
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -186,13 +186,22 @@ namespace CaptivityEvents.Events
             }
 
             Vec3? position3D = (captorParty != null && captorParty.IsMobile) ? captorParty?.MobileParty?.GetPosition() : captorParty?.Settlement?.GetPosition();
-            List<TaleWorlds.Core.TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
+            List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
+#if V121
+            AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel((Vec3)position3D);
+
+            string environmentTerrainTypes = "";
+            faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
+
+            //environmentTerrainTypes += "Snow";
+#else
             AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, (Vec3)position3D);
 
             string environmentTerrainTypes = "";
             faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
 
             if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
+#endif
 
             returnString += "\nEnvironment Terrain Types : " + environmentTerrainTypes;
 
@@ -229,7 +238,7 @@ namespace CaptivityEvents.Events
             returnString += "\nTotal : " + captorParty.PrisonRoster.Count;
 
             returnString += "\n\n--- Other Settings ---";
-            returnString += "\nToo Many Companions : " + (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit);
+            returnString += "\nToo Many Companions : " + (Clan.PlayerClan.Companions.Count() >= Clan.PlayerClan.CompanionLimit);
 
             returnString += "\nWork in progress\n";
 
@@ -528,7 +537,11 @@ namespace CaptivityEvents.Events
 
                     string environmentTerrainTypes = "";
                     faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
+#if V121
+
+#else
                     if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
+#endif
 
                     eventMatchingCondition = false;
                     if (hasWorldMapWater) eventMatchingCondition = environmentTerrainTypes.Contains("Water");
@@ -565,11 +578,19 @@ namespace CaptivityEvents.Events
 
             if (hasWinterFlag || hasSummerFlag || hasSpringFlag || hasFallFlag)
             {
+#if V121
+                eventMatchingCondition =
+                  hasSummerFlag && CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Summer ||
+                  hasFallFlag && CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Autumn ||
+                  hasWinterFlag && CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Winter ||
+                  hasSpringFlag && (CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Spring);
+#else
                 eventMatchingCondition =
                     hasSummerFlag && CampaignTime.Now.GetSeasonOfYear == 1 ||
                     hasFallFlag && CampaignTime.Now.GetSeasonOfYear == 2 ||
                     hasWinterFlag && CampaignTime.Now.GetSeasonOfYear == 3 ||
                     hasSpringFlag && (CampaignTime.Now.GetSeasonOfYear == 4 || CampaignTime.Now.GetSeasonOfYear == 0);
+#endif
             }
 
             if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the seasons conditions.");
@@ -2186,7 +2207,7 @@ namespace CaptivityEvents.Events
 
             // Custom Flags
             if (PlayerEncounter.Current != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerIsNotBusy)) return Error("Skipping event " + _listEvent.Name + " Player is busy.");
-            if (Clan.PlayerClan.Companions.Count<Hero>() >= Clan.PlayerClan.CompanionLimit && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerAllowedCompanion)) return Error("Skipping event " + _listEvent.Name + " Player has too many companions.");
+            if (Clan.PlayerClan.Companions.Count() >= Clan.PlayerClan.CompanionLimit && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PlayerAllowedCompanion)) return Error("Skipping event " + _listEvent.Name + " Player has too many companions.");
 
             return true;
         }
@@ -2210,14 +2231,14 @@ namespace CaptivityEvents.Events
 
                         if (eventSettingFound.Key != null)
                         {
-                            if (!eventSettingFound.Value.WeightedChanceOfOccuring.Equals(""))
+                            if (!eventSettingFound.Value.WeightedChanceOfOccurring.Equals(""))
                             {
-                                if (_listEvent.OldWeightedChanceOfOccuring != null) _listEvent.OldWeightedChanceOfOccuring = _listEvent.WeightedChanceOfOccuring;
-                                _listEvent.WeightedChanceOfOccuring = eventSettingFound.Value.WeightedChanceOfOccuring;
+                                if (_listEvent.OldWeightedChanceOfOccurring != null) _listEvent.OldWeightedChanceOfOccurring = _listEvent.WeightedChanceOfOccurring;
+                                _listEvent.WeightedChanceOfOccurring = eventSettingFound.Value.WeightedChanceOfOccurring;
                             }
                             else
                             {
-                                if (_listEvent.OldWeightedChanceOfOccuring != null) _listEvent.WeightedChanceOfOccuring = _listEvent.OldWeightedChanceOfOccuring;
+                                if (_listEvent.OldWeightedChanceOfOccurring != null) _listEvent.WeightedChanceOfOccurring = _listEvent.OldWeightedChanceOfOccurring;
                             }
 
                             if (!eventSettingFound.Value.BackgroundName.Equals(""))
@@ -2227,7 +2248,7 @@ namespace CaptivityEvents.Events
                             }
                             else
                             {
-                                if (_listEvent.OldWeightedChanceOfOccuring != null) _listEvent.BackgroundName = _listEvent.OldBackgroundName;
+                                if (_listEvent.OldWeightedChanceOfOccurring != null) _listEvent.BackgroundName = _listEvent.OldBackgroundName;
                             }
                         }
                     }
@@ -2290,6 +2311,6 @@ namespace CaptivityEvents.Events
             return false;
         }
 
-        #endregion private
+#endregion private
     }
 }

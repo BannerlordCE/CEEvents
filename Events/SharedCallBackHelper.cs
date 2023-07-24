@@ -1,4 +1,4 @@
-﻿#define V112
+﻿#define V120
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -31,6 +31,7 @@ using static CaptivityEvents.CampaignBehaviors.CECampaignBehavior;
 using TaleWorlds.Library;
 using SandBox.Missions.MissionLogics;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.CampaignSystem.Settlements.Locations;
 
 namespace CaptivityEvents.Events
 {
@@ -199,7 +200,7 @@ namespace CaptivityEvents.Events
             try
             {
                 _listedEvent.Pregnancy.Mother.IsPregnant = false;
-                _listedEvent.Pregnancy.AlreadyOccured = true;
+                _listedEvent.Pregnancy.AlreadyOccurred = true;
 
                 ChangeWeight(_listedEvent.Pregnancy.Mother, 0, MBRandom.RandomFloatRanged(0.4025f, 0.6025f));
             }
@@ -986,31 +987,17 @@ namespace CaptivityEvents.Events
                                             CEPersistence.defeatEvent = null;
                                             return;
                                         }
-                                        // StartCommonAreaBattle RivalGangMovingInIssueBehavior
-                                        MobileParty customParty = MobileParty.CreateParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), null, null);
-
-                                        Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
-                                        clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
-
-                                        PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
-
-                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, Settlement.CurrentSettlement.GatePosition, 1f, 0.5f);
-                                        customParty.MemberRoster.Clear();
-                                        customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
-
-                                        TextObject textObject = new(_option.BattleSettings.EnemyName ?? "Bandits", null);
-                                        customParty.SetCustomName(textObject);
-
-                                        EnterSettlementAction.ApplyForParty(customParty, Settlement.CurrentSettlement);
-
-                                        PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, false);
 
                                         CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
-                                        CEPersistence.destroyParty = true;
+                                        CEPersistence.destroyParty = false;
                                         CEPersistence.surrenderParty = false;
 
-                                        PlayerEncounter.StartBattle();
-                                        
+                                        //PlayerEncounter StartVillageBattleMission
+                                        int wallLevel = Settlement.CurrentSettlement.Town.GetWallLevel();
+                                        string scene = Settlement.CurrentSettlement.LocationComplex.GetScene("center", wallLevel);
+                                        Location locationWithId = LocationComplex.Current.GetLocationWithId("center");
+
+                                        CampaignMission.OpenAlleyFightMission(scene, wallLevel, locationWithId, PartyBase.MainParty.MemberRoster, enemyTroops);
                                         break;
                                     }
                                 case "regularspawn":
@@ -1034,7 +1021,11 @@ namespace CaptivityEvents.Events
                                         customParty.SetCustomName(textObject);
 
                                         // InitBanditParty
+#if V120
+                                        customParty.Party.SetVisualAsDirty();
+#else
                                         customParty.Party.Visuals.SetMapIconAsDirty();
+#endif
                                         customParty.ActualClan = clan;
 
                                         // CreatePartyTrade
@@ -1074,7 +1065,11 @@ namespace CaptivityEvents.Events
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
+#if V120
+                                            AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.GetLogicalPosition())
+#else
                                             AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, MobileParty.MainParty.GetLogicalPosition())
+#endif
                                         };
                                         float timeOfDay = Campaign.CurrentTime % 24f;
                                         if (Campaign.Current != null)
@@ -1104,7 +1099,11 @@ namespace CaptivityEvents.Events
                                         customParty.SetCustomName(textObject);
 
                                         // InitBanditParty
+#if V120
+                                        customParty.Party.SetVisualAsDirty();
+#else
                                         customParty.Party.Visuals.SetMapIconAsDirty();
+#endif
                                         customParty.ActualClan = clan;
 
                                         // CreatePartyTrade
@@ -1143,7 +1142,11 @@ namespace CaptivityEvents.Events
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
+#if V120
+                                            AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.GetLogicalPosition())
+#else
                                             AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, MobileParty.MainParty.GetLogicalPosition())
+#endif
                                         };
                                         float timeOfDay = Campaign.CurrentTime % 24f;
                                         if (Campaign.Current != null)
@@ -1442,7 +1445,7 @@ namespace CaptivityEvents.Events
             }
         }
 
-        #endregion Consequences
+#endregion Consequences
 
         #region Icons
 
@@ -1584,7 +1587,7 @@ namespace CaptivityEvents.Events
 
                                 if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
                                 {
-                                    CECustomHandler.LogToFile("IgnoreAllOther detected - autofire " + triggeredEvent.Name);
+                                    CECustomHandler.LogToFile("IgnoreAllOther detected - auto fire " + triggeredEvent.Name);
                                     backgroundNames.Add(background.Name);
                                     break;
                                 }
@@ -1593,7 +1596,7 @@ namespace CaptivityEvents.Events
                                 {
                                     weightedChance = _variableLoader.GetIntFromXML(!string.IsNullOrWhiteSpace(background.Weight)
                                                                                   ? background.Weight
-                                                                                  : triggeredEvent.WeightedChanceOfOccuring);
+                                                                                  : triggeredEvent.WeightedChanceOfOccurring);
                                 }
                                 catch (Exception) { CECustomHandler.LogToFile("Missing EventWeight"); }
                             }

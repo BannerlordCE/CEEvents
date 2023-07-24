@@ -116,7 +116,9 @@
     <Compile Include="Notifications\CEEventMapNotificationItemVM.cs" />
     <Compile Include="Helper\CEHelper.cs" />
     <Compile Include="Notifications\CESceneNotification.cs" />
-    <Compile Include="Patches\CEHeroCreatorPatch.cs" />
+    <Compile Include="Patches\CEBKPatch.cs" />
+    <Compile Include="Patches\CEPatchAlleyCampaignBehavior.cs" />
+    <Compile Include="Patches\CEPatchHeroCreator.cs" />
     <Compile Include="Patches\CEPatchAttributes.cs" />
     <Compile Include="Patches\CEPatchBasicCharacterObject.cs" />
     <Compile Include="Patches\CEPatchCharacterObject.cs" />
@@ -417,7 +419,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Bannerlord.MCM">
-      <Version>5.7.1</Version>
+      <Version>5.8.0</Version>
     </PackageReference>
     <PackageReference Include="Lib.Harmony">
       <Version>2.2.2</Version>
