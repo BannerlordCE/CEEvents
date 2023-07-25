@@ -15,6 +15,7 @@ using TaleWorlds.Library;
 using TaleWorlds.Core.ViewModelCollection.Information;
 using System.Collections.Generic;
 using CaptivityEvents.Custom;
+using TaleWorlds.Core.ViewModelCollection.Selector;
 
 namespace CaptivityEvents.Brothel
 {
