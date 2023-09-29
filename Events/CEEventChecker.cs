@@ -1,4 +1,4 @@
-﻿#define V121
+﻿#define V115
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -187,7 +187,7 @@ namespace CaptivityEvents.Events
 
             Vec3? position3D = (captorParty != null && captorParty.IsMobile) ? captorParty?.MobileParty?.GetPosition() : captorParty?.Settlement?.GetPosition();
             List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
-#if V121
+#if V120
             AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel((Vec3)position3D);
 
             string environmentTerrainTypes = "";
@@ -932,16 +932,17 @@ namespace CaptivityEvents.Events
         private bool OwnerGenderCheck()
         {
             Hero owner = CECampaignBehavior.ExtraProps.Owner;
-            if (owner != null && owner.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsMale.");
-            if (owner != null && !owner.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsFemale.");
+            if ((owner == null || owner != null && owner.IsFemale) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsMale.");
+            if ((owner == null || owner != null && !owner.IsFemale) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsFemale.");
 
             return true;
         }
 
         private bool CaptorPartyGenderCheck(PartyBase captorParty)
         {
-            if (captorParty?.LeaderHero != null && captorParty.LeaderHero.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsMale.");
-            if (captorParty?.LeaderHero != null && !captorParty.LeaderHero.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale.");
+
+            if ((captorParty?.LeaderHero == null || captorParty?.LeaderHero != null && captorParty.LeaderHero.IsFemale) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsMale.");
+            if ((captorParty?.LeaderHero == null || captorParty?.LeaderHero != null && !captorParty.LeaderHero.IsFemale) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale.");
 
             return true;
         }

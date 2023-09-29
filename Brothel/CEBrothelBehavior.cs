@@ -1,4 +1,4 @@
-#define V120
+#define V115
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -1515,9 +1515,9 @@ namespace CaptivityEvents.Brothel
                         if (_brothelList[i].CaptiveProstitutes[y].IsHero)
                         {
                             if (_brothelList[i].CaptiveProstitutes[y].HeroObject.GetSkillValue(prostitutionSkill) < 50)
-                                new Dynamics().RenownModifier(MBRandom.RandomInt(-20, -5), _brothelList[i].CaptiveProstitutes[y].HeroObject, false);
+                                new Dynamics().RenownModifier(MBRandom.RandomInt(-3, -1), _brothelList[i].CaptiveProstitutes[y].HeroObject, false);
 
-                            new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(10, 20), _brothelList[i].CaptiveProstitutes[y].HeroObject);
+                            new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(1, 10), _brothelList[i].CaptiveProstitutes[y].HeroObject);
                         }
                     }
                 }

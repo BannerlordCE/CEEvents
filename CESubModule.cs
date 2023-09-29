@@ -1,4 +1,4 @@
-#define V120
+#define V115
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -708,8 +708,7 @@ namespace CaptivityEvents
             ResetHelper();
             if (!_isLoaded) return;
             InitializeAttributes(game);
-            CampaignGameStarter campaignStarter = (CampaignGameStarter)gameStarter;
-            AddBehaviors(campaignStarter);
+            AddBehaviors((CampaignGameStarter)gameStarter);
         }
 
         private void CleanBugs()

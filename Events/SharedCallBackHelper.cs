@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V115
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -768,7 +768,9 @@ namespace CaptivityEvents.Events
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Horse, horseEquipment);
                 }
 
-                if ((CESettings.Instance?.StolenGearQuest ?? true) && CEHelper.HelperMBRandom(100) < (CESettings.Instance?.StolenGearChance ?? 99) && questEnabled)
+                bool isEquipmentTheSame = new Equipment(Hero.MainHero.BattleEquipment).IsEquipmentEqualTo(randomElement) && new Equipment(Hero.MainHero.CivilianEquipment).IsEquipmentEqualTo(randomElement2);
+
+                if ((CESettings.Instance?.StolenGearQuest ?? true) && CEHelper.HelperMBRandom(100) < (CESettings.Instance?.StolenGearChance ?? 99) && questEnabled && !isEquipmentTheSame)
                 {
                     Hero issueOwner = null;
                     List<TextObject> listOfSettlements = new();
@@ -1445,7 +1447,7 @@ namespace CaptivityEvents.Events
             }
         }
 
-#endregion Consequences
+        #endregion Consequences
 
         #region Icons
 

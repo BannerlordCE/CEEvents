@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V115
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -13,7 +13,8 @@ using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
-
+using TaleWorlds.CampaignSystem.LogEntries;
+using TaleWorlds.CampaignSystem.Extensions;
 
 namespace CaptivityEvents.Events
 {
@@ -241,6 +242,9 @@ namespace CaptivityEvents.Events
                     textObject3.SetTextVariable("SPOUSE", randomSoldier.Name);
                     InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
 
+
+                    randomSoldier.SetHasMet();
+
                     CEHelper.spouseOne = randomSoldier;
                     CEHelper.spouseTwo = targetHero;
                     MakePregnantAction.Apply(targetHero);
@@ -251,7 +255,7 @@ namespace CaptivityEvents.Events
                 else if (forcePreg)
                 {
                     CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
-                    Hero randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.BornSettlement, null, null, CEHelper.HelperMBRandom(20) + 20);    
+                    Hero randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.BornSettlement, null, null, CEHelper.HelperMBRandom(20) + 20);
                     DisableHeroAction.Apply(randomSoldier);
                     CEHelper.spouseOne = randomSoldier;
                     CEHelper.spouseTwo = targetHero;
@@ -333,11 +337,12 @@ namespace CaptivityEvents.Events
                     InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
 
                     CEHelper.spouseOne = randomSoldier;
-                }
+                    randomSoldier.SetHasMet();
 
-                CEHelper.spouseTwo = targetHero;
-                MakePregnantAction.Apply(randomSoldier);
-                CEHelper.spouseOne = CEHelper.spouseTwo = null;
+                    CEHelper.spouseTwo = targetHero;
+                    MakePregnantAction.Apply(randomSoldier);
+                    CEHelper.spouseOne = CEHelper.spouseTwo = null;
+                }
 
                 //RelationsModifier(randomSoldier, 50, targetHero);
             }

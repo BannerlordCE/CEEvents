@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V115
 
 using CaptivityEvents.Config;
 using Helpers;
