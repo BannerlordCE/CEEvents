@@ -1,4 +1,4 @@
-#define V115
+#define V127
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -519,21 +519,13 @@ namespace CaptivityEvents.CampaignBehaviors
                     {
                         ChildbirthLogEntry childbirthLogEntry = new(mother, null);
                         LogEntry.AddLogEntry(childbirthLogEntry);
-#if V120
                         Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText(), CampaignTime.Now));
-#else
-                        Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText()));
-#endif
                     }
                     foreach (Hero newbornHero in aliveOffsprings)
                     {
                         ChildbirthLogEntry childbirthLogEntry2 = new(mother, newbornHero);
                         LogEntry.AddLogEntry(childbirthLogEntry2);
-#if V120
                         Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText(), CampaignTime.Now));
-#else
-                        Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(newbornHero, childbirthLogEntry2.GetEncyclopediaText()));
-#endif
                     }
                 }
 

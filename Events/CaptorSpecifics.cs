@@ -1,4 +1,4 @@
-﻿#define V115
+﻿#define V127
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -111,11 +111,7 @@ namespace CaptivityEvents.Events
             {
                 int prisonerCount = MobileParty.MainParty.PrisonRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
-#if V120
                 MobileParty.MainParty.PrisonRoster.KillNumberOfNonHeroTroopsRandomly(amount);
-#else
-                MobileParty.MainParty.PrisonRoster.KillNumberOfMenRandomly(amount, false);        
-#endif
                 if (releaseHeroes)
                 {
                     foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster.GetTroopRoster())
@@ -162,11 +158,7 @@ namespace CaptivityEvents.Events
                 if (amount == 0) return;
                 int prisonerCount = MobileParty.MainParty.PrisonRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
-#if V120
                 MobileParty.MainParty.PrisonRoster.KillNumberOfNonHeroTroopsRandomly(amount);
-#else
-                MobileParty.MainParty.PrisonRoster.KillNumberOfMenRandomly(amount, killHeroes);        
-#endif
                 TextObject textObject = GameTexts.FindText("str_CE_kill_prisoners");
                 textObject.SetTextVariable("HERO", Hero.MainHero.Name);
                 textObject.SetTextVariable("AMOUNT", amount);
@@ -324,11 +316,7 @@ namespace CaptivityEvents.Events
                     prisonerParty.ActualClan = clan;
 
                     prisonerParty.Party.SetCustomOwner(clan.Leader);
-#if V120
                     prisonerParty.Party.SetVisualAsDirty();
-#else
-                    prisonerParty.Party.Visuals.SetMapIconAsDirty();
-#endif
                     prisonerParty.InitializePartyTrade(0);
                     prisonerParty.SetCustomHomeSettlement(nearest);
 
@@ -352,11 +340,7 @@ namespace CaptivityEvents.Events
                         NeedsRandomTerrain = false,
                         PlayingInCampaignMode = true,
                         RandomTerrainSeed = MBRandom.RandomInt(10000),
-#if V120
                         AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.GetLogicalPosition())
-#else
-                        AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, MobileParty.MainParty.GetLogicalPosition())
-#endif
                     };
                     float timeOfDay = Campaign.CurrentTime % 24f;
                     if (Campaign.Current != null)

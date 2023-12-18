@@ -1,4 +1,4 @@
-﻿#define V115
+﻿#define V127
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -807,11 +807,7 @@ namespace CaptivityEvents.Events
                 if (amount == 0) return;
                 int prisonerCount = party.PrisonRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
-#if V120
                 party.PrisonRoster.KillNumberOfNonHeroTroopsRandomly(amount);
-#else
-                party.PrisonRoster.KillNumberOfMenRandomly(amount, killHeroes);        
-#endif
                 TextObject textObject = GameTexts.FindText("str_CE_kill_prisoners");
                 textObject.SetTextVariable("HERO", party.Name);
                 textObject.SetTextVariable("AMOUNT", amount);
@@ -849,11 +845,7 @@ namespace CaptivityEvents.Events
                 if (amount == 0) return;
                 int prisonerCount = party.MemberRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
-#if V120
                 party.MemberRoster.KillNumberOfNonHeroTroopsRandomly(amount);
-#else
-                party.MemberRoster.KillNumberOfMenRandomly(amount, killHeroes);        
-#endif
                 TextObject textObject = GameTexts.FindText("str_CE_kill_troops");
                 textObject.SetTextVariable("PARTY", party.Name);
                 textObject.SetTextVariable("AMOUNT", amount);

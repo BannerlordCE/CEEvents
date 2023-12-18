@@ -1,4 +1,4 @@
-﻿#define V115
+﻿#define V127
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -559,11 +559,7 @@ namespace CaptivityEvents.Events
                     customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
 
                     // InitBanditParty
-#if V120
                     customParty.Party.SetVisualAsDirty();
-#else
-                    customParty.Party.Visuals.SetMapIconAsDirty();
-#endif
                     customParty.ActualClan = clan;
 
                     customParty.IsActive = true;

@@ -1,4 +1,4 @@
-#define V115
+#define V127
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -106,7 +106,7 @@ namespace CaptivityEvents.Brothel
 
         private static void SellAllPrisoners()
         {
-            SellPrisonersAction.ApplyForAllPrisoners(MobileParty.MainParty, MobileParty.MainParty.PrisonRoster, Settlement.CurrentSettlement);
+            SellPrisonersAction.ApplyForSelectedPrisoners(PartyBase.MainParty, Settlement.CurrentSettlement.Party, MobilePartyHelper.GetPlayerPrisonersPlayerCanSell());
             GameMenu.SwitchToMenu("town_brothel");
         }
 

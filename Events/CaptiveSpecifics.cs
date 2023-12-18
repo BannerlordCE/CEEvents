@@ -1,4 +1,4 @@
-﻿#define V115
+﻿#define V127
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -128,11 +128,7 @@ namespace CaptivityEvents.Events
                     MobileParty.MainParty.IsActive = true;
                     PartyBase.MainParty.SetAsCameraFollowParty();
                     MobileParty.MainParty.Ai.SetMoveModeHold();
-#if V120
                     PartyBase.MainParty.UpdateVisibilityAndInspected(0f);
-#else
-                    PartyBase.MainParty.UpdateVisibilityAndInspected(0f, true);
-#endif
                 }
 
                 PlayerCaptivity.CaptorParty = null;

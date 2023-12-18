@@ -1,4 +1,4 @@
-#define V115
+#define V127
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -809,11 +809,7 @@ namespace CaptivityEvents
 
             if (_isLoadedInGame) return;
             //TooltipRefresherCollection RefreshWorkshopTooltip
-#if V120
             InformationManager.RegisterTooltip<CEBrothel, PropertyBasedTooltipVM>(new Action<PropertyBasedTooltipVM, object[]>(CEBrothelToolTip.BrothelTypeTooltipAction), "PropertyBasedTooltip");
-#else
-            PropertyBasedTooltipVM.AddTooltipType(typeof(CEBrothel), CEBrothelToolTip.BrothelTypeTooltipAction);
-#endif
             LoadBrothelSounds();
             _isLoadedInGame = true;
         }
@@ -1037,11 +1033,7 @@ namespace CaptivityEvents
                             }
 
                             CEPersistence.removeHero = null;
-#if V120
                             PartyBase.MainParty.SetVisualAsDirty();
-#else
-                            PartyBase.MainParty.Visuals.SetMapIconAsDirty();
-#endif
                         }
                         CEPersistence.captiveInventoryStage = 0;
                     }
