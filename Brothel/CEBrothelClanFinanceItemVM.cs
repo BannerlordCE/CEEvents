@@ -16,6 +16,8 @@ using TaleWorlds.Core.ViewModelCollection.Information;
 using System.Collections.Generic;
 using CaptivityEvents.Custom;
 using TaleWorlds.Core.ViewModelCollection.Selector;
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
+using TaleWorlds.CampaignSystem.ComponentInterfaces;
 
 namespace CaptivityEvents.Brothel
 {
@@ -44,7 +46,12 @@ namespace CaptivityEvents.Brothel
 
         public override void RefreshValues()
         {
-            base.RefreshValues();
+            //base.RefreshValues();
+            this.StoreOutputPercentageText = "N/A";
+            this.UseWarehouseAsInputText = "N/A";
+            this.WarehouseCapacityText = new TextObject("{=CEBROTHEL1103}Prostitute Capacity", null).ToString();
+            this.WarehouseCapacityValue = GameTexts.FindText("str_LEFT_over_RIGHT", null).SetTextVariable("LEFT", _brothel.CaptiveProstitutes.Count()).SetTextVariable("RIGHT", _brothel.CaptiveProstitutes.Count() < 10 ? 10 : _brothel.CaptiveProstitutes.Count()).ToString();
+
 
             // WORKAROUND IN 1.5.9
             if (_brothel == null) _brothel = new CEBrothel(Workshop.Settlement);
@@ -56,7 +63,7 @@ namespace CaptivityEvents.Brothel
             Income = (int)(Math.Max(0, _brothel.ProfitMade) / Campaign.Current.Models.ClanFinanceModel.RevenueSmoothenFraction()) * (_brothel.Level + 1);
 
             IncomeValueText = DetermineIncomeText(Income);
-            InputsText = new TextObject("{=CEBROTHEL0985}Description").ToString();
+            InputsText = new TextObject("{=CEBROTHEL1104}Regular Prostitutes").ToString();
             OutputsText = new TextObject("{=CEBROTHEL0994}Notable Prostitutes").ToString();
 
             ItemProperties.Clear();
@@ -64,13 +71,11 @@ namespace CaptivityEvents.Brothel
             PopulateStatsList();
         }
 
-
-
         public new void ExecuteManageWorkshop()
         {
             TextObject title = new("{=CEBROTHEL0975}Manage Brothel", null);
             ClanCardSelectionInfo obj = new(title, GetManageWorkshopItems(), new Action<List<object>, Action>(OnManageWorkshopDone), false);
-            Action<ClanCardSelectionInfo> openCardSelectionPopup = this._openCardSelectionPopup;
+            Action<ClanCardSelectionInfo> openCardSelectionPopup = _openCardSelectionPopup;
             openCardSelectionPopup?.Invoke(obj);
         }
 
@@ -93,10 +98,10 @@ namespace CaptivityEvents.Brothel
             TextObject disabledTextObject = new("You will need {AMOUNT} denars to begin operations again{\\?}.");
             textObject.SetTextVariable("AMOUNT", costToStart);
 
-   
+
 
             TextObject disabledReason2 = Hero.MainHero.Gold < costToStart && !isCurrentlyActive ? disabledTextObject : TextObject.Empty;
-            TextObject textObject2 = isCurrentlyActive  ? new TextObject("{=CEBROTHEL0995}Stop Operations") : new TextObject("{=CEBROTHEL0996}Start Operations");
+            TextObject textObject2 = isCurrentlyActive ? new TextObject("{=CEBROTHEL0995}Stop Operations") : new TextObject("{=CEBROTHEL0996}Start Operations");
             CharacterObject townswoman = CharacterObject.CreateFrom(_brothel.Settlement.Culture.TavernWench);
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
             ImageIdentifier image2 = new(CampaignUIHelper.GetCharacterCode(townswoman, true));
@@ -125,7 +130,7 @@ namespace CaptivityEvents.Brothel
                         ExecuteSellBrothel(selectedItems);
                     }
                 }
-            } 
+            }
             catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("OnManageWorkshopDone : " + e);
@@ -151,12 +156,11 @@ namespace CaptivityEvents.Brothel
                 ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=*}Last Run").ToString(), textObject.ToString()));
             }
 
-            InputProducts = GameTexts.FindText("str_CE_brothel_description", _brothel.IsRunning
-                                                   ? null
-                                                   : "inactive").ToString();
-  
-
+            InputProducts = "";
             OutputProducts = string.Join(",", _brothel.CaptiveProstitutes.Where(c => c.IsHero).Select(c => c.HeroObject.Name.ToString()).ToArray());
+
+            WarehouseInputAmount = _brothel.CaptiveProstitutes.Where(c => !c.IsHero).Count();
+            WarehouseOutputAmount = _brothel.CaptiveProstitutes.Where(c => c.IsHero).Count();
         }
 
         private new void ExecuteBeginWorkshopHint()
@@ -207,62 +211,330 @@ namespace CaptivityEvents.Brothel
             onRefresh?.Invoke();
         }
 
-        public new string WorkshopTypeId
+        private CEBrothel _brothel;
+
+        [DataSourceProperty]
+        public new HintViewModel UseWarehouseAsInputHint
         {
-            get => _workshopTypeId;
+            get
+            {
+                return _useWarehouseAsInputHint;
+            }
             set
             {
-                if (value == _workshopTypeId) return;
-                _workshopTypeId = value;
-                OnPropertyChangedWithValue(value, "WorkshopTypeId");
+                if (value != _useWarehouseAsInputHint)
+                {
+                    _useWarehouseAsInputHint = value;
+                    OnPropertyChangedWithValue(value, "UseWarehouseAsInputHint");
+                }
+            }
+        }
+
+        [DataSourceProperty]
+        public new HintViewModel StoreOutputPercentageHint
+        {
+            get
+            {
+                return _storeOutputPercentageHint;
+            }
+            set
+            {
+                if (value != _storeOutputPercentageHint)
+                {
+                    _storeOutputPercentageHint = value;
+                    OnPropertyChangedWithValue(value, "StoreOutputPercentageHint");
+                }
+            }
+        }
+
+        [DataSourceProperty]
+        public new HintViewModel ManageWorkshopHint
+        {
+            get
+            {
+                return _manageWorkshopHint;
+            }
+            set
+            {
+                if (value != _manageWorkshopHint)
+                {
+                    _manageWorkshopHint = value;
+                    OnPropertyChangedWithValue(value, "ManageWorkshopHint");
+                }
+            }
+        }
+
+        [DataSourceProperty]
+        public new BasicTooltipViewModel InputWarehouseCountsTooltip
+        {
+            get
+            {
+                return _inputWarehouseCountsTooltip;
+            }
+            set
+            {
+                if (value != _inputWarehouseCountsTooltip)
+                {
+                    _inputWarehouseCountsTooltip = value;
+                    OnPropertyChangedWithValue(value, "InputWarehouseCountsTooltip");
+                }
+            }
+        }
+
+        [DataSourceProperty]
+        public new BasicTooltipViewModel OutputWarehouseCountsTooltip
+        {
+            get
+            {
+                return _outputWarehouseCountsTooltip;
+            }
+            set
+            {
+                if (value != _outputWarehouseCountsTooltip)
+                {
+                    _outputWarehouseCountsTooltip = value;
+                    OnPropertyChangedWithValue(value, "OutputWarehouseCountsTooltip");
+                }
+            }
+        }
+
+        public new string WorkshopTypeId
+        {
+            get
+            {
+                return _workshopTypeId;
+            }
+            set
+            {
+                if (value != _workshopTypeId)
+                {
+                    _workshopTypeId = value;
+                    OnPropertyChangedWithValue(value, "WorkshopTypeId");
+                }
             }
         }
 
         public new string InputsText
         {
-            get => _inputsText;
+            get
+            {
+                return _inputsText;
+            }
             set
             {
-                if (value == _inputsText) return;
-                _inputsText = value;
-                OnPropertyChangedWithValue(value, "InputsText");
+                if (value != _inputsText)
+                {
+                    _inputsText = value;
+                    OnPropertyChangedWithValue(value, "InputsText");
+                }
             }
         }
 
         public new string OutputsText
         {
-            get => _outputsText;
+            get
+            {
+                return _outputsText;
+            }
             set
             {
-                if (value == _outputsText) return;
-                _outputsText = value;
-                OnPropertyChangedWithValue(value, "OutputsText");
+                if (value != _outputsText)
+                {
+                    _outputsText = value;
+                    OnPropertyChangedWithValue(value, "OutputsText");
+                }
             }
         }
 
         public new string InputProducts
         {
-            get => _inputProducts;
+            get
+            {
+                return _inputProducts;
+            }
             set
             {
-                if (value == _inputProducts) return;
-                _inputProducts = value;
-                OnPropertyChangedWithValue(value, "InputProducts");
+                if (value != _inputProducts)
+                {
+                    _inputProducts = value;
+                    OnPropertyChangedWithValue(value, "InputProducts");
+                }
             }
         }
 
         public new string OutputProducts
         {
-            get => _outputProducts;
+            get
+            {
+                return _outputProducts;
+            }
             set
             {
-                if (value == _outputProducts) return;
-                _outputProducts = value;
-                OnPropertyChangedWithValue(value, "OutputProducts");
+                if (value != _outputProducts)
+                {
+                    _outputProducts = value;
+                    OnPropertyChangedWithValue(value, "OutputProducts");
+                }
             }
         }
 
-        private CEBrothel _brothel;
+        public new string UseWarehouseAsInputText
+        {
+            get
+            {
+                return _useWarehouseAsInputText;
+            }
+            set
+            {
+                if (value != _useWarehouseAsInputText)
+                {
+                    _useWarehouseAsInputText = value;
+                    OnPropertyChangedWithValue(value, "UseWarehouseAsInputText");
+                }
+            }
+        }
+
+        public new string StoreOutputPercentageText
+        {
+            get
+            {
+                return _storeOutputPercentageText;
+            }
+            set
+            {
+                if (value != _storeOutputPercentageText)
+                {
+                    _storeOutputPercentageText = value;
+                    OnPropertyChangedWithValue(value, "StoreOutputPercentageText");
+                }
+            }
+        }
+
+        public new string WarehouseCapacityText
+        {
+            get
+            {
+                return _warehouseCapacityText;
+            }
+            set
+            {
+                if (value != _warehouseCapacityText)
+                {
+                    _warehouseCapacityText = value;
+                    OnPropertyChangedWithValue(value, "WarehouseCapacityText");
+                }
+            }
+        }
+
+        public new string WarehouseCapacityValue
+        {
+            get
+            {
+                return _warehouseCapacityValue;
+            }
+            set
+            {
+                if (value != _warehouseCapacityValue)
+                {
+                    _warehouseCapacityValue = value;
+                    OnPropertyChangedWithValue(value, "WarehouseCapacityValue");
+                }
+            }
+        }
+
+        public new bool ReceiveInputFromWarehouse
+        {
+            get
+            {
+                return _receiveInputFromWarehouse;
+            }
+            set
+            {
+                if (value != _receiveInputFromWarehouse)
+                {
+                    _receiveInputFromWarehouse = value;
+                    OnPropertyChangedWithValue(value, "ReceiveInputFromWarehouse");
+                }
+            }
+        }
+
+        public new int WarehouseInputAmount
+        {
+            get
+            {
+                return _warehouseInputAmount;
+            }
+            set
+            {
+                if (value != _warehouseInputAmount)
+                {
+                    _warehouseInputAmount = value;
+                    OnPropertyChangedWithValue(value, "WarehouseInputAmount");
+                }
+            }
+        }
+
+        public new int WarehouseOutputAmount
+        {
+            get
+            {
+                return _warehouseOutputAmount;
+            }
+            set
+            {
+                if (value != _warehouseOutputAmount)
+                {
+                    _warehouseOutputAmount = value;
+                    OnPropertyChangedWithValue(value, "WarehouseOutputAmount");
+                }
+            }
+        }
+
+        public new SelectorVM<WorkshopPercentageSelectorItemVM> WarehousePercentageSelector
+        {
+            get
+            {
+                return _warehousePercentageSelector;
+            }
+            set
+            {
+                if (value != _warehousePercentageSelector)
+                {
+                    _warehousePercentageSelector = value;
+                    OnPropertyChangedWithValue(value, "WarehousePercentageSelector");
+                }
+            }
+        }
+
+        private readonly TextObject _runningText = new("{=iuKvbKJ7}Running", null);
+
+        private readonly TextObject _haltedText = new("{=zgnEagTJ}Halted", null);
+
+        private readonly TextObject _noRawMaterialsText = new("{=JRKC4ed4}This workshop has not been producing for {DAY} {?PLURAL_DAYS}days{?}day{\\?} due to lack of raw materials in the town market.", null);
+
+        private readonly TextObject _noProfitText = new("{=no0chrAH}This workshop has not been running for {DAY} {?PLURAL_DAYS}days{?}day{\\?} because the production has not been profitable", null);
+
+        private readonly IWorkshopWarehouseCampaignBehavior _workshopWarehouseBehavior;
+
+        private readonly WorkshopModel _workshopModel;
+
+        private readonly Action<ClanCardSelectionInfo> _openCardSelectionPopup;
+
+        private readonly Action<ClanFinanceWorkshopItemVM> _onSelectionT;
+
+        private ExplainedNumber _inputDetails;
+
+        private ExplainedNumber _outputDetails;
+
+        private HintViewModel _useWarehouseAsInputHint;
+
+        private HintViewModel _storeOutputPercentageHint;
+
+        private HintViewModel _manageWorkshopHint;
+
+        private BasicTooltipViewModel _inputWarehouseCountsTooltip;
+
+        private BasicTooltipViewModel _outputWarehouseCountsTooltip;
 
         private string _workshopTypeId;
 
@@ -274,9 +546,21 @@ namespace CaptivityEvents.Brothel
 
         private string _outputProducts;
 
-        private readonly Action<ClanCardSelectionInfo> _openCardSelectionPopup;
+        private string _useWarehouseAsInputText;
 
-        private Action<ClanFinanceWorkshopItemVM> _onSelectionT;
+        private string _storeOutputPercentageText;
+
+        private string _warehouseCapacityText;
+
+        private string _warehouseCapacityValue;
+
+        private bool _receiveInputFromWarehouse;
+
+        private int _warehouseInputAmount;
+
+        private int _warehouseOutputAmount;
+
+        private SelectorVM<WorkshopPercentageSelectorItemVM> _warehousePercentageSelector;
 
     }
 }

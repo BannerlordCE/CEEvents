@@ -20,7 +20,7 @@ using TaleWorlds.CampaignSystem.Actions;
 
 namespace CaptivityEvents.Patches
 {
-#if V112
+
     // TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories ClanIncomeVM
     [HarmonyPatch(typeof(ClanIncomeVM), "RefreshList")]
     internal class CEPatchClanIncomeVM
@@ -41,11 +41,10 @@ namespace CaptivityEvents.Patches
             {
                 foreach (CEBrothel brothel in CEBrothelBehavior.GetPlayerBrothels())
                 {
-                    Workshop workshop = new(brothel.Settlement, brothel.Name.ToString());
+                    Workshop workshop = new(brothel.Settlement, "_brothel_" + (brothel.Settlement.StringId ?? ""));
                     WorkshopType workshopType = WorkshopType.Find("brewery");
 
-
-                    workshop.SetWorkshop(brothel.Owner, workshopType, brothel.Capital, true, 0, 1, brothel.Name);
+                    InitializeWorkshopAction.ApplyByNewGame(workshop, brothel.Owner, workshopType);
 
                     try
                     {
@@ -71,7 +70,7 @@ namespace CaptivityEvents.Patches
                 int count = CEBrothelBehavior.GetPlayerBrothels().Count;
                 GameTexts.SetVariable("STR1", GameTexts.FindText("str_CE_properties", null));
                 GameTexts.SetVariable("LEFT", Hero.MainHero.OwnedWorkshops.Count + count);
-                GameTexts.SetVariable("RIGHT", Campaign.Current.Models.WorkshopModel.GetMaxWorkshopCountForTier(Clan.PlayerClan.Tier) + count);
+                GameTexts.SetVariable("RIGHT", Campaign.Current.Models.WorkshopModel.GetMaxWorkshopCountForClanTier(Clan.PlayerClan.Tier) + count);
                 GameTexts.SetVariable("STR2", GameTexts.FindText("str_LEFT_over_RIGHT_in_paranthesis", null));
                 __instance.WorkshopText = GameTexts.FindText("str_STR1_space_STR2", null).ToString();
 
@@ -85,6 +84,5 @@ namespace CaptivityEvents.Patches
             }
         }
     }
-#endif
 
 }

@@ -9,6 +9,9 @@ using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.GameComponents;
 using CaptivityEvents.Custom;
+using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance;
+using TaleWorlds.Core.ViewModelCollection.Selector;
+using TaleWorlds.Core;
 
 namespace CaptivityEvents.Patches
 {

@@ -118,6 +118,7 @@
     <Compile Include="Notifications\CESceneNotification.cs" />
     <Compile Include="Patches\CEBKPatch.cs" />
     <Compile Include="Patches\CEPatchAlleyCampaignBehavior.cs" />
+    <Compile Include="Patches\CEPatchClanFinanceWorkshipItemVM.cs" />
     <Compile Include="Patches\CEPatchHeroCreator.cs" />
     <Compile Include="Patches\CEPatchAttributes.cs" />
     <Compile Include="Patches\CEPatchBasicCharacterObject.cs" />
