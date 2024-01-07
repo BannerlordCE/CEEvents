@@ -50,7 +50,9 @@ namespace CaptivityEvents.Brothel
             this.StoreOutputPercentageText = "N/A";
             this.UseWarehouseAsInputText = "N/A";
             this.WarehouseCapacityText = new TextObject("{=CEBROTHEL1103}Prostitute Capacity", null).ToString();
-            this.WarehouseCapacityValue = GameTexts.FindText("str_LEFT_over_RIGHT", null).SetTextVariable("LEFT", _brothel.CaptiveProstitutes.Count()).SetTextVariable("RIGHT", _brothel.CaptiveProstitutes.Count() < 10 ? 10 : _brothel.CaptiveProstitutes.Count()).ToString();
+
+            var count = _brothel?.CaptiveProstitutes?.Count() ?? 0;
+            this.WarehouseCapacityValue = GameTexts.FindText("str_LEFT_over_RIGHT", null).SetTextVariable("LEFT", count).SetTextVariable("RIGHT", count < 10 ? 10 : count).ToString();
 
 
             // WORKAROUND IN 1.5.9

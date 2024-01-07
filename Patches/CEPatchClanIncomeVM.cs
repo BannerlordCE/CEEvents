@@ -44,7 +44,7 @@ namespace CaptivityEvents.Patches
                     Workshop workshop = new(brothel.Settlement, "_brothel_" + (brothel.Settlement.StringId ?? ""));
                     WorkshopType workshopType = WorkshopType.Find("brewery");
 
-                    InitializeWorkshopAction.ApplyByNewGame(workshop, brothel.Owner, workshopType);
+                    workshop.InitializeWorkshop(brothel.Owner, workshopType);
 
                     try
                     {
