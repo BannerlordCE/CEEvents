@@ -56,7 +56,7 @@ namespace CaptivityEvents.Events
                         }
                         else
                         {
-                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring");
+                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring for " + listEvent.Name);
                         }
 
                         for (int a = weightedChance; a > 0; a--) eventNames.Add(listEvent.Name);
