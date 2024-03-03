@@ -238,7 +238,7 @@ namespace CaptivityEvents.Events
             ReqCaptorSkills(ref args);
             ReqGold(ref args);
 
-            return true;
+            return _sharedCallBackHelper.ShouldHide(ref args);
         }
 
         internal void CaptiveEventOptionConsequenceGameMenu(MenuCallbackArgs args)

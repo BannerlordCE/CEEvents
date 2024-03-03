@@ -1521,6 +1521,14 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid GiveItem"); }
         }
 
+
+        internal bool ShouldHide(ref MenuCallbackArgs args)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.UnavailableIsInvisible)) return true;
+
+            return args.IsEnabled;
+        }
+
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {
             try

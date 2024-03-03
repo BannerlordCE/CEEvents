@@ -567,7 +567,7 @@ namespace CaptivityEvents.Events
                 {
                     RemoveFactionLeader(firstHero);
 
-                    if (firstHero.PartyBelongedTo != null && clan != null && !firstHero.IsHumanPlayerCharacter)
+                    if (firstHero.PartyBelongedTo != null && clan != null)
                     {
                         if (clan.Kingdom != newClan.Kingdom)
                         {

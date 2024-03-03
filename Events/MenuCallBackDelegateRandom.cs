@@ -204,7 +204,7 @@ namespace CaptivityEvents.Events
             ReqTrait(ref args);
             ReqGold(ref args);
 
-            return true;
+            return _sharedCallBackHelper.ShouldHide(ref args);
         }
 
         internal void RandomEventConsequenceMenuOption(MenuCallbackArgs args)
