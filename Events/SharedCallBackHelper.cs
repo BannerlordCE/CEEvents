@@ -187,7 +187,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-                CheckOffspringsToDeliver(_listedEvent.Pregnancy);
+                CheckOffspringToDeliver(_listedEvent.Pregnancy);
             }
             catch (Exception e) { CECustomHandler.LogToFile("Invalid ConsequenceGiveBirth : " + e); }
 
