@@ -19,7 +19,7 @@ namespace CaptivityEvents.Patches
     {
         public static AccessTools.FieldRef<BasicCharacterObject, MBCharacterSkills> MBCharacterSkills = AccessTools.FieldRefAccess<BasicCharacterObject, MBCharacterSkills>("DefaultCharacterSkills");
 
-        static readonly List<MBGUID> ms = new();
+        static readonly List<MBGUID> ms = [];
 
         [HarmonyPatch("GetSkillValue")]
         [HarmonyPrefix]

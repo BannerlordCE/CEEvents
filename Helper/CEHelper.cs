@@ -26,7 +26,7 @@ namespace CaptivityEvents.Helper
             return settlement.IsCastle ? "castle" : settlement.IsTown ? "town" : "village";
         }
 
-        private static readonly string[] _validCultures = new string[] { "aserai", "battania", "empire", "khuzait", "sturgia", "vlandia"};
+        private static readonly string[] _validCultures = ["aserai", "battania", "empire", "khuzait", "sturgia", "vlandia"];
 
         public static string CustomSceneToPlay(string sceneToPlay, PartyBase partyBase)
         {
@@ -39,7 +39,7 @@ namespace CaptivityEvents.Helper
 
                     if (!_validCultures.Contains(locationCulture)) locationCulture = "empire";
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     locationCulture = "empire";
                 }
@@ -58,12 +58,12 @@ namespace CaptivityEvents.Helper
                 sceneToPlay = sceneToPlay.Replace("$location", CurrentLocation(partyBase.Settlement ?? SettlementHelper.FindNearestSettlement((Settlement x) => true, partyBase.IsMobile ? partyBase.MobileParty : MobileParty.MainParty)));
             }
 
-            string[] e = new string[]
-            {
+            string[] e =
+            [
                 "01",
                 "02",
                 "03"
-            };
+            ];
 
             if (sceneToPlay.Contains("$randomize"))
             {
@@ -88,12 +88,12 @@ namespace CaptivityEvents.Helper
                 sceneToPlay = sceneToPlay.Replace("$location", CurrentLocation(settlement));
             }
 
-            string[] e = new string[]
-            {
+            string[] e =
+            [
                 "01",
                 "02",
                 "03"
-            };
+            ];
 
             if (sceneToPlay.Contains("$randomize"))
             {
@@ -120,7 +120,7 @@ namespace CaptivityEvents.Helper
 
         public static int HelperMBRandom(int minValue, int maxValue)
         {
-            return MBRandom.RandomInt(maxValue);
+            return MBRandom.RandomInt(minValue, maxValue);
         }
 
         public enum EquipmentCustomIndex
@@ -153,7 +153,7 @@ namespace CaptivityEvents.Helper
         public static bool progressEventExists = false;
         public static bool progressEventCheck = false;
 
-        public static List<CEDelayedEvent> delayedEvents = new();
+        public static List<CEDelayedEvent> delayedEvents = [];
 
         internal static void SetSkillValue(Hero hero, SkillObject skillObject, int value)
         {
@@ -164,7 +164,7 @@ namespace CaptivityEvents.Helper
             }
             else
             {
-                mi.Invoke(hero, new object[] { skillObject, value });
+                mi.Invoke(hero, [skillObject, value]);
             }
         }
 
@@ -178,9 +178,9 @@ namespace CaptivityEvents.Helper
 
         internal static List<string> GetModulePaths(string[] modulesFound, out List<ModuleInfo> modules)
         {
-            List<string> modulePaths = new();
+            List<string> modulePaths = [];
 
-            List<ModuleInfo> findingModules = new();
+            List<ModuleInfo> findingModules = [];
 
             foreach (string moduleID in modulesFound)
             {

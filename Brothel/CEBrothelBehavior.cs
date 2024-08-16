@@ -34,7 +34,7 @@ namespace CaptivityEvents.Brothel
 {
     internal class CEBrothelBehavior : CampaignBehaviorBase
     {
-        public static Location _brothel = new("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanAlways", "CanAlways", "CanNever", "CanNever", new[] { "empire_house_c_tavern_a", "empire_house_c_tavern_a", "empire_house_c_tavern_a", "empire_house_c_tavern_a" }, null);
+        public static Location _brothel = new("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanAlways", "CanAlways", "CanNever", "CanNever", ["empire_house_c_tavern_a", "empire_house_c_tavern_a", "empire_house_c_tavern_a", "empire_house_c_tavern_a"], null);
 
         public static bool _isBrothelInitialized;
 
@@ -1034,7 +1034,7 @@ namespace CaptivityEvents.Brothel
         }
 
         // Prostitute Conditions
-        private static readonly string[] prostituteStrings = { "prostitute_confident", "prostitute_confident", "prostitute_tired" };
+        private static readonly string[] prostituteStrings = ["prostitute_confident", "prostitute_confident", "prostitute_tired"];
 
         private bool ConversationWithCaptive() => Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.HeroState == Hero.CharacterStates.Prisoner && ContainsPrisoner(Hero.OneToOneConversationHero.CharacterObject);
 
@@ -1201,11 +1201,11 @@ namespace CaptivityEvents.Brothel
         }
 
         // Customer Conditions
-        private static readonly string[] CustomerStrings = { "customer_confident", "customer_tired" };
+        private static readonly string[] CustomerStrings = ["customer_confident", "customer_tired"];
 
-        private static readonly string[] Responses = { "{=CEBROTHEL1019}That's too much, no thanks.", "{=CEBROTHEL1049}Alright, here you go." };
+        private static readonly string[] Responses = ["{=CEBROTHEL1019}That's too much, no thanks.", "{=CEBROTHEL1049}Alright, here you go."];
 
-        private static readonly string[] RageResponses = { "{=CEBROTHEL1065}Well perhaps you should, you sure look like a {?PLAYER.GENDER}whore{?}prostitute{\\?}!", "{=CEBROTHEL1066}My apologies, {?PLAYER.GENDER}milady{?}my lord{\\?}!" };
+        private static readonly string[] RageResponses = ["{=CEBROTHEL1065}Well perhaps you should, you sure look like a {?PLAYER.GENDER}whore{?}prostitute{\\?}!", "{=CEBROTHEL1066}My apologies, {?PLAYER.GENDER}milady{?}my lord{\\?}!"];
 
         private bool ConversationWithCustomerNotMetRequirements() => CharacterObject.OneToOneConversationCharacter.StringId.StartsWith("customer") && (!Hero.MainHero.IsFemale && !CharacterObject.OneToOneConversationCharacter.IsFemale || Campaign.Current.IsMainHeroDisguised);
 
@@ -1582,7 +1582,7 @@ namespace CaptivityEvents.Brothel
             {
                 CECustomHandler.ForceLogToFile("Failed to get player owned brothels.");
 
-                return new List<CEBrothel>();
+                return [];
             }
         }
 
@@ -1594,7 +1594,7 @@ namespace CaptivityEvents.Brothel
             }
             catch (Exception)
             {
-                _brothelList = new List<CEBrothel>();
+                _brothelList = [];
                 return false;
             }
         }
@@ -1665,7 +1665,7 @@ namespace CaptivityEvents.Brothel
                             }
                         }
                     }
-                    _brothelList[i].CaptiveProstitutes = new List<CharacterObject>();
+                    _brothelList[i].CaptiveProstitutes = [];
                 }
             }
             catch (Exception e)
@@ -1686,7 +1686,7 @@ namespace CaptivityEvents.Brothel
                 CECustomHandler.ForceLogToFile("Failed on FetchBrothelPrisoners: " + e);
             }
 
-            return new List<CharacterObject>();
+            return [];
         }
 
         public static void SetBrothelPrisoners(Settlement settlement, TroopRoster prisoners)
@@ -1699,7 +1699,7 @@ namespace CaptivityEvents.Brothel
 
                 int index = _brothelList.FindIndex(brothel => brothel.Settlement.StringId == settlement.StringId);
 
-                List<string> captivesFreed = new();
+                List<string> captivesFreed = [];
 
                 foreach (CharacterObject captive in _brothelList[index].CaptiveProstitutes)
                 {
@@ -1842,12 +1842,12 @@ namespace CaptivityEvents.Brothel
                 }
                 Hero.MainHero.ChangeHeroGold(brothelCost * (brothel.Level + 1));
             }
-            _brothelList = new List<CEBrothel>();
+            _brothelList = [];
         }
 
-        private static List<CEBrothel> _brothelList = new();
+        private static List<CEBrothel> _brothelList = [];
 
-        private List<Settlement> SettlementsThatPlayerHasSpy = new();
+        private List<Settlement> SettlementsThatPlayerHasSpy = [];
 
         private const int prostitutionCost = 60;
 

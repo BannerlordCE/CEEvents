@@ -291,7 +291,7 @@ namespace CaptivityEvents.Events
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
         {
             CaptorSpecifics captorSpecifics = new();
-            List<CEEvent> eventNames = new();
+            List<CEEvent> eventNames = [];
 
             try
             {
@@ -400,7 +400,7 @@ namespace CaptivityEvents.Events
         private void ConsequenceRandomEventTrigger(ref MenuCallbackArgs args)
         {
             CaptorSpecifics captorSpecifics = new();
-            List<CEEvent> eventNames = new();
+            List<CEEvent> eventNames = [];
 
             try
             {
@@ -539,6 +539,11 @@ namespace CaptivityEvents.Events
                 }
 
                 PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter);
+
+                if(PartyBase.MainParty.SiegeEvent != null)
+                {
+                    LiftSiegeAction.GetGameAction(PartyBase.MainParty.MobileParty);
+                }
 
                 if (!enemyTroops.GetTroopRoster().IsEmpty())
                 {

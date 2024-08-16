@@ -361,7 +361,7 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
         {
-            List<CEEvent> eventNames = new();
+            List<CEEvent> eventNames = [];
 
             try
             {
@@ -453,7 +453,7 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceRandomEventTrigger(ref MenuCallbackArgs args)
         {
-            List<CEEvent> eventNames = new();
+            List<CEEvent> eventNames = [];
 
             try
             {

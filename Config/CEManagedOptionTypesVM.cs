@@ -332,7 +332,7 @@ namespace CaptivityEvents.Config
             {
                 if (selectableOptionNames.All((SelectionData n) => n.IsLocalizationId))
                 {
-                    List<TextObject> list = new();
+                    List<TextObject> list = [];
                     foreach (SelectionData selectionData in selectableOptionNames)
                     {
                         TextObject item = Module.CurrentModule.GlobalTextManager.FindText(selectionData.Data, null);
@@ -342,7 +342,7 @@ namespace CaptivityEvents.Config
                     goto IL_183;
                 }
             }
-            List<string> list2 = new();
+            List<string> list2 = [];
             foreach (SelectionData selectionData2 in selectableOptionNames)
             {
                 if (selectionData2.IsLocalizationId)

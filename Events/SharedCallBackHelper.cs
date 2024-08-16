@@ -35,22 +35,15 @@ using TaleWorlds.CampaignSystem.Settlements.Locations;
 
 namespace CaptivityEvents.Events
 {
-    public class SharedCallBackHelper
+    public class SharedCallBackHelper(CEEvent listedEvent, Option option, List<CEEvent> eventList)
     {
-        private readonly CEEvent _listedEvent;
-        private readonly List<CEEvent> _eventList;
-        private readonly Option _option;
+        private readonly CEEvent _listedEvent = listedEvent;
+        private readonly List<CEEvent> _eventList = eventList;
+        private readonly Option _option = option;
 
         private readonly Dynamics _dynamics = new();
         private readonly ScoresCalculation _score = new();
         private readonly CEVariablesLoader _variableLoader = new();
-
-        public SharedCallBackHelper(CEEvent listedEvent, Option option, List<CEEvent> eventList)
-        {
-            _listedEvent = listedEvent;
-            _option = option;
-            _eventList = eventList;
-        }
 
         #region Consequences
 
@@ -773,7 +766,7 @@ namespace CaptivityEvents.Events
                 if ((CESettings.Instance?.StolenGearQuest ?? true) && CEHelper.HelperMBRandom(100) < (CESettings.Instance?.StolenGearChance ?? 99) && questEnabled && !isEquipmentTheSame)
                 {
                     Hero issueOwner = null;
-                    List<TextObject> listOfSettlements = new();
+                    List<TextObject> listOfSettlements = [];
 
                     while (issueOwner == null)
                     {
@@ -944,7 +937,7 @@ namespace CaptivityEvents.Events
 
                             if (!CEPersistence.playerTroops.IsEmpty())
                             {
-                                List<CharacterObject> list = new();
+                                List<CharacterObject> list = [];
                                 int num = _variableLoader.GetIntFromXML(_option.BattleSettings.PlayerTroops);
                                 foreach (TroopRosterElement troopRosterElement in from t in CEPersistence.playerTroops
                                                                                   orderby t.Character.Level descending
@@ -1185,6 +1178,7 @@ namespace CaptivityEvents.Events
 
                 if (soundToPlay == null) return;
                 int soundIndex = SoundEvent.GetEventIdFromString(soundToPlay);
+
                 if (soundIndex != -1)
                 {
                     Campaign campaign = Campaign.Current;
@@ -1542,7 +1536,7 @@ namespace CaptivityEvents.Events
 
                 if (_listedEvent.Backgrounds != null)
                 {
-                    List<string> backgroundNames = new();
+                    List<string> backgroundNames = [];
                     foreach (Background background in _listedEvent.Backgrounds)
                     {
                         try

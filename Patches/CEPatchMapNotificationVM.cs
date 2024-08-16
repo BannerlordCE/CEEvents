@@ -31,7 +31,7 @@ namespace CaptivityEvents.Patches
                 {
                     CEHelper.notificationCaptorExists = false;
                     new CESubModule().LoadCampaignNotificationTexture("default");
-                    RemoveNotificationItem.Invoke(__instance, new object[] { item });
+                    RemoveNotificationItem.Invoke(__instance, [item]);
                 };
 
                 mapNotification = new CECaptorMapNotificationItemVM(data);
@@ -47,7 +47,7 @@ namespace CaptivityEvents.Patches
                 {
                     CEHelper.notificationEventExists = false;
                     new CESubModule().LoadCampaignNotificationTexture("default", 1);
-                    RemoveNotificationItem.Invoke(__instance, new object[] { item });
+                    RemoveNotificationItem.Invoke(__instance, [item]);
                 };
 
                 mapNotification = new CEEventMapNotificationItemVM(data);

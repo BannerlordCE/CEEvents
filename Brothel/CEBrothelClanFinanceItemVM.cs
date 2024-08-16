@@ -56,7 +56,7 @@ namespace CaptivityEvents.Brothel
 
 
             // WORKAROUND IN 1.5.9
-            if (_brothel == null) _brothel = new CEBrothel(Workshop.Settlement);
+            _brothel ??= new CEBrothel(Workshop.Settlement);
 
             Name = _brothel.Name.ToString();
             WorkshopType workshopType = WorkshopType.Find("brewery");
@@ -141,7 +141,7 @@ namespace CaptivityEvents.Brothel
 
         protected override void PopulateStatsList()
         {
-            if (_brothel == null) _brothel = new CEBrothel(Workshop.Settlement);
+            _brothel ??= new CEBrothel(Workshop.Settlement);
 
             ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0976}Level").ToString(), _brothel.Level.ToString()));
             ItemProperties.Add(new SelectableItemPropertyVM(new TextObject("{=CEBROTHEL0988}State").ToString(), _brothel.IsRunning

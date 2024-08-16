@@ -10,27 +10,17 @@ using TaleWorlds.CampaignSystem.Settlements;
 
 namespace CaptivityEvents.Brothel
 {
-    internal class CEBrothel
+    internal class CEBrothel(Settlement settlement)
     {
-        public CEBrothel(Settlement settlement)
-        {
-            Level = 0;
-            Settlement = settlement;
-            Expense = 200;
-            InitialCapital = 5000;
-            Capital = 5000;
-            CaptiveProstitutes = new List<CharacterObject>();
-        }
-
         public void ChangeGold(int amount) => Capital = MBMath.ClampInt(Capital + amount, 1, 10000);
 
         public int ProfitMade => Math.Max(Capital - InitialCapital, 0);
 
         [SaveableField(1)]
-        public Settlement Settlement;
+        public Settlement Settlement = settlement;
 
         [SaveableField(2)]
-        public List<CharacterObject> CaptiveProstitutes;
+        public List<CharacterObject> CaptiveProstitutes = [];
 
         [SaveableField(3)]
         public Hero Owner = null;
@@ -45,15 +35,15 @@ namespace CaptivityEvents.Brothel
         public readonly TextObject Name = new("{=CEEVENTS1099}Brothel");
 
         [SaveableField(8)]
-        public int Capital;
+        public int Capital = 5000;
 
         [SaveableField(9)]
-        public readonly int Expense;
+        public readonly int Expense = 200;
 
         [SaveableField(10)]
-        public readonly int InitialCapital;
+        public readonly int InitialCapital = 5000;
 
         [SaveableField(11)]
-        public int Level;
+        public int Level = 0;
     }
 }

@@ -45,7 +45,7 @@ namespace CaptivityEvents.Events
                     foreach (Companion companion in _option.Companions)
                     {
                         Hero referenceHero;
-                        List<Hero> heroes = new();
+                        List<Hero> heroes = [];
 
                         if (companion.Ref != null)
                         {

@@ -168,7 +168,7 @@ namespace CaptivityEvents.Events
                     {
                         // Reflection One
                         MethodInfo mi = typeof(CampaignEventDispatcher).GetMethod("OnPlayerTraitChanged", BindingFlags.Instance | BindingFlags.NonPublic);
-                        mi?.Invoke(CampaignEventDispatcher.Instance, new object[] { traitObject, traitLevel });
+                        mi?.Invoke(CampaignEventDispatcher.Instance, [traitObject, traitLevel]);
                     }
                 }
                 catch (Exception e)

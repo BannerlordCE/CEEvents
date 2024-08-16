@@ -20,7 +20,7 @@ namespace CaptivityEvents.Patches
     internal static class CEPatchCharacterObject
     {
 
-        static readonly List<MBGUID> ms = new();
+        static readonly List<MBGUID> ms = [];
 
         public static void RestartCharacter(CharacterObject character)
         {
@@ -87,7 +87,7 @@ namespace CaptivityEvents.Patches
                     }
                 }
                 catch (Exception e) { CECustomHandler.LogToFile("Failed UpgradeTargets " + e); }
-                __result = new CharacterObject[0];
+                __result = [];
             }
         }
 

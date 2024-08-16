@@ -315,7 +315,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.Companions != null)
                 {
-                    _listEvent.SavedCompanions = new Dictionary<string, Hero>();
+                    _listEvent.SavedCompanions = [];
                     foreach (Companion companion in _listEvent.Companions)
                     {
                         Hero referenceHero;
@@ -342,7 +342,7 @@ namespace CaptivityEvents.Events
                         {
                             referenceHero = Hero.MainHero;
                         }
-                        List<Hero> heroes = new();
+                        List<Hero> heroes = [];
 
                         if (companion.Type != null)
                         {

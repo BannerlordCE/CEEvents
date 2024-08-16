@@ -52,7 +52,7 @@ namespace CaptivityEvents.Patches
                         CEBrothelClanFinanceItemVM brothelFinanceItemVM = new(
                             brothel,
                             workshop,
-                            brothelIncome => { OnIncomeSelection.Invoke(__instance, new object[] { brothelIncome }); },
+                            brothelIncome => { OnIncomeSelection.Invoke(__instance, [brothelIncome]); },
                             __instance.OnRefresh,
                             _openCardSelectionPopup.Invoke(__instance));
 
@@ -75,7 +75,7 @@ namespace CaptivityEvents.Patches
                 __instance.WorkshopText = GameTexts.FindText("str_STR1_space_STR2", null).ToString();
 
                 __instance.RefreshTotalIncome();
-                OnIncomeSelection.Invoke(__instance, new[] { GetDefaultIncome.Invoke(__instance, null) });
+                OnIncomeSelection.Invoke(__instance, [GetDefaultIncome.Invoke(__instance, null)]);
                 __instance.RefreshValues();
             } 
             catch (Exception e)

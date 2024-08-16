@@ -444,12 +444,12 @@ namespace CaptivityEvents.CampaignBehaviors
 
                 Hero mother = pregnancy.Mother;
                 bool flag = MBRandom.RandomFloat <= pregnancyModel.DeliveringTwinsProbability;
-                List<Hero> aliveOffspring = new();
+                List<Hero> aliveOffspring = [];
 
                 int num = flag ? 2 : 1;
                 int stillbornCount = 0;
 
-                string[] validCultures = { "khuzait", "battania", "aserai", "sturgia", "vlandia", "empire" };
+                string[] validCultures = ["khuzait", "battania", "aserai", "sturgia", "vlandia", "empire"];
 
                 for (int i = 0; i < 1; i++)
                 {
@@ -576,7 +576,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private static void ConsequencePregnancyEvent(Pregnancy pregnancy)
         {
-            List<CEEvent> eventNames = new();
+            List<CEEvent> eventNames = [];
 
             try
             {
@@ -697,7 +697,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 {
                     item.Mother.IsPregnant = false;
                 });
-                _heroPregnancies = new List<Pregnancy>();
+                _heroPregnancies = [];
 
                 return true;
             }
@@ -842,7 +842,7 @@ namespace CaptivityEvents.CampaignBehaviors
             {
                 TextObject textObject = new("{=CEEVENTS1007}Error: resetting the CE pregnancy list");
                 InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Black));
-                _heroPregnancies = new List<Pregnancy>();
+                _heroPregnancies = [];
                 CECustomHandler.ForceLogToFile("Failed _heroPregnancies ForEach");
                 CECustomHandler.ForceLogToFile(e.Message + " : " + e);
             }
@@ -860,7 +860,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 {
                     TextObject textObject = new("{=CEEVENTS1006}Error: resetting the return equipment list");
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Black));
-                    _returnEquipment = new List<ReturnEquipment>();
+                    _returnEquipment = [];
                     CECustomHandler.ForceLogToFile("Failed _returnEquipment ForEach");
                     CECustomHandler.ForceLogToFile(e.Message + " : " + e);
                 }
@@ -900,8 +900,8 @@ namespace CaptivityEvents.CampaignBehaviors
         {
             _extraVariables = new ExtraVariables();
             _extraVariables.ResetVariables();
-            _returnEquipment = new List<ReturnEquipment>();
-            _heroPregnancies = new List<Pregnancy>();
+            _returnEquipment = [];
+            _heroPregnancies = [];
         }
 
         public static List<Pregnancy> HeroPregnancies => _heroPregnancies;
@@ -910,35 +910,27 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private int _hoursPassed;
 
-        private static List<Pregnancy> _heroPregnancies = new();
+        private static List<Pregnancy> _heroPregnancies = [];
 
-        private static List<ReturnEquipment> _returnEquipment = new();
+        private static List<ReturnEquipment> _returnEquipment = [];
 
         public static ExtraVariables ExtraProps => _extraVariables;
 
         private static ExtraVariables _extraVariables = new();
 
-        public class Pregnancy
+        public class Pregnancy(Hero pregnantHero, Hero father, CampaignTime dueDate)
         {
-            public Pregnancy(Hero pregnantHero, Hero father, CampaignTime dueDate)
-            {
-                Mother = pregnantHero;
-                Father = father;
-                DueDate = dueDate;
-                AlreadyOccurred = false;
-            }
-
             [SaveableField(1)]
-            public readonly Hero Mother;
+            public readonly Hero Mother = pregnantHero;
 
             [SaveableField(2)]
-            public readonly Hero Father;
+            public readonly Hero Father = father;
 
             [SaveableField(3)]
-            public readonly CampaignTime DueDate;
+            public readonly CampaignTime DueDate = dueDate;
 
             [SaveableField(4)]
-            public bool AlreadyOccurred;
+            public bool AlreadyOccurred = false;
         }
 
         public class ReturnEquipment

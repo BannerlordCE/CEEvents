@@ -22,11 +22,11 @@ namespace CaptivityEvents.Patches
         {
             if (CampaignMission.Current.Location.StringId == "brothel")
             {
-                List<string> listOfLocationTags = new()
-                {
+                List<string> listOfLocationTags =
+                [
                     "tavern"
-                };
-                Dictionary<CultureObject, float> dictionary = new();
+                ];
+                Dictionary<CultureObject, float> dictionary = [];
                 MBReadOnlyList<CultureObject> objectTypeList = MBObjectManager.Instance.GetObjectTypeList<CultureObject>();
                 Town town = settlement.Town;
                 float num;
@@ -96,7 +96,7 @@ namespace CaptivityEvents.Patches
                                                                   select x).ToList();
                 KeyValuePair<CultureObject, float> maxWeightedCulture = dictionary.MaxBy((KeyValuePair<CultureObject, float> x) => x.Value);
                 float num9 = (float)settlementMusicDatas.Count((SettlementMusicData x) => x.Culture == maxWeightedCulture.Key) / maxWeightedCulture.Value;
-                List<SettlementMusicData> playList = new();
+                List<SettlementMusicData> playList = [];
                 foreach (KeyValuePair<CultureObject, float> keyValuePair in dictionary)
                 {
                     int num10 = MBRandom.RoundRandomized(num9 * keyValuePair.Value);

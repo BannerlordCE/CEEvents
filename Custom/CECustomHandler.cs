@@ -20,10 +20,10 @@ namespace CaptivityEvents.Custom
         public static int Lines;
         public static string TestLog = "FC";
 
-        private static readonly List<CECustomModule> AllModules = new();
-        private static readonly List<CEEvent> AllEvents = new();
-        private static readonly List<CECustom> AllCustom = new();
-        private static readonly List<CEScene> AllScenes = new();
+        private static readonly List<CECustomModule> AllModules = [];
+        private static readonly List<CEEvent> AllEvents = [];
+        private static readonly List<CECustom> AllCustom = [];
+        private static readonly List<CEScene> AllScenes = [];
 
         public static List<CECustom> GetCustom() => AllCustom;
 
@@ -48,7 +48,7 @@ namespace CaptivityEvents.Custom
                 {
                     ForceLogToFile("Found new module path to be checked " + fullPath);
 
-                    List<CEEvent> TempEvents = new();
+                    List<CEEvent> TempEvents = [];
 
                     try
                     {
@@ -118,7 +118,7 @@ namespace CaptivityEvents.Custom
                 ForceLogToFile("Found new module path to be checked " + fullPath);
                 string[] files = Directory.GetFiles(fullPath, "*.xml", SearchOption.AllDirectories);
 
-                List<CEEvent> TempEvents = new();
+                List<CEEvent> TempEvents = [];
 
                 foreach (string text in files)
                 {
@@ -171,7 +171,7 @@ namespace CaptivityEvents.Custom
                 LogXMLIssueToFile(" ! " + e + " ! ");
                 InformationManager.DisplayMessage(new InformationMessage("{=CEEVENTS1003}Failed to load captivity events more information refer to Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs\\LoadingFailedXML.txt", Colors.Red));
 
-                return new List<CEEvent>();
+                return [];
             }
         }
 
@@ -257,7 +257,7 @@ namespace CaptivityEvents.Custom
 
         public static List<CEScene> DeserializeXMLFileToScene(string XmlFilename)
         {
-            List<CEScene> list = new();
+            List<CEScene> list = [];
 
             try
             {
@@ -324,7 +324,7 @@ namespace CaptivityEvents.Custom
 
         public static List<CECustom> DeserializeXMLFileToFlags(string XmlFilename)
         {
-            List<CECustom> list = new();
+            List<CECustom> list = [];
 
             try
             {
@@ -392,7 +392,7 @@ namespace CaptivityEvents.Custom
 
         public static List<CEEvent> DeserializeXMLFileToObject(string XmlFilename)
         {
-            List<CEEvent> list = new();
+            List<CEEvent> list = [];
 
             try
             {
@@ -520,18 +520,18 @@ namespace CaptivityEvents.Custom
         {
             CEEvents ceEvents = new()
             {
-                CEEvent = new CEEvent[]
-                {
+                CEEvent =
+                [
                     new CEEvent {
-                        TerrainTypesRequirements = new TerrainType[][]
-                        {
-                            new TerrainType[] {
+                        TerrainTypesRequirements =
+                        [
+                            [
                                 TerrainType.Water,
                                 TerrainType.Steppe
-                            }
-                        }
+                            ]
+                        ]
                     }
-                }
+                ]
             };
 
             string xml = GetEventXml(ceEvents, omitStandardNamespaces: true);

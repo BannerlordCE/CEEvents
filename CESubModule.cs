@@ -80,13 +80,13 @@ namespace CaptivityEvents
         }
 
         // Events
-        public static List<CEEvent> CEEvents = new();
+        public static List<CEEvent> CEEvents = [];
 
-        public static List<CEEvent> CEEventList = new();
-        public static List<CEEvent> CEMenuOptionEvents = new();
-        public static List<CEEvent> CEAlternativePregnancyEvents = new();
-        public static List<CEEvent> CEWaitingList = new();
-        public static List<CEEvent> CECallableEvents = new();
+        public static List<CEEvent> CEEventList = [];
+        public static List<CEEvent> CEMenuOptionEvents = [];
+        public static List<CEEvent> CEAlternativePregnancyEvents = [];
+        public static List<CEEvent> CEWaitingList = [];
+        public static List<CEEvent> CECallableEvents = [];
 
         // Captive Variables
         public static bool captivePlayEvent;
@@ -98,7 +98,7 @@ namespace CaptivityEvents
 
         public static string victoryEvent;
         public static string defeatEvent;
-        public static List<TroopRosterElement> playerTroops = new();
+        public static List<TroopRosterElement> playerTroops = [];
         public static bool removePlayer = false;
         public static bool destroyParty = false;
         public static bool surrenderParty = false;
@@ -109,7 +109,7 @@ namespace CaptivityEvents
         // Animation Variables
         public static bool animationPlayEvent;
 
-        public static List<string> animationImageList = new();
+        public static List<string> animationImageList = [];
         public static int animationIndex;
         public static float animationSpeed = 0.03f;
 
@@ -132,15 +132,15 @@ namespace CaptivityEvents
         public static float brothelBlack = 10f;
         public static float brothelFadeOut = 2f;
 
-        public static List<CECustom> CECustomFlags = new();
-        public static List<CEScene> CECustomScenes = new();
+        public static List<CECustom> CECustomFlags = [];
+        public static List<CEScene> CECustomScenes = [];
 
-        public static List<CECustomModule> CECustomModules = new();
+        public static List<CECustomModule> CECustomModules = [];
 
         // Images
-        public static Dictionary<string, string> CEEventImageList = new();
+        public static Dictionary<string, string> CEEventImageList = [];
 
-        public static Dictionary<string, Texture> CELoadedTextures = new();
+        public static Dictionary<string, Texture> CELoadedTextures = [];
 
 
         // Sound
@@ -182,10 +182,10 @@ namespace CaptivityEvents
 
         // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml
         // Mount & Blade II Bannerlord\Modules\Native\GUI\NativeSpriteData.xml
-        private static readonly int[] sprite_index = new int[] { 2, 3, 4, 5 };
+        private static readonly int[] sprite_index = [2, 3, 4, 5];
 
         // Sounds for Brothel
-        private static readonly Dictionary<string, int> brothelSounds = new();
+        private static readonly Dictionary<string, int> brothelSounds = [];
 
         public Texture QuickLoadCampaignTexture(string path)
         {
@@ -437,8 +437,8 @@ namespace CaptivityEvents
                 }
 
                 SpriteCategory spriteCategory = UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"];
-                spriteCategory.SpriteSheets.AddRange(new Texture[] { QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"]) });
-                spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray(new Vec2i[] { new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805) });
+                spriteCategory.SpriteSheets.AddRange([QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"])]);
+                spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray([new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805)]);
                 spriteCategory.SpriteSheetCount = 6;
                 CECustomHandler.ForceLogToFile("Loading Textures 1.1.1");
 
@@ -452,8 +452,8 @@ namespace CaptivityEvents
                             spritePart.SheetID = 6;
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
                             spritePart.UpdateInitValues();
                             break;
 
@@ -461,8 +461,8 @@ namespace CaptivityEvents
                             spritePart.SheetID = 5;
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
                             spritePart.UpdateInitValues();
                             break;
 
@@ -470,8 +470,8 @@ namespace CaptivityEvents
                             spritePart.SheetID = 4;
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
                             spritePart.UpdateInitValues();
                             break;
 
@@ -479,8 +479,8 @@ namespace CaptivityEvents
                             spritePart.SheetID = 3;
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, new object[] { 445 });
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, new object[] { 805 });
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
                             spritePart.UpdateInitValues();
                             break;
 
@@ -697,7 +697,7 @@ namespace CaptivityEvents
 
         public override void OnNewGameCreated(Game game, object initializerObject)
         {
-            CEConsole.CleanSave(new List<string>());
+            CEConsole.CleanSave([]);
             base.OnNewGameCreated(game, initializerObject);
         }
 
@@ -747,7 +747,7 @@ namespace CaptivityEvents
         {
             if (Campaign.Current == null) return true;
 
-            CEConsole.ReloadEvents(new List<string>());
+            CEConsole.ReloadEvents([]);
             if (!(CESettings.Instance?.PrisonerEscapeBehavior ?? true)) return base.DoLoading(game);
             IMbEvent<Hero> dailyTickHeroEvent = CampaignEvents.DailyTickHeroEvent;
 
@@ -804,7 +804,7 @@ namespace CaptivityEvents
                 prisonerDialogue.AddCustomLines(campaignStarter, CEPersistence.CECustomScenes);
             }
 
-            if (_isLoadedInGame) CEConsole.ReloadEvents(new List<string>());
+            if (_isLoadedInGame) CEConsole.ReloadEvents([]);
             else AddCustomEvents(campaignStarter);
 
             if (_isLoadedInGame) return;
