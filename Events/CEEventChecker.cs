@@ -1,4 +1,4 @@
-﻿#define V121
+﻿#define V127
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -187,21 +187,14 @@ namespace CaptivityEvents.Events
 
             Vec3? position3D = (captorParty != null && captorParty.IsMobile) ? captorParty?.MobileParty?.GetPosition() : captorParty?.Settlement?.GetPosition();
             List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
-#if V121
+
             AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel((Vec3)position3D);
 
             string environmentTerrainTypes = "";
             faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
 
             //environmentTerrainTypes += "Snow";
-#else
-            AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, (Vec3)position3D);
 
-            string environmentTerrainTypes = "";
-            faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
-
-            if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
-#endif
 
             returnString += "\nEnvironment Terrain Types : " + environmentTerrainTypes;
 
@@ -322,7 +315,7 @@ namespace CaptivityEvents.Events
             {
                 if (_listEvent.Companions != null)
                 {
-                    _listEvent.SavedCompanions = new Dictionary<string, Hero>();
+                    _listEvent.SavedCompanions = [];
                     foreach (Companion companion in _listEvent.Companions)
                     {
                         Hero referenceHero;
@@ -349,7 +342,7 @@ namespace CaptivityEvents.Events
                         {
                             referenceHero = Hero.MainHero;
                         }
-                        List<Hero> heroes = new();
+                        List<Hero> heroes = [];
 
                         if (companion.Type != null)
                         {
@@ -537,11 +530,8 @@ namespace CaptivityEvents.Events
 
                     string environmentTerrainTypes = "";
                     faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
-#if V121
 
-#else
-                    if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
-#endif
+                    //if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
 
                     eventMatchingCondition = false;
                     if (hasWorldMapWater) eventMatchingCondition = environmentTerrainTypes.Contains("Water");
@@ -578,19 +568,11 @@ namespace CaptivityEvents.Events
 
             if (hasWinterFlag || hasSummerFlag || hasSpringFlag || hasFallFlag)
             {
-#if V121
                 eventMatchingCondition =
                   hasSummerFlag && CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Summer ||
                   hasFallFlag && CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Autumn ||
                   hasWinterFlag && CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Winter ||
                   hasSpringFlag && (CampaignTime.Now.GetSeasonOfYear == CampaignTime.Seasons.Spring);
-#else
-                eventMatchingCondition =
-                    hasSummerFlag && CampaignTime.Now.GetSeasonOfYear == 1 ||
-                    hasFallFlag && CampaignTime.Now.GetSeasonOfYear == 2 ||
-                    hasWinterFlag && CampaignTime.Now.GetSeasonOfYear == 3 ||
-                    hasSpringFlag && (CampaignTime.Now.GetSeasonOfYear == 4 || CampaignTime.Now.GetSeasonOfYear == 0);
-#endif
             }
 
             if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the seasons conditions.");
@@ -932,16 +914,17 @@ namespace CaptivityEvents.Events
         private bool OwnerGenderCheck()
         {
             Hero owner = CECampaignBehavior.ExtraProps.Owner;
-            if (owner != null && owner.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsMale.");
-            if (owner != null && !owner.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsFemale.");
+            if ((owner == null || owner != null && owner.IsFemale) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsMale.");
+            if ((owner == null || owner != null && !owner.IsFemale) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.OwnerGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. OwnerGenderIsFemale.");
 
             return true;
         }
 
         private bool CaptorPartyGenderCheck(PartyBase captorParty)
         {
-            if (captorParty?.LeaderHero != null && captorParty.LeaderHero.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsMale.");
-            if (captorParty?.LeaderHero != null && !captorParty.LeaderHero.IsFemale && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale.");
+
+            if ((captorParty?.LeaderHero == null || captorParty?.LeaderHero != null && captorParty.LeaderHero.IsFemale) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsMale.");
+            if ((captorParty?.LeaderHero == null || captorParty?.LeaderHero != null && !captorParty.LeaderHero.IsFemale) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale.");
 
             return true;
         }

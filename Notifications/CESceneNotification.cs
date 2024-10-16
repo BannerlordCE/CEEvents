@@ -29,7 +29,7 @@ namespace CaptivityEvents.Notifications
 
         public override IEnumerable<SceneNotificationCharacter> GetSceneNotificationCharacters()
         {
-            List<SceneNotificationCharacter> list = new();
+            List<SceneNotificationCharacter> list = [];
 
             try
             {

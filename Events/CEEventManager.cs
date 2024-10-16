@@ -28,7 +28,7 @@ namespace CaptivityEvents.Events
 
         public static string FireSpecificEvent(string specificEvent, bool force = false)
         {
-            List<string> eventNames = new();
+            List<string> eventNames = [];
 
             string flag = "$FAILEDTOFIND";
 
@@ -65,7 +65,7 @@ namespace CaptivityEvents.Events
 
         public static string FireSpecificEventRandom(string specificEvent, out CEEvent ceEvent, bool force = false)
         {
-            List<string> eventNames = new();
+            List<string> eventNames = [];
 
             string flag = "$FAILEDTOFIND";
             ceEvent = null;
@@ -105,7 +105,7 @@ namespace CaptivityEvents.Events
 
         public static string FireSpecificEventPartyLeader(string specificEvent, out CEEvent ceEvent, bool force = false, string heroname = null)
         {
-            List<string> eventNames = new();
+            List<string> eventNames = [];
 
             string flag = "$FAILEDTOFIND";
             ceEvent = null;
@@ -173,7 +173,7 @@ namespace CaptivityEvents.Events
 
         public static CEEvent ReturnWeightedChoiceOfEventsRandom()
         {
-            List<CEEvent> events = new();
+            List<CEEvent> events = [];
             int CurrentOrder = 0;
 
             if (CEPersistence.CECallableEvents != null && CEPersistence.CECallableEvents.Count > 0)
@@ -251,7 +251,7 @@ namespace CaptivityEvents.Events
 
         public static CEEvent ReturnWeightedChoiceOfEvents()
         {
-            List<CEEvent> events = new();
+            List<CEEvent> events = [];
             int CurrentOrder = 0;
 
             if (CEPersistence.CECallableEvents != null && CEPersistence.CECallableEvents.Count > 0)
@@ -329,7 +329,7 @@ namespace CaptivityEvents.Events
 
         public static CEEvent ReturnWeightedChoiceOfEventsPartyLeader(CharacterObject captive)
         {
-            List<CEEvent> events = new();
+            List<CEEvent> events = [];
 
             int CurrentOrder = 0;
             CECustomHandler.LogToFile("Number of Filitered events is " + events.Count);

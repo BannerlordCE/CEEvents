@@ -22,7 +22,7 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.ForceLogToFile("Failed to parse int " + stringpassed);
 
-                return new string[1] { stringpassed };
+                return [stringpassed];
             }
         }
 

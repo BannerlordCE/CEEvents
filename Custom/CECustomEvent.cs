@@ -83,7 +83,8 @@ namespace CaptivityEvents.Custom
         KillRandomTroops,
         WoundRandomTroops,
         GiveBirth,
-        Abort
+        Abort,
+        UnavailableIsInvisible,
     }
 
     [XmlType(AnonymousType = true)]

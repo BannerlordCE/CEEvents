@@ -9,7 +9,7 @@ namespace CaptivityEvents.Config
     {
         public CESettingsVMCategory(CESettingsVM options, TextObject name, IEnumerable<ICEOptionData> targetList, bool isNative)
         {
-            _options = new MBBindingList<CEGenericOptionDataVM>();
+            _options = [];
             IsNative = isNative;
             _nameObj = name;
             foreach (ICEOptionData optionData in targetList)
@@ -23,11 +23,11 @@ namespace CaptivityEvents.Config
                 {
                     CEBooleanOptionDataVM booleanOptionDataVM = new(options, optionData as ICEBooleanOptionData, name2, textObject)
                     {
-                        ImageIDs = new string[]
-                    {
+                        ImageIDs =
+                    [
                         text + "_0",
                         text + "_1"
-                    }
+                    ]
                     };
                     _options.Add(booleanOptionDataVM);
                 }
