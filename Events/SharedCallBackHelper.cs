@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V127
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -35,22 +35,15 @@ using TaleWorlds.CampaignSystem.Settlements.Locations;
 
 namespace CaptivityEvents.Events
 {
-    public class SharedCallBackHelper
+    public class SharedCallBackHelper(CEEvent listedEvent, Option option, List<CEEvent> eventList)
     {
-        private readonly CEEvent _listedEvent;
-        private readonly List<CEEvent> _eventList;
-        private readonly Option _option;
+        private readonly CEEvent _listedEvent = listedEvent;
+        private readonly List<CEEvent> _eventList = eventList;
+        private readonly Option _option = option;
 
         private readonly Dynamics _dynamics = new();
         private readonly ScoresCalculation _score = new();
         private readonly CEVariablesLoader _variableLoader = new();
-
-        public SharedCallBackHelper(CEEvent listedEvent, Option option, List<CEEvent> eventList)
-        {
-            _listedEvent = listedEvent;
-            _option = option;
-            _eventList = eventList;
-        }
 
         #region Consequences
 
@@ -187,7 +180,7 @@ namespace CaptivityEvents.Events
 
             try
             {
-                CheckOffspringsToDeliver(_listedEvent.Pregnancy);
+                CheckOffspringToDeliver(_listedEvent.Pregnancy);
             }
             catch (Exception e) { CECustomHandler.LogToFile("Invalid ConsequenceGiveBirth : " + e); }
 
@@ -768,10 +761,12 @@ namespace CaptivityEvents.Events
                     randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Horse, horseEquipment);
                 }
 
-                if ((CESettings.Instance?.StolenGearQuest ?? true) && CEHelper.HelperMBRandom(100) < (CESettings.Instance?.StolenGearChance ?? 99) && questEnabled)
+                bool isEquipmentTheSame = new Equipment(Hero.MainHero.BattleEquipment).IsEquipmentEqualTo(randomElement) && new Equipment(Hero.MainHero.CivilianEquipment).IsEquipmentEqualTo(randomElement2);
+
+                if ((CESettings.Instance?.StolenGearQuest ?? true) && CEHelper.HelperMBRandom(100) < (CESettings.Instance?.StolenGearChance ?? 99) && questEnabled && !isEquipmentTheSame)
                 {
                     Hero issueOwner = null;
-                    List<TextObject> listOfSettlements = new();
+                    List<TextObject> listOfSettlements = [];
 
                     while (issueOwner == null)
                     {
@@ -942,7 +937,7 @@ namespace CaptivityEvents.Events
 
                             if (!CEPersistence.playerTroops.IsEmpty())
                             {
-                                List<CharacterObject> list = new();
+                                List<CharacterObject> list = [];
                                 int num = _variableLoader.GetIntFromXML(_option.BattleSettings.PlayerTroops);
                                 foreach (TroopRosterElement troopRosterElement in from t in CEPersistence.playerTroops
                                                                                   orderby t.Character.Level descending
@@ -1021,11 +1016,7 @@ namespace CaptivityEvents.Events
                                         customParty.SetCustomName(textObject);
 
                                         // InitBanditParty
-#if V120
                                         customParty.Party.SetVisualAsDirty();
-#else
-                                        customParty.Party.Visuals.SetMapIconAsDirty();
-#endif
                                         customParty.ActualClan = clan;
 
                                         // CreatePartyTrade
@@ -1065,11 +1056,7 @@ namespace CaptivityEvents.Events
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
-#if V120
                                             AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.GetLogicalPosition())
-#else
-                                            AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, MobileParty.MainParty.GetLogicalPosition())
-#endif
                                         };
                                         float timeOfDay = Campaign.CurrentTime % 24f;
                                         if (Campaign.Current != null)
@@ -1099,11 +1086,7 @@ namespace CaptivityEvents.Events
                                         customParty.SetCustomName(textObject);
 
                                         // InitBanditParty
-#if V120
                                         customParty.Party.SetVisualAsDirty();
-#else
-                                        customParty.Party.Visuals.SetMapIconAsDirty();
-#endif
                                         customParty.ActualClan = clan;
 
                                         // CreatePartyTrade
@@ -1142,11 +1125,7 @@ namespace CaptivityEvents.Events
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
-#if V120
                                             AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.GetLogicalPosition())
-#else
-                                            AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(CampaignTime.Now, MobileParty.MainParty.GetLogicalPosition())
-#endif
                                         };
                                         float timeOfDay = Campaign.CurrentTime % 24f;
                                         if (Campaign.Current != null)
@@ -1199,6 +1178,7 @@ namespace CaptivityEvents.Events
 
                 if (soundToPlay == null) return;
                 int soundIndex = SoundEvent.GetEventIdFromString(soundToPlay);
+
                 if (soundIndex != -1)
                 {
                     Campaign campaign = Campaign.Current;
@@ -1445,7 +1425,7 @@ namespace CaptivityEvents.Events
             }
         }
 
-#endregion Consequences
+        #endregion Consequences
 
         #region Icons
 
@@ -1535,6 +1515,14 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid GiveItem"); }
         }
 
+
+        internal bool ShouldHide(ref MenuCallbackArgs args)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.UnavailableIsInvisible)) return true;
+
+            return args.IsEnabled;
+        }
+
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)
         {
             try
@@ -1548,7 +1536,7 @@ namespace CaptivityEvents.Events
 
                 if (_listedEvent.Backgrounds != null)
                 {
-                    List<string> backgroundNames = new();
+                    List<string> backgroundNames = [];
                     foreach (Background background in _listedEvent.Backgrounds)
                     {
                         try

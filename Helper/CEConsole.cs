@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V127
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
@@ -766,7 +766,7 @@ namespace CaptivityEvents.Helper
                     ClearParties(strings);
                     bool successful = CECampaignBehavior.ClearPregnancyList();
                     CEBrothelBehavior.CleanList();
-                    ResetStatus(new List<string>());
+                    ResetStatus([]);
 
                     return successful
                         ? "Successfully cleaned save of captivity events data. Save & Exit the game now."
@@ -858,7 +858,7 @@ namespace CaptivityEvents.Helper
 
                     string test = "";
 
-                    CEBrothelBehavior._brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanAlways", "CanAlways", "CanNever", "CanNever", new[] { "empire_house_c_tavern_a", "", "", "" }, null);
+                    CEBrothelBehavior._brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanAlways", "CanAlways", "CanNever", "CanNever", ["empire_house_c_tavern_a", "", "", ""], null);
                     CEBrothelBehavior._isBrothelInitialized = true;
 
                     List<CEBrothel> list = CEBrothelBehavior.GetPlayerBrothels();
@@ -1317,7 +1317,7 @@ namespace CaptivityEvents.Helper
                         Mission.Current.MakeSound(id, Agent.Main.Frame.origin, true, false, -1, -1);
 
                         string text = "";
-                        List<GameEntity> entities = new();
+                        List<GameEntity> entities = [];
                         Mission.Current.Scene.GetEntities(ref entities);
                         foreach (GameEntity test in entities)
                         {

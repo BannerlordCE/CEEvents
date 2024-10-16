@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V127
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -204,7 +204,7 @@ namespace CaptivityEvents.Events
             ReqTrait(ref args);
             ReqGold(ref args);
 
-            return true;
+            return _sharedCallBackHelper.ShouldHide(ref args);
         }
 
         internal void RandomEventConsequenceMenuOption(MenuCallbackArgs args)
@@ -291,7 +291,7 @@ namespace CaptivityEvents.Events
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
         {
             CaptorSpecifics captorSpecifics = new();
-            List<CEEvent> eventNames = new();
+            List<CEEvent> eventNames = [];
 
             try
             {
@@ -400,7 +400,7 @@ namespace CaptivityEvents.Events
         private void ConsequenceRandomEventTrigger(ref MenuCallbackArgs args)
         {
             CaptorSpecifics captorSpecifics = new();
-            List<CEEvent> eventNames = new();
+            List<CEEvent> eventNames = [];
 
             try
             {
@@ -540,6 +540,11 @@ namespace CaptivityEvents.Events
 
                 PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter);
 
+                if(PartyBase.MainParty.SiegeEvent != null)
+                {
+                    LiftSiegeAction.GetGameAction(PartyBase.MainParty.MobileParty);
+                }
+
                 if (!enemyTroops.GetTroopRoster().IsEmpty())
                 {
                     //SpawnAPartyInFaction
@@ -559,11 +564,7 @@ namespace CaptivityEvents.Events
                     customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
 
                     // InitBanditParty
-#if V120
                     customParty.Party.SetVisualAsDirty();
-#else
-                    customParty.Party.Visuals.SetMapIconAsDirty();
-#endif
                     customParty.ActualClan = clan;
 
                     customParty.IsActive = true;

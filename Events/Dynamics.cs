@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V127
 
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -137,6 +137,12 @@ namespace CaptivityEvents.Events
 
         private void TraitObjectModifier(TraitObject traitObject, Color color, Hero hero, string trait, int amount, int xp, bool display)
         {
+            if (hero == null)
+            {
+                CECustomHandler.ForceLogToFile("Failed TraitObjectModifier Missing Hero");
+                return;
+            }
+
             if (xp == 0)
             {
                 int currentTraitLevel = hero.GetTraitLevel(traitObject);
@@ -162,7 +168,7 @@ namespace CaptivityEvents.Events
                     {
                         // Reflection One
                         MethodInfo mi = typeof(CampaignEventDispatcher).GetMethod("OnPlayerTraitChanged", BindingFlags.Instance | BindingFlags.NonPublic);
-                        mi?.Invoke(CampaignEventDispatcher.Instance, new object[] { traitObject, traitLevel });
+                        mi?.Invoke(CampaignEventDispatcher.Instance, [traitObject, traitLevel]);
                     }
                 }
                 catch (Exception e)
@@ -175,6 +181,12 @@ namespace CaptivityEvents.Events
         internal void TraitModifier(Hero hero, string trait, int amount, int xp, bool display = true, string color = "gray")
         {
             bool found = false;
+
+            if (hero == null)
+            {
+                CECustomHandler.ForceLogToFile("Failed TraitModifier Missing Hero");
+                return;
+            }
 
             foreach (TraitObject traitObject in DefaultTraits.Personality)
             {
@@ -202,90 +214,103 @@ namespace CaptivityEvents.Events
 
         private void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp, bool display = true, bool resetSkill = false)
         {
-            if (xp == 0)
+            try
             {
-                int currentSkillLevel = hero.GetSkillValue(skillObject);
-                int newNumber = resetSkill ? 0 : currentSkillLevel + amount;
-                bool isToggle = false;
-                bool wasPositive = false;
-
-                CESkillNode skillNode = CESkills.FindSkillNode(skill);
-                if (skillNode != null)
+                if (hero == null)
                 {
-                    int maxLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MaxLevel);
-                    int minLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MinLevel);
+                    CECustomHandler.ForceLogToFile("Failed SkillObjectModifier Missing Hero");
+                    return;
+                }
 
-                    if (maxLevel == 1 && minLevel == 0)
+                if (xp == 0)
+                {
+                    int currentSkillLevel = hero.GetSkillValue(skillObject);
+                    int newNumber = resetSkill ? 0 : currentSkillLevel + amount;
+                    bool isToggle = false;
+                    bool wasPositive = false;
+
+                    CESkillNode skillNode = CESkills.FindSkillNode(skill);
+                    if (skillNode != null)
                     {
-                        isToggle = true;
+                        int maxLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MaxLevel);
+                        int minLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MinLevel);
+
+                        if (maxLevel == 1 && minLevel == 0)
+                        {
+                            isToggle = true;
+                        }
+
+                        wasPositive = amount > 0 || amount == 0 && !isToggle;
+
+                        if (maxLevel != 0 && newNumber > maxLevel)
+                        {
+                            newNumber = maxLevel;
+                            amount = maxLevel - currentSkillLevel;
+                        }
+                        else if (newNumber < minLevel)
+                        {
+                            newNumber = minLevel;
+                            amount = minLevel - currentSkillLevel;
+                        }
+                    }
+                    else if (newNumber < 0)
+                    {
+                        newNumber = 0;
+                        amount = newNumber - currentSkillLevel;
                     }
 
-                    wasPositive = amount > 0 || amount == 0 && !isToggle;
+                    float xpToSet = Campaign.Current.Models.CharacterDevelopmentModel.GetXpRequiredForSkillLevel(newNumber);
 
-                    if (maxLevel != 0 && newNumber > maxLevel)
+                    int levels = Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet);
+
+                    hero.HeroDeveloper.SetInitialSkillLevel(skillObject, newNumber);
+
+                    if (levels > 0)
                     {
-                        newNumber = maxLevel;
-                        amount = maxLevel - currentSkillLevel;
+                        //MethodInfo mi = hero.HeroDeveloper.GetType().GetMethod("ChangeSkillLevelFromXpChange", BindingFlags.Instance | BindingFlags.NonPublic);
+                        //if (mi != null) mi.Invoke(hero.HeroDeveloper, new object[] { skillObject, levels, false });
                     }
-                    else if (newNumber < minLevel)
-                    {
-                        newNumber = minLevel;
-                        amount = minLevel - currentSkillLevel;
-                    }
-                }
-                else if (newNumber < 0)
-                {
-                    newNumber = 0;
-                    amount = newNumber - currentSkillLevel;
-                }
-
-                float xpToSet = Campaign.Current.Models.CharacterDevelopmentModel.GetXpRequiredForSkillLevel(newNumber);
-
-                int levels = Campaign.Current.Models.CharacterDevelopmentModel.GetSkillLevelChange(hero, skillObject, xpToSet);
-
-                hero.HeroDeveloper.SetInitialSkillLevel(skillObject, newNumber);
-
-                if (levels > 0)
-                {
-                    //MethodInfo mi = hero.HeroDeveloper.GetType().GetMethod("ChangeSkillLevelFromXpChange", BindingFlags.Instance | BindingFlags.NonPublic);
-                    //if (mi != null) mi.Invoke(hero.HeroDeveloper, new object[] { skillObject, levels, false });
-                }
-                else
-                {
-                    CEHelper.SetSkillValue(hero, skillObject, newNumber);
-                }
-
-                if (!display) return;
-
-                TextObject textObject;
-
-                if (isToggle)
-                {
-                    textObject = wasPositive ? GameTexts.FindText("str_CE_level_enter") : GameTexts.FindText("str_CE_level_leave");
-                    textObject.SetTextVariable("HERO", hero.Name);
-                    textObject.SetTextVariable("OCCUPATION", skillObject.Name.ToString());
-                }
-                else
-                {
-                    textObject = GameTexts.FindText("str_CE_level_skill");
-                    textObject.SetTextVariable("HERO", hero.Name);
-
-                    if (xp == 0)
-                        textObject.SetTextVariable("NEGATIVE", wasPositive ? 0 : 1);
                     else
-                        textObject.SetTextVariable("NEGATIVE", xp >= 0 ? 0 : 1);
+                    {
+                        CEHelper.SetSkillValue(hero, skillObject, newNumber);
+                    }
 
-                    textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
-                    textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
-                    textObject.SetTextVariable("SKILL", skillObject.Name.ToString().ToLower());
-                    textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
+                    if (!display) return;
+
+                    TextObject textObject;
+
+                    if (isToggle)
+                    {
+                        textObject = wasPositive ? GameTexts.FindText("str_CE_level_enter") : GameTexts.FindText("str_CE_level_leave");
+                        textObject.SetTextVariable("HERO", hero.Name);
+                        textObject.SetTextVariable("OCCUPATION", skillObject.Name.ToString());
+                    }
+                    else
+                    {
+                        textObject = GameTexts.FindText("str_CE_level_skill");
+                        textObject.SetTextVariable("HERO", hero.Name);
+
+                        if (xp == 0)
+                            textObject.SetTextVariable("NEGATIVE", wasPositive ? 0 : 1);
+                        else
+                            textObject.SetTextVariable("NEGATIVE", xp >= 0 ? 0 : 1);
+
+                        textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
+                        textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
+                        textObject.SetTextVariable("SKILL", skillObject.Name.ToString().ToLower());
+                        textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
+                    }
+
+                    InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
                 }
-
-                InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), color));
+                else
+                {
+                    hero.HeroDeveloper.AddSkillXp(skillObject, xp, true, display);
+                }
             }
-            else
+            catch (Exception e)
             {
-                hero.HeroDeveloper.AddSkillXp(skillObject, xp, true, display);
+                CECustomHandler.ForceLogToFile("Failed SkillObjectModifier " + e);
             }
         }
 
@@ -307,6 +332,12 @@ namespace CaptivityEvents.Events
         internal void ResetCustomSkill(Hero hero, string skill, bool display = true, string color = "gray")
         {
             bool found = false;
+
+            if (hero == null)
+            {
+                CECustomHandler.ForceLogToFile("Failed ResetCustomSkill Missing Hero");
+                return;
+            }
 
             foreach (SkillObject skillObjectCustom in CESkills.CustomSkills)
             {
@@ -372,6 +403,12 @@ namespace CaptivityEvents.Events
 
         private void SetModifier(int amount, Hero hero, SkillObject skill, bool displayMessage = true, bool quickInformation = false)
         {
+            if (hero == null)
+            {
+                CECustomHandler.ForceLogToFile("Failed SetModifier Missing Hero");
+                return;
+            }
+
             if (amount == 0)
             {
                 if ((displayMessage || quickInformation) && hero.GetSkillValue(skill) > 0)
@@ -516,6 +553,12 @@ namespace CaptivityEvents.Events
         // KillCharacterAction && MarriageAction
         internal void ClanOption(Hero firstHero, Clan newClan, bool setLeader = false, bool adopt = false)
         {
+            if (firstHero == null)
+            {
+                CECustomHandler.ForceLogToFile("Failed ClanOption Missing Hero");
+                return;
+            }
+
             if (firstHero.Clan != newClan)
             {
                 Clan clan = firstHero.Clan;
@@ -524,7 +567,7 @@ namespace CaptivityEvents.Events
                 {
                     RemoveFactionLeader(firstHero);
 
-                    if (firstHero.PartyBelongedTo != null && clan != null && !firstHero.IsHumanPlayerCharacter)
+                    if (firstHero.PartyBelongedTo != null && clan != null)
                     {
                         if (clan.Kingdom != newClan.Kingdom)
                         {

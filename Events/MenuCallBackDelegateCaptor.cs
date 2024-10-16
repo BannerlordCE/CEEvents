@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V127
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -187,7 +187,8 @@ namespace CaptivityEvents.Events
             ReqCaptorSkill(ref args);
             ReqCaptorSkills(ref args);
             ReqGold(ref args);
-            return true;
+
+            return _sharedCallBackHelper.ShouldHide(ref args);
         }
 
         internal void CaptorConsequenceGameMenu(MenuCallbackArgs args)
@@ -266,11 +267,11 @@ namespace CaptivityEvents.Events
                     if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
 
                     TextObject leftRosterName = new("_", null);
-                    ItemRoster itemRoster = new();
+                    ItemRoster itemRoster = [];
                     InventoryManager instance = InventoryManager.Instance;
                     InventoryLogic inventoryLogic = InventoryManager.InventoryLogic;
                     MethodInfo method = typeof(InventoryManager).GetMethod("GetCurrentMarketData", BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-                    IMarketData marketData = (IMarketData)method.Invoke(null, new object[0]);
+                    IMarketData marketData = (IMarketData)method.Invoke(null, []);
                     MobileParty mobileParty = captiveHero.PartyBelongedTo;
                     bool flag = mobileParty == null;
                     if (flag)
@@ -325,7 +326,7 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
         {
-            List<CEEvent> eventNames = new();
+            List<CEEvent> eventNames = [];
 
             try
             {
@@ -418,7 +419,7 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceRandomEventTrigger(ref MenuCallbackArgs args)
         {
-            List<CEEvent> eventNames = new();
+            List<CEEvent> eventNames = [];
 
             try
             {

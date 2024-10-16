@@ -20,11 +20,11 @@ namespace CaptivityEvents.Config
             }
         }
 
-        public Dictionary<string, bool> CustomFlags { get; set; } = new Dictionary<string, bool>();
+        public Dictionary<string, bool> CustomFlags { get; set; } = [];
 
         public void InitializeSettings(List<CECustom> moduleCustoms)
         {
-            CustomFlags = new Dictionary<string, bool>();
+            CustomFlags = [];
             ISettingsBuilder builder = BaseSettingsBuilder.Create("CaptivityEventsFlags", "Captivity Events Custom Flags");
 
             if (builder != null)

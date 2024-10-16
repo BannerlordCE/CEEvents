@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V127
 
 using CaptivityEvents.Custom;
 using HarmonyLib;
@@ -20,7 +20,7 @@ namespace CaptivityEvents.Patches
     internal static class CEPatchCharacterObject
     {
 
-        static readonly List<MBGUID> ms = new();
+        static readonly List<MBGUID> ms = [];
 
         public static void RestartCharacter(CharacterObject character)
         {
@@ -30,10 +30,6 @@ namespace CaptivityEvents.Patches
                 BodyProperties bodyProperties = characterObject.GetBodyProperties(null, -1);
                 FaceGenerationParams faceGenerationParams = FaceGenerationParams.Create();
                 MBBodyProperties.GetParamsFromKey(ref faceGenerationParams, bodyProperties, false, false);
-#if V120
-#else
-                faceGenerationParams._heightMultiplier = 0.5f;
-#endif
                 MBBodyProperties.ProduceNumericKeyWithParams(faceGenerationParams, false, false, ref bodyProperties);
                 character.UpdatePlayerCharacterBodyProperties(bodyProperties, characterObject.Race, characterObject.IsFemale);
                 character.Culture = new CultureObject();
@@ -91,7 +87,7 @@ namespace CaptivityEvents.Patches
                     }
                 }
                 catch (Exception e) { CECustomHandler.LogToFile("Failed UpgradeTargets " + e); }
-                __result = new CharacterObject[0];
+                __result = [];
             }
         }
 

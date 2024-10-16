@@ -27,12 +27,12 @@ namespace CaptivityEvents
 
         internal static CharacterAttribute CEAttribute { get; private set; }
 
-        internal static readonly List<CESkillNode> NodeSkills = new() {
+        internal static readonly List<CESkillNode> NodeSkills = [
            new CESkillNode("Prostitution", "{=CEEVENTS1106}Prostitution", "0"),
            new CESkillNode("IsProstitute", "{=CEEVENTS1104}prostitute", "0", "1"),
            new CESkillNode("Slavery", "{=CEEVENTS1105}Slavery", "0"),
            new CESkillNode("IsSlave", "{=CEEVENTS1103}slave", "0", "1")
-        };
+        ];
 
 
         public static void AddCustomSkill(CESkillNode skillNode)
@@ -87,7 +87,7 @@ namespace CaptivityEvents
 
         public static void RegisterAll(Game game)
         {
-            CustomSkills = new List<SkillObject>();
+            CustomSkills = [];
 
             CEAttribute = game.ObjectManager.RegisterPresumedObject(new CharacterAttribute("CEAttribute"));
 

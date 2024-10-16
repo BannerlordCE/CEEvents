@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V127
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
@@ -238,7 +238,7 @@ namespace CaptivityEvents.Events
             ReqCaptorSkills(ref args);
             ReqGold(ref args);
 
-            return true;
+            return _sharedCallBackHelper.ShouldHide(ref args);
         }
 
         internal void CaptiveEventOptionConsequenceGameMenu(MenuCallbackArgs args)
@@ -361,7 +361,7 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceRandomEventTriggerProgress(ref MenuCallbackArgs args)
         {
-            List<CEEvent> eventNames = new();
+            List<CEEvent> eventNames = [];
 
             try
             {
@@ -453,7 +453,7 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceRandomEventTrigger(ref MenuCallbackArgs args)
         {
-            List<CEEvent> eventNames = new();
+            List<CEEvent> eventNames = [];
 
             try
             {

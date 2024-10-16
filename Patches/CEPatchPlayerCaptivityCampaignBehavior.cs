@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V127
 
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
@@ -161,6 +161,7 @@ namespace CaptivityEvents.Patches
                 {
                     CEHelper.delayedEvents.RemoveAll(item => item.hasBeenFired);
                     PlayerCaptivity.LastCheckTime = CampaignTime.Now;
+                    Hero.MainHero.HitPoints += MBRandom.RandomInt(10);
                     return eventToFire;
                 }
             }
@@ -173,7 +174,7 @@ namespace CaptivityEvents.Patches
                 CECustomHandler.LogToFile("About to choose a event!");
                 CEEvent captiveEvent = CEEventManager.ReturnWeightedChoiceOfEvents();
 
-                if (captiveEvent != null) return captiveEvent.Name;
+                if (captiveEvent != null) { Hero.MainHero.HitPoints += MBRandom.RandomInt(10); return captiveEvent.Name; }
             }
             else
             {
@@ -183,7 +184,7 @@ namespace CaptivityEvents.Patches
                 CECustomHandler.LogToFile("About to choose a settlement event!");
                 CEEvent captiveEvent = CEEventManager.ReturnWeightedChoiceOfEvents();
 
-                if (captiveEvent != null) return captiveEvent.Name;
+                if (captiveEvent != null) { Hero.MainHero.HitPoints += MBRandom.RandomInt(10); return captiveEvent.Name; }
             }
 
             return DefaultOverridenCheckCaptivityChange(dt);
