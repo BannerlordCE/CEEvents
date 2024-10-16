@@ -19,7 +19,7 @@
       <Name value="Captivity Events" />
       <DLLName value="CaptivityEvents.dll" />
       <SubModuleClassType value="CaptivityEvents.CESubModule" />
-      <Tags>
+      <Tags>  
         <Tag key="DedicatedServerType" value="none" />
         <Tag key="IsNoRenderModeElement" value="false" />
       </Tags>
