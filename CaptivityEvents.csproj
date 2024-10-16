@@ -118,6 +118,7 @@
     <Compile Include="Notifications\CESceneNotification.cs" />
     <Compile Include="Patches\CEBKPatch.cs" />
     <Compile Include="Patches\CEPatchAlleyCampaignBehavior.cs" />
+    <Compile Include="Patches\CEPatchClanFinanceWorkshipItemVM.cs" />
     <Compile Include="Patches\CEPatchHeroCreator.cs" />
     <Compile Include="Patches\CEPatchAttributes.cs" />
     <Compile Include="Patches\CEPatchBasicCharacterObject.cs" />
@@ -271,6 +272,10 @@
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.GauntletUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="TaleWorlds.GauntletUI.CodeGenerator">
+      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.GauntletUI.CodeGenerator.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="TaleWorlds.GauntletUI.Data">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.GauntletUI.Data.dll</HintPath>
       <Private>False</Private>
@@ -367,18 +372,6 @@
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlatformService.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="TaleWorlds.PlatformService.Epic">
-      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlatformService.Epic.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="TaleWorlds.PlatformService.GOG">
-      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlatformService.GOG.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="TaleWorlds.PlatformService.Steam">
-      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlatformService.Steam.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="TaleWorlds.PlayerServices">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlayerServices.dll</HintPath>
       <Private>False</Private>
@@ -419,10 +412,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Bannerlord.MCM">
-      <Version>5.8.0</Version>
+      <Version>5.10.2</Version>
     </PackageReference>
     <PackageReference Include="Lib.Harmony">
-      <Version>2.2.2</Version>
+      <Version>2.3.3</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

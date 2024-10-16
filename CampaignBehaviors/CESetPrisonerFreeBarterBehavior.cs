@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V127
 
 using CaptivityEvents.Config;
 using TaleWorlds.CampaignSystem;

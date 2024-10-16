@@ -301,7 +301,7 @@ namespace CaptivityEvents.Config
 
         #region Captor
 
-        [SettingPropertyBool("{=CESETTINGS1001}Captor Events Enabled", HintText = "{=CESETTINGS1141}Captor events are events that require captives while leading a party.", Order = 1, RequireRestart = true, IsToggle = true)]
+        [SettingPropertyBool("{=CESETTINGS1001}Captor Events Enabled", HintText = "{=CESETTINGS1141}Captor events are events that require captives while leading a party.", Order = 1, RequireRestart = false, IsToggle = true)]
         [SettingPropertyGroup("{=CESETTINGS0099}Captor", GroupOrder = 2)]
         public bool EventCaptorOn { get; set; } = true;
 

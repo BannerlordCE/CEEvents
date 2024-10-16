@@ -1,4 +1,4 @@
-﻿#define V120
+﻿#define V127
 
 using HarmonyLib;
 using SandBox.CampaignBehaviors;
@@ -22,11 +22,11 @@ namespace CaptivityEvents.Patches
         {
             if (CampaignMission.Current.Location.StringId == "brothel")
             {
-                List<string> listOfLocationTags = new()
-                {
+                List<string> listOfLocationTags =
+                [
                     "tavern"
-                };
-                Dictionary<CultureObject, float> dictionary = new();
+                ];
+                Dictionary<CultureObject, float> dictionary = [];
                 MBReadOnlyList<CultureObject> objectTypeList = MBObjectManager.Instance.GetObjectTypeList<CultureObject>();
                 Town town = settlement.Town;
                 float num;
@@ -80,11 +80,7 @@ namespace CaptivityEvents.Patches
                 {
                     float num7 = (Campaign.MapDiagonal - Campaign.Current.Models.MapDistanceModel.GetDistance(settlement, town2.Settlement)) / Campaign.MapDiagonal;
                     float num8 = num7 * num7 * num7;
-#if V120
                     num8 *= MathF.Min(town2.Prosperity, 5000f) * 0.0002f;
-#else
-                    num8 *= MathF.Min(settlement.Prosperity, 5000f) * 0.0002f;
-#endif
                     dictionary2 = dictionary;
                     culture = town2.Culture;
                     dictionary2[culture] += num8;
@@ -100,7 +96,7 @@ namespace CaptivityEvents.Patches
                                                                   select x).ToList();
                 KeyValuePair<CultureObject, float> maxWeightedCulture = dictionary.MaxBy((KeyValuePair<CultureObject, float> x) => x.Value);
                 float num9 = (float)settlementMusicDatas.Count((SettlementMusicData x) => x.Culture == maxWeightedCulture.Key) / maxWeightedCulture.Value;
-                List<SettlementMusicData> playList = new();
+                List<SettlementMusicData> playList = [];
                 foreach (KeyValuePair<CultureObject, float> keyValuePair in dictionary)
                 {
                     int num10 = MBRandom.RoundRandomized(num9 * keyValuePair.Value);

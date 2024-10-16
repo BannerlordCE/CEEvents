@@ -12,7 +12,7 @@ namespace CaptivityEvents.Events
     {
         public static string CEWaitingList()
         {
-            List<string> eventNames = new();
+            List<string> eventNames = [];
             int CurrentOrder = 0;
 
             if (CEPersistence.CEWaitingList != null && CEPersistence.CEWaitingList.Count > 0)
@@ -56,7 +56,7 @@ namespace CaptivityEvents.Events
                         }
                         else
                         {
-                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring");
+                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring for " + listEvent.Name);
                         }
 
                         for (int a = weightedChance; a > 0; a--) eventNames.Add(listEvent.Name);

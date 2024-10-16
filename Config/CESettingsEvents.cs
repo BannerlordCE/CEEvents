@@ -29,15 +29,15 @@ namespace CaptivityEvents.Config
             }
         }
 
-        public Dictionary<string, bool> EventToggle { get; set; } = new Dictionary<string, bool>();
-        public Dictionary<string, CESettingsEvent> EventSettings { get; set; } = new Dictionary<string, CESettingsEvent>();
+        public Dictionary<string, bool> EventToggle { get; set; } = [];
+        public Dictionary<string, CESettingsEvent> EventSettings { get; set; } = [];
 
         public void InitializeSettings(List<CECustomModule> moduleCustoms, List<CEEvent> callableEvents)
         {
             ISettingsBuilder builder = BaseSettingsBuilder.Create("CaptivityEventsCustomEvents", "Captivity Events Optional Events");
 
-            EventToggle = new Dictionary<string, bool>();
-            EventSettings = new Dictionary<string, CESettingsEvent>();
+            EventToggle = [];
+            EventSettings = [];
 
             int eventModuleId = 0;
             int eventId = 0;
