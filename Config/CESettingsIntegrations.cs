@@ -1,4 +1,5 @@
-﻿using MCM.Abstractions.Base.Global;
+﻿using CaptivityEvents.Helper;
+using MCM.Abstractions.Base.Global;
 using MCM.Abstractions.FluentBuilder;
 using MCM.Common;
 using System.Linq;
@@ -31,11 +32,11 @@ namespace CaptivityEvents.Config
 
 
 
-            ModuleInfo KLBShackles = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "KLBShackles"; });
-            ModuleInfo HotButter = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "hotbutterscenes" || searchInfo.Id == "hotbutter"; });
-            ModuleInfo PrimaeNoctisBLord = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "PrimaeNoctisBLord"; });
+            var HotButter = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id.ToLower().StartsWith( "hotbutter"); });
+            var KLBShackles = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "KLBShackles";}) ;
+            var PrimaeNoctisBLord = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id.ToLower().StartsWith("primaenoctisblord"); });
 
-            if (KLBShackles != null || HotButter != null || PrimaeNoctisBLord != null) shouldRegister = true;
+            if (KLBShackles!=null || HotButter!=null || PrimaeNoctisBLord!=null) shouldRegister = true;
             if (!shouldRegister) return;
 
             ISettingsBuilder builder = BaseSettingsBuilder.Create("CESettingsIntegrations", "Captivity Events Integrations");

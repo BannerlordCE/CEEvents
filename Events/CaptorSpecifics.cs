@@ -111,7 +111,7 @@ namespace CaptivityEvents.Events
             {
                 int prisonerCount = MobileParty.MainParty.PrisonRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
-                MobileParty.MainParty.PrisonRoster.KillNumberOfMenRandomly(amount, false);
+                MobileParty.MainParty.PrisonRoster.KillNumberOfNonHeroTroopsRandomly(amount);
                 if (releaseHeroes)
                 {
                     foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster.GetTroopRoster())
@@ -158,7 +158,7 @@ namespace CaptivityEvents.Events
                 if (amount == 0) return;
                 int prisonerCount = MobileParty.MainParty.PrisonRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
-                MobileParty.MainParty.PrisonRoster.KillNumberOfMenRandomly(amount, killHeroes);
+                MobileParty.MainParty.PrisonRoster.KillNumberOfNonHeroTroopsRandomly(amount);
                 TextObject textObject = GameTexts.FindText("str_CE_kill_prisoners");
                 textObject.SetTextVariable("HERO", Hero.MainHero.Name);
                 textObject.SetTextVariable("AMOUNT", amount);

@@ -106,7 +106,7 @@ namespace CaptivityEvents.Brothel
 
         private static void SellAllPrisoners()
         {
-            SellPrisonersAction.ApplyForAllPrisoners(MobileParty.MainParty, MobileParty.MainParty.PrisonRoster, Settlement.CurrentSettlement);
+            SellPrisonersAction.ApplyForAllPrisoners(MobileParty.MainParty.Party, null);
             GameMenu.SwitchToMenu("town_brothel");
         }
 
