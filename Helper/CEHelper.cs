@@ -282,5 +282,48 @@ namespace CaptivityEvents.Helper
 
             return text;
         }
+
+
+        static Assembly[] GetAssemblies()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(alz =>
+                    {
+                        return !alz.GetName().ToString().StartsWith("TaleWorlds")
+                            && !alz.GetName().ToString().StartsWith("System")
+                            && !alz.GetName().ToString().StartsWith("Microsoft")
+                            && !alz.GetName().ToString().StartsWith("mscorlib")
+                            && !alz.GetName().ToString().StartsWith("SandBox")
+                            && !alz.GetName().ToString().StartsWith("Native")
+                            && !alz.GetName().ToString().StartsWith("CustomBattle")
+                            && !alz.GetName().ToString().StartsWith("Bannerlord");
+                    })
+                    .ToArray();
+        }
+
+        public static bool CheckAssemblies(string v)
+        {
+            Assembly[] captivityAssemblies = GetAssemblies().Where(azc => {
+                return azc.GetName().ToString().ToLower().StartsWith(v.ToLower())
+                ;
+            }).ToArray();
+            if (captivityAssemblies.Length > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static bool CheckHotButter()
+        {
+
+            var HotButter = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id.ToLower().StartsWith("hotbutterscenes"); });
+            if (HotButter != null)
+            {
+                return true; // CheckAssemblies("captivityevents");
+            }
+            return CheckAssemblies("hotbutter");
+
+        }
     }
 }
