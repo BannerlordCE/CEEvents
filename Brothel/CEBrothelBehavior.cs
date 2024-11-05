@@ -268,35 +268,13 @@ namespace CaptivityEvents.Brothel
 
                 int level = GetBrothel(Settlement.CurrentSettlement)?.Level ?? 0;
 
-                switch (level)
-                {
-                    case 1:
-                        SetScenes(settlement.Culture.GetCultureCode() switch
-                        {
-                            CultureCode.Sturgia => "sturgia_house_b_interior_tavern",
-                            CultureCode.Vlandia => "vlandia_tavern_interior_a",
-                            CultureCode.Aserai => "arabian_house_new_c_interior_c_tavern",
-                            CultureCode.Empire => "empire_house_c_tavern_a",                
-                            CultureCode.Battania => "battania_tavern_interior_b",
-                            CultureCode.Khuzait => "khuzait_house_g_interior_a_tavern",
-                            _ => "empire_house_c_tavern_a",
-                        });
-                        break;
-                    default:
-                        SetScenes(settlement.Culture.GetCultureCode() switch
-                        {
-                            CultureCode.Sturgia => "sturgia_house_a_interior_tavern",
-                            CultureCode.Vlandia => "vlandia_house_interior_b_tavern",
-                            CultureCode.Aserai => "arabian_house_new_c_interior_b_tavern",
-                            CultureCode.Empire => "empire_interior_tavern_a",
-                            CultureCode.Battania => "battania_tavern_interior_a",
-                            CultureCode.Khuzait => "khuzait_tavern_a",
-                            _ => "empire_interior_tavern_a",
-                        });
-                        break;
-                        
-                }
-               
+                // find the current city's set Tavern
+                int tier = 2+level;
+                string scn = settlement.LocationComplex.GetLocationWithId("tavern").GetSceneName(tier);
+                //InformationManager.DisplayMessage(new InformationMessage($"onInit {scn}", Colors.Magenta));
+                _brothel.SetSceneName(tier, scn);
+                SetScenes(scn);
+
                 List<CharacterObject> brothelPrisoners = FetchBrothelPrisoners(Settlement.CurrentSettlement);
                 _brothel.RemoveAllCharacters();
                 foreach (CharacterObject brothelPrisoner in brothelPrisoners)
@@ -1297,41 +1275,13 @@ namespace CaptivityEvents.Brothel
 
                     _brothel.SetOwnerComplex(settlement.LocationComplex);
 
-                    switch (settlement.Culture.GetCultureCode())
-                    {
-                        case CultureCode.Sturgia:
-                            _brothel.SetSceneName(0, "sturgia_house_a_interior_tavern");
-                            break;
+                    // find the current city's set Tavern
+                    int tier = 2;  // Be nice to have this set by City Tier minus 1? enhancement
 
-                        case CultureCode.Vlandia:
-                            _brothel.SetSceneName(0, "vlandia_tavern_interior_a");
-                            break;
+                    string scn = settlement.LocationComplex.GetLocationWithId("tavern").GetSceneName(tier);
+                    _brothel.SetSceneName(tier, scn);
+                    //                    InformationManager.DisplayMessage(new InformationMessage($"onSettlementEntered {scn}", Colors.Magenta));
 
-                        case CultureCode.Aserai:
-                            _brothel.SetSceneName(0, "arabian_house_new_c_interior_b_tavern");
-                            break;
-
-                        case CultureCode.Empire:
-                            _brothel.SetSceneName(0, "empire_house_c_tavern_a");
-                            break;
-
-                        case CultureCode.Battania:
-                            _brothel.SetSceneName(0, "battania_tavern_interior_b");
-                            break;
-
-                        case CultureCode.Khuzait:
-                            _brothel.SetSceneName(0, "khuzait_tavern_a");
-                            break;
-
-                        case CultureCode.Nord:
-                        case CultureCode.Darshi:
-                        case CultureCode.Vakken:
-                        case CultureCode.AnyOtherCulture:
-                        case CultureCode.Invalid:
-                        default:
-                            _brothel.SetSceneName(0, "empire_house_c_tavern_a");
-                            break;
-                    }
                     List<CharacterObject> brothelPrisoners = FetchBrothelPrisoners(Settlement.CurrentSettlement);
                     _brothel.RemoveAllCharacters();
                     foreach (CharacterObject brothelPrisoner in brothelPrisoners)
