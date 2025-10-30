@@ -107,13 +107,13 @@ namespace CaptivityEvents.Events
 
             if (PlayerCaptivity.CaptorParty.IsMobile)
             {
-                PlayerCaptivity.CaptorParty.MobileParty.Ai.SetMoveModeHold();
+                PlayerCaptivity.CaptorParty.MobileParty.SetMoveModeHold();
             }
 
             if (_timer / _max == 1)
             {
                 CEHelper.progressEventExists = false;
-                PlayerCaptivity.CaptorParty.MobileParty.Ai.RecalculateShortTermAi();
+                PlayerCaptivity.CaptorParty.MobileParty.RecalculateShortTermBehavior();
             }
 
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
@@ -184,8 +184,8 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("Failed to CaptiveTickWaitGameMenu for " + _listedEvent.Name);
             }
 
-            if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.IsActive) PartyBase.MainParty.MobileParty.Position2D = PlayerCaptivity.CaptorParty.MobileParty.Position2D;
-            else if (PlayerCaptivity.CaptorParty.IsSettlement) PartyBase.MainParty.MobileParty.Position2D = PlayerCaptivity.CaptorParty.Settlement.GatePosition;
+            if (PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.MobileParty.IsActive) PartyBase.MainParty.MobileParty.Position = PlayerCaptivity.CaptorParty.MobileParty.Position;
+            else if (PlayerCaptivity.CaptorParty.IsSettlement) PartyBase.MainParty.MobileParty.Position = PlayerCaptivity.CaptorParty.Settlement.GatePosition;
             PlayerCaptivity.CaptorParty.SetAsCameraFollowParty();
 
             ICaptivityCampaignBehavior captivityCampaignBehavior = Campaign.Current.GetCampaignBehavior<ICaptivityCampaignBehavior>();

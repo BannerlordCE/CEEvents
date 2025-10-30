@@ -25,6 +25,7 @@ using Path = System.IO.Path;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements.Locations;
+using TaleWorlds.CampaignSystem.Actions;
 
 namespace CaptivityEvents.Helper
 {
@@ -1061,7 +1062,7 @@ namespace CaptivityEvents.Helper
                     CEHelper.brothelFlagFemale = false;
                     CEHelper.brothelFlagMale = false;
 
-                    CampaignGameStarter campaignGameStarter = new(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager, Campaign.Current.CurrentGame.GameTextManager);
+                    CampaignGameStarter campaignGameStarter = new(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager);
                     CEVariablesLoader variablesLoader = new();
 
                     // Go Through Events
@@ -1270,7 +1271,7 @@ namespace CaptivityEvents.Helper
 
                 foreach (MobileParty mobile in mobileParties)
                 {
-                    mobile.RemoveParty();
+                    DestroyPartyAction.Apply(PartyBase.MainParty, mobile);
                 }
 
                 return "Success";

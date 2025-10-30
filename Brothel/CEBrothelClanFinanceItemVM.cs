@@ -18,6 +18,7 @@ using CaptivityEvents.Custom;
 using TaleWorlds.Core.ViewModelCollection.Selector;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.CampaignSystem.ComponentInterfaces;
+using TaleWorlds.Core.ImageIdentifiers;
 
 namespace CaptivityEvents.Brothel
 {
@@ -84,7 +85,7 @@ namespace CaptivityEvents.Brothel
         private IEnumerable<ClanCardSelectionItemInfo> GetManageWorkshopItems()
         {
             int sellingCost = _brothel.Capital;
-            TextObject disabledReason = TextObject.Empty;
+            TextObject disabledReason = TextObject.GetEmpty();
             bool flag = true;
             TextObject textObject = new("{=CEBROTHEL0974}Sell this Brothel for {GOLD_AMOUNT}{GOLD_ICON}", null);
             textObject.SetTextVariable("GOLD_AMOUNT", sellingCost);
@@ -102,11 +103,11 @@ namespace CaptivityEvents.Brothel
 
 
 
-            TextObject disabledReason2 = Hero.MainHero.Gold < costToStart && !isCurrentlyActive ? disabledTextObject : TextObject.Empty;
+            TextObject disabledReason2 = Hero.MainHero.Gold < costToStart && !isCurrentlyActive ? disabledTextObject : TextObject.GetEmpty();
             TextObject textObject2 = isCurrentlyActive ? new TextObject("{=CEBROTHEL0995}Stop Operations") : new TextObject("{=CEBROTHEL0996}Start Operations");
             CharacterObject townswoman = CharacterObject.CreateFrom(_brothel.Settlement.Culture.TavernWench);
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-            ImageIdentifier image2 = new(CampaignUIHelper.GetCharacterCode(townswoman, true));
+            CharacterImageIdentifier image2 = new(CampaignUIHelper.GetCharacterCode(townswoman, true));
 
             yield return new ClanCardSelectionItemInfo("operations", textObject2, image2, CardSelectionItemSpriteType.None, null, null, GetText(GetBrothelRunningHintText(_brothel.IsRunning, _brothel.Expense)), !flag2, disabledReason2, ClanCardSelectionItemPropertyInfo.CreateActionGoldChangeText(isCurrentlyActive ? 0 : -costToStart));
         }

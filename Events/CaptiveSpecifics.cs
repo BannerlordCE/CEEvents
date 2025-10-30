@@ -87,6 +87,7 @@ namespace CaptivityEvents.Events
             }
         }
 
+
         /// EndCaptivityInternal from PlayerCaptivity
         internal void CECaptivityLeave(ref MenuCallbackArgs args)
         {
@@ -121,14 +122,21 @@ namespace CaptivityEvents.Events
                     Hero.MainHero.ChangeState(Hero.CharacterStates.Active);
                 }
 
-                if (captorParty.IsActive) captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject);
+
+                if (captorParty.IsActive)
+                {
+                    captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject, 1, default, 0);
+                }
 
                 if (Hero.MainHero.IsAlive)
                 {
                     MobileParty.MainParty.IsActive = true;
                     PartyBase.MainParty.SetAsCameraFollowParty();
-                    MobileParty.MainParty.Ai.SetMoveModeHold();
-                    PartyBase.MainParty.UpdateVisibilityAndInspected(0f);
+                    MobileParty.MainParty.SetMoveModeHold();
+                    if (!MobileParty.MainParty.IsCurrentlyAtSea)
+                    {
+                        PartyBase.MainParty.UpdateVisibilityAndInspected(MobileParty.MainParty.Position, 0f);
+                    }
                 }
 
                 PlayerCaptivity.CaptorParty = null;

@@ -32,6 +32,7 @@ using TaleWorlds.Library;
 using SandBox.Missions.MissionLogics;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.CampaignSystem.Settlements.Locations;
+using TaleWorlds.CampaignSystem.MapEvents;
 
 namespace CaptivityEvents.Events
 {
@@ -466,7 +467,7 @@ namespace CaptivityEvents.Events
                 if (CESettingsIntegrations.Instance == null && clothingLevel == "slave" || !CESettingsIntegrations.Instance.ActivateKLBShackles && clothingLevel == "slave") return;
 
                 if (!(CESettings.Instance?.StolenGear ?? true) && !forced) return;
-                Equipment randomElement = new(false);
+                Equipment randomElement = new();
 
                 if (clothingLevel != "nude")
                 {
@@ -478,9 +479,9 @@ namespace CaptivityEvents.Events
                         string capeString = "";
                         string glovesString = "";
 
-                        switch (PlayerCaptivity.CaptorParty?.Culture?.GetCultureCode())
+                        switch (PlayerCaptivity.CaptorParty?.Culture != null ? PlayerCaptivity.CaptorParty?.Culture.Name.ToString().ToLower() : null)
                         {
-                            case CultureCode.Sturgia:
+                            case CampaignData.CultureSturgia:
                                 headString = "nordic_fur_cap";
                                 capeString = Hero.MainHero.IsFemale
                                     ? "female_hood"
@@ -494,7 +495,7 @@ namespace CaptivityEvents.Events
                                 glovesString = "armwraps";
                                 break;
 
-                            case CultureCode.Aserai:
+                            case CampaignData.CultureAserai:
                                 headString = Hero.MainHero.IsFemale
                                     ? ""
                                     : "turban";
@@ -509,7 +510,7 @@ namespace CaptivityEvents.Events
                                 glovesString = "armwraps";
                                 break;
 
-                            case CultureCode.Khuzait:
+                            case CampaignData.CultureKhuzait:
                                 headString = "fur_hat";
                                 capeString = "wrapped_scarf";
                                 bodyString = Hero.MainHero.IsFemale
@@ -521,7 +522,7 @@ namespace CaptivityEvents.Events
                                 glovesString = "armwraps";
                                 break;
 
-                            case CultureCode.Empire:
+                            case CampaignData.CultureEmpire:
                                 headString = Hero.MainHero.IsFemale
                                     ? "female_head_wrap"
                                     : "arming_cap";
@@ -535,7 +536,7 @@ namespace CaptivityEvents.Events
                                 glovesString = "armwraps";
                                 break;
 
-                            case CultureCode.Battania:
+                            case CampaignData.CultureBattania:
                                 headString = Hero.MainHero.IsFemale
                                     ? "female_head_wrap"
                                     : "wrapped_headcloth";
@@ -549,7 +550,7 @@ namespace CaptivityEvents.Events
                                 legString = "ragged_boots";
                                 break;
 
-                            case CultureCode.Vlandia:
+                            case CampaignData.CultureVlandia:
                                 headString = Hero.MainHero.IsFemale
                                     ? "female_head_wrap"
                                     : "arming_cap";
@@ -563,11 +564,6 @@ namespace CaptivityEvents.Events
                                 glovesString = "armwraps";
                                 break;
 
-                            case CultureCode.Invalid:
-                            case CultureCode.Nord:
-                            case CultureCode.Darshi:
-                            case CultureCode.Vakken:
-                            case CultureCode.AnyOtherCulture:
                             default:
                                 headString = Hero.MainHero.IsFemale
                                     ? "female_head_wrap"
@@ -657,23 +653,23 @@ namespace CaptivityEvents.Events
                             ? Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.OneHanded) / 275 * 100, Math.Max(Hero.MainHero.GetSkillValue(DefaultSkills.TwoHanded) / 275 * 100, Hero.MainHero.GetSkillValue(DefaultSkills.Polearm) / 275 * 100))
                             : (CESettings.Instance?.WeaponChance ?? 75)) && meleeLevel == "Default" || meleeLevel == "Advanced")
                     {
-                        item = PlayerCaptivity.CaptorParty.Culture.GetCultureCode() switch
+                        item = (PlayerCaptivity.CaptorParty?.Culture != null ? PlayerCaptivity.CaptorParty?.Culture.Name.ToString().ToLower() : null) switch
                         {
-                            CultureCode.Sturgia => "sturgia_axe_3_t3",
-                            CultureCode.Aserai => "eastern_spear_1_t2",
-                            CultureCode.Empire => "northern_spear_1_t2",
-                            CultureCode.Battania => "aserai_sword_1_t2",
+                            CampaignData.CultureSturgia => "sturgia_axe_3_t3",
+                            CampaignData.CultureAserai => "eastern_spear_1_t2",
+                            CampaignData.CultureEmpire => "northern_spear_1_t2",
+                            CampaignData.CultureBattania => "aserai_sword_1_t2",
                             _ => "vlandia_sword_1_t2",
                         };
                     }
                     else
                     {
-                        item = (PlayerCaptivity.CaptorParty?.Culture?.GetCultureCode()) switch
+                        item = (PlayerCaptivity.CaptorParty?.Culture != null ? PlayerCaptivity.CaptorParty?.Culture.Name.ToString().ToLower() : null) switch
                         {
-                            CultureCode.Sturgia => "seax",
-                            CultureCode.Aserai => "celtic_dagger",
-                            CultureCode.Empire => "gladius_b",
-                            CultureCode.Battania => "hooked_cleaver",
+                            CampaignData.CultureSturgia => "seax",
+                            CampaignData.CultureAserai => "celtic_dagger",
+                            CampaignData.CultureEmpire => "gladius_b",
+                            CampaignData.CultureBattania => "hooked_cleaver",
                             _ => "seax",
                         };
                     }
@@ -693,38 +689,32 @@ namespace CaptivityEvents.Events
                         string rangedItem;
                         string rangedAmmo = null;
 
-                        switch (PlayerCaptivity.CaptorParty.Culture.GetCultureCode())
+                        switch (PlayerCaptivity.CaptorParty?.Culture != null ? PlayerCaptivity.CaptorParty?.Culture.Name.ToString().ToLower() : null)
                         {
-                            case CultureCode.Sturgia:
+                            case CampaignData.CultureSturgia:
                                 rangedItem = "nordic_shortbow";
                                 rangedAmmo = "default_arrows";
                                 break;
 
-                            case CultureCode.Vlandia:
+                            case CampaignData.CultureVlandia:
                                 rangedItem = "crossbow_a";
                                 rangedAmmo = "tournament_bolts";
                                 break;
 
-                            case CultureCode.Aserai:
+                            case CampaignData.CultureAserai:
                                 rangedItem = "tribal_bow";
                                 rangedAmmo = "default_arrows";
                                 break;
 
-                            case CultureCode.Empire:
+                            case CampaignData.CultureEmpire:
                                 rangedItem = "hunting_bow";
                                 rangedAmmo = "default_arrows";
                                 break;
 
-                            case CultureCode.Battania:
+                            case CampaignData.CultureBattania:
                                 rangedItem = "northern_javelin_2_t3";
                                 break;
 
-                            case CultureCode.Invalid:
-                            case CultureCode.Khuzait:
-                            case CultureCode.Nord:
-                            case CultureCode.Darshi:
-                            case CultureCode.Vakken:
-                            case CultureCode.AnyOtherCulture:
                             default:
                                 rangedItem = "hunting_bow";
                                 rangedAmmo = "default_arrows";
@@ -747,7 +737,7 @@ namespace CaptivityEvents.Events
                     }
                 }
 
-                Equipment randomElement2 = new(true);
+                Equipment randomElement2 = new();
                 randomElement2.FillFrom(randomElement, false);
 
                 if (CEHelper.HelperMBRandom(100)
@@ -770,12 +760,12 @@ namespace CaptivityEvents.Events
 
                     while (issueOwner == null)
                     {
-                        Settlement nearestSettlement = SettlementHelper.FindNearestSettlement(settlement => !listOfSettlements.Contains(settlement.Name));
+                        Settlement nearestSettlement = SettlementHelper.FindNearestSettlementToPoint(PlayerCaptivity.CaptorParty.Position, settlement => !listOfSettlements.Contains(settlement.Name));
                         listOfSettlements.Add(nearestSettlement.Name);
 
                         if (nearestSettlement.IsUnderRaid || nearestSettlement.IsRaided) continue;
 
-                        issueOwner = nearestSettlement.Notables.FirstOrDefault((Hero y) => y.CanHaveQuestsOrIssues() && y.GetTraitLevel(DefaultTraits.Mercy) <= 0);
+                        issueOwner = nearestSettlement.Notables.FirstOrDefault((Hero y) => y.CanHaveCampaignIssues() && y.GetTraitLevel(DefaultTraits.Mercy) <= 0);
 
                         if (issueOwner == null) continue;
 
@@ -1001,19 +991,19 @@ namespace CaptivityEvents.Events
                                         Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
-                                        Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
+                                        Settlement nearest = SettlementHelper.FindNearestSettlementToPoint(PlayerCaptivity.CaptorParty.Position, settlement => { return true; });
 
-                                        MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false);
+                                        MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false, null, CEHelper.GetSpawnPositionAroundSettlement(nearest));
 
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
-                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position, 0.5f, 0.1f);
 
                                         customParty.MemberRoster.Clear();
-                                        customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
+                                        customParty.MemberRoster.Add(enemyTroops);
 
                                         TextObject textObject = new(_option.BattleSettings.EnemyName ?? "Bandits", null);
-                                        customParty.SetCustomName(textObject);
+                                        customParty.Party.SetCustomName(textObject);
 
                                         // InitBanditParty
                                         customParty.Party.SetVisualAsDirty();
@@ -1036,7 +1026,7 @@ namespace CaptivityEvents.Events
                                         }
 
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
-                                        customParty.Ai.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
+                                        customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position, customParty.NavigationCapability);
 
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, true);
                                         CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
@@ -1046,8 +1036,11 @@ namespace CaptivityEvents.Events
                                         PlayerEncounter.Update();
                                         //EncounterAttackConsequence
 
-                                        MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position2D);
-                                        string battleSceneForMapPatch = PlayerEncounter.GetBattleSceneForMapPatch(mapPatchAtPosition);
+                                        bool flag = PlayerEncounter.IsNavalEncounter();
+                                        MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position);
+                                        string battleSceneForMapPatch = Campaign.Current.Models.SceneModel.GetBattleSceneForMapPatch(mapPatchAtPosition, flag);
+                                        CampaignVec2 campaignVec = CampaignVec2.Normalized(PlayerEncounter.Battle.AttackerSide.LeaderParty.Position - PlayerEncounter.Battle.DefenderSide.LeaderParty.Position);
+
                                         MissionInitializerRecord rec = new(battleSceneForMapPatch)
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
@@ -1056,14 +1049,36 @@ namespace CaptivityEvents.Events
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
-                                            AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.GetLogicalPosition())
+                                            AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.Position),
+                                            SceneHasMapPatch = true,
+                                            DecalAtlasGroup = 2,
+                                            PatchCoordinates = mapPatchAtPosition.normalizedCoordinates,
+                                            PatchEncounterDir = campaignVec.ToVec2(),
                                         };
-                                        float timeOfDay = Campaign.CurrentTime % 24f;
-                                        if (Campaign.Current != null)
+
+
+                                        bool flag2 = MapEvent.PlayerMapEvent.PartiesOnSide(BattleSideEnum.Defender).Any((MapEventParty involvedParty) => involvedParty.Party.IsMobile && (involvedParty.Party.MobileParty.IsCaravan || (involvedParty.Party.Owner != null && involvedParty.Party.Owner.IsMerchant)));
+                                        bool flag3;
+                                        if (MapEvent.PlayerMapEvent.MapEventSettlement == null)
                                         {
-                                            rec.TimeOfDay = timeOfDay;
+                                            flag3 = MapEvent.PlayerMapEvent.PartiesOnSide(BattleSideEnum.Defender).Any((MapEventParty involvedParty) => involvedParty.Party.IsMobile && involvedParty.Party.MobileParty.IsVillager);
                                         }
-                                        CampaignMission.OpenBattleMission(rec);
+                                        else
+                                        {
+                                            flag3 = false;
+                                        }
+                                        if (flag)
+                                        {
+                                            CampaignMission.OpenNavalBattleMission(rec);
+                                        }
+                                        else if (flag2)
+                                        {
+                                            CampaignMission.OpenCaravanBattleMission(rec, flag2);
+                                        }
+                                        else
+                                        {
+                                            CampaignMission.OpenBattleMission(rec);
+                                        }
                                         break;
                                     }
                                 case "regular":
@@ -1072,18 +1087,18 @@ namespace CaptivityEvents.Events
                                         Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
-                                        Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
+                                        Settlement nearest = SettlementHelper.FindNearestSettlementToPoint(PlayerCaptivity.CaptorParty.Position, settlement => { return true; });
 
-                                        MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false);
+                                        MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false, null, CEHelper.GetSpawnPositionAroundSettlement(nearest));
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
-                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
+                                        customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position, 0.5f, 0.1f);
 
                                         customParty.MemberRoster.Clear();
-                                        customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
+                                        customParty.MemberRoster.Add(enemyTroops);
 
                                         TextObject textObject = new(_option.BattleSettings.EnemyName ?? "Bandits", null);
-                                        customParty.SetCustomName(textObject);
+                                        customParty.Party.SetCustomName(textObject);
 
                                         // InitBanditParty
                                         customParty.Party.SetVisualAsDirty();
@@ -1106,7 +1121,7 @@ namespace CaptivityEvents.Events
                                         }
 
                                         customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
-                                        customParty.Ai.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
+                                        customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position, customParty.NavigationCapability);
 
                                         PlayerEncounter.RestartPlayerEncounter(customParty.Party, PartyBase.MainParty, true);
                                         CEPersistence.battleState = CEPersistence.BattleState.StartBattle;
@@ -1115,8 +1130,12 @@ namespace CaptivityEvents.Events
                                         PlayerEncounter.StartBattle();
                                         PlayerEncounter.Update();
                                         //EncounterAttackConsequence
-                                        MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position2D);
-                                        string battleSceneForMapPatch = PlayerEncounter.GetBattleSceneForMapPatch(mapPatchAtPosition);
+
+                                        bool flag = PlayerEncounter.IsNavalEncounter();
+                                        MapPatchData mapPatchAtPosition = Campaign.Current.MapSceneWrapper.GetMapPatchAtPosition(MobileParty.MainParty.Position);
+                                        string battleSceneForMapPatch = Campaign.Current.Models.SceneModel.GetBattleSceneForMapPatch(mapPatchAtPosition, flag);
+                                        CampaignVec2 campaignVec = CampaignVec2.Normalized(PlayerEncounter.Battle.AttackerSide.LeaderParty.Position - PlayerEncounter.Battle.DefenderSide.LeaderParty.Position);
+  
                                         MissionInitializerRecord rec = new(battleSceneForMapPatch)
                                         {
                                             TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
@@ -1125,14 +1144,36 @@ namespace CaptivityEvents.Events
                                             NeedsRandomTerrain = false,
                                             PlayingInCampaignMode = true,
                                             RandomTerrainSeed = MBRandom.RandomInt(10000),
-                                            AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.GetLogicalPosition())
+                                            AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.Position),
+                                            SceneHasMapPatch = true,
+                                            DecalAtlasGroup = 2,
+                                            PatchCoordinates = mapPatchAtPosition.normalizedCoordinates,
+                                            PatchEncounterDir = campaignVec.ToVec2(),
                                         };
-                                        float timeOfDay = Campaign.CurrentTime % 24f;
-                                        if (Campaign.Current != null)
+
+
+                                        bool flag2 = MapEvent.PlayerMapEvent.PartiesOnSide(BattleSideEnum.Defender).Any((MapEventParty involvedParty) => involvedParty.Party.IsMobile && (involvedParty.Party.MobileParty.IsCaravan || (involvedParty.Party.Owner != null && involvedParty.Party.Owner.IsMerchant)));
+                                        bool flag3;
+                                        if (MapEvent.PlayerMapEvent.MapEventSettlement == null)
                                         {
-                                            rec.TimeOfDay = timeOfDay;
+                                            flag3 = MapEvent.PlayerMapEvent.PartiesOnSide(BattleSideEnum.Defender).Any((MapEventParty involvedParty) => involvedParty.Party.IsMobile && involvedParty.Party.MobileParty.IsVillager);
                                         }
-                                        CampaignMission.OpenBattleMission(rec);
+                                        else
+                                        {
+                                            flag3 = false;
+                                        }
+                                        if (flag)
+                                        {
+                                            CampaignMission.OpenNavalBattleMission(rec);
+                                        }
+                                        else if (flag2)
+                                        {
+                                            CampaignMission.OpenCaravanBattleMission(rec, flag2);
+                                        }
+                                        else
+                                        {
+                                            CampaignMission.OpenBattleMission(rec);
+                                        }
                                         break;
                                     }
                                 default:
@@ -1256,7 +1297,7 @@ namespace CaptivityEvents.Events
                 Settlement nearest;
                 if (teleportSettings.LocationName != null)
                 {
-                    nearest = SettlementHelper.FindNearestSettlement(settlement => { return settlement.IsTown && settlement.MapFaction != Hero.MainHero.MapFaction; });
+                    nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => { return settlement.IsTown && settlement.MapFaction != Hero.MainHero.MapFaction; });
                     if (nearest != null)
                     {
                         CECustomHandler.ForceLogToFile("LocationName Failed to Find: " + teleportSettings.LocationName);
@@ -1281,7 +1322,7 @@ namespace CaptivityEvents.Events
                                                                      {
                                                                          return TeleportChecker(settlement.IsVillage, settlement, faction);
                                                                      }),
-                                _ => SettlementHelper.FindNearestSettlement(settlement =>
+                                _ => SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement =>
                                {
                                    return TeleportChecker(settlement.IsVillage, settlement, faction);
                                }),
@@ -1295,7 +1336,7 @@ namespace CaptivityEvents.Events
                                                                      {
                                                                          return TeleportChecker(settlement.IsCastle, settlement, faction);
                                                                      }),
-                                _ => SettlementHelper.FindNearestSettlement(settlement =>
+                                _ => SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement =>
                                {
                                    return TeleportChecker(settlement.IsCastle, settlement, faction);
                                }),
@@ -1309,7 +1350,7 @@ namespace CaptivityEvents.Events
                                                                      {
                                                                          return TeleportChecker(settlement.IsHideout, settlement, faction);
                                                                      }),
-                                _ => SettlementHelper.FindNearestSettlement(settlement =>
+                                _ => SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement =>
                                {
                                    return TeleportChecker(settlement.IsHideout, settlement, faction);
                                }),
@@ -1324,7 +1365,7 @@ namespace CaptivityEvents.Events
                                                                      {
                                                                          return TeleportChecker(settlement.IsTown, settlement, faction);
                                                                      }),
-                                _ => SettlementHelper.FindNearestSettlement(settlement =>
+                                _ => SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement =>
                                {
                                    return TeleportChecker(settlement.IsTown, settlement, faction);
                                }),
@@ -1354,7 +1395,7 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        MobileParty.MainParty.Position2D = nearest.GatePosition;
+                        MobileParty.MainParty.Position = nearest.GatePosition;
                         EncounterManager.StartSettlementEncounter(MobileParty.MainParty, nearest);
                     }
                 }

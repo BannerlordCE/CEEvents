@@ -32,7 +32,6 @@ namespace CaptivityEvents.Patches
                 MBBodyProperties.GetParamsFromKey(ref faceGenerationParams, bodyProperties, false, false);
                 MBBodyProperties.ProduceNumericKeyWithParams(faceGenerationParams, false, false, ref bodyProperties);
                 character.UpdatePlayerCharacterBodyProperties(bodyProperties, characterObject.Race, characterObject.IsFemale);
-                character.Culture = new CultureObject();
 
                 if (character?.HeroObject != null) DisableHeroAction.Apply(character.HeroObject);
             }
@@ -43,8 +42,6 @@ namespace CaptivityEvents.Patches
         {
             try
             {
-               
-
                 List<MobileParty> mobileParties = MobileParty.All
                 .Where((mobileParty) =>
                 {
@@ -60,7 +57,7 @@ namespace CaptivityEvents.Patches
 
                 foreach (MobileParty mobile in mobileParties)
                 {
-                    mobile.RemoveParty();
+                    DestroyPartyAction.Apply(PartyBase.MainParty, mobile);
                 }
             }
             catch (Exception e) { CECustomHandler.LogToFile("Failed RemoveParty " + e); }

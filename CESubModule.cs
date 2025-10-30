@@ -442,6 +442,8 @@ namespace CaptivityEvents
                 spriteCategory.SpriteSheetCount = 6;
                 CECustomHandler.ForceLogToFile("Loading Textures 1.1.1");
 
+             
+
                 PropertyInfo propertyWidth = typeof(SpritePart).GetProperty("Width");
                 PropertyInfo propertyHeight = typeof(SpritePart).GetProperty("Height");
                 foreach (SpritePart spritePart in UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteParts)
@@ -503,7 +505,7 @@ namespace CaptivityEvents
                 // Load theMount & Blade II Bannerlord\Modules\SandBox\GUI\Brushes
                 // MapNotification Sprite (REMEMBER TO DOUBLE CHECK FOR NEXT VERSION 1.1.1)
                 SpriteData loadedData = new("CESpriteData");
-                loadedData.Load(UIResourceManager.UIResourceDepot);
+                loadedData.Load(UIResourceManager.ResourceDepot);
 
                 string categoryName = "ce_notification_icons";
                 SpriteData spriteData = UIResourceManager.SpriteData;
@@ -511,7 +513,7 @@ namespace CaptivityEvents
                 SpriteCategory spriteCategory = spriteData.SpriteCategories[categoryName];
                 spriteCategory.SpriteSheets.Add(QuickLoadCampaignTexture(CEPersistence.CEEventImageList["CE_default_notification"]));
                 spriteCategory.SpriteSheets.Add(QuickLoadCampaignTexture(CEPersistence.CEEventImageList["CE_default_notification"]));
-                spriteCategory.Load(UIResourceManager.ResourceContext, UIResourceManager.UIResourceDepot);
+                spriteCategory.Load(UIResourceManager.ResourceContext, UIResourceManager.ResourceDepot);
 
                 UIResourceManager.BrushFactory.Initialize();
             }
@@ -563,7 +565,7 @@ namespace CaptivityEvents
                             new TextObject("Captivity Events Settings", null),
                             9990,
                             () => { ScreenManager.PushScreen(new CESettingsScreen()); },
-                             () => new ValueTuple<bool, TextObject>(false, TextObject.Empty)
+                             () => new ValueTuple<bool, TextObject>(false, TextObject.GetEmpty())
                         )
                       );
                 }
@@ -1132,7 +1134,7 @@ namespace CaptivityEvents
                             {
                                 MissionCameraFadeView behavior = Mission.Current.GetMissionBehavior<MissionCameraFadeView>();
 
-                                Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
+                                Mission.Current.MainAgentServer.Controller = AgentControllerType.AI;
 
                                 WorldPosition worldPosition = new(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
 
@@ -1194,7 +1196,7 @@ namespace CaptivityEvents
                             {
                                 MissionCameraFadeView behavior = Mission.Current.GetMissionBehavior<MissionCameraFadeView>();
 
-                                Mission.Current.MainAgentServer.Controller = Agent.ControllerType.AI;
+                                Mission.Current.MainAgentServer.Controller = AgentControllerType.AI;
 
                                 if (CEPersistence.gameEntity != null)
                                 {
@@ -1246,7 +1248,7 @@ namespace CaptivityEvents
                             if (CESettingsIntegrations.Instance != null && CESettingsIntegrations.Instance.ActivateHotButter && CEPersistence.hotbutterAvailable)
                             {
                                 brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelFadeOut;
-                                Mission.Current.MainAgentServer.Controller = Agent.ControllerType.Player;
+                                Mission.Current.MainAgentServer.Controller = AgentControllerType.AI;
                                 CEPersistence.brothelState = CEPersistence.BrothelState.FadeOut;
                                 try
                                 {
@@ -1278,7 +1280,7 @@ namespace CaptivityEvents
                         if (brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
                         {
                             brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelFadeOut;
-                            Mission.Current.MainAgentServer.Controller = Agent.ControllerType.Player;
+                            Mission.Current.MainAgentServer.Controller = AgentControllerType.AI;
                             CEPersistence.brothelState = CEPersistence.BrothelState.FadeOut;
                         }
                         else if (brothelTimerTwo < missionStateBrothel.CurrentMission.CurrentTime && (!CEPersistence.hotbutterAvailable || (CESettingsIntegrations.Instance == null || !CESettingsIntegrations.Instance.ActivateHotButter)))

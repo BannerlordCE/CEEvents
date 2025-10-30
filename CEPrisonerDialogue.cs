@@ -140,7 +140,7 @@ namespace CaptivityEvents
 
         private bool ConversationCEEventBrothelOnCondition(out TextObject text)
         {
-            text = TextObject.Empty;
+            text = TextObject.GetEmpty();
             if (Settlement.CurrentSettlement != null && CEBrothelBehavior.DoesOwnBrothelInSettlement(Settlement.CurrentSettlement))
             {
                 return true;

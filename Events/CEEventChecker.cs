@@ -185,10 +185,10 @@ namespace CaptivityEvents.Events
                 if (captorParty.MapEvent != null && captorParty.MapEvent.IsRaid && captorParty.MapFaction.IsAtWarWith(captorParty.MapEvent.MapEventSettlement.MapFaction) && captorParty.MapEvent.DefenderSide.TroopCount == 0) returnString += "(duringRaidFlag)";
             }
 
-            Vec3? position3D = (captorParty != null && captorParty.IsMobile) ? captorParty?.MobileParty?.GetPosition() : captorParty?.Settlement?.GetPosition();
-            List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position2D);
+            CampaignVec2 position = (captorParty != null && captorParty.IsMobile) ? captorParty?.MobileParty?.Position ?? CampaignVec2.Invalid : captorParty?.Settlement?.Position ?? CampaignVec2.Invalid;
+            List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position);
 
-            AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel((Vec3)position3D);
+            AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(position);
 
             string environmentTerrainTypes = "";
             faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
@@ -525,8 +525,8 @@ namespace CaptivityEvents.Events
                     hasWorldMapWater || hasWorldMapMountain || hasWorldMapSnow || hasWorldMapSteppe || hasWorldMapPlain || hasWorldMapDesert || hasWorldMapSwamp || hasWorldMapDune || hasWorldMapBridge || hasWorldMapRiver || hasWorldMapForest || hasWorldMapShallowRiver || hasWorldMapLake || hasWorldMapCanyon || hasWorldMapRuralArea
                 )
                 {
-                    Vec3? position3D = (party != null && party.IsMobile) ? party?.MobileParty?.GetPosition() : party?.Settlement?.GetPosition();
-                    List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(party.Position2D);
+                    Vec3? position3D = (party != null && party.IsMobile) ? party?.MobileParty?.GetPositionAsVec3() : party?.Settlement?.GetPosition();
+                    List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(party.Position);
 
                     string environmentTerrainTypes = "";
                     faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });

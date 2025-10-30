@@ -133,7 +133,7 @@ namespace CaptivityEvents.Events
 
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
 
-            PartyBase.MainParty.MobileParty.Ai.SetMoveModeHold();
+            PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
 
         #endregion Progress Event
@@ -551,17 +551,17 @@ namespace CaptivityEvents.Events
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                     clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
-                    Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
+                    Settlement nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(),settlement => { return true; });
 
-                    MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false);
+                    MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false, null, CEHelper.GetSpawnPositionAroundSettlement(nearest));
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
-                    customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-                    customParty.SetCustomName(new TextObject("Bandits", null));
+                    customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position, 0.5f, 0.1f);
+                    customParty.Party.SetCustomName(new TextObject("Bandits", null));
 
                     customParty.MemberRoster.Clear();
-                    customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
+                    customParty.MemberRoster.Add(enemyTroops);
 
                     // InitBanditParty
                     customParty.Party.SetVisualAsDirty();
@@ -571,7 +571,7 @@ namespace CaptivityEvents.Events
                     customParty.Party.SetCustomOwner(clan.Leader);
 
                     // CreatePartyTrade
-                    float totalStrength = customParty.Party.TotalStrength;
+                    float totalStrength = customParty.Party.CalculateCurrentStrength();
                     int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                     customParty.InitializePartyTrade(initialGold);
 
@@ -588,7 +588,7 @@ namespace CaptivityEvents.Events
                     }
 
                     customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
-                    customParty.Ai.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
+                    customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position, customParty.NavigationCapability);
 
                     ConsequenceRandomCaptivityChange(ref args, customParty.Party);
                 }

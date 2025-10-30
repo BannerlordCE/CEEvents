@@ -22,6 +22,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ObjectSystem;
+using Helpers;
 
 namespace CaptivityEvents.Events
 {
@@ -146,7 +147,7 @@ namespace CaptivityEvents.Events
 
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
 
-            PartyBase.MainParty.MobileParty.Ai.SetMoveModeHold();
+            PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
 
         #endregion Progress Event
@@ -266,25 +267,13 @@ namespace CaptivityEvents.Events
                 {
                     if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(captiveHero, captiveHero.BattleEquipment, captiveHero.CivilianEquipment);
 
-                    TextObject leftRosterName = new("_", null);
-                    ItemRoster itemRoster = [];
-                    InventoryManager instance = InventoryManager.Instance;
-                    InventoryLogic inventoryLogic = InventoryManager.InventoryLogic;
-                    MethodInfo method = typeof(InventoryManager).GetMethod("GetCurrentMarketData", BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-                    IMarketData marketData = (IMarketData)method.Invoke(null, []);
                     MobileParty mobileParty = captiveHero.PartyBelongedTo;
                     bool flag = mobileParty == null;
                     if (flag)
                     {
                         mobileParty = MBObjectManager.Instance.CreateObject<MobileParty>("Temp_party");
                     }
-                    inventoryLogic = new InventoryLogic(mobileParty, captiveHero.CharacterObject, null);
-                    inventoryLogic.Initialize(MobileParty.MainParty.ItemRoster, mobileParty, false, true, captiveHero.CharacterObject, InventoryManager.InventoryCategoryType.None, marketData, false, leftRosterName, null);
-                    FieldInfo field = typeof(InventoryManager).GetField("_inventoryLogic", BindingFlags.Instance | BindingFlags.NonPublic);
-                    field.SetValue(InventoryManager.Instance, inventoryLogic);
-                    InventoryState inventoryState = Game.Current.GameStateManager.CreateState<InventoryState>();
-                    inventoryState.InitializeLogic(inventoryLogic);
-                    Game.Current.GameStateManager.PushState(inventoryState, 0);
+                    InventoryScreenHelper.OpenScreenAsInventoryOf(mobileParty, captiveHero.CharacterObject);
                 }
                 catch (Exception e)
                 {

@@ -13,7 +13,6 @@ using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.CampaignSystem.Overlay;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -61,7 +60,7 @@ namespace CaptivityEvents.Brothel
                     }
                 }, false, 2);
 
-            campaignGameStarter.AddGameMenu("town_brothel", "{=CEEVENTS1098}You are in the brothel district", BrothelDistrictOnInit, GameOverlays.MenuOverlayType.SettlementWithBoth);
+            campaignGameStarter.AddGameMenu("town_brothel", "{=CEEVENTS1098}You are in the brothel district", BrothelDistrictOnInit, GameMenu.MenuOverlayType.SettlementWithBoth);
 
             campaignGameStarter.AddGameMenuOption("town_brothel", "town_brothel_visit", "{=CEEVENTS1101}Visit the brothel", VisitBrothelOnCondition, VisitBrothelOnConsequence, false, 0);
 
@@ -137,9 +136,10 @@ namespace CaptivityEvents.Brothel
 
             try
             {
-                // Reflection
-                FieldInfo fi = PartyScreenManager.Instance.GetType().GetField("_currentMode", BindingFlags.Instance | BindingFlags.NonPublic);
-                fi?.SetValue(PartyScreenManager.Instance, PartyScreenMode.PrisonerManage);
+                PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
+                partyState.IsDonating = false;
+                partyState.PartyScreenMode = PartyScreenHelper.PartyScreenMode.PrisonerManage;
+                PartyScreenLogic partyScreenLogic = new PartyScreenLogic();
 
                 TroopRoster prisonRoster = TroopRoster.CreateDummyTroopRoster();
                 List<CharacterObject> prisoners = FetchBrothelPrisoners(Hero.MainHero.CurrentSettlement);
@@ -150,28 +150,21 @@ namespace CaptivityEvents.Brothel
 
                 int leftPartyMembersSizeLimit = 10 - prisonRoster.Count;
                 TextObject textObject = new("{=CEBROTHEL0984}The brothel of {SETTLEMENT}", null);
-                textObject.SetTextVariable("SETTLEMENT", Hero.MainHero.CurrentSettlement.Name);
-
+                textObject.SetTextVariable("SETTLEMENT_NAME", Hero.MainHero.CurrentSettlement.Name);
                 TroopRoster leftMemberRoster = TroopRoster.CreateDummyTroopRoster();
                 TroopRoster leftPrisonerRoster = prisonRoster;
                 PartyScreenLogic.TransferState memberTransferState = PartyScreenLogic.TransferState.NotTransferable;
                 PartyScreenLogic.TransferState prisonerTransferState = PartyScreenLogic.TransferState.Transferable;
                 PartyScreenLogic.TransferState accompanyingTransferState = PartyScreenLogic.TransferState.NotTransferable;
-                IsTroopTransferableDelegate troopTransferableDelegate = new(BrothelTroopTransferableDelegate);
+                IsTroopTransferableDelegate troopTransferableDelegate = new(PartyScreenHelper.TroopTransferableDelegate);
+                PartyScreenHelper.PartyScreenMode partyScreenMode = partyState.PartyScreenMode;
                 PartyBase leftOwnerParty = null;
                 TextObject leftPartyName = textObject;
+                int prisonerSizeLimit = Hero.MainHero.CurrentSettlement.Party.PrisonerSizeLimit;
                 PartyPresentationDoneButtonDelegate partyPresentationDoneButtonDelegate = new(ManageBrothelDoneHandler);
-
-                PartyScreenLogicInitializationData initializationData = PartyScreenLogicInitializationData.CreateBasicInitDataWithMainParty(TroopRoster.CreateDummyTroopRoster(), leftPrisonerRoster, memberTransferState, prisonerTransferState, accompanyingTransferState, troopTransferableDelegate, leftOwnerParty, leftPartyName, new TextObject("{=aadTnAEg}Manage Prisoners", null), null, leftPartyMembersSizeLimit, 0, partyPresentationDoneButtonDelegate, null, null, null, null, false, false, false, false);
-
-                _partyScreenLogic.Initialize(initializationData);
-
-                PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
-                partyState.InitializeLogic(_partyScreenLogic);
-
-                fi = PartyScreenManager.Instance.GetType().GetField("_partyScreenLogic", BindingFlags.Instance | BindingFlags.NonPublic);
-                fi?.SetValue(PartyScreenManager.Instance, _partyScreenLogic);
-
+                PartyScreenLogicInitializationData initializationData = PartyScreenLogicInitializationData.CreateBasicInitDataWithMainParty(leftMemberRoster, leftPrisonerRoster, memberTransferState, prisonerTransferState, accompanyingTransferState, troopTransferableDelegate, partyScreenMode, leftOwnerParty, leftPartyName, new TextObject("{=aadTnAEg}Manage Prisoners", null), null, 0, prisonerSizeLimit, partyPresentationDoneButtonDelegate, null, null, null, null, false, false, false, false, 0);
+                partyScreenLogic.Initialize(initializationData);
+                partyState.PartyScreenLogic = partyScreenLogic;
                 Game.Current.GameStateManager.PushState(partyState, 0);
             }
             catch (Exception e)
@@ -207,7 +200,7 @@ namespace CaptivityEvents.Brothel
         private static void ChooseRansomPrisoners()
         {
             GameMenu.SwitchToMenu("town_brothel");
-            PartyScreenManager.OpenScreenAsRansom();
+            PartyScreenHelper.OpenScreenAsRansom();
         }
 
         // Back Condition
@@ -352,7 +345,7 @@ namespace CaptivityEvents.Brothel
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Green));
             CEHelper.AddQuickInformation(textObject, 0, CharacterObject.PlayerCharacter, "event:/ui/notification/relation");
 
-            PartyBase capturerParty = SettlementHelper.FindNearestSettlement(settlement => settlement.IsTown).Party;
+            PartyBase capturerParty = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => settlement.IsTown).Party;
             // TaleWorlds.CampaignSystem.Actions TakePrisonerAction
             Hero prisonerCharacter = Hero.MainHero;
             if (prisonerCharacter.PartyBelongedTo != null)
@@ -420,7 +413,7 @@ namespace CaptivityEvents.Brothel
             }
 
             Monster monster = HelperGetMonster(owner, false);
-            AgentData agentData = new AgentData(new SimpleAgentOrigin(owner)).Monster(monster).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge)).Equipment(culture.FemaleDancer.AllEquipments.GetRandomElement());
+            AgentData agentData = new AgentData(new SimpleAgentOrigin(owner)).Monster(monster).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge)).Equipment(culture.FemaleDancer.GetRandomEquipment);
 
             return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "spawnpoint_tavernkeeper", true, relation, "as_human_tavern_keeper", true);
         }
@@ -979,7 +972,7 @@ namespace CaptivityEvents.Brothel
 
         private bool ConversationHasEnoughMoneyForBrothel(out TextObject text)
         {
-            text = TextObject.Empty;
+            text = TextObject.GetEmpty();
 
             if (Hero.MainHero.Gold >= (brothelCost * ((GetBrothel(Settlement.CurrentSettlement)?.Level ?? 0) + 1))) return true;
             text = new TextObject("{=CEEVENTS1138}You don't have enough gold");
@@ -1034,7 +1027,7 @@ namespace CaptivityEvents.Brothel
 
         private bool ConversationHasEnoughForService(out TextObject text)
         {
-            text = TextObject.Empty;
+            text = TextObject.GetEmpty();
 
             if (Hero.MainHero.Gold >= prostitutionCost) return true;
             text = new TextObject("{=CEEVENTS1138}You don't have enough gold");
@@ -1044,7 +1037,7 @@ namespace CaptivityEvents.Brothel
 
         private bool ConversationHasEnoughForDrinks(out TextObject text)
         {
-            text = TextObject.Empty;
+            text = TextObject.GetEmpty();
 
             if (Hero.MainHero.Gold >= drinkCost) return true;
             text = new TextObject("{=CEEVENTS1138}You don't have enough gold");
@@ -1063,7 +1056,7 @@ namespace CaptivityEvents.Brothel
 
         private bool ConversationHasEnoughForPartyService(out TextObject text)
         {
-            text = TextObject.Empty;
+            text = TextObject.GetEmpty();
             int numberOfMen = PartyBase.MainParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
             int totalCost = numberOfMen * prostitutionCostPerParty;
 
@@ -1159,14 +1152,14 @@ namespace CaptivityEvents.Brothel
             {
                 if (!DoesOwnBrothelInSettlement(Settlement.CurrentSettlement)) GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, prostitutionCost);
 
-                CEPersistence.gameEntity = Settlement.CurrentSettlement.Culture.GetCultureCode() switch
+                CEPersistence.gameEntity = Settlement.CurrentSettlement.Culture.Name.ToString().ToLower() switch
                 {
-                    CultureCode.Sturgia => Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a"),
-                    CultureCode.Vlandia => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i"),
-                    CultureCode.Aserai => Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a"),
-                    CultureCode.Empire => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a"),
-                    CultureCode.Battania => Mission.Current.Scene.GetFirstEntityWithName("bed_wodden_straw_a"),
-                    CultureCode.Khuzait => Mission.Current.Scene.GetFirstEntityWithName("bed_ground_f"),
+                    CampaignData.CultureSturgia => Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a"),
+                    CampaignData.CultureVlandia => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i"),
+                    CampaignData.CultureAserai => Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a"),
+                    CampaignData.CultureEmpire => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a"),
+                    CampaignData.CultureBattania => Mission.Current.Scene.GetFirstEntityWithName("bed_wodden_straw_a"),
+                    CampaignData.CultureKhuzait => Mission.Current.Scene.GetFirstEntityWithName("bed_ground_f"),
                     _ => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a"),
                 };
                 CEPersistence.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => agent.Character == CharacterObject.OneToOneConversationCharacter);
@@ -1207,14 +1200,14 @@ namespace CaptivityEvents.Brothel
                 }
                 new Dynamics().VictimProstitutionModifier(MBRandom.RandomInt(1, 10), Hero.MainHero, false, true, true);
 
-                CEPersistence.gameEntity = Settlement.CurrentSettlement.Culture.GetCultureCode() switch
+                CEPersistence.gameEntity = Settlement.CurrentSettlement.Culture.Name.ToString().ToLower() switch
                 {
-                    CultureCode.Sturgia => Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a"),
-                    CultureCode.Vlandia => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i"),
-                    CultureCode.Aserai => Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a"),
-                    CultureCode.Empire => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a"),
-                    CultureCode.Battania => Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f"),
-                    CultureCode.Khuzait => Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_b"),
+                    CampaignData.CultureSturgia => Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a"),
+                    CampaignData.CultureVlandia => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i"),
+                    CampaignData.CultureAserai => Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a"),
+                    CampaignData.CultureEmpire => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a"),
+                    CampaignData.CultureBattania => Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f"),
+                    CampaignData.CultureKhuzait => Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_b"),
                     _ => Mission.Current.Scene.GetFirstEntityWithName("bed_convolute_f"),
                 };
                 CEPersistence.agentTalkingTo = Mission.Current.Agents.FirstOrDefault(agent => { return agent.Character == CharacterObject.OneToOneConversationCharacter; });
@@ -1678,7 +1671,7 @@ namespace CaptivityEvents.Brothel
                                 if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(troopElement.Character.HeroObject, troopElement.Character.HeroObject.BattleEquipment, troopElement.Character.HeroObject.CivilianEquipment);
 
                                 Equipment randomCivilian = character.CivilianEquipments.GetRandomElementInefficiently();
-                                Equipment randomBattle = new(false);
+                                Equipment randomBattle = new();
                                 randomBattle.FillFrom(randomCivilian, false);
 
                                 EquipmentHelper.AssignHeroEquipmentFromEquipment(troopElement.Character.HeroObject, randomCivilian);
@@ -1736,7 +1729,7 @@ namespace CaptivityEvents.Brothel
                         if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(prisoner.HeroObject, prisoner.HeroObject.BattleEquipment, prisoner.HeroObject.CivilianEquipment);
 
                         Equipment randomCivilian = femaleDancer.CivilianEquipments.GetRandomElementInefficiently();
-                        Equipment randomBattle = new(false);
+                        Equipment randomBattle = new();
                         randomBattle.FillFrom(randomCivilian, false);
 
                         EquipmentHelper.AssignHeroEquipmentFromEquipment(prisoner.HeroObject, randomCivilian);

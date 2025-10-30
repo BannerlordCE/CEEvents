@@ -167,7 +167,7 @@ namespace CaptivityEvents.CampaignBehaviors
             CEEvent eventToFire = null;
             bool shouldFireEvent = delayedEvents.Any(item =>
             {
-                if (item.eventName != null && item.eventTime < Campaign.Current.CampaignStartTime.ElapsedHoursUntilNow)
+                if (item.eventName != null && item.eventTime < CampaignTime.Now.ElapsedHoursUntilNow)
                 {
                     CECustomHandler.LogToFile("Firing " + item.eventName);
                     if (item.conditions == true)
@@ -229,7 +229,7 @@ namespace CaptivityEvents.CampaignBehaviors
             CEEvent eventToFire = null;
             bool shouldFireEvent = delayedEvents.Any(item =>
             {
-                if (item.eventName != null && item.eventTime < Campaign.Current.CampaignStartTime.ElapsedHoursUntilNow)
+                if (item.eventName != null && item.eventTime < CampaignTime.Now.ElapsedHoursUntilNow)
                 {
                     CECustomHandler.LogToFile("Firing " + item.eventName);
                     if (item.conditions == true)
@@ -867,7 +867,7 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
-        private void OnHeroPrisonerReleased(Hero prisoner, PartyBase party, IFaction capturerFaction, EndCaptivityDetail detail)
+        private void OnHeroPrisonerReleased(Hero prisoner, PartyBase party, IFaction capturerFaction, EndCaptivityDetail detail, bool showNotification)
         {
             CESkills.NodeSkills.ForEach((CESkillNode skillNode) =>
             {
@@ -938,10 +938,10 @@ namespace CaptivityEvents.CampaignBehaviors
             public ReturnEquipment(Hero captive, Equipment battleEquipment, Equipment civilianEquipment)
             {
                 Captive = captive;
-                Equipment randomElement = new(false);
+                Equipment randomElement = new();
                 randomElement.FillFrom(battleEquipment, false);
                 BattleEquipment = randomElement;
-                Equipment randomElement2 = new(true);
+                Equipment randomElement2 = new();
                 randomElement2.FillFrom(civilianEquipment, false);
                 CivilianEquipment = randomElement2;
                 AlreadyOccurred = false;

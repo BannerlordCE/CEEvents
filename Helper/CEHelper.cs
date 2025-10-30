@@ -35,7 +35,7 @@ namespace CaptivityEvents.Helper
                 string locationCulture = "empire";
                 try
                 {
-                    locationCulture = partyBase.Settlement?.Culture?.StringId ?? SettlementHelper.FindNearestSettlement((Settlement x) => true, partyBase.IsMobile ? partyBase.MobileParty : MobileParty.MainParty).Culture.StringId;
+                    locationCulture = partyBase.Settlement?.Culture?.StringId ?? SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition()).Culture.StringId;
 
                     if (!_validCultures.Contains(locationCulture)) locationCulture = "empire";
                 }
@@ -43,7 +43,7 @@ namespace CaptivityEvents.Helper
                 {
                     locationCulture = "empire";
                 }
-                sceneToPlay = sceneToPlay.Replace("$location_culture", locationCulture);          
+                sceneToPlay = sceneToPlay.Replace("$location_culture", locationCulture);
             }
 
             if (sceneToPlay.Contains("$party_culture"))
@@ -55,7 +55,7 @@ namespace CaptivityEvents.Helper
 
             if (sceneToPlay.Contains("$location"))
             {
-                sceneToPlay = sceneToPlay.Replace("$location", CurrentLocation(partyBase.Settlement ?? SettlementHelper.FindNearestSettlement((Settlement x) => true, partyBase.IsMobile ? partyBase.MobileParty : MobileParty.MainParty)));
+                sceneToPlay = sceneToPlay.Replace("$location", CurrentLocation(partyBase.Settlement ?? SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), (Settlement x) => true)));
             }
 
             string[] e =
@@ -104,8 +104,9 @@ namespace CaptivityEvents.Helper
 
         }
 
-        public static void AddQuickInformation(TextObject message, int priorty = 0, BasicCharacterObject announcerCharacter = null, string soundEventPath = "") {
-            MBInformationManager.AddQuickInformation(message, priorty, announcerCharacter, soundEventPath);
+        public static void AddQuickInformation(TextObject message, int priorty = 0, BasicCharacterObject announcerCharacter = null, string soundEventPath = "", Equipment equipment = null)
+        {
+            MBInformationManager.AddQuickInformation(message, priorty, announcerCharacter, equipment, soundEventPath);
         }
 
         public static int HelperMBRandom()
@@ -303,7 +304,8 @@ namespace CaptivityEvents.Helper
 
         public static bool CheckAssemblies(string v)
         {
-            Assembly[] captivityAssemblies = GetAssemblies().Where(azc => {
+            Assembly[] captivityAssemblies = GetAssemblies().Where(azc =>
+            {
                 return azc.GetName().ToString().ToLower().StartsWith(v.ToLower())
                 ;
             }).ToArray();
@@ -324,6 +326,29 @@ namespace CaptivityEvents.Helper
             }
             return CheckAssemblies("hotbutter");
 
+        }
+
+        public static CampaignVec2 GetSpawnPositionAroundSettlement(Settlement settlement)
+        {
+            CampaignVec2 campaignVec = NavigationHelper.FindPointAroundPosition(settlement.GatePosition, MobileParty.NavigationType.Default, 5f, 0f, true, false);
+            float num = MobileParty.MainParty.SeeingRange * MobileParty.MainParty.SeeingRange;
+            if (campaignVec.DistanceSquared(MobileParty.MainParty.Position) < num)
+            {
+                for (int i = 0; i < 15; i++)
+                {
+                    CampaignVec2 campaignVec2 = NavigationHelper.FindReachablePointAroundPosition(campaignVec, MobileParty.NavigationType.Default, 5f, 0f, false);
+                    if (NavigationHelper.IsPositionValidForNavigationType(campaignVec2, MobileParty.NavigationType.Default))
+                    {
+                        float num2 = DistanceHelper.FindClosestDistanceFromMobilePartyToPoint(MobileParty.MainParty, campaignVec2, MobileParty.NavigationType.Default, out _);
+                        if (num2 * num2 > num)
+                        {
+                            campaignVec = campaignVec2;
+                            break;
+                        }
+                    }
+                }
+            }
+            return campaignVec;
         }
     }
 }

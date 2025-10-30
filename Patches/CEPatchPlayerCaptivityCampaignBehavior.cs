@@ -107,7 +107,7 @@ namespace CaptivityEvents.Patches
 
                 bool shouldFireEvent = CEHelper.delayedEvents.Any(item =>
                 {
-                    if (item.eventName != null && item.eventTime < Campaign.Current.CampaignStartTime.ElapsedHoursUntilNow)
+                    if (item.eventName != null && item.eventTime < CampaignTime.Now.ElapsedHoursUntilNow)
                     {
                         CECustomHandler.LogToFile("Firing " + item.eventName);
                         if (item.conditions == true)
