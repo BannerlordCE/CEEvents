@@ -175,7 +175,7 @@ namespace CaptivityEvents.Brothel
 
         private static bool BrothelTroopTransferableDelegate(CharacterObject character, PartyScreenLogic.TroopType type, PartyScreenLogic.PartyRosterSide side, PartyBase LeftOwnerParty)
         {
-            // No Selling Children (If you somehow manage to get children as prisoners??)
+            // No Selling Children
             if (character.Age < 18)
             {
                 return false;
@@ -381,6 +381,36 @@ namespace CaptivityEvents.Brothel
 
         public static CharacterObject HelperCreateFrom(CharacterObject character, bool traitsAndSkills) => CharacterObject.CreateFrom(character);
 
+        public static Tuple<string, Monster> GetRandomTownsManActionSetAndMonster(int race)
+        {
+            int num = MBRandom.RandomInt(3);
+            Monster monsterWithSuffix;
+            if (num == 0)
+            {
+                monsterWithSuffix = TaleWorlds.Core.FaceGen.GetMonsterWithSuffix(race, "_settlement");
+                return new Tuple<string, Monster>(ActionSetCode.GenerateActionSetNameWithSuffix(monsterWithSuffix, false, "_villager"), monsterWithSuffix);
+            }
+            if (num != 1)
+            {
+                monsterWithSuffix = TaleWorlds.Core.FaceGen.GetMonsterWithSuffix(race, "_settlement");
+                return new Tuple<string, Monster>(ActionSetCode.GenerateActionSetNameWithSuffix(monsterWithSuffix, false, "_villager_3"), monsterWithSuffix);
+            }
+            monsterWithSuffix = TaleWorlds.Core.FaceGen.GetMonsterWithSuffix(race, "_settlement_slow");
+            return new Tuple<string, Monster>(ActionSetCode.GenerateActionSetNameWithSuffix(monsterWithSuffix, false, "_villager_2"), monsterWithSuffix);
+        }
+
+        public static Tuple<string, Monster> GetRandomTownsWomanActionSetAndMonster(int race)
+        {
+            Monster monsterWithSuffix;
+            if (MBRandom.RandomInt(4) == 0)
+            {
+                monsterWithSuffix = TaleWorlds.Core.FaceGen.GetMonsterWithSuffix(race, "_settlement_fast");
+                return new Tuple<string, Monster>(ActionSetCode.GenerateActionSetNameWithSuffix(monsterWithSuffix, true, "_villager"), monsterWithSuffix);
+            }
+            monsterWithSuffix = TaleWorlds.Core.FaceGen.GetMonsterWithSuffix(race, "_settlement_slow");
+            return new Tuple<string, Monster>(ActionSetCode.GenerateActionSetNameWithSuffix(monsterWithSuffix, true, "_villager_2"), monsterWithSuffix);
+        }
+
         public static Monster HelperGetMonster(BasicCharacterObject character, bool slow) => TaleWorlds.Core.FaceGen.GetMonsterWithSuffix(character.Race, !slow ? "_settlement" : "_settlement_slow");
 
         private static LocationCharacter CreateTavernkeeper(CultureObject culture, LocationCharacter.CharacterRelations relation)
@@ -415,7 +445,7 @@ namespace CaptivityEvents.Brothel
             Monster monster = HelperGetMonster(owner, false);
             AgentData agentData = new AgentData(new SimpleAgentOrigin(owner)).Monster(monster).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge)).Equipment(culture.FemaleDancer.GetRandomEquipment);
 
-            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "spawnpoint_tavernkeeper", true, relation, "as_human_tavern_keeper", true);
+            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "spawnpoint_tavernkeeper", true, relation, ActionSetCode.GenerateActionSetNameWithSuffix(agentData.AgentMonster, agentData.AgentIsFemale, "_tavern_keeper"), true);
         }
 
         private static LocationCharacter CreateRansomBroker(CultureObject culture, LocationCharacter.CharacterRelations relation)
@@ -452,13 +482,13 @@ namespace CaptivityEvents.Brothel
 
             string actionSetCode;
 
-            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
-            else actionSetCode = "as_human_villager_in_tavern";
+            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "_villager_in_aserai_tavern";
+            else actionSetCode = "_villager_in_tavern";
 
             Monster monster = HelperGetMonster(townsman, false);
             AgentData agentData = new AgentData(new SimpleAgentOrigin(townsman)).Monster(monster).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge));
 
-            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, true);
+            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, ActionSetCode.GenerateActionSetNameWithSuffix(agentData.AgentMonster, agentData.AgentIsFemale, actionSetCode), true);
         }
 
         private static LocationCharacter CreateTownsWomanForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
@@ -469,12 +499,12 @@ namespace CaptivityEvents.Brothel
 
             string actionSetCode;
 
-            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
-            else actionSetCode = "as_human_villager_in_tavern";
+            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "_villager_in_aserai_tavern";
+            else actionSetCode = "_villager_in_tavern";
 
             Monster monster = HelperGetMonster(townswoman, false);
             AgentData agentData = new AgentData(new SimpleAgentOrigin(townswoman)).Monster(monster).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.MaxAge));
-            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, true);
+            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, ActionSetCode.GenerateActionSetNameWithSuffix(agentData.AgentMonster, agentData.AgentIsFemale, actionSetCode), true);
         }
 
         private static LocationCharacter CreateTavernWench(CultureObject culture, LocationCharacter.CharacterRelations relation)
@@ -491,7 +521,7 @@ namespace CaptivityEvents.Brothel
             Monster monster = HelperGetMonster(townswoman, false);
             AgentData agentData = new AgentData(new SimpleAgentOrigin(townswoman)).Monster(monster).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge));
 
-            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "sp_tavern_wench", true, relation, "as_human_barmaid", true) { PrefabNamesForBones = { { agentData.AgentMonster.OffHandItemBoneIndex, "kitchen_pitcher_b_tavern" } } };
+            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "sp_tavern_wench", true, relation, ActionSetCode.GenerateActionSetNameWithSuffix(agentData.AgentMonster, agentData.AgentIsFemale, "_barmaid"), true) { PrefabNamesForBones = { { agentData.AgentMonster.OffHandItemBoneIndex, "kitchen_pitcher_b_tavern" } } };
         }
 
         private static LocationCharacter CreateDancer(CultureObject culture, LocationCharacter.CharacterRelations relation)
@@ -508,12 +538,12 @@ namespace CaptivityEvents.Brothel
 
             Monster monster = HelperGetMonster(townswoman, false);
             AgentData agentData = new AgentData(new SimpleAgentOrigin(townswoman)).Monster(monster).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge));
-            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_dancer", true, relation, "as_human_female_dancer", true);
+            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_dancer", true, relation, ActionSetCode.GenerateActionSetNameWithSuffix(agentData.AgentMonster, agentData.AgentIsFemale, "_dancer"), true);
         }
 
         private static LocationCharacter CreateFemalesForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
         {
-            CharacterObject townswoman = HelperCreateFrom(culture.FemaleDancer, true);
+            CharacterObject townswoman = HelperCreateFrom(culture.TavernWench, true);
 
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
 
@@ -525,13 +555,13 @@ namespace CaptivityEvents.Brothel
 
             string actionSetCode;
 
-            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
-            else actionSetCode = "as_human_villager_in_tavern";
+            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "_villager_in_aserai_tavern";
+            else actionSetCode = "_villager_in_tavern";
 
             Monster monster = HelperGetMonster(townswoman, true);
             AgentData agentData = new AgentData(new SimpleAgentOrigin(townswoman, -1, Banner.CreateRandomBanner())).Monster(monster).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge));
 
-            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, true);
+            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, ActionSetCode.GenerateActionSetNameWithSuffix(agentData.AgentMonster, agentData.AgentIsFemale, actionSetCode), true);
         }
 
         private static LocationCharacter CreateMalesForTavern(CultureObject culture, LocationCharacter.CharacterRelations relation)
@@ -548,13 +578,13 @@ namespace CaptivityEvents.Brothel
 
             string actionSetCode;
 
-            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
-            else actionSetCode = "as_human_villager_in_tavern";
+            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "_villager_in_aserai_tavern";
+            else actionSetCode = "_villager_in_tavern";
 
             Monster monster = HelperGetMonster(townsman, true);
             AgentData agentData = new AgentData(new SimpleAgentOrigin(townsman, -1, Banner.CreateRandomBanner())).Monster(monster).Age(MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge));
 
-            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, true);
+            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, ActionSetCode.GenerateActionSetNameWithSuffix(agentData.AgentMonster, agentData.AgentIsFemale, actionSetCode), true);
         }
 
         private static LocationCharacter CreateBrothelPrisoner(CharacterObject prisoner, CultureObject culture, LocationCharacter.CharacterRelations relation)
@@ -563,8 +593,8 @@ namespace CaptivityEvents.Brothel
             prisoner.HeroObject.StayingInSettlement = Settlement.CurrentSettlement;
 
             string actionSetCode;
-            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "as_human_villager_in_aserai_tavern";
-            else actionSetCode = "as_human_villager_in_tavern";
+            if (culture.StringId.ToLower() == "aserai" || culture.StringId.ToLower() == "khuzait") actionSetCode = "_villager_in_aserai_tavern";
+            else actionSetCode = "_villager_in_tavern";
 
             Monster monster = HelperGetMonster(prisoner, true);
 
@@ -572,7 +602,7 @@ namespace CaptivityEvents.Brothel
             AgentData agentData = new AgentData(new PartyAgentOrigin(null, prisoner, -1, default, false)).Monster(monster).Age((int)prisoner.Age).CivilianEquipment(true).Equipment(RandomCivilian);
 
 
-            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, actionSetCode, false);
+            return new LocationCharacter(agentData, SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors, "npc_common", true, relation, ActionSetCode.GenerateActionSetNameWithSuffix(agentData.AgentMonster, agentData.AgentIsFemale, actionSetCode), false);
         }
 
         private void AddPeopleToTownTavern(Settlement settlement, Dictionary<string, int> unusedUsablePointCount)

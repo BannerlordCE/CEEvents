@@ -233,6 +233,7 @@ namespace CaptivityEvents.Events
                     else
                     {
                         CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+                        if (m == null) return;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
                         DisableHeroAction.Apply(randomSoldier);
                     }
@@ -324,6 +325,7 @@ namespace CaptivityEvents.Events
                 else
                 {
                     CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale && characterObject.Occupation == Occupation.Wanderer);
+                    if (m == null) return;
                     randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(15) + 18);
                     DisableHeroAction.Apply(randomSoldier);
                 }
