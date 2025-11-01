@@ -61,7 +61,7 @@ namespace CaptivityEvents.Notifications
             {
                 if (maleHero == null)
                 {
-                    CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture==CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
                     MaleHero = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
                     MaleHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
                 }
@@ -73,7 +73,7 @@ namespace CaptivityEvents.Notifications
 
                 if (femaleHero == null)
                 {
-                    CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale != false && characterObject.Occupation == Occupation.Wanderer);
+                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture==CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale != false && characterObject.Occupation == Occupation.Wanderer);
                     femaleHero = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
                     femaleHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
                 }
@@ -96,7 +96,7 @@ namespace CaptivityEvents.Notifications
             {
                 if (maleHero == null)
                 {
-                    CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture==CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
                     MaleHero = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
                     MaleHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
                 }
@@ -108,7 +108,7 @@ namespace CaptivityEvents.Notifications
 
                 if (femaleHero == null)
                 {
-                    CharacterObject m = CharacterObject.PlayerCharacter.Culture.NotableTemplates.GetRandomElementWithPredicate(characterObject => characterObject.IsFemale != false && characterObject.Occupation == Occupation.Wanderer);
+                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture==CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale != false && characterObject.Occupation == Occupation.Wanderer);
                     FemaleHero = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
                     FemaleHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
                 }
