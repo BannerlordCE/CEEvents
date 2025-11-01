@@ -760,7 +760,7 @@ namespace CaptivityEvents.Events
 
                     while (issueOwner == null)
                     {
-                        Settlement nearestSettlement = SettlementHelper.FindNearestSettlementToPoint(PlayerCaptivity.CaptorParty.Position, settlement => !listOfSettlements.Contains(settlement.Name));
+                        Settlement nearestSettlement = SettlementHelper.FindNearestSettlementToPoint(CEHelper.GetPlayerPositionClean(), settlement => !listOfSettlements.Contains(settlement.Name));
                         listOfSettlements.Add(nearestSettlement.Name);
 
                         if (nearestSettlement.IsUnderRaid || nearestSettlement.IsRaided) continue;
@@ -991,7 +991,7 @@ namespace CaptivityEvents.Events
                                         Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
-                                        Settlement nearest = SettlementHelper.FindNearestSettlementToPoint(PlayerCaptivity.CaptorParty.Position, settlement => { return true; });
+                                        Settlement nearest = SettlementHelper.FindNearestSettlementToPoint(CEHelper.GetPlayerPositionClean(), settlement => { return true; });
 
                                         MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false, null, CEHelper.GetSpawnPositionAroundSettlement(nearest));
 
@@ -1087,7 +1087,7 @@ namespace CaptivityEvents.Events
                                         Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
-                                        Settlement nearest = SettlementHelper.FindNearestSettlementToPoint(PlayerCaptivity.CaptorParty.Position, settlement => { return true; });
+                                        Settlement nearest = SettlementHelper.FindNearestSettlementToPoint(CEHelper.GetPlayerPositionClean(), settlement => { return true; });
 
                                         MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false, null, CEHelper.GetSpawnPositionAroundSettlement(nearest));
                                         PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;

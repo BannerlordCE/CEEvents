@@ -328,6 +328,11 @@ namespace CaptivityEvents.Helper
 
         }
 
+        public static CampaignVec2 GetPlayerPositionClean()
+        {
+            return PlayerCaptivity.CaptorParty!=null ? PlayerCaptivity.CaptorParty.Position : Campaign.Current.CameraFollowParty.Position;
+        }
+
         public static CampaignVec2 GetSpawnPositionAroundSettlement(Settlement settlement)
         {
             CampaignVec2 campaignVec = NavigationHelper.FindPointAroundPosition(settlement.GatePosition, MobileParty.NavigationType.Default, 5f, 0f, true, false);
