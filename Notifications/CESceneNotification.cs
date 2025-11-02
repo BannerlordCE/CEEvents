@@ -102,7 +102,9 @@ namespace CaptivityEvents.Notifications
                 }
                 else
                 {
-                    MaleHero = HeroCreator.CreateSpecialHero(maleHero, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == maleHero.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
+                    Hero mh;
+                    HeroCreator.CreateBasicHero(maleHero.StringId, maleHero, out mh);
+                    MaleHero = mh;
                     MaleHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
                 }
 
@@ -114,7 +116,9 @@ namespace CaptivityEvents.Notifications
                 }
                 else
                 {
-                    FemaleHero = HeroCreator.CreateSpecialHero(femaleHero, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == femaleHero.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
+                    Hero fh;
+                    HeroCreator.CreateBasicHero(femaleHero.StringId, femaleHero, out fh);
+                    FemaleHero = fh;
                     FemaleHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
                 }
             }

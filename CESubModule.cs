@@ -174,6 +174,9 @@ namespace CaptivityEvents
         private static float brothelTimerOne;
         private static float brothelTimerTwo;
         private static float brothelTimerThree;
+        public static float sfIn = CEPersistence.brothelFadeIn; 
+        public static float sfBlack = CEPersistence.brothelBlack; 
+        public static float sfOut = CEPersistence.brothelFadeOut;
 
         // Max Brothel Sound
         private static readonly float brothelSoundMin = 1f;
@@ -1215,8 +1218,23 @@ namespace CaptivityEvents
                                         CEPersistence.brothelFadeIn = 3f;
                                     }
                                 }
-
-                                behavior.BeginFadeOutAndIn(CEPersistence.brothelFadeIn, CEPersistence.brothelBlack, CEPersistence.brothelFadeOut);
+                                if (CESettingsIntegrations.Instance.ActivateHotButter && CEPersistence.hotbutterAvailable)
+                                {
+                                    sfIn = .5f;          // base .5/1/.5 goes dark, then does a come-back
+                                    sfBlack = 1f;       // 1/1/.5 Goes dark AFTER
+                                    sfOut = .5f;         // .5/1/1 not too bad but goes dark after
+                                                        // .5/1/1.5 stays dark
+                                                        // 1.5/1/.95 stays dark
+                                                        // 1/1/1 stays dark
+                                                        // 1/1/.95 stays dark
+                                } 
+                                else
+                                {
+                                    sfIn = CEPersistence.brothelFadeIn;
+                                    sfBlack = CEPersistence.brothelBlack; 
+                                    sfOut = CEPersistence.brothelFadeOut;
+                                }
+                                behavior.BeginFadeOutAndIn(sfOut, sfBlack, sfIn);
                             }
                             catch (Exception)
                             {
@@ -1231,7 +1249,7 @@ namespace CaptivityEvents
                     case CEPersistence.BrothelState.FadeIn:
                         if (brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
                         {
-                            brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelBlack;
+                            brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelBlack -2f;
                             brothelTimerTwo = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
                             brothelTimerThree = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
                             Hero.MainHero.HitPoints += 10;
@@ -1239,16 +1257,16 @@ namespace CaptivityEvents
                             CEPersistence.agentTalkingTo.ResetLookAgent();
                             CEPersistence.agentTalkingTo.ResetAgentProperties();
 
-                            if (CEPersistence.gameEntity != null)
-                            {
-                                Mission.Current.MainAgent.TeleportToPosition(CEPersistence.gameEntity.GlobalPosition);
-                            }
+                            //if (CEPersistence.gameEntity != null)
+                            //{
+                            //    Mission.Current.MainAgent.TeleportToPosition(CEPersistence.gameEntity.GlobalPosition);
+                            //}
                             CEPersistence.brothelState = CEPersistence.BrothelState.Black;
 
                             if (CESettingsIntegrations.Instance != null && CESettingsIntegrations.Instance.ActivateHotButter && CEPersistence.hotbutterAvailable)
                             {
                                 brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelFadeOut;
-                                Mission.Current.MainAgentServer.Controller = AgentControllerType.AI;
+                                Mission.Current.MainAgentServer.Controller = AgentControllerType.Player;
                                 CEPersistence.brothelState = CEPersistence.BrothelState.FadeOut;
                                 try
                                 {
@@ -1280,7 +1298,7 @@ namespace CaptivityEvents
                         if (brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
                         {
                             brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelFadeOut;
-                            Mission.Current.MainAgentServer.Controller = AgentControllerType.AI;
+                            Mission.Current.MainAgentServer.Controller = AgentControllerType.Player;
                             CEPersistence.brothelState = CEPersistence.BrothelState.FadeOut;
                         }
                         else if (brothelTimerTwo < missionStateBrothel.CurrentMission.CurrentTime && (!CEPersistence.hotbutterAvailable || (CESettingsIntegrations.Instance == null || !CESettingsIntegrations.Instance.ActivateHotButter)))
