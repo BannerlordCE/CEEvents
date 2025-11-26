@@ -3,7 +3,6 @@
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
-using CaptivityEvents.Helper;
 using CaptivityEvents.Notifications;
 using Helpers;
 using System;
@@ -12,19 +11,17 @@ using System.Globalization;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.LogEntries;
 using TaleWorlds.CampaignSystem.MapNotificationTypes;
+using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
-using TaleWorlds.CampaignSystem.GameState;
-using TaleWorlds.CampaignSystem.ComponentInterfaces;
-using TaleWorlds.CampaignSystem.Party;
-
 using static CaptivityEvents.Helper.CEHelper;
-using TaleWorlds.LinQuick;
 
 
 namespace CaptivityEvents.CampaignBehaviors
@@ -466,7 +463,7 @@ namespace CaptivityEvents.CampaignBehaviors
                             {
                                 Hero item = HeroCreator.DeliverOffSpring(pregnancy.Mother, pregnancy.Father, isOffspringFemale);
                                 aliveOffspring.Add(item);
-                            } 
+                            }
                             else
                             {
                                 if (mother == Hero.MainHero)
@@ -589,7 +586,7 @@ namespace CaptivityEvents.CampaignBehaviors
                         if (PlayerCaptivity.IsCaptive)
                         {
                             conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
-                        } 
+                        }
                         else
                         {
                             conditionMatched = "PlayerNotCaptive";
@@ -600,7 +597,7 @@ namespace CaptivityEvents.CampaignBehaviors
                         if (!PlayerCaptivity.IsCaptive)
                         {
                             conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
-                        } 
+                        }
                         else
                         {
                             conditionMatched = "PlayerCaptive";
@@ -707,7 +704,7 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
-#endregion Pregnancy
+        #endregion Pregnancy
 
         #region Equipment
 

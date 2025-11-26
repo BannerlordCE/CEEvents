@@ -2,19 +2,19 @@
 
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
+using Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
-using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.CampaignSystem.Party;
-using Helpers;
 
 namespace CaptivityEvents.Helper
 {
@@ -330,7 +330,7 @@ namespace CaptivityEvents.Helper
 
         public static CampaignVec2 GetPlayerPositionClean()
         {
-            return PlayerCaptivity.CaptorParty!=null ? PlayerCaptivity.CaptorParty.Position : Campaign.Current.CameraFollowParty.Position;
+            return PlayerCaptivity.CaptorParty != null ? PlayerCaptivity.CaptorParty.Position : Campaign.Current.CameraFollowParty.Position;
         }
 
         public static CampaignVec2 GetSpawnPositionAroundSettlement(Settlement settlement)

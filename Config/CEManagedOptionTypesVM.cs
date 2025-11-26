@@ -2,13 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TaleWorlds.Core.ViewModelCollection.Selector;
 using TaleWorlds.Engine.Options;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.ViewModelCollection.GameOptions;
-
-using TaleWorlds.Core.ViewModelCollection.Selector;
 
 namespace CaptivityEvents.Config
 {

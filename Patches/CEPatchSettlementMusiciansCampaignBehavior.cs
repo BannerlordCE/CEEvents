@@ -11,7 +11,6 @@ using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.ObjectSystem;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace CaptivityEvents.Patches
 {
@@ -117,7 +116,7 @@ namespace CaptivityEvents.Patches
                     {
                         List<SettlementMusicData> list4 = (from x in list
                                                            where x.Culture == culture
-                                                          select x).ToList<SettlementMusicData>();
+                                                           select x).ToList<SettlementMusicData>();
                         list4.Shuffle<SettlementMusicData>();
                         int num11 = 0;
                         while (num11 < num10 && num11 < list4.Count)

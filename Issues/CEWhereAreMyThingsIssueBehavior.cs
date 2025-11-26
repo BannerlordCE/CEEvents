@@ -4,14 +4,13 @@ using CaptivityEvents.Config;
 using Helpers;
 using System;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Issues;
+using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.SaveSystem;
 using static CaptivityEvents.Helper.CEHelper;
-
-using TaleWorlds.CampaignSystem.Issues;
-using TaleWorlds.CampaignSystem.Party;
 
 namespace CaptivityEvents.Issues
 {

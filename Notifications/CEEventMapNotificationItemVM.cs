@@ -8,10 +8,10 @@ using CaptivityEvents.Helper;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
 
 namespace CaptivityEvents.Notifications
 {
@@ -52,7 +52,7 @@ namespace CaptivityEvents.Notifications
                 }
             }
         }
-             
+
         private void OnRandomNotificationInspect()
         {
             CEHelper.notificationEventExists = false;

@@ -205,14 +205,14 @@ namespace CaptivityEvents.Events
                     if (leader.Character != null)
                     {
                         clan = leader.Character.HeroObject.Clan;
-                        nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => settlement.OwnerClan == clan) ??SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(),settlement => true);
+                        nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => true);
                         prisonerParty = LordPartyComponent.CreateLordParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), leader.Character.HeroObject, MobileParty.MainParty.Position, 0.5f, nearest, leader.Character.HeroObject);
                     }
                     else
                     {
                         clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
-                        nearest =SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(),settlement => true);
+                        nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => true);
                         prisonerParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false, null, CEHelper.GetSpawnPositionAroundSettlement(nearest));
                     }
 
@@ -341,8 +341,8 @@ namespace CaptivityEvents.Events
                     MissionInitializerRecord rec = new(battleSceneForMapPatch)
                     {
                         TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
-                        DamageToPlayerMultiplier = Campaign.Current.Models.DifficultyModel.GetDamageToPlayerMultiplier(),
                         DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
+                        DamageFromPlayerToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
                         NeedsRandomTerrain = false,
                         PlayingInCampaignMode = true,
                         RandomTerrainSeed = MBRandom.RandomInt(10000),
@@ -613,13 +613,14 @@ namespace CaptivityEvents.Events
                         if (itemObjectGloves != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Gloves, new EquipmentElement(itemObjectGloves));
                         if (itemObjectLeg != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Leg, new EquipmentElement(itemObjectLeg));
                         if (itemObjectHead != null) randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Head, new EquipmentElement(itemObjectHead));
-                    }                    
+                    }
                     else
                     {
                         MBEquipmentRoster tryRoster = MBObjectManager.Instance.GetObject<MBEquipmentRoster>(clothingLevel);
-                        if (tryRoster != null) {
+                        if (tryRoster != null)
+                        {
                             Equipment tryEquipSet = tryRoster.AllEquipments.GetRandomElementWithPredicate(e => e.IsCivilian != true);
-                                randomElement.FillFrom(tryEquipSet);
+                            randomElement.FillFrom(tryEquipSet);
                         }
                         else
                         {

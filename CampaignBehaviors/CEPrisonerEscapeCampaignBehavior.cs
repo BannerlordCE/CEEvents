@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.Core;
 using TaleWorlds.CampaignSystem.BarterSystem;
 using TaleWorlds.CampaignSystem.BarterSystem.Barterables;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
+using TaleWorlds.Core;
 
 namespace CaptivityEvents.CampaignBehaviors
 {
@@ -152,7 +152,7 @@ namespace CaptivityEvents.CampaignBehaviors
 
             if (character.IsHero)
             {
-                bool customCheck = isHeroParty ? CESettings.Instance?.PrisonerHeroEscapeParty ?? true: CESettings.Instance?.PrisonerHeroEscapeOther ?? true;
+                bool customCheck = isHeroParty ? CESettings.Instance?.PrisonerHeroEscapeParty ?? true : CESettings.Instance?.PrisonerHeroEscapeOther ?? true;
                 if (!customCheck) return false;
                 int numEscapeChance = isHeroParty ? CESettings.Instance?.PrisonerHeroEscapeChanceParty ?? 0 : CESettings.Instance?.PrisonerHeroEscapeChanceOther ?? 0;
                 if (MBRandom.RandomInt(100) < numEscapeChance) EndCaptivityAction.ApplyByEscape(character.HeroObject);

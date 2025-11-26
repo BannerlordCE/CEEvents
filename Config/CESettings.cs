@@ -2,7 +2,6 @@ using CaptivityEvents.Custom;
 using MCM.Abstractions;
 using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
-using MCM.Abstractions.Base;
 using MCM.Abstractions.Base.Global;
 using MCM.Common;
 using System;
@@ -561,10 +560,10 @@ namespace CaptivityEvents.Config
         [SettingPropertyBool("{=CESETTINGS1078}Pregnancy Messages", Order = 6, RequireRestart = false, HintText = "{=CESETTINGS1079}Allows daily pregnancy messages by Captivity Events.")]
         [SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
         public bool PregnancyMessages { get; set; } = true;
-        
+
         [SettingPropertyBool("{=CESETTINGS1100}Pregnancy Toggle - FemalexFemale", Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1100}Allows females to impregnate females. (Only if events account for it; Alternatively, use captivity.ImpregnateBy console command to attempt it manually)")]
-		[SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
-		public bool PregnancyToggleFemalexFemale { get; set; } = true;
+        [SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
+        public bool PregnancyToggleFemalexFemale { get; set; } = true;
 
         #endregion Pregnancy
 

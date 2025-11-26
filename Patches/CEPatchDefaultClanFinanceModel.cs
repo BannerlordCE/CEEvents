@@ -2,16 +2,13 @@
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
+using CaptivityEvents.Custom;
 using HarmonyLib;
 using System;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.GameComponents;
-using CaptivityEvents.Custom;
-using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance;
-using TaleWorlds.Core.ViewModelCollection.Selector;
-using TaleWorlds.Core;
+using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Patches
 {
@@ -47,7 +44,7 @@ namespace CaptivityEvents.Patches
 
                 goldChange.Add(num, new TextObject("{=CEBROTHEL1001}Brothel income."));
                 if (Hero.MainHero.Clan.Leader.GetPerkValue(DefaultPerks.Trade.ArtisanCommunity) && applyWithdrawals) Hero.MainHero.Clan.AddRenown(num2 * DefaultPerks.Trade.ArtisanCommunity.PrimaryBonus);
-            } 
+            }
             catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("CalculateClanIncomeInternal: " + e);

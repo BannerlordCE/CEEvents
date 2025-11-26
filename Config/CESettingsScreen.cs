@@ -12,7 +12,7 @@ namespace CaptivityEvents.Config
         {
             base.OnInitialize();
             _viewModel = new CESettingsVM();
-            _gauntletLayer = new GauntletLayer(1, "GauntletLayer");
+            _gauntletLayer = new GauntletLayer("GauntletLayer", 1);
             _gauntletLayer.LoadMovie("CaptivityEventsConfigScreen", _viewModel);
             _gauntletLayer.InputRestrictions.SetInputRestrictions(true, InputUsageMask.All);
             AddLayer(_gauntletLayer);

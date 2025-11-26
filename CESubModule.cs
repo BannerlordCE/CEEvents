@@ -6,6 +6,7 @@ using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
+using CaptivityEvents.Notifications;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -15,32 +16,28 @@ using System.Reflection;
 using System.Windows.Forms;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.BarterSystem;
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
+using TaleWorlds.CampaignSystem.CampaignBehaviors.BarterBehaviors;
+using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Roster;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
+using TaleWorlds.Core.ViewModelCollection.Information;
 using TaleWorlds.Engine;
 using TaleWorlds.Engine.GauntletUI;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.MountAndBlade.View.MissionViews;
+using TaleWorlds.ScreenSystem;
 using TaleWorlds.TwoDimension;
 using Path = System.IO.Path;
 using Texture = TaleWorlds.TwoDimension.Texture;
-using TaleWorlds.ScreenSystem;
-using TaleWorlds.CampaignSystem.GameState;
-using TaleWorlds.CampaignSystem.BarterSystem;
-using TaleWorlds.CampaignSystem.CampaignBehaviors;
-using TaleWorlds.CampaignSystem.CampaignBehaviors.BarterBehaviors;
-using TaleWorlds.CampaignSystem.Encounters;
-using TaleWorlds.CampaignSystem.Party;
-using TaleWorlds.CampaignSystem.Roster;
-using TaleWorlds.CampaignSystem.Settlements;
-using CaptivityEvents.Notifications;
-
-using TaleWorlds.MountAndBlade.View.MissionViews;
-using TaleWorlds.Core.ViewModelCollection.Information;
-using TaleWorlds.CampaignSystem.ViewModelCollection;
-using TaleWorlds.CampaignSystem.Settlements.Workshops;
 
 namespace CaptivityEvents
 {
@@ -174,8 +171,8 @@ namespace CaptivityEvents
         private static float brothelTimerOne;
         private static float brothelTimerTwo;
         private static float brothelTimerThree;
-        public static float sfIn = CEPersistence.brothelFadeIn; 
-        public static float sfBlack = CEPersistence.brothelBlack; 
+        public static float sfIn = CEPersistence.brothelFadeIn;
+        public static float sfBlack = CEPersistence.brothelBlack;
         public static float sfOut = CEPersistence.brothelFadeOut;
 
         // Max Brothel Sound
@@ -361,10 +358,10 @@ namespace CaptivityEvents
             string requiredPath = fullPath + "CaptivityRequired";
 
             // Get Required
-            string[] requiredImages = Directory.EnumerateFiles(requiredPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+            string[] requiredImages = [.. Directory.EnumerateFiles(requiredPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif"))];
 
             // Get All in ModuleLoader
-            string[] files = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+            string[] files = [.. Directory.EnumerateFiles(fullPath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif"))];
 
             // Module Image Load
             if (modulePaths.Count != 0)
@@ -373,7 +370,7 @@ namespace CaptivityEvents
                 {
                     try
                     {
-                        string[] moduleFiles = Directory.EnumerateFiles(filePath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif")).ToArray();
+                        string[] moduleFiles = [.. Directory.EnumerateFiles(filePath, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif"))];
 
                         foreach (string file in moduleFiles)
                         {
@@ -445,7 +442,7 @@ namespace CaptivityEvents
                 spriteCategory.SpriteSheetCount = 6;
                 CECustomHandler.ForceLogToFile("Loading Textures 1.1.1");
 
-             
+
 
                 PropertyInfo propertyWidth = typeof(SpritePart).GetProperty("Width");
                 PropertyInfo propertyHeight = typeof(SpritePart).GetProperty("Height");
@@ -713,7 +710,7 @@ namespace CaptivityEvents
             ResetHelper();
             if (!_isLoaded) return;
             InitializeAttributes(game);
-            AddBehaviors((CampaignGameStarter)gameStarter); 
+            AddBehaviors((CampaignGameStarter)gameStarter);
             CEPersistence.hotbutterAvailable = CEHelper.CheckHotButter();
         }
 
@@ -1223,15 +1220,15 @@ namespace CaptivityEvents
                                     sfIn = .5f;          // base .5/1/.5 goes dark, then does a come-back
                                     sfBlack = 1f;       // 1/1/.5 Goes dark AFTER
                                     sfOut = .5f;         // .5/1/1 not too bad but goes dark after
-                                                        // .5/1/1.5 stays dark
-                                                        // 1.5/1/.95 stays dark
-                                                        // 1/1/1 stays dark
-                                                        // 1/1/.95 stays dark
-                                } 
+                                                         // .5/1/1.5 stays dark
+                                                         // 1.5/1/.95 stays dark
+                                                         // 1/1/1 stays dark
+                                                         // 1/1/.95 stays dark
+                                }
                                 else
                                 {
                                     sfIn = CEPersistence.brothelFadeIn;
-                                    sfBlack = CEPersistence.brothelBlack; 
+                                    sfBlack = CEPersistence.brothelBlack;
                                     sfOut = CEPersistence.brothelFadeOut;
                                 }
                                 behavior.BeginFadeOutAndIn(sfOut, sfBlack, sfIn);
@@ -1249,7 +1246,7 @@ namespace CaptivityEvents
                     case CEPersistence.BrothelState.FadeIn:
                         if (brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
                         {
-                            brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelBlack -2f;
+                            brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelBlack - 2f;
                             brothelTimerTwo = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
                             brothelTimerThree = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
                             Hero.MainHero.HitPoints += 10;
@@ -1433,7 +1430,7 @@ namespace CaptivityEvents
         {
             CEPersistence.battleState = CEPersistence.BattleState.Normal;
 
-            PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter || CEPersistence.removePlayer);
+            PartyBase.MainParty.MemberRoster.RemoveIf(t => !t.Character.IsPlayerCharacter || CEPersistence.removePlayer);
 
             foreach (TroopRosterElement troopRosterElement in CEPersistence.playerTroops)
             {

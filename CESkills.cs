@@ -3,10 +3,10 @@
 using CaptivityEvents.Custom;
 using System;
 using System.Collections.Generic;
+using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-using TaleWorlds.CampaignSystem.Extensions;
 
 
 namespace CaptivityEvents

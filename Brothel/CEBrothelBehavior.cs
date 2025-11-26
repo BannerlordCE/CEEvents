@@ -12,22 +12,21 @@ using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.AgentOrigins;
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.Conversation;
+using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.Core;
-using TaleWorlds.Library;
-using TaleWorlds.Localization;
-using TaleWorlds.MountAndBlade;
-using TaleWorlds.ObjectSystem;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Settlements.Locations;
-using TaleWorlds.CampaignSystem.AgentOrigins;
-using TaleWorlds.CampaignSystem.CharacterDevelopment;
-using TaleWorlds.CampaignSystem.Conversation;
-using TaleWorlds.CampaignSystem.Encounters;
-using CaptivityEvents.Notifications;
+using TaleWorlds.Core;
+using TaleWorlds.Library;
+using TaleWorlds.Localization;
+using TaleWorlds.MountAndBlade;
+using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Brothel
 {
@@ -139,7 +138,7 @@ namespace CaptivityEvents.Brothel
                 PartyState partyState = Game.Current.GameStateManager.CreateState<PartyState>();
                 partyState.IsDonating = false;
                 partyState.PartyScreenMode = PartyScreenHelper.PartyScreenMode.PrisonerManage;
-                PartyScreenLogic partyScreenLogic = new PartyScreenLogic();
+                PartyScreenLogic partyScreenLogic = new();
 
                 TroopRoster prisonRoster = TroopRoster.CreateDummyTroopRoster();
                 List<CharacterObject> prisoners = FetchBrothelPrisoners(Hero.MainHero.CurrentSettlement);
@@ -262,7 +261,7 @@ namespace CaptivityEvents.Brothel
                 int level = GetBrothel(Settlement.CurrentSettlement)?.Level ?? 0;
 
                 // find the current city's set Tavern
-                int tier = 2+level;
+                int tier = 2 + level;
                 string scn = settlement.LocationComplex.GetLocationWithId("tavern").GetSceneName(tier);
                 //InformationManager.DisplayMessage(new InformationMessage($"onInit {scn}", Colors.Magenta));
                 _brothel.SetSceneName(tier, scn);

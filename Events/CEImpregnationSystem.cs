@@ -8,13 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.Roster;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-using TaleWorlds.CampaignSystem.Roster;
-using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.CampaignSystem.LogEntries;
-using TaleWorlds.CampaignSystem.Extensions;
 
 namespace CaptivityEvents.Events
 {
@@ -71,7 +69,7 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture==CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+                        CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
                         randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
                         DisableHeroAction.Apply(randomSoldier);
                     }
@@ -90,7 +88,7 @@ namespace CaptivityEvents.Events
                 }
                 else if (forcePreg)
                 {
-                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture==CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
                     Hero randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.BornSettlement, null, null, CEHelper.HelperMBRandom(20) + 20);
                     DisableHeroAction.Apply(randomSoldier);
                     CEHelper.spouseOne = randomSoldier;
@@ -154,7 +152,7 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
-                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture==CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale && characterObject.Occupation == Occupation.Wanderer);
+                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale && characterObject.Occupation == Occupation.Wanderer);
                     randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(15) + 18);
                     DisableHeroAction.Apply(randomSoldier);
                 }
@@ -232,7 +230,7 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture==CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+                        CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
                         if (m == null) return;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
                         DisableHeroAction.Apply(randomSoldier);
@@ -255,7 +253,7 @@ namespace CaptivityEvents.Events
                 }
                 else if (forcePreg)
                 {
-                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture==CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
                     Hero randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.BornSettlement, null, null, CEHelper.HelperMBRandom(20) + 20);
                     DisableHeroAction.Apply(randomSoldier);
                     CEHelper.spouseOne = randomSoldier;
@@ -324,7 +322,7 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
-                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture==CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale && characterObject.Occupation == Occupation.Wanderer);
+                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale && characterObject.Occupation == Occupation.Wanderer);
                     if (m == null) return;
                     randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(15) + 18);
                     DisableHeroAction.Apply(randomSoldier);

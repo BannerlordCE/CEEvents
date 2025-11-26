@@ -9,11 +9,10 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.ObjectSystem;
 using static CaptivityEvents.Helper.CEHelper;
-
-using TaleWorlds.CampaignSystem.Party;
 
 
 namespace CaptivityEvents.Events

@@ -1,24 +1,24 @@
 #define V127
 
+using CaptivityEvents.Custom;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
+using TaleWorlds.CampaignSystem.ComponentInterfaces;
+using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance;
 using TaleWorlds.Core;
-using TaleWorlds.Localization;
-using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.CampaignSystem.Settlements.Workshops;
-using TaleWorlds.Library;
-using TaleWorlds.Core.ViewModelCollection.Information;
-using System.Collections.Generic;
-using CaptivityEvents.Custom;
-using TaleWorlds.Core.ViewModelCollection.Selector;
-using TaleWorlds.CampaignSystem.CampaignBehaviors;
-using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.Core.ImageIdentifiers;
+using TaleWorlds.Core.ViewModelCollection.Information;
+using TaleWorlds.Core.ViewModelCollection.Selector;
+using TaleWorlds.Library;
+using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Brothel
 {
@@ -160,7 +160,7 @@ namespace CaptivityEvents.Brothel
             }
 
             InputProducts = "";
-            OutputProducts = string.Join(",", _brothel.CaptiveProstitutes.Where(c => c.IsHero).Select(c => c.HeroObject.Name.ToString()).ToArray());
+            OutputProducts = string.Join(",", [.. _brothel.CaptiveProstitutes.Where(c => c.IsHero).Select(c => c.HeroObject.Name.ToString())]);
 
             WarehouseInputAmount = _brothel.CaptiveProstitutes.Where(c => !c.IsHero).Count();
             WarehouseOutputAmount = _brothel.CaptiveProstitutes.Where(c => c.IsHero).Count();

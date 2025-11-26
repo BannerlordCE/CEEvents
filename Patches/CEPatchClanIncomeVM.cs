@@ -2,21 +2,15 @@
 
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
+using CaptivityEvents.Custom;
 using HarmonyLib;
+using System;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories;
-using TaleWorlds.Core;
 using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement;
-using System;
-using CaptivityEvents.Custom;
-using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance;
-using TaleWorlds.CampaignSystem.CampaignBehaviors;
-using System.Collections.Generic;
-using TaleWorlds.CampaignSystem.Roster;
-using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories;
+using TaleWorlds.Core;
 
 namespace CaptivityEvents.Patches
 {
@@ -77,7 +71,7 @@ namespace CaptivityEvents.Patches
                 __instance.RefreshTotalIncome();
                 OnIncomeSelection.Invoke(__instance, [GetDefaultIncome.Invoke(__instance, null)]);
                 __instance.RefreshValues();
-            } 
+            }
             catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("CEPatchClanIncomeVM RefreshList: " + e);

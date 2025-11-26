@@ -1,5 +1,4 @@
-﻿using CaptivityEvents.Helper;
-using MCM.Abstractions.Base.Global;
+﻿using MCM.Abstractions.Base.Global;
 using MCM.Abstractions.FluentBuilder;
 using MCM.Common;
 using System.Linq;
@@ -32,11 +31,11 @@ namespace CaptivityEvents.Config
 
 
 
-            var HotButter = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id.ToLower().StartsWith( "hotbutter"); });
-            var KLBShackles = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "KLBShackles";}) ;
+            var HotButter = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id.ToLower().StartsWith("hotbutter"); });
+            var KLBShackles = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "KLBShackles"; });
             var PrimaeNoctisBLord = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id.ToLower().StartsWith("primaenoctisblord"); });
 
-            if (KLBShackles!=null || HotButter!=null || PrimaeNoctisBLord!=null) shouldRegister = true;
+            if (KLBShackles != null || HotButter != null || PrimaeNoctisBLord != null) shouldRegister = true;
             if (!shouldRegister) return;
 
             ISettingsBuilder builder = BaseSettingsBuilder.Create("CESettingsIntegrations", "Captivity Events Integrations");
@@ -55,12 +54,12 @@ namespace CaptivityEvents.Config
                     if (PrimaeNoctisBLord != null)
                     {
                         groupBuilder.AddBool("PrimaeNoctisBLord", "Primae Noctis (Laws and Stats)", new ProxyRef<bool>(() => ActivatePrimaeNoctisBLord, o => ActivatePrimaeNoctisBLord = o), boolBuilder => boolBuilder.SetHintText("Enables Laws to have a effect on the captivity and stats for sex. (Make sure to double check if the extension is turned on in the launcher)").SetRequireRestart(false));
-                    } 
+                    }
 
                     if (HotButter != null)
                     {
                         groupBuilder.AddBool("HotButter", "Hot Butter (Animated Scenes)", new ProxyRef<bool>(() => ActivateHotButter, o => ActivateHotButter = o), boolBuilder => boolBuilder.SetHintText("Enables Custom Sex Scenes in Brothel/Other.  (Make sure to double check if the extension is turned on in the launcher)").SetRequireRestart(false));
-                    } 
+                    }
                 });
 
                 _settings?.Unregister();

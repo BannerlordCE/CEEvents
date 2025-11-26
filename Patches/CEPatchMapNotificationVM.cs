@@ -6,9 +6,9 @@ using CaptivityEvents.Notifications;
 using HarmonyLib;
 using System;
 using System.Reflection;
-using TaleWorlds.Core;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
+using TaleWorlds.Core;
 
 namespace CaptivityEvents.Patches
 {
