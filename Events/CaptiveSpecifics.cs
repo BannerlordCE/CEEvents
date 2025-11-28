@@ -4,10 +4,13 @@ using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
+using NavalDLC.CampaignBehaviors;
 using System;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.MapEvents;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
@@ -97,8 +100,16 @@ namespace CaptivityEvents.Events
 
             if (!captorParty.IsSettlement || !captorParty.Settlement.IsTown)
             {
+                if (captorParty != null && captorParty.IsMobile)
+                {
+                    MobileParty.MainParty.IsCurrentlyAtSea = captorParty.MobileParty.IsCurrentlyAtSea;
+                }
                 PlayerCaptivity.EndCaptivity();
                 return;
+            }
+            else
+            {
+                MobileParty.MainParty.IsCurrentlyAtSea = false;
             }
 
             // EndCaptivityInternal
@@ -147,6 +158,32 @@ namespace CaptivityEvents.Events
             }
         }
 
+        private bool ShouldActivateRaftStateForMobileParty(MobileParty mobileParty)
+        {
+            return mobileParty.IsCurrentlyAtSea && !mobileParty.IsInRaftState && !mobileParty.HasNavalNavigationCapability && mobileParty.IsActive;
+        }
+
+
+        private void HandleRaftStateActivate(MobileParty mobileParty)
+        {
+            if (mobileParty.HasLandNavigationCapability)
+            {
+                RaftStateChangeAction.ActivateRaftStateForParty(mobileParty);
+            }
+        }
+
+        private void ConsiderMemberAndArmyRaftStateStatus(MobileParty party, Army army)
+        {
+            if (ShouldActivateRaftStateForMobileParty(party))
+            {
+                HandleRaftStateActivate(party);
+            }
+            if (army != null && army.LeaderParty.IsCurrentlyAtSea && !army.LeaderParty.HasNavalNavigationCapability)
+            {
+                DisbandArmyAction.ApplyByNoShip(army);
+            }
+        }
+
         internal void CECaptivityEscape(ref MenuCallbackArgs args)
         {
             CECampaignBehavior.ExtraProps.Owner = null;
@@ -167,8 +204,29 @@ namespace CaptivityEvents.Events
                 textObject.SetTextVariable("SETTLEMENT", settlementName);
             }
 
+            if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.IsMobile)
+            {
+                MobileParty.MainParty.IsCurrentlyAtSea = PlayerCaptivity.CaptorParty.MobileParty.IsCurrentlyAtSea;
+            }
+            else
+            {
+                MobileParty.MainParty.IsCurrentlyAtSea = false;
+            }
+
             new CESubModule().LoadTexture("default");
             PlayerCaptivity.EndCaptivity();
+
+            if (ShouldActivateRaftStateForMobileParty(MobileParty.MainParty))
+            {
+                if (MobileParty.MainParty.Army != null)
+                {
+                    ConsiderMemberAndArmyRaftStateStatus(MobileParty.MainParty, MobileParty.MainParty.Army);
+                }
+                else
+                {
+                    HandleRaftStateActivate(MobileParty.MainParty);
+                }
+            }
         }
 
         internal void CECaptivityChange(ref MenuCallbackArgs args, PartyBase party)

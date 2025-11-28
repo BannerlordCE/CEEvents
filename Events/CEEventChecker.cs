@@ -18,7 +18,6 @@ using static CaptivityEvents.Helper.CEHelper;
 using CETerrainType = CaptivityEvents.Custom.TerrainType;
 using TerrainType = TaleWorlds.Core.TerrainType;
 
-
 namespace CaptivityEvents.Events
 {
     internal class CEEventChecker
@@ -39,6 +38,151 @@ namespace CaptivityEvents.Events
         }
 
         public CEEventChecker(CEEvent listEvent) => _listEvent = listEvent;
+
+        public static string LocationString(PartyBase captorParty = null)
+        {
+            string returnString = "";
+            if (captorParty != null && captorParty.IsSettlement)
+            {
+                if (captorParty.Settlement.IsTown)
+                {
+                    returnString += "(hasDungeonFlag || hasCityFlag)";
+                }
+
+                if (captorParty.Settlement.IsVillage) returnString += "(hasVillageFlag)";
+
+                if (captorParty.Settlement.IsHideout) returnString += "(hasHideoutFlag)";
+
+                if (captorParty.Settlement.IsCastle)
+                {
+                    returnString += "(hasCastleFlag || hasDungeonFlag)";
+                }
+
+                try
+                {
+                    bool hasCaravan = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
+                    if (hasCaravan) returnString += "(visitedByCaravanFlag)";
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Failed to get Caravan");
+                }
+
+                try
+                {
+                    bool hasLord = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty && !mobileParty.IsMainParty; }) != null;
+                    if (hasLord) returnString += "(VisitedByLordFlag)";
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Failed to get Lord Party");
+                }
+
+                try
+                {
+                    bool hasNotableMalesNearby = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
+                    if (hasNotableMalesNearby) returnString += "(hasNotableMalesNearby)";
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Failed to get hasNotableMalesNearby");
+                }
+
+                try
+                {
+                    bool hasNotableFemalesNearby = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
+                    if (hasNotableFemalesNearby) returnString += "(hasNotableFemalesNearby)";
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Failed to get hasNotableFemalesNearby");
+                }
+
+                if (captorParty.Settlement.IsUnderSiege) returnString += "(duringSiegeFlag)";
+
+                if (captorParty.Settlement.IsUnderRaid) returnString += "(duringRaidFlag)";
+
+                returnString += "(hasPartyOnLandFlag)";
+            }
+            else if (captorParty != null && captorParty.IsMobile && captorParty.MobileParty.CurrentSettlement != null)
+            {
+                if (captorParty.MobileParty.CurrentSettlement.IsTown)
+                {
+                    returnString += "(hasPartyInTownFlag)";
+                }
+
+                if (captorParty.MobileParty.CurrentSettlement.IsVillage)
+                {
+                    returnString += "(hasVillageFlag)";
+                }
+
+                if (captorParty.MobileParty.CurrentSettlement.IsCastle)
+                {
+                    returnString += "(hasCastleFlag || hasDungeonFlag)";
+                }
+
+                try
+                {
+                    bool hasCaravan = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
+                    if (hasCaravan) returnString += "(visitedByCaravanFlag)";
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Failed to get Caravan");
+                }
+
+                try
+                {
+                    bool hasLord = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty && !mobileParty.IsMainParty; }) != null;
+                    if (hasLord) returnString += "(VisitedByLordFlag)";
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Failed to get Lord Party");
+                }
+
+                try
+                {
+                    bool hasNotableMalesNearby = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
+                    if (hasNotableMalesNearby) returnString += "(hasNotableMalesNearby)";
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Failed to get hasNotableMalesNearby");
+                }
+
+                try
+                {
+                    bool hasNotableFemalesNearby = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
+                    if (hasNotableFemalesNearby) returnString += "(hasNotableFemalesNearby)";
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Failed to get hasNotableFemalesNearby");
+                }
+
+                if (captorParty.MobileParty.CurrentSettlement.IsHideout) returnString += "(hasHideoutFlag)";
+
+                if (captorParty.MobileParty.CurrentSettlement.IsUnderSiege) returnString += "(duringSiegeFlag)";
+
+                if (captorParty.MobileParty.CurrentSettlement.IsUnderRaid) returnString += "(duringRaidFlag)";
+
+                if (captorParty.MobileParty.IsTargetingPort) returnString += "(LocationPartyInPort)";
+
+                returnString += "(hasPartyOnLandFlag)";
+            }
+            else if (captorParty != null && captorParty.IsMobile)
+            {
+                returnString += "(hasTravellingFlag)";
+                if (captorParty.MobileParty.BesiegerCamp != null) returnString += "(duringSiegeFlag)";
+
+                if (captorParty.MapEvent != null && captorParty.MapEvent.IsRaid && captorParty.MapFaction.IsAtWarWith(captorParty.MapEvent.MapEventSettlement.MapFaction) && captorParty.MapEvent.DefenderSide.TroopCount == 0) returnString += "(duringRaidFlag)";
+
+                returnString += (captorParty.MobileParty.IsCurrentlyAtSea) ? "(hasPartyAtSeaFlag)" : "(hasPartyOnLandFlag)";
+            }
+
+            return returnString;
+        }
 
         public static string CheckFlags(CharacterObject captive, PartyBase captorParty = null)
         {
@@ -75,125 +219,13 @@ namespace CaptivityEvents.Events
                     CECampaignBehavior.ExtraProps.Owner.Name.ToString()) +
                 "\n";
 
-            returnString += "Location : ";
-            if (captorParty != null && captorParty.IsSettlement)
-            {
-                if (captorParty.Settlement.IsTown)
-                {
-                    returnString += "(hasDungeonFlag || hasCityFlag)";
-
-                    try
-                    {
-                        bool hasCaravan = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
-                        if (hasCaravan) returnString += "(visitedByCaravanFlag)";
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Failed to get Caravan");
-                    }
-
-                    try
-                    {
-                        bool hasLord = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty && !mobileParty.IsMainParty; }) != null;
-                        if (hasLord) returnString += "(VisitedByLordFlag)";
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Failed to get Lord Party");
-                    }
-                }
-
-                if (captorParty.Settlement.IsVillage) returnString += "(hasVillageFlag)";
-
-                if (captorParty.Settlement.IsHideout) returnString += "(hasHideoutFlag)";
-
-                if (captorParty.Settlement.IsCastle)
-                {
-                    returnString += "(hasCastleFlag)";
-
-                    try
-                    {
-                        bool hasLord = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty && !mobileParty.IsMainParty; }) != null;
-                        if (hasLord) returnString += "(VisitedByLordFlag)";
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Failed to get Lord Party");
-                    }
-                }
-
-                if (captorParty.Settlement.IsUnderSiege) returnString += "(duringSiegeFlag)";
-
-                if (captorParty.Settlement.IsUnderRaid) returnString += "(duringRaidFlag)";
-            }
-            else if (captorParty != null && captorParty.IsMobile && captorParty.MobileParty.CurrentSettlement != null)
-            {
-                if (captorParty.MobileParty.CurrentSettlement.IsTown)
-                {
-                    returnString += "(hasPartyInTownFlag)";
-
-                    try
-                    {
-                        bool hasCaravan = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
-                        if (hasCaravan) returnString += "(visitedByCaravanFlag)";
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Failed to get Caravan");
-                    }
-
-                    try
-                    {
-                        bool hasLord = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty && !mobileParty.IsMainParty; }) != null;
-                        if (hasLord) returnString += "(VisitedByLordFlag)";
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Failed to get Lord Party");
-                    }
-                }
-
-                if (captorParty.MobileParty.CurrentSettlement.IsVillage) returnString += "(hasVillageFlag)";
-
-                if (captorParty.MobileParty.CurrentSettlement.IsCastle)
-                {
-                    returnString += "(hasCastleFlag)";
-
-                    try
-                    {
-                        bool hasLord = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty && !mobileParty.IsMainParty; }) != null;
-                        if (hasLord) returnString += "(VisitedByLordFlag)";
-                    }
-                    catch (Exception)
-                    {
-                        CECustomHandler.LogToFile("Failed to get Lord Party");
-                    }
-                }
-
-                if (captorParty.MobileParty.CurrentSettlement.IsHideout) returnString += "(hasHideoutFlag)";
-
-                if (captorParty.MobileParty.CurrentSettlement.IsUnderSiege) returnString += "(duringSiegeFlag)";
-
-                if (captorParty.MobileParty.CurrentSettlement.IsUnderRaid) returnString += "(duringRaidFlag)";
-            }
-            else if (captorParty != null && captorParty.IsMobile)
-            {
-                returnString += "(hasTravellingFlag)";
-                if (captorParty.MobileParty.BesiegerCamp != null) returnString += "(duringSiegeFlag)";
-
-                if (captorParty.MapEvent != null && captorParty.MapEvent.IsRaid && captorParty.MapFaction.IsAtWarWith(captorParty.MapEvent.MapEventSettlement.MapFaction) && captorParty.MapEvent.DefenderSide.TroopCount == 0) returnString += "(duringRaidFlag)";
-            }
+            returnString += "Location : " + LocationString(captorParty);
 
             CampaignVec2 position = (captorParty != null && captorParty.IsMobile) ? captorParty?.MobileParty?.Position ?? CampaignVec2.Invalid : captorParty?.Settlement?.Position ?? CampaignVec2.Invalid;
             List<TerrainType> faceTerrainType = Campaign.Current.MapSceneWrapper.GetEnvironmentTerrainTypes(captorParty.Position);
 
-            AtmosphereInfo atmosphere = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(position);
-
             string environmentTerrainTypes = "";
             faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
-
-            //environmentTerrainTypes += "Snow";
-
 
             returnString += "\nEnvironment Terrain Types : " + environmentTerrainTypes;
 
@@ -504,24 +536,31 @@ namespace CaptivityEvents.Events
 
             foreach (CETerrainType[] terrainTypes in _listEvent.TerrainTypesRequirements)
             {
-                bool hasWorldMapWater = terrainTypes.Contains(CETerrainType.Water);
-                bool hasWorldMapMountain = terrainTypes.Contains(CETerrainType.Mountain);
-                bool hasWorldMapSnow = terrainTypes.Contains(CETerrainType.Snow);
-                bool hasWorldMapSteppe = terrainTypes.Contains(CETerrainType.Steppe);
                 bool hasWorldMapPlain = terrainTypes.Contains(CETerrainType.Plain);
                 bool hasWorldMapDesert = terrainTypes.Contains(CETerrainType.Desert);
+                bool hasWorldMapSnow = terrainTypes.Contains(CETerrainType.Snow);
+                bool hasWorldMapForest = terrainTypes.Contains(CETerrainType.Forest);
+                bool hasWorldMapSteppe = terrainTypes.Contains(CETerrainType.Steppe);
+                bool hasWorldMapFording = terrainTypes.Contains(CETerrainType.Fording);
+                bool hasWorldMapMountain = terrainTypes.Contains(CETerrainType.Mountain);
+                bool hasWorldMapLake = terrainTypes.Contains(CETerrainType.Lake);
+                bool hasWorldMapWater = terrainTypes.Contains(CETerrainType.Water);
+                bool hasWorldMapRiver = terrainTypes.Contains(CETerrainType.River);
+                bool hasWorldMapCanyon = terrainTypes.Contains(CETerrainType.Canyon);
+                bool hasWorldMapRuralArea = terrainTypes.Contains(CETerrainType.RuralArea);
                 bool hasWorldMapSwamp = terrainTypes.Contains(CETerrainType.Swamp);
                 bool hasWorldMapDune = terrainTypes.Contains(CETerrainType.Dune);
                 bool hasWorldMapBridge = terrainTypes.Contains(CETerrainType.Bridge);
-                bool hasWorldMapRiver = terrainTypes.Contains(CETerrainType.River);
-                bool hasWorldMapForest = terrainTypes.Contains(CETerrainType.Forest);
-                bool hasWorldMapShallowRiver = terrainTypes.Contains(CETerrainType.ShallowRiver);
-                bool hasWorldMapLake = terrainTypes.Contains(CETerrainType.Lake);
-                bool hasWorldMapCanyon = terrainTypes.Contains(CETerrainType.Canyon);
-                bool hasWorldMapRuralArea = terrainTypes.Contains(CETerrainType.RuralArea);
+                bool hasWorldMapCoastalSea = terrainTypes.Contains(CETerrainType.CoastalSea);
+                bool hasWorldMapOpenSea = terrainTypes.Contains(CETerrainType.OpenSea);
+                bool hasWorldMapBeach = terrainTypes.Contains(CETerrainType.Beach);
+                bool hasWorldMapCliff = terrainTypes.Contains(CETerrainType.Cliff);
+                bool hasWorldMapNonNavigableRiver = terrainTypes.Contains(CETerrainType.NonNavigableRiver);
+                bool hasWorldMapLandRestriction = terrainTypes.Contains(CETerrainType.LandRestriction);
+                bool hasWorldMapSeaRestriction = terrainTypes.Contains(CETerrainType.SeaRestriction);
+                bool hasWorldMapUnderBridge = terrainTypes.Contains(CETerrainType.UnderBridge);
 
-                if (
-                    hasWorldMapWater || hasWorldMapMountain || hasWorldMapSnow || hasWorldMapSteppe || hasWorldMapPlain || hasWorldMapDesert || hasWorldMapSwamp || hasWorldMapDune || hasWorldMapBridge || hasWorldMapRiver || hasWorldMapForest || hasWorldMapShallowRiver || hasWorldMapLake || hasWorldMapCanyon || hasWorldMapRuralArea
+                if (hasWorldMapPlain || hasWorldMapDesert || hasWorldMapSnow || hasWorldMapForest || hasWorldMapSteppe || hasWorldMapFording || hasWorldMapMountain || hasWorldMapLake || hasWorldMapWater || hasWorldMapRiver || hasWorldMapCanyon || hasWorldMapRuralArea || hasWorldMapSwamp || hasWorldMapDune || hasWorldMapBridge || hasWorldMapCoastalSea || hasWorldMapOpenSea || hasWorldMapBeach || hasWorldMapCliff || hasWorldMapNonNavigableRiver || hasWorldMapLandRestriction || hasWorldMapSeaRestriction || hasWorldMapUnderBridge
                 )
                 {
                     Vec3? position3D = (party != null && party.IsMobile) ? party?.MobileParty?.GetPositionAsVec3() : party?.Settlement?.GetPosition();
@@ -530,24 +569,30 @@ namespace CaptivityEvents.Events
                     string environmentTerrainTypes = "";
                     faceTerrainType.ForEach((type) => { environmentTerrainTypes += type.ToString() + " "; });
 
-                    //if (Campaign.Current.Models.MapWeatherModel.GetIsSnowTerrainInPos((Vec3)position3D)) environmentTerrainTypes += "Snow";
-
                     eventMatchingCondition = false;
-                    if (hasWorldMapWater) eventMatchingCondition = environmentTerrainTypes.Contains("Water");
-                    if (hasWorldMapMountain) eventMatchingCondition = environmentTerrainTypes.Contains("Mountain");
-                    if (hasWorldMapSnow) eventMatchingCondition = environmentTerrainTypes.Contains("Snow");
-                    if (hasWorldMapSteppe) eventMatchingCondition = environmentTerrainTypes.Contains("Steppe");
                     if (hasWorldMapPlain) eventMatchingCondition = environmentTerrainTypes.Contains("Plain");
                     if (hasWorldMapDesert) eventMatchingCondition = environmentTerrainTypes.Contains("Desert");
+                    if (hasWorldMapSnow) eventMatchingCondition = environmentTerrainTypes.Contains("Snow");
+                    if (hasWorldMapForest) eventMatchingCondition = environmentTerrainTypes.Contains("Forest");
+                    if (hasWorldMapSteppe) eventMatchingCondition = environmentTerrainTypes.Contains("Steppe");
+                    if (hasWorldMapFording) eventMatchingCondition = environmentTerrainTypes.Contains("Fording");
+                    if (hasWorldMapMountain) eventMatchingCondition = environmentTerrainTypes.Contains("Mountain");
+                    if (hasWorldMapLake) eventMatchingCondition = environmentTerrainTypes.Contains("Lake");
+                    if (hasWorldMapWater) eventMatchingCondition = environmentTerrainTypes.Contains("Water");
+                    if (hasWorldMapRiver) eventMatchingCondition = environmentTerrainTypes.Contains("River");
+                    if (hasWorldMapCanyon) eventMatchingCondition = environmentTerrainTypes.Contains("Canyon");
+                    if (hasWorldMapRuralArea) eventMatchingCondition = environmentTerrainTypes.Contains("RuralArea");
                     if (hasWorldMapSwamp) eventMatchingCondition = environmentTerrainTypes.Contains("Swamp");
                     if (hasWorldMapDune) eventMatchingCondition = environmentTerrainTypes.Contains("Dune");
                     if (hasWorldMapBridge) eventMatchingCondition = environmentTerrainTypes.Contains("Bridge");
-                    if (hasWorldMapRiver) eventMatchingCondition = environmentTerrainTypes.Contains("River");
-                    if (hasWorldMapForest) eventMatchingCondition = environmentTerrainTypes.Contains("Forest");
-                    if (hasWorldMapShallowRiver) eventMatchingCondition = environmentTerrainTypes.Contains("ShallowRiver");
-                    if (hasWorldMapLake) eventMatchingCondition = environmentTerrainTypes.Contains("Lake");
-                    if (hasWorldMapCanyon) eventMatchingCondition = environmentTerrainTypes.Contains("Canyon");
-                    if (hasWorldMapRuralArea) eventMatchingCondition = environmentTerrainTypes.Contains("RuralArea");
+                    if (hasWorldMapCoastalSea) eventMatchingCondition = environmentTerrainTypes.Contains("CoastalSea");
+                    if (hasWorldMapOpenSea) eventMatchingCondition = environmentTerrainTypes.Contains("OpenSea");
+                    if (hasWorldMapBeach) eventMatchingCondition = environmentTerrainTypes.Contains("Beach");
+                    if (hasWorldMapCliff) eventMatchingCondition = environmentTerrainTypes.Contains("Cliff");
+                    if (hasWorldMapNonNavigableRiver) eventMatchingCondition = environmentTerrainTypes.Contains("NonNavigableRiver");
+                    if (hasWorldMapLandRestriction) eventMatchingCondition = environmentTerrainTypes.Contains("LandRestriction");
+                    if (hasWorldMapSeaRestriction) eventMatchingCondition = environmentTerrainTypes.Contains("SeaRestriction");
+                    if (hasWorldMapUnderBridge) eventMatchingCondition = environmentTerrainTypes.Contains("UnderBridge");
 
                     if (eventMatchingCondition) break;
                 }
@@ -631,6 +676,9 @@ namespace CaptivityEvents.Events
             bool hasPartyInVillageFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInVillage);
             bool hasPartyInCastleFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInCastle);
             bool hasTravelingFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationTravellingParty);
+            bool hasPartyOnLandFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationLand);
+            bool hasPartyAtSeaFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationSea);
+            bool hasPartyInPort = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInPort);
             bool hasNotableFemalesNearby = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.NotableFemalesNearby);
             bool hasNotableMalesNearby = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.NotableMalesNearby);
             bool visitedByCaravanFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByCaravan);
@@ -640,268 +688,73 @@ namespace CaptivityEvents.Events
 
             eventMatchingCondition = true;
 
-            if (hasCityFlag || hasDungeonFlag || hasVillageFlag || hasHideoutFlag || hasTravelingFlag || hasCastleFlag || hasPartyInTownFlag || hasPartyInVillageFlag || hasPartyInCastleFlag || visitedByCaravanFlag || visitedByLordFlag || duringSiegeFlag || duringRaidFlag || hasNotableFemalesNearby || hasNotableMalesNearby)
+            if (hasCityFlag || hasDungeonFlag || hasVillageFlag || hasHideoutFlag || hasPartyOnLandFlag || hasPartyAtSeaFlag ||  hasPartyInPort || hasTravelingFlag || hasCastleFlag || hasPartyInTownFlag || hasPartyInVillageFlag || hasPartyInCastleFlag || visitedByCaravanFlag || visitedByLordFlag || duringSiegeFlag || duringRaidFlag || hasNotableFemalesNearby || hasNotableMalesNearby)
             {
-                eventMatchingCondition = false;
+                string locationString = LocationString(captorParty);
 
-                if (captorParty != null && captorParty.IsSettlement)
+                if (hasCityFlag && !locationString.Contains("hasCityFlag"))
                 {
-                    if (captorParty.Settlement.IsTown && (hasDungeonFlag || hasCityFlag))
-                    {
-                        if (hasNotableFemalesNearby && !hasNotableMalesNearby)
-                        {
-                            eventMatchingCondition = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
-                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                        }
-                        else if (hasNotableMalesNearby && !hasNotableFemalesNearby)
-                        {
-                            eventMatchingCondition = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
-                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                        }
-
-                        if (visitedByCaravanFlag)
-                        {
-                            try
-                            {
-                                eventMatchingCondition = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan) != null;
-                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
-                            }
-                            catch (Exception)
-                            {
-                                return LogError("Failed to get Caravan");
-                            }
-                        }
-                        else if (visitedByLordFlag)
-                        {
-                            try
-                            {
-                                eventMatchingCondition = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty) != null;
-                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByLordFlag conditions.");
-                            }
-                            catch (Exception)
-                            {
-                                return LogError("Failed to get Lord Party");
-                            }
-                        }
-                        else
-                        {
-                            eventMatchingCondition = true;
-                        }
-                    }
-
-                    if (hasVillageFlag && captorParty.Settlement.IsVillage)
-                    {
-                        if (hasNotableFemalesNearby && !hasNotableMalesNearby)
-                        {
-                            eventMatchingCondition = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
-                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                        }
-                        else if (hasNotableMalesNearby && !hasNotableFemalesNearby)
-                        {
-                            eventMatchingCondition = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
-                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                        }
-                        else
-                        {
-                            eventMatchingCondition = true;
-                        }
-                    }
-                    if (hasHideoutFlag && captorParty.Settlement.IsHideout) eventMatchingCondition = true;
-                    if ((hasCastleFlag || hasDungeonFlag) && captorParty.Settlement.IsCastle)
-                    {
-                        if (hasNotableFemalesNearby && !hasNotableMalesNearby)
-                        {
-                            eventMatchingCondition = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
-                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                        }
-                        else if (hasNotableMalesNearby && !hasNotableFemalesNearby)
-                        {
-                            eventMatchingCondition = captorParty.Settlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
-                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                        }
-
-                        if (visitedByCaravanFlag)
-                        {
-                            try
-                            {
-                                eventMatchingCondition = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan) != null;
-                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
-                            }
-                            catch (Exception)
-                            {
-                                return LogError("Failed to get Caravan");
-                            }
-                        }
-                        else if (visitedByLordFlag)
-                        {
-                            try
-                            {
-                                eventMatchingCondition = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty) != null;
-                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByLordFlag conditions.");
-                            }
-                            catch (Exception)
-                            {
-                                return LogError("Failed to get Lord Party");
-                            }
-                        }
-                        else
-                        {
-                            eventMatchingCondition = true;
-                        }
-                    }
-
-                    if (duringSiegeFlag != captorParty.Settlement.IsUnderSiege) eventMatchingCondition = false;
-
-                    if (duringRaidFlag != captorParty.Settlement.IsUnderRaid) eventMatchingCondition = false;
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasCityFlag conditions.");
                 }
-                else if (captorParty != null && captorParty.IsMobile && captorParty.MobileParty.CurrentSettlement != null)
+                else if (hasDungeonFlag && !locationString.Contains("hasDungeonFlag"))
                 {
-                    if (hasPartyInTownFlag && captorParty.MobileParty.CurrentSettlement.IsTown)
-                    {
-                        if (hasNotableFemalesNearby && !hasNotableMalesNearby)
-                        {
-                            eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
-                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                        }
-                        else if (hasNotableMalesNearby && !hasNotableFemalesNearby)
-                        {
-                            eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
-                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                        }
-
-                        if (visitedByCaravanFlag)
-                        {
-                            try
-                            {
-                                eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan) != null;
-                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
-                            }
-                            catch (Exception)
-                            {
-                                return LogError("Failed to get Caravan");
-                            }
-                        }
-                        else if (visitedByLordFlag)
-                        {
-                            try
-                            {
-                                eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty) != null;
-                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByLordFlag conditions.");
-                            }
-                            catch (Exception)
-                            {
-                                return LogError("Failed to get Lord Party");
-                            }
-                        }
-                        else
-                        {
-                            eventMatchingCondition = true;
-                        }
-                    }
-
-                    if (hasPartyInVillageFlag && captorParty.MobileParty.CurrentSettlement.IsVillage)
-                    {
-                        if (hasNotableFemalesNearby && !hasNotableMalesNearby)
-                        {
-                            eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
-                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                        }
-                        else if (hasNotableMalesNearby && !hasNotableFemalesNearby)
-                        {
-                            eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
-                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                        }
-
-
-                        if (visitedByCaravanFlag)
-                        {
-                            try
-                            {
-                                eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan) != null;
-                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
-                            }
-                            catch (Exception)
-                            {
-                                return LogError("Failed to get Caravan");
-                            }
-                        }
-                        else if (visitedByLordFlag)
-                        {
-                            try
-                            {
-                                eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty) != null;
-                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByLordFlag conditions.");
-                            }
-                            catch (Exception)
-                            {
-                                return LogError("Failed to get Lord Party");
-                            }
-                        }
-                        else
-                        {
-                            eventMatchingCondition = true;
-                        }
-                    }
-
-                    if (hasPartyInCastleFlag && captorParty.MobileParty.CurrentSettlement.IsCastle)
-                    {
-                        if (hasNotableFemalesNearby && !hasNotableMalesNearby)
-                        {
-                            eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => findFirstNotable.IsFemale) != null;
-                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                        }
-                        else if (hasNotableMalesNearby && !hasNotableFemalesNearby)
-                        {
-                            eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Notables.FirstOrDefault(findFirstNotable => !findFirstNotable.IsFemale) != null;
-                            if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                        }
-
-
-                        if (visitedByCaravanFlag)
-                        {
-                            try
-                            {
-                                eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan) != null;
-                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
-                            }
-                            catch (Exception)
-                            {
-                                return LogError("Failed to get Caravan");
-                            }
-                        }
-                        else if (visitedByLordFlag)
-                        {
-                            try
-                            {
-                                eventMatchingCondition = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty) != null;
-                                if (!eventMatchingCondition) return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByLordFlag conditions.");
-                            }
-                            catch (Exception)
-                            {
-                                return LogError("Failed to get Lord Party");
-                            }
-                        }
-                        else
-                        {
-                            eventMatchingCondition = true;
-                        }
-                    }
-
-                    if (duringSiegeFlag != captorParty.MobileParty.CurrentSettlement.IsUnderSiege) eventMatchingCondition = false;
-                    if (duringRaidFlag != captorParty.MobileParty.CurrentSettlement.IsUnderRaid) eventMatchingCondition = false;
-                    if (hasHideoutFlag && captorParty.MobileParty.CurrentSettlement.IsHideout) eventMatchingCondition = true;
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasDungeonFlag conditions.");
                 }
-                else if (hasTravelingFlag)
+                else if (hasVillageFlag && !locationString.Contains("hasVillageFlag"))
                 {
-                    if (captorParty.IsMobile)
-                    {
-                        eventMatchingCondition = true;
-
-                        if (duringSiegeFlag != (captorParty.MobileParty.BesiegerCamp != null)) eventMatchingCondition = false;
-
-                        bool raidingEvent = captorParty.MapEvent != null && captorParty.MapEvent.IsRaid && captorParty.MapFaction.IsAtWarWith(captorParty.MapEvent.MapEventSettlement.MapFaction) && captorParty.MapEvent.DefenderSide.TroopCount == 0;
-                        if (duringRaidFlag != raidingEvent) eventMatchingCondition = false;
-                    }
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasVillageFlag conditions.");
+                }
+                else if (hasHideoutFlag && !locationString.Contains("hasHideoutFlag"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasHideoutFlag conditions.");
+                }
+                else if (hasPartyOnLandFlag && !locationString.Contains("hasPartyOnLandFlag"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyOnLandFlag conditions.");
+                }
+                else if (hasPartyAtSeaFlag && !locationString.Contains("hasPartyAtSeaFlag"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyAtSeaFlag conditions.");
+                }
+                else if (hasPartyInPort && !locationString.Contains("hasPartyInPort"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyInPort conditions.");
+                }
+                else if (hasCastleFlag && !locationString.Contains("hasCastleFlag"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasCastleFlag conditions.");
+                }
+                else if (hasPartyInTownFlag && !locationString.Contains("hasPartyInTownFlag"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyInTownFlag conditions.");
+                }
+                else if (hasPartyInVillageFlag && !locationString.Contains("hasPartyInVillageFlag"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyInVillageFlag conditions.");
+                }
+                else if (hasPartyInCastleFlag && !locationString.Contains("hasPartyInCastleFlag"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyInCastleFlag conditions.");
+                }
+                else if (visitedByCaravanFlag && !locationString.Contains("visitedByCaravanFlag"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
+                }
+                else if (duringSiegeFlag && !locationString.Contains("duringSiegeFlag"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the duringSiegeFlag conditions.");
+                }
+                else if (duringRaidFlag && !locationString.Contains("duringRaidFlag"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the duringRaidFlag conditions.");
+                }
+                else if (hasNotableFemalesNearby && !locationString.Contains("hasNotableFemalesNearby"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                }
+                else if (hasNotableMalesNearby && !locationString.Contains("hasNotableMalesNearby"))
+                {
+                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableMalesNearby conditions.");
                 }
             }
 
@@ -921,7 +774,6 @@ namespace CaptivityEvents.Events
 
         private bool CaptorPartyGenderCheck(PartyBase captorParty)
         {
-
             if ((captorParty?.LeaderHero == null || captorParty?.LeaderHero != null && captorParty.LeaderHero.IsFemale) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsMale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsMale.");
             if ((captorParty?.LeaderHero == null || captorParty?.LeaderHero != null && !captorParty.LeaderHero.IsFemale) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. CaptorGenderIsFemale.");
 

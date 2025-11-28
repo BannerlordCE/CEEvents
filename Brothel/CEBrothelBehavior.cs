@@ -1332,9 +1332,17 @@ namespace CaptivityEvents.Brothel
 
         private void CleanUpBrothel()
         {
-            if (_isBrothelInitialized)
+            try
             {
-                LocationComplex.Current.GetLocationWithId("brothel").RemoveAllCharacters();
+                if (_isBrothelInitialized)
+                {
+                    LocationComplex.Current.GetLocationWithId("brothel").RemoveAllCharacters();
+                    _isBrothelInitialized = false;
+                }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed to CleanUpBrothel (Corrupt Save)" + e);
                 _isBrothelInitialized = false;
             }
         }

@@ -6,6 +6,7 @@ using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Notifications;
+using Helpers;
 using SandBox;
 using System;
 using System.Collections.Generic;
@@ -15,9 +16,12 @@ using System.Reflection;
 using System.Threading;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
+using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Settlements.Locations;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
@@ -113,7 +117,7 @@ namespace CaptivityEvents.Helper
 
                 CESettings._provider = _provider;
 
-                return "Success";
+                return "Success reloaded from Modules/zCaptivityEvents/ModuleLoader/CaptivityRequired/Events/CESettings.xml";
             }
             catch (Exception e)
             {
@@ -605,6 +609,43 @@ namespace CaptivityEvents.Helper
             }
         }
 
+        [CommandLineFunctionality.CommandLineArgumentFunction("current_location_flags", "captivity")]
+        public static string CurrentLocation(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.current_location_flags [SEARCH_HERO]\".";
+
+                //try
+                //{
+                //    CommandLineFunctionality.CallFunction("console.clear", "", out bool found);
+
+                //} catch (Exception e)
+                //{
+                //    string et = e.ToString();
+                //}
+
+                string searchTerm = null;
+
+                if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
+
+                Hero hero = string.IsNullOrWhiteSpace(searchTerm)
+                    ? Hero.MainHero
+                    : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
+
+                return hero == null
+                    ? "Hero not found."
+                    : "Location : " + CEEventChecker.LocationString(hero.IsPrisoner ? hero.PartyBelongedToAsPrisoner : hero.PartyBelongedTo.Party);
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
+
         [CommandLineFunctionality.CommandLineArgumentFunction("current_status", "captivity")]
         public static string CurrentStatus(List<string> strings)
         {
@@ -633,7 +674,7 @@ namespace CaptivityEvents.Helper
 
                 return hero == null
                     ? "Hero not found."
-                    : CEEventChecker.CheckFlags(hero.CharacterObject, PlayerCaptivity.CaptorParty);
+                    : CEEventChecker.CheckFlags(hero.CharacterObject, hero.IsPrisoner ? hero.PartyBelongedToAsPrisoner : hero.PartyBelongedTo.Party);
             }
             catch (Exception e)
             {
@@ -847,6 +888,8 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
+                    RaftStateChangeAction.DeactivateRaftStateForParty(MobileParty.MainParty);
+
                     Hero.MainHero.Children.ForEach(child =>
                     {
                         child.Clan = Hero.MainHero.Clan;

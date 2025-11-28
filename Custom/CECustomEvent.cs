@@ -116,6 +116,9 @@ namespace CaptivityEvents.Custom
         VisitedByLord,
         DuringSiege,
         DuringRaid,
+        LocationLand,
+        LocationSea,
+        LocationPartyInPort,
         LocationTravellingParty,
         LocationCaravan,
         LocationPartyInTown,
@@ -213,21 +216,29 @@ namespace CaptivityEvents.Custom
     [Serializable]
     public enum TerrainType
     {
-        Water,
-        Mountain,
-        Snow,
-        Steppe,
-        Plain,
+        Plain = 1,
         Desert,
+        Snow,
+        Forest,
+        Steppe,
+        Fording,
+        Mountain,
+        Lake,
+        Water = 10,
+        River,
+        Canyon = 13,
+        RuralArea,
         Swamp,
         Dune,
         Bridge,
-        River,
-        Forest,
-        ShallowRiver,
-        Lake,
-        Canyon,
-        RuralArea
+        CoastalSea,
+        OpenSea,
+        Beach,
+        Cliff,
+        NonNavigableRiver,
+        LandRestriction,
+        SeaRestriction,
+        UnderBridge
     }
 
     [DebuggerStepThrough]

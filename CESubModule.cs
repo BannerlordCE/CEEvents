@@ -153,6 +153,8 @@ namespace CaptivityEvents
 
         private static bool _isLoadedInGame;
 
+        private static bool _isNavalLoaded;
+
         // Harmony
         private Harmony _harmony;
 
@@ -238,12 +240,27 @@ namespace CaptivityEvents
                         : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[0]] = name == "default"
-                          ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sfw"])
+                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sfw"])
                         : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sfw"])
                         : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+
+                    if (_isNavalLoaded)
+                    {
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
+                            ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea_sfw"])
+                            : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
+                            ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea_sfw"])
+                            : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
+                           ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft_sfw"])
+                           : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                    }
                 }
                 else
                 {
@@ -262,6 +279,21 @@ namespace CaptivityEvents
                     UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
                         ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sfw"])
                         : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+
+                    if (_isNavalLoaded)
+                    {
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
+                            ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea_sfw"])
+                            : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
+                            ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea_sfw"])
+                            : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
+                           ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft_sfw"])
+                           : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                    }
                 }
             }
             catch (Exception e)
@@ -440,9 +472,8 @@ namespace CaptivityEvents
                 spriteCategory.SpriteSheets.AddRange([QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"])]);
                 spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray([new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805)]);
                 spriteCategory.SpriteSheetCount = 6;
+
                 CECustomHandler.ForceLogToFile("Loading Textures 1.1.1");
-
-
 
                 PropertyInfo propertyWidth = typeof(SpritePart).GetProperty("Width");
                 PropertyInfo propertyHeight = typeof(SpritePart).GetProperty("Height");
@@ -489,6 +520,55 @@ namespace CaptivityEvents
                         default:
                             break;
                     }
+                }
+
+
+                if (modulesFound.Contains("NavalDLC"))
+                {
+                    SpriteCategory spriteCategoryNaval = UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"];
+                    spriteCategoryNaval.SpriteSheets.AddRange([QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft"])]);
+                    spriteCategoryNaval.SheetSizes = spriteCategoryNaval.SheetSizes.AddRangeToArray([new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805)]);
+                    spriteCategoryNaval.SpriteSheetCount = 4;
+
+                    _isNavalLoaded = true;
+
+                    CECustomHandler.ForceLogToFile("Loading Textures 1.3.5");
+
+                    foreach (SpritePart spritePart in UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteParts)
+                    {
+                        switch (spritePart.Name)
+                        {
+                            case "wait_captive_at_sea_female":
+                                spritePart.SheetID = 2;
+                                spritePart.SheetX = 0;
+                                spritePart.SheetY = 0;
+                                propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                                propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                                spritePart.UpdateInitValues();
+                                break;
+
+                            case "wait_captive_at_sea_male":
+                                spritePart.SheetID = 3;
+                                spritePart.SheetX = 0;
+                                spritePart.SheetY = 0;
+                                propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                                propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                                spritePart.UpdateInitValues();
+                                break;
+
+                            case "raft_state":
+                                spritePart.SheetID = 4;
+                                spritePart.SheetX = 0;
+                                spritePart.SheetY = 0;
+                                propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                                propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                                spritePart.UpdateInitValues();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
                 }
 
                 LoadTexture("default", false, true);

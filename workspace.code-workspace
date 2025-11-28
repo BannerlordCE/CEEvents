@@ -36,5 +36,10 @@
 		{
 			"path": "../../zModules"
 		}
-	]
+	],
+	"settings": {
+		"cSpell.words": [
+			"Overwritable"
+		]
+	}
 }
