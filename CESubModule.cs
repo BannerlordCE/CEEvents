@@ -249,15 +249,15 @@ namespace CaptivityEvents
 
                     if (_isNavalLoaded)
                     {
-                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[1] = name == "default"
                             ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea_sfw"])
                             : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[2] = name == "default"
                             ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea_sfw"])
                             : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[3] = name == "default"
                            ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft_sfw"])
                            : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
                     }
@@ -282,15 +282,15 @@ namespace CaptivityEvents
 
                     if (_isNavalLoaded)
                     {
-                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[sprite_index[1]] = name == "default"
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[2] = name == "default"
                             ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea_sfw"])
                             : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[sprite_index[2]] = name == "default"
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[1] = name == "default"
                             ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea_sfw"])
                             : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[sprite_index[3]] = name == "default"
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[3] = name == "default"
                            ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft_sfw"])
                            : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
                     }

@@ -675,86 +675,114 @@ namespace CaptivityEvents.Events
             bool hasPartyInTownFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInTown);
             bool hasPartyInVillageFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInVillage);
             bool hasPartyInCastleFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInCastle);
-            bool hasTravelingFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationTravellingParty);
+            bool hasPartyInPortFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInPort);
+            bool hasTravellingFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationTravellingParty);
+
             bool hasPartyOnLandFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationLand);
             bool hasPartyAtSeaFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationSea);
-            bool hasPartyInPort = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationPartyInPort);
+
             bool hasNotableFemalesNearby = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.NotableFemalesNearby);
             bool hasNotableMalesNearby = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.NotableMalesNearby);
+
             bool visitedByCaravanFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByCaravan);
             bool visitedByLordFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByLord);
+
             bool duringSiegeFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DuringSiege);
             bool duringRaidFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DuringRaid);
 
             eventMatchingCondition = true;
 
-            if (hasCityFlag || hasDungeonFlag || hasVillageFlag || hasHideoutFlag || hasPartyOnLandFlag || hasPartyAtSeaFlag ||  hasPartyInPort || hasTravelingFlag || hasCastleFlag || hasPartyInTownFlag || hasPartyInVillageFlag || hasPartyInCastleFlag || visitedByCaravanFlag || visitedByLordFlag || duringSiegeFlag || duringRaidFlag || hasNotableFemalesNearby || hasNotableMalesNearby)
+
+            bool inclusiveConditions = (hasCityFlag || hasDungeonFlag || hasVillageFlag || hasHideoutFlag || hasPartyInPortFlag || hasTravellingFlag || hasCastleFlag || hasPartyInTownFlag || hasPartyInVillageFlag || hasPartyInCastleFlag);
+
+            bool exclusiveConditionsLand = (hasPartyOnLandFlag || hasPartyAtSeaFlag) && !(hasPartyOnLandFlag && hasPartyAtSeaFlag);
+
+            bool exclusiveConditions = (exclusiveConditionsLand || hasNotableFemalesNearby || hasNotableMalesNearby || hasNotableFemalesNearby || hasNotableMalesNearby || visitedByCaravanFlag || visitedByLordFlag);
+
+            if (exclusiveConditions || inclusiveConditions)
             {
                 string locationString = LocationString(captorParty);
 
-                if (hasCityFlag && !locationString.Contains("hasCityFlag"))
+                if (exclusiveConditions)
                 {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasCityFlag conditions.");
+                    if (hasPartyOnLandFlag && !locationString.Contains("hasPartyOnLandFlag"))
+                    {
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyOnLandFlag conditions.");
+                    }
+                    else if (hasPartyAtSeaFlag && !locationString.Contains("hasPartyAtSeaFlag"))
+                    {
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyAtSeaFlag conditions.");
+                    }
+                    else if (visitedByCaravanFlag && !locationString.Contains("visitedByCaravanFlag"))
+                    {
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
+                    }
+                    else if (visitedByCaravanFlag && !locationString.Contains("visitedByLordFlag"))
+                    {
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByLordFlag conditions.");
+                    }
+                    else if (duringSiegeFlag && !locationString.Contains("duringSiegeFlag"))
+                    {
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the duringSiegeFlag conditions.");
+                    }
+                    else if (duringRaidFlag && !locationString.Contains("duringRaidFlag"))
+                    {
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the duringRaidFlag conditions.");
+                    }
+                    else if (hasNotableFemalesNearby && !locationString.Contains("hasNotableFemalesNearby"))
+                    {
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
+                    }
+                    else if (hasNotableMalesNearby && !locationString.Contains("hasNotableMalesNearby"))
+                    {
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableMalesNearby conditions.");
+                    }
                 }
-                else if (hasDungeonFlag && !locationString.Contains("hasDungeonFlag"))
+
+                if (inclusiveConditions)
                 {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasDungeonFlag conditions.");
-                }
-                else if (hasVillageFlag && !locationString.Contains("hasVillageFlag"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasVillageFlag conditions.");
-                }
-                else if (hasHideoutFlag && !locationString.Contains("hasHideoutFlag"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasHideoutFlag conditions.");
-                }
-                else if (hasPartyOnLandFlag && !locationString.Contains("hasPartyOnLandFlag"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyOnLandFlag conditions.");
-                }
-                else if (hasPartyAtSeaFlag && !locationString.Contains("hasPartyAtSeaFlag"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyAtSeaFlag conditions.");
-                }
-                else if (hasPartyInPort && !locationString.Contains("hasPartyInPort"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyInPort conditions.");
-                }
-                else if (hasCastleFlag && !locationString.Contains("hasCastleFlag"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasCastleFlag conditions.");
-                }
-                else if (hasPartyInTownFlag && !locationString.Contains("hasPartyInTownFlag"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyInTownFlag conditions.");
-                }
-                else if (hasPartyInVillageFlag && !locationString.Contains("hasPartyInVillageFlag"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyInVillageFlag conditions.");
-                }
-                else if (hasPartyInCastleFlag && !locationString.Contains("hasPartyInCastleFlag"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasPartyInCastleFlag conditions.");
-                }
-                else if (visitedByCaravanFlag && !locationString.Contains("visitedByCaravanFlag"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
-                }
-                else if (duringSiegeFlag && !locationString.Contains("duringSiegeFlag"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the duringSiegeFlag conditions.");
-                }
-                else if (duringRaidFlag && !locationString.Contains("duringRaidFlag"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the duringRaidFlag conditions.");
-                }
-                else if (hasNotableFemalesNearby && !locationString.Contains("hasNotableFemalesNearby"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableFemalesNearby conditions.");
-                }
-                else if (hasNotableMalesNearby && !locationString.Contains("hasNotableMalesNearby"))
-                {
-                    return Error("Skipping event " + _listEvent.Name + " it does not match the hasNotableMalesNearby conditions.");
+                    eventMatchingCondition = false;
+
+                    if (hasTravellingFlag && locationString.Contains("hasTravellingFlag"))
+                    {
+                        eventMatchingCondition = true;
+                    }
+                    else if (hasCityFlag && locationString.Contains("hasCityFlag"))
+                    {
+                        eventMatchingCondition = true;
+                    }
+                    else if (hasDungeonFlag && locationString.Contains("hasDungeonFlag"))
+                    {
+                        eventMatchingCondition = true;
+                    }
+                    else if (hasVillageFlag && locationString.Contains("hasVillageFlag"))
+                    {
+                        eventMatchingCondition = true;
+                    }
+                    else if (hasHideoutFlag && locationString.Contains("hasHideoutFlag"))
+                    {
+                        eventMatchingCondition = true;
+                    }
+                    else if (hasPartyInPortFlag && locationString.Contains("hasPartyInPortFlag"))
+                    {
+                        eventMatchingCondition = true;
+                    }
+                    else if (hasCastleFlag && locationString.Contains("hasCastleFlag"))
+                    {
+                        eventMatchingCondition = true;
+                    }
+                    else if (hasPartyInTownFlag && locationString.Contains("hasPartyInTownFlag"))
+                    {
+                        eventMatchingCondition = true;
+                    }
+                    else if (hasPartyInVillageFlag && locationString.Contains("hasPartyInVillageFlag"))
+                    {
+                        eventMatchingCondition = true;
+                    }
+                    else if (hasPartyInCastleFlag && locationString.Contains("hasPartyInCastleFlag"))
+                    {
+                        eventMatchingCondition = true;
+                    }
                 }
             }
 
