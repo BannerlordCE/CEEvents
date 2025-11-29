@@ -697,7 +697,7 @@ namespace CaptivityEvents.Events
 
             bool exclusiveConditionsLand = (hasPartyOnLandFlag || hasPartyAtSeaFlag) && !(hasPartyOnLandFlag && hasPartyAtSeaFlag);
 
-            bool exclusiveConditions = (exclusiveConditionsLand || hasNotableFemalesNearby || hasNotableMalesNearby || hasNotableFemalesNearby || hasNotableMalesNearby || visitedByCaravanFlag || visitedByLordFlag);
+            bool exclusiveConditions = (exclusiveConditionsLand || visitedByCaravanFlag || visitedByLordFlag || duringSiegeFlag || duringRaidFlag || hasNotableMalesNearby || hasNotableFemalesNearby);
 
             if (exclusiveConditions || inclusiveConditions)
             {
@@ -717,7 +717,7 @@ namespace CaptivityEvents.Events
                     {
                         return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
                     }
-                    else if (visitedByCaravanFlag && !locationString.Contains("visitedByLordFlag"))
+                    else if (visitedByLordFlag && !locationString.Contains("visitedByLordFlag"))
                     {
                         return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByLordFlag conditions.");
                     }
