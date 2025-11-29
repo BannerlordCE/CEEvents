@@ -1,5 +1,4 @@
-﻿#define V127
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.Core.ViewModelCollection.Selector;
@@ -94,6 +93,20 @@ namespace CaptivityEvents.Config
             }
         }
 
+        // Enable interaction for OptionItemWidget (IsOptionEnabled="@IsEnabled")
+        [DataSourceProperty]
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set { _isEnabled = value; }
+        }
+
+        protected bool _isEnabled = true;
+
+        // Some native templates may bind IsOptionEnabled instead of IsEnabled.
+        [DataSourceProperty]
+        public bool IsOptionEnabled => IsEnabled;
+
         public abstract void UpdateValue();
 
         public abstract void Cancel();
@@ -147,10 +160,12 @@ namespace CaptivityEvents.Config
 
         public override void UpdateValue()
         {
-            if (!Option.SetValue(OptionValueAsBoolean ? 1 : 0))
+            int newVal = OptionValueAsBoolean ? 1 : 0;
+            if ((int)Option.GetValue(false) != newVal)
             {
+                Option.SetValue(newVal);
                 Option.Commit();
-                _optionsVM.SetConfig(Option, OptionValueAsBoolean ? 1 : 0);
+                _optionsVM.SetConfig(Option, newVal);
             }
         }
 
@@ -178,13 +193,30 @@ namespace CaptivityEvents.Config
         public CENumericOptionDataVM(CESettingsVM optionsVM, ICENumericOptionData option, TextObject name, TextObject description) : base(optionsVM, option, name, description, OptionsVM.OptionsDataType.NumericOption)
         {
             _numericOptionData = option;
+            _min = _numericOptionData.GetMinValue();
+            _max = _numericOptionData.GetMaxValue();
+            // Ensure sane defaults if data source returns invalid values
+            if (_min >= _max || _min < -1e10f || _max > 1e10f)
+            {
+                _min = 0f;
+                _max = 100f;
+            }
             _initialValue = _numericOptionData.GetValue(false);
-            Min = _numericOptionData.GetMinValue();
-            Max = _numericOptionData.GetMaxValue();
+            // Clamp initial value to range
+            if (_initialValue < _min) _initialValue = _min;
+            if (_initialValue > _max) _initialValue = _max;
+            _optionValue = _initialValue;
             IsDiscrete = _numericOptionData.GetIsDiscrete();
             UpdateContinuously = _numericOptionData.GetShouldUpdateContinuously();
-            OptionValue = _initialValue;
+            _isEnabled = false; // Disabled: use manual XML editing
         }
+
+        // Some bundled widget templates may expect OptionMin/OptionMax rather than Min/Max.
+        [DataSourceProperty]
+        public float OptionMin => Min;
+
+        [DataSourceProperty]
+        public float OptionMax => Max;
 
         [DataSourceProperty]
         public float Min
@@ -220,11 +252,16 @@ namespace CaptivityEvents.Config
             get => _optionValue;
             set
             {
-                if (value != _optionValue)
+                float clamped = value;
+                if (clamped < Min) clamped = Min;
+                if (clamped > Max) clamped = Max;
+                if (clamped != _optionValue)
                 {
-                    _optionValue = value;
-                    OnPropertyChangedWithValue(value, "OptionValue");
+                    _optionValue = clamped;
+                    OnPropertyChangedWithValue(clamped, "OptionValue");
                     OnPropertyChanged("OptionValueAsString");
+                    OnPropertyChanged("NormalizedValue");
+                    OnPropertyChanged("Value");
                     UpdateValue();
                 }
             }
@@ -271,11 +308,36 @@ namespace CaptivityEvents.Config
             }
         }
 
+        // Alias often used in UI text bindings.
+        [DataSourceProperty]
+        public string ValueText => OptionValueAsString;
+
+        // Step suggestion for discrete sliders.
+        [DataSourceProperty]
+        public float StepSize
+        {
+            get
+            {
+                if (IsDiscrete)
+                {
+                    return 1f;
+                }
+                // Provide a reasonable granularity.
+                float span = Max - Min;
+                return span <= 0 ? 0.1f : span / 100f;
+            }
+        }
+
         public override void UpdateValue()
         {
-            if (!Option.SetValue(OptionValue)) return;
-            Option.Commit();
-            _optionsVM.SetConfig(Option, OptionValue);
+            float newVal = IsDiscrete ? (float)Math.Round(OptionValue) : OptionValue;
+            if (newVal < Min) newVal = Min;
+            if (newVal > Max) newVal = Max;
+            if (Option.SetValue(newVal))
+            {
+                Option.Commit();
+                _optionsVM.SetConfig(Option, newVal);
+            }
         }
 
         public override void Cancel()
@@ -285,8 +347,77 @@ namespace CaptivityEvents.Config
         }
 
         public override void SetValue(float value) => OptionValue = value;
-
+        
         public override void ResetData() => OptionValue = Option.GetDefaultValue();
+
+        // Additional alias properties for various slider templates.
+        [DataSourceProperty]
+        public float MinValue => Min;
+
+        [DataSourceProperty]
+        public float MaxValue => Max;
+
+        [DataSourceProperty]
+        public float RangeMin => Min;
+
+        [DataSourceProperty]
+        public float RangeMax => Max;
+
+        [DataSourceProperty]
+        public float Value
+        {
+            get => OptionValue;
+            set => OptionValue = value;
+        }
+
+        // Additional common alias names some templates may reference
+        [DataSourceProperty]
+        public float OptionCurrentValue
+        {
+            get => OptionValue;
+            set => OptionValue = value;
+        }
+
+        [DataSourceProperty]
+        public float CurrentValue
+        {
+            get => OptionValue;
+            set => OptionValue = value;
+        }
+
+        [DataSourceProperty]
+        public float Current => OptionValue;
+
+        [DataSourceProperty]
+        public float OptionMinValue => Min;
+
+        [DataSourceProperty]
+        public float OptionMaxValue => Max;
+
+        [DataSourceProperty]
+        public float LowerBound => Min;
+
+        [DataSourceProperty]
+        public float UpperBound => Max;
+
+        [DataSourceProperty]
+        public float NormalizedValue
+        {
+            get
+            {
+                float span = Max - Min;
+                if (span <= 0.00001f) return 0f;
+                return (OptionValue - Min) / span;
+            }
+            set
+            {
+                float span = Max - Min;
+                if (span <= 0.00001f) return;
+                float v = value;
+                if (v < 0f) v = 0f; else if (v > 1f) v = 1f;
+                OptionValue = Min + (v * span);
+            }
+        }
 
         public override bool IsChanged() => _initialValue != OptionValue;
 
@@ -387,8 +518,11 @@ namespace CaptivityEvents.Config
         {
             if (Selector.SelectedIndex >= 0 && Selector.SelectedIndex != Option.GetValue(false))
             {
-                Option.Commit();
-                _optionsVM.SetConfig(Option, Selector.SelectedIndex);
+                if (Option.SetValue(Selector.SelectedIndex))
+                {
+                    Option.Commit();
+                    _optionsVM.SetConfig(Option, Selector.SelectedIndex);
+                }
             }
         }
 

@@ -77,6 +77,7 @@
     <Compile Include="Brothel\CEBrothelClanFinanceItemVM.cs" />
     <Compile Include="Brothel\CEBrothelToolTip.cs" />
     <Compile Include="CampaignBehaviors\CECampaignBehavior.cs" />
+    <Compile Include="Config\CEOptionGroupVM.cs" />
     <Compile Include="Config\CESettingsIntegrations.cs" />
     <Compile Include="Config\CEManagedOptionTypesVM.cs" />
     <Compile Include="Config\CESettingsEvents.cs" />
@@ -476,7 +477,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Bannerlord.MCM">
-      <Version>5.10.2</Version>
+      <Version>5.11.3</Version>
     </PackageReference>
     <PackageReference Include="Lib.Harmony">
       <Version>2.4.2</Version>

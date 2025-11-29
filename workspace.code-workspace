@@ -35,6 +35,12 @@
 		},
 		{
 			"path": "../../zModules"
+		},
+		{
+			"path": "../../Native"
+		},
+		{
+			"path": "Config"
 		}
 	],
 	"settings": {

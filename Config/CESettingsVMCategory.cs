@@ -96,6 +96,38 @@ namespace CaptivityEvents.Config
             }
         }
 
+        // Needed by OptionsGroupedPage: exposes the base (ungrouped) option list.
+        [DataSourceProperty]
+        public MBBindingList<CEGenericOptionDataVM> BaseOptions
+        {
+            get => _options;
+            set
+            {
+                if (value != _options)
+                {
+                    _options = value;
+                    OnPropertyChangedWithValue(value, "BaseOptions");
+                    // Keep Options in sync
+                    OnPropertyChangedWithValue(value, "Options");
+                }
+            }
+        }
+
+        // Group support (currently unused). Required by OptionsGroupedPage; kept empty so page renders BaseOptions panel only.
+        [DataSourceProperty]
+        public MBBindingList<CEOptionGroupVM> Groups
+        {
+            get => _groups;
+            set
+            {
+                if (value != _groups)
+                {
+                    _groups = value;
+                    OnPropertyChangedWithValue(value, "Groups");
+                }
+            }
+        }
+
         private readonly TextObject _nameObj;
 
         public readonly bool IsNative;
@@ -103,5 +135,6 @@ namespace CaptivityEvents.Config
         private string _name;
 
         private MBBindingList<CEGenericOptionDataVM> _options;
+        private MBBindingList<CEOptionGroupVM> _groups = new();
     }
 }
