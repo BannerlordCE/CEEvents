@@ -12,12 +12,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
+using Helpers;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Settlements.Locations;
 using TaleWorlds.Core;
 using TaleWorlds.Engine;
@@ -1498,16 +1501,203 @@ namespace CaptivityEvents.Helper
             {
                 Thread.Sleep(500);
 
-                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.create_new_prisoner \".";
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.create_new_prisoner [CULTURE_NAME] [GENDER] [IS_HERO]\". Creates a new prisoner and adds to your party.\nGENDER: 'male' or 'female' (default: female)\nIS_HERO: 'true' or 'false' (default: true)";
 
                 try
                 {
-                    return "Unimplemented";
+                    // Get culture if specified, otherwise use player's culture
+                    CultureObject culture = CharacterObject.PlayerCharacter.Culture;
+                    bool isFemale = true;
+                    bool isHero = true;
+                    
+                    // Parse parameters
+                    if (CampaignCheats.CheckParameters(strings, 1))
+                    {
+                        string param = strings[0].ToLower();
+                        
+                        // Check if it's a gender parameter
+                        if (param == "male" || param == "female" || param == "m" || param == "f")
+                        {
+                            isFemale = param == "female" || param == "f";
+                        }
+                        else
+                        {
+                            // Try to parse as culture
+                            CultureObject foundCulture = Campaign.Current.ObjectManager.GetObjectTypeList<CultureObject>()
+                                .FirstOrDefault(c => c.Name.ToString().ToLower().Contains(param) || c.StringId.ToLower().Contains(param));
+                            
+                            if (foundCulture != null)
+                            {
+                                culture = foundCulture;
+                            }
+                        }
+                    }
+                    
+                    if (CampaignCheats.CheckParameters(strings, 2))
+                    {
+                        string cultureName = strings[0].ToLower();
+                        string genderParam = strings[1].ToLower();
+                        
+                        // Parse culture
+                        CultureObject foundCulture = Campaign.Current.ObjectManager.GetObjectTypeList<CultureObject>()
+                            .FirstOrDefault(c => c.Name.ToString().ToLower().Contains(cultureName) || c.StringId.ToLower().Contains(cultureName));
+                        
+                        if (foundCulture != null)
+                        {
+                            culture = foundCulture;
+                        }
+                        
+                        // Parse gender
+                        if (genderParam == "male" || genderParam == "m")
+                        {
+                            isFemale = false;
+                        }
+                        else if (genderParam == "female" || genderParam == "f")
+                        {
+                            isFemale = true;
+                        }
+                        else if (genderParam == "true" || genderParam == "false")
+                        {
+                            // Second parameter is hero flag, not gender
+                            isHero = genderParam == "true";
+                        }
+                    }
+                    
+                    if (CampaignCheats.CheckParameters(strings, 3))
+                    {
+                        string cultureName = strings[0].ToLower();
+                        string genderParam = strings[1].ToLower();
+                        string heroParam = strings[2].ToLower();
+                        
+                        // Parse culture
+                        CultureObject foundCulture = Campaign.Current.ObjectManager.GetObjectTypeList<CultureObject>()
+                            .FirstOrDefault(c => c.Name.ToString().ToLower().Contains(cultureName) || c.StringId.ToLower().Contains(cultureName));
+                        
+                        if (foundCulture != null)
+                        {
+                            culture = foundCulture;
+                        }
+                        
+                        // Parse gender
+                        isFemale = genderParam == "female" || genderParam == "f";
+                        
+                        // Parse hero flag
+                        isHero = heroParam == "true" || heroParam == "yes" || heroParam == "1";
+                    }
+
+                    if (isHero)
+                    {
+                        // Create a hero prisoner
+                        CharacterObject template = Campaign.Current.Characters.GetRandomElementWithPredicate(
+                            characterObject => characterObject.Culture == culture 
+                                && characterObject.IsFemale == isFemale 
+                                && characterObject.Occupation == Occupation.Wanderer);
+
+                        if (template == null)
+                        {
+                            return $"No suitable {(isFemale ? "female" : "male")} character template found for culture {culture.Name}.";
+                        }
+
+                        // Find a settlement for the hero's origin
+                        Settlement settlement = SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == culture);
+                        if (settlement == null)
+                        {
+                            settlement = Settlement.All.FirstOrDefault(s => s.IsTown);
+                        }
+
+                        // Create the hero (age between 20-40)
+                        int age = CEHelper.HelperMBRandom(20) + 20;
+                        Hero newHero = HeroCreator.CreateSpecialHero(template, settlement, null, null, age);
+
+                        // Check and fix equipment
+                        newHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
+
+                        // Add to player's party as prisoner
+                        TakePrisonerAction.Apply(PartyBase.MainParty, newHero);
+
+                        return $"Successfully created {(isFemale ? "female" : "male")} hero prisoner '{newHero.Name}' (Age: {newHero.Age}, Culture: {culture.Name}) and added to your party.";
+                    }
+                    else
+                    {
+                        // Create a regular troop prisoner
+                        CharacterObject troopTemplate = Campaign.Current.Characters.FirstOrDefault(
+                            characterObject => characterObject.Culture == culture 
+                                && characterObject.IsFemale == isFemale 
+                                && characterObject.Occupation == Occupation.Soldier
+                                && !characterObject.IsHero);
+
+                        if (troopTemplate == null)
+                        {
+                            // Fallback to any regular troop
+                            troopTemplate = Campaign.Current.Characters.FirstOrDefault(
+                                characterObject => characterObject.Culture == culture 
+                                    && characterObject.IsFemale == isFemale 
+                                    && !characterObject.IsHero);
+                        }
+
+                        if (troopTemplate == null)
+                        {
+                            return $"No suitable {(isFemale ? "female" : "male")} troop template found for culture {culture.Name}.";
+                        }
+
+                        // Add the troop to prisoner roster
+                        PartyBase.MainParty.PrisonRoster.AddToCounts(troopTemplate, 1);
+
+                        return $"Successfully created {(isFemale ? "female" : "male")} troop prisoner '{troopTemplate.Name}' (Culture: {culture.Name}) and added to your party.";
+                    }
                 }
                 catch (Exception e)
                 {
                     return "Failed : " + e;
                 }
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("list_images", "captivity")]
+        public static string ListImages(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.list_images [SEARCH_TERM]\".";
+
+                string searchTerm = null;
+                if (CampaignCheats.CheckParameters(strings, 1)) searchTerm = strings[0].ToLower();
+
+                if (CEPersistence.CEEventImageList == null || CEPersistence.CEEventImageList.Count <= 0)
+                {
+                    return "No images loaded. Image count: 0";
+                }
+
+                StringBuilder sb = new StringBuilder();
+                int totalCount = CEPersistence.CEEventImageList.Count;
+                int displayCount = 0;
+
+                foreach (var kvp in CEPersistence.CEEventImageList.OrderBy(x => x.Key))
+                {
+                    if (searchTerm == null || kvp.Key.ToLower().Contains(searchTerm))
+                    {
+                        sb.AppendLine(kvp.Key);
+                        sb.AppendLine($"    -> {kvp.Value}");
+                        displayCount++;
+                    }
+                }
+
+                if (searchTerm != null)
+                {
+                    sb.Insert(0, $"Loaded images matching '{searchTerm}': {displayCount} of {totalCount}\n\n");
+                }
+                else
+                {
+                    sb.Insert(0, $"Loaded images: {totalCount}\n\n");
+                }
+
+                return sb.ToString();
             }
             catch (Exception e)
             {
