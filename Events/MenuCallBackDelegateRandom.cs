@@ -184,7 +184,9 @@ namespace CaptivityEvents.Events
 
             InitSoldToSettlement();
             InitSoldToCaravan();
+            InitSoldToTradeShip();
             InitSoldToLordParty();
+            InitRemoveOwner();
             InitGiveGold();
             InitChangeGold();
 
@@ -233,6 +235,7 @@ namespace CaptivityEvents.Events
             ConsequenceChangeKingdom();
             ConsequenceImpregnation();
             ConsequenceGainRandomPrisoners();
+            ConsequenceRemoveOwner();
             ConsequenceCapturedByParty(ref args);
             ConsequenceSoldEvents(ref args);
             ConsequenceWoundTroops();
@@ -599,6 +602,7 @@ namespace CaptivityEvents.Events
         {
             if (Hero.MainHero.PartyBelongedTo?.CurrentSettlement == null) return;
             ConsequenceSoldToSettlement(ref args);
+            ConsequenceSoldToTradeShip(ref args);
             ConsequenceSoldToCaravan(ref args);
             ConsequenceSoldToNotable(ref args);
             ConsequenceSoldToLordParty(ref args);
@@ -653,13 +657,24 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
         }
 
+        private void ConsequenceSoldToTradeShip(ref MenuCallbackArgs args)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToTradeShip)) return;
+            try
+            {
+                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan && mobileParty.IsCurrentlyAtSea);
+                ConsequenceRandomCaptivityChange(ref args, party.Party);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Trade Ship"); }
+        }
+
         private void ConsequenceSoldToCaravan(ref MenuCallbackArgs args)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToCaravan)) return;
 
             try
             {
-                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan);
+                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan && !mobileParty.IsCurrentlyAtSea);
                 ConsequenceRandomCaptivityChange(ref args, party.Party);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }
@@ -687,6 +702,16 @@ namespace CaptivityEvents.Events
                 ConsequenceRandomCaptivityChange(ref args, party);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
+        }
+
+        private void ConsequenceRemoveOwner()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveOwner)) return;
+            try
+            {
+                CECampaignBehavior.ExtraProps.Owner = null;
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Remove Owner"); }
         }
 
         private void ConsequenceGainRandomPrisoners()
@@ -1515,13 +1540,37 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Lord"); }
         }
 
+        private void InitSoldToTradeShip()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToTradeShip)) return;
+
+            try
+            {
+                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan && mobileParty.IsCurrentlyAtSea; });
+                if (party != null) MBTextManager.SetTextVariable("BUYERTRADESHIP", party.Name);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Ship"); }
+        }
+
+        private void InitRemoveOwner()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveOwner)) return;
+
+            try
+            {
+                if (CECampaignBehavior.ExtraProps.Owner != null) MBTextManager.SetTextVariable("PREVIOUSOWNER", CECampaignBehavior.ExtraProps.Owner.Name);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Owner"); }
+        }
+
+
         private void InitSoldToCaravan()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToCaravan)) return;
 
             try
             {
-                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; });
+                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan && !mobileParty.IsCurrentlyAtSea; });
                 if (party != null) MBTextManager.SetTextVariable("BUYERCARAVAN", party.Name);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }

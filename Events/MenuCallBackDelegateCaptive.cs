@@ -215,6 +215,7 @@ namespace CaptivityEvents.Events
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeCaptorGold)) InitChangeCaptorGold();
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToSettlement)) InitSoldToSettlement();
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToCaravan)) InitSoldToCaravan();
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToTradeShip)) InitSoldToTradeShip();
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToLordParty)) InitSoldToLordParty();
 
             ReqMorale(ref args);
@@ -573,10 +574,32 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceSoldEvents(ref MenuCallbackArgs args)
         {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddOwner)) ConsequenceAddOwner();
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveOwner)) ConsequenceRemoveOwner();
+
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToCaravan)) ConsequenceSoldToCaravan(ref args);
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToTradeShip)) ConsequenceSoldToTradeShip(ref args);
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToSettlement)) ConsequenceSoldToSettlement(ref args);
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToLordParty)) ConsequenceSoldToLordParty(ref args);
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToNotable)) ConsequenceSoldToNotable(ref args);
+        }
+
+
+        private void ConsequenceAddOwner()
+        {
+            try
+            {
+                CECampaignBehavior.ExtraProps.Owner = PlayerCaptivity.CaptorParty.LeaderHero ?? _impregnation.GenerateARandomHero();
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Add Owner"); }
+        }
+        private void ConsequenceRemoveOwner()
+        {
+            try
+            {
+                CECampaignBehavior.ExtraProps.Owner = null;
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Remove Owner"); }
         }
 
         private void ConsequenceSoldToNotable(ref MenuCallbackArgs args)
@@ -639,17 +662,39 @@ namespace CaptivityEvents.Events
                 if (PlayerCaptivity.CaptorParty.IsSettlement)
                 {
                     CECampaignBehavior.ExtraProps.Owner = null;
-                    party = PlayerCaptivity.CaptorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan);
+                    party = PlayerCaptivity.CaptorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan && !mobileParty.IsCurrentlyAtSea);
                 }
                 else
                 {
                     CECampaignBehavior.ExtraProps.Owner = null;
-                    party = PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan);
+                    party = PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan && !mobileParty.IsCurrentlyAtSea);
                 }
 
                 if (party != null) _captive.CECaptivityChange(ref args, party.Party);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }
+        }
+
+        private void ConsequenceSoldToTradeShip(ref MenuCallbackArgs args)
+        {
+            try
+            {
+                MobileParty party = null;
+
+                if (PlayerCaptivity.CaptorParty.IsSettlement)
+                {
+                    CECampaignBehavior.ExtraProps.Owner = null;
+                    party = PlayerCaptivity.CaptorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan && mobileParty.IsCurrentlyAtSea);
+                }
+                else
+                {
+                    CECampaignBehavior.ExtraProps.Owner = null;
+                    party = PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan && mobileParty.IsCurrentlyAtSea);
+                }
+
+                if (party != null) _captive.CECaptivityChange(ref args, party.Party);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Ship"); }
         }
 
         private void ConsequenceSpecificCaptor()
@@ -1904,6 +1949,19 @@ namespace CaptivityEvents.Events
         }
 
         private static void InitSoldToCaravan()
+        {
+            try
+            {
+                PartyBase party = PlayerCaptivity.CaptorParty.IsSettlement
+                    ? PlayerCaptivity.CaptorParty.Settlement.Parties.First(mobileParty => mobileParty.IsCaravan).Party
+                    : PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Parties.First(mobileParty => mobileParty.IsCaravan).Party;
+
+                MBTextManager.SetTextVariable("BUYERCARAVAN", party.Name);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }
+        }
+
+        private static void InitSoldToTradeShip()
         {
             try
             {

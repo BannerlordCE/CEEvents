@@ -60,12 +60,22 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    bool hasCaravan = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
+                    bool hasCaravan = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan && !mobileParty.IsCurrentlyAtSea; }) != null;
                     if (hasCaravan) returnString += "(visitedByCaravanFlag)";
                 }
                 catch (Exception)
                 {
                     CECustomHandler.LogToFile("Failed to get Caravan");
+                }
+
+                try
+                {
+                    bool hasTradeShip = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan && mobileParty.IsCurrentlyAtSea; }) != null;
+                    if (hasTradeShip) returnString += "(visitedByTradeShipFlag)";
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Failed to get TradeShip");
                 }
 
                 try
@@ -123,12 +133,22 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    bool hasCaravan = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; }) != null;
+                    bool hasCaravan = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan && !mobileParty.IsCurrentlyAtSea; }) != null;
                     if (hasCaravan) returnString += "(visitedByCaravanFlag)";
                 }
                 catch (Exception)
                 {
                     CECustomHandler.LogToFile("Failed to get Caravan");
+                }
+
+                try
+                {
+                    bool hasTradeShip = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan && mobileParty.IsCurrentlyAtSea; }) != null;
+                    if (hasTradeShip) returnString += "(visitedByTradeShipFlag)";
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("Failed to get TradeShip");
                 }
 
                 try
@@ -167,9 +187,9 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.MobileParty.CurrentSettlement.IsUnderRaid) returnString += "(duringRaidFlag)";
 
-                if (captorParty.MobileParty.IsTargetingPort) returnString += "(LocationPartyInPort)";
+                if (captorParty.MobileParty.IsTargetingPort) returnString += "(hasPartyInPortFlag)";
 
-                returnString += "(hasPartyOnLandFlag)";
+                returnString += (captorParty.MobileParty.IsCurrentlyAtSea) ? "(hasPartyAtSeaFlag)" : "(hasPartyOnLandFlag)";
             }
             else if (captorParty != null && captorParty.IsMobile)
             {
@@ -685,6 +705,7 @@ namespace CaptivityEvents.Events
             bool hasNotableMalesNearby = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.NotableMalesNearby);
 
             bool visitedByCaravanFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByCaravan);
+            bool visitedByTradeShipFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByTradeShip);
             bool visitedByLordFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.VisitedByLord);
 
             bool duringSiegeFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DuringSiege);
@@ -697,7 +718,7 @@ namespace CaptivityEvents.Events
 
             bool exclusiveConditionsLand = (hasPartyOnLandFlag || hasPartyAtSeaFlag) && !(hasPartyOnLandFlag && hasPartyAtSeaFlag);
 
-            bool exclusiveConditions = (exclusiveConditionsLand || visitedByCaravanFlag || visitedByLordFlag || duringSiegeFlag || duringRaidFlag || hasNotableMalesNearby || hasNotableFemalesNearby);
+            bool exclusiveConditions = (exclusiveConditionsLand || visitedByCaravanFlag || visitedByTradeShipFlag || visitedByLordFlag || duringSiegeFlag || duringRaidFlag || hasNotableMalesNearby || hasNotableFemalesNearby);
 
             if (exclusiveConditions || inclusiveConditions)
             {
@@ -716,6 +737,10 @@ namespace CaptivityEvents.Events
                     else if (visitedByCaravanFlag && !locationString.Contains("visitedByCaravanFlag"))
                     {
                         return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByCaravanFlag conditions.");
+                    }
+                    else if (visitedByTradeShipFlag && !locationString.Contains("visitedByTradeShipFlag"))
+                    {
+                        return Error("Skipping event " + _listEvent.Name + " it does not match the visitedByTradeShipFlag conditions.");
                     }
                     else if (visitedByLordFlag && !locationString.Contains("visitedByLordFlag"))
                     {

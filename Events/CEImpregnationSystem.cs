@@ -13,11 +13,23 @@ using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
+using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events
 {
     public class CEImpregnationSystem
     {
+
+        public Hero GenerateARandomHero()
+        {
+            Hero randomSoldier;
+            CharacterObject m = MBObjectManager.Instance.GetObject<CharacterObject>("gangster_2");
+            randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
+            DisableHeroAction.Apply(randomSoldier);
+
+            return randomSoldier;
+        }
+
         // Random Version
         public void ImpregnationChance(Hero targetHero, int modifier = 0, bool forcePreg = false, Hero senderHero = null)
         {
@@ -69,9 +81,7 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
-                        randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
-                        DisableHeroAction.Apply(randomSoldier);
+                        randomSoldier = GenerateARandomHero();
                     }
 
                     TextObject textObject3 = GameTexts.FindText("str_CE_impregnated");

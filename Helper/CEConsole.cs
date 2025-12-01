@@ -372,7 +372,18 @@ namespace CaptivityEvents.Helper
 
                     if (Game.Current.GameStateManager.ActiveState is MapState mapStateCaptive)
                     {
-                        HandleEventLaunch(null, mapStateCaptive);
+                        Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+
+                        if (!mapStateCaptive.AtMenu)
+                            GameMenu.ActivateGameMenu("prisoner_wait");
+                        else
+                        {
+                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapStateCaptive.GameMenuId;
+                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapStateCaptive.MenuContext.CurrentBackgroundMeshName;
+                        }
+
+                        GameMenu.SwitchToMenu(result);
+
                         return "Successfully launched event.";
                     }
                     return "Failed to launch event, incorrect game state.";
