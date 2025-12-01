@@ -431,8 +431,6 @@ namespace CaptivityEvents.Helper
             }
         }
 
-
-
         [CommandLineFunctionality.CommandLineArgumentFunction("can_i_run_this_event", "captivity")]
         public static string TestEvent(List<string> strings)
         {
@@ -535,9 +533,6 @@ namespace CaptivityEvents.Helper
                 return "Sosig\n" + e;
             }
         }
-
-
-
 
         [CommandLineFunctionality.CommandLineArgumentFunction("list_events", "captivity")]
         public static string ListEvents(List<string> strings)
@@ -785,7 +780,6 @@ namespace CaptivityEvents.Helper
                 return "Sosig\n" + e;
             }
         }
-
 
         [CommandLineFunctionality.CommandLineArgumentFunction("current_status", "captivity")]
         public static string CurrentStatus(List<string> strings)
@@ -1293,22 +1287,24 @@ namespace CaptivityEvents.Helper
                         CEPersistence.CEAlternativePregnancyEvents.Add(ev);
                     else if (ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
                         CEPersistence.CEWaitingList.Add(ev);
-                    else if (!ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
+                    else
                     {
-                        int weightedChance = 1;
-                        try
+                        if (!ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
                         {
-                            if (ev.WeightedChanceOfOccurring != null)
-                                weightedChance = variablesLoader.GetIntFromXML(ev.WeightedChanceOfOccurring);
-                        }
-                        catch
-                        {
-                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring on " + ev.Name);
-                        }
+                            int weightedChance = 1;
+                            try
+                            {
+                                if (ev.WeightedChanceOfOccurring != null)
+                                    weightedChance = variablesLoader.GetIntFromXML(ev.WeightedChanceOfOccurring);
+                            }
+                            catch
+                            {
+                                CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring on " + ev.Name);
+                            }
 
-                        if (weightedChance > 0)
-                            CEPersistence.CECallableEvents.Add(ev);
-
+                            if (weightedChance > 0)
+                                CEPersistence.CECallableEvents.Add(ev);
+                        }
                         CEPersistence.CEEventList.Add(ev);
                     }
                 }

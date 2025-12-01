@@ -467,111 +467,6 @@ namespace CaptivityEvents
                         CECustomHandler.ForceLogToFile("Failure to load " + file + " - exception : " + e);
                     }
                 }
-
-                SpriteCategory spriteCategory = UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"];
-                spriteCategory.SpriteSheets.AddRange([QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"])]);
-                spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray([new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805)]);
-                spriteCategory.SpriteSheetCount = 6;
-
-                CECustomHandler.ForceLogToFile("Loading Textures 1.1.1");
-
-                PropertyInfo propertyWidth = typeof(SpritePart).GetProperty("Width");
-                PropertyInfo propertyHeight = typeof(SpritePart).GetProperty("Height");
-                foreach (SpritePart spritePart in UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteParts)
-                {
-                    switch (spritePart.Name)
-                    {
-                        case "wait_prisoner_female":
-                            spritePart.SheetID = 6;
-                            spritePart.SheetX = 0;
-                            spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
-                            spritePart.UpdateInitValues();
-                            break;
-
-                        case "wait_prisoner_male":
-                            spritePart.SheetID = 5;
-                            spritePart.SheetX = 0;
-                            spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
-                            spritePart.UpdateInitValues();
-                            break;
-
-                        case "wait_captive_female":
-                            spritePart.SheetID = 4;
-                            spritePart.SheetX = 0;
-                            spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
-                            spritePart.UpdateInitValues();
-                            break;
-
-                        case "wait_captive_male":
-                            spritePart.SheetID = 3;
-                            spritePart.SheetX = 0;
-                            spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
-                            spritePart.UpdateInitValues();
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-
-
-                if (modulesFound.Contains("NavalDLC"))
-                {
-                    SpriteCategory spriteCategoryNaval = UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"];
-                    spriteCategoryNaval.SpriteSheets.AddRange([QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft"])]);
-                    spriteCategoryNaval.SheetSizes = spriteCategoryNaval.SheetSizes.AddRangeToArray([new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805)]);
-                    spriteCategoryNaval.SpriteSheetCount = 4;
-
-                    _isNavalLoaded = true;
-
-                    CECustomHandler.ForceLogToFile("Loading Textures 1.3.5");
-
-                    foreach (SpritePart spritePart in UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteParts)
-                    {
-                        switch (spritePart.Name)
-                        {
-                            case "wait_captive_at_sea_female":
-                                spritePart.SheetID = 2;
-                                spritePart.SheetX = 0;
-                                spritePart.SheetY = 0;
-                                propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                                propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
-                                spritePart.UpdateInitValues();
-                                break;
-
-                            case "wait_captive_at_sea_male":
-                                spritePart.SheetID = 3;
-                                spritePart.SheetX = 0;
-                                spritePart.SheetY = 0;
-                                propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                                propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
-                                spritePart.UpdateInitValues();
-                                break;
-
-                            case "raft_state":
-                                spritePart.SheetID = 4;
-                                spritePart.SheetX = 0;
-                                spritePart.SheetY = 0;
-                                propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                                propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
-                                spritePart.UpdateInitValues();
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                }
-
-                LoadTexture("default", false, true);
             }
             catch (Exception e)
             {
@@ -634,6 +529,118 @@ namespace CaptivityEvents
             }
 
             if (_isLoaded) return;
+
+            try
+            {
+                string[] modulesFound = Utilities.GetModulesNames();
+
+                SpriteCategory spriteCategory = UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"];
+                spriteCategory.SpriteSheets.AddRange([QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"])]);
+                spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray([new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805)]);
+                spriteCategory.SpriteSheetCount = 6;
+
+                CECustomHandler.ForceLogToFile("Loading Textures 1.1.1");
+
+                PropertyInfo propertyWidth = typeof(SpritePart).GetProperty("Width");
+                PropertyInfo propertyHeight = typeof(SpritePart).GetProperty("Height");
+                foreach (SpritePart spritePart in UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteParts)
+                {
+                    switch (spritePart.Name)
+                    {
+                        case "wait_prisoner_female":
+                            spritePart.SheetID = 6;
+                            spritePart.SheetX = 0;
+                            spritePart.SheetY = 0;
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                            spritePart.UpdateInitValues();
+                            break;
+
+                        case "wait_prisoner_male":
+                            spritePart.SheetID = 5;
+                            spritePart.SheetX = 0;
+                            spritePart.SheetY = 0;
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                            spritePart.UpdateInitValues();
+                            break;
+
+                        case "wait_captive_female":
+                            spritePart.SheetID = 4;
+                            spritePart.SheetX = 0;
+                            spritePart.SheetY = 0;
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                            spritePart.UpdateInitValues();
+                            break;
+
+                        case "wait_captive_male":
+                            spritePart.SheetID = 3;
+                            spritePart.SheetX = 0;
+                            spritePart.SheetY = 0;
+                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                            spritePart.UpdateInitValues();
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                if (modulesFound.Contains("NavalDLC"))
+                {
+                    SpriteCategory spriteCategoryNaval = UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"];
+                    spriteCategoryNaval.SpriteSheets.AddRange([QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea"]), QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft"])]);
+                    spriteCategoryNaval.SheetSizes = spriteCategoryNaval.SheetSizes.AddRangeToArray([new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805)]);
+                    spriteCategoryNaval.SpriteSheetCount = 4;
+
+                    _isNavalLoaded = true;
+
+                    CECustomHandler.ForceLogToFile("Loading Textures 1.3.5");
+
+                    foreach (SpritePart spritePart in UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteParts)
+                    {
+                        switch (spritePart.Name)
+                        {
+                            case "wait_captive_at_sea_female":
+                                spritePart.SheetID = 2;
+                                spritePart.SheetX = 0;
+                                spritePart.SheetY = 0;
+                                propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                                propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                                spritePart.UpdateInitValues();
+                                break;
+
+                            case "wait_captive_at_sea_male":
+                                spritePart.SheetID = 3;
+                                spritePart.SheetX = 0;
+                                spritePart.SheetY = 0;
+                                propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                                propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                                spritePart.UpdateInitValues();
+                                break;
+
+                            case "raft_state":
+                                spritePart.SheetID = 4;
+                                spritePart.SheetX = 0;
+                                spritePart.SheetY = 0;
+                                propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
+                                propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                                spritePart.UpdateInitValues();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+                LoadTexture("default", false, true);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failure to load textures, OnBeforeInitialModuleScreenSetAsRoot Critical failure. " + e);
+            }
 
             try
             {

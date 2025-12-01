@@ -40,7 +40,7 @@
 			"path": "../../Native"
 		},
 		{
-			"path": "Config"
+			"path": "."
 		}
 	],
 	"settings": {
