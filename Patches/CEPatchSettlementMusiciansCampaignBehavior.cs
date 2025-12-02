@@ -24,20 +24,8 @@ namespace CaptivityEvents.Patches
             if (CampaignMission.Current.Location.StringId == "brothel")
             {
                 List<string> listOfLocationTags = new List<string>();
-                string stringId = CampaignMission.Current.Location.StringId;
-                if (stringId == "center")
-                {
-                    listOfLocationTags.Add("lordshall");
-                    listOfLocationTags.Add("tavern");
-                }
-                else
-                {
-                    listOfLocationTags.Add(stringId);
-                    if (stringId == "port")
-                    {
-                        listOfLocationTags.Add("tavern");
-                    }
-                }
+                listOfLocationTags.Add("tavern");
+                
                 Dictionary<CultureObject, float> dictionary = new Dictionary<CultureObject, float>();
                 List<CultureObject> objectTypeList = MBObjectManager.Instance.GetObjectTypeList<CultureObject>();
                 Town town = settlement.Town;

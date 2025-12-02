@@ -6,6 +6,8 @@ using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
 using Helpers;
+using SandBox.Objects;
+using SandBox.Objects.Usables;
 using System;
 using System.Collections.Generic;
 using System.Linq;

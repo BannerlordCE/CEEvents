@@ -122,24 +122,6 @@ namespace CaptivityEvents.Events
             }
         }
 
-        internal void ConsequenceXP()
-        {
-            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.GiveXP))
-            {
-                try
-                {
-                    string skillToLevel = "";
-
-                    if (!string.IsNullOrEmpty(_option.SkillToLevel)) skillToLevel = _option.SkillToLevel;
-                    else if (!string.IsNullOrEmpty(_listedEvent.SkillToLevel)) skillToLevel = _listedEvent.SkillToLevel;
-                    else CECustomHandler.LogToFile("Missing SkillToLevel");
-
-                    foreach (SkillObject skillObject in Skills.All.Where(skillObject => skillObject.Name.ToString().Equals(skillToLevel, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skillToLevel)) _dynamics.GainSkills(skillObject, 50, 100);
-                }
-                catch (Exception) { CECustomHandler.LogToFile("GiveXP Failed"); }
-            }
-        }
-
         internal void ConsequenceLeaveSpouse()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CaptiveLeaveSpouse)) _dynamics.ChangeSpouse(Hero.MainHero, null);
@@ -231,23 +213,6 @@ namespace CaptivityEvents.Events
                         _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                     }
                 }
-                else
-                {
-                    if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeTrait)) return;
-
-                    int level = 0;
-                    int xp = 0;
-
-                    if (!string.IsNullOrEmpty(_option.TraitTotal)) level = _variableLoader.GetIntFromXML(_option.TraitTotal);
-                    else if (!string.IsNullOrEmpty(_option.TraitXPTotal)) xp = _variableLoader.GetIntFromXML(_option.TraitXPTotal);
-                    else if (!string.IsNullOrEmpty(_listedEvent.TraitTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.TraitTotal);
-                    else if (!string.IsNullOrEmpty(_listedEvent.TraitXPTotal)) xp = _variableLoader.GetIntFromXML(_listedEvent.TraitXPTotal);
-                    else CECustomHandler.LogToFile("Missing Trait TraitTotal");
-
-                    if (!string.IsNullOrEmpty(_option.TraitToLevel)) _dynamics.TraitModifier(Hero.MainHero, _option.TraitToLevel, level, xp);
-                    else if (!string.IsNullOrEmpty(_listedEvent.TraitToLevel)) _dynamics.TraitModifier(Hero.MainHero, _listedEvent.TraitToLevel, level, xp);
-                    else CECustomHandler.LogToFile("Missing TraitToLevel");
-                }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
         }
@@ -283,23 +248,6 @@ namespace CaptivityEvents.Events
 
                         new Dynamics().SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }
-                }
-                else
-                {
-                    if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeSkill)) return;
-
-                    int level = 0;
-                    int xp = 0;
-
-                    if (!string.IsNullOrWhiteSpace(_option.SkillTotal)) level = _variableLoader.GetIntFromXML(_option.SkillTotal);
-                    else if (!string.IsNullOrWhiteSpace(_option.SkillXPTotal)) xp = _variableLoader.GetIntFromXML(_option.SkillXPTotal);
-                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillTotal)) level = _variableLoader.GetIntFromXML(_listedEvent.SkillTotal);
-                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillXPTotal)) xp = _variableLoader.GetIntFromXML(_listedEvent.SkillXPTotal);
-                    else CECustomHandler.LogToFile("Missing Skill SkillTotal");
-
-                    if (!string.IsNullOrWhiteSpace(_option.SkillToLevel)) new Dynamics().SkillModifier(Hero.MainHero, _option.SkillToLevel, level, xp);
-                    else if (!string.IsNullOrWhiteSpace(_listedEvent.SkillToLevel)) new Dynamics().SkillModifier(Hero.MainHero, _listedEvent.SkillToLevel, level, xp);
-                    else CECustomHandler.LogToFile("Missing SkillToLevel");
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }

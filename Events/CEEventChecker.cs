@@ -315,8 +315,6 @@ namespace CaptivityEvents.Events
             if (!ProstitutionCheck(captive)) return LatestMessage;
             if (!ProstitutionLevelCheck(captive)) return LatestMessage;
             if (!AgeCheck(captive)) return LatestMessage;
-            if (!HeroTraitCheck(captive)) return LatestMessage;
-            if (!HeroSkillCheck(captive)) return LatestMessage;
             if (!TraitsCheck(captive)) return LatestMessage;
             if (!SkillsCheck(captive)) return LatestMessage;
             if (!HealthCheck(captive)) return LatestMessage;
@@ -340,9 +338,7 @@ namespace CaptivityEvents.Events
 
             if (nonRandomBehaviour)
             {
-                if (!CaptorTraitCheck(captorParty)) return LatestMessage;
                 if (!CaptorTraitsCheck(captorParty)) return LatestMessage;
-                if (!CaptorSkillCheck(captorParty)) return LatestMessage;
                 if (!CaptorSkillsCheck(captorParty)) return LatestMessage;
                 if (!CaptorItemCheck(captorParty)) return LatestMessage;
                 if (!CaptorPartyGenderCheck(captorParty)) return LatestMessage;
@@ -932,92 +928,6 @@ namespace CaptivityEvents.Events
             catch (Exception)
             {
                 return LogError("Incorrect ReqCaptorPartyHaveItem / Failed ");
-            }
-
-            return true;
-        }
-
-        private bool CaptorSkillCheck(PartyBase captorParty)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(_listEvent.ReqCaptorSkill)) return true;
-
-                if (captorParty.LeaderHero == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkill.");
-
-                int skillLevel = captorParty.LeaderHero.GetSkillValue(Skills.All.Single(skill => skill.StringId == _listEvent.ReqCaptorSkill));
-
-                try
-                {
-                    if (!string.IsNullOrWhiteSpace(_listEvent.ReqCaptorSkillLevelAbove))
-                    {
-                        if (skillLevel < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelAbove))
-                            return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelAbove.");
-                    }
-                }
-                catch (Exception)
-                {
-                    return LogError("Missing ReqCaptorSkillLevelAbove");
-                }
-
-                try
-                {
-                    if (string.IsNullOrWhiteSpace(_listEvent.ReqCaptorSkillLevelBelow)) return true;
-
-                    if (skillLevel > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptorSkillLevelBelow))
-                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorSkillLevelBelow.");
-                }
-                catch (Exception)
-                {
-                    return LogError("Missing ReqCaptorSkillLevelBelow");
-                }
-            }
-            catch (Exception)
-            {
-                return LogError("Incorrect ReqCaptorTrait / Failed ");
-            }
-
-            return true;
-        }
-
-        private bool CaptorTraitCheck(PartyBase captorParty)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(_listEvent.ReqCaptorTrait)) return true;
-
-                if (captorParty.LeaderHero == null) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTrait.");
-
-                int traitLevel = captorParty.LeaderHero.GetTraitLevel(TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _listEvent.ReqCaptorTrait));
-
-                try
-                {
-                    if (!string.IsNullOrWhiteSpace(_listEvent.ReqCaptorTraitLevelAbove))
-                    {
-                        if (traitLevel < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptorTraitLevelAbove))
-                            return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTraitLevelAbove.");
-                    }
-                }
-                catch (Exception)
-                {
-                    return LogError("Missing ReqCaptorTraitLevelAbove");
-                }
-
-                try
-                {
-                    if (string.IsNullOrWhiteSpace(_listEvent.ReqCaptorTraitLevelBelow)) return true;
-
-                    if (traitLevel > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqCaptorTraitLevelBelow))
-                        return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqCaptorTraitLevelBelow.");
-                }
-                catch (Exception)
-                {
-                    return LogError("Missing ReqCaptorTraitLevelBelow");
-                }
-            }
-            catch (Exception)
-            {
-                return LogError("Incorrect ReqCaptorTrait / Failed ");
             }
 
             return true;
@@ -1783,49 +1693,6 @@ namespace CaptivityEvents.Events
             return true;
         }
 
-        private bool HeroSkillCheck(CharacterObject captive)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(_listEvent.ReqHeroSkill)) return true;
-
-                SkillObject foundSkill = CESkills.FindSkill(_listEvent.ReqHeroSkill);
-                if (foundSkill == null) return LogError("Couldn't find " + _listEvent.ReqHeroSkill);
-
-                int skillLevel = captive.GetSkillValue(foundSkill);
-
-                try
-                {
-                    if (!string.IsNullOrWhiteSpace(_listEvent.ReqHeroSkillLevelAbove))
-                    {
-                        if (skillLevel < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelAbove))
-                            return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelAbove.");
-                    }
-                }
-                catch (Exception)
-                {
-                    return LogError("Missing ReqHeroSkillLevelAbove");
-                }
-
-                try
-                {
-                    if (string.IsNullOrWhiteSpace(_listEvent.ReqHeroSkillLevelBelow)) return true;
-
-                    if (skillLevel > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroSkillLevelBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroSkillLevelBelow.");
-                }
-                catch (Exception)
-                {
-                    return LogError("Missing ReqHeroSkillLevelBelow");
-                }
-            }
-            catch (Exception)
-            {
-                return LogError("Incorrect ReqHeroSkill / Failed ");
-            }
-
-            return true;
-        }
-
         private bool CaptorTraitsCheck(PartyBase captorParty)
         {
             if (_listEvent.TraitsRequired == null) return true;
@@ -1878,48 +1745,6 @@ namespace CaptivityEvents.Events
             catch (Exception)
             {
                 return LogError("Incorrect TraitsRequired / Failed ");
-            }
-
-            return true;
-        }
-
-        private bool HeroTraitCheck(CharacterObject captive)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(_listEvent.ReqHeroTrait)) return true;
-
-                TraitObject foundTrait = TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _listEvent.ReqHeroTrait);
-
-                int traitLevel = captive.GetTraitLevel(foundTrait);
-
-                try
-                {
-                    if (!string.IsNullOrEmpty(_listEvent.ReqHeroTraitLevelAbove))
-                    {
-                        if (traitLevel < new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroTraitLevelAbove))
-                            return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroTraitLevelAbove.");
-                    }
-                }
-                catch (Exception)
-                {
-                    return LogError("Invalid ReqHeroTraitLevelAbove");
-                }
-
-                try
-                {
-                    if (string.IsNullOrEmpty(_listEvent.ReqHeroTraitLevelBelow)) return true;
-
-                    if (traitLevel > new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroTraitLevelBelow)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. ReqHeroTraitLevelBelow.");
-                }
-                catch (Exception)
-                {
-                    return LogError("Invalid ReqHeroTraitLevelBelow");
-                }
-            }
-            catch (Exception)
-            {
-                return LogError("Missing ReqTrait");
             }
 
             return true;

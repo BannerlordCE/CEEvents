@@ -13,7 +13,6 @@ namespace CaptivityEvents.Custom
     [Serializable]
     public enum RestrictedListOfConsequences
     {
-        GiveXP,
         GiveItem,
         GiveGold,
         GiveCaptorGold,
@@ -31,10 +30,6 @@ namespace CaptivityEvents.Custom
         ChangeCaptorRenown,
         ChangeHealth,
         ChangeRelation,
-        ChangeTrait,
-        ChangeCaptorTrait,
-        ChangeSkill,
-        ChangeCaptorSkill,
         ImpregnationRisk,
         ImpregnationHero,
         ImpregnationByPlayer,
@@ -636,22 +631,6 @@ namespace CaptivityEvents.Custom
 
         public string ReqHeroProstituteLevelBelow { get; set; }
 
-        public string ReqHeroTraitLevelAbove { get; set; }
-
-        public string ReqHeroTraitLevelBelow { get; set; }
-
-        public string ReqCaptorTraitLevelAbove { get; set; }
-
-        public string ReqCaptorTraitLevelBelow { get; set; }
-
-        public string ReqHeroSkillLevelAbove { get; set; }
-
-        public string ReqHeroSkillLevelBelow { get; set; }
-
-        public string ReqCaptorSkillLevelAbove { get; set; }
-
-        public string ReqCaptorSkillLevelBelow { get; set; }
-
         public string ReqMoraleAbove { get; set; }
 
         public string ReqMoraleBelow { get; set; }
@@ -708,18 +687,6 @@ namespace CaptivityEvents.Custom
 
         public string ReqGoldBelow { get; set; }
 
-        public string SkillToLevel { get; set; }
-
-        public string ReqCaptorSkill { get; set; }
-
-        public string ReqHeroSkill { get; set; }
-
-        public string TraitToLevel { get; set; }
-
-        public string ReqCaptorTrait { get; set; }
-
-        public string ReqHeroTrait { get; set; }
-
         public string ItemToGive { get; set; }
 
         public string GoldTotal { get; set; }
@@ -737,14 +704,6 @@ namespace CaptivityEvents.Custom
         public string ProstitutionTotal { get; set; }
 
         public string SlaveryTotal { get; set; }
-
-        public string TraitTotal { get; set; }
-
-        public string TraitXPTotal { get; set; }
-
-        public string SkillTotal { get; set; }
-
-        public string SkillXPTotal { get; set; }
 
         public string SceneToPlay { get; set; }
 
@@ -890,22 +849,6 @@ namespace CaptivityEvents.Custom
 
         public string ReqHeroSlaveLevelBelow { get; set; }
 
-        public string ReqHeroTraitLevelAbove { get; set; }
-
-        public string ReqHeroTraitLevelBelow { get; set; }
-
-        public string ReqCaptorTraitLevelAbove { get; set; }
-
-        public string ReqCaptorTraitLevelBelow { get; set; }
-
-        public string ReqHeroSkillLevelAbove { get; set; }
-
-        public string ReqHeroSkillLevelBelow { get; set; }
-
-        public string ReqCaptorSkillLevelAbove { get; set; }
-
-        public string ReqCaptorSkillLevelBelow { get; set; }
-
         public string ReqMoraleAbove { get; set; }
 
         public string ReqMoraleBelow { get; set; }
@@ -977,26 +920,6 @@ namespace CaptivityEvents.Custom
         public string SlaveryTotal { get; set; }
 
         public string ProstitutionTotal { get; set; }
-
-        public string TraitTotal { get; set; }
-
-        public string TraitXPTotal { get; set; }
-
-        public string SkillTotal { get; set; }
-
-        public string SkillXPTotal { get; set; }
-
-        public string SkillToLevel { get; set; }
-
-        public string ReqCaptorSkill { get; set; }
-
-        public string ReqHeroSkill { get; set; }
-
-        public string TraitToLevel { get; set; }
-
-        public string ReqCaptorTrait { get; set; }
-
-        public string ReqHeroTrait { get; set; }
 
         [XmlArrayItem("SkillRequired", IsNullable = true)]
         public SkillRequired[] SkillsRequired { get; set; }

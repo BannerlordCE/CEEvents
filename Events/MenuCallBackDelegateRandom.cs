@@ -200,9 +200,8 @@ namespace CaptivityEvents.Events
             ReqHeroHealthPercentage(ref args);
             ReqSlavery(ref args);
             ReqProstitute(ref args);
-            ReqHeroSkill(ref args);
             ReqHeroSkills(ref args);
-            ReqTrait(ref args);
+            ReqHeroTraits(ref args);
             ReqGold(ref args);
 
             return _sharedCallBackHelper.ShouldHide(ref args);
@@ -212,7 +211,6 @@ namespace CaptivityEvents.Events
         {
             CaptorSpecifics captorSpecifics = new();
             _sharedCallBackHelper.ConsequenceGiveItem();
-            _sharedCallBackHelper.ConsequenceXP();
             _sharedCallBackHelper.ConsequenceLeaveSpouse();
             _sharedCallBackHelper.ConsequenceGold();
             _sharedCallBackHelper.ConsequenceChangeGold();
@@ -817,56 +815,6 @@ namespace CaptivityEvents.Events
 
         #endregion ReqGold
 
-        #region ReqTrait
-
-        private void ReqTrait(ref MenuCallbackArgs args)
-        {
-            if (string.IsNullOrWhiteSpace(_option.ReqHeroTrait)) return;
-            int traitLevel;
-
-            try
-            {
-                traitLevel = Hero.MainHero.GetTraitLevel(TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _option.ReqHeroTrait));
-            }
-            catch (Exception)
-            {
-                CECustomHandler.LogToFile("Invalid Trait Captive");
-                traitLevel = 0;
-            }
-
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(_option.ReqHeroTraitLevelAbove)) ReqHeroTraitLevelAbove(ref args, traitLevel);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid ReqHeroTraitLevelAbove"); }
-
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(_option.ReqHeroTraitLevelBelow)) ReqHeroTraitLevelBelow(ref args, traitLevel);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid ReqHeroTraitLevelBelow"); }
-        }
-
-        private void ReqHeroTraitLevelBelow(ref MenuCallbackArgs args, int traitLevel)
-        {
-            if (traitLevel <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroTraitLevelBelow)) return;
-            TextObject text = GameTexts.FindText("str_CE_trait_level", "high");
-            text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(_option.ReqHeroTrait));
-            args.Tooltip = text;
-            args.IsEnabled = false;
-        }
-
-        private void ReqHeroTraitLevelAbove(ref MenuCallbackArgs args, int traitLevel)
-        {
-            if (traitLevel >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroTraitLevelAbove)) return;
-            TextObject text = GameTexts.FindText("str_CE_trait_level", "low");
-            text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(_option.ReqHeroTrait));
-            args.Tooltip = text;
-            args.IsEnabled = false;
-        }
-
-        #endregion ReqTrait
-
         #region ReqHeroSkills
 
         private void ReqHeroSkills(ref MenuCallbackArgs args)
@@ -934,59 +882,68 @@ namespace CaptivityEvents.Events
 
         #endregion ReqHeroSkills
 
-        #region ReqHeroSkill
+        #region ReqHeroTraits
 
-        private void ReqHeroSkill(ref MenuCallbackArgs args)
+        private void ReqHeroTraits(ref MenuCallbackArgs args)
         {
-            if (string.IsNullOrWhiteSpace(_option.ReqHeroSkill)) return;
-            int skillLevel = 0;
+            if (_option.TraitsRequired == null) return;
 
-            try
+            foreach (TraitRequired traitRequired in _option.TraitsRequired)
             {
-                SkillObject foundSkill = CESkills.FindSkill(_option.ReqHeroSkill);
-                if (foundSkill == null)
-                    CECustomHandler.LogToFile("Invalid Skill");
-                else
-                    skillLevel = Hero.MainHero.GetSkillValue(foundSkill);
-            }
-            catch (Exception)
-            {
-                CECustomHandler.LogToFile("Invalid Skill");
-                skillLevel = 0;
-            }
+                if (traitRequired.Ref == "Captor") continue;
 
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(_option.ReqHeroSkillLevelAbove)) ReqHeroSkillLevelAbove(ref args, skillLevel);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid ReqHeroSkillLevelAbove"); }
+                TraitObject foundTrait;
+                try
+                {
+                    foundTrait = TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == traitRequired.Id);
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.ForceLogToFile("Could not find trait " + traitRequired.Id);
+                    return;
+                }
 
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(_option.ReqHeroSkillLevelBelow)) ReqHeroSkillLevelBelow(ref args, skillLevel);
+                int traitLevel = Hero.MainHero.GetTraitLevel(foundTrait);
+
+                try
+                {
+                    if (ReqTraitsLevelAbove(ref args, foundTrait, traitLevel, traitRequired.Min)) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid TraitRequiredAbove"); }
+
+                try
+                {
+                    if (ReqTraitsLevelBelow(ref args, foundTrait, traitLevel, traitRequired.Max)) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid TraitRequiredBelow"); }
             }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid ReqHeroSkillLevelBelow"); }
         }
 
-        private void ReqHeroSkillLevelBelow(ref MenuCallbackArgs args, int skillLevel)
+        private bool ReqTraitsLevelBelow(ref MenuCallbackArgs args, TraitObject traitRequired, int traitLevel, string max)
         {
-            if (skillLevel <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroSkillLevelBelow)) return;
-            TextObject text = GameTexts.FindText("str_CE_skill_level", "high");
-            text.SetTextVariable("SKILL", _option.ReqHeroSkill);
+            if (string.IsNullOrWhiteSpace(max)) return false;
+            if (traitLevel <= new CEVariablesLoader().GetIntFromXML(max)) return false;
+
+            TextObject text = GameTexts.FindText("str_CE_trait_level", "high");
+            text.SetTextVariable("TRAIT", traitRequired.Name);
             args.Tooltip = text;
             args.IsEnabled = false;
+            return true;
         }
 
-        private void ReqHeroSkillLevelAbove(ref MenuCallbackArgs args, int skillLevel)
+        private bool ReqTraitsLevelAbove(ref MenuCallbackArgs args, TraitObject traitRequired, int traitLevel, string min)
         {
-            if (skillLevel >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroSkillLevelAbove)) return;
-            TextObject text = GameTexts.FindText("str_CE_skill_level", "low");
-            text.SetTextVariable("SKILL", _option.ReqHeroSkill);
+            if (string.IsNullOrWhiteSpace(min)) return false;
+            if (traitLevel >= new CEVariablesLoader().GetIntFromXML(min)) return false;
+
+            TextObject text = GameTexts.FindText("str_CE_trait_level", "low");
+            text.SetTextVariable("TRAIT", traitRequired.Name);
             args.Tooltip = text;
             args.IsEnabled = false;
+            return true;
         }
 
-        #endregion ReqHeroSkill
+        #endregion ReqHeroTraits
 
         #region ReqProstitute
 

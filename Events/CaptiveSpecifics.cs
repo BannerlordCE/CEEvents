@@ -160,7 +160,7 @@ namespace CaptivityEvents.Events
 
         private bool ShouldActivateRaftStateForMobileParty(MobileParty mobileParty)
         {
-            return mobileParty.IsCurrentlyAtSea && !mobileParty.IsInRaftState && !mobileParty.HasNavalNavigationCapability && mobileParty.IsActive;
+            return mobileParty.IsCurrentlyAtSea && !mobileParty.IsInRaftState && mobileParty.IsActive;
         }
 
 
