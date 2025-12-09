@@ -923,7 +923,7 @@ namespace CaptivityEvents.Events
                                         CEPersistence.destroyParty = false;
                                         CEPersistence.surrenderParty = false;
 
-                                        //PlayerEncounter StartVillageBattleMission
+                                        //PlayerEncounter StartVillageBattleMission StartAlleyFightWithOtherAlley
                                         int wallLevel = Settlement.CurrentSettlement.Town.GetWallLevel();
                                         string scene = Settlement.CurrentSettlement.LocationComplex.GetScene("center", wallLevel);
                                         Location locationWithId = LocationComplex.Current.GetLocationWithId("center");

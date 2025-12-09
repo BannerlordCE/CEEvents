@@ -82,7 +82,16 @@ namespace CaptivityEvents
         public static List<CEEvent> CEEventList = [];
         public static List<CEEvent> CEMenuOptionEvents = [];
         public static List<CEEvent> CEAlternativePregnancyEvents = [];
+        public static List<CEEvent> CEAlternativeDeathEvents = [];
+        public static List<CEEvent> CEAlternativeMarriageEvents = [];
+        public static List<CEEvent> CEAlternativeDesertionEvents = [];
+        public static List<CEEvent> CEPartyEnteredSettlementEvents = [];
         public static List<CEEvent> CEWaitingList = [];
+
+        public static List<CEEvent> CECaptorEvents = [];
+        public static List<CEEvent> CERandomEvents = [];
+        public static List<CEEvent> CECaptiveEvents = [];
+
         public static List<CEEvent> CECallableEvents = [];
 
         // Captive Variables
@@ -208,7 +217,14 @@ namespace CaptivityEvents
                     {
                         KeyValuePair<string, Texture> textureToRemove = CEPersistence.CELoadedTextures.First();
                         CEPersistence.CELoadedTextures.Remove(textureToRemove.Key);
-                        textureToRemove.Value.PlatformTexture.Release();
+                        try
+                        {
+                            textureToRemove.Value.PlatformTexture?.Release();
+                        }
+                        catch (Exception)
+                        {
+                            // Texture may have already been released by the engine
+                        }
                     }
                 }
 
@@ -705,9 +721,26 @@ namespace CaptivityEvents
                     CEPersistence.CEMenuOptionEvents.Add(_listedEvent);
                 }
 
+                if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredSettlement))
+                {
+                    CEPersistence.CEPartyEnteredSettlementEvents.Add(_listedEvent);
+                }
+
                 if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BirthAlternative))
                 {
                     CEPersistence.CEAlternativePregnancyEvents.Add(_listedEvent);
+                }
+                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DeathAlternative))
+                {
+                    CEPersistence.CEAlternativeDeathEvents.Add(_listedEvent);
+                }
+                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.MarriageAlternative))
+                {
+                    CEPersistence.CEAlternativeMarriageEvents.Add(_listedEvent);
+                }
+                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DesertionAlternative))
+                {
+                    CEPersistence.CEAlternativeDesertionEvents.Add(_listedEvent);
                 }
                 else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
                 {
@@ -730,6 +763,20 @@ namespace CaptivityEvents
                         {
                             CEPersistence.CECallableEvents.Add(_listedEvent);
                         }
+                    }
+
+
+                    if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                    {
+                        CEPersistence.CECaptiveEvents.Add(_listedEvent);
+                    }
+                    else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                    {
+                        CEPersistence.CERandomEvents.Add(_listedEvent);
+                    }
+                    else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                    {
+                        CEPersistence.CECaptorEvents.Add(_listedEvent);
                     }
 
                     CEPersistence.CEEventList.Add(_listedEvent);
@@ -967,6 +1014,9 @@ namespace CaptivityEvents
 
             // Alternative Event Load 
             foreach (CEEvent alternativeEvent in CEPersistence.CEAlternativePregnancyEvents) AddEvent(gameStarter, alternativeEvent, CEPersistence.CEEvents);
+            foreach (CEEvent alternativeEvent in CEPersistence.CEAlternativeDeathEvents) AddEvent(gameStarter, alternativeEvent, CEPersistence.CEEvents);
+            foreach (CEEvent alternativeEvent in CEPersistence.CEAlternativeMarriageEvents) AddEvent(gameStarter, alternativeEvent, CEPersistence.CEEvents);
+            foreach (CEEvent alternativeEvent in CEPersistence.CEAlternativeDesertionEvents) AddEvent(gameStarter, alternativeEvent, CEPersistence.CEEvents);
 
             // Listed Event Load
             foreach (CEEvent listedEvent in CEPersistence.CEEventList) AddEvent(gameStarter, listedEvent, CEPersistence.CEEvents);
@@ -1152,8 +1202,8 @@ namespace CaptivityEvents
                     if (Hero.MainHero.IsFemale)
                     {
                         CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale
-                            ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu")
-                            : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
+                            ? CEPersistence.CECaptorEvents.Find(item => item.Name == "CE_captor_female_sexual_menu")
+                            : CEPersistence.CECaptorEvents.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
                         triggeredEvent.Captive = CEPersistence.captiveToPlay;
 
                         if (mapState.AtMenu)
@@ -1174,8 +1224,8 @@ namespace CaptivityEvents
                     else
                     {
                         CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale
-                            ? CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu")
-                            : CEPersistence.CEEventList.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
+                            ? CEPersistence.CECaptorEvents.Find(item => item.Name == "CE_captor_male_sexual_menu")
+                            : CEPersistence.CECaptorEvents.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
                         triggeredEvent.Captive = CEPersistence.captiveToPlay;
 
                         if (mapState.AtMenu)

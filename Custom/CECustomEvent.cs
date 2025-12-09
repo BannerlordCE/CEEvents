@@ -35,6 +35,7 @@ namespace CaptivityEvents.Custom
         ImpregnationByPlayer,
         AttemptEscape,
         Escape,
+        Release,
         Leave,
         Continue,
         SoldToCaravan,
@@ -83,6 +84,13 @@ namespace CaptivityEvents.Custom
         GiveBirth,
         Abort,
         UnavailableIsInvisible,
+        // Alternative Event Consequences
+        ProceedWithDeath,
+        CancelDeath,
+        ProceedWithMarriage,
+        CancelMarriage,
+        ProceedWithDesertion,
+        CancelDesertion,
     }
 
     [XmlType(AnonymousType = true)]
@@ -208,6 +216,14 @@ namespace CaptivityEvents.Custom
         CaptorIsClanLeader,
         CaptorIsFactionLeader,
         CaptorIsNotFactionLeader,
+        PartyEnteredSettlement,
+        PartyEnteredSettlementIsTown,
+        PartyEnteredSettlementIsCastle,
+        PartyEnteredSettlementIsVillage,
+        PartyEnteredPartyIsCaravan,
+        PartyEnteredPartyIsLordParty,
+        PartyEnteredPartyIsBanditParty,
+        PartyEnteredPartyHasPrisoners,
     }
 
     [XmlType(AnonymousType = true)]

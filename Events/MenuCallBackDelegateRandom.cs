@@ -648,7 +648,7 @@ namespace CaptivityEvents.Events
                     if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(party);
                 }
                 else
-                {
+                {   
                     prisonerCharacter.PartyBelongedTo?.MemberRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
                     prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
                     prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);

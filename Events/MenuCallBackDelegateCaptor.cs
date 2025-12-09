@@ -246,6 +246,7 @@ namespace CaptivityEvents.Events
             ConsequenceWoundTroops(ref args);
             ConsequenceKillTroops(ref args);
             ConsequenceJoinParty();
+            ConsequenceAlternativeEvents();
 
             _sharedCallBackHelper.ConsequenceGiveItem();
             _sharedCallBackHelper.ConsequencePlayScene();
@@ -543,6 +544,39 @@ namespace CaptivityEvents.Events
             }
         }
 
+        private void ConsequenceAlternativeEvents()
+        {
+            // Death Alternative consequences
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ProceedWithDeath))
+            {
+                Patches.CEPatchAlternativeEvents.ProceedWithDeath();
+            }
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CancelDeath))
+            {
+                Patches.CEPatchAlternativeEvents.CancelDeath();
+            }
+
+            // Marriage Alternative consequences
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ProceedWithMarriage))
+            {
+                Patches.CEPatchAlternativeEvents.ProceedWithMarriage();
+            }
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CancelMarriage))
+            {
+                Patches.CEPatchAlternativeEvents.CancelMarriage();
+            }
+
+            // Desertion Alternative consequences
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ProceedWithDesertion))
+            {
+                Patches.CEPatchAlternativeEvents.ProceedWithDesertion();
+            }
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CancelDesertion))
+            {
+                Patches.CEPatchAlternativeEvents.CancelDesertion();
+            }
+        }
+
         private void ConsequenceWoundPrisoner(ref MenuCallbackArgs args)
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundPrisoner))
@@ -600,6 +634,20 @@ namespace CaptivityEvents.Events
 
         private void ConsequenceRelease(ref MenuCallbackArgs args)
         {
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Release))
+            {
+                try
+                {
+                    if (_listedEvent.Captive.IsHero) EndCaptivityAction.ApplyByReleasedByChoice(_listedEvent.Captive.HeroObject);
+                    else PartyBase.MainParty.PrisonRoster.AddToCounts(_listedEvent.Captive, -1);
+                }
+                catch (Exception e)
+                {
+                    CECustomHandler.ForceLogToFile("Consequence Release: " + e.ToString());
+                }
+            }
+
+
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseRandomPrisoners)) _captor.CECaptorReleasePrisoners(args);
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ReleaseAllPrisoners)) _captor.CECaptorReleasePrisoners(args, PartyBase.MainParty.PrisonRoster.Count, true);
         }

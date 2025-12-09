@@ -15,6 +15,7 @@ using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 
 namespace CaptivityEvents.Events
@@ -182,6 +183,11 @@ namespace CaptivityEvents.Events
             {
                 DisbandArmyAction.ApplyByNoShip(army);
             }
+        }
+
+        internal void CECaptivityRelease(ref MenuCallbackArgs args)
+        {
+            CECaptivityLeave(ref args);
         }
 
         internal void CECaptivityEscape(ref MenuCallbackArgs args)

@@ -12,6 +12,7 @@ using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using static CaptivityEvents.Helper.CEHelper;
@@ -350,6 +351,173 @@ namespace CaptivityEvents.Events
             if (!SeasonCheck(ref eventMatchingCondition)) return LatestMessage;
 
             _listEvent.Captive = captive;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Checks if flags match for party entering settlement events
+        /// </summary>
+        /// <param name="party">The party entering the settlement</param>
+        /// <param name="settlement">The settlement being entered</param>
+        /// <returns>null if conditions match, error message otherwise</returns>
+        public string FlagsDoMatchEventConditionsPartyEnter(MobileParty party, Settlement settlement)
+        {
+            // Null checks for party and settlement
+            if (party == null)
+            {
+                LogError("Skipping event " + _listEvent.Name + " party is null.");
+                return LatestMessage;
+            }
+            if (settlement == null)
+            {
+                LogError("Skipping event " + _listEvent.Name + " settlement is null.");
+                return LatestMessage;
+            }
+
+            if (!ValidateEvent()) return LatestMessage;
+            if (!SettingsCheck()) return LatestMessage;
+            if (!CustomFlagCheck()) return LatestMessage;
+
+            // Check settlement type flags
+            bool hasSettlementTypeFlag = false;
+            bool settlementTypeMatches = false;
+
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredSettlementIsTown))
+            {
+                hasSettlementTypeFlag = true;
+                if (settlement.IsTown) settlementTypeMatches = true;
+            }
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredSettlementIsCastle))
+            {
+                hasSettlementTypeFlag = true;
+                if (settlement.IsCastle) settlementTypeMatches = true;
+            }
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredSettlementIsVillage))
+            {
+                hasSettlementTypeFlag = true;
+                if (settlement.IsVillage) settlementTypeMatches = true;
+            }
+
+            if (hasSettlementTypeFlag && !settlementTypeMatches)
+            {
+                LogError("Skipping event " + _listEvent.Name + " settlement type does not match.");
+                return LatestMessage;
+            }
+
+            // Check party type flags
+            bool hasPartyTypeFlag = false;
+            bool partyTypeMatches = false;
+
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredPartyIsCaravan))
+            {
+                hasPartyTypeFlag = true;
+                if (party.IsCaravan) partyTypeMatches = true;
+            }
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredPartyIsLordParty))
+            {
+                hasPartyTypeFlag = true;
+                if (party.IsLordParty) partyTypeMatches = true;
+            }
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredPartyIsBanditParty))
+            {
+                hasPartyTypeFlag = true;
+                if (party.IsBandit) partyTypeMatches = true;
+            }
+
+            if (hasPartyTypeFlag && !partyTypeMatches)
+            {
+                LogError("Skipping event " + _listEvent.Name + " party type does not match.");
+                return LatestMessage;
+            }
+
+            // Check if party has prisoners
+            if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredPartyHasPrisoners))
+            {
+                if (party.PrisonRoster == null || party.PrisonRoster.TotalManCount == 0)
+                {
+                    LogError("Skipping event " + _listEvent.Name + " party has no prisoners.");
+                    return LatestMessage;
+                }
+            }
+
+            // Check time of day
+            bool eventMatchingCondition = true;
+            if (!TimeCheck(ref eventMatchingCondition)) return LatestMessage;
+            if (!SeasonCheck(ref eventMatchingCondition)) return LatestMessage;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Checks if flags match for alternative events (Death, Marriage, Desertion)
+        /// </summary>
+        /// <param name="targetHero">The hero affected by the event (victim, spouse, or deserting companion)</param>
+        /// <param name="secondaryHero">Optional secondary hero (killer for death, other spouse for marriage)</param>
+        /// <param name="alternativeFlag">The alternative event type flag</param>
+        /// <returns>null if conditions match, error message otherwise</returns>
+        public string FlagsDoMatchEventConditionsAlternative(Hero targetHero, Hero secondaryHero, RestrictedListOfFlags alternativeFlag)
+        {
+            if (!ValidateEvent()) return LatestMessage;
+            if (!SettingsCheck()) return LatestMessage;
+            if (!CustomFlagCheck()) return LatestMessage;
+
+            // Check hero gender flags if target hero exists
+            if (targetHero != null)
+            {
+                if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale) && !targetHero.IsFemale)
+                {
+                    LogError("Skipping event " + _listEvent.Name + " target hero is not female.");
+                    return LatestMessage;
+                }
+                if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale) && targetHero.IsFemale)
+                {
+                    LogError("Skipping event " + _listEvent.Name + " target hero is not male.");
+                    return LatestMessage;
+                }
+
+                // Age check for target hero
+                if (!string.IsNullOrEmpty(_listEvent.ReqHeroMinAge))
+                {
+                    int minAge = new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroMinAge);
+                    if (targetHero.Age < minAge)
+                    {
+                        LogError("Skipping event " + _listEvent.Name + " target hero too young.");
+                        return LatestMessage;
+                    }
+                }
+                if (!string.IsNullOrEmpty(_listEvent.ReqHeroMaxAge))
+                {
+                    int maxAge = new CEVariablesLoader().GetIntFromXML(_listEvent.ReqHeroMaxAge);
+                    if (targetHero.Age > maxAge)
+                    {
+                        LogError("Skipping event " + _listEvent.Name + " target hero too old.");
+                        return LatestMessage;
+                    }
+                }
+            }
+
+            // Check secondary hero (captor flags for death events)
+            if (secondaryHero != null && alternativeFlag == RestrictedListOfFlags.DeathAlternative)
+            {
+                if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsFemale) && !secondaryHero.IsFemale)
+                {
+                    LogError("Skipping event " + _listEvent.Name + " killer is not female.");
+                    return LatestMessage;
+                }
+                if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CaptorGenderIsMale) && secondaryHero.IsFemale)
+                {
+                    LogError("Skipping event " + _listEvent.Name + " killer is not male.");
+                    return LatestMessage;
+                }
+            }
+
+            // Time and season checks
+            bool eventMatchingCondition = true;
+            if (!TimeCheck(ref eventMatchingCondition)) return LatestMessage;
+            if (!SeasonCheck(ref eventMatchingCondition)) return LatestMessage;
+
+            _listEvent.Captive = targetHero?.CharacterObject;
 
             return null;
         }
@@ -1540,8 +1708,8 @@ namespace CaptivityEvents.Events
             if (_listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotPregnant) && (captiveHero.IsPregnant || CECampaignBehavior.CheckIfPregnancyExists(captiveHero))) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsNotPregnant.");
             if (captiveHero.Spouse == null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroHaveSpouse)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroHaveSpouse.");
             if (captiveHero.Spouse != null && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroNotHaveSpouse)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroNotHaveSpouse.");
-            if (captiveHero.Clan == null || captiveHero.Clan.Fiefs.Count == 0 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnsFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroOwnsFief.");
-            if (captiveHero.Clan != null && captiveHero.Clan.Fiefs.Count >= 1 && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnsNoFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroOwnsNoFief.");
+            if ((captiveHero.Clan == null || captiveHero.Clan.Fiefs.Count == 0) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnsFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroOwnsFief.");
+            if ((captiveHero.Clan != null && captiveHero.Clan.Fiefs.Count >= 1) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroOwnsNoFief)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroOwnsNoFief.");
             if ((captiveHero.Clan == null || captiveHero != captiveHero.Clan.Leader) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsClanLeader)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsClanLeader.");
             if (captiveHero.Clan != null && captiveHero == captiveHero.Clan.Leader && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsNotClanLeader)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsNotClanLeader.");
             if (!captiveHero.IsFactionLeader && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsFactionLeader)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. HeroIsFactionLeader.");

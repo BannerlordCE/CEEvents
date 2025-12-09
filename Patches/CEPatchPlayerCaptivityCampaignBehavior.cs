@@ -144,8 +144,8 @@ namespace CaptivityEvents.Patches
                         else
                         {
                             eventToFire = item.eventName.ToLower();
-                            CEEvent foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == eventToFire);
-                            if (foundevent != null && !foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                            CEEvent foundevent = CEPersistence.CECaptiveEvents.FirstOrDefault(ceevent => ceevent.Name.ToLower() == eventToFire);
+                            if (foundevent == null)
                             {
                                 eventToFire = null;
                                 return false;

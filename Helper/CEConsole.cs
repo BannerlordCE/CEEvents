@@ -432,7 +432,7 @@ namespace CaptivityEvents.Helper
 
                 if (Game.Current.GameStateManager.ActiveState is MapState mapStateRandom)
                 {
-                    HandleEventLaunch(returnedEvent, mapStateRandom);
+                    HandleEventLaunch(returnedEvent, null);
                     return "Successfully launched event.";
                 }
 
@@ -600,14 +600,15 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckParameters(strings, 1)) searchTerm = strings[0];
 
-                if (CEPersistence.CEEvents == null || CEPersistence.CEEvents.Count <= 0) return "Failed to load event list.";
+                if (CEPersistence.CECallableEvents == null || CEPersistence.CECallableEvents.Count <= 0) return "Failed to load event list.";
                 string text = "";
                 bool searchActive = !string.IsNullOrWhiteSpace(searchTerm);
 
                 if (searchActive) searchTerm = searchTerm.ToLower();
 
-                foreach (CEEvent ceEvent in CEPersistence.CEEvents)
+                foreach (CEEvent ceEvent in CEPersistence.CECallableEvents)
                 {
+
                     string eventName = ceEvent.Name;
                     string result;
                     CEEvent returnedEvent = null;
@@ -1239,9 +1240,16 @@ namespace CaptivityEvents.Helper
                 CEPersistence.CEEvents.Clear();
                 CEPersistence.CEEventList.Clear();
                 CEPersistence.CEAlternativePregnancyEvents.Clear();
+                CEPersistence.CEAlternativeDeathEvents.Clear();
+                CEPersistence.CEAlternativeMarriageEvents.Clear();
+                CEPersistence.CEAlternativeDesertionEvents.Clear();
+                CEPersistence.CEPartyEnteredSettlementEvents.Clear();
                 CEPersistence.CEWaitingList.Clear();
                 CEPersistence.CECallableEvents.Clear();
                 CEPersistence.CEMenuOptionEvents.Clear();
+                CEPersistence.CECaptiveEvents.Clear();
+                CEPersistence.CERandomEvents.Clear();
+                CEPersistence.CECaptorEvents.Clear();
 
                 // Load new events
                 CEPersistence.CEEvents = CECustomHandler.GetAllVerifiedXSEFSEvents(modulePaths);
@@ -1269,57 +1277,80 @@ namespace CaptivityEvents.Helper
                 var variablesLoader = new CEVariablesLoader();
 
                 // Process events
-                foreach (var ev in CEPersistence.CEEvents.Where(e => !string.IsNullOrWhiteSpace(e.Name)))
+                foreach (var _listedEvent in CEPersistence.CEEvents.Where(e => !string.IsNullOrWhiteSpace(e.Name)))
                 {
-                    if (ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwritable)
-                        && (CEPersistence.CEEventList.Any(x => x.Name == ev.Name) || CEPersistence.CEWaitingList.Any(x => x.Name == ev.Name)))
+                    if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwritable)
+                        && (CEPersistence.CEEventList.Any(x => x.Name == _listedEvent.Name) || CEPersistence.CEWaitingList.Any(x => x.Name == _listedEvent.Name)))
                         continue;
 
                     // Set brothel flags
-                    if (!CEHelper.brothelFlagFemale && ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) &&
-                        ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) &&
-                        ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) &&
-                        ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) &&
-                        ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale))
+                    if (!CEHelper.brothelFlagFemale && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) &&
+                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) &&
+                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) &&
+                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) &&
+                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale))
                     {
                         CEHelper.brothelFlagFemale = true;
                     }
 
-                    if (!CEHelper.brothelFlagMale && ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) &&
-                        ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) &&
-                        ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) &&
-                        ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) &&
-                        ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale))
+                    if (!CEHelper.brothelFlagMale && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) &&
+                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) &&
+                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) &&
+                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) &&
+                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale))
                     {
                         CEHelper.brothelFlagMale = true;
                     }
 
-                    if (ev.MenuOptions?.Length > 0)
-                        CEPersistence.CEMenuOptionEvents.Add(ev);
+                    if (_listedEvent.MenuOptions?.Length > 0)
+                        CEPersistence.CEMenuOptionEvents.Add(_listedEvent);
 
-                    if (ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BirthAlternative))
-                        CEPersistence.CEAlternativePregnancyEvents.Add(ev);
-                    else if (ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
-                        CEPersistence.CEWaitingList.Add(ev);
+                    if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredSettlement))
+                        CEPersistence.CEPartyEnteredSettlementEvents.Add(_listedEvent);
+
+                    if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BirthAlternative))
+                        CEPersistence.CEAlternativePregnancyEvents.Add(_listedEvent);
+                    else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DeathAlternative))
+                        CEPersistence.CEAlternativeDeathEvents.Add(_listedEvent);
+                    else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.MarriageAlternative))
+                        CEPersistence.CEAlternativeMarriageEvents.Add(_listedEvent);
+                    else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DesertionAlternative))
+                        CEPersistence.CEAlternativeDesertionEvents.Add(_listedEvent);
+                    else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
+                        CEPersistence.CEWaitingList.Add(_listedEvent);
                     else
                     {
-                        if (!ev.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
+                        if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
                         {
                             int weightedChance = 1;
                             try
                             {
-                                if (ev.WeightedChanceOfOccurring != null)
-                                    weightedChance = variablesLoader.GetIntFromXML(ev.WeightedChanceOfOccurring);
+                                if (_listedEvent.WeightedChanceOfOccurring != null)
+                                    weightedChance = variablesLoader.GetIntFromXML(_listedEvent.WeightedChanceOfOccurring);
                             }
                             catch
                             {
-                                CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring on " + ev.Name);
+                                CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring on " + _listedEvent.Name);
                             }
 
                             if (weightedChance > 0)
-                                CEPersistence.CECallableEvents.Add(ev);
+                                CEPersistence.CECallableEvents.Add(_listedEvent);
                         }
-                        CEPersistence.CEEventList.Add(ev);
+
+                        if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                        {
+                            CEPersistence.CECaptiveEvents.Add(_listedEvent);
+                        }
+                        else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                        {
+                            CEPersistence.CERandomEvents.Add(_listedEvent);
+                        }
+                        else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                        {
+                            CEPersistence.CECaptorEvents.Add(_listedEvent);
+                        }
+
+                        CEPersistence.CEEventList.Add(_listedEvent);
                     }
                 }
 

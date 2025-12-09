@@ -280,6 +280,7 @@ namespace CaptivityEvents.Events
             _sharedCallBackHelper.ConsequenceMission();
             _sharedCallBackHelper.ConsequenceTeleportPlayer();
             _sharedCallBackHelper.ConsequenceDamageParty(PlayerCaptivity.CaptorParty);
+            ConsequenceAlternativeEvents();
 
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor) && PlayerCaptivity.CaptorParty.NumberOfAllMembers == 1)
             {
@@ -308,6 +309,10 @@ namespace CaptivityEvents.Events
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Escape))
             {
                 _captive.CECaptivityEscape(ref args);
+            }
+            else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Release))
+            {
+                _captive.CECaptivityRelease(ref args);
             }
             else if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Leave))
             {
@@ -593,6 +598,39 @@ namespace CaptivityEvents.Events
         private void ConsequenceKillTroops()
         {
             if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillRandomTroops)) _dynamics.CEKillTroops(PlayerCaptivity.CaptorParty);
+        }
+
+        private void ConsequenceAlternativeEvents()
+        {
+            // Death Alternative consequences
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ProceedWithDeath))
+            {
+                Patches.CEPatchAlternativeEvents.ProceedWithDeath();
+            }
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CancelDeath))
+            {
+                Patches.CEPatchAlternativeEvents.CancelDeath();
+            }
+
+            // Marriage Alternative consequences
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ProceedWithMarriage))
+            {
+                Patches.CEPatchAlternativeEvents.ProceedWithMarriage();
+            }
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CancelMarriage))
+            {
+                Patches.CEPatchAlternativeEvents.CancelMarriage();
+            }
+
+            // Desertion Alternative consequences
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ProceedWithDesertion))
+            {
+                Patches.CEPatchAlternativeEvents.ProceedWithDesertion();
+            }
+            if (_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.CancelDesertion))
+            {
+                Patches.CEPatchAlternativeEvents.CancelDesertion();
+            }
         }
 
         private void ConsequenceSoldEvents(ref MenuCallbackArgs args)

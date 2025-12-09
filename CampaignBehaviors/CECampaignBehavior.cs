@@ -17,6 +17,7 @@ using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.LogEntries;
 using TaleWorlds.CampaignSystem.MapNotificationTypes;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -159,6 +160,109 @@ namespace CaptivityEvents.CampaignBehaviors
             return true;
         }
 
+        private bool LaunchPartyEnterEvent(MobileParty party, Settlement settlement, CEEvent OverrideEvent = null)
+        {
+            if (CESettings.Instance?.EventCaptorNotifications ?? true)
+            {
+                if (notificationEventExists || progressEventExists) return false;
+            }
+
+            CEEvent returnedEvent;
+            if (OverrideEvent == null)
+            {
+                returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyEnterSettlement(party, settlement);
+            }
+            else
+            {
+                returnedEvent = OverrideEvent;
+            }
+
+            if (returnedEvent == null) return false;
+            notificationEventExists = true;
+
+            if (CESettings.Instance?.EventCaptorNotifications ?? true)
+            {
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName)) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
+                    else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
+                    else new CESubModule().LoadCampaignNotificationTexture("CE_random_notification", 1);
+                }
+                catch (Exception e)
+                {
+                    InformationManager.DisplayMessage(new InformationMessage("LoadCampaignNotificationTextureFailure", Colors.Red));
+
+                    CECustomHandler.ForceLogToFile("LoadCampaignNotificationTexture");
+                    CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+                }
+
+                Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new CEEventMapNotification(returnedEvent, new TextObject("{=CEEVENTS1100}A party has entered the settlement")));
+            }
+            else
+            {
+                if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+                {
+                    Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+
+                    if (!mapState.AtMenu)
+                    {
+                        _extraVariables.menuToSwitchBackTo = null;
+                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
+                        GameMenu.ActivateGameMenu("prisoner_wait");
+                    }
+                    else
+                    {
+                        _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
+                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                    }
+
+                    GameMenu.SwitchToMenu(returnedEvent.Name);
+                }
+            }
+
+            return true;
+        }
+
+        private void OnPartyEnteredSettlement(MobileParty party, Settlement settlement, Hero hero)
+        {
+            // Skip if party is null
+            if (party == null) return;
+
+            // Skip if it's the player's party
+            if (party == MobileParty.MainParty) return;
+
+            // Skip if player is not in a settlement
+            if (Settlement.CurrentSettlement == null) return;
+
+            // Only trigger if the party entered the same settlement the player is in
+            if (settlement != Settlement.CurrentSettlement) return;
+
+            // Only trigger for towns and castles (not villages or hideouts)
+            if (!settlement.IsTown && !settlement.IsCastle) return;
+
+            // Check if random events are enabled
+            if (!(CESettings.Instance?.EventRandomEnabled ?? true)) return;
+
+            // Random chance to trigger (configurable via settings, default 10%)
+            int randomNumber = MBRandom.RandomInt(100);
+            float fireChance = CESettings.Instance?.EventRandomFireChance ?? 20f;
+            
+            // Use a lower chance for party enter events (half of random event chance)
+            if (randomNumber >= fireChance / 2) return;
+
+            CECustomHandler.LogToFile($"Party {party.Name} entered settlement {settlement.Name} where player is - checking for events");
+
+            try
+            {
+                LaunchPartyEnterEvent(party, settlement);
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("OnPartyEnteredSettlement Failure");
+                CECustomHandler.ForceLogToFile(e.Message + " : " + e);
+            }
+        }
+
         private CEEvent CheckDelayedCaptorEvent()
         {
             CEEvent eventToFire = null;
@@ -200,8 +304,8 @@ namespace CaptivityEvents.CampaignBehaviors
                     }
                     else
                     {
-                        eventToFire = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == item.eventName.ToLower());
-                        if (!eventToFire.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                        eventToFire = CEPersistence.CECaptorEvents.FirstOrDefault(ceevent => ceevent.Name.ToLower() == item.eventName.ToLower());
+                        if (eventToFire == null)
                         {
                             eventToFire = null;
                             return false;
@@ -262,8 +366,8 @@ namespace CaptivityEvents.CampaignBehaviors
                     }
                     else
                     {
-                        eventToFire = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == item.eventName.ToLower());
-                        if (!eventToFire.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                        eventToFire = CEPersistence.CERandomEvents.FirstOrDefault(ceevent => ceevent.Name.ToLower() == item.eventName.ToLower());
+                        if (eventToFire == null)
                         {
                             eventToFire = null;
                             return false;
@@ -884,6 +988,9 @@ namespace CaptivityEvents.CampaignBehaviors
             CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, OnDailyTick);
 
             CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, OnHeroKilled);
+            
+            // Party entered settlement events
+            CampaignEvents.SettlementEntered.AddNonSerializedListener(this, OnPartyEnteredSettlement);
         }
 
         public override void SyncData(IDataStore dataStore)
