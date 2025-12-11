@@ -424,18 +424,6 @@
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlatformService.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="TaleWorlds.PlatformService.Epic">
-      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlatformService.Epic.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="TaleWorlds.PlatformService.GOG">
-      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlatformService.GOG.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="TaleWorlds.PlatformService.Steam">
-      <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlatformService.Steam.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="TaleWorlds.PlayerServices">
       <HintPath>..\..\..\bin\Win64_Shipping_Client\TaleWorlds.PlayerServices.dll</HintPath>
       <Private>False</Private>
