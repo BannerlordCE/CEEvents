@@ -1,8 +1,5 @@
-﻿#define V127
-
+﻿using TaleWorlds.Core.ViewModelCollection.Information;
 using TaleWorlds.Localization;
-using TaleWorlds.Core.ViewModelCollection.Information;
-using TaleWorlds.Library;
 
 namespace CaptivityEvents.Brothel
 {

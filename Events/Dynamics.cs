@@ -1,6 +1,4 @@
-﻿#define V127
-
-using CaptivityEvents.Config;
+﻿using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
 using Helpers;
@@ -10,15 +8,15 @@ using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Election;
+using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-using TaleWorlds.CampaignSystem.CharacterDevelopment;
-using TaleWorlds.CampaignSystem.Extensions;
-using TaleWorlds.CampaignSystem.Party;
-using TaleWorlds.CampaignSystem.Settlements;
 
 
 namespace CaptivityEvents.Events
@@ -163,12 +161,9 @@ namespace CaptivityEvents.Events
                 try
                 {
                     int traitLevel = Hero.MainHero.GetTraitLevel(traitObject);
-                    Campaign.Current.PlayerTraitDeveloper.AddTraitXp(traitObject, xp);
                     if (traitLevel != Hero.MainHero.GetTraitLevel(traitObject))
                     {
-                        // Reflection One
-                        MethodInfo mi = typeof(CampaignEventDispatcher).GetMethod("OnPlayerTraitChanged", BindingFlags.Instance | BindingFlags.NonPublic);
-                        mi?.Invoke(CampaignEventDispatcher.Instance, [traitObject, traitLevel]);
+                        CampaignEventDispatcher.Instance.OnPlayerTraitChanged(traitObject, traitLevel);
                     }
                 }
                 catch (Exception e)
@@ -188,7 +183,8 @@ namespace CaptivityEvents.Events
                 return;
             }
 
-            foreach (TraitObject traitObject in DefaultTraits.Personality)
+
+            foreach (TraitObject traitObject in TraitObject.All)
             {
                 if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
                 {
@@ -197,17 +193,6 @@ namespace CaptivityEvents.Events
                 }
             }
 
-            if (!found)
-            {
-                foreach (TraitObject traitObject in DefaultTraits.SkillCategories)
-                {
-                    if (traitObject.Name.ToString().Equals(trait, StringComparison.InvariantCultureIgnoreCase) || traitObject.StringId == trait)
-                    {
-                        found = true;
-                        TraitObjectModifier(traitObject, PickColor(color), hero, trait, amount, xp, display);
-                    }
-                }
-            }
 
             if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + trait);
         }
@@ -809,11 +794,11 @@ namespace CaptivityEvents.Events
                             break;
 
                         case "join":
-                            ChangeKingdomAction.ApplyByJoinToKingdom(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, kingdom, !kingdomOption.HideNotification);
+                            ChangeKingdomAction.ApplyByJoinToKingdom(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, kingdom, default(CampaignTime), !kingdomOption.HideNotification);
                             break;
 
                         case "joinasmercenary":
-                            ChangeKingdomAction.ApplyByJoinFactionAsMercenary(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, kingdom, 50, !kingdomOption.HideNotification);
+                            ChangeKingdomAction.ApplyByJoinFactionAsMercenary(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, kingdom, default(CampaignTime), 50, !kingdomOption.HideNotification);
                             break;
                     }
                 }
@@ -831,7 +816,7 @@ namespace CaptivityEvents.Events
                 if (amount == 0) return;
                 int prisonerCount = party.PrisonRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
-                party.PrisonRoster.WoundNumberOfTroopsRandomly(amount);
+                party.PrisonRoster.WoundNumberOfNonHeroTroopsRandomly(amount);
                 TextObject textObject = GameTexts.FindText("str_CE_wound_prisoners");
                 textObject.SetTextVariable("HERO", party.Name);
                 textObject.SetTextVariable("AMOUNT", amount);
@@ -850,7 +835,7 @@ namespace CaptivityEvents.Events
                 if (amount == 0) return;
                 int prisonerCount = party.PrisonRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
-                party.PrisonRoster.KillNumberOfNonHeroTroopsRandomly(amount);
+                party.PrisonRoster.RemoveNumberOfNonHeroTroopsRandomly(amount);
                 TextObject textObject = GameTexts.FindText("str_CE_kill_prisoners");
                 textObject.SetTextVariable("HERO", party.Name);
                 textObject.SetTextVariable("AMOUNT", amount);
@@ -869,7 +854,7 @@ namespace CaptivityEvents.Events
                 if (amount == 0) return;
                 int prisonerCount = party.MemberRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
-                party.MemberRoster.WoundNumberOfTroopsRandomly(amount);
+                party.MemberRoster.WoundNumberOfNonHeroTroopsRandomly(amount);
                 TextObject textObject = GameTexts.FindText("str_CE_wound_troops");
                 textObject.SetTextVariable("PARTY", party.Name);
                 textObject.SetTextVariable("AMOUNT", amount);
@@ -888,7 +873,7 @@ namespace CaptivityEvents.Events
                 if (amount == 0) return;
                 int prisonerCount = party.MemberRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
-                party.MemberRoster.KillNumberOfNonHeroTroopsRandomly(amount);
+                party.MemberRoster.RemoveNumberOfNonHeroTroopsRandomly(amount);
                 TextObject textObject = GameTexts.FindText("str_CE_kill_troops");
                 textObject.SetTextVariable("PARTY", party.Name);
                 textObject.SetTextVariable("AMOUNT", amount);
@@ -902,7 +887,7 @@ namespace CaptivityEvents.Events
 
         internal void CEGainRandomPrisoners(PartyBase party)
         {
-            Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => settlement.IsVillage);
+            Settlement nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => settlement.IsVillage);
             //PartyTemplateObject villagerPartyTemplate = nearest.Culture.VillagerPartyTemplate; Will be used in figuring out on what to give
             MBRandom.RandomInt(1, 10);
 

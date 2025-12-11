@@ -2,7 +2,6 @@ using CaptivityEvents.Custom;
 using MCM.Abstractions;
 using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
-using MCM.Abstractions.Base;
 using MCM.Abstractions.Base.Global;
 using MCM.Common;
 using System;
@@ -56,7 +55,6 @@ namespace CaptivityEvents.Config
         bool ProstitutionControl { get; set; }
         bool SlaveryToggle { get; set; }
         bool FemdomControl { get; set; }
-        bool BestialityControl { get; set; }
         bool RomanceControl { get; set; }
         bool StolenGear { get; set; }
         bool StolenGearQuest { get; set; }
@@ -142,7 +140,6 @@ namespace CaptivityEvents.Config
         public bool ProstitutionControl { get; set; } = true;
         public bool SlaveryToggle { get; set; } = true;
         public bool FemdomControl { get; set; } = true;
-        public bool BestialityControl { get; set; } = true;
         public bool RomanceControl { get; set; } = true;
         public bool StolenGear { get; set; } = true;
         public bool StolenGearQuest { get; set; } = true;
@@ -526,10 +523,6 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool FemdomControl { get; set; } = true;
 
-        [SettingPropertyBool("{=CESETTINGS1038}Bestiality Events", Order = 8, RequireRestart = false, HintText = "{=CESETTINGS1039}Should Bestiality events be enabled.")]
-        [SettingPropertyGroup("{=CESETTINGS0096}Events")]
-        public bool BestialityControl { get; set; } = true;
-
         [SettingPropertyBool("{=CESETTINGS1040}Romance Events", Order = 9, RequireRestart = false, HintText = "{=CESETTINGS1041}Should Romance events be enabled.")]
         [SettingPropertyGroup("{=CESETTINGS0096}Events")]
         public bool RomanceControl { get; set; } = true;
@@ -561,10 +554,10 @@ namespace CaptivityEvents.Config
         [SettingPropertyBool("{=CESETTINGS1078}Pregnancy Messages", Order = 6, RequireRestart = false, HintText = "{=CESETTINGS1079}Allows daily pregnancy messages by Captivity Events.")]
         [SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
         public bool PregnancyMessages { get; set; } = true;
-        
+
         [SettingPropertyBool("{=CESETTINGS1100}Pregnancy Toggle - FemalexFemale", Order = 7, RequireRestart = false, HintText = "{=CESETTINGS1100}Allows females to impregnate females. (Only if events account for it; Alternatively, use captivity.ImpregnateBy console command to attempt it manually)")]
-		[SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
-		public bool PregnancyToggleFemalexFemale { get; set; } = true;
+        [SettingPropertyGroup("{=CESETTINGS0093}Pregnancy")]
+        public bool PregnancyToggleFemalexFemale { get; set; } = true;
 
         #endregion Pregnancy
 
@@ -655,7 +648,6 @@ namespace CaptivityEvents.Config
                         _provider.ProstitutionControl = customSettings.ProstitutionControl;
                         _provider.SlaveryToggle = customSettings.SlaveryToggle;
                         _provider.FemdomControl = customSettings.FemdomControl;
-                        _provider.BestialityControl = customSettings.BestialityControl;
                         _provider.RomanceControl = customSettings.RomanceControl;
                         _provider.StolenGear = customSettings.StolenGear;
                         _provider.StolenGearQuest = customSettings.StolenGearQuest;

@@ -35,6 +35,18 @@
 		},
 		{
 			"path": "../../zModules"
+		},
+		{
+			"path": "../../Native"
+		},
+		{
+			"path": "."
 		}
-	]
+	],
+	"settings": {
+		"cSpell.words": [
+			"Overwritable",
+			"Travelling"
+		]
+	}
 }

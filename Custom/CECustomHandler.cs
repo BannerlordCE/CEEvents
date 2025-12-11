@@ -8,7 +8,6 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
@@ -33,6 +32,10 @@ namespace CaptivityEvents.Custom
 
         public static List<CEEvent> GetAllVerifiedXSEFSEvents(List<string> modules)
         {
+            AllModules.Clear();
+            AllEvents.Clear();
+            AllCustom.Clear();
+            AllScenes.Clear();
 #if DEBUG
             //TestWrite();
 #endif

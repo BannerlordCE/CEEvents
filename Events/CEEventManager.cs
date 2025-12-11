@@ -5,12 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Roster;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-
-using TaleWorlds.CampaignSystem.Party;
-using TaleWorlds.CampaignSystem.Roster;
 
 
 namespace CaptivityEvents.Events
@@ -70,29 +70,22 @@ namespace CaptivityEvents.Events
             string flag = "$FAILEDTOFIND";
             ceEvent = null;
 
-            if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
+            if (CEPersistence.CERandomEvents == null || CEPersistence.CERandomEvents.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
-            CEEvent foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
+            CEEvent foundevent = CEPersistence.CERandomEvents.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
 
             if (foundevent != null)
             {
-                if (foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
-                {
-                    string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
 
-                    if (force || result == null)
-                    {
-                        flag = foundevent.Name;
-                        ceEvent = foundevent;
-                    }
-                    else
-                    {
-                        flag = "$" + result;
-                    }
+                if (force || result == null)
+                {
+                    flag = foundevent.Name;
+                    ceEvent = foundevent;
                 }
                 else
                 {
-                    flag = "$EVENTCONDITIONSNOTMET";
+                    flag = "$" + result;
                 }
             }
             else
@@ -110,9 +103,9 @@ namespace CaptivityEvents.Events
             string flag = "$FAILEDTOFIND";
             ceEvent = null;
 
-            if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
+            if (CEPersistence.CECaptorEvents == null || CEPersistence.CECaptorEvents.Count <= 0) return flag;
             specificEvent = specificEvent.ToLower();
-            CEEvent foundevent = CEPersistence.CEEventList.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
+            CEEvent foundevent = CEPersistence.CECaptorEvents.FirstOrDefault(ceevent => ceevent.Name.ToLower() == specificEvent);
 
             if (foundevent != null)
             {
@@ -122,19 +115,16 @@ namespace CaptivityEvents.Events
                     {
                         if (troopRosterElement.Character != null)
                         {
-                            if (foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                            string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(troopRosterElement.Character, PartyBase.MainParty);
+
+                            if (force || result == null)
                             {
-                                string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(troopRosterElement.Character, PartyBase.MainParty);
-
-                                if (force || result == null)
-                                {
-                                    foundevent.Captive = troopRosterElement.Character;
-                                    ceEvent = foundevent;
-                                    return foundevent.Name;
-                                }
-
-                                flag = "$" + result;
+                                foundevent.Captive = troopRosterElement.Character;
+                                ceEvent = foundevent;
+                                return foundevent.Name;
                             }
+
+                            flag = "$" + result;
                         }
                     }
                 }
@@ -404,6 +394,88 @@ namespace CaptivityEvents.Events
                 CECustomHandler.ForceLogToFile("eventNames.Count Broken : " + e);
                 PrintDebugInGameTextMessage("eventNames.Count Broken");
             }
+
+            return null;
+        }
+
+        public static CEEvent ReturnWeightedChoiceOfEventsPartyEnterSettlement(MobileParty party, Settlement settlement)
+        {
+            // Null checks
+            if (party == null || settlement == null)
+            {
+                CECustomHandler.LogToFile("PartyEnter: party or settlement is null, skipping.");
+                return null;
+            }
+
+            List<CEEvent> events = [];
+            int CurrentOrder = 0;
+
+            if (CEPersistence.CEPartyEnteredSettlementEvents != null && CEPersistence.CEPartyEnteredSettlementEvents.Count > 0)
+            {
+                CECustomHandler.LogToFile("PartyEnter: Having " + CEPersistence.CEPartyEnteredSettlementEvents.Count + " of events to weight and check conditions on.");
+
+                foreach (CEEvent listEvent in CEPersistence.CEPartyEnteredSettlementEvents)
+                {
+                    string result = new CEEventChecker(listEvent).FlagsDoMatchEventConditionsPartyEnter(party, settlement);
+
+                    if (result == null)
+                    {
+                        int weightedChance = 10;
+
+                        if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
+                        {
+                            CECustomHandler.LogToFile("IgnoreAllOther detected - auto fire " + listEvent.Name);
+                            return listEvent;
+                        }
+
+                        int OrderToCall = 0;
+                        if (!string.IsNullOrEmpty(listEvent.OrderToCall))
+                        {
+                            OrderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
+                        }
+
+                        if (OrderToCall < CurrentOrder)
+                        {
+                            CECustomHandler.LogToFile("OrderToCall - " + OrderToCall + " was less than CurrentOrder - " + CurrentOrder + " for " + listEvent.Name);
+                            continue;
+                        }
+                        else if (OrderToCall > CurrentOrder)
+                        {
+                            events.Clear();
+                            CurrentOrder = OrderToCall;
+                        }
+
+                        if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccurring))
+                        {
+                            weightedChance = new CEVariablesLoader().GetIntFromXML(listEvent.WeightedChanceOfOccurring);
+                        }
+                        else
+                        {
+                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring");
+                        }
+
+                        for (int a = weightedChance; a > 0; a--) events.Add(listEvent);
+                    }
+                    else
+                    {
+                        CECustomHandler.LogToFile(result);
+                    }
+                }
+
+                CECustomHandler.LogToFile("PartyEnter: Number of Filtered events is " + events.Count);
+
+                try
+                {
+                    if (events.Count > 0) return events.GetRandomElement();
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.LogToFile("PartyEnter: Something is broken?");
+                    PrintDebugInGameTextMessage("PartyEnter Something Broken...?");
+                }
+            }
+
+            CECustomHandler.LogToFile("PartyEnter: Number of Filtered events is " + events.Count);
 
             return null;
         }

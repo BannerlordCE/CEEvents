@@ -13,7 +13,6 @@ namespace CaptivityEvents.Custom
     [Serializable]
     public enum RestrictedListOfConsequences
     {
-        GiveXP,
         GiveItem,
         GiveGold,
         GiveCaptorGold,
@@ -31,21 +30,21 @@ namespace CaptivityEvents.Custom
         ChangeCaptorRenown,
         ChangeHealth,
         ChangeRelation,
-        ChangeTrait,
-        ChangeCaptorTrait,
-        ChangeSkill,
-        ChangeCaptorSkill,
         ImpregnationRisk,
         ImpregnationHero,
         ImpregnationByPlayer,
         AttemptEscape,
         Escape,
+        Release,
         Leave,
         Continue,
         SoldToCaravan,
         SoldToSettlement,
+        SoldToTradeShip,
         SoldToLordParty,
         SoldToNotable,
+        AddOwner,
+        RemoveOwner,
         CapturePlayer,
         PlayerIsNotBusy,
         PlayerAllowedCompanion,
@@ -85,6 +84,13 @@ namespace CaptivityEvents.Custom
         GiveBirth,
         Abort,
         UnavailableIsInvisible,
+        // Alternative Event Consequences
+        ProceedWithDeath,
+        CancelDeath,
+        ProceedWithMarriage,
+        CancelMarriage,
+        ProceedWithDesertion,
+        CancelDesertion,
     }
 
     [XmlType(AnonymousType = true)]
@@ -98,14 +104,10 @@ namespace CaptivityEvents.Custom
         BirthAlternative,
         Common,
         Femdom,
-        Bestiality,
         Prostitution,
         Romance,
         Slavery,
-        Straight,
-        Lesbian,
         Overwritable,
-        Gay,
         CaravanParty,
         BanditParty,
         LordParty,
@@ -113,9 +115,13 @@ namespace CaptivityEvents.Custom
         NotableFemalesNearby,
         NotableMalesNearby,
         VisitedByCaravan,
+        VisitedByTradeShip,
         VisitedByLord,
         DuringSiege,
         DuringRaid,
+        LocationLand,
+        LocationSea,
+        LocationPartyInPort,
         LocationTravellingParty,
         LocationCaravan,
         LocationPartyInTown,
@@ -206,6 +212,14 @@ namespace CaptivityEvents.Custom
         CaptorIsClanLeader,
         CaptorIsFactionLeader,
         CaptorIsNotFactionLeader,
+        PartyEnteredSettlement,
+        PartyEnteredSettlementIsTown,
+        PartyEnteredSettlementIsCastle,
+        PartyEnteredSettlementIsVillage,
+        PartyEnteredPartyIsCaravan,
+        PartyEnteredPartyIsLordParty,
+        PartyEnteredPartyIsBanditParty,
+        PartyEnteredPartyHasPrisoners,
     }
 
     [XmlType(AnonymousType = true)]
@@ -213,21 +227,29 @@ namespace CaptivityEvents.Custom
     [Serializable]
     public enum TerrainType
     {
-        Water,
-        Mountain,
-        Snow,
-        Steppe,
-        Plain,
+        Plain = 1,
         Desert,
+        Snow,
+        Forest,
+        Steppe,
+        Fording,
+        Mountain,
+        Lake,
+        Water = 10,
+        River,
+        Canyon = 13,
+        RuralArea,
         Swamp,
         Dune,
         Bridge,
-        River,
-        Forest,
-        ShallowRiver,
-        Lake,
-        Canyon,
-        RuralArea
+        CoastalSea,
+        OpenSea,
+        Beach,
+        Cliff,
+        NonNavigableRiver,
+        LandRestriction,
+        SeaRestriction,
+        UnderBridge
     }
 
     [DebuggerStepThrough]
@@ -621,22 +643,6 @@ namespace CaptivityEvents.Custom
 
         public string ReqHeroProstituteLevelBelow { get; set; }
 
-        public string ReqHeroTraitLevelAbove { get; set; }
-
-        public string ReqHeroTraitLevelBelow { get; set; }
-
-        public string ReqCaptorTraitLevelAbove { get; set; }
-
-        public string ReqCaptorTraitLevelBelow { get; set; }
-
-        public string ReqHeroSkillLevelAbove { get; set; }
-
-        public string ReqHeroSkillLevelBelow { get; set; }
-
-        public string ReqCaptorSkillLevelAbove { get; set; }
-
-        public string ReqCaptorSkillLevelBelow { get; set; }
-
         public string ReqMoraleAbove { get; set; }
 
         public string ReqMoraleBelow { get; set; }
@@ -693,18 +699,6 @@ namespace CaptivityEvents.Custom
 
         public string ReqGoldBelow { get; set; }
 
-        public string SkillToLevel { get; set; }
-
-        public string ReqCaptorSkill { get; set; }
-
-        public string ReqHeroSkill { get; set; }
-
-        public string TraitToLevel { get; set; }
-
-        public string ReqCaptorTrait { get; set; }
-
-        public string ReqHeroTrait { get; set; }
-
         public string ItemToGive { get; set; }
 
         public string GoldTotal { get; set; }
@@ -722,14 +716,6 @@ namespace CaptivityEvents.Custom
         public string ProstitutionTotal { get; set; }
 
         public string SlaveryTotal { get; set; }
-
-        public string TraitTotal { get; set; }
-
-        public string TraitXPTotal { get; set; }
-
-        public string SkillTotal { get; set; }
-
-        public string SkillXPTotal { get; set; }
 
         public string SceneToPlay { get; set; }
 
@@ -875,22 +861,6 @@ namespace CaptivityEvents.Custom
 
         public string ReqHeroSlaveLevelBelow { get; set; }
 
-        public string ReqHeroTraitLevelAbove { get; set; }
-
-        public string ReqHeroTraitLevelBelow { get; set; }
-
-        public string ReqCaptorTraitLevelAbove { get; set; }
-
-        public string ReqCaptorTraitLevelBelow { get; set; }
-
-        public string ReqHeroSkillLevelAbove { get; set; }
-
-        public string ReqHeroSkillLevelBelow { get; set; }
-
-        public string ReqCaptorSkillLevelAbove { get; set; }
-
-        public string ReqCaptorSkillLevelBelow { get; set; }
-
         public string ReqMoraleAbove { get; set; }
 
         public string ReqMoraleBelow { get; set; }
@@ -962,26 +932,6 @@ namespace CaptivityEvents.Custom
         public string SlaveryTotal { get; set; }
 
         public string ProstitutionTotal { get; set; }
-
-        public string TraitTotal { get; set; }
-
-        public string TraitXPTotal { get; set; }
-
-        public string SkillTotal { get; set; }
-
-        public string SkillXPTotal { get; set; }
-
-        public string SkillToLevel { get; set; }
-
-        public string ReqCaptorSkill { get; set; }
-
-        public string ReqHeroSkill { get; set; }
-
-        public string TraitToLevel { get; set; }
-
-        public string ReqCaptorTrait { get; set; }
-
-        public string ReqHeroTrait { get; set; }
 
         [XmlArrayItem("SkillRequired", IsNullable = true)]
         public SkillRequired[] SkillsRequired { get; set; }

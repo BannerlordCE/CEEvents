@@ -1,10 +1,8 @@
-﻿#define V127
-
-using HarmonyLib;
+﻿using HarmonyLib;
 using System.Linq;
+using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
-using TaleWorlds.CampaignSystem.Extensions;
 
 namespace CaptivityEvents.Patches
 {

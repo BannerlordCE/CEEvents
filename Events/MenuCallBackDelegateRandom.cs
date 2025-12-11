@@ -1,5 +1,3 @@
-﻿#define V127
-
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -9,18 +7,17 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.Core;
-using TaleWorlds.Localization;
-using TaleWorlds.ObjectSystem;
-
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Extensions;
+using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Party.PartyComponents;
 using TaleWorlds.CampaignSystem.Roster;
 using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.Core;
+using TaleWorlds.Localization;
+using TaleWorlds.ObjectSystem;
 
 
 namespace CaptivityEvents.Events
@@ -133,7 +130,7 @@ namespace CaptivityEvents.Events
 
             args.MenuContext.GameMenu.SetProgressOfWaitingInMenu(_timer / _max);
 
-            PartyBase.MainParty.MobileParty.Ai.SetMoveModeHold();
+            PartyBase.MainParty.MobileParty.SetMoveModeHold();
         }
 
         #endregion Progress Event
@@ -185,7 +182,9 @@ namespace CaptivityEvents.Events
 
             InitSoldToSettlement();
             InitSoldToCaravan();
+            InitSoldToTradeShip();
             InitSoldToLordParty();
+            InitRemoveOwner();
             InitGiveGold();
             InitChangeGold();
 
@@ -199,9 +198,8 @@ namespace CaptivityEvents.Events
             ReqHeroHealthPercentage(ref args);
             ReqSlavery(ref args);
             ReqProstitute(ref args);
-            ReqHeroSkill(ref args);
             ReqHeroSkills(ref args);
-            ReqTrait(ref args);
+            ReqHeroTraits(ref args);
             ReqGold(ref args);
 
             return _sharedCallBackHelper.ShouldHide(ref args);
@@ -211,7 +209,6 @@ namespace CaptivityEvents.Events
         {
             CaptorSpecifics captorSpecifics = new();
             _sharedCallBackHelper.ConsequenceGiveItem();
-            _sharedCallBackHelper.ConsequenceXP();
             _sharedCallBackHelper.ConsequenceLeaveSpouse();
             _sharedCallBackHelper.ConsequenceGold();
             _sharedCallBackHelper.ConsequenceChangeGold();
@@ -234,6 +231,7 @@ namespace CaptivityEvents.Events
             ConsequenceChangeKingdom();
             ConsequenceImpregnation();
             ConsequenceGainRandomPrisoners();
+            ConsequenceRemoveOwner();
             ConsequenceCapturedByParty(ref args);
             ConsequenceSoldEvents(ref args);
             ConsequenceWoundTroops();
@@ -305,16 +303,29 @@ namespace CaptivityEvents.Events
                         continue;
                     }
 
-                    if (!string.IsNullOrWhiteSpace(triggerEvent.EventUseConditions) && triggerEvent.EventUseConditions.ToLower() == "true")
+                    if (!string.IsNullOrWhiteSpace(triggerEvent.EventUseConditions) && triggerEvent.EventUseConditions.ToLower() != "false")
                     {
-                        string conditionMatched = null;
-                        if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                        CEEvent conditionEvent = triggeredEvent;
+                        
+                        if (triggerEvent.EventUseConditions.ToLower() != "true")
                         {
-                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                            conditionEvent = _eventList.Find(item => item.Name == triggerEvent.EventUseConditions);
+                            
+                            if (conditionEvent == null)
+                            {
+                                CECustomHandler.ForceLogToFile("Couldn't find " + triggerEvent.EventUseConditions + " in events.");
+                                continue;
+                            }
                         }
-                        else if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                        
+                        string conditionMatched = null;
+                        if (conditionEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                         {
-                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                            conditionMatched = new CEEventChecker(conditionEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                        }
+                        else if (conditionEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                        {
+                            conditionMatched = new CEEventChecker(conditionEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
                         }
 
                         if (conditionMatched != null)
@@ -348,7 +359,7 @@ namespace CaptivityEvents.Events
                         CEEvent triggeredEvent = eventNames[number];
                         triggeredEvent.Captive = CharacterObject.PlayerCharacter;
                         triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
-                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
+                        CEHelper.SafeActivateGameMenu(triggeredEvent.Name);
                     }
                     catch (Exception)
                     {
@@ -372,7 +383,7 @@ namespace CaptivityEvents.Events
                 CEEvent triggeredEvent = _eventList.Find(item => item.Name == _listedEvent.ProgressEvent.TriggerEventName);
                 triggeredEvent.Captive = CharacterObject.PlayerCharacter;
                 triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
-                GameMenu.SwitchToMenu(triggeredEvent.Name);
+                CEHelper.SafeSwitchToMenu(triggeredEvent.Name);
             }
             catch (Exception)
             {
@@ -388,7 +399,7 @@ namespace CaptivityEvents.Events
                 CEEvent triggeredEvent = _eventList.Find(item => item.Name == _option.TriggerEventName);
                 triggeredEvent.Captive = CharacterObject.PlayerCharacter;
                 triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
-                GameMenu.SwitchToMenu(triggeredEvent.Name);
+                CEHelper.SafeSwitchToMenu(triggeredEvent.Name);
             }
             catch (Exception)
             {
@@ -415,17 +426,30 @@ namespace CaptivityEvents.Events
                         continue;
                     }
 
-                    if (!string.IsNullOrWhiteSpace(triggerEvent.EventUseConditions) && triggerEvent.EventUseConditions.ToLower() == "true")
+                    if (!string.IsNullOrWhiteSpace(triggerEvent.EventUseConditions) && triggerEvent.EventUseConditions.ToLower() != "false")
                     {
+                        CEEvent conditionEvent = triggeredEvent;
+                        
+                        if (triggerEvent.EventUseConditions.ToLower() != "true")
+                        {
+                            conditionEvent = _eventList.Find(item => item.Name == triggerEvent.EventUseConditions);
+                            
+                            if (conditionEvent == null)
+                            {
+                                CECustomHandler.ForceLogToFile("Couldn't find " + triggerEvent.EventUseConditions + " in events.");
+                                continue;
+                            }
+                        }
+                        
                         string conditionMatched = null;
 
-                        if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                        if (conditionEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                         {
-                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                            conditionMatched = new CEEventChecker(conditionEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
                         }
-                        else if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                        else if (conditionEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                         {
-                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                            conditionMatched = new CEEventChecker(conditionEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
                         }
 
                         if (conditionMatched != null)
@@ -458,7 +482,7 @@ namespace CaptivityEvents.Events
                         CEEvent triggeredEvent = eventNames[number];
                         triggeredEvent.Captive = CharacterObject.PlayerCharacter;
                         triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
-                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
+                        CEHelper.SafeActivateGameMenu(triggeredEvent.Name);
                     }
                     catch (Exception)
                     {
@@ -540,7 +564,7 @@ namespace CaptivityEvents.Events
 
                 PartyBase.MainParty.MemberRoster.RemoveIf((TroopRosterElement t) => !t.Character.IsPlayerCharacter);
 
-                if(PartyBase.MainParty.SiegeEvent != null)
+                if (PartyBase.MainParty.SiegeEvent != null)
                 {
                     LiftSiegeAction.GetGameAction(PartyBase.MainParty.MobileParty);
                 }
@@ -551,17 +575,17 @@ namespace CaptivityEvents.Events
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                     clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
-                    Settlement nearest = SettlementHelper.FindNearestSettlement(settlement => { return true; });
+                    Settlement nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => { return true; });
 
-                    MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false);
+                    MobileParty customParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false, null, CEHelper.GetSpawnPositionAroundSettlement(nearest));
 
                     PartyTemplateObject defaultPartyTemplate = clan.DefaultPartyTemplate;
 
-                    customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position2D, 0.5f, 0.1f, -1);
-                    customParty.SetCustomName(new TextObject("Bandits", null));
+                    customParty.InitializeMobilePartyAroundPosition(defaultPartyTemplate, MobileParty.MainParty.Position, 0.5f, 0.1f);
+                    customParty.Party.SetCustomName(new TextObject("Bandits", null));
 
                     customParty.MemberRoster.Clear();
-                    customParty.MemberRoster.Add(enemyTroops.ToFlattenedRoster());
+                    customParty.MemberRoster.Add(enemyTroops);
 
                     // InitBanditParty
                     customParty.Party.SetVisualAsDirty();
@@ -571,7 +595,7 @@ namespace CaptivityEvents.Events
                     customParty.Party.SetCustomOwner(clan.Leader);
 
                     // CreatePartyTrade
-                    float totalStrength = customParty.Party.TotalStrength;
+                    float totalStrength = customParty.Party.CalculateCurrentStrength();
                     int initialGold = (int)(10f * customParty.Party.MemberRoster.TotalManCount * (0.5f + 1f * MBRandom.RandomFloat));
                     customParty.InitializePartyTrade(initialGold);
 
@@ -588,7 +612,7 @@ namespace CaptivityEvents.Events
                     }
 
                     customParty.Aggressiveness = 1f - 0.2f * MBRandom.RandomFloat;
-                    customParty.Ai.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position2D);
+                    customParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position, customParty.NavigationCapability);
 
                     ConsequenceRandomCaptivityChange(ref args, customParty.Party);
                 }
@@ -600,6 +624,7 @@ namespace CaptivityEvents.Events
         {
             if (Hero.MainHero.PartyBelongedTo?.CurrentSettlement == null) return;
             ConsequenceSoldToSettlement(ref args);
+            ConsequenceSoldToTradeShip(ref args);
             ConsequenceSoldToCaravan(ref args);
             ConsequenceSoldToNotable(ref args);
             ConsequenceSoldToLordParty(ref args);
@@ -621,7 +646,7 @@ namespace CaptivityEvents.Events
                     if (prisonerCharacter == Hero.MainHero) PlayerCaptivity.StartCaptivity(party);
                 }
                 else
-                {
+                {   
                     prisonerCharacter.PartyBelongedTo?.MemberRoster.RemoveTroop(prisonerCharacter.CharacterObject, 1, default, 0);
                     prisonerCharacter.CaptivityStartTime = CampaignTime.Now;
                     prisonerCharacter.ChangeState(Hero.CharacterStates.Prisoner);
@@ -654,13 +679,24 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
         }
 
+        private void ConsequenceSoldToTradeShip(ref MenuCallbackArgs args)
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToTradeShip)) return;
+            try
+            {
+                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan && mobileParty.IsCurrentlyAtSea);
+                ConsequenceRandomCaptivityChange(ref args, party.Party);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Trade Ship"); }
+        }
+
         private void ConsequenceSoldToCaravan(ref MenuCallbackArgs args)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToCaravan)) return;
 
             try
             {
-                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan);
+                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan && !mobileParty.IsCurrentlyAtSea);
                 ConsequenceRandomCaptivityChange(ref args, party.Party);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }
@@ -688,6 +724,16 @@ namespace CaptivityEvents.Events
                 ConsequenceRandomCaptivityChange(ref args, party);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Settlement"); }
+        }
+
+        private void ConsequenceRemoveOwner()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveOwner)) return;
+            try
+            {
+                CECampaignBehavior.ExtraProps.Owner = null;
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Remove Owner"); }
         }
 
         private void ConsequenceGainRandomPrisoners()
@@ -728,7 +774,7 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Invalid PregnancyRiskModifier"); }
         }
 
-#endregion Consequences
+        #endregion Consequences
 
         #region Requirements
 
@@ -766,56 +812,6 @@ namespace CaptivityEvents.Events
         }
 
         #endregion ReqGold
-
-        #region ReqTrait
-
-        private void ReqTrait(ref MenuCallbackArgs args)
-        {
-            if (string.IsNullOrWhiteSpace(_option.ReqHeroTrait)) return;
-            int traitLevel;
-
-            try
-            {
-                traitLevel = Hero.MainHero.GetTraitLevel(TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == _option.ReqHeroTrait));
-            }
-            catch (Exception)
-            {
-                CECustomHandler.LogToFile("Invalid Trait Captive");
-                traitLevel = 0;
-            }
-
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(_option.ReqHeroTraitLevelAbove)) ReqHeroTraitLevelAbove(ref args, traitLevel);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid ReqHeroTraitLevelAbove"); }
-
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(_option.ReqHeroTraitLevelBelow)) ReqHeroTraitLevelBelow(ref args, traitLevel);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid ReqHeroTraitLevelBelow"); }
-        }
-
-        private void ReqHeroTraitLevelBelow(ref MenuCallbackArgs args, int traitLevel)
-        {
-            if (traitLevel <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroTraitLevelBelow)) return;
-            TextObject text = GameTexts.FindText("str_CE_trait_level", "high");
-            text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(_option.ReqHeroTrait));
-            args.Tooltip = text;
-            args.IsEnabled = false;
-        }
-
-        private void ReqHeroTraitLevelAbove(ref MenuCallbackArgs args, int traitLevel)
-        {
-            if (traitLevel >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroTraitLevelAbove)) return;
-            TextObject text = GameTexts.FindText("str_CE_trait_level", "low");
-            text.SetTextVariable("TRAIT", CEStrings.FetchTraitString(_option.ReqHeroTrait));
-            args.Tooltip = text;
-            args.IsEnabled = false;
-        }
-
-        #endregion ReqTrait
 
         #region ReqHeroSkills
 
@@ -884,59 +880,68 @@ namespace CaptivityEvents.Events
 
         #endregion ReqHeroSkills
 
-        #region ReqHeroSkill
+        #region ReqHeroTraits
 
-        private void ReqHeroSkill(ref MenuCallbackArgs args)
+        private void ReqHeroTraits(ref MenuCallbackArgs args)
         {
-            if (string.IsNullOrWhiteSpace(_option.ReqHeroSkill)) return;
-            int skillLevel = 0;
+            if (_option.TraitsRequired == null) return;
 
-            try
+            foreach (TraitRequired traitRequired in _option.TraitsRequired)
             {
-                SkillObject foundSkill = CESkills.FindSkill(_option.ReqHeroSkill);
-                if (foundSkill == null)
-                    CECustomHandler.LogToFile("Invalid Skill");
-                else
-                    skillLevel = Hero.MainHero.GetSkillValue(foundSkill);
-            }
-            catch (Exception)
-            {
-                CECustomHandler.LogToFile("Invalid Skill");
-                skillLevel = 0;
-            }
+                if (traitRequired.Ref == "Captor") continue;
 
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(_option.ReqHeroSkillLevelAbove)) ReqHeroSkillLevelAbove(ref args, skillLevel);
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid ReqHeroSkillLevelAbove"); }
+                TraitObject foundTrait;
+                try
+                {
+                    foundTrait = TraitObject.All.Single((TraitObject traitObject) => traitObject.StringId == traitRequired.Id);
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.ForceLogToFile("Could not find trait " + traitRequired.Id);
+                    return;
+                }
 
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(_option.ReqHeroSkillLevelBelow)) ReqHeroSkillLevelBelow(ref args, skillLevel);
+                int traitLevel = Hero.MainHero.GetTraitLevel(foundTrait);
+
+                try
+                {
+                    if (ReqTraitsLevelAbove(ref args, foundTrait, traitLevel, traitRequired.Min)) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid TraitRequiredAbove"); }
+
+                try
+                {
+                    if (ReqTraitsLevelBelow(ref args, foundTrait, traitLevel, traitRequired.Max)) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid TraitRequiredBelow"); }
             }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid ReqHeroSkillLevelBelow"); }
         }
 
-        private void ReqHeroSkillLevelBelow(ref MenuCallbackArgs args, int skillLevel)
+        private bool ReqTraitsLevelBelow(ref MenuCallbackArgs args, TraitObject traitRequired, int traitLevel, string max)
         {
-            if (skillLevel <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroSkillLevelBelow)) return;
-            TextObject text = GameTexts.FindText("str_CE_skill_level", "high");
-            text.SetTextVariable("SKILL", _option.ReqHeroSkill);
+            if (string.IsNullOrWhiteSpace(max)) return false;
+            if (traitLevel <= new CEVariablesLoader().GetIntFromXML(max)) return false;
+
+            TextObject text = GameTexts.FindText("str_CE_trait_level", "high");
+            text.SetTextVariable("TRAIT", traitRequired.Name);
             args.Tooltip = text;
             args.IsEnabled = false;
+            return true;
         }
 
-        private void ReqHeroSkillLevelAbove(ref MenuCallbackArgs args, int skillLevel)
+        private bool ReqTraitsLevelAbove(ref MenuCallbackArgs args, TraitObject traitRequired, int traitLevel, string min)
         {
-            if (skillLevel >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroSkillLevelAbove)) return;
-            TextObject text = GameTexts.FindText("str_CE_skill_level", "low");
-            text.SetTextVariable("SKILL", _option.ReqHeroSkill);
+            if (string.IsNullOrWhiteSpace(min)) return false;
+            if (traitLevel >= new CEVariablesLoader().GetIntFromXML(min)) return false;
+
+            TextObject text = GameTexts.FindText("str_CE_trait_level", "low");
+            text.SetTextVariable("TRAIT", traitRequired.Name);
             args.Tooltip = text;
             args.IsEnabled = false;
+            return true;
         }
 
-        #endregion ReqHeroSkill
+        #endregion ReqHeroTraits
 
         #region ReqProstitute
 
@@ -1516,13 +1521,37 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Lord"); }
         }
 
+        private void InitSoldToTradeShip()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToTradeShip)) return;
+
+            try
+            {
+                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan && mobileParty.IsCurrentlyAtSea; });
+                if (party != null) MBTextManager.SetTextVariable("BUYERTRADESHIP", party.Name);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Ship"); }
+        }
+
+        private void InitRemoveOwner()
+        {
+            if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveOwner)) return;
+
+            try
+            {
+                if (CECampaignBehavior.ExtraProps.Owner != null) MBTextManager.SetTextVariable("PREVIOUSOWNER", CECampaignBehavior.ExtraProps.Owner.Name);
+            }
+            catch (Exception) { CECustomHandler.LogToFile("Failed to get Owner"); }
+        }
+
+
         private void InitSoldToCaravan()
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.SoldToCaravan)) return;
 
             try
             {
-                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan; });
+                MobileParty party = PartyBase.MainParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan && !mobileParty.IsCurrentlyAtSea; });
                 if (party != null) MBTextManager.SetTextVariable("BUYERCARAVAN", party.Name);
             }
             catch (Exception) { CECustomHandler.LogToFile("Failed to get Caravan"); }

@@ -3,10 +3,10 @@
 using CaptivityEvents.Custom;
 using System;
 using System.Collections.Generic;
+using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-using TaleWorlds.CampaignSystem.Extensions;
 
 
 namespace CaptivityEvents
@@ -126,7 +126,7 @@ namespace CaptivityEvents
 
             for (int i = 0; i < CustomSkills.Count; i++)
             {
-                CustomSkills[i].Initialize(new TextObject(NodeSkills[i].Name), new TextObject(NodeSkills[i].Name), SkillObject.SkillTypeEnum.Personal).SetAttribute(CEAttribute);
+                CustomSkills[i].Initialize(new TextObject(NodeSkills[i].Name), new TextObject(NodeSkills[i].Name), [CEAttribute]);
             }
 
             IsInitialized = true;

@@ -1,17 +1,16 @@
-﻿#define V127
-
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
 using System;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.Core;
-using TaleWorlds.Localization;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.Encounters;
+using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.Core;
+using TaleWorlds.Localization;
 
 
 namespace CaptivityEvents.Events
@@ -30,13 +29,13 @@ namespace CaptivityEvents.Events
 
                     if (waitingList != null)
                     {
-                        GameMenu.ActivateGameMenu(waitingList);
+                        CEHelper.SafeActivateGameMenu(waitingList);
                     }
                     else
                     {
                         new CESubModule().LoadTexture("default");
 
-                        GameMenu.SwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement
+                        CEHelper.SafeSwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement
                                                   ? "settlement_wait"
                                                   : "prisoner_wait");
                     }
@@ -59,13 +58,13 @@ namespace CaptivityEvents.Events
             {
                 if (CESettings.Instance?.SexualContent ?? true)
                 {
-                    GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
+                    CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale
                                                ? "CE_captivity_sexual_escape_failure"
                                                : "CE_captivity_sexual_escape_failure_male");
                 }
                 else
                 {
-                    GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
+                    CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale
                                             ? "CE_captivity_escape_failure"
                                             : "CE_captivity_escape_failure_male");
                 }
@@ -75,17 +74,18 @@ namespace CaptivityEvents.Events
 
             if (CESettings.Instance?.SexualContent ?? true)
             {
-                GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
+                CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale
                                           ? "CE_captivity_sexual_escape_success"
                                           : "CE_captivity_sexual_escape_success_male");
             }
             else
             {
-                GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
+                CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale
                                          ? "CE_captivity_escape_success"
                                          : "CE_captivity_escape_success_male");
             }
         }
+
 
         /// EndCaptivityInternal from PlayerCaptivity
         internal void CECaptivityLeave(ref MenuCallbackArgs args)
@@ -96,8 +96,16 @@ namespace CaptivityEvents.Events
 
             if (!captorParty.IsSettlement || !captorParty.Settlement.IsTown)
             {
+                if (captorParty != null && captorParty.IsMobile)
+                {
+                    MobileParty.MainParty.IsCurrentlyAtSea = captorParty.MobileParty.IsCurrentlyAtSea;
+                }
                 PlayerCaptivity.EndCaptivity();
                 return;
+            }
+            else
+            {
+                MobileParty.MainParty.IsCurrentlyAtSea = false;
             }
 
             // EndCaptivityInternal
@@ -114,21 +122,28 @@ namespace CaptivityEvents.Events
                 }
 
                 MobileParty.MainParty.CurrentSettlement = PlayerCaptivity.CaptorParty.Settlement;
-                if (Campaign.Current.CurrentMenuContext != null) GameMenu.SwitchToMenu("town");
+                if (Campaign.Current.CurrentMenuContext != null) CEHelper.SafeSwitchToMenu("town");
 
                 if (Hero.MainHero.IsAlive)
                 {
                     Hero.MainHero.ChangeState(Hero.CharacterStates.Active);
                 }
 
-                if (captorParty.IsActive) captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject);
+
+                if (captorParty.IsActive)
+                {
+                    captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject, 1, default, 0);
+                }
 
                 if (Hero.MainHero.IsAlive)
                 {
                     MobileParty.MainParty.IsActive = true;
                     PartyBase.MainParty.SetAsCameraFollowParty();
-                    MobileParty.MainParty.Ai.SetMoveModeHold();
-                    PartyBase.MainParty.UpdateVisibilityAndInspected(0f);
+                    MobileParty.MainParty.SetMoveModeHold();
+                    if (!MobileParty.MainParty.IsCurrentlyAtSea)
+                    {
+                        PartyBase.MainParty.UpdateVisibilityAndInspected(MobileParty.MainParty.Position, 0f);
+                    }
                 }
 
                 PlayerCaptivity.CaptorParty = null;
@@ -137,6 +152,37 @@ namespace CaptivityEvents.Events
             {
                 PlayerCaptivity.EndCaptivity();
             }
+        }
+
+        private bool ShouldActivateRaftStateForMobileParty(MobileParty mobileParty)
+        {
+            return mobileParty.IsCurrentlyAtSea && !mobileParty.IsInRaftState && mobileParty.IsActive;
+        }
+
+
+        private void HandleRaftStateActivate(MobileParty mobileParty)
+        {
+            if (mobileParty.HasLandNavigationCapability)
+            {
+                RaftStateChangeAction.ActivateRaftStateForParty(mobileParty);
+            }
+        }
+
+        private void ConsiderMemberAndArmyRaftStateStatus(MobileParty party, Army army)
+        {
+            if (ShouldActivateRaftStateForMobileParty(party))
+            {
+                HandleRaftStateActivate(party);
+            }
+            if (army != null && army.LeaderParty.IsCurrentlyAtSea && !army.LeaderParty.HasNavalNavigationCapability)
+            {
+                DisbandArmyAction.ApplyByNoShip(army);
+            }
+        }
+
+        internal void CECaptivityRelease(ref MenuCallbackArgs args)
+        {
+            CECaptivityLeave(ref args);
         }
 
         internal void CECaptivityEscape(ref MenuCallbackArgs args)
@@ -159,8 +205,29 @@ namespace CaptivityEvents.Events
                 textObject.SetTextVariable("SETTLEMENT", settlementName);
             }
 
+            if (PlayerCaptivity.CaptorParty != null && PlayerCaptivity.CaptorParty.IsMobile)
+            {
+                MobileParty.MainParty.IsCurrentlyAtSea = PlayerCaptivity.CaptorParty.MobileParty.IsCurrentlyAtSea;
+            }
+            else
+            {
+                MobileParty.MainParty.IsCurrentlyAtSea = false;
+            }
+
             new CESubModule().LoadTexture("default");
             PlayerCaptivity.EndCaptivity();
+
+            if (ShouldActivateRaftStateForMobileParty(MobileParty.MainParty))
+            {
+                if (MobileParty.MainParty.Army != null)
+                {
+                    ConsiderMemberAndArmyRaftStateStatus(MobileParty.MainParty, MobileParty.MainParty.Army);
+                }
+                else
+                {
+                    HandleRaftStateActivate(MobileParty.MainParty);
+                }
+            }
         }
 
         internal void CECaptivityChange(ref MenuCallbackArgs args, PartyBase party)

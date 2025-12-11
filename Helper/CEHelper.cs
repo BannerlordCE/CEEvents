@@ -1,20 +1,18 @@
-﻿#define V127
-
-using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
+using Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
 using Path = System.IO.Path;
-using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.CampaignSystem.Party;
-using Helpers;
 
 namespace CaptivityEvents.Helper
 {
@@ -35,7 +33,7 @@ namespace CaptivityEvents.Helper
                 string locationCulture = "empire";
                 try
                 {
-                    locationCulture = partyBase.Settlement?.Culture?.StringId ?? SettlementHelper.FindNearestSettlement((Settlement x) => true, partyBase.IsMobile ? partyBase.MobileParty : MobileParty.MainParty).Culture.StringId;
+                    locationCulture = partyBase.Settlement?.Culture?.StringId ?? SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition()).Culture.StringId;
 
                     if (!_validCultures.Contains(locationCulture)) locationCulture = "empire";
                 }
@@ -43,7 +41,7 @@ namespace CaptivityEvents.Helper
                 {
                     locationCulture = "empire";
                 }
-                sceneToPlay = sceneToPlay.Replace("$location_culture", locationCulture);          
+                sceneToPlay = sceneToPlay.Replace("$location_culture", locationCulture);
             }
 
             if (sceneToPlay.Contains("$party_culture"))
@@ -55,7 +53,7 @@ namespace CaptivityEvents.Helper
 
             if (sceneToPlay.Contains("$location"))
             {
-                sceneToPlay = sceneToPlay.Replace("$location", CurrentLocation(partyBase.Settlement ?? SettlementHelper.FindNearestSettlement((Settlement x) => true, partyBase.IsMobile ? partyBase.MobileParty : MobileParty.MainParty)));
+                sceneToPlay = sceneToPlay.Replace("$location", CurrentLocation(partyBase.Settlement ?? SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), (Settlement x) => true)));
             }
 
             string[] e =
@@ -104,8 +102,9 @@ namespace CaptivityEvents.Helper
 
         }
 
-        public static void AddQuickInformation(TextObject message, int priorty = 0, BasicCharacterObject announcerCharacter = null, string soundEventPath = "") {
-            MBInformationManager.AddQuickInformation(message, priorty, announcerCharacter, soundEventPath);
+        public static void AddQuickInformation(TextObject message, int priorty = 0, BasicCharacterObject announcerCharacter = null, string soundEventPath = "", Equipment equipment = null)
+        {
+            MBInformationManager.AddQuickInformation(message, priorty, announcerCharacter, equipment, soundEventPath);
         }
 
         public static int HelperMBRandom()
@@ -217,9 +216,64 @@ namespace CaptivityEvents.Helper
         internal static void ChangeMenu(int number)
         {
             string waitingList = WaitingList.CEWaitingList();
-            if (waitingList != null) GameMenu.SwitchToMenu(waitingList);
+            if (waitingList != null) SafeSwitchToMenu(waitingList);
             waitMenuCheck = number;
         }
+
+        /// <summary>
+        /// Safely switches to a menu after validating it exists in the GameMenuManager.
+        /// </summary>
+        /// <param name="menuName">The name of the menu to switch to</param>
+        /// <returns>True if the menu switch was successful, false otherwise</returns>
+        public static bool SafeSwitchToMenu(string menuName)
+        {
+            try
+            {
+                if (Campaign.Current?.GameMenuManager?.GetGameMenu(menuName) != null)
+                {
+                    GameMenu.SwitchToMenu(menuName);
+                    return true;
+                }
+                else
+                {
+                    CECustomHandler.ForceLogToFile($"SafeSwitchToMenu failed: Menu '{menuName}' does not exist in GameMenuManager. This event may not have been properly registered.");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                CECustomHandler.ForceLogToFile($"SafeSwitchToMenu exception for menu '{menuName}': {ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Safely activates a menu after validating it exists in the GameMenuManager.
+        /// </summary>
+        /// <param name="menuName">The name of the menu to activate</param>
+        /// <returns>True if the menu activation was successful, false otherwise</returns>
+        public static bool SafeActivateGameMenu(string menuName)
+        {
+            try
+            {
+                if (Campaign.Current?.GameMenuManager?.GetGameMenu(menuName) != null)
+                {
+                    GameMenu.ActivateGameMenu(menuName);
+                    return true;
+                }
+                else
+                {
+                    CECustomHandler.ForceLogToFile($"SafeActivateGameMenu failed: Menu '{menuName}' does not exist in GameMenuManager. This event may not have been properly registered.");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                CECustomHandler.ForceLogToFile($"SafeActivateGameMenu exception for menu '{menuName}': {ex}");
+                return false;
+            }
+        }
+
 
         internal static TextObject ShouldChangeMenu(TextObject text)
         {
@@ -281,6 +335,78 @@ namespace CaptivityEvents.Helper
             }
 
             return text;
+        }
+
+
+        static Assembly[] GetAssemblies()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(alz =>
+                    {
+                        return !alz.GetName().ToString().StartsWith("TaleWorlds")
+                            && !alz.GetName().ToString().StartsWith("System")
+                            && !alz.GetName().ToString().StartsWith("Microsoft")
+                            && !alz.GetName().ToString().StartsWith("mscorlib")
+                            && !alz.GetName().ToString().StartsWith("SandBox")
+                            && !alz.GetName().ToString().StartsWith("Native")
+                            && !alz.GetName().ToString().StartsWith("CustomBattle")
+                            && !alz.GetName().ToString().StartsWith("Bannerlord");
+                    })
+                    .ToArray();
+        }
+
+        public static bool CheckAssemblies(string v)
+        {
+            Assembly[] captivityAssemblies = GetAssemblies().Where(azc =>
+            {
+                return azc.GetName().ToString().ToLower().StartsWith(v.ToLower())
+                ;
+            }).ToArray();
+            if (captivityAssemblies.Length > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static bool CheckHotButter()
+        {
+
+            var HotButter = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id.ToLower().StartsWith("hotbutterscenes"); });
+            if (HotButter != null)
+            {
+                return true; // CheckAssemblies("captivityevents");
+            }
+            return CheckAssemblies("hotbutter");
+
+        }
+
+        public static CampaignVec2 GetPlayerPositionClean()
+        {
+            return PlayerCaptivity.CaptorParty != null ? PlayerCaptivity.CaptorParty.Position : Campaign.Current.CameraFollowParty.Position;
+        }
+
+        public static CampaignVec2 GetSpawnPositionAroundSettlement(Settlement settlement)
+        {
+            CampaignVec2 campaignVec = NavigationHelper.FindPointAroundPosition(settlement.GatePosition, MobileParty.NavigationType.Default, 5f, 0f, true, false);
+            float num = MobileParty.MainParty.SeeingRange * MobileParty.MainParty.SeeingRange;
+            if (campaignVec.DistanceSquared(MobileParty.MainParty.Position) < num)
+            {
+                for (int i = 0; i < 15; i++)
+                {
+                    CampaignVec2 campaignVec2 = NavigationHelper.FindReachablePointAroundPosition(campaignVec, MobileParty.NavigationType.Default, 5f, 0f, false);
+                    if (NavigationHelper.IsPositionValidForNavigationType(campaignVec2, MobileParty.NavigationType.Default))
+                    {
+                        float num2 = DistanceHelper.FindClosestDistanceFromMobilePartyToPoint(MobileParty.MainParty, campaignVec2, MobileParty.NavigationType.Default, out _);
+                        if (num2 * num2 > num)
+                        {
+                            campaignVec = campaignVec2;
+                            break;
+                        }
+                    }
+                }
+            }
+            return campaignVec;
         }
     }
 }

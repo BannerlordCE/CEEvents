@@ -1,23 +1,22 @@
-#define V127
-
+using CaptivityEvents.Custom;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
+using TaleWorlds.CampaignSystem.ComponentInterfaces;
+using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement;
 using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.ClanFinance;
 using TaleWorlds.Core;
-using TaleWorlds.Localization;
-using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.CampaignSystem.Settlements.Workshops;
-using TaleWorlds.Library;
+using TaleWorlds.Core.ImageIdentifiers;
 using TaleWorlds.Core.ViewModelCollection.Information;
-using System.Collections.Generic;
-using CaptivityEvents.Custom;
 using TaleWorlds.Core.ViewModelCollection.Selector;
-using TaleWorlds.CampaignSystem.CampaignBehaviors;
-using TaleWorlds.CampaignSystem.ComponentInterfaces;
+using TaleWorlds.Library;
+using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Brothel
 {
@@ -84,7 +83,7 @@ namespace CaptivityEvents.Brothel
         private IEnumerable<ClanCardSelectionItemInfo> GetManageWorkshopItems()
         {
             int sellingCost = _brothel.Capital;
-            TextObject disabledReason = TextObject.Empty;
+            TextObject disabledReason = TextObject.GetEmpty();
             bool flag = true;
             TextObject textObject = new("{=CEBROTHEL0974}Sell this Brothel for {GOLD_AMOUNT}{GOLD_ICON}", null);
             textObject.SetTextVariable("GOLD_AMOUNT", sellingCost);
@@ -102,11 +101,11 @@ namespace CaptivityEvents.Brothel
 
 
 
-            TextObject disabledReason2 = Hero.MainHero.Gold < costToStart && !isCurrentlyActive ? disabledTextObject : TextObject.Empty;
+            TextObject disabledReason2 = Hero.MainHero.Gold < costToStart && !isCurrentlyActive ? disabledTextObject : TextObject.GetEmpty();
             TextObject textObject2 = isCurrentlyActive ? new TextObject("{=CEBROTHEL0995}Stop Operations") : new TextObject("{=CEBROTHEL0996}Start Operations");
             CharacterObject townswoman = CharacterObject.CreateFrom(_brothel.Settlement.Culture.TavernWench);
             townswoman.Age = MBRandom.RandomInt(25, Campaign.Current.Models.AgeModel.BecomeOldAge);
-            ImageIdentifier image2 = new(CampaignUIHelper.GetCharacterCode(townswoman, true));
+            CharacterImageIdentifier image2 = new(CampaignUIHelper.GetCharacterCode(townswoman, true));
 
             yield return new ClanCardSelectionItemInfo("operations", textObject2, image2, CardSelectionItemSpriteType.None, null, null, GetText(GetBrothelRunningHintText(_brothel.IsRunning, _brothel.Expense)), !flag2, disabledReason2, ClanCardSelectionItemPropertyInfo.CreateActionGoldChangeText(isCurrentlyActive ? 0 : -costToStart));
         }
@@ -159,7 +158,7 @@ namespace CaptivityEvents.Brothel
             }
 
             InputProducts = "";
-            OutputProducts = string.Join(",", _brothel.CaptiveProstitutes.Where(c => c.IsHero).Select(c => c.HeroObject.Name.ToString()).ToArray());
+            OutputProducts = string.Join(",", [.. _brothel.CaptiveProstitutes.Where(c => c.IsHero).Select(c => c.HeroObject.Name.ToString())]);
 
             WarehouseInputAmount = _brothel.CaptiveProstitutes.Where(c => !c.IsHero).Count();
             WarehouseOutputAmount = _brothel.CaptiveProstitutes.Where(c => c.IsHero).Count();

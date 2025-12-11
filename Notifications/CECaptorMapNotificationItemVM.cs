@@ -1,4 +1,4 @@
-﻿#define V120
+#define V120
 
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -7,12 +7,12 @@ using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.Core;
-using TaleWorlds.Library;
-using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
+using TaleWorlds.Core;
+using TaleWorlds.Library;
+using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Notifications
 {
@@ -82,7 +82,7 @@ namespace CaptivityEvents.Notifications
                             CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
                             CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
                         }
-                        GameMenu.ActivateGameMenu(_captorEvent.Name);
+                        CEHelper.SafeActivateGameMenu(_captorEvent.Name);
                     }
                     else
                     {
@@ -91,7 +91,7 @@ namespace CaptivityEvents.Notifications
                             CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
                             CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                         }
-                        GameMenu.SwitchToMenu(_captorEvent.Name);
+                        CEHelper.SafeSwitchToMenu(_captorEvent.Name);
                     }
                 }
                 else

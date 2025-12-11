@@ -9,11 +9,10 @@ using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.ObjectSystem;
 using static CaptivityEvents.Helper.CEHelper;
-
-using TaleWorlds.CampaignSystem.Party;
 
 
 namespace CaptivityEvents.Events
@@ -555,13 +554,13 @@ namespace CaptivityEvents.Events
             if (companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.Strip))
             {
                 if (hero == null) return;
-                Equipment randomElement = new(false);
+                Equipment randomElement = new();
 
                 ItemObject itemObjectBody = hero.IsFemale
                     ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
                     : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
                 randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
-                Equipment randomElement2 = new(true);
+                Equipment randomElement2 = new();
                 randomElement2.FillFrom(randomElement, false);
 
                 if (CESettings.Instance?.EventCaptorGearCaptives ?? true) CECampaignBehavior.AddReturnEquipment(hero, hero.BattleEquipment, hero.CivilianEquipment);

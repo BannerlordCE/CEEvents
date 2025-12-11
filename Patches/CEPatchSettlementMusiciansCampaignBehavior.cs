@@ -1,11 +1,10 @@
-﻿#define V127
-
-using HarmonyLib;
+﻿using HarmonyLib;
 using SandBox.CampaignBehaviors;
 using SandBox.Objects;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -22,12 +21,11 @@ namespace CaptivityEvents.Patches
         {
             if (CampaignMission.Current.Location.StringId == "brothel")
             {
-                List<string> listOfLocationTags =
-                [
-                    "tavern"
-                ];
-                Dictionary<CultureObject, float> dictionary = [];
-                MBReadOnlyList<CultureObject> objectTypeList = MBObjectManager.Instance.GetObjectTypeList<CultureObject>();
+                List<string> listOfLocationTags = new List<string>();
+                listOfLocationTags.Add("tavern");
+                
+                Dictionary<CultureObject, float> dictionary = new Dictionary<CultureObject, float>();
+                List<CultureObject> objectTypeList = MBObjectManager.Instance.GetObjectTypeList<CultureObject>();
                 Town town = settlement.Town;
                 float num;
                 if (town == null)
@@ -53,7 +51,7 @@ namespace CaptivityEvents.Patches
                             {
                                 return 0f;
                             }
-                            return k.TotalStrength;
+                            return k.CurrentTotalStrength;
                         });
                         if (num4 > num3)
                         {
@@ -63,7 +61,7 @@ namespace CaptivityEvents.Patches
                 }
                 foreach (Kingdom kingdom in Kingdom.All)
                 {
-                    float num5 = (Campaign.MapDiagonal - Campaign.Current.Models.MapDistanceModel.GetDistance(kingdom.FactionMidSettlement, settlement.MapFaction.FactionMidSettlement)) / Campaign.MaximumDistanceBetweenTwoSettlements;
+                    float num5 = (Campaign.MapDiagonal - Campaign.Current.Models.MapDistanceModel.GetDistance(kingdom.FactionMidSettlement, settlement.MapFaction.FactionMidSettlement, false, false, MobileParty.NavigationType.All)) / Campaign.Current.Models.MapDistanceModel.GetMaximumDistanceBetweenTwoConnectedSettlements(MobileParty.NavigationType.All);
                     float num6 = num5 * num5 * num5 * 2f;
                     num6 += (settlement.MapFaction.IsAtWarWith(kingdom) ? 1f : 2f) * num2;
                     dictionary[kingdom.Culture] = MathF.Max(dictionary[kingdom.Culture], num6);
@@ -74,11 +72,11 @@ namespace CaptivityEvents.Patches
                 {
                     dictionary2 = dictionary;
                     culture = kingdom2.Culture;
-                    dictionary2[culture] += kingdom2.TotalStrength / num3 * 0.5f;
+                    dictionary2[culture] += kingdom2.CurrentTotalStrength / num3 * 0.5f;
                 }
                 foreach (Town town2 in Town.AllTowns)
                 {
-                    float num7 = (Campaign.MapDiagonal - Campaign.Current.Models.MapDistanceModel.GetDistance(settlement, town2.Settlement)) / Campaign.MapDiagonal;
+                    float num7 = (Campaign.MapDiagonal - Campaign.Current.Models.MapDistanceModel.GetDistance(settlement, town2.Settlement, false, false, (settlement.HasPort && town2.Settlement.HasPort) ? MobileParty.NavigationType.All : MobileParty.NavigationType.Default)) / Campaign.MapDiagonal;
                     float num8 = num7 * num7 * num7;
                     num8 *= MathF.Min(town2.Prosperity, 5000f) * 0.0002f;
                     dictionary2 = dictionary;
@@ -91,35 +89,35 @@ namespace CaptivityEvents.Patches
                 dictionary2 = dictionary;
                 culture = settlement.MapFaction.Culture;
                 dictionary2[culture] += num2 * 5f;
-                List<SettlementMusicData> settlementMusicDatas = (from x in MBObjectManager.Instance.GetObjectTypeList<SettlementMusicData>()
-                                                                  where listOfLocationTags.Contains(x.LocationId)
-                                                                  select x).ToList();
+                List<SettlementMusicData> list = (from x in MBObjectManager.Instance.GetObjectTypeList<SettlementMusicData>()
+                                                  where listOfLocationTags.Contains(x.LocationId)
+                                                  select x).ToList<SettlementMusicData>();
                 KeyValuePair<CultureObject, float> maxWeightedCulture = dictionary.MaxBy((KeyValuePair<CultureObject, float> x) => x.Value);
-                float num9 = (float)settlementMusicDatas.Count((SettlementMusicData x) => x.Culture == maxWeightedCulture.Key) / maxWeightedCulture.Value;
-                List<SettlementMusicData> playList = [];
+                float num9 = (float)list.Count((SettlementMusicData x) => x.Culture == maxWeightedCulture.Key) / maxWeightedCulture.Value;
+                List<SettlementMusicData> list2 = new List<SettlementMusicData>();
                 foreach (KeyValuePair<CultureObject, float> keyValuePair in dictionary)
                 {
                     int num10 = MBRandom.RoundRandomized(num9 * keyValuePair.Value);
                     if (num10 > 0)
                     {
-                        List<SettlementMusicData> list = (from x in settlementMusicDatas
-                                                          where x.Culture == keyValuePair.Key
-                                                          select x).ToList();
-                        list.Shuffle();
+                        List<SettlementMusicData> list4 = (from x in list
+                                                           where x.Culture == culture
+                                                           select x).ToList<SettlementMusicData>();
+                        list4.Shuffle<SettlementMusicData>();
                         int num11 = 0;
-                        while (num11 < num10 && num11 < list.Count)
+                        while (num11 < num10 && num11 < list4.Count)
                         {
-                            playList.Add(list[num11]);
+                            list2.Add(list4[num11]);
                             num11++;
                         }
                     }
                 }
-                if (playList.IsEmpty())
+                if (list2.IsEmpty<SettlementMusicData>())
                 {
-                    playList = settlementMusicDatas;
+                    list2 = list;
                 }
-                playList.Shuffle();
-                __result = playList;
+                list2.Shuffle<SettlementMusicData>();
+                __result = list2;
             }
         }
     }

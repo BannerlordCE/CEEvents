@@ -1,6 +1,7 @@
-﻿using CaptivityEvents.CampaignBehaviors;
+using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Events;
+using CaptivityEvents.Helper;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameMenus;
@@ -21,9 +22,9 @@ namespace CaptivityEvents.Patches
             {
                 case "defeated_and_taken_prisoner":
                     if (CESettings.Instance?.SexualContent ?? true)
-                        GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner_sexual" : "CE_defeated_and_taken_prisoner_sexual_male");
+                        CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner_sexual" : "CE_defeated_and_taken_prisoner_sexual_male");
                     else
-                        GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner" : "CE_defeated_and_taken_prisoner_male");
+                        CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner" : "CE_defeated_and_taken_prisoner_male");
 
                     if (Game.Current.GameStateManager.ActiveState is MapState ms1 && ms1.MenuContext != null)
                         ms1.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
@@ -31,9 +32,9 @@ namespace CaptivityEvents.Patches
 
                 case "taken_prisoner":
                     if (CESettings.Instance?.SexualContent ?? true)
-                        GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner_sexual" : "CE_taken_prisoner_sexual_male");
+                        CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner_sexual" : "CE_taken_prisoner_sexual_male");
                     else
-                        GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner" : "CE_taken_prisoner_male");
+                        CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner" : "CE_taken_prisoner_male");
 
                     if (Game.Current.GameStateManager.ActiveState is MapState ms2 && ms2.MenuContext != null)
                         ms2.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
@@ -41,9 +42,9 @@ namespace CaptivityEvents.Patches
 
                 case "menu_captivity_castle_taken_prisoner":
                     if (CESettings.Instance?.SexualContent ?? true)
-                        GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner_sexual" : "CE_menu_captivity_castle_taken_prisoner_sexual_male");
+                        CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner_sexual" : "CE_menu_captivity_castle_taken_prisoner_sexual_male");
                     else
-                        GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner" : "CE_menu_captivity_castle_taken_prisoner_male");
+                        CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner" : "CE_menu_captivity_castle_taken_prisoner_male");
 
                     if (Game.Current.GameStateManager.ActiveState is MapState ms3 && ms3.MenuContext != null)
                         ms3.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
@@ -74,9 +75,9 @@ namespace CaptivityEvents.Patches
             {
                 case "defeated_and_taken_prisoner":
                     if (CESettings.Instance?.SexualContent ?? true)
-                        GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner_sexual" : "CE_defeated_and_taken_prisoner_sexual_male");
+                        CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner_sexual" : "CE_defeated_and_taken_prisoner_sexual_male");
                     else
-                        GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner" : "CE_defeated_and_taken_prisoner_male");
+                        CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_defeated_and_taken_prisoner" : "CE_defeated_and_taken_prisoner_male");
 
                     if (Game.Current.GameStateManager.ActiveState is MapState ms1 && ms1.MenuContext != null)
                         ms1.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
@@ -84,9 +85,9 @@ namespace CaptivityEvents.Patches
 
                 case "taken_prisoner":
                     if (CESettings.Instance?.SexualContent ?? true)
-                        GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner_sexual" : "CE_taken_prisoner_sexual_male");
+                        CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner_sexual" : "CE_taken_prisoner_sexual_male");
                     else
-                        GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner" : "CE_taken_prisoner_male");
+                        CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_taken_prisoner" : "CE_taken_prisoner_male");
 
                     if (Game.Current.GameStateManager.ActiveState is MapState ms2 && ms2.MenuContext != null)
                         ms2.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
@@ -94,9 +95,9 @@ namespace CaptivityEvents.Patches
 
                 case "menu_captivity_castle_taken_prisoner":
                     if (CESettings.Instance?.SexualContent ?? true)
-                        GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner_sexual" : "CE_menu_captivity_castle_taken_prisoner_sexual_male");
+                        CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner_sexual" : "CE_menu_captivity_castle_taken_prisoner_sexual_male");
                     else
-                        GameMenu.SwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner" : "CE_menu_captivity_castle_taken_prisoner_male");
+                        CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_menu_captivity_castle_taken_prisoner" : "CE_menu_captivity_castle_taken_prisoner_male");
 
                     if (Game.Current.GameStateManager.ActiveState is MapState ms3 && ms3.MenuContext != null)
                         ms3.MenuContext.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");

@@ -5,10 +5,10 @@ using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.Core;
-using TaleWorlds.ObjectSystem;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.Core;
+using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Events
 {
@@ -83,10 +83,10 @@ namespace CaptivityEvents.Events
 
                     CultureObject cultureObject = MBObjectManager.Instance.GetObjectTypeList<CultureObject>().Where(x => (culture == null && x.IsMainCulture || x.StringId == culture.ToLower())).FirstOrDefault();
                     cultureObject ??= Hero.MainHero.Culture;
-                    CharacterObject wanderer = cultureObject.NotableAndWandererTemplates.GetRandomElementWithPredicate((CharacterObject x) => x.Occupation == Occupation.Wanderer && (heroVariables.Gender == null || x.IsFemale == isFemale));
+                    CharacterObject wanderer = Campaign.Current.Characters.GetRandomElementWithPredicate((CharacterObject x) => (x.Occupation == Occupation.Wanderer) && (x.Culture == cultureObject) && (heroVariables.Gender == null || x.IsFemale == isFemale));
                     Settlement randomElement = Settlement.All.GetRandomElementWithPredicate((Settlement settlement) => settlement.Culture == wanderer.Culture && settlement.IsTown);
 
-                    Clan ceClan = Clan.BanditFactions.GetRandomElementInefficiently();                        
+                    Clan ceClan = Clan.BanditFactions.GetRandomElementInefficiently();
                     if (heroVariables.Clan != null)
                     {
                         switch (heroVariables.Clan.ToLower())
@@ -100,13 +100,13 @@ namespace CaptivityEvents.Events
                                 break;
 
                             default:
-                                Clan tClan = Clan.BanditFactions.Where(x => x.StringId.ToLower() == heroVariables.Clan.ToLower()).FirstOrDefault(); 
-                                if (tClan.StringId != null){ ceClan = tClan; }
+                                Clan tClan = Clan.BanditFactions.Where(x => x.StringId.ToLower() == heroVariables.Clan.ToLower()).FirstOrDefault();
+                                if (tClan.StringId != null) { ceClan = tClan; }
                                 break;
                         }
-                    } 
+                    }
                     Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, ceClan, null, -1);
-                    
+
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);
                     hero.SetHasMet();
                     hero.ChangeState(Hero.CharacterStates.Active);
