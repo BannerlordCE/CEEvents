@@ -1,6 +1,4 @@
-﻿#define V127
-
-using CaptivityEvents.Config;
+﻿using CaptivityEvents.Config;
 using Helpers;
 using System;
 using TaleWorlds.CampaignSystem;

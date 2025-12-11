@@ -1,5 +1,3 @@
-﻿#define V127
-
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -40,13 +38,13 @@ namespace CaptivityEvents.Events
 
                     if (waitingList != null)
                     {
-                        GameMenu.ActivateGameMenu(waitingList);
+                        CEHelper.SafeActivateGameMenu(waitingList);
                     }
                     else
                     {
                         new CESubModule().LoadTexture("default");
 
-                        GameMenu.SwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement
+                        CEHelper.SafeSwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement
                                                   ? "settlement_wait"
                                                   : "prisoner_wait");
                     }
@@ -57,7 +55,7 @@ namespace CaptivityEvents.Events
                     {
                         if (CECampaignBehavior.ExtraProps.menuToSwitchBackTo != "prisoner_wait")
                         {
-                            GameMenu.SwitchToMenu(CECampaignBehavior.ExtraProps.menuToSwitchBackTo);
+                            CEHelper.SafeSwitchToMenu(CECampaignBehavior.ExtraProps.menuToSwitchBackTo);
                         }
                         else
                         {
@@ -251,7 +249,7 @@ namespace CaptivityEvents.Events
                     CECustomHandler.LogToFile(prisonerParty.Name.ToString());
 
                     PlayerEncounter.RestartPlayerEncounter(MobileParty.MainParty.Party, prisonerParty.Party);
-                    GameMenu.SwitchToMenu("encounter");
+                    CEHelper.SafeSwitchToMenu("encounter");
                 }
                 catch (Exception)
                 {

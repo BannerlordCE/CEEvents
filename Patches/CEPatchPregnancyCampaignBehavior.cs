@@ -1,6 +1,4 @@
-﻿#define V127
-
-using CaptivityEvents.Helper;
+﻿using CaptivityEvents.Helper;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;

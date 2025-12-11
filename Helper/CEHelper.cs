@@ -1,6 +1,4 @@
-﻿#define V127
-
-using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using Helpers;
 using System;
@@ -218,9 +216,64 @@ namespace CaptivityEvents.Helper
         internal static void ChangeMenu(int number)
         {
             string waitingList = WaitingList.CEWaitingList();
-            if (waitingList != null) GameMenu.SwitchToMenu(waitingList);
+            if (waitingList != null) SafeSwitchToMenu(waitingList);
             waitMenuCheck = number;
         }
+
+        /// <summary>
+        /// Safely switches to a menu after validating it exists in the GameMenuManager.
+        /// </summary>
+        /// <param name="menuName">The name of the menu to switch to</param>
+        /// <returns>True if the menu switch was successful, false otherwise</returns>
+        public static bool SafeSwitchToMenu(string menuName)
+        {
+            try
+            {
+                if (Campaign.Current?.GameMenuManager?.GetGameMenu(menuName) != null)
+                {
+                    GameMenu.SwitchToMenu(menuName);
+                    return true;
+                }
+                else
+                {
+                    CECustomHandler.ForceLogToFile($"SafeSwitchToMenu failed: Menu '{menuName}' does not exist in GameMenuManager. This event may not have been properly registered.");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                CECustomHandler.ForceLogToFile($"SafeSwitchToMenu exception for menu '{menuName}': {ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Safely activates a menu after validating it exists in the GameMenuManager.
+        /// </summary>
+        /// <param name="menuName">The name of the menu to activate</param>
+        /// <returns>True if the menu activation was successful, false otherwise</returns>
+        public static bool SafeActivateGameMenu(string menuName)
+        {
+            try
+            {
+                if (Campaign.Current?.GameMenuManager?.GetGameMenu(menuName) != null)
+                {
+                    GameMenu.ActivateGameMenu(menuName);
+                    return true;
+                }
+                else
+                {
+                    CECustomHandler.ForceLogToFile($"SafeActivateGameMenu failed: Menu '{menuName}' does not exist in GameMenuManager. This event may not have been properly registered.");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                CECustomHandler.ForceLogToFile($"SafeActivateGameMenu exception for menu '{menuName}': {ex}");
+                return false;
+            }
+        }
+
 
         internal static TextObject ShouldChangeMenu(TextObject text)
         {

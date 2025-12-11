@@ -1,13 +1,9 @@
-#define V127
-
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
 using Helpers;
-using SandBox.Objects;
-using SandBox.Objects.Usables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,11 +49,11 @@ namespace CaptivityEvents.Brothel
                 {
                     try
                     {
-                        GameMenu.SwitchToMenu("town_brothel");
+                        CEHelper.SafeSwitchToMenu("town_brothel");
                     }
                     catch (Exception)
                     {
-                        GameMenu.SwitchToMenu("town");
+                        CEHelper.SafeSwitchToMenu("town");
                     }
                 }, false, 2);
 
@@ -73,7 +69,7 @@ namespace CaptivityEvents.Brothel
 
             campaignGameStarter.AddGameMenuOption("town_brothel", "town_brothel_manage_prisoners", "{=CEEVENTS1175}Manage brothel captives", ManagePrisonerCondition, delegate { ManagePrisoners(); }, false, 4);
 
-            campaignGameStarter.AddGameMenuOption("town_brothel", "town_brothel_back", "{=qWAmxyYz}Back to town center", BackOnCondition, delegate { GameMenu.SwitchToMenu("town"); }, true, 5);
+            campaignGameStarter.AddGameMenuOption("town_brothel", "town_brothel_back", "{=qWAmxyYz}Back to town center", BackOnCondition, delegate { CEHelper.SafeSwitchToMenu("town"); }, true, 5);
         }
 
         // Ransom Functions
@@ -107,7 +103,7 @@ namespace CaptivityEvents.Brothel
         private static void SellAllPrisoners()
         {
             SellPrisonersAction.ApplyForSelectedPrisoners(PartyBase.MainParty, Settlement.CurrentSettlement.Party, MobilePartyHelper.GetPlayerPrisonersPlayerCanSell());
-            GameMenu.SwitchToMenu("town_brothel");
+            CEHelper.SafeSwitchToMenu("town_brothel");
         }
 
         // New Manage
@@ -124,7 +120,7 @@ namespace CaptivityEvents.Brothel
 
         private static void ManagePrisoners()
         {
-            GameMenu.SwitchToMenu("town_brothel");
+            CEHelper.SafeSwitchToMenu("town_brothel");
             ManageProstitutes();
         }
 
@@ -200,7 +196,7 @@ namespace CaptivityEvents.Brothel
 
         private static void ChooseRansomPrisoners()
         {
-            GameMenu.SwitchToMenu("town_brothel");
+            CEHelper.SafeSwitchToMenu("town_brothel");
             PartyScreenHelper.OpenScreenAsRansom();
         }
 
@@ -317,7 +313,7 @@ namespace CaptivityEvents.Brothel
             }
             catch (Exception)
             {
-                GameMenu.SwitchToMenu("town_brothel");
+                CEHelper.SafeSwitchToMenu("town_brothel");
             }
         }
 
@@ -365,7 +361,7 @@ namespace CaptivityEvents.Brothel
             CEHelper.delayedEvents.Clear();
             string waitingMenu = WaitingList.CEWaitingList();
             GameMenu.ExitToLast();
-            if (waitingMenu != null) GameMenu.ActivateGameMenu(waitingMenu);
+            if (waitingMenu != null) CEHelper.SafeActivateGameMenu(waitingMenu);
         }
 
         #endregion GameMenu

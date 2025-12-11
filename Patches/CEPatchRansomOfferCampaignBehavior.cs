@@ -1,6 +1,4 @@
-﻿#define V127
-
-using HarmonyLib;
+﻿using HarmonyLib;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;

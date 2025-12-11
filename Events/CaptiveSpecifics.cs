@@ -1,21 +1,16 @@
-﻿#define V127
-
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
-using NavalDLC.CampaignBehaviors;
 using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.GameMenus;
-using TaleWorlds.CampaignSystem.MapEvents;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 
 namespace CaptivityEvents.Events
@@ -34,13 +29,13 @@ namespace CaptivityEvents.Events
 
                     if (waitingList != null)
                     {
-                        GameMenu.ActivateGameMenu(waitingList);
+                        CEHelper.SafeActivateGameMenu(waitingList);
                     }
                     else
                     {
                         new CESubModule().LoadTexture("default");
 
-                        GameMenu.SwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement
+                        CEHelper.SafeSwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement
                                                   ? "settlement_wait"
                                                   : "prisoner_wait");
                     }
@@ -63,13 +58,13 @@ namespace CaptivityEvents.Events
             {
                 if (CESettings.Instance?.SexualContent ?? true)
                 {
-                    GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
+                    CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale
                                                ? "CE_captivity_sexual_escape_failure"
                                                : "CE_captivity_sexual_escape_failure_male");
                 }
                 else
                 {
-                    GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
+                    CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale
                                             ? "CE_captivity_escape_failure"
                                             : "CE_captivity_escape_failure_male");
                 }
@@ -79,13 +74,13 @@ namespace CaptivityEvents.Events
 
             if (CESettings.Instance?.SexualContent ?? true)
             {
-                GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
+                CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale
                                           ? "CE_captivity_sexual_escape_success"
                                           : "CE_captivity_sexual_escape_success_male");
             }
             else
             {
-                GameMenu.SwitchToMenu(Hero.MainHero.IsFemale
+                CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale
                                          ? "CE_captivity_escape_success"
                                          : "CE_captivity_escape_success_male");
             }
@@ -127,7 +122,7 @@ namespace CaptivityEvents.Events
                 }
 
                 MobileParty.MainParty.CurrentSettlement = PlayerCaptivity.CaptorParty.Settlement;
-                if (Campaign.Current.CurrentMenuContext != null) GameMenu.SwitchToMenu("town");
+                if (Campaign.Current.CurrentMenuContext != null) CEHelper.SafeSwitchToMenu("town");
 
                 if (Hero.MainHero.IsAlive)
                 {

@@ -1,5 +1,3 @@
-#define V127
-
 using CaptivityEvents.Config;
 using System;
 using System.Collections.Generic;

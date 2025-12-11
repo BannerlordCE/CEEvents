@@ -1,6 +1,4 @@
-﻿#define V127
-
-using CaptivityEvents.Brothel;
+﻿using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using HarmonyLib;

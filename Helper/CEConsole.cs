@@ -1,5 +1,3 @@
-﻿#define V127
-
 using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
@@ -89,7 +87,6 @@ namespace CaptivityEvents.Helper
                     _provider.ProstitutionControl = customSettings.ProstitutionControl;
                     _provider.SlaveryToggle = customSettings.SlaveryToggle;
                     _provider.FemdomControl = customSettings.FemdomControl;
-                    _provider.BestialityControl = customSettings.BestialityControl;
                     _provider.RomanceControl = customSettings.RomanceControl;
                     _provider.StolenGear = customSettings.StolenGear;
                     _provider.StolenGearQuest = customSettings.StolenGearQuest;
@@ -165,9 +162,9 @@ namespace CaptivityEvents.Helper
                 {
                     Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
                     if (!mapState.AtMenu)
-                        GameMenu.ActivateGameMenu("prisoner_wait");
+                        CEHelper.SafeActivateGameMenu("prisoner_wait");
 
-                    GameMenu.SwitchToMenu(result);
+                    CEHelper.SafeSwitchToMenu(result);
                 }
 
                 // ─── PLAYER CAPTIVE PATH ─────────────────────────────
@@ -348,14 +345,14 @@ namespace CaptivityEvents.Helper
                         Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
 
                         if (!mapState.AtMenu)
-                            GameMenu.ActivateGameMenu("prisoner_wait");
+                            CEHelper.SafeActivateGameMenu("prisoner_wait");
                         else
                         {
                             CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
                             CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                         }
 
-                        GameMenu.SwitchToMenu(result);
+                        CEHelper.SafeSwitchToMenu(result);
                     }
                 }
 
@@ -378,14 +375,14 @@ namespace CaptivityEvents.Helper
                         Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
 
                         if (!mapStateCaptive.AtMenu)
-                            GameMenu.ActivateGameMenu("prisoner_wait");
+                            CEHelper.SafeActivateGameMenu("prisoner_wait");
                         else
                         {
                             CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapStateCaptive.GameMenuId;
                             CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapStateCaptive.MenuContext.CurrentBackgroundMeshName;
                         }
 
-                        GameMenu.SwitchToMenu(result);
+                        CEHelper.SafeSwitchToMenu(result);
 
                         return "Successfully launched event.";
                     }
@@ -1101,6 +1098,9 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
+
+                    new CESubModule().ReloadImagesAgain();
+
                     string[] modulesFound = Utilities.GetModulesNames();
 
                     CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));

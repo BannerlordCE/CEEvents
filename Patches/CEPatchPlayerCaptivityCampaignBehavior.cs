@@ -1,6 +1,4 @@
-﻿#define V127
-
-using CaptivityEvents.Config;
+﻿using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
@@ -107,6 +105,21 @@ namespace CaptivityEvents.Patches
 
                 bool shouldFireEvent = CEHelper.delayedEvents.Any(item =>
                 {
+
+                    if (item.eventName == "taken_prisoner")
+                    {
+                        eventToFire = "taken_prisoner";
+                        item.hasBeenFired = true;
+                        return true;
+                    }
+
+                    if (item.eventName == "defeated_and_taken_prisoner")
+                    {
+                        eventToFire = "defeated_and_taken_prisoner";
+                        item.hasBeenFired = true;
+                        return true;
+                    }
+
                     if (item.eventName != null && item.eventTime < CampaignTime.Now.ElapsedHoursUntilNow)
                     {
                         CECustomHandler.LogToFile("Firing " + item.eventName);
@@ -196,10 +209,28 @@ namespace CaptivityEvents.Patches
         {
             try
             {
+                // Check for new menu to activate
                 string name = CheckCaptivityChangeOld(dt);
                 if (name != null)
                 {
-                    GameMenu.SwitchToMenu(name);
+                    try
+                    {
+                        // Validate menu exists before attempting to switch
+                        if (Campaign.Current?.GameMenuManager?.GetGameMenu(name) != null)
+                        {
+                            GameMenu.SwitchToMenu(name);
+                        }
+                        else
+                        {
+                            CECustomHandler.ForceLogToFile($"Deferred SwitchToMenu failed: Menu '{name}' does not exist in GameMenuManager. This event may not have been properly registered.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        CECustomHandler.ForceLogToFile("Deferred SwitchToMenu failed: " + ex);
+                    }
+
+                    return false; // Skip original
                 }
             }
             catch (Exception e)

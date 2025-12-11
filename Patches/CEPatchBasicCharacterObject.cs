@@ -1,6 +1,4 @@
-﻿#define V127
-
-using CaptivityEvents.Custom;
+﻿using CaptivityEvents.Custom;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;

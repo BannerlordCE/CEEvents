@@ -1,6 +1,4 @@
-﻿#define V127
-
-using CaptivityEvents.CampaignBehaviors;
+﻿using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Helper;
 using Helpers;

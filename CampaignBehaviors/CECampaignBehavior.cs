@@ -1,8 +1,7 @@
-#define V127
-
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
+using CaptivityEvents.Helper;
 using CaptivityEvents.Notifications;
 using Helpers;
 using System;
@@ -82,7 +81,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     {
                         _extraVariables.menuToSwitchBackTo = null;
                         _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
-                        GameMenu.ActivateGameMenu("prisoner_wait");
+                        CEHelper.SafeActivateGameMenu("prisoner_wait");
                     }
                     else
                     {
@@ -90,7 +89,7 @@ namespace CaptivityEvents.CampaignBehaviors
                         _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                     }
 
-                    GameMenu.SwitchToMenu(returnedEvent.Name);
+                    CEHelper.SafeSwitchToMenu(returnedEvent.Name);
                 }
             }
 
@@ -145,7 +144,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     {
                         _extraVariables.menuToSwitchBackTo = null;
                         _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
-                        GameMenu.ActivateGameMenu("prisoner_wait");
+                        CEHelper.SafeActivateGameMenu("prisoner_wait");
                     }
                     else
                     {
@@ -153,7 +152,7 @@ namespace CaptivityEvents.CampaignBehaviors
                         _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                     }
 
-                    GameMenu.SwitchToMenu(returnedEvent.Name);
+                    CEHelper.SafeSwitchToMenu(returnedEvent.Name);
                 }
             }
 
@@ -208,7 +207,7 @@ namespace CaptivityEvents.CampaignBehaviors
                     {
                         _extraVariables.menuToSwitchBackTo = null;
                         _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
-                        GameMenu.ActivateGameMenu("prisoner_wait");
+                        CEHelper.SafeActivateGameMenu("prisoner_wait");
                     }
                     else
                     {
@@ -216,7 +215,7 @@ namespace CaptivityEvents.CampaignBehaviors
                         _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                     }
 
-                    GameMenu.SwitchToMenu(returnedEvent.Name);
+                    CEHelper.SafeSwitchToMenu(returnedEvent.Name);
                 }
             }
 
@@ -735,7 +734,7 @@ namespace CaptivityEvents.CampaignBehaviors
                         CEEvent triggeredEvent = eventNames[number];
                         triggeredEvent.Captive = CharacterObject.PlayerCharacter;
                         triggeredEvent.Pregnancy = pregnancy;
-                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
+                        CEHelper.SafeActivateGameMenu(triggeredEvent.Name);
                     }
                     catch (Exception)
                     {

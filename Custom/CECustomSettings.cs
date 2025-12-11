@@ -53,7 +53,6 @@ namespace CaptivityEvents
         public bool ProstitutionControl { get; set; } = true;
         public bool SlaveryToggle { get; set; } = true;
         public bool FemdomControl { get; set; } = true;
-        public bool BestialityControl { get; set; } = true;
         public bool RomanceControl { get; set; } = true;
         public bool StolenGear { get; set; } = true;
         public bool StolenGearQuest { get; set; } = true;

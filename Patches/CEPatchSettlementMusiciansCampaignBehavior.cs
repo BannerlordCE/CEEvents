@@ -1,6 +1,4 @@
-﻿#define V127
-
-using HarmonyLib;
+﻿using HarmonyLib;
 using SandBox.CampaignBehaviors;
 using SandBox.Objects;
 using System.Collections.Generic;

@@ -1,6 +1,4 @@
-﻿#define V127
-
-using CaptivityEvents.Brothel;
+﻿using CaptivityEvents.Brothel;
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
@@ -2078,7 +2076,6 @@ namespace CaptivityEvents.Events
             if (!(CESettings.Instance?.FemdomControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Femdom)) return Error("Skipping event " + _listEvent.Name + " Femdom events disabled.");
             if (!(CESettings.Instance?.CommonControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Common)) return Error("Skipping event " + _listEvent.Name + " Common events disabled.");
             if (!(CESettings.Instance?.SlaveryToggle ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Slavery)) return Error("Skipping event " + _listEvent.Name + " Slavery events disabled.");
-            if (!(CESettings.Instance?.BestialityControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Bestiality)) return Error("Skipping event " + _listEvent.Name + " Bestiality events disabled.");
             if (!(CESettings.Instance?.ProstitutionControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution)) return Error("Skipping event " + _listEvent.Name + " Prostitution events disabled.");
             if (!(CESettings.Instance?.RomanceControl ?? true) && _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Romance)) return Error("Skipping event " + _listEvent.Name + " Romance events disabled.");
 

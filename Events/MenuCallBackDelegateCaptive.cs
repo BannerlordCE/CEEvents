@@ -1,5 +1,3 @@
-﻿#define V127
-
 using CaptivityEvents.CampaignBehaviors;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
@@ -432,7 +430,7 @@ namespace CaptivityEvents.Events
                         CEEvent triggeredEvent = eventNames[number];
                         triggeredEvent.Captive = CharacterObject.PlayerCharacter;
                         triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
-                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
+                        CEHelper.SafeActivateGameMenu(triggeredEvent.Name);
                     }
                     catch (Exception)
                     {
@@ -456,7 +454,7 @@ namespace CaptivityEvents.Events
                 CEEvent triggeredEvent = _eventList.Find(item => item.Name == _listedEvent.ProgressEvent.TriggerEventName);
                 triggeredEvent.Captive = CharacterObject.PlayerCharacter;
                 triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
-                GameMenu.SwitchToMenu(triggeredEvent.Name);
+                CEHelper.SafeSwitchToMenu(triggeredEvent.Name);
             }
             catch (Exception)
             {
@@ -537,7 +535,7 @@ namespace CaptivityEvents.Events
                         CEEvent triggeredEvent = eventNames[number];
                         triggeredEvent.Captive = CharacterObject.PlayerCharacter;
                         triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
-                        GameMenu.ActivateGameMenu(triggeredEvent.Name);
+                        CEHelper.SafeActivateGameMenu(triggeredEvent.Name);
                     }
                     catch (Exception)
                     {
@@ -561,7 +559,7 @@ namespace CaptivityEvents.Events
                 CEEvent triggeredEvent = _eventList.Find(item => item.Name == _option.TriggerEventName);
                 triggeredEvent.Captive = CharacterObject.PlayerCharacter;
                 triggeredEvent.SavedCompanions = _listedEvent.SavedCompanions;
-                GameMenu.SwitchToMenu(triggeredEvent.Name);
+                CEHelper.SafeSwitchToMenu(triggeredEvent.Name);
             }
             catch (Exception)
             {

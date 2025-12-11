@@ -1,5 +1,3 @@
-#define V127
-
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
@@ -12,7 +10,6 @@ using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameState;
-using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -430,10 +427,10 @@ namespace CaptivityEvents.Patches
 
                     if (!mapState.AtMenu)
                     {
-                        TaleWorlds.CampaignSystem.GameMenus.GameMenu.ActivateGameMenu("prisoner_wait");
+                        CEHelper.SafeActivateGameMenu("prisoner_wait");
                     }
 
-                    TaleWorlds.CampaignSystem.GameMenus.GameMenu.SwitchToMenu(ceEvent.Name);
+                    CEHelper.SafeSwitchToMenu(ceEvent.Name);
                 }
             }
         }

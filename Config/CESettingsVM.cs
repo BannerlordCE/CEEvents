@@ -59,7 +59,6 @@ namespace CaptivityEvents.Config
             public bool ProstitutionControl;
             public bool SlaveryToggle;
             public bool FemdomControl;
-            public bool BestialityControl;
             public bool RomanceControl;
             public bool CustomBackgrounds;
             public int EventAmountOfImagesToPreload;
@@ -121,7 +120,6 @@ namespace CaptivityEvents.Config
                 ProstitutionControl = CESettings.Instance.ProstitutionControl,
                 SlaveryToggle = CESettings.Instance.SlaveryToggle,
                 FemdomControl = CESettings.Instance.FemdomControl,
-                BestialityControl = CESettings.Instance.BestialityControl,
                 RomanceControl = CESettings.Instance.RomanceControl,
                 CustomBackgrounds = CESettings.Instance.CustomBackgrounds,
                 EventAmountOfImagesToPreload = CESettings.Instance.EventAmountOfImagesToPreload,
@@ -472,12 +470,6 @@ namespace CaptivityEvents.Config
                     return value;
                 });
 
-                yield return new CEManagedBooleanOptionData("BestialityControl", "Bestiality Events", "Enable bestiality-related events.", CESettings.Instance.BestialityControl ? 1f : 0f, (value) =>
-                {
-                    CESettings.Instance.BestialityControl = value == 1f;
-                    return value;
-                });
-
                 yield return new CEManagedBooleanOptionData("RomanceControl", "Romance Events", "Enable romance-related events.", CESettings.Instance.RomanceControl ? 1f : 0f, (value) =>
                 {
                     CESettings.Instance.RomanceControl = value == 1f;
@@ -580,7 +572,6 @@ namespace CaptivityEvents.Config
                         new System.Xml.Linq.XElement("ProstitutionControl", s.ProstitutionControl),
                         new System.Xml.Linq.XElement("SlaveryToggle", s.SlaveryToggle),
                         new System.Xml.Linq.XElement("FemdomControl", s.FemdomControl),
-                        new System.Xml.Linq.XElement("BestialityControl", s.BestialityControl),
                         new System.Xml.Linq.XElement("RomanceControl", s.RomanceControl),
                         new System.Xml.Linq.XElement("CustomBackgrounds", s.CustomBackgrounds),
                         new System.Xml.Linq.XElement("EventAmountOfImagesToPreload", s.EventAmountOfImagesToPreload)
@@ -635,7 +626,6 @@ namespace CaptivityEvents.Config
             CESettings.Instance.ProstitutionControl = _initial.ProstitutionControl;
             CESettings.Instance.SlaveryToggle = _initial.SlaveryToggle;
             CESettings.Instance.FemdomControl = _initial.FemdomControl;
-            CESettings.Instance.BestialityControl = _initial.BestialityControl;
             CESettings.Instance.RomanceControl = _initial.RomanceControl;
             CESettings.Instance.CustomBackgrounds = _initial.CustomBackgrounds;
             CESettings.Instance.EventAmountOfImagesToPreload = _initial.EventAmountOfImagesToPreload;

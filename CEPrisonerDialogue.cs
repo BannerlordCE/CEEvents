@@ -1,9 +1,8 @@
-﻿#define V127
-
 using CaptivityEvents.Brothel;
 using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
+using CaptivityEvents.Helper;
 using Helpers;
 using System;
 using System.Collections.Generic;
@@ -127,7 +126,7 @@ namespace CaptivityEvents
                 {
                     try
                     {
-                        GameMenu.SwitchToMenu(CustomLine.NextScene);
+                        CEHelper.SafeSwitchToMenu(CustomLine.NextScene);
                     }
                     catch (Exception)
                     {

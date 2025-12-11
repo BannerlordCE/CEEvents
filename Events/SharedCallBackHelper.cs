@@ -1,6 +1,4 @@
-﻿#define V127
-
-using CaptivityEvents.Config;
+﻿using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Helper;
 using CaptivityEvents.Issues;

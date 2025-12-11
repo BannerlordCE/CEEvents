@@ -32,6 +32,10 @@ namespace CaptivityEvents.Custom
 
         public static List<CEEvent> GetAllVerifiedXSEFSEvents(List<string> modules)
         {
+            AllModules.Clear();
+            AllEvents.Clear();
+            AllCustom.Clear();
+            AllScenes.Clear();
 #if DEBUG
             //TestWrite();
 #endif
