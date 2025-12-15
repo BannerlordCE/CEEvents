@@ -1,10 +1,11 @@
 ﻿using CaptivityEvents.Custom;
-using CaptivityEvents.Helper;
 using HarmonyLib;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using TaleWorlds.Engine.GauntletUI;
+using TaleWorlds.MountAndBlade;
+using TaleWorlds.MountAndBlade.GauntletUI;
+using TaleWorlds.MountAndBlade.GauntletUI.Mission;
 using TaleWorlds.TwoDimension;
 
 namespace CaptivityEvents.Patches
@@ -88,6 +89,47 @@ namespace CaptivityEvents.Patches
             }
 
             return false; // Skip original method since we handled it
+        }
+    }
+
+    [HarmonyPatch(typeof(MissionGauntletCategoryLoadManager))]
+    internal class CEPatchMissionGauntletCategoryLoadManager
+    {
+        /// <summary>
+        /// Restores CE custom textures after MissionGauntletCategoryLoadManager.LoadUnloadAllCategories reloads categories.
+        /// This is the PRIMARY cause of textures becoming "material_error" after battles.
+        /// When categories are unloaded/reloaded during battle transitions, runtime-added CE textures are lost.
+        /// </summary>
+        [HarmonyPatch("LoadUnloadAllCategories", typeof(bool))]
+        [HarmonyPostfix]
+        private static void LoadUnloadAllCategoriesPostfix(bool load)
+        {
+            try
+            {
+                // Only restore when loading (not when unloading)
+                if (!load)
+                {
+                    return;
+                }
+
+                // Check if we're in a valid game state
+                if (Mission.Current == null)
+                {
+                    return;
+                }
+
+                // Get the CESubModule instance to call restore method
+                CESubModule ceSubModule = CESubModule.Instance;
+                if (ceSubModule != null)
+                {
+                    CECustomHandler.LogToFile("MissionGauntletCategoryLoadManager reloaded categories - restoring CE textures");
+                    ceSubModule.ReloadImagesAgain();
+                }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile($"CEPatchMissionGauntletCategoryLoadManager.LoadUnloadAllCategoriesPostfix failed: {e.Message}\n{e.StackTrace}");
+            }
         }
     }
 }

@@ -117,6 +117,7 @@ namespace CaptivityEvents
         public static string victoryEvent;
         public static string defeatEvent;
         public static List<TroopRosterElement> playerTroops = [];
+        public static List<TroopRosterElement> temporaryTroops = [];
         public static bool removePlayer = false;
         public static bool destroyParty = false;
         public static bool surrenderParty = false;
@@ -173,6 +174,9 @@ namespace CaptivityEvents
 
     public class CESubModule : MBSubModuleBase
     {
+        // Static instance for patches to access
+        public static CESubModule Instance { get; private set; }
+
         // Loaded Variables
         private static bool _isLoaded;
 
@@ -226,16 +230,65 @@ namespace CaptivityEvents
                 if (CEPersistence.CELoadedTextures.ContainsKey(name))
                 {
                     Texture cachedTexture = CEPersistence.CELoadedTextures[name];
-                    // Verify the cached texture is still valid
+                    // Verify the cached texture is still valid (note: IsValid is false until added to sprite sheet)
                     if (cachedTexture?.PlatformTexture != null)
                     {
-                        return cachedTexture;
+                        // Additional check: verify the underlying texture hasn't been invalidated (material_error)
+                        try
+                        {
+                            var textureField = typeof(EngineTexture).GetField("Texture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                            if (textureField != null)
+                            {
+                                var engineTexture = textureField.GetValue(cachedTexture.PlatformTexture);
+                                if (engineTexture != null)
+                                {
+                                    var nameProperty = engineTexture.GetType().GetProperty("Name", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                                    if (nameProperty != null)
+                                    {
+                                        string textureName = nameProperty.GetValue(engineTexture) as string;
+                                        if (textureName == "material_error")
+                                        {
+                                            CECustomHandler.ForceLogToFile($"Cached texture {name} has been invalidated (material_error), reloading from disk");
+                                            CEPersistence.CELoadedTextures.Remove(name);
+                                            // Continue to load fresh texture below
+                                        }
+                                        else
+                                        {
+                                            // Texture is valid, return it
+                                            return cachedTexture;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Can't verify, return cached texture
+                                        return cachedTexture;
+                                    }
+                                }
+                                else
+                                {
+                                    // engineTexture is null, texture has been invalidated
+                                    CECustomHandler.ForceLogToFile($"Cached texture {name} has null underlying texture, reloading from disk");
+                                    CEPersistence.CELoadedTextures.Remove(name);
+                                }
+                            }
+                            else
+                            {
+                                // Can't verify, return cached texture
+                                return cachedTexture;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            CECustomHandler.LogToFile($"Error validating cached texture {name}: {ex.Message}");
+                            // If validation fails, assume it's valid and return it
+                            return cachedTexture;
+                        }
                     }
                     else
                     {
                         // Remove invalid cached texture
                         CEPersistence.CELoadedTextures.Remove(name);
-                        CECustomHandler.ForceLogToFile($"Removed invalid cached texture: {name}");
+                        CECustomHandler.ForceLogToFile($"Removed invalid cached texture: {name} (PlatformTexture is null)");
                     }
                 }
 
@@ -257,17 +310,24 @@ namespace CaptivityEvents
 
                 texture.PreloadTexture(true);
                 Texture texture2D = new(new EngineTexture(texture));
+                
+                // Note: IsValid will be false until the texture is added to a sprite category's SpriteSheets
+                // This is expected behavior - the texture becomes valid once it's part of a sprite sheet
+                CECustomHandler.LogToFile($"Loaded texture {name}, IsValid={texture2D.IsValid} (will become true after adding to sprite sheet)");
 
-                if (!CEPersistence.CELoadedTextures.ContainsKey(name))
+                // If texture is already in cache, remove it so we can re-add it at the end (LRU behavior)
+                if (CEPersistence.CELoadedTextures.ContainsKey(name))
                 {
-                    CEPersistence.CELoadedTextures.Add(name, texture2D);
+                    CEPersistence.CELoadedTextures.Remove(name);
+                    CECustomHandler.LogToFile($"Moved texture {name} to end of cache (LRU)");
                 }
 
-                // Manage cache size
+                // Manage cache size before adding
                 if (CEPersistence.CELoadedTextures.Count >= (CESettings.Instance?.EventAmountOfImagesToPreload ?? 40))
                 {
                     KeyValuePair<string, Texture> textureToRemove = CEPersistence.CELoadedTextures.First();
                     CEPersistence.CELoadedTextures.Remove(textureToRemove.Key);
+                    CECustomHandler.LogToFile($"Cache full, removing oldest texture: {textureToRemove.Key}");
                     try
                     {
                         textureToRemove.Value.PlatformTexture?.Release();
@@ -277,6 +337,15 @@ namespace CaptivityEvents
                         // Texture may have already been released by the engine
                         CECustomHandler.LogToFile($"Error releasing texture {textureToRemove.Key}: {ex.Message}");
                     }
+                }
+                
+                // Add to end of cache (most recently used)
+                CEPersistence.CELoadedTextures.Add(name, texture2D);
+
+                if (texture2D == null || texture2D.IsValid == false)
+                {
+                    CECustomHandler.ForceLogToFile("QuickLoadCampaignTexture failed to create Texture2D for path: " + path);
+                    return null;
                 }
 
                 return texture2D;
@@ -330,7 +399,7 @@ namespace CaptivityEvents
             }
         }
 
-        private void ValidateAndRestoreTextures()
+        public void ValidateAndRestoreTextures()
         {
             try
             {
@@ -565,6 +634,7 @@ namespace CaptivityEvents
         protected override void OnSubModuleLoad()
         {
             base.OnSubModuleLoad();
+            Instance = this;
 
             ModuleInfo ceModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
             ModuleInfo nativeModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative; });
@@ -950,24 +1020,84 @@ namespace CaptivityEvents
 
         public void ReloadImagesAgain()
         {
+            CEPersistence.CELoadedTextures.Clear();
+
             try
             {
+                CECustomHandler.ForceLogToFile("ReloadImagesAgain called - restoring CE textures to sprite categories");
                 string[] modulesFound = Utilities.GetModulesNames();
 
                 SpriteCategory spriteCategory = UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"];
 
-                // Check if textures need to be reloaded (empty or contain null textures)
-                bool needsReload = CEPersistence.CETextures.IsEmpty() ||
-                                   CEPersistence.CETextures.Any(t => t == null || t.PlatformTexture == null);
+                // After LoadUnloadAllCategories reloads the category, the SpriteSheets list is reset to original state
+                // Check if the category has been reset by comparing current count to expected count
+                int expectedCount = CEPersistence.CETexturesCount + 4; // Original count + our 4 textures
+                bool categoryWasReset = spriteCategory.SpriteSheets.Count < expectedCount;
+                
+                CECustomHandler.ForceLogToFile($"ReloadImagesAgain: Current count={spriteCategory.SpriteSheets.Count}, Expected count={expectedCount}, Was reset={categoryWasReset}");
 
-                if (needsReload)
+                bool needsFullReload = categoryWasReset;
+                
+                // If not reset, verify our textures are still valid
+                if (!needsFullReload)
                 {
-                    CECustomHandler.ForceLogToFile("ReloadImagesAgain: Loading fresh textures");
+                    foreach (int index in CEPersistence.sprite_index)
+                    {
+                        if (index < 0 || index >= spriteCategory.SpriteSheets.Count)
+                        {
+                            CECustomHandler.ForceLogToFile($"ReloadImagesAgain: sprite_index {index} out of bounds (count: {spriteCategory.SpriteSheets.Count}), needs full reload");
+                            needsFullReload = true;
+                            break;
+                        }
+                        
+                        Texture texture = spriteCategory.SpriteSheets[index];
+                        if (texture == null || texture.PlatformTexture == null)
+                        {
+                            CECustomHandler.ForceLogToFile($"ReloadImagesAgain: texture at index {index} is invalid (null or null PlatformTexture), needs full reload");
+                            needsFullReload = true;
+                            break;
+                        }
+                        
+                        // Check if the underlying engine texture is "material_error"
+                        if (texture.PlatformTexture is EngineTexture engineTexture && engineTexture.Texture != null)
+                        {
+                            string textureName = engineTexture.Texture.Name;
+                            if (textureName == "material_error")
+                            {
+                                CECustomHandler.ForceLogToFile($"ReloadImagesAgain: texture at index {index} is 'material_error', needs full reload");
+                                needsFullReload = true;
+                                break;
+                            }
+                        }
+                    }
+                }
 
-                    // Clear any invalid textures
+                if (needsFullReload)
+                {
+                    CECustomHandler.ForceLogToFile("ReloadImagesAgain: Performing full texture reload");
+
+                    // Clear and reload textures
                     CEPersistence.CETextures.Clear();
 
-                    // Load fresh textures
+                    // Force clear cached default textures so they reload from disk
+                    string[] defaultTextureKeys = [
+                        "default_female_prison.png", "default_male_prison.png",
+                        "default_female.png", "default_male.png",
+                        "default_female_sea.png", "default_male_sea.png", "default_raft.png"
+                    ];
+                    
+                    foreach (string key in defaultTextureKeys)
+                    {
+                        if (CEPersistence.CELoadedTextures.ContainsKey(key))
+                        {
+                            CECustomHandler.ForceLogToFile($"ReloadImagesAgain: Clearing cached texture {key}");
+                            CEPersistence.CELoadedTextures.Remove(key);
+                        }
+                    }
+
+                    CEPersistence.CELoadedTextures.Clear();
+
+                    // Load fresh textures from disk
                     Texture t1 = SafeLoadTexture("default_female_prison", "default_female_prison");
                     Texture t2 = SafeLoadTexture("default_male_prison", "default_male_prison");
                     Texture t3 = SafeLoadTexture("default_female", "default_female");
@@ -981,11 +1111,10 @@ namespace CaptivityEvents
                     if (CEPersistence.CETextures.Count < 4)
                     {
                         CECustomHandler.ForceLogToFile($"WARNING: Only loaded {CEPersistence.CETextures.Count} out of 4 default textures");
+                        return;
                     }
-                }
 
-                if (CEPersistence.CETextures.Count > 0)
-                {
+                    // Add textures to sprite category
                     spriteCategory.SpriteSheets.AddRange(CEPersistence.CETextures);
                     spriteCategory.SheetSizes = spriteCategory.SheetSizes.AddRangeToArray([new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805), new Vec2i(445, 805)]);
                     CEPersistence.CETexturesCount = spriteCategory.SpriteSheetCount;
@@ -993,7 +1122,7 @@ namespace CaptivityEvents
                 }
                 else
                 {
-                    CECustomHandler.ForceLogToFile("ERROR: Failed to load any default textures in ReloadImagesAgain");
+                    CECustomHandler.ForceLogToFile("ReloadImagesAgain: Textures still valid, skipping reload");
                     return;
                 }
 
@@ -1867,6 +1996,17 @@ namespace CaptivityEvents
             {
                 PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, 0, troopRosterElement.Xp, true, -1);
             }
+
+            foreach (TroopRosterElement troopRosterElement in CEPersistence.temporaryTroops)
+            {
+                PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, 0, troopRosterElement.Xp, true, -1);
+            }
+
+            foreach (TroopRosterElement troopRosterElement in CEPersistence.temporaryTroops)
+            {
+                PartyBase.MainParty.MemberRoster.RemoveTroop(troopRosterElement.Character, troopRosterElement.Number);
+            }
+
 
             if (CEPersistence.playerWon)
             {

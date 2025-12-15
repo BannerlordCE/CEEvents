@@ -549,7 +549,7 @@ namespace CaptivityEvents.CampaignBehaviors
                 int num = flag ? 2 : 1;
                 int stillbornCount = 0;
 
-                string[] validCultures = ["khuzait", "battania", "aserai", "sturgia", "vlandia", "empire"];
+                string[] validCultures = ["khuzait", "battania", "aserai", "sturgia", "vlandia", "empire", "nord"];
 
                 for (int i = 0; i < 1; i++)
                 {

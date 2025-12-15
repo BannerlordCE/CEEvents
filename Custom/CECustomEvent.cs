@@ -619,6 +619,8 @@ namespace CaptivityEvents.Custom
         [XmlElement(Form = XmlSchemaForm.Unqualified)]
         public string OptionText { get; set; }
 
+        public string UseConditions { get; set; }
+
         public string PregnancyRiskModifier { get; set; }
 
         public string EscapeChance { get; set; }

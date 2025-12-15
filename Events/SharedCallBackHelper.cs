@@ -439,6 +439,20 @@ namespace CaptivityEvents.Events
                                 glovesString = "armwraps";
                                 break;
 
+                            case CampaignData.CultureNord:
+                                headString = "nordic_fur_cap";
+                                capeString = Hero.MainHero.IsFemale
+                                    ? "female_hood"
+                                    : "";
+                                bodyString = Hero.MainHero.IsFemale
+                                    ? "cut_dress"
+                                    : "heavy_nordic_tunic";
+                                legString = Hero.MainHero.IsFemale
+                                    ? "ladys_shoe"
+                                    : "rough_tied_boots";
+                                glovesString = "armwraps";
+                                break;
+
                             case CampaignData.CultureAserai:
                                 headString = Hero.MainHero.IsFemale
                                     ? ""
@@ -505,6 +519,20 @@ namespace CaptivityEvents.Events
                                     ? "ladys_shoe"
                                     : "ragged_boots";
                                 capeString = "wrapped_scarf";
+                                glovesString = "armwraps";
+                                break;
+
+                            case CampaignData.CultureNord:
+                                headString = "nordic_fur_cap";
+                                capeString = Hero.MainHero.IsFemale
+                                    ? "female_hood"
+                                    : "";
+                                bodyString = Hero.MainHero.IsFemale
+                                    ? "cut_dress"
+                                    : "heavy_nordic_tunic";
+                                legString = Hero.MainHero.IsFemale
+                                    ? "ladys_shoe"
+                                    : "rough_tied_boots";
                                 glovesString = "armwraps";
                                 break;
 
@@ -636,6 +664,11 @@ namespace CaptivityEvents.Events
                         switch (PlayerCaptivity.CaptorParty?.Culture != null ? PlayerCaptivity.CaptorParty?.Culture.Name.ToString().ToLower() : null)
                         {
                             case CampaignData.CultureSturgia:
+                                rangedItem = "nordic_shortbow";
+                                rangedAmmo = "default_arrows";
+                                break;
+
+                            case CampaignData.CultureNord:
                                 rangedItem = "nordic_shortbow";
                                 rangedAmmo = "default_arrows";
                                 break;
@@ -809,7 +842,7 @@ namespace CaptivityEvents.Events
                                     {
                                         if (num > 0)
                                         {
-                                            if (troop.Ref != null && troop.Ref.ToLower() == "friendly")
+                                            if (troop.Ref != null && troop.Ref.ToLower() == "friend")
                                             {
                                                 friendlyTroops.AddToCounts(characterObject, num, false, numWounded, 0, true, -1);
                                             }
@@ -896,6 +929,7 @@ namespace CaptivityEvents.Events
                             foreach (TroopRosterElement troopRosterElement in temporaryTroops.GetTroopRoster())
                             {
                                 PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, troopRosterElement.WoundedNumber, 0, true, -1);
+                                CEPersistence.temporaryTroops.Add(troopRosterElement);
                             }
 
                             foreach (TroopRosterElement troopRosterElement in friendlyTroops.GetTroopRoster())
@@ -1506,6 +1540,52 @@ namespace CaptivityEvents.Events
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.UnavailableIsInvisible)) return true;
 
             return args.IsEnabled;
+        }
+
+        internal bool CheckUseConditions(ref MenuCallbackArgs args)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(_option?.UseConditions)) return true;
+
+                CEEvent conditionEvent = _eventList.Find(item => item.Name == _option.UseConditions);
+                
+                if (conditionEvent == null)
+                {
+                    CECustomHandler.LogToFile("UseConditions event not found: " + _option.UseConditions);
+                    return true;
+                }
+
+                string conditionMatched = null;
+                
+                if (conditionEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                {
+                    conditionMatched = new CEEventChecker(conditionEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                }
+                else if (conditionEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                {
+                    conditionMatched = new CEEventChecker(conditionEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                }
+                else if (conditionEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                {
+                    conditionMatched = new CEEventChecker(conditionEvent).FlagsDoMatchEventConditions(_listedEvent.Captive, PartyBase.MainParty);
+                }
+                
+                if (conditionMatched != null)
+                {
+                    args.IsEnabled = false;
+                    args.Tooltip = GameTexts.FindText("str_CE_conditions_not_met");
+                    CECustomHandler.LogToFile("MenuOption disabled: " + conditionMatched);
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.LogToFile("CheckUseConditions failed: " + e.Message);
+                return true;
+            }
         }
 
         internal void LoadBackgroundImage(string textureFlag = "", CharacterObject specificCaptive = null)

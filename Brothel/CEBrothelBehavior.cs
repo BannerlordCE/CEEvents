@@ -246,8 +246,37 @@ namespace CaptivityEvents.Brothel
                 FieldInfo fi = LocationComplex.Current.GetType().GetField("_locations", BindingFlags.Instance | BindingFlags.NonPublic);
                 Dictionary<string, Location> _locations = (Dictionary<string, Location>)fi.GetValue(LocationComplex.Current);
 
-                string backgroundMeshName = settlement.Culture.StringId + "_tavern";
+                string backgroundMeshName = "wait_prisoner_female";
                 args.MenuContext.SetBackgroundMeshName(backgroundMeshName);
+
+
+                switch (settlement.Culture.StringId)
+                {
+                    case CampaignData.CultureSturgia:
+                        new CESubModule().LoadTexture("ce_sturgia_brothel");
+                        break;
+                    case CampaignData.CultureKhuzait:
+                        new CESubModule().LoadTexture("ce_khuzait_brothel");
+                        break;
+                    case CampaignData.CultureNord:
+                        new CESubModule().LoadTexture("ce_nord_brothel");
+                        break;
+                    case CampaignData.CultureVlandia:
+                        new CESubModule().LoadTexture("ce_vlandia_brothel");
+                        break;
+                    case CampaignData.CultureEmpire:
+                        new CESubModule().LoadTexture("ce_empire_brothel");
+                        break;
+                    case CampaignData.CultureBattania:
+                        new CESubModule().LoadTexture("ce_battania_brothel");
+                        break;
+                    case CampaignData.CultureAserai:
+                        new CESubModule().LoadTexture("ce_aserai_brothel");
+                        break;
+                    default:
+                        new CESubModule().LoadTexture("ce_empire_brothel");
+                        break;
+                }
 
                 if (_locations.ContainsKey("brothel"))
                 {
@@ -1182,6 +1211,7 @@ namespace CaptivityEvents.Brothel
                 CEPersistence.gameEntity = Settlement.CurrentSettlement.Culture.Name.ToString().ToLower() switch
                 {
                     CampaignData.CultureSturgia => Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a"),
+                    CampaignData.CultureNord => Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a"),
                     CampaignData.CultureVlandia => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i"),
                     CampaignData.CultureAserai => Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a"),
                     CampaignData.CultureEmpire => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a"),
@@ -1230,6 +1260,7 @@ namespace CaptivityEvents.Brothel
                 CEPersistence.gameEntity = Settlement.CurrentSettlement.Culture.Name.ToString().ToLower() switch
                 {
                     CampaignData.CultureSturgia => Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a"),
+                    CampaignData.CultureNord => Mission.Current.Scene.GetFirstEntityWithName("bed_straw_a"),
                     CampaignData.CultureVlandia => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_i"),
                     CampaignData.CultureAserai => Mission.Current.Scene.GetFirstEntityWithName("bed_ground_a"),
                     CampaignData.CultureEmpire => Mission.Current.Scene.GetFirstEntityWithName("bed_tavern_a"),

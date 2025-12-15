@@ -473,6 +473,20 @@ namespace CaptivityEvents.Events
                                 glovesString = "armwraps";
                                 break;
 
+                            case CampaignData.CultureNord:
+                                headString = "nordic_fur_cap";
+                                capeString = Hero.MainHero.IsFemale
+                                    ? "female_hood"
+                                    : "";
+                                bodyString = Hero.MainHero.IsFemale
+                                    ? "cut_dress"
+                                    : "heavy_nordic_tunic";
+                                legString = Hero.MainHero.IsFemale
+                                    ? "ladys_shoe"
+                                    : "rough_tied_boots";
+                                glovesString = "armwraps";
+                                break;
+
                             case CampaignData.CultureAserai:
                                 headString = Hero.MainHero.IsFemale
                                     ? ""
@@ -671,6 +685,11 @@ namespace CaptivityEvents.Events
                         switch (PlayerCaptivity.CaptorParty?.Culture != null ? PlayerCaptivity.CaptorParty?.Culture.Name.ToString().ToLower() : null)
                         {
                             case CampaignData.CultureSturgia:
+                                rangedItem = "nordic_shortbow";
+                                rangedAmmo = "default_arrows";
+                                break;
+
+                            case CampaignData.CultureNord:
                                 rangedItem = "nordic_shortbow";
                                 rangedAmmo = "default_arrows";
                                 break;

@@ -205,6 +205,7 @@ namespace CaptivityEvents.Events
 
         internal bool CaptiveEventOptionGameMenu(MenuCallbackArgs args)
         {
+            _sharedCallBackHelper.CheckUseConditions(ref args);
             _sharedCallBackHelper.InitIcons(ref args);
             _sharedCallBackHelper.InitGiveItem();
 

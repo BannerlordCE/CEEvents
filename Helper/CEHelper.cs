@@ -24,7 +24,7 @@ namespace CaptivityEvents.Helper
             return settlement.IsCastle ? "castle" : settlement.IsTown ? "town" : "village";
         }
 
-        private static readonly string[] _validCultures = ["aserai", "battania", "empire", "khuzait", "sturgia", "vlandia"];
+        private static readonly string[] _validCultures = ["aserai", "battania", "empire", "khuzait", "sturgia", "vlandia", "nord"];
 
         public static string CustomSceneToPlay(string sceneToPlay, PartyBase partyBase)
         {

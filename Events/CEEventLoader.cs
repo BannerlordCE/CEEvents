@@ -38,9 +38,9 @@ namespace CaptivityEvents.Events
                     rcb.RandomProgressConditionWaitGameMenu,
                     rcb.RandomProgressConsequenceWaitGameMenu,
                     rcb.RandomProgressTickWaitGameMenu,
-                    CEProgressMode(variablesLoader.GetIntFromXML(listedEvent.ProgressEvent.DisplayProgressMode)),
+                    CEProgressMode(variablesLoader.GetIntFromXML(listedEvent?.ProgressEvent?.DisplayProgressMode ?? "0")),
                      GameMenu.MenuOverlayType.None,
-                    variablesLoader.GetFloatFromXML(listedEvent.ProgressEvent.TimeToTake),
+                    variablesLoader.GetFloatFromXML(listedEvent?.ProgressEvent?.TimeToTake ?? "1"),
                     GameMenu.MenuFlags.None,
                     "CEEVENTS");
             }

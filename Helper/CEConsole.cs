@@ -1098,8 +1098,16 @@ namespace CaptivityEvents.Helper
 
                 try
                 {
-
-                    new CESubModule().ReloadImagesAgain();
+                    // Use the static Instance instead of creating a new CESubModule
+                    if (CESubModule.Instance != null)
+                    {
+                        CESubModule.Instance.ReloadImagesAgain();
+                    }
+                    else
+                    {
+                        CECustomHandler.ForceLogToFile("CESubModule.Instance is null, cannot reload images");
+                        return "Error: CESubModule.Instance is null";
+                    }
 
                     string[] modulesFound = Utilities.GetModulesNames();
 
@@ -1189,7 +1197,11 @@ namespace CaptivityEvents.Helper
                             }
                         }
 
-                        new CESubModule().LoadTexture("default", false, true);
+                        // Use the static Instance instead of creating a new CESubModule
+                        if (CESubModule.Instance != null)
+                        {
+                            CESubModule.Instance.LoadTexture("default", false, true);
+                        }
                     }
                     catch (Exception e)
                     {

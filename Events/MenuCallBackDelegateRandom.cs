@@ -174,6 +174,8 @@ namespace CaptivityEvents.Events
 
         internal bool RandomEventConditionMenuOption(MenuCallbackArgs args)
         {
+            _sharedCallBackHelper.CheckUseConditions(ref args);
+
             PlayerIsNotBusy(ref args);
             PlayerHasOpenSpaceForCompanions(ref args);
 
