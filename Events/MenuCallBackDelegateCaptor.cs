@@ -67,6 +67,7 @@ namespace CaptivityEvents.Events
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                             ? 1
                                             : 0);
+            MBTextManager.SetTextVariable("ISONSEA", MobileParty.MainParty.IsCurrentlyAtSea ? 1 : 0);
 
             if (MobileParty.MainParty.CurrentSettlement != null)
             {
@@ -1893,6 +1894,7 @@ namespace CaptivityEvents.Events
             if (MobileParty.MainParty.CurrentSettlement != null) text.SetTextVariable("SETTLEMENT_NAME", MobileParty.MainParty.CurrentSettlement.Name);
             text.SetTextVariable("PARTY_NAME", MobileParty.MainParty.Name);
             text.SetTextVariable("CAPTOR_NAME", Hero.MainHero.Name);
+            text.SetTextVariable("ISONSEA", MobileParty.MainParty.IsCurrentlyAtSea ? 1 : 0);
 
             try
             {

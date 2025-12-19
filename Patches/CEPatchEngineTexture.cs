@@ -64,7 +64,10 @@ namespace CaptivityEvents.Patches
                     {
                         if (texture?.PlatformTexture != null)
                         {
-                            texture.PlatformTexture.Release();
+                            if (texture.PlatformTexture is EngineTexture engineTexture && engineTexture.Texture != null)
+                            {
+                                texture.PlatformTexture.Release();
+                            }
                         }
                     }
                     catch (Exception)

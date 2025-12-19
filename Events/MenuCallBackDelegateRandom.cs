@@ -68,6 +68,7 @@ namespace CaptivityEvents.Events
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                             ? 1
                                             : 0);
+            MBTextManager.SetTextVariable("ISONSEA", MobileParty.MainParty.IsCurrentlyAtSea ? 1 : 0);
 
             try
             {
@@ -149,6 +150,7 @@ namespace CaptivityEvents.Events
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale
                                               ? 1
                                               : 0);
+            MBTextManager.SetTextVariable("ISONSEA", MobileParty.MainParty.IsCurrentlyAtSea ? 1 : 0);
 
             if (MobileParty.MainParty.CurrentSettlement != null)
             {

@@ -332,6 +332,7 @@ namespace CaptivityEvents.Helper
             {
                 if (waitMenuCheck != 1) ChangeMenu(1);
                 text.SetTextVariable("PARTY_NAME", PlayerCaptivity.CaptorParty.Name);
+                text.SetTextVariable("ISONSEA", PlayerCaptivity.CaptorParty.MobileParty.IsCurrentlyAtSea ? 1 : 0);
             }
 
             return text;

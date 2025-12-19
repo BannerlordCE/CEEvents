@@ -522,20 +522,6 @@ namespace CaptivityEvents.Events
                                 glovesString = "armwraps";
                                 break;
 
-                            case CampaignData.CultureNord:
-                                headString = "nordic_fur_cap";
-                                capeString = Hero.MainHero.IsFemale
-                                    ? "female_hood"
-                                    : "";
-                                bodyString = Hero.MainHero.IsFemale
-                                    ? "cut_dress"
-                                    : "heavy_nordic_tunic";
-                                legString = Hero.MainHero.IsFemale
-                                    ? "ladys_shoe"
-                                    : "rough_tied_boots";
-                                glovesString = "armwraps";
-                                break;
-
                             default:
                                 headString = Hero.MainHero.IsFemale
                                     ? "female_head_wrap"

@@ -1971,6 +1971,10 @@ namespace CaptivityEvents.Events
                                          : 0);
 
                 text.SetTextVariable("PARTY_NAME", PlayerCaptivity.CaptorParty.Name);
+
+
+                text.SetTextVariable("ISONSEA", PlayerCaptivity.CaptorParty.MobileParty.IsCurrentlyAtSea ? 1 : 0);
+
             }
 
             InitCaptiveTimeInDays(captiveTimeInDays, ref text);
