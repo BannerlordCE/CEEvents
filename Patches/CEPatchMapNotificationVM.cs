@@ -22,36 +22,49 @@ namespace CaptivityEvents.Patches
         private static void GetNotificationFromData(MapNotificationVM __instance, ref MapNotificationItemBaseVM __result, InformationData data)
         {
             Type type = data.GetType();
-            MapNotificationItemBaseVM mapNotification = null;
+            MapNotificationItemBaseVM mapNotification;
+
             if (type == typeof(CECaptorMapNotification))
             {
-                Action<MapNotificationItemBaseVM> onRemove = (MapNotificationItemBaseVM item) =>
+                void OnRemove(MapNotificationItemBaseVM item)
                 {
-                    CEHelper.notificationCaptorExists = false;
+                    CEHelper.NotificationCaptorExists = false;
                     new CESubModule().LoadCampaignNotificationTexture("default");
                     RemoveNotificationItem.Invoke(__instance, [item]);
-                };
+                }
+
 
                 mapNotification = new CECaptorMapNotificationItemVM(data);
 
-                FieldInfo fi = mapNotification.GetType().BaseType.GetField("OnRemove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
-                fi?.SetValue(mapNotification, onRemove);
+                Type memberInfo = mapNotification.GetType().BaseType;
+
+                if (memberInfo != null)
+                {
+                    FieldInfo fi = memberInfo.GetField("OnRemove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+                    fi?.SetValue(mapNotification, (Action<MapNotificationItemBaseVM>)OnRemove);
+                }
 
                 __result = mapNotification;
             }
             else if (type == typeof(CEEventMapNotification))
             {
-                Action<MapNotificationItemBaseVM> onRemove = (MapNotificationItemBaseVM item) =>
+                void OnRemove(MapNotificationItemBaseVM item)
                 {
-                    CEHelper.notificationEventExists = false;
+                    CEHelper.NotificationEventExists = false;
                     new CESubModule().LoadCampaignNotificationTexture("default", 1);
                     RemoveNotificationItem.Invoke(__instance, [item]);
-                };
+                }
+
 
                 mapNotification = new CEEventMapNotificationItemVM(data);
 
-                FieldInfo fi = mapNotification.GetType().BaseType.GetField("OnRemove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
-                fi?.SetValue(mapNotification, onRemove);
+                Type memberInfo = mapNotification.GetType().BaseType;
+
+                if (memberInfo != null)
+                {
+                    FieldInfo fi = memberInfo.GetField("OnRemove", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+                    fi?.SetValue(mapNotification, (Action<MapNotificationItemBaseVM>)OnRemove);
+                }
 
                 __result = mapNotification;
             }

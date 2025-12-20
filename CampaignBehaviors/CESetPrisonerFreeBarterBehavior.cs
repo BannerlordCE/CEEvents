@@ -10,8 +10,7 @@ namespace CaptivityEvents.CampaignBehaviors
     {
         public override void RegisterEvents() => CampaignEvents.BarterablesRequested.AddNonSerializedListener(this, CheckForBarters);
 
-        public override void SyncData(IDataStore dataStore)
-        { }
+        public override void SyncData(IDataStore dataStore) { }
 
         public void CheckForBarters(BarterData args)
         {
@@ -24,7 +23,7 @@ namespace CaptivityEvents.CampaignBehaviors
             {
                 if (characterObject.IsHero && !FactionManager.IsAtWarAgainstFaction(characterObject.HeroObject.MapFaction, otherParty.MapFaction))
                 {
-                    if (((CESettings.Instance?.EscapeAutoRansom.SelectedIndex != 0) || !(CESettings.Instance?.EscapeAutoRansom.SelectedIndex == 1) && (!characterObject.IsPlayerCharacter || offererParty != PartyBase.MainParty)))
+                    if (((CESettings.Instance?.EscapeAutoRansom.SelectedIndex != 0) || CESettings.Instance?.EscapeAutoRansom.SelectedIndex != 1 && (!characterObject.IsPlayerCharacter || offererParty != PartyBase.MainParty)))
                     {
                         Barterable barterable = new SetPrisonerFreeBarterable(characterObject.HeroObject, args.OffererHero, args.OffererParty, args.OtherHero);
                         args.AddBarterable<PrisonerBarterGroup>(barterable);
@@ -36,7 +35,7 @@ namespace CaptivityEvents.CampaignBehaviors
             {
                 if (characterObject2.IsHero && !FactionManager.IsAtWarAgainstFaction(characterObject2.HeroObject.MapFaction, offererParty.MapFaction))
                 {
-                    if (((CESettings.Instance?.EscapeAutoRansom.SelectedIndex != 0) || !(CESettings.Instance?.EscapeAutoRansom.SelectedIndex == 1) && (!characterObject2.IsPlayerCharacter || otherParty != PartyBase.MainParty)))
+                    if (((CESettings.Instance?.EscapeAutoRansom.SelectedIndex != 0) || CESettings.Instance?.EscapeAutoRansom.SelectedIndex != 1 && (!characterObject2.IsPlayerCharacter || otherParty != PartyBase.MainParty)))
                     {
                         Barterable barterable2 = new SetPrisonerFreeBarterable(characterObject2.HeroObject, args.OtherHero, args.OtherParty, args.OffererHero);
                         args.AddBarterable<PrisonerBarterGroup>(barterable2);

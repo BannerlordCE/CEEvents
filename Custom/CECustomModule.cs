@@ -2,16 +2,10 @@
 
 namespace CaptivityEvents.Custom
 {
-    public class CECustomModule
+    public class CECustomModule(string ceModuleName, List<CEEvent> ceEvents)
     {
-        public CECustomModule(string CEModuleName, List<CEEvent> CEEvents)
-        {
-            this.CEModuleName = CEModuleName;
-            this.CEEvents = CEEvents;
-        }
+        public string CEModuleName { get; set; } = ceModuleName;
 
-        public string CEModuleName { get; set; }
-
-        public List<CEEvent> CEEvents { get; set; }
+        public List<CEEvent> CEEvents { get; set; } = ceEvents;
     }
 }

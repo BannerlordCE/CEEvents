@@ -35,9 +35,7 @@ namespace CaptivityEvents.Events
                     {
                         new CESubModule().LoadTexture("default");
 
-                        CEHelper.SafeSwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement
-                                                  ? "settlement_wait"
-                                                  : "prisoner_wait");
+                        CEHelper.SafeSwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement ? "settlement_wait" : "prisoner_wait");
                     }
                 }
                 else
@@ -58,15 +56,11 @@ namespace CaptivityEvents.Events
             {
                 if (CESettings.Instance?.SexualContent ?? true)
                 {
-                    CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale
-                                               ? "CE_captivity_sexual_escape_failure"
-                                               : "CE_captivity_sexual_escape_failure_male");
+                    CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_captivity_sexual_escape_failure" : "CE_captivity_sexual_escape_failure_male");
                 }
                 else
                 {
-                    CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale
-                                            ? "CE_captivity_escape_failure"
-                                            : "CE_captivity_escape_failure_male");
+                    CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_captivity_escape_failure" : "CE_captivity_escape_failure_male");
                 }
 
                 return;
@@ -74,15 +68,11 @@ namespace CaptivityEvents.Events
 
             if (CESettings.Instance?.SexualContent ?? true)
             {
-                CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale
-                                          ? "CE_captivity_sexual_escape_success"
-                                          : "CE_captivity_sexual_escape_success_male");
+                CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_captivity_sexual_escape_success" : "CE_captivity_sexual_escape_success_male");
             }
             else
             {
-                CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale
-                                         ? "CE_captivity_escape_success"
-                                         : "CE_captivity_escape_success_male");
+                CEHelper.SafeSwitchToMenu(Hero.MainHero.IsFemale ? "CE_captivity_escape_success" : "CE_captivity_escape_success_male");
             }
         }
 
@@ -100,7 +90,9 @@ namespace CaptivityEvents.Events
                 {
                     MobileParty.MainParty.IsCurrentlyAtSea = captorParty.MobileParty.IsCurrentlyAtSea;
                 }
+
                 PlayerCaptivity.EndCaptivity();
+
                 return;
             }
             else
@@ -132,7 +124,7 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.IsActive)
                 {
-                    captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject, 1, default, 0);
+                    captorParty.PrisonRoster.RemoveTroop(Hero.MainHero.CharacterObject);
                 }
 
                 if (Hero.MainHero.IsAlive)
@@ -140,9 +132,10 @@ namespace CaptivityEvents.Events
                     MobileParty.MainParty.IsActive = true;
                     PartyBase.MainParty.SetAsCameraFollowParty();
                     MobileParty.MainParty.SetMoveModeHold();
+
                     if (!MobileParty.MainParty.IsCurrentlyAtSea)
                     {
-                        PartyBase.MainParty.UpdateVisibilityAndInspected(MobileParty.MainParty.Position, 0f);
+                        PartyBase.MainParty.UpdateVisibilityAndInspected(MobileParty.MainParty.Position);
                     }
                 }
 
@@ -174,6 +167,7 @@ namespace CaptivityEvents.Events
             {
                 HandleRaftStateActivate(party);
             }
+
             if (army != null && army.LeaderParty.IsCurrentlyAtSea && !army.LeaderParty.HasNavalNavigationCapability)
             {
                 DisbandArmyAction.ApplyByNoShip(army);
@@ -191,17 +185,13 @@ namespace CaptivityEvents.Events
             bool wasInSettlement = PlayerCaptivity.CaptorParty.IsSettlement;
             Settlement currentSettlement = PlayerCaptivity.CaptorParty.Settlement;
 
-            TextObject textObject = GameTexts.FindText("str_CE_escape_success", wasInSettlement
-                                                    ? "settlement"
-                                                    : null);
+            TextObject textObject = GameTexts.FindText("str_CE_escape_success", wasInSettlement ? "settlement" : null);
 
             textObject.SetTextVariable("PLAYER_HERO", Hero.MainHero.Name);
 
             if (wasInSettlement)
             {
-                string settlementName = currentSettlement != null
-                    ? currentSettlement.Name.ToString()
-                    : "ERROR";
+                string settlementName = currentSettlement != null ? currentSettlement.Name.ToString() : "ERROR";
                 textObject.SetTextVariable("SETTLEMENT", settlementName);
             }
 
@@ -236,7 +226,7 @@ namespace CaptivityEvents.Events
             {
                 PlayerCaptivity.CaptorParty = party;
                 PlayerCaptivity.StartCaptivity(party);
-                CEHelper.delayedEvents.Clear();
+                CEHelper.DelayedEvents.Clear();
             }
             catch (Exception e)
             {

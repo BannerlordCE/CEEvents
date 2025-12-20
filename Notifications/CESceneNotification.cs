@@ -33,8 +33,8 @@ namespace CaptivityEvents.Notifications
 
             try
             {
-                Equipment overridenEquipmentMale = MaleHero.CivilianEquipment.Clone(false);
-                Equipment overridenEquipmentFemale = FemaleHero.CivilianEquipment.Clone(false);
+                Equipment overridenEquipmentMale = MaleHero.CivilianEquipment.Clone();
+                Equipment overridenEquipmentFemale = FemaleHero.CivilianEquipment.Clone();
 
 
                 for (int i = 0; i < Equipment.EquipmentSlotLength; i++)
@@ -43,8 +43,8 @@ namespace CaptivityEvents.Notifications
                     overridenEquipmentFemale[i] = EquipmentElement.Invalid;
                 }
 
-                list.Add(CampaignSceneNotificationHelper.CreateNotificationCharacterFromHero(MaleHero, overridenEquipmentMale, false, default, uint.MaxValue, uint.MaxValue, false));
-                list.Add(CampaignSceneNotificationHelper.CreateNotificationCharacterFromHero(FemaleHero, overridenEquipmentFemale, false, default, uint.MaxValue, uint.MaxValue, false));
+                list.Add(CampaignSceneNotificationHelper.CreateNotificationCharacterFromHero(MaleHero, overridenEquipmentMale));
+                list.Add(CampaignSceneNotificationHelper.CreateNotificationCharacterFromHero(FemaleHero, overridenEquipmentFemale));
             }
             catch (Exception e)
             {
@@ -57,6 +57,7 @@ namespace CaptivityEvents.Notifications
         public CESceneNotification(Hero maleHero, Hero femaleHero, string sceneID)
         {
             SceneID = sceneID;
+
             try
             {
                 if (maleHero == null)
@@ -73,7 +74,7 @@ namespace CaptivityEvents.Notifications
 
                 if (femaleHero == null)
                 {
-                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale != false && characterObject.Occupation == Occupation.Wanderer);
+                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale && characterObject.Occupation == Occupation.Wanderer);
                     femaleHero = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
                     femaleHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
                 }
@@ -92,6 +93,7 @@ namespace CaptivityEvents.Notifications
         public CESceneNotification(CharacterObject maleHero, CharacterObject femaleHero, string sceneID)
         {
             SceneID = sceneID;
+
             try
             {
                 if (maleHero == null)
@@ -110,7 +112,7 @@ namespace CaptivityEvents.Notifications
 
                 if (femaleHero == null)
                 {
-                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale != false && characterObject.Occupation == Occupation.Wanderer);
+                    CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale && characterObject.Occupation == Occupation.Wanderer);
                     FemaleHero = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
                     FemaleHero.CheckInvalidEquipmentsAndReplaceIfNeeded();
                 }
@@ -127,6 +129,5 @@ namespace CaptivityEvents.Notifications
                 CECustomHandler.ForceLogToFile("Invalid Scene CESceneNotification: " + e);
             }
         }
-
     }
 }

@@ -3,6 +3,7 @@
 using CaptivityEvents.Custom;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -21,23 +22,25 @@ namespace CaptivityEvents
 
         public static SkillObject IsSlave => CustomSkills[3];
 
-        public static bool IsInitialized { get; private set; } = false;
+        public static bool IsInitialized { get; private set; }
 
         internal static List<SkillObject> CustomSkills { get; private set; }
 
         internal static CharacterAttribute CEAttribute { get; private set; }
 
-        internal static readonly List<CESkillNode> NodeSkills = [
-           new CESkillNode("Prostitution", "{=CEEVENTS1106}Prostitution", "0"),
-           new CESkillNode("IsProstitute", "{=CEEVENTS1104}prostitute", "0", "1"),
-           new CESkillNode("Slavery", "{=CEEVENTS1105}Slavery", "0"),
-           new CESkillNode("IsSlave", "{=CEEVENTS1103}slave", "0", "1")
+        internal static readonly List<CESkillNode> NodeSkills =
+        [
+            new CESkillNode("Prostitution", "{=CEEVENTS1106}Prostitution", "0"),
+            new CESkillNode("IsProstitute", "{=CEEVENTS1104}prostitute", "0", "1"),
+            new CESkillNode("Slavery", "{=CEEVENTS1105}Slavery", "0"),
+            new CESkillNode("IsSlave", "{=CEEVENTS1103}slave", "0", "1")
         ];
 
 
         public static void AddCustomSkill(CESkillNode skillNode)
         {
             int index = NodeSkills.FindIndex((item) => item.Id == skillNode.Id);
+
             if (index == -1)
             {
                 NodeSkills.Add(skillNode);
@@ -60,29 +63,14 @@ namespace CaptivityEvents
             catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile(skill + " : " + e);
+
                 return null;
             }
         }
 
         public static SkillObject FindSkill(string skill)
         {
-            foreach (SkillObject skillObjectCustom in CustomSkills)
-            {
-                if (skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill)
-                {
-                    return skillObjectCustom;
-                }
-            }
-
-            foreach (SkillObject skillObject in Skills.All)
-            {
-                if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
-                {
-                    return skillObject;
-                }
-            }
-
-            return null;
+            return CustomSkills.FirstOrDefault(skillObjectCustom => skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill) ?? Skills.All.FirstOrDefault(skillObject => skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill);
         }
 
         public static void RegisterAll(Game game)
@@ -109,11 +97,12 @@ namespace CaptivityEvents
                 }
 
                 game.ObjectManager.UnregisterObject(CEAttribute);
+
                 return true;
             }
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("Uninstall Error: " + e.ToString());
+                CECustomHandler.ForceLogToFile("Uninstall Error: " + e);
                 InformationManager.DisplayMessage(new InformationMessage("Failure to Uninstall. Refer to LogFileFC.txt in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs", Colors.Red));
 
                 return false;

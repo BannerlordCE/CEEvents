@@ -17,202 +17,179 @@ using static CaptivityEvents.Helper.CEHelper;
 
 namespace CaptivityEvents.Events
 {
-    internal class CECompanionSystem
+    internal class CECompanionSystem(CEEvent listedEvent, Option option)
     {
-        private readonly CEEvent _listedEvent;
-        private readonly List<CEEvent> _eventList;
-        private readonly Option _option;
-
         private readonly Dynamics _dynamics = new();
         private readonly ScoresCalculation _score = new();
         private readonly CEImpregnationSystem _impregnation = new();
-        private readonly CEVariablesLoader _variableLoader = new();
-
-        public CECompanionSystem(CEEvent listedEvent, Option option, List<CEEvent> eventList)
-        {
-            _listedEvent = listedEvent;
-            _option = option;
-            _eventList = eventList;
-        }
 
         internal void ConsequenceCompanions(CharacterObject hero, PartyBase party)
         {
-            if (_option.Companions != null)
+            if (option.Companions == null) return;
+
+            try
             {
-                try
+                foreach (Companion companion in option.Companions)
                 {
-                    foreach (Companion companion in _option.Companions)
+                    List<Hero> heroes = [];
+
+                    if (companion.Ref != null)
                     {
                         Hero referenceHero;
-                        List<Hero> heroes = [];
 
-                        if (companion.Ref != null)
+                        switch (companion.Ref.ToLower())
                         {
-                            switch (companion.Ref.ToLower())
+                            case "hero":
+                                if (!hero.IsHero) { continue; }
+
+                                referenceHero = hero.HeroObject;
+
+                                break;
+
+                            case "captor":
+                                if (party.LeaderHero != null) { continue; }
+
+                                referenceHero = party.LeaderHero;
+
+                                break;
+
+                            default:
+                                referenceHero = Hero.MainHero;
+
+                                break;
+                        }
+
+                        if (companion.Type != null)
+                        {
+                            switch (companion.Type.ToLower())
                             {
-                                case "hero":
-                                    if (!hero.IsHero) { continue; }
-                                    referenceHero = hero.HeroObject;
-                                    break;
-
-                                case "captor":
-                                    if (party.LeaderHero != null) { continue; }
-                                    referenceHero = party.LeaderHero;
-                                    break;
-
-                                default:
-                                    referenceHero = Hero.MainHero;
-                                    break;
-                            }
-
-                            if (companion.Type != null)
-                            {
-                                switch (companion.Type.ToLower())
-                                {
-                                    case "spouse":
-                                        if (referenceHero.Spouse == null) continue;
-                                        heroes.Add(referenceHero.Spouse);
-                                        break;
-
-                                    case "companion":
-                                        if (referenceHero.Clan == null) continue;
-                                        foreach (Hero companionHero in referenceHero.Clan.Companions)
-                                        {
-                                            heroes.Add(companionHero);
-                                        }
-                                        break;
-
-                                    default:
-                                        if (referenceHero.Spouse != null)
-                                        {
-                                            heroes.Add(referenceHero.Spouse);
-                                        }
-                                        if (referenceHero.Clan != null)
-                                        {
-                                            foreach (Hero companionHero in referenceHero.Clan.Companions)
-                                            {
-                                                heroes.Add(companionHero);
-                                            }
-                                        }
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                if (referenceHero.Spouse != null)
-                                {
+                                case "spouse":
+                                    if (referenceHero.Spouse == null) continue;
                                     heroes.Add(referenceHero.Spouse);
-                                }
-                                if (referenceHero.Clan != null)
-                                {
-                                    foreach (Hero companionHero in referenceHero.Clan.Companions)
-                                    {
-                                        heroes.Add(companionHero);
-                                    }
-                                }
-                            }
-                        }
-                        else if (companion.Id != null)
-                        {
-                            Hero heroCompanion = _listedEvent.SavedCompanions.FirstOrDefault((item) => item.Key == companion.Id).Value;
-                            if (hero != null) heroes.Add(heroCompanion);
-                        }
 
-                        if (heroes.Count == 0) continue;
-
-                        if (companion.Location != null)
-                        {
-                            switch (companion.Location.ToLower())
-                            {
-                                case "prisoner":
-                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedToAsPrisoner != party && companionHero.IsPrisoner; });
                                     break;
 
-                                case "party":
-                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedTo?.Party != null && companionHero.PartyBelongedTo.Party != party && !companionHero.PartyBelongedTo.IsGarrison; });
-                                    break;
+                                case "companion":
+                                    if (referenceHero.Clan == null) continue;
 
-                                case "settlement":
-                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.CurrentSettlement != null; });
-                                    break;
+                                    heroes.AddRange(referenceHero.Clan.Companions);
 
-                                case "current prisoner":
-                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedToAsPrisoner == party; });
-                                    break;
-
-                                case "current":
-                                    heroes = heroes.FindAll((companionHero) => { return companionHero?.PartyBelongedTo?.Party == party; });
                                     break;
 
                                 default:
+                                    if (referenceHero.Spouse != null)
+                                    {
+                                        heroes.Add(referenceHero.Spouse);
+                                    }
+
+                                    if (referenceHero.Clan != null)
+                                    {
+                                        heroes.AddRange(referenceHero.Clan.Companions);
+                                    }
+
                                     break;
                             }
-                            if (heroes.Count == 0) continue;
                         }
-
-                        if (companion.UseOtherConditions != null && companion.UseOtherConditions.ToLower() != "false")
+                        else
                         {
-                            CEEvent triggeredEvent = CEPersistence.CEEventList.Find(item => item.Name == companion.UseOtherConditions);
-
-                            if (triggeredEvent == null) continue;
-
-                            heroes = heroes.FindAll((companionHero) =>
+                            if (referenceHero.Spouse != null)
                             {
-                                string conditionals = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(companionHero.CharacterObject, party);
-                                if (conditionals != null)
-                                {
-                                    CECustomHandler.LogToFile(conditionals);
-                                    return false;
-                                }
-                                else
-                                {
-                                    return true;
-                                }
-                            });
-                        }
+                                heroes.Add(referenceHero.Spouse);
+                            }
 
-                        if (heroes.Count == 0) continue;
-
-                        Hero heroSelected = heroes.GetRandomElement();
-
-                        try
-                        {
-                            ConsequenceForceMarry(companion, heroSelected);
-                            ConsequenceLeaveSpouse(companion, heroSelected);
-                            ConsequenceGold(companion, heroSelected);
-                            ConsequenceChangeGold(companion, heroSelected);
-                            ConsequenceChangeCaptorGold(companion, heroSelected);
-                            ConsequenceRenown(companion, heroSelected);
-                            ConsequenceChangeCaptorRenown(companion, heroSelected);
-                            ConsequenceChangeHealth(companion, heroSelected);
-                            ConsequenceChangeTrait(companion, heroSelected);
-                            ConsequenceChangeSkill(companion, heroSelected);
-                            ConsequenceSlaveryFlags(companion, heroSelected);
-                            ConsequenceProstitutionFlags(companion, heroSelected);
-                            ConsequenceChangeMorale(companion, heroSelected);
-                            ConsequenceSpecificCaptorRelations(companion, heroSelected);
-                            ConsequenceImpregnation(companion, heroSelected);
-                            ConsequenceImpregnationByLeader(companion, heroSelected);
-                            ConsequenceImpregnationByPlayer(companion, heroSelected);
-                            ConsequenceChangeClan(companion, heroSelected);
-                            ConsequenceChangeKingdom(companion, heroSelected);
-                            ConsequenceEscape(companion, heroSelected);
-                            ConsequenceRelease(companion, heroSelected);
-                            ConsequenceWoundPrisoner(companion, heroSelected);
-                            ConsequenceKillPrisoner(companion, heroSelected);
-                            ConsequenceStrip(companion, heroSelected);
-                            ConsequenceGainRandomPrisoners(companion, heroSelected);
-                        }
-                        catch (Exception e)
-                        {
-                            CECustomHandler.ForceLogToFile("Incorrect ConsequenceCompanions heroSelected: " + e.ToString() + _listedEvent.Name);
+                            if (referenceHero.Clan != null)
+                            {
+                                heroes.AddRange(referenceHero.Clan.Companions);
+                            }
                         }
                     }
+                    else if (companion.Id != null)
+                    {
+                        Hero heroCompanion = listedEvent.SavedCompanions.FirstOrDefault((item) => item.Key == companion.Id).Value;
+                        if (hero != null) heroes.Add(heroCompanion);
+                    }
+
+                    if (heroes.Count == 0) continue;
+
+                    if (companion.Location != null)
+                    {
+                        heroes = companion.Location.ToLower() switch
+                                 {
+                                     "prisoner" => heroes.FindAll((companionHero) => companionHero?.PartyBelongedToAsPrisoner != party && companionHero is { IsPrisoner: true }),
+                                     "party" => heroes.FindAll((companionHero) => companionHero?.PartyBelongedTo?.Party != null && companionHero.PartyBelongedTo.Party != party && !companionHero.PartyBelongedTo.IsGarrison),
+                                     "settlement" => heroes.FindAll((companionHero) => companionHero?.CurrentSettlement != null),
+                                     "current prisoner" => heroes.FindAll((companionHero) => companionHero?.PartyBelongedToAsPrisoner == party),
+                                     "current" => heroes.FindAll((companionHero) => companionHero?.PartyBelongedTo?.Party == party),
+                                     _ => heroes
+                                 };
+
+                        if (heroes.Count == 0) continue;
+                    }
+
+                    if (companion.UseOtherConditions != null && companion.UseOtherConditions.ToLower() != "false")
+                    {
+                        CEEvent triggeredEvent = CEPersistence.CEEventList.Find(item => item.Name == companion.UseOtherConditions);
+
+                        if (triggeredEvent == null) continue;
+
+                        heroes = heroes.FindAll((companionHero) =>
+                                                {
+                                                    string conditionals = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(companionHero.CharacterObject, party);
+
+                                                    if (conditionals != null)
+                                                    {
+                                                        CECustomHandler.LogToFile(conditionals);
+
+                                                        return false;
+                                                    }
+                                                    else
+                                                    {
+                                                        return true;
+                                                    }
+                                                });
+                    }
+
+                    if (heroes.Count == 0) continue;
+
+                    Hero heroSelected = heroes.GetRandomElement();
+
+                    try
+                    {
+                        ConsequenceForceMarry(companion, heroSelected);
+                        ConsequenceLeaveSpouse(companion, heroSelected);
+                        ConsequenceGold(companion, heroSelected);
+                        ConsequenceChangeGold(companion, heroSelected);
+                        ConsequenceChangeCaptorGold(companion, heroSelected);
+                        ConsequenceRenown(companion, heroSelected);
+                        ConsequenceChangeCaptorRenown(companion, heroSelected);
+                        ConsequenceChangeHealth(companion, heroSelected);
+                        ConsequenceChangeTrait(companion, heroSelected);
+                        ConsequenceChangeSkill(companion, heroSelected);
+                        ConsequenceSlaveryFlags(companion, heroSelected);
+                        ConsequenceProstitutionFlags(companion, heroSelected);
+                        ConsequenceChangeMorale(companion, heroSelected);
+                        ConsequenceSpecificCaptorRelations(companion, heroSelected);
+                        ConsequenceImpregnation(companion, heroSelected);
+                        ConsequenceImpregnationByLeader(companion, heroSelected);
+                        ConsequenceImpregnationByPlayer(companion, heroSelected);
+                        ConsequenceChangeClan(companion, heroSelected);
+                        ConsequenceChangeKingdom(companion, heroSelected);
+                        ConsequenceEscape(companion, heroSelected);
+                        ConsequenceRelease(companion, heroSelected);
+                        ConsequenceWoundPrisoner(companion, heroSelected);
+                        ConsequenceKillPrisoner(companion, heroSelected);
+                        ConsequenceStrip(companion, heroSelected);
+                        ConsequenceGainRandomPrisoners(companion, heroSelected);
+                    }
+                    catch (Exception e)
+                    {
+                        CECustomHandler.ForceLogToFile("Incorrect ConsequenceCompanions heroSelected: " + e + listedEvent.Name);
+                    }
                 }
-                catch (Exception e)
-                {
-                    CECustomHandler.ForceLogToFile("Incorrect ConsequenceCompanions: " + e.ToString() + _listedEvent.Name);
-                }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Incorrect ConsequenceCompanions: " + e + listedEvent.Name);
             }
         }
 
@@ -245,8 +222,10 @@ namespace CaptivityEvents.Events
             {
                 int level = 0;
 
-                if (!string.IsNullOrEmpty(companion.GoldTotal)) level = new CEVariablesLoader().GetIntFromXML(companion.GoldTotal);
-                else CECustomHandler.LogToFile("Missing GoldTotal");
+                if (!string.IsNullOrEmpty(companion.GoldTotal))
+                    level = new CEVariablesLoader().GetIntFromXML(companion.GoldTotal);
+                else
+                    CECustomHandler.LogToFile("Missing GoldTotal");
 
                 GiveGoldAction.ApplyBetweenCharacters(null, hero, level);
             }
@@ -263,8 +242,10 @@ namespace CaptivityEvents.Events
             {
                 int level = 0;
 
-                if (!string.IsNullOrEmpty(companion.GoldTotal)) level = new CEVariablesLoader().GetIntFromXML(companion.GoldTotal);
-                else CECustomHandler.LogToFile("Missing GoldTotal");
+                if (!string.IsNullOrEmpty(companion.GoldTotal))
+                    level = new CEVariablesLoader().GetIntFromXML(companion.GoldTotal);
+                else
+                    CECustomHandler.LogToFile("Missing GoldTotal");
 
                 GiveGoldAction.ApplyBetweenCharacters(null, hero.PartyBelongedToAsPrisoner.LeaderHero, level);
             }
@@ -325,19 +306,20 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                if (companion.TraitsToLevel != null && companion.TraitsToLevel.Count(TraitToLevel => TraitToLevel.Ref.ToLower() == "hero") != 0)
+                if (companion.TraitsToLevel == null || companion.TraitsToLevel.Count(traitToLevel => traitToLevel.Ref.ToLower() == "hero") == 0) return;
+
+                foreach (TraitToLevel traitToLevel in companion.TraitsToLevel)
                 {
-                    foreach (TraitToLevel traitToLevel in companion.TraitsToLevel)
-                    {
-                        int level = 0;
-                        int xp = 0;
+                    int level = 0;
+                    int xp = 0;
 
-                        if (traitToLevel.Ref.ToLower() == "captor" && hero.PartyBelongedToAsPrisoner.LeaderHero == null) continue;
-                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+                    if (traitToLevel.Ref.ToLower() == "captor" && hero.PartyBelongedToAsPrisoner.LeaderHero == null) continue;
 
-                        _dynamics.TraitModifier(traitToLevel.Ref.ToLower() != "hero" ? hero.PartyBelongedToAsPrisoner.LeaderHero : hero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
-                    }
+                    if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel))
+                        level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
+                    else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
+
+                    _dynamics.TraitModifier(traitToLevel.Ref.ToLower() != "hero" ? hero.PartyBelongedToAsPrisoner.LeaderHero : hero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
@@ -347,19 +329,20 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                if (companion.SkillsToLevel != null && companion.SkillsToLevel.Count(SkillToLevel => SkillToLevel.Ref.ToLower() == "hero") != 0)
+                if (companion.SkillsToLevel == null || companion.SkillsToLevel.Count(skillToLevel => skillToLevel.Ref.ToLower() == "hero") == 0) return;
+
+                foreach (SkillToLevel skillToLevel in companion.SkillsToLevel)
                 {
-                    foreach (SkillToLevel skillToLevel in companion.SkillsToLevel)
-                    {
-                        int level = 0;
-                        int xp = 0;
+                    int level = 0;
+                    int xp = 0;
 
-                        if (skillToLevel.Ref.ToLower() == "captor" && hero.PartyBelongedToAsPrisoner.LeaderHero == null) continue;
-                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+                    if (skillToLevel.Ref.ToLower() == "captor" && hero.PartyBelongedToAsPrisoner.LeaderHero == null) continue;
 
-                        new Dynamics().SkillModifier(skillToLevel.Ref.ToLower() != "hero" ? hero.PartyBelongedToAsPrisoner.LeaderHero : hero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
-                    }
+                    if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel))
+                        level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
+                    else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
+
+                    new Dynamics().SkillModifier(skillToLevel.Ref.ToLower() != "hero" ? hero.PartyBelongedToAsPrisoner.LeaderHero : hero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                 }
             }
             catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
@@ -367,20 +350,22 @@ namespace CaptivityEvents.Events
 
         internal void ConsequenceSlaveryFlags(Companion companion, Hero hero)
         {
-            bool InformationMessage = !companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
-            bool NoMessages = companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoMessages);
+            bool informationMessage = !companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
+            bool noMessages = companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoMessages);
 
-            if (companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddSlaveryFlag)) _dynamics.VictimSlaveryModifier(1, hero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
-            else if (companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveSlaveryFlag)) _dynamics.VictimSlaveryModifier(0, hero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
+            if (companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddSlaveryFlag))
+                _dynamics.VictimSlaveryModifier(1, hero, true, !informationMessage && !noMessages, informationMessage && !noMessages);
+            else if (companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveSlaveryFlag)) _dynamics.VictimSlaveryModifier(0, hero, true, !informationMessage && !noMessages, informationMessage && !noMessages);
         }
 
         internal void ConsequenceProstitutionFlags(Companion companion, Hero hero)
         {
-            bool InformationMessage = !companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
-            bool NoMessages = companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoMessages);
+            bool informationMessage = !companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
+            bool noMessages = companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoMessages);
 
-            if (companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag)) _dynamics.VictimProstitutionModifier(1, hero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
-            else if (companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) _dynamics.VictimProstitutionModifier(0, hero, true, !InformationMessage && !NoMessages, InformationMessage && !NoMessages);
+            if (companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.AddProstitutionFlag))
+                _dynamics.VictimProstitutionModifier(1, hero, true, !informationMessage && !noMessages, informationMessage && !noMessages);
+            else if (companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.RemoveProstitutionFlag)) _dynamics.VictimProstitutionModifier(0, hero, true, !informationMessage && !noMessages, informationMessage && !noMessages);
         }
 
         internal void ConsequenceChangeMorale(Companion companion, Hero hero)
@@ -406,17 +391,17 @@ namespace CaptivityEvents.Events
         private void ConsequenceSpecificCaptorRelations(Companion companion, Hero hero)
         {
             if (!companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeRelation)) return;
-            bool InformationMessage = !companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
-            bool NoMessages = companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoMessages);
+            bool informationMessage = !companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoInformationMessage);
+            bool noMessages = companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.NoMessages);
 
             try
             {
-                _dynamics.RelationsModifier(hero, new CEVariablesLoader().GetIntFromXML(companion.RelationTotal), null, InformationMessage && !NoMessages, !InformationMessage && !NoMessages);
+                _dynamics.RelationsModifier(hero, new CEVariablesLoader().GetIntFromXML(companion.RelationTotal), null, informationMessage && !noMessages, !informationMessage && !noMessages);
             }
             catch (Exception)
             {
                 CECustomHandler.LogToFile("Missing RelationTotal");
-                _dynamics.RelationsModifier(hero, MBRandom.RandomInt(-5, 5), null, InformationMessage && !NoMessages, !InformationMessage && !NoMessages);
+                _dynamics.RelationsModifier(hero, MBRandom.RandomInt(-5, 5), null, informationMessage && !noMessages, !informationMessage && !noMessages);
             }
         }
 
@@ -475,16 +460,20 @@ namespace CaptivityEvents.Events
         {
             if (companion.ClanOptions == null) return;
 
-            if (hero.PartyBelongedToAsPrisoner != null && hero.PartyBelongedToAsPrisoner.LeaderHero != null) _dynamics.ClanChange(companion.ClanOptions, hero, hero.PartyBelongedToAsPrisoner.LeaderHero);
-            else _dynamics.ClanChange(companion.ClanOptions, hero, null);
+            if (hero.PartyBelongedToAsPrisoner?.LeaderHero != null)
+                _dynamics.ClanChange(companion.ClanOptions, hero, hero.PartyBelongedToAsPrisoner.LeaderHero);
+            else
+                _dynamics.ClanChange(companion.ClanOptions, hero);
         }
 
         private void ConsequenceChangeKingdom(Companion companion, Hero hero)
         {
             if (companion.KingdomOptions == null) return;
 
-            if (hero.PartyBelongedToAsPrisoner != null && hero.PartyBelongedToAsPrisoner.LeaderHero != null) _dynamics.KingdomChange(companion.KingdomOptions, hero, hero.PartyBelongedToAsPrisoner.LeaderHero);
-            else _dynamics.KingdomChange(companion.KingdomOptions, hero, null);
+            if (hero.PartyBelongedToAsPrisoner?.LeaderHero != null)
+                _dynamics.KingdomChange(companion.KingdomOptions, hero, hero.PartyBelongedToAsPrisoner.LeaderHero);
+            else
+                _dynamics.KingdomChange(companion.KingdomOptions, hero);
         }
 
         private void ConsequenceEscape(Companion companion, Hero hero)
@@ -497,7 +486,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("Failure of companion escape: " + e.ToString());
+                CECustomHandler.ForceLogToFile("Failure of companion escape: " + e);
             }
         }
 
@@ -505,13 +494,17 @@ namespace CaptivityEvents.Events
         {
             if (hero.IsPrisoner && companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundPrisoner))
             {
-                hero.MakeWounded(null);
+                hero.MakeWounded();
             }
 
             if (companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.WoundCaptor))
             {
-                if (!hero.IsPrisoner) hero.MakeWounded();
-                else if (hero?.PartyBelongedToAsPrisoner?.LeaderHero != null) hero.PartyBelongedToAsPrisoner.LeaderHero.MakeWounded();
+                if (!hero.IsPrisoner)
+                    hero.MakeWounded();
+                else
+                {
+                    hero.PartyBelongedToAsPrisoner?.LeaderHero?.MakeWounded();
+                }
             }
         }
 
@@ -519,14 +512,17 @@ namespace CaptivityEvents.Events
         {
             if (hero.IsPrisoner && companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillPrisoner))
             {
-                if (hero?.PartyBelongedToAsPrisoner?.LeaderHero != null) KillCharacterAction.ApplyByExecution(hero, hero?.PartyBelongedToAsPrisoner?.LeaderHero);
-                else KillCharacterAction.ApplyByMurder(hero);
+                if (hero.PartyBelongedToAsPrisoner?.LeaderHero != null)
+                    KillCharacterAction.ApplyByExecution(hero, hero.PartyBelongedToAsPrisoner?.LeaderHero);
+                else
+                    KillCharacterAction.ApplyByMurder(hero);
             }
 
             if (companion.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.KillCaptor))
             {
-                if (!hero.IsPrisoner) KillCharacterAction.ApplyByMurder(hero);
-                else if (hero?.PartyBelongedToAsPrisoner?.LeaderHero != null) KillCharacterAction.ApplyByMurder(hero?.PartyBelongedToAsPrisoner?.LeaderHero);
+                if (!hero.IsPrisoner)
+                    KillCharacterAction.ApplyByMurder(hero);
+                else if (hero.PartyBelongedToAsPrisoner?.LeaderHero != null) KillCharacterAction.ApplyByMurder(hero.PartyBelongedToAsPrisoner?.LeaderHero);
             }
         }
 
@@ -545,7 +541,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("Failure of ConsequenceRelease: " + e.ToString());
+                CECustomHandler.ForceLogToFile("Failure of ConsequenceRelease: " + e);
             }
         }
 
@@ -556,9 +552,7 @@ namespace CaptivityEvents.Events
                 if (hero == null) return;
                 Equipment randomElement = new();
 
-                ItemObject itemObjectBody = hero.IsFemale
-                    ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
-                    : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
+                ItemObject itemObjectBody = hero.IsFemale ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress") : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
                 randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
                 Equipment randomElement2 = new();
                 randomElement2.FillFrom(randomElement, false);
@@ -573,13 +567,19 @@ namespace CaptivityEvents.Events
                     {
                         if (!hero.BattleEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(hero.BattleEquipment.GetEquipmentFromSlot(i).Item, 1);
                     }
-                    catch (Exception) { }
+                    catch (Exception e)
+                    {
+                        CECustomHandler.ForceLogToFile("BattleEquipment: " + e);
+                    }
 
                     try
                     {
                         if (!hero.CivilianEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(hero.CivilianEquipment.GetEquipmentFromSlot(i).Item, 1);
                     }
-                    catch (Exception) { }
+                    catch (Exception e)
+                    {
+                        CECustomHandler.ForceLogToFile("CivilianEquipment: " + e);
+                    }
                 }
 
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, randomElement);

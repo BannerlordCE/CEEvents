@@ -11,7 +11,6 @@ using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.ComponentInterfaces;
-using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.LogEntries;
 using TaleWorlds.CampaignSystem.MapNotificationTypes;
@@ -30,36 +29,40 @@ namespace CaptivityEvents.CampaignBehaviors
     {
         private readonly Dynamics _dynamics = new();
 
-        #region Events
+#region Events
 
-        private bool LaunchCaptorEvent(CEEvent OverrideEvent = null)
+        private bool LaunchCaptorEvent(CEEvent overrideEvent = null)
         {
             if (CESettings.Instance?.EventCaptorNotifications ?? true)
             {
-                if (notificationCaptorExists || progressEventExists) return false;
+                if (NotificationCaptorExists || ProgressEventExists) return false;
             }
 
             CEEvent returnedEvent;
-            if (OverrideEvent == null)
+
+            if (overrideEvent == null)
             {
                 CharacterObject captive = MobileParty.MainParty.Party.PrisonRoster.GetTroopRoster().GetRandomElement().Character;
                 returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyLeader(captive);
             }
             else
             {
-                returnedEvent = OverrideEvent;
+                returnedEvent = overrideEvent;
             }
 
             if (returnedEvent == null) return false;
-            notificationCaptorExists = true;
+            NotificationCaptorExists = true;
 
             if (CESettings.Instance?.EventCaptorNotifications ?? true)
             {
                 try
                 {
-                    if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName)) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName);
-                    else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_sexual_notification");
-                    else new CESubModule().LoadCampaignNotificationTexture("CE_castle_notification");
+                    if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName))
+                        new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName);
+                    else if (returnedEvent.SexualContent)
+                        new CESubModule().LoadCampaignNotificationTexture("CE_sexual_notification");
+                    else
+                        new CESubModule().LoadCampaignNotificationTexture("CE_castle_notification");
                 }
                 catch (Exception e)
                 {
@@ -73,56 +76,49 @@ namespace CaptivityEvents.CampaignBehaviors
             }
             else
             {
-                if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+                if (Game.Current.GameStateManager.ActiveState is not MapState mapState) return true;
+                Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+
+                if (!mapState.AtMenu)
                 {
-                    Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-
-                    if (!mapState.AtMenu)
-                    {
-                        _extraVariables.menuToSwitchBackTo = null;
-                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
-                        CEHelper.SafeActivateGameMenu("prisoner_wait");
-                    }
-                    else
-                    {
-                        _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                    }
-
-                    CEHelper.SafeSwitchToMenu(returnedEvent.Name);
+                    _extraVariables.MenuToSwitchBackTo = null;
+                    _extraVariables.CurrentBackgroundMeshNameToSwitchBackTo = null;
+                    CEHelper.SafeActivateGameMenu("prisoner_wait");
                 }
+                else
+                {
+                    _extraVariables.MenuToSwitchBackTo = mapState.GameMenuId;
+                    _extraVariables.CurrentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                }
+
+                CEHelper.SafeSwitchToMenu(returnedEvent.Name);
             }
 
             return true;
         }
 
-        private bool LaunchRandomEvent(CEEvent OverrideEvent = null)
+        private static bool LaunchRandomEvent(CEEvent overrideEvent = null)
         {
             if (CESettings.Instance?.EventCaptorNotifications ?? true)
             {
-                if (notificationEventExists || progressEventExists) return false;
+                if (NotificationEventExists || ProgressEventExists) return false;
             }
 
-            CEEvent returnedEvent;
-            if (OverrideEvent == null)
-            {
-                returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsRandom();
-            }
-            else
-            {
-                returnedEvent = OverrideEvent;
-            }
+            CEEvent returnedEvent = overrideEvent ?? CEEventManager.ReturnWeightedChoiceOfEventsRandom();
 
             if (returnedEvent == null) return false;
-            notificationEventExists = true;
+            NotificationEventExists = true;
 
             if (CESettings.Instance?.EventCaptorNotifications ?? true)
             {
                 try
                 {
-                    if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName)) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
-                    else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
-                    else new CESubModule().LoadCampaignNotificationTexture("CE_random_notification", 1);
+                    if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName))
+                        new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
+                    else if (returnedEvent.SexualContent)
+                        new CESubModule().LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
+                    else
+                        new CESubModule().LoadCampaignNotificationTexture("CE_random_notification", 1);
                 }
                 catch (Exception e)
                 {
@@ -142,14 +138,14 @@ namespace CaptivityEvents.CampaignBehaviors
 
                     if (!mapState.AtMenu)
                     {
-                        _extraVariables.menuToSwitchBackTo = null;
-                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
+                        _extraVariables.MenuToSwitchBackTo = null;
+                        _extraVariables.CurrentBackgroundMeshNameToSwitchBackTo = null;
                         CEHelper.SafeActivateGameMenu("prisoner_wait");
                     }
                     else
                     {
-                        _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                        _extraVariables.MenuToSwitchBackTo = mapState.GameMenuId;
+                        _extraVariables.CurrentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                     }
 
                     CEHelper.SafeSwitchToMenu(returnedEvent.Name);
@@ -159,33 +155,27 @@ namespace CaptivityEvents.CampaignBehaviors
             return true;
         }
 
-        private bool LaunchPartyEnterEvent(MobileParty party, Settlement settlement, CEEvent OverrideEvent = null)
+        private static void LaunchPartyEnterEvent(MobileParty party, Settlement settlement, CEEvent overrideEvent = null)
         {
             if (CESettings.Instance?.EventCaptorNotifications ?? true)
             {
-                if (notificationEventExists || progressEventExists) return false;
+                if (NotificationEventExists || ProgressEventExists) return;
             }
 
-            CEEvent returnedEvent;
-            if (OverrideEvent == null)
-            {
-                returnedEvent = CEEventManager.ReturnWeightedChoiceOfEventsPartyEnterSettlement(party, settlement);
-            }
-            else
-            {
-                returnedEvent = OverrideEvent;
-            }
+            CEEvent returnedEvent = overrideEvent ?? CEEventManager.ReturnWeightedChoiceOfEventsPartyEnterSettlement(party, settlement);
 
-            if (returnedEvent == null) return false;
-            notificationEventExists = true;
+            if (returnedEvent == null) return;
 
             if (CESettings.Instance?.EventCaptorNotifications ?? true)
             {
                 try
                 {
-                    if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName)) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
-                    else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
-                    else new CESubModule().LoadCampaignNotificationTexture("CE_random_notification", 1);
+                    if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName))
+                        new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
+                    else if (returnedEvent.SexualContent)
+                        new CESubModule().LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
+                    else
+                        new CESubModule().LoadCampaignNotificationTexture("CE_random_notification", 1);
                 }
                 catch (Exception e)
                 {
@@ -199,30 +189,26 @@ namespace CaptivityEvents.CampaignBehaviors
             }
             else
             {
-                if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+                if (Game.Current.GameStateManager.ActiveState is not MapState mapState) return;
+                Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
+
+                if (!mapState.AtMenu)
                 {
-                    Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-
-                    if (!mapState.AtMenu)
-                    {
-                        _extraVariables.menuToSwitchBackTo = null;
-                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = null;
-                        CEHelper.SafeActivateGameMenu("prisoner_wait");
-                    }
-                    else
-                    {
-                        _extraVariables.menuToSwitchBackTo = mapState.GameMenuId;
-                        _extraVariables.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
-                    }
-
-                    CEHelper.SafeSwitchToMenu(returnedEvent.Name);
+                    _extraVariables.MenuToSwitchBackTo = null;
+                    _extraVariables.CurrentBackgroundMeshNameToSwitchBackTo = null;
+                    CEHelper.SafeActivateGameMenu("prisoner_wait");
                 }
-            }
+                else
+                {
+                    _extraVariables.MenuToSwitchBackTo = mapState.GameMenuId;
+                    _extraVariables.CurrentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                }
 
-            return true;
+                CEHelper.SafeSwitchToMenu(returnedEvent.Name);
+            }
         }
 
-        private void OnPartyEnteredSettlement(MobileParty party, Settlement settlement, Hero hero)
+        private static void OnPartyEnteredSettlement(MobileParty party, Settlement settlement, Hero hero)
         {
             // Skip if party is null
             if (party == null) return;
@@ -245,7 +231,7 @@ namespace CaptivityEvents.CampaignBehaviors
             // Random chance to trigger (configurable via settings, default 10%)
             int randomNumber = MBRandom.RandomInt(100);
             float fireChance = CESettings.Instance?.EventRandomFireChance ?? 20f;
-            
+
             // Use a lower chance for party enter events (half of random event chance)
             if (randomNumber >= fireChance / 2) return;
 
@@ -265,131 +251,158 @@ namespace CaptivityEvents.CampaignBehaviors
         private CEEvent CheckDelayedCaptorEvent()
         {
             CEEvent eventToFire = null;
-            bool shouldFireEvent = delayedEvents.Any(item =>
+
+            bool shouldFireEvent = DelayedEvents.Any(item =>
+                                                     {
+                                                         if (item.eventName != null && item.eventTime < CampaignTime.Now.ElapsedHoursUntilNow)
+                                                         {
+                                                             CECustomHandler.LogToFile("Firing " + item.eventName);
+
+                                                             if (item.conditions)
+                                                             {
+                                                                 string result = CEEventManager.FireSpecificEventPartyLeader(item.eventName, out CEEvent ceEvent, true, item.heroName);
+
+                                                                 switch (result)
+                                                                 {
+                                                                     case "$FAILEDTOFIND":
+                                                                         CECustomHandler.LogToFile("Failed to load event list.");
+
+                                                                         break;
+
+                                                                     case "$EVENTNOTFOUND":
+                                                                         CECustomHandler.LogToFile("Event not found.");
+
+                                                                         break;
+
+                                                                     case "$EVENTCONDITIONSNOTMET":
+                                                                         CECustomHandler.LogToFile("Event conditions are not met.");
+
+                                                                         break;
+
+                                                                     default:
+                                                                         if (result.StartsWith("$"))
+                                                                         {
+                                                                             CECustomHandler.LogToFile(result.Substring(1));
+                                                                         }
+                                                                         else
+                                                                         {
+                                                                             eventToFire = ceEvent;
+                                                                             item.hasBeenFired = true;
+
+                                                                             return true;
+                                                                         }
+
+                                                                         break;
+                                                                 }
+                                                             }
+                                                             else
+                                                             {
+                                                                 eventToFire = CEPersistence.CECaptorEvents.FirstOrDefault(ceevent => ceevent.Name.ToLower() == item.eventName.ToLower());
+
+                                                                 if (eventToFire == null)
+                                                                 {
+                                                                     eventToFire = null;
+
+                                                                     return false;
+                                                                 }
+
+                                                                 item.hasBeenFired = true;
+
+                                                                 return true;
+                                                             }
+                                                         }
+
+                                                         return false;
+                                                     });
+
+            if (!shouldFireEvent) return null;
+
             {
-                if (item.eventName != null && item.eventTime < CampaignTime.Now.ElapsedHoursUntilNow)
-                {
-                    CECustomHandler.LogToFile("Firing " + item.eventName);
-                    if (item.conditions == true)
-                    {
-                        string result = CEEventManager.FireSpecificEventPartyLeader(item.eventName, out CEEvent ceEvent, true, item.heroName);
-                        switch (result)
-                        {
-                            case "$FAILEDTOFIND":
-                                CECustomHandler.LogToFile("Failed to load event list.");
-                                break;
+                DelayedEvents.RemoveAll(item => item.hasBeenFired);
 
-                            case "$EVENTNOTFOUND":
-                                CECustomHandler.LogToFile("Event not found.");
-                                break;
-
-                            case "$EVENTCONDITIONSNOTMET":
-                                CECustomHandler.LogToFile("Event conditions are not met.");
-                                break;
-
-                            default:
-                                if (result.StartsWith("$"))
-                                {
-                                    CECustomHandler.LogToFile(result.Substring(1));
-                                }
-                                else
-                                {
-                                    eventToFire = ceEvent;
-                                    item.hasBeenFired = true;
-                                    return true;
-                                }
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        eventToFire = CEPersistence.CECaptorEvents.FirstOrDefault(ceevent => ceevent.Name.ToLower() == item.eventName.ToLower());
-                        if (eventToFire == null)
-                        {
-                            eventToFire = null;
-                            return false;
-                        }
-                        item.hasBeenFired = true;
-                        return true;
-                    }
-                }
-                return false;
-            });
-
-            if (shouldFireEvent)
-            {
-                delayedEvents.RemoveAll(item => item.hasBeenFired);
                 return eventToFire;
             }
-            return null;
         }
 
-        private CEEvent CheckDelayedRandomEvent()
+        private static CEEvent CheckDelayedRandomEvent()
         {
             CEEvent eventToFire = null;
-            bool shouldFireEvent = delayedEvents.Any(item =>
+
+            bool shouldFireEvent = DelayedEvents.Any(item =>
+                                                     {
+                                                         if (item.eventName != null && item.eventTime < CampaignTime.Now.ElapsedHoursUntilNow)
+                                                         {
+                                                             CECustomHandler.LogToFile("Firing " + item.eventName);
+
+                                                             if (item.conditions)
+                                                             {
+                                                                 string result = CEEventManager.FireSpecificEventRandom(item.eventName, out CEEvent ceEvent, true);
+
+                                                                 switch (result)
+                                                                 {
+                                                                     case "$FAILEDTOFIND":
+                                                                         CECustomHandler.LogToFile("Failed to load event list.");
+
+                                                                         break;
+
+                                                                     case "$EVENTNOTFOUND":
+                                                                         CECustomHandler.LogToFile("Event not found.");
+
+                                                                         break;
+
+                                                                     case "$EVENTCONDITIONSNOTMET":
+                                                                         CECustomHandler.LogToFile("Event conditions are not met.");
+
+                                                                         break;
+
+                                                                     default:
+                                                                         if (result.StartsWith("$"))
+                                                                         {
+                                                                             CECustomHandler.LogToFile(result.Substring(1));
+                                                                         }
+                                                                         else
+                                                                         {
+                                                                             eventToFire = ceEvent;
+                                                                             item.hasBeenFired = true;
+
+                                                                             return true;
+                                                                         }
+
+                                                                         break;
+                                                                 }
+                                                             }
+                                                             else
+                                                             {
+                                                                 eventToFire = CEPersistence.CERandomEvents.FirstOrDefault(ceevent => ceevent.Name.ToLower() == item.eventName.ToLower());
+
+                                                                 if (eventToFire == null)
+                                                                 {
+                                                                     eventToFire = null;
+
+                                                                     return false;
+                                                                 }
+
+                                                                 item.hasBeenFired = true;
+
+                                                                 return true;
+                                                             }
+                                                         }
+
+                                                         return false;
+                                                     });
+
+            if (!shouldFireEvent) return null;
+
             {
-                if (item.eventName != null && item.eventTime < CampaignTime.Now.ElapsedHoursUntilNow)
-                {
-                    CECustomHandler.LogToFile("Firing " + item.eventName);
-                    if (item.conditions == true)
-                    {
-                        string result = CEEventManager.FireSpecificEventRandom(item.eventName, out CEEvent ceEvent, true);
-                        switch (result)
-                        {
-                            case "$FAILEDTOFIND":
-                                CECustomHandler.LogToFile("Failed to load event list.");
-                                break;
+                DelayedEvents.RemoveAll(item => item.hasBeenFired);
 
-                            case "$EVENTNOTFOUND":
-                                CECustomHandler.LogToFile("Event not found.");
-                                break;
-
-                            case "$EVENTCONDITIONSNOTMET":
-                                CECustomHandler.LogToFile("Event conditions are not met.");
-                                break;
-
-                            default:
-                                if (result.StartsWith("$"))
-                                {
-                                    CECustomHandler.LogToFile(result.Substring(1));
-                                }
-                                else
-                                {
-                                    eventToFire = ceEvent;
-                                    item.hasBeenFired = true;
-                                    return true;
-                                }
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        eventToFire = CEPersistence.CERandomEvents.FirstOrDefault(ceevent => ceevent.Name.ToLower() == item.eventName.ToLower());
-                        if (eventToFire == null)
-                        {
-                            eventToFire = null;
-                            return false;
-                        }
-                        item.hasBeenFired = true;
-                        return true;
-                    }
-                }
-                return false;
-            });
-
-            if (shouldFireEvent)
-            {
-                delayedEvents.RemoveAll(item => item.hasBeenFired);
                 return eventToFire;
             }
-
-            return null;
         }
 
         private bool CheckEventHourly()
         {
-            if (progressEventExists) return false;
+            if (ProgressEventExists) return false;
             _hoursPassed++;
 
             float value = CESettings.Instance?.EventOccurrenceRandom ?? 12f;
@@ -407,24 +420,23 @@ namespace CaptivityEvents.CampaignBehaviors
             }
 
             if (!(_hoursPassed > value)) return false;
-            notificationEventCheck = true;
-            notificationCaptorCheck = true;
+            NotificationEventCheck = true;
+            NotificationCaptorCheck = true;
             _hoursPassed = 0;
+
             return true;
         }
 
-        #endregion Events
+#endregion Events
 
-        #region Pregnancy
+#region Pregnancy
 
         private void OnChildConceived(Hero hero)
         {
             try
             {
-                if (spouseOne == null && spouseTwo == null) return;
-                Hero father = spouseOne == hero
-                    ? spouseTwo
-                    : spouseOne;
+                if (SpouseOne == null && SpouseTwo == null) return;
+                Hero father = SpouseOne == hero ? SpouseTwo : SpouseOne;
                 CECustomHandler.ForceLogToFile("Added " + hero.Name + "'s Pregnancy");
                 _heroPregnancies.Add(new Pregnancy(hero, father, CampaignTime.DaysFromNow(CESettings.Instance?.PregnancyDurationInDays ?? 14f)));
                 ChangeMenu(0);
@@ -439,29 +451,20 @@ namespace CaptivityEvents.CampaignBehaviors
         /// <summary>
         /// Change Weight
         /// </summary>
+        /// <param name="stage"></param>
         /// <param name="weight"></param>
         /// <param name="hero"></param>
         public static void ChangeWeight(Hero hero, int stage, float weight = 0.3f)
         {
             if (stage != 0) weight = hero.Weight;
 
-            switch (stage)
-            {
-                case 1:
-                    weight = MBMath.ClampFloat(weight + 0.01f, 0.3f, 0.7f);
-                    break;
-
-                case 2:
-                    weight = MBMath.ClampFloat(weight + 0.01f, 0.3f, 0.95f);
-                    break;
-
-                case 3:
-                    weight = 1f;
-                    break;
-
-                default:
-                    break;
-            }
+            weight = stage switch
+                     {
+                         1 => MBMath.ClampFloat(weight + 0.01f, 0.3f, 0.7f),
+                         2 => MBMath.ClampFloat(weight + 0.01f, 0.3f, 0.95f),
+                         3 => 1f,
+                         _ => weight
+                     };
 
             hero.Weight = weight;
         }
@@ -539,21 +542,17 @@ namespace CaptivityEvents.CampaignBehaviors
         {
             try
             {
-
                 PregnancyModel pregnancyModel = Campaign.Current.Models.PregnancyModel;
 
                 Hero mother = pregnancy.Mother;
-                bool flag = MBRandom.RandomFloat <= pregnancyModel.DeliveringTwinsProbability;
                 List<Hero> aliveOffspring = [];
 
-                int num = flag ? 2 : 1;
                 int stillbornCount = 0;
 
                 string[] validCultures = ["khuzait", "battania", "aserai", "sturgia", "vlandia", "empire", "nord"];
 
                 for (int i = 0; i < 1; i++)
                 {
-
                     if (MBRandom.RandomFloat > pregnancyModel.StillbirthProbability)
                     {
                         bool isOffspringFemale = MBRandom.RandomFloat <= pregnancyModel.DeliveringFemaleOffspringProbability;
@@ -575,6 +574,7 @@ namespace CaptivityEvents.CampaignBehaviors
                                     StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, textObject);
                                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString()));
                                 }
+
                                 stillbornCount++;
                             }
                         }
@@ -608,32 +608,36 @@ namespace CaptivityEvents.CampaignBehaviors
 
                 if (mother == Hero.MainHero || pregnancy.Father == Hero.MainHero)
                 {
-                    TextObject textObject = mother == Hero.MainHero
-                        ? new TextObject("{=oIA9lkpc}You have given birth to {DELIVERED_CHILDREN}.")
-                        : new TextObject("{=CEEVENTS1092}Your captive {MOTHER.NAME} has given birth to {DELIVERED_CHILDREN}.");
+                    TextObject textObject = mother == Hero.MainHero ? new TextObject("{=oIA9lkpc}You have given birth to {DELIVERED_CHILDREN}.") : new TextObject("{=CEEVENTS1092}Your captive {MOTHER.NAME} has given birth to {DELIVERED_CHILDREN}.");
 
                     switch (stillbornCount)
                     {
                         case 2:
                             textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=Sn9a1Aba}two stillborn babies"));
+
                             break;
 
                         case 1 when aliveOffspring.Count == 0:
                             textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=qWLq2y84}a stillborn baby"));
+
                             break;
 
                         case 1 when aliveOffspring.Count == 1:
                             textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=CEEVENTS1168}one healthy and one stillborn baby"));
+
                             break;
 
                         case 0 when aliveOffspring.Count == 1:
                             textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=CEEVENTS1169}a healthy baby"));
+
                             break;
 
                         case 0 when aliveOffspring.Count == 2:
                             textObject.SetTextVariable("DELIVERED_CHILDREN", new TextObject("{=CEEVENTS1170}two healthy babies"));
+
                             break;
                     }
+
                     StringHelpers.SetCharacterProperties("MOTHER", mother.CharacterObject, textObject);
                     AddQuickInformation(textObject);
                 }
@@ -646,6 +650,7 @@ namespace CaptivityEvents.CampaignBehaviors
                         LogEntry.AddLogEntry(childbirthLogEntry);
                         Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new ChildBornMapNotification(null, childbirthLogEntry.GetEncyclopediaText(), CampaignTime.Now));
                     }
+
                     foreach (Hero newbornHero in aliveOffspring)
                     {
                         ChildbirthLogEntry childbirthLogEntry2 = new(mother, newbornHero);
@@ -682,36 +687,24 @@ namespace CaptivityEvents.CampaignBehaviors
             {
                 foreach (CEEvent triggeredEvent in CEPersistence.CEAlternativePregnancyEvents)
                 {
-
                     string conditionMatched = "InvalidEvent";
+
                     if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                     {
-                        if (PlayerCaptivity.IsCaptive)
-                        {
-                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
-                        }
-                        else
-                        {
-                            conditionMatched = "PlayerNotCaptive";
-                        }
+                        conditionMatched = PlayerCaptivity.IsCaptive ? new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty) : "PlayerNotCaptive";
                     }
                     else if (triggeredEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                     {
-                        if (!PlayerCaptivity.IsCaptive)
-                        {
-                            conditionMatched = new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
-                        }
-                        else
-                        {
-                            conditionMatched = "PlayerCaptive";
-                        }
+                        conditionMatched = !PlayerCaptivity.IsCaptive ? new CEEventChecker(triggeredEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter) : "PlayerCaptive";
                     }
 
                     if (conditionMatched != null)
                     {
                         CECustomHandler.LogToFile(conditionMatched);
+
                         continue;
                     }
+
                     int weightedChance = 0;
 
                     try
@@ -794,9 +787,9 @@ namespace CaptivityEvents.CampaignBehaviors
             try
             {
                 _heroPregnancies.ForEach(item =>
-                {
-                    item.Mother.IsPregnant = false;
-                });
+                                         {
+                                             item.Mother.IsPregnant = false;
+                                         });
                 _heroPregnancies = [];
 
                 return true;
@@ -807,11 +800,11 @@ namespace CaptivityEvents.CampaignBehaviors
             }
         }
 
-        #endregion Pregnancy
+#endregion Pregnancy
 
-        #region Equipment
+#region Equipment
 
-        private void CheckEquipmentToReturn(ReturnEquipment returnEquipment)
+        private static void CheckEquipmentToReturn(ReturnEquipment returnEquipment)
         {
             try
             {
@@ -826,14 +819,20 @@ namespace CaptivityEvents.CampaignBehaviors
                         EquipmentElement fetchedEquipment = returnEquipment.BattleEquipment.GetEquipmentFromSlot(i);
                         returnEquipment.Captive.BattleEquipment.AddEquipmentToSlotWithoutAgent(i, fetchedEquipment);
                     }
-                    catch (Exception) { }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
 
                     try
                     {
                         EquipmentElement fetchedEquipment2 = returnEquipment.CivilianEquipment.GetEquipmentFromSlot(i);
                         returnEquipment.Captive.CivilianEquipment.AddEquipmentToSlotWithoutAgent(i, fetchedEquipment2);
                     }
-                    catch (Exception) { }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
                 }
 
                 returnEquipment.AlreadyOccurred = true;
@@ -853,7 +852,7 @@ namespace CaptivityEvents.CampaignBehaviors
             if (!_returnEquipment.Exists(item => item.Captive == captive)) _returnEquipment.Add(new ReturnEquipment(captive, battleEquipment, civilianEquipment));
         }
 
-        #endregion Equipment
+#endregion Equipment
 
         public void OnHeroKilled(Hero victim, Hero killer, KillCharacterAction.KillCharacterActionDetail detail, bool showNotification)
         {
@@ -868,26 +867,22 @@ namespace CaptivityEvents.CampaignBehaviors
 
                 try
                 {
-                    bool shouldEventsFire = !progressEventExists;
+                    bool shouldEventsFire = !ProgressEventExists;
 
-                    if (delayedEvents.Count > 0 && shouldEventsFire)
+                    if (DelayedEvents.Count > 0 && shouldEventsFire)
                     {
                         CEEvent captorEventCheck = CheckDelayedCaptorEvent();
                         CEEvent randomEventCheck = CheckDelayedRandomEvent();
 
                         if (captorEventCheck != null)
                         {
-                            notificationCaptorExists = false;
+                            NotificationCaptorExists = false;
                             LaunchCaptorEvent(captorEventCheck);
                         }
                         else if (randomEventCheck != null)
                         {
-                            notificationEventExists = false;
+                            NotificationEventExists = false;
                             LaunchCaptorEvent(randomEventCheck);
-                        }
-                        else
-                        {
-                            shouldEventsFire = true;
                         }
                     }
 
@@ -924,18 +919,18 @@ namespace CaptivityEvents.CampaignBehaviors
             try
             {
                 _heroPregnancies.ForEach(item =>
-                {
-                    if (item.Mother != null && !item.AlreadyOccurred)
-                    {
-                        item.Mother.IsPregnant = true;
-                        CheckPregnancy(item);
-                    }
-                    else
-                    {
-                        item.AlreadyOccurred = true;
-                        ChangeMenu(0);
-                    }
-                });
+                                         {
+                                             if (item.Mother != null && !item.AlreadyOccurred)
+                                             {
+                                                 item.Mother.IsPregnant = true;
+                                                 CheckPregnancy(item);
+                                             }
+                                             else
+                                             {
+                                                 item.AlreadyOccurred = true;
+                                                 ChangeMenu(0);
+                                             }
+                                         });
                 _heroPregnancies.RemoveAll(item => item.AlreadyOccurred);
             }
             catch (Exception e)
@@ -969,13 +964,13 @@ namespace CaptivityEvents.CampaignBehaviors
 
         private void OnHeroPrisonerReleased(Hero prisoner, PartyBase party, IFaction capturerFaction, EndCaptivityDetail detail, bool showNotification)
         {
-            CESkills.NodeSkills.ForEach((CESkillNode skillNode) =>
-            {
-                if (skillNode.SetZeroOnEscape)
-                {
-                    _dynamics.ResetCustomSkill(prisoner, skillNode.Id, false);
-                }
-            });
+            CESkills.NodeSkills.ForEach((skillNode) =>
+                                        {
+                                            if (skillNode.SetZeroOnEscape)
+                                            {
+                                                _dynamics.ResetCustomSkill(prisoner, skillNode.Id, false);
+                                            }
+                                        });
         }
 
         public override void RegisterEvents()
@@ -987,7 +982,7 @@ namespace CaptivityEvents.CampaignBehaviors
             CampaignEvents.DailyTickEvent.AddNonSerializedListener(this, OnDailyTick);
 
             CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, OnHeroKilled);
-            
+
             // Party entered settlement events
             CampaignEvents.SettlementEntered.AddNonSerializedListener(this, OnPartyEnteredSettlement);
         }
@@ -1023,17 +1018,13 @@ namespace CaptivityEvents.CampaignBehaviors
 
         public class Pregnancy(Hero pregnantHero, Hero father, CampaignTime dueDate)
         {
-            [SaveableField(1)]
-            public readonly Hero Mother = pregnantHero;
+            [SaveableField(1)] public readonly Hero Mother = pregnantHero;
 
-            [SaveableField(2)]
-            public readonly Hero Father = father;
+            [SaveableField(2)] public readonly Hero Father = father;
 
-            [SaveableField(3)]
-            public readonly CampaignTime DueDate = dueDate;
+            [SaveableField(3)] public readonly CampaignTime DueDate = dueDate;
 
-            [SaveableField(4)]
-            public bool AlreadyOccurred = false;
+            [SaveableField(4)] public bool AlreadyOccurred;
         }
 
         public class ReturnEquipment
@@ -1050,17 +1041,13 @@ namespace CaptivityEvents.CampaignBehaviors
                 AlreadyOccurred = false;
             }
 
-            [SaveableField(1)]
-            public readonly Hero Captive;
+            [SaveableField(1)] public readonly Hero Captive;
 
-            [SaveableField(2)]
-            public readonly Equipment CivilianEquipment;
+            [SaveableField(2)] public readonly Equipment CivilianEquipment;
 
-            [SaveableField(3)]
-            public readonly Equipment BattleEquipment;
+            [SaveableField(3)] public readonly Equipment BattleEquipment;
 
-            [SaveableField(4)]
-            public bool AlreadyOccurred;
+            [SaveableField(4)] public bool AlreadyOccurred;
         }
 
         public class ExtraVariables
@@ -1068,25 +1055,22 @@ namespace CaptivityEvents.CampaignBehaviors
             public void ResetVariables()
             {
                 Owner = null;
-                menuToSwitchBackTo = null;
-                currentBackgroundMeshNameToSwitchBackTo = null;
+                MenuToSwitchBackTo = null;
+                CurrentBackgroundMeshNameToSwitchBackTo = null;
 
-                notificationCaptorCheck = false;
-                notificationEventCheck = false;
-                notificationCaptorExists = false;
-                notificationEventExists = false;
+                NotificationCaptorCheck = false;
+                NotificationEventCheck = false;
+                NotificationCaptorExists = false;
+                NotificationEventExists = false;
 
-                progressEventExists = false;
+                ProgressEventExists = false;
             }
 
-            [SaveableField(1)]
-            public Hero Owner;
+            [SaveableField(1)] public Hero Owner;
 
-            [SaveableField(2)]
-            public string menuToSwitchBackTo;
+            [SaveableField(2)] public string MenuToSwitchBackTo;
 
-            [SaveableField(3)]
-            public string currentBackgroundMeshNameToSwitchBackTo;
+            [SaveableField(3)] public string CurrentBackgroundMeshNameToSwitchBackTo;
         }
     }
 }

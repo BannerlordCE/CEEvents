@@ -3,7 +3,6 @@ using SandBox.CampaignBehaviors;
 
 namespace CaptivityEvents.Patches
 {
-
     [HarmonyPatch(typeof(AlleyCampaignBehavior))]
     internal class CEPatchAlleyCampaignBehavior
     {
@@ -11,9 +10,9 @@ namespace CaptivityEvents.Patches
         [HarmonyPostfix]
         private static void OnPlayerRetreatedFromMission()
         {
-            if (CEPersistence.battleState == CEPersistence.BattleState.AfterBattle)
+            if (CEPersistence.CurrentBattleState == CEPersistence.BattleState.AfterBattle)
             {
-                CEPersistence.playerSurrendered = true;
+                CEPersistence.PlayerSurrendered = true;
             }
         }
 
@@ -21,9 +20,9 @@ namespace CaptivityEvents.Patches
         [HarmonyPostfix]
         private static void OnPlayerDiedInMission()
         {
-            if (CEPersistence.battleState == CEPersistence.BattleState.AfterBattle)
+            if (CEPersistence.CurrentBattleState == CEPersistence.BattleState.AfterBattle)
             {
-                CEPersistence.playerDied = true;
+                CEPersistence.PlayerDied = true;
             }
         }
     }

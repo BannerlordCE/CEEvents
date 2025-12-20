@@ -38,6 +38,7 @@ namespace CaptivityEvents.Config
                 if (!File.Exists(_fullSettingsPath))
                 {
                     InformationManager.DisplayMessage(new InformationMessage($"Settings file not found: {_fullSettingsPath}", Colors.Red));
+
                     return;
                 }
 
@@ -47,6 +48,7 @@ namespace CaptivityEvents.Config
                 if (root == null)
                 {
                     InformationManager.DisplayMessage(new InformationMessage("Invalid CESettings.xml structure.", Colors.Red));
+
                     return;
                 }
 
@@ -67,24 +69,22 @@ namespace CaptivityEvents.Config
 
                 // Try to set the value on the ViewModel using reflection
                 var property = _viewModel.GetType().GetProperty(name);
+
                 if (property != null && property.CanWrite)
                 {
                     try
                     {
                         if (property.PropertyType == typeof(bool))
                         {
-                            if (bool.TryParse(value, out var boolValue))
-                                property.SetValue(_viewModel, boolValue);
+                            if (bool.TryParse(value, out var boolValue)) property.SetValue(_viewModel, boolValue);
                         }
                         else if (property.PropertyType == typeof(int))
                         {
-                            if (int.TryParse(value, out var intValue))
-                                property.SetValue(_viewModel, intValue);
+                            if (int.TryParse(value, out var intValue)) property.SetValue(_viewModel, intValue);
                         }
                         else if (property.PropertyType == typeof(float))
                         {
-                            if (float.TryParse(value, out var floatValue))
-                                property.SetValue(_viewModel, floatValue);
+                            if (float.TryParse(value, out var floatValue)) property.SetValue(_viewModel, floatValue);
                         }
                     }
                     catch { }
@@ -96,18 +96,17 @@ namespace CaptivityEvents.Config
         {
             try
             {
-                if (_settingsDocument == null)
-                    return;
+                if (_settingsDocument == null) return;
 
                 // Update XML from ViewModel properties
                 foreach (var prop in _viewModel.GetType().GetProperties())
                 {
                     var element = _settingsDocument.Root?.Element(prop.Name);
+
                     if (element != null)
                     {
                         var value = prop.GetValue(_viewModel);
-                        if (value != null)
-                            element.Value = value.ToString();
+                        if (value != null) element.Value = value.ToString();
                     }
                 }
 
@@ -123,11 +122,13 @@ namespace CaptivityEvents.Config
         {
             SaveSettings();
             base.OnFinalize();
+
             if (_gauntletLayer != null)
             {
                 RemoveLayer(_gauntletLayer);
                 _gauntletLayer = null;
             }
+
             _viewModel = null;
         }
     }

@@ -17,12 +17,10 @@ namespace CaptivityEvents.Events
 {
     public class CEImpregnationSystem
     {
-
         public Hero GenerateARandomHero()
         {
-            Hero randomSoldier;
             CharacterObject m = MBObjectManager.Instance.GetObject<CharacterObject>("gangster_2");
-            randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
+            Hero randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
             DisableHeroAction.Apply(randomSoldier);
 
             return randomSoldier;
@@ -39,10 +37,7 @@ namespace CaptivityEvents.Events
                 {
                     if (!(CESettings.Instance?.UsePregnancyModifiers ?? true)) modifier = 0;
 
-                    if (CEHelper.HelperMBRandom(100)
-                        >= ((CESettings.Instance?.AttractivenessSkill ?? true)
-                            ? score.AttractivenessScore(targetHero) / 20 + modifier
-                            : CESettings.Instance?.PregnancyChance + modifier))
+                    if (CEHelper.HelperMBRandom(100) >= ((CESettings.Instance?.AttractivenessSkill ?? true) ? score.AttractivenessScore(targetHero) / 20 + modifier : CESettings.Instance?.PregnancyChance + modifier))
                     {
                         return;
                     }
@@ -51,8 +46,10 @@ namespace CaptivityEvents.Events
 
                     if (senderHero != null)
                     {
-                        if (!senderHero.IsFemale || (senderHero.IsFemale && CESettings.Instance.PregnancyToggleFemalexFemale)) randomSoldier = senderHero;
-                        else return;
+                        if (!senderHero.IsFemale || (senderHero.IsFemale && CESettings.Instance is { PregnancyToggleFemalexFemale: true }))
+                            randomSoldier = senderHero;
+                        else
+                            return;
                     }
                     else if (targetHero.CurrentSettlement?.Party != null && !targetHero.CurrentSettlement.Party.MemberRoster.GetTroopRoster().IsEmpty())
                     {
@@ -87,10 +84,10 @@ namespace CaptivityEvents.Events
                     textObject3.SetTextVariable("SPOUSE", randomSoldier.Name);
                     InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
 
-                    CEHelper.spouseOne = randomSoldier;
-                    CEHelper.spouseTwo = targetHero;
+                    CEHelper.SpouseOne = randomSoldier;
+                    CEHelper.SpouseTwo = targetHero;
                     MakePregnantAction.Apply(targetHero);
-                    CEHelper.spouseOne = CEHelper.spouseTwo = null;
+                    CEHelper.SpouseOne = CEHelper.SpouseTwo = null;
 
                     //RelationsModifier(randomSoldier, 50, targetHero);
                 }
@@ -99,10 +96,10 @@ namespace CaptivityEvents.Events
                     CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
                     Hero randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.BornSettlement, null, null, CEHelper.HelperMBRandom(20) + 20);
                     DisableHeroAction.Apply(randomSoldier);
-                    CEHelper.spouseOne = randomSoldier;
-                    CEHelper.spouseTwo = targetHero;
+                    CEHelper.SpouseOne = randomSoldier;
+                    CEHelper.SpouseTwo = targetHero;
                     MakePregnantAction.Apply(targetHero);
-                    CEHelper.spouseOne = CEHelper.spouseTwo = null;
+                    CEHelper.SpouseOne = CEHelper.SpouseTwo = null;
                     TextObject textObject4 = new("{PLAYER_HERO} forced impregnated by {PLAYER_SPOUSE}.");
                     textObject4.SetTextVariable("PLAYER_HERO", targetHero.Name);
                     textObject4.SetTextVariable("PLAYER_SPOUSE", randomSoldier.Name);
@@ -114,10 +111,7 @@ namespace CaptivityEvents.Events
                 if (!(CESettings.Instance?.PregnancyToggle ?? true)) return;
                 if (!(CESettings.Instance?.UsePregnancyModifiers ?? true)) modifier = 0;
 
-                if (!forcePreg && CEHelper.HelperMBRandom(100)
-                    >= ((CESettings.Instance?.AttractivenessSkill ?? true)
-                        ? score.AttractivenessScore(targetHero) / 20 + modifier
-                        : CESettings.Instance?.PregnancyChance + modifier))
+                if (!forcePreg && CEHelper.HelperMBRandom(100) >= ((CESettings.Instance?.AttractivenessSkill ?? true) ? score.AttractivenessScore(targetHero) / 20 + modifier : CESettings.Instance?.PregnancyChance + modifier))
                 {
                     return;
                 }
@@ -126,8 +120,10 @@ namespace CaptivityEvents.Events
 
                 if (senderHero != null)
                 {
-                    if (senderHero.IsFemale && !senderHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(senderHero) && IsHeroAgeSuitableForPregnancy(senderHero)) randomSoldier = senderHero;
-                    else return;
+                    if (senderHero.IsFemale && !senderHero.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(senderHero) && IsHeroAgeSuitableForPregnancy(senderHero))
+                        randomSoldier = senderHero;
+                    else
+                        return;
                 }
                 else if (targetHero.CurrentSettlement?.Party != null && !targetHero.CurrentSettlement.Party.MemberRoster.GetTroopRoster().IsEmpty())
                 {
@@ -142,6 +138,7 @@ namespace CaptivityEvents.Events
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, settlementCurrent, null, null, CEHelper.HelperMBRandom(15) + 18);
                     } while (!IsHeroAgeSuitableForPregnancy(randomSoldier));
+
                     DisableHeroAction.Apply(randomSoldier);
                 }
                 else if (targetHero.PartyBelongedTo != null)
@@ -156,6 +153,7 @@ namespace CaptivityEvents.Events
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.PartyBelongedTo.HomeSettlement, null, null, CEHelper.HelperMBRandom(15) + 18);
                     } while (!IsHeroAgeSuitableForPregnancy(randomSoldier));
+
                     DisableHeroAction.Apply(randomSoldier);
                 }
                 else
@@ -170,10 +168,10 @@ namespace CaptivityEvents.Events
                 textObject3.SetTextVariable("SPOUSE", targetHero.Name);
                 InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
 
-                CEHelper.spouseOne = randomSoldier;
-                CEHelper.spouseTwo = targetHero;
+                CEHelper.SpouseOne = randomSoldier;
+                CEHelper.SpouseTwo = targetHero;
                 MakePregnantAction.Apply(randomSoldier);
-                CEHelper.spouseOne = CEHelper.spouseTwo = null;
+                CEHelper.SpouseOne = CEHelper.SpouseTwo = null;
 
                 //RelationsModifier(randomSoldier, 50, targetHero);
             }
@@ -190,10 +188,7 @@ namespace CaptivityEvents.Events
                 {
                     if (!(CESettings.Instance?.UsePregnancyModifiers ?? true)) modifier = 0;
 
-                    if (CEHelper.HelperMBRandom(100)
-                        >= ((CESettings.Instance?.AttractivenessSkill ?? true)
-                            ? scoresCalculation.AttractivenessScore(targetHero) / 20 + modifier
-                            : CESettings.Instance?.PregnancyChance + modifier))
+                    if (CEHelper.HelperMBRandom(100) >= ((CESettings.Instance?.AttractivenessSkill ?? true) ? scoresCalculation.AttractivenessScore(targetHero) / 20 + modifier : CESettings.Instance?.PregnancyChance + modifier))
                     {
                         return;
                     }
@@ -202,8 +197,10 @@ namespace CaptivityEvents.Events
 
                     if (captorHero != null)
                     {
-                        if (!captorHero.IsFemale || (captorHero.IsFemale && CESettings.Instance.PregnancyToggleFemalexFemale)) randomSoldier = captorHero;
-                        else return;
+                        if (!captorHero.IsFemale || (captorHero.IsFemale && CESettings.Instance is { PregnancyToggleFemalexFemale: true }))
+                            randomSoldier = captorHero;
+                        else
+                            return;
                     }
                     else if (lord && CECampaignBehavior.ExtraProps.Owner != null)
                     {
@@ -239,6 +236,7 @@ namespace CaptivityEvents.Events
                     else
                     {
                         CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
+
                         if (m == null) return;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(20) + 20);
                         DisableHeroAction.Apply(randomSoldier);
@@ -252,10 +250,10 @@ namespace CaptivityEvents.Events
 
                     randomSoldier.SetHasMet();
 
-                    CEHelper.spouseOne = randomSoldier;
-                    CEHelper.spouseTwo = targetHero;
+                    CEHelper.SpouseOne = randomSoldier;
+                    CEHelper.SpouseTwo = targetHero;
                     MakePregnantAction.Apply(targetHero);
-                    CEHelper.spouseOne = CEHelper.spouseTwo = null;
+                    CEHelper.SpouseOne = CEHelper.SpouseTwo = null;
 
                     //RelationsModifier(randomSoldier, 50, targetHero);
                 }
@@ -264,10 +262,10 @@ namespace CaptivityEvents.Events
                     CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale == false && characterObject.Occupation == Occupation.Wanderer);
                     Hero randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.BornSettlement, null, null, CEHelper.HelperMBRandom(20) + 20);
                     DisableHeroAction.Apply(randomSoldier);
-                    CEHelper.spouseOne = randomSoldier;
-                    CEHelper.spouseTwo = targetHero;
+                    CEHelper.SpouseOne = randomSoldier;
+                    CEHelper.SpouseTwo = targetHero;
                     MakePregnantAction.Apply(targetHero);
-                    CEHelper.spouseOne = CEHelper.spouseTwo = null;
+                    CEHelper.SpouseOne = CEHelper.SpouseTwo = null;
                     TextObject textObject4 = new("{PLAYER_HERO} forced impregnated by {PLAYER_SPOUSE}.");
                     textObject4.SetTextVariable("PLAYER_HERO", targetHero.Name);
                     textObject4.SetTextVariable("PLAYER_SPOUSE", randomSoldier.Name);
@@ -279,10 +277,7 @@ namespace CaptivityEvents.Events
                 if (!(CESettings.Instance?.PregnancyToggle ?? true)) return;
                 if (!(CESettings.Instance?.UsePregnancyModifiers ?? true)) modifier = 0;
 
-                if (CEHelper.HelperMBRandom(100)
-                    >= ((CESettings.Instance?.AttractivenessSkill ?? true)
-                        ? scoresCalculation.AttractivenessScore(targetHero) / 20 + modifier
-                        : CESettings.Instance?.PregnancyChance + modifier))
+                if (CEHelper.HelperMBRandom(100) >= ((CESettings.Instance?.AttractivenessSkill ?? true) ? scoresCalculation.AttractivenessScore(targetHero) / 20 + modifier : CESettings.Instance?.PregnancyChance + modifier))
                 {
                     return;
                 }
@@ -292,11 +287,13 @@ namespace CaptivityEvents.Events
                 if (captorHero != null)
                 {
                     randomSoldier = captorHero;
+
                     if (!(randomSoldier.IsFemale && !randomSoldier.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(randomSoldier))) return;
                 }
                 else if (lord && targetHero.PartyBelongedToAsPrisoner != null && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty?.LeaderHero != null)
                 {
                     randomSoldier = targetHero.PartyBelongedToAsPrisoner.MobileParty.LeaderHero;
+
                     if (!(randomSoldier.IsFemale && !randomSoldier.IsPregnant && !CECampaignBehavior.CheckIfPregnancyExists(randomSoldier))) return;
                 }
                 else if (targetHero.PartyBelongedToAsPrisoner != null && targetHero.PartyBelongedToAsPrisoner.IsMobile && targetHero.PartyBelongedToAsPrisoner.MobileParty != null)
@@ -311,6 +308,7 @@ namespace CaptivityEvents.Events
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.PartyBelongedToAsPrisoner.MobileParty.HomeSettlement, null, null, CEHelper.HelperMBRandom(15) + 18);
                     } while (!IsHeroAgeSuitableForPregnancy(randomSoldier));
+
                     DisableHeroAction.Apply(randomSoldier);
                 }
                 else if (targetHero.PartyBelongedToAsPrisoner != null && targetHero.PartyBelongedToAsPrisoner.IsSettlement && targetHero.PartyBelongedToAsPrisoner.Settlement.Party != null && !targetHero.PartyBelongedToAsPrisoner.Settlement.Party.MemberRoster.GetTroopRoster().IsEmpty())
@@ -326,11 +324,13 @@ namespace CaptivityEvents.Events
                         CharacterObject m = troopRosterElements.GetRandomElement().Character;
                         if (targetHero.PartyBelongedToAsPrisoner.MobileParty != null) randomSoldier = HeroCreator.CreateSpecialHero(m, targetHero.PartyBelongedToAsPrisoner.MobileParty.HomeSettlement, null, null, CEHelper.HelperMBRandom(15) + 18);
                     } while (!IsHeroAgeSuitableForPregnancy(randomSoldier));
+
                     DisableHeroAction.Apply(randomSoldier);
                 }
                 else
                 {
                     CharacterObject m = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == CharacterObject.PlayerCharacter.Culture && characterObject.IsFemale && characterObject.Occupation == Occupation.Wanderer);
+
                     if (m == null) return;
                     randomSoldier = HeroCreator.CreateSpecialHero(m, SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == m.Culture), null, null, CEHelper.HelperMBRandom(15) + 18);
                     DisableHeroAction.Apply(randomSoldier);
@@ -344,12 +344,12 @@ namespace CaptivityEvents.Events
                     textObject3.SetTextVariable("SPOUSE", targetHero.Name);
                     InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
 
-                    CEHelper.spouseOne = randomSoldier;
+                    CEHelper.SpouseOne = randomSoldier;
                     randomSoldier.SetHasMet();
 
-                    CEHelper.spouseTwo = targetHero;
+                    CEHelper.SpouseTwo = targetHero;
                     MakePregnantAction.Apply(randomSoldier);
-                    CEHelper.spouseOne = CEHelper.spouseTwo = null;
+                    CEHelper.SpouseOne = CEHelper.SpouseTwo = null;
                 }
 
                 //RelationsModifier(randomSoldier, 50, targetHero);

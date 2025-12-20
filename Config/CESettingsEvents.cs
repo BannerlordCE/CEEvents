@@ -18,13 +18,14 @@ namespace CaptivityEvents.Config
     {
         private FluentGlobalSettings _settings;
 
-        private static CESettingsEvents _instance = null;
+        private static CESettingsEvents _instance;
 
         public static CESettingsEvents Instance
         {
             get
             {
                 _instance ??= new CESettingsEvents();
+
                 return _instance;
             }
         }
@@ -50,6 +51,7 @@ namespace CaptivityEvents.Config
                 {
                     eventModuleId += 1;
                     eventId = 0;
+
                     foreach (CEEvent currentEvent in module.CEEvents)
                     {
                         eventId += 1;
@@ -93,21 +95,22 @@ namespace CaptivityEvents.Config
                             folderName += "/" + currentEvent.Name;
 
                             builder.CreateGroup(folderName, groupBuilder =>
-                            {
-                                EventToggle.Add(currentEvent.Name, true);
-                                EventSettings.Add(currentEvent.Name, new CESettingsEvent());
+                                                            {
+                                                                EventToggle.Add(currentEvent.Name, true);
+                                                                EventSettings.Add(currentEvent.Name, new CESettingsEvent());
 
-                                string hintText = currentEvent.Text.Length <= 300 ? currentEvent.Text : (currentEvent.Text.Substring(0, 300) + "...");
+                                                                string hintText = currentEvent.Text.Length <= 300 ? currentEvent.Text : (currentEvent.Text.Substring(0, 300) + "...");
 
-                                groupBuilder.AddToggle(currentEvent.Name + "_" + eventModuleId + "_" + eventId + "_toggle", "{=CESETTINGS1123}Event", new ProxyRef<bool>(() => EventToggle[currentEvent.Name], o => EventToggle[currentEvent.Name] = o), boolBuilder => boolBuilder.SetHintText(hintText).SetRequireRestart(false).SetOrder(0));
+                                                                groupBuilder.AddToggle(currentEvent.Name + "_" + eventModuleId + "_" + eventId + "_toggle", "{=CESETTINGS1123}Event", new ProxyRef<bool>(() => EventToggle[currentEvent.Name], o => EventToggle[currentEvent.Name] = o), boolBuilder => boolBuilder.SetHintText(hintText).SetRequireRestart(false).SetOrder(0));
 
-                                groupBuilder.AddText(currentEvent.Name + "_" + eventModuleId + "_" + eventId + "_weight", "{=CESETTINGS1124}Custom Event Frequency", new ProxyRef<string>(() => EventSettings[currentEvent.Name].WeightedChanceOfOccurring, o => EventSettings[currentEvent.Name].WeightedChanceOfOccurring = o), stringBuilder => stringBuilder.SetHintText("{=CESETTINGS1126}Default is " + currentEvent.WeightedChanceOfOccurring).SetRequireRestart(false).SetOrder(1));
+                                                                groupBuilder.AddText(currentEvent.Name + "_" + eventModuleId + "_" + eventId + "_weight", "{=CESETTINGS1124}Custom Event Frequency", new ProxyRef<string>(() => EventSettings[currentEvent.Name].WeightedChanceOfOccurring, o => EventSettings[currentEvent.Name].WeightedChanceOfOccurring = o), stringBuilder => stringBuilder.SetHintText("{=CESETTINGS1126}Default is " + currentEvent.WeightedChanceOfOccurring).SetRequireRestart(false).SetOrder(1));
 
-                                groupBuilder.AddText(currentEvent.Name + "_" + eventModuleId + "_" + eventId + "_image", "{=CESETTINGS1125}Custom Event Image", new ProxyRef<string>(() => EventSettings[currentEvent.Name].BackgroundName, o => EventSettings[currentEvent.Name].BackgroundName = o), stringBuilder => stringBuilder.SetHintText("{=CESETTINGS1126}Default is " + (currentEvent.Backgrounds != null ? currentEvent.Backgrounds.ToString() : currentEvent.BackgroundName)).SetRequireRestart(false).SetOrder(2));
-                            });
+                                                                groupBuilder.AddText(currentEvent.Name + "_" + eventModuleId + "_" + eventId + "_image", "{=CESETTINGS1125}Custom Event Image", new ProxyRef<string>(() => EventSettings[currentEvent.Name].BackgroundName, o => EventSettings[currentEvent.Name].BackgroundName = o), stringBuilder => stringBuilder.SetHintText("{=CESETTINGS1126}Default is " + (currentEvent.Backgrounds != null ? currentEvent.Backgrounds.ToString() : currentEvent.BackgroundName)).SetRequireRestart(false).SetOrder(2));
+                                                            });
                         }
                     }
                 }
+
                 _settings?.Unregister();
                 _settings = builder.BuildAsGlobal();
                 _settings.Register();

@@ -24,12 +24,10 @@ namespace CaptivityEvents.Events
             InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
         }
 
-        #region Return Specifics Events
+#region Return Specifics Events
 
         public static string FireSpecificEvent(string specificEvent, bool force = false)
         {
-            List<string> eventNames = [];
-
             string flag = "$FAILEDTOFIND";
 
             if (CEPersistence.CEEventList == null || CEPersistence.CEEventList.Count <= 0) return flag;
@@ -39,20 +37,27 @@ namespace CaptivityEvents.Events
 
             if (foundevent != null)
             {
-                if (!force && foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                switch (force)
                 {
-                    string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                    case false when foundevent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive):
+                    {
+                        string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
 
-                    if (result == null) flag = foundevent.Name;
-                    else flag = "$" + result;
-                }
-                else if (force)
-                {
-                    flag = foundevent.Name;
-                }
-                else
-                {
-                    flag = "$EVENTCONDITIONSNOTMET";
+                        if (result == null)
+                            flag = foundevent.Name;
+                        else
+                            flag = "$" + result;
+
+                        break;
+                    }
+                    case true:
+                        flag = foundevent.Name;
+
+                        break;
+                    default:
+                        flag = "$EVENTCONDITIONSNOTMET";
+
+                        break;
                 }
             }
             else
@@ -65,8 +70,6 @@ namespace CaptivityEvents.Events
 
         public static string FireSpecificEventRandom(string specificEvent, out CEEvent ceEvent, bool force = false)
         {
-            List<string> eventNames = [];
-
             string flag = "$FAILEDTOFIND";
             ceEvent = null;
 
@@ -98,8 +101,6 @@ namespace CaptivityEvents.Events
 
         public static string FireSpecificEventPartyLeader(string specificEvent, out CEEvent ceEvent, bool force = false, string heroname = null)
         {
-            List<string> eventNames = [];
-
             string flag = "$FAILEDTOFIND";
             ceEvent = null;
 
@@ -113,19 +114,18 @@ namespace CaptivityEvents.Events
                 {
                     foreach (TroopRosterElement troopRosterElement in PartyBase.MainParty.PrisonRoster.GetTroopRoster())
                     {
-                        if (troopRosterElement.Character != null)
+                        if (troopRosterElement.Character == null) continue;
+                        string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(troopRosterElement.Character, PartyBase.MainParty);
+
+                        if (force || result == null)
                         {
-                            string result = new CEEventChecker(foundevent).FlagsDoMatchEventConditions(troopRosterElement.Character, PartyBase.MainParty);
+                            foundevent.Captive = troopRosterElement.Character;
+                            ceEvent = foundevent;
 
-                            if (force || result == null)
-                            {
-                                foundevent.Captive = troopRosterElement.Character;
-                                ceEvent = foundevent;
-                                return foundevent.Name;
-                            }
-
-                            flag = "$" + result;
+                            return foundevent.Name;
                         }
+
+                        flag = "$" + result;
                     }
                 }
                 else
@@ -157,14 +157,14 @@ namespace CaptivityEvents.Events
             return flag;
         }
 
-        #endregion Return Specifics Events
+#endregion Return Specifics Events
 
-        #region Return Random Events
+#region Return Random Events
 
         public static CEEvent ReturnWeightedChoiceOfEventsRandom()
         {
             List<CEEvent> events = [];
-            int CurrentOrder = 0;
+            int currentOrder = 0;
 
             if (CEPersistence.CECallableEvents != null && CEPersistence.CECallableEvents.Count > 0)
             {
@@ -183,24 +183,27 @@ namespace CaptivityEvents.Events
                             if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
                             {
                                 CECustomHandler.LogToFile("IgnoreAllOther detected - auto fire " + listEvent.Name);
+
                                 return listEvent;
                             }
 
-                            int OrderToCall = 0;
+                            int orderToCall = 0;
+
                             if (!string.IsNullOrEmpty(listEvent.OrderToCall))
                             {
-                                OrderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
+                                orderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
                             }
 
-                            if (OrderToCall < CurrentOrder)
+                            if (orderToCall < currentOrder)
                             {
-                                CECustomHandler.LogToFile("OrderToCall - " + OrderToCall + " was less than CurrentOrder - " + CurrentOrder + " for " + listEvent.Name);
+                                CECustomHandler.LogToFile("OrderToCall - " + orderToCall + " was less than CurrentOrder - " + currentOrder + " for " + listEvent.Name);
+
                                 continue;
                             }
-                            else if (OrderToCall > CurrentOrder)
+                            else if (orderToCall > currentOrder)
                             {
                                 events.Clear();
-                                CurrentOrder = OrderToCall;
+                                currentOrder = orderToCall;
                             }
 
                             if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccurring))
@@ -242,7 +245,7 @@ namespace CaptivityEvents.Events
         public static CEEvent ReturnWeightedChoiceOfEvents()
         {
             List<CEEvent> events = [];
-            int CurrentOrder = 0;
+            int currentOrder = 0;
 
             if (CEPersistence.CECallableEvents != null && CEPersistence.CECallableEvents.Count > 0)
             {
@@ -261,24 +264,27 @@ namespace CaptivityEvents.Events
                             if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
                             {
                                 CECustomHandler.LogToFile("IgnoreAllOther detected - auto fire " + listEvent.Name);
+
                                 return listEvent;
                             }
 
-                            int OrderToCall = 0;
+                            int orderToCall = 0;
+
                             if (!string.IsNullOrEmpty(listEvent.OrderToCall))
                             {
-                                OrderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
+                                orderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
                             }
 
-                            if (OrderToCall < CurrentOrder)
+                            if (orderToCall < currentOrder)
                             {
-                                CECustomHandler.LogToFile("OrderToCall - " + OrderToCall + " was less than CurrentOrder - " + CurrentOrder + " for " + listEvent.Name);
+                                CECustomHandler.LogToFile("OrderToCall - " + orderToCall + " was less than CurrentOrder - " + currentOrder + " for " + listEvent.Name);
+
                                 continue;
                             }
-                            else if (OrderToCall > CurrentOrder)
+                            else if (orderToCall > currentOrder)
                             {
                                 events.Clear();
-                                CurrentOrder = OrderToCall;
+                                currentOrder = orderToCall;
                             }
 
                             if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccurring))
@@ -320,8 +326,7 @@ namespace CaptivityEvents.Events
         public static CEEvent ReturnWeightedChoiceOfEventsPartyLeader(CharacterObject captive)
         {
             List<CEEvent> events = [];
-
-            int CurrentOrder = 0;
+            int currentOrder = 0;
             CECustomHandler.LogToFile("Number of Filitered events is " + events.Count);
 
             if (CEPersistence.CECallableEvents == null || CEPersistence.CECallableEvents.Count <= 0) return null;
@@ -340,24 +345,27 @@ namespace CaptivityEvents.Events
                         if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
                         {
                             CECustomHandler.LogToFile("IgnoreAllOther detected - auto fire " + listEvent.Name);
+
                             return listEvent;
                         }
 
-                        int OrderToCall = 0;
+                        int orderToCall = 0;
+
                         if (!string.IsNullOrEmpty(listEvent.OrderToCall))
                         {
-                            OrderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
+                            orderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
                         }
 
-                        if (OrderToCall < CurrentOrder)
+                        if (orderToCall < currentOrder)
                         {
-                            CECustomHandler.LogToFile("OrderToCall - " + OrderToCall + " was less than CurrentOrder - " + CurrentOrder + " for " + listEvent.Name);
+                            CECustomHandler.LogToFile("OrderToCall - " + orderToCall + " was less than CurrentOrder - " + currentOrder + " for " + listEvent.Name);
+
                             continue;
                         }
-                        else if (OrderToCall > CurrentOrder)
+                        else if (orderToCall > currentOrder)
                         {
                             events.Clear();
-                            CurrentOrder = OrderToCall;
+                            currentOrder = orderToCall;
                         }
 
                         if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccurring))
@@ -386,6 +394,7 @@ namespace CaptivityEvents.Events
                 {
                     CEEvent randomEvent = events.GetRandomElement();
                     randomEvent.Captive = captive;
+
                     return randomEvent;
                 }
             }
@@ -404,11 +413,12 @@ namespace CaptivityEvents.Events
             if (party == null || settlement == null)
             {
                 CECustomHandler.LogToFile("PartyEnter: party or settlement is null, skipping.");
+
                 return null;
             }
 
             List<CEEvent> events = [];
-            int CurrentOrder = 0;
+            int currentOrder = 0;
 
             if (CEPersistence.CEPartyEnteredSettlementEvents != null && CEPersistence.CEPartyEnteredSettlementEvents.Count > 0)
             {
@@ -425,24 +435,27 @@ namespace CaptivityEvents.Events
                         if (listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.IgnoreAllOther))
                         {
                             CECustomHandler.LogToFile("IgnoreAllOther detected - auto fire " + listEvent.Name);
+
                             return listEvent;
                         }
 
-                        int OrderToCall = 0;
+                        int orderToCall = 0;
+
                         if (!string.IsNullOrEmpty(listEvent.OrderToCall))
                         {
-                            OrderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
+                            orderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
                         }
 
-                        if (OrderToCall < CurrentOrder)
+                        if (orderToCall < currentOrder)
                         {
-                            CECustomHandler.LogToFile("OrderToCall - " + OrderToCall + " was less than CurrentOrder - " + CurrentOrder + " for " + listEvent.Name);
+                            CECustomHandler.LogToFile("OrderToCall - " + orderToCall + " was less than CurrentOrder - " + currentOrder + " for " + listEvent.Name);
+
                             continue;
                         }
-                        else if (OrderToCall > CurrentOrder)
+                        else if (orderToCall > currentOrder)
                         {
                             events.Clear();
-                            CurrentOrder = OrderToCall;
+                            currentOrder = orderToCall;
                         }
 
                         if (!string.IsNullOrEmpty(listEvent.WeightedChanceOfOccurring))
@@ -480,6 +493,6 @@ namespace CaptivityEvents.Events
             return null;
         }
 
-        #endregion Return Random Events
+#endregion Return Random Events
     }
 }

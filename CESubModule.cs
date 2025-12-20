@@ -18,7 +18,6 @@ using TaleWorlds.CampaignSystem.BarterSystem;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.CampaignSystem.CampaignBehaviors.BarterBehaviors;
 using TaleWorlds.CampaignSystem.Encounters;
-using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Roster;
@@ -41,6 +40,8 @@ namespace CaptivityEvents
 {
     public static class CEPersistence
     {
+        public static bool animationPlayEvent;
+
         public enum DungeonState
         {
             Normal,
@@ -100,60 +101,60 @@ namespace CaptivityEvents
 
         // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml
         // Mount & Blade II Bannerlord\Modules\Native\GUI\NativeSpriteData.xml
-        public static int[] sprite_index = [0, 0, 0, 0];
+        public static int[] SpriteIndex = [0, 0, 0, 0];
 
         // Mount & Blade II Bannerlord\GUI\GauntletUI\spriteData.xml
         // Mount & Blade II Bannerlord\Modules\Native\GUI\NativeSpriteData.xml
-        public static int[] naval_sprite_index = [0, 0, 0];
+        public static int[] NavalSpriteIndex = [0, 0, 0];
 
         // Captive Variables
-        public static bool captivePlayEvent;
+        public static bool CaptivePlayEvent;
 
-        public static CharacterObject captiveToPlay;
+        public static CharacterObject CaptiveToPlay;
 
-        public static int captiveInventoryStage = 0;
-        public static Hero removeHero = null;
+        public static int CaptiveInventoryStage = 0;
+        public static Hero RemoveHero = null;
 
-        public static string victoryEvent;
-        public static string defeatEvent;
-        public static List<TroopRosterElement> playerTroops = [];
-        public static List<TroopRosterElement> temporaryTroops = [];
-        public static bool removePlayer = false;
-        public static bool destroyParty = false;
-        public static bool surrenderParty = false;
-        public static bool playerWon = false;
-        public static bool playerDied = false;
-        public static bool playerSurrendered;
+        public static string VictoryEvent;
+        public static string DefeatEvent;
+        public static List<TroopRosterElement> PlayerTroops = [];
+        public static List<TroopRosterElement> TemporaryTroops = [];
+        public static bool RemovePlayer = false;
+        public static bool DestroyParty = false;
+        public static bool SurrenderParty = false;
+        public static bool PlayerWon = false;
+        public static bool PlayerDied = false;
+        public static bool PlayerSurrendered;
 
         // Animation Variables
-        public static bool animationPlayEvent;
+        public static bool AnimationPlayEvent;
 
-        public static List<string> animationImageList = [];
-        public static int animationIndex;
-        public static float animationSpeed = 0.03f;
+        public static List<string> AnimationImageList = [];
+        public static int AnimationIndex;
+        public static float AnimationSpeed = 0.03f;
 
-        public static bool notificationExists;
+        public static bool NotificationExists;
 
-        public static Agent agentTalkingTo;
-        public static GameEntity gameEntity = null;
+        public static Agent AgentTalkingTo;
+        public static GameEntity GameEntity = null;
 
         // Unknown
-        public static float playerSpeed = 0f;
+        public static float PlayerSpeed = 0f;
 
-        public static HuntState huntState = HuntState.Normal;
-        public static DungeonState dungeonState = DungeonState.Normal;
-        public static BrothelState brothelState = BrothelState.Normal;
-        public static BattleState battleState = BattleState.Normal;
+        public static HuntState CurrentHuntState = HuntState.Normal;
+        public static DungeonState CurrentDungeonState = DungeonState.Normal;
+        public static BrothelState CurrentBrothelState = BrothelState.Normal;
+        public static BattleState CurrentBattleState = BattleState.Normal;
 
         // Dialog line tracking to prevent duplicates
-        public static bool prisonerLinesAdded = false;
-        public static bool customLinesAdded = false;
+        public static bool PrisonerLinesAdded = false;
+        public static bool CustomLinesAdded = false;
 
         // Fade out for Brothel
-        public static float brothelFadeIn = 2f;
-        public static bool hotbutterAvailable = false;
-        public static float brothelBlack = 10f;
-        public static float brothelFadeOut = 2f;
+        public static float BrothelFadeIn = 2f;
+        public static bool HotButterAvailable;
+        public static float BrothelBlack = 10f;
+        public static float BrothelFadeOut = 2f;
 
         public static List<CECustom> CECustomFlags = [];
         public static List<CEScene> CECustomScenes = [];
@@ -167,9 +168,9 @@ namespace CaptivityEvents
 
 
         // Sound
-        public static SoundEvent soundEvent = null;
+        public static SoundEvent SoundEvent;
 
-        public static bool soundLoop = false;
+        public static bool SoundLoop = false;
     }
 
     public class CESubModule : MBSubModuleBase
@@ -190,29 +191,29 @@ namespace CaptivityEvents
         public const string HarmonyId = "com.CE.captivityEvents";
 
         // Last Check on Animation Loop
-        private static float lastCheck;
+        private static float _lastCheck;
 
         // Timer for Hunting
-        private static float huntingTimerOne;
+        private static float _huntingTimerOne;
 
         // Fade out for Dungeon
-        private static float dungeonFadeOut = 2f;
+        private static float _dungeonFadeOut = 2f;
 
         // Timer for Brothel
-        private static float brothelTimerOne;
-        private static float brothelTimerTwo;
-        private static float brothelTimerThree;
-        public static float sfIn = CEPersistence.brothelFadeIn;
-        public static float sfBlack = CEPersistence.brothelBlack;
-        public static float sfOut = CEPersistence.brothelFadeOut;
+        private static float _brothelTimerOne;
+        private static float _brothelTimerTwo;
+        private static float _brothelTimerThree;
+        public static float SfIn = CEPersistence.BrothelFadeIn;
+        public static float SfBlack = CEPersistence.BrothelBlack;
+        public static float SfOut = CEPersistence.BrothelFadeOut;
 
         // Max Brothel Sound
-        private static readonly float brothelSoundMin = 1f;
+        private static readonly float BrothelSoundMin = 1f;
 
-        private static readonly float brothelSoundMax = 3f;
+        private static readonly float BrothelSoundMax = 3f;
 
         // Sounds for Brothel
-        private static readonly Dictionary<string, int> brothelSounds = [];
+        private static readonly Dictionary<string, int> BrothelSounds = [];
 
         public Texture QuickLoadCampaignTexture(string path)
         {
@@ -221,6 +222,7 @@ namespace CaptivityEvents
                 if (string.IsNullOrWhiteSpace(path))
                 {
                     CECustomHandler.ForceLogToFile("QuickLoadCampaignTexture called with null or empty path");
+
                     return null;
                 }
 
@@ -230,22 +232,27 @@ namespace CaptivityEvents
                 if (CEPersistence.CELoadedTextures.ContainsKey(name))
                 {
                     Texture cachedTexture = CEPersistence.CELoadedTextures[name];
+
                     // Verify the cached texture is still valid (note: IsValid is false until added to sprite sheet)
                     if (cachedTexture?.PlatformTexture != null)
                     {
                         // Additional check: verify the underlying texture hasn't been invalidated (material_error)
                         try
                         {
-                            var textureField = typeof(EngineTexture).GetField("Texture", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                            FieldInfo textureField = typeof(EngineTexture).GetField("Texture", BindingFlags.NonPublic | BindingFlags.Instance);
+
                             if (textureField != null)
                             {
-                                var engineTexture = textureField.GetValue(cachedTexture.PlatformTexture);
+                                object engineTexture = textureField.GetValue(cachedTexture.PlatformTexture);
+
                                 if (engineTexture != null)
                                 {
-                                    var nameProperty = engineTexture.GetType().GetProperty("Name", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                                    PropertyInfo nameProperty = engineTexture.GetType().GetProperty("Name", BindingFlags.Public | BindingFlags.Instance);
+
                                     if (nameProperty != null)
                                     {
                                         string textureName = nameProperty.GetValue(engineTexture) as string;
+
                                         if (textureName == "material_error")
                                         {
                                             CECustomHandler.ForceLogToFile($"Cached texture {name} has been invalidated (material_error), reloading from disk");
@@ -280,6 +287,7 @@ namespace CaptivityEvents
                         catch (Exception ex)
                         {
                             CECustomHandler.LogToFile($"Error validating cached texture {name}: {ex.Message}");
+
                             // If validation fails, assume it's valid and return it
                             return cachedTexture;
                         }
@@ -294,9 +302,11 @@ namespace CaptivityEvents
 
                 // Load new texture
                 string directory = Path.GetDirectoryName(path);
+
                 if (string.IsNullOrWhiteSpace(directory))
                 {
                     CECustomHandler.ForceLogToFile($"Invalid directory for texture: {path}");
+
                     return null;
                 }
 
@@ -305,20 +315,20 @@ namespace CaptivityEvents
                 if (texture == null)
                 {
                     CECustomHandler.ForceLogToFile($"LoadTextureFromPath returned null for: {name} in {directory}");
+
                     return null;
                 }
 
                 texture.PreloadTexture(true);
                 Texture texture2D = new(new EngineTexture(texture));
-                
+
                 // Note: IsValid will be false until the texture is added to a sprite category's SpriteSheets
                 // This is expected behavior - the texture becomes valid once it's part of a sprite sheet
                 CECustomHandler.LogToFile($"Loaded texture {name}, IsValid={texture2D.IsValid} (will become true after adding to sprite sheet)");
 
                 // If texture is already in cache, remove it so we can re-add it at the end (LRU behavior)
-                if (CEPersistence.CELoadedTextures.ContainsKey(name))
+                if (CEPersistence.CELoadedTextures.Remove(name))
                 {
-                    CEPersistence.CELoadedTextures.Remove(name);
                     CECustomHandler.LogToFile($"Moved texture {name} to end of cache (LRU)");
                 }
 
@@ -328,6 +338,7 @@ namespace CaptivityEvents
                     KeyValuePair<string, Texture> textureToRemove = CEPersistence.CELoadedTextures.First();
                     CEPersistence.CELoadedTextures.Remove(textureToRemove.Key);
                     CECustomHandler.LogToFile($"Cache full, removing oldest texture: {textureToRemove.Key}");
+
                     try
                     {
                         textureToRemove.Value.PlatformTexture?.Release();
@@ -338,22 +349,19 @@ namespace CaptivityEvents
                         CECustomHandler.LogToFile($"Error releasing texture {textureToRemove.Key}: {ex.Message}");
                     }
                 }
-                
+
                 // Add to end of cache (most recently used)
                 CEPersistence.CELoadedTextures.Add(name, texture2D);
 
-                if (texture2D == null || texture2D.IsValid == false)
-                {
-                    CECustomHandler.ForceLogToFile("QuickLoadCampaignTexture failed to create Texture2D for path: " + path);
-                    return null;
-                }
+                if (texture2D.IsValid) return texture2D;
+                CECustomHandler.ForceLogToFile("QuickLoadCampaignTexture failed to create Texture2D for path: " + path);
 
-                return texture2D;
-
+                return null;
             }
             catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile("Failure to load " + path + " - exception : " + e);
+
                 return null;
             }
         }
@@ -363,7 +371,8 @@ namespace CaptivityEvents
         {
             try
             {
-                string[] requiredImages = [
+                string[] requiredImages =
+                [
                     "default_male_prison", "default_male_prison_sfw",
                     "default_female_prison", "default_female_prison_sfw",
                     "default_male", "default_male_sfw",
@@ -375,6 +384,7 @@ namespace CaptivityEvents
                 ];
 
                 int missingCount = 0;
+
                 foreach (string imageName in requiredImages)
                 {
                     if (!CEPersistence.CEEventImageList.ContainsKey(imageName))
@@ -409,15 +419,17 @@ namespace CaptivityEvents
                 bool needsRestore = false;
 
                 // Check if our custom sprite indices still point to valid textures
-                foreach (int index in CEPersistence.sprite_index)
+                foreach (int index in CEPersistence.SpriteIndex)
                 {
                     if (index >= 0 && index < spriteCategory.SpriteSheets.Count)
                     {
                         Texture texture = spriteCategory.SpriteSheets[index];
+
                         if (texture == null || texture.PlatformTexture == null)
                         {
                             CECustomHandler.ForceLogToFile($"Texture at sprite_index {index} is invalid after battle, needs restore");
                             needsRestore = true;
+
                             break;
                         }
                     }
@@ -425,23 +437,23 @@ namespace CaptivityEvents
                     {
                         CECustomHandler.ForceLogToFile($"Sprite index {index} is out of range (count: {spriteCategory.SpriteSheets.Count}), needs restore");
                         needsRestore = true;
+
                         break;
                     }
                 }
 
                 // Clear invalid cached textures
-                var invalidKeys = CEPersistence.CELoadedTextures
-                    .Where(kvp => kvp.Value == null || kvp.Value.PlatformTexture == null)
-                    .Select(kvp => kvp.Key)
-                    .ToList();
+                var invalidKeys = CEPersistence.CELoadedTextures.Where(kvp => kvp.Value == null || kvp.Value.PlatformTexture == null).Select(kvp => kvp.Key).ToList();
 
                 if (invalidKeys.Count > 0)
                 {
                     CECustomHandler.ForceLogToFile($"Removing {invalidKeys.Count} invalid cached textures after battle");
+
                     foreach (var key in invalidKeys)
                     {
                         CEPersistence.CELoadedTextures.Remove(key);
                     }
+
                     needsRestore = true;
                 }
 
@@ -472,6 +484,7 @@ namespace CaptivityEvents
                 if (CEPersistence.CEEventImageList.ContainsKey(name))
                 {
                     Texture texture = QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+
                     if (texture != null) return texture;
                 }
 
@@ -486,6 +499,7 @@ namespace CaptivityEvents
             catch (Exception e)
             {
                 CECustomHandler.ForceLogToFile($"SafeLoadTexture failed for '{name}', defaultKey '{defaultKey}': {e.Message}");
+
                 return null;
             }
         }
@@ -500,78 +514,52 @@ namespace CaptivityEvents
                 if (name != "default" && !CEPersistence.CEEventImageList.ContainsKey(name))
                 {
                     CECustomHandler.ForceLogToFile($"Image '{name}' not found in CEEventImageList. Available images: {CEPersistence.CEEventImageList.Count}");
+
                     if (forcelog)
                     {
                         InformationManager.DisplayMessage(new InformationMessage($"Image '{name}' not found. Using default. Refer to LogFileFC.txt", Colors.Red));
                     }
+
                     // Fall back to default
                     name = "default";
                 }
 
                 if (!swap)
                 {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.sprite_index[2]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison_sfw"])
-                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.SpriteIndex[2]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.sprite_index[3]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison_sfw"])
-                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.SpriteIndex[3]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.sprite_index[0]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sfw"])
-                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.SpriteIndex[0]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.sprite_index[1]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sfw"])
-                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.SpriteIndex[1]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
                     if (_isNavalLoaded)
                     {
-                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[CEPersistence.naval_sprite_index[0]] = name == "default"
-                            ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea_sfw"])
-                            : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[CEPersistence.NavalSpriteIndex[0]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[CEPersistence.naval_sprite_index[1]] = name == "default"
-                            ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea_sfw"])
-                            : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[CEPersistence.NavalSpriteIndex[1]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[CEPersistence.naval_sprite_index[2]] = name == "default"
-                           ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft_sfw"])
-                           : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[CEPersistence.NavalSpriteIndex[2]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
                     }
                 }
                 else
                 {
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.sprite_index[2]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison_sfw"])
-                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.SpriteIndex[2]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_prison_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.sprite_index[3]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison_sfw"])
-                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.SpriteIndex[3]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_prison_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.sprite_index[0]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sfw"])
-                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.SpriteIndex[0]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.sprite_index[1]] = name == "default"
-                        ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sfw"])
-                        : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                    UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteSheets[CEPersistence.SpriteIndex[1]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
                     if (_isNavalLoaded)
                     {
-                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[CEPersistence.naval_sprite_index[1]] = name == "default"
-                            ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea_sfw"])
-                            : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[CEPersistence.NavalSpriteIndex[1]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_female_sea_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[CEPersistence.naval_sprite_index[0]] = name == "default"
-                            ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea_sfw"])
-                            : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[CEPersistence.NavalSpriteIndex[0]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_male_sea_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
 
-                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[CEPersistence.naval_sprite_index[2]] = name == "default"
-                           ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft_sfw"])
-                           : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
+                        UIResourceManager.SpriteData.SpriteCategories["ui_naval_fullbackgrounds"].SpriteSheets[CEPersistence.NavalSpriteIndex[2]] = name == "default" ? (CESettings.Instance?.SexualContent ?? true) && (CESettings.Instance?.CustomBackgrounds ?? true) ? QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList["default_raft_sfw"]) : QuickLoadCampaignTexture(CEPersistence.CEEventImageList[name]);
                     }
                 }
             }
@@ -597,16 +585,16 @@ namespace CaptivityEvents
                 if (name != "default" && !CEPersistence.CEEventImageList.ContainsKey(name))
                 {
                     CECustomHandler.ForceLogToFile($"Notification image '{name}' not found in CEEventImageList. Using default.");
+
                     if (forcelog)
                     {
                         InformationManager.DisplayMessage(new InformationMessage($"Notification image '{name}' not found. Using default.", Colors.Red));
                     }
+
                     name = "default";
                 }
 
-                Texture texture = name == "default"
-                    ? SafeLoadTexture("CE_default_notification", "CE_default_notification")
-                    : SafeLoadTexture(name, "CE_default_notification");
+                Texture texture = name == "default" ? SafeLoadTexture("CE_default_notification", "CE_default_notification") : SafeLoadTexture(name, "CE_default_notification");
 
                 if (texture != null)
                 {
@@ -636,20 +624,23 @@ namespace CaptivityEvents
             base.OnSubModuleLoad();
             Instance = this;
 
-            ModuleInfo ceModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.Id == "zCaptivityEvents"; });
-            ModuleInfo nativeModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => { return searchInfo.IsNative; });
+            ModuleInfo ceModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == "zCaptivityEvents");
+            ModuleInfo nativeModule = ModuleHelper.GetModules().FirstOrDefault(searchInfo => searchInfo.IsNative);
 
-            ApplicationVersion modversion = ceModule.Version;
-            ApplicationVersion gameversion = nativeModule.Version;
+            if (ceModule != null && nativeModule != null)
+            {
+                ApplicationVersion modversion = ceModule.Version;
+                ApplicationVersion gameversion = nativeModule.Version;
 
-            if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor || modversion.Revision != gameversion.Revision)
-            {
-                CECustomHandler.ForceLogToFile("Captivity Events " + modversion + " has the detected the wrong version " + gameversion);
-                DialogResult a = MessageBox.Show("Warning:\n Captivity Events " + modversion + " has the detected the wrong game version. Please download the correct version for " + gameversion + ". Or continue at your own risk.", "Captivity Events has the detected the wrong version");
-            }
-            else
-            {
-                CECustomHandler.ForceLogToFile("Captivity Events " + modversion + " has the detected the version " + gameversion);
+                if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor || modversion.Revision != gameversion.Revision)
+                {
+                    CECustomHandler.ForceLogToFile("Captivity Events " + modversion + " has the detected the wrong version " + gameversion);
+                    MessageBox.Show("Warning:\n Captivity Events " + modversion + " has the detected the wrong game version. Please download the correct version for " + gameversion + ". Or continue at your own risk.", "Captivity Events has the detected the wrong version");
+                }
+                else
+                {
+                    CECustomHandler.ForceLogToFile("Captivity Events " + modversion + " has the detected the version " + gameversion);
+                }
             }
 
             try
@@ -676,9 +667,9 @@ namespace CaptivityEvents
             try
             {
                 CEPersistence.CECustomModules.ForEach(item =>
-                {
-                    item.CEModuleName = modules.FirstOrDefault(moduleInfo => { return moduleInfo.Id == item.CEModuleName; })?.Name ?? item.CEModuleName;
-                });
+                                                      {
+                                                          item.CEModuleName = modules.FirstOrDefault(moduleInfo => moduleInfo.Id == item.CEModuleName)?.Name ?? item.CEModuleName;
+                                                      });
             }
             catch (Exception)
             {
@@ -819,9 +810,7 @@ namespace CaptivityEvents
                     CECustomHandler.ForceLogToFile("Mod " + id + " uses Harmony version " + version);
                 }
 
-                CECustomHandler.ForceLogToFile(CESettings.Instance?.EventCaptorNotifications ?? true
-                                                   ? "Patching Map Notifications: No Conflicts Detected : Enabled."
-                                                                   : "EventCaptorNotifications: Disabled.");
+                CECustomHandler.ForceLogToFile(CESettings.Instance?.EventCaptorNotifications ?? true ? "Patching Map Notifications: No Conflicts Detected : Enabled." : "EventCaptorNotifications: Disabled.");
 
                 _harmony.PatchAll();
             }
@@ -839,15 +828,7 @@ namespace CaptivityEvents
             {
                 if (CESettings.Instance?.IsHardCoded ?? false)
                 {
-                    TaleWorlds.MountAndBlade.Module.CurrentModule.AddInitialStateOption(
-                        new InitialStateOption(
-                            "CaptivityEventsSettings",
-                            new TextObject("Captivity Events Settings", null),
-                            9990,
-                            () => { ScreenManager.PushScreen(new CESettingsScreen()); },
-                             () => new ValueTuple<bool, TextObject>(false, TextObject.GetEmpty())
-                        )
-                      );
+                    TaleWorlds.MountAndBlade.Module.CurrentModule.AddInitialStateOption(new InitialStateOption("CaptivityEventsSettings", new TextObject("Captivity Events Settings"), 9990, () => { ScreenManager.PushScreen(new CESettingsScreen()); }, () => new ValueTuple<bool, TextObject>(false, TextObject.GetEmpty())));
                 }
 
                 if (CESettingsIntegrations.Instance == null)
@@ -867,96 +848,94 @@ namespace CaptivityEvents
                 {
                     CESettingsFlags.Instance.InitializeSettings(CEPersistence.CECustomFlags);
                 }
-                CECustomHandler.ForceLogToFile("Loaded CESettings: "
-                                               + (CESettings.Instance?.LogToggle ?? false
-                                                   ? "Logs are enabled."
-                                                   : "Extra Event Logs are disabled enable them through settings."));
+
+                CECustomHandler.ForceLogToFile("Loaded CESettings: " + (CESettings.Instance?.LogToggle ?? false ? "Logs are enabled." : "Extra Event Logs are disabled enable them through settings."));
             }
             catch (Exception)
             {
                 CECustomHandler.ForceLogToFile("OnBeforeInitialModuleScreenSetAsRoot : CESettings is being accessed improperly.");
             }
 
-            foreach (CEEvent _listedEvent in CEPersistence.CEEvents.Where(_listedEvent => !string.IsNullOrWhiteSpace(_listedEvent.Name)))
+            foreach (CEEvent listedEvent in CEPersistence.CEEvents.Where(listedEvent => !string.IsNullOrWhiteSpace(listedEvent.Name)))
             {
-                if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwritable) && (CEPersistence.CEEventList.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 0 || CEPersistence.CEWaitingList.FindAll(matchEvent => matchEvent.Name == _listedEvent.Name).Count > 0)) continue;
+                if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwritable) && (CEPersistence.CEEventList.FindAll(matchEvent => matchEvent.Name == listedEvent.Name).Count > 0 || CEPersistence.CEWaitingList.FindAll(matchEvent => matchEvent.Name == listedEvent.Name).Count > 0)) continue;
 
-                if (!CEHelper.brothelFlagFemale)
+                if (!CEHelper.BrothelFlagFemale)
                 {
-                    if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale))
-                        CEHelper.brothelFlagFemale = true;
-                }
-
-                if (!CEHelper.brothelFlagMale)
-                {
-                    if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale))
-                        CEHelper.brothelFlagMale = true;
+                    if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale)) CEHelper.BrothelFlagFemale = true;
                 }
 
-                if (_listedEvent?.MenuOptions != null && _listedEvent?.MenuOptions.Length != 0)
+                if (!CEHelper.BrothelFlagMale)
                 {
-                    CEPersistence.CEMenuOptionEvents.Add(_listedEvent);
+                    if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale)) CEHelper.BrothelFlagMale = true;
                 }
 
-                if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredSettlement))
+                if (listedEvent?.MenuOptions != null && listedEvent?.MenuOptions.Length != 0)
                 {
-                    CEPersistence.CEPartyEnteredSettlementEvents.Add(_listedEvent);
+                    CEPersistence.CEMenuOptionEvents.Add(listedEvent);
                 }
 
-                if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BirthAlternative))
+                if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredSettlement))
                 {
-                    CEPersistence.CEAlternativePregnancyEvents.Add(_listedEvent);
+                    CEPersistence.CEPartyEnteredSettlementEvents.Add(listedEvent);
                 }
-                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DeathAlternative))
+
+                if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BirthAlternative))
                 {
-                    CEPersistence.CEAlternativeDeathEvents.Add(_listedEvent);
+                    CEPersistence.CEAlternativePregnancyEvents.Add(listedEvent);
                 }
-                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.MarriageAlternative))
+                else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DeathAlternative))
                 {
-                    CEPersistence.CEAlternativeMarriageEvents.Add(_listedEvent);
+                    CEPersistence.CEAlternativeDeathEvents.Add(listedEvent);
                 }
-                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DesertionAlternative))
+                else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.MarriageAlternative))
                 {
-                    CEPersistence.CEAlternativeDesertionEvents.Add(_listedEvent);
+                    CEPersistence.CEAlternativeMarriageEvents.Add(listedEvent);
                 }
-                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
+                else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DesertionAlternative))
                 {
-                    CEPersistence.CEWaitingList.Add(_listedEvent);
+                    CEPersistence.CEAlternativeDesertionEvents.Add(listedEvent);
+                }
+                else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
+                {
+                    CEPersistence.CEWaitingList.Add(listedEvent);
                 }
                 else
                 {
-                    if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
+                    if (!listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
                     {
                         int weightedChance = 1;
+
                         try
                         {
-                            if (_listedEvent.WeightedChanceOfOccurring != null) weightedChance = new CEVariablesLoader().GetIntFromXML(_listedEvent.WeightedChanceOfOccurring);
+                            if (listedEvent.WeightedChanceOfOccurring != null) weightedChance = new CEVariablesLoader().GetIntFromXML(listedEvent.WeightedChanceOfOccurring);
                         }
                         catch (Exception)
                         {
-                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring on " + _listedEvent.Name);
+                            CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring on " + listedEvent.Name);
                         }
+
                         if (weightedChance > 0)
                         {
-                            CEPersistence.CECallableEvents.Add(_listedEvent);
+                            CEPersistence.CECallableEvents.Add(listedEvent);
                         }
                     }
 
 
-                    if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                    if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                     {
-                        CEPersistence.CECaptiveEvents.Add(_listedEvent);
+                        CEPersistence.CECaptiveEvents.Add(listedEvent);
                     }
-                    else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                    else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                     {
-                        CEPersistence.CERandomEvents.Add(_listedEvent);
+                        CEPersistence.CERandomEvents.Add(listedEvent);
                     }
-                    else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                    else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                     {
-                        CEPersistence.CECaptorEvents.Add(_listedEvent);
+                        CEPersistence.CECaptorEvents.Add(listedEvent);
                     }
 
-                    CEPersistence.CEEventList.Add(_listedEvent);
+                    CEPersistence.CEEventList.Add(listedEvent);
                 }
             }
 
@@ -1033,39 +1012,44 @@ namespace CaptivityEvents
                 // Check if the category has been reset by comparing current count to expected count
                 int expectedCount = CEPersistence.CETexturesCount + 4; // Original count + our 4 textures
                 bool categoryWasReset = spriteCategory.SpriteSheets.Count < expectedCount;
-                
+
                 CECustomHandler.ForceLogToFile($"ReloadImagesAgain: Current count={spriteCategory.SpriteSheets.Count}, Expected count={expectedCount}, Was reset={categoryWasReset}");
 
                 bool needsFullReload = categoryWasReset;
-                
+
                 // If not reset, verify our textures are still valid
                 if (!needsFullReload)
                 {
-                    foreach (int index in CEPersistence.sprite_index)
+                    foreach (int index in CEPersistence.SpriteIndex)
                     {
                         if (index < 0 || index >= spriteCategory.SpriteSheets.Count)
                         {
                             CECustomHandler.ForceLogToFile($"ReloadImagesAgain: sprite_index {index} out of bounds (count: {spriteCategory.SpriteSheets.Count}), needs full reload");
                             needsFullReload = true;
+
                             break;
                         }
-                        
+
                         Texture texture = spriteCategory.SpriteSheets[index];
+
                         if (texture == null || texture.PlatformTexture == null)
                         {
                             CECustomHandler.ForceLogToFile($"ReloadImagesAgain: texture at index {index} is invalid (null or null PlatformTexture), needs full reload");
                             needsFullReload = true;
+
                             break;
                         }
-                        
+
                         // Check if the underlying engine texture is "material_error"
                         if (texture.PlatformTexture is EngineTexture engineTexture && engineTexture.Texture != null)
                         {
                             string textureName = engineTexture.Texture.Name;
+
                             if (textureName == "material_error")
                             {
                                 CECustomHandler.ForceLogToFile($"ReloadImagesAgain: texture at index {index} is 'material_error', needs full reload");
                                 needsFullReload = true;
+
                                 break;
                             }
                         }
@@ -1080,12 +1064,13 @@ namespace CaptivityEvents
                     CEPersistence.CETextures.Clear();
 
                     // Force clear cached default textures so they reload from disk
-                    string[] defaultTextureKeys = [
+                    string[] defaultTextureKeys =
+                    [
                         "default_female_prison.png", "default_male_prison.png",
                         "default_female.png", "default_male.png",
                         "default_female_sea.png", "default_male_sea.png", "default_raft.png"
                     ];
-                    
+
                     foreach (string key in defaultTextureKeys)
                     {
                         if (CEPersistence.CELoadedTextures.ContainsKey(key))
@@ -1111,6 +1096,7 @@ namespace CaptivityEvents
                     if (CEPersistence.CETextures.Count < 4)
                     {
                         CECustomHandler.ForceLogToFile($"WARNING: Only loaded {CEPersistence.CETextures.Count} out of 4 default textures");
+
                         return;
                     }
 
@@ -1123,6 +1109,7 @@ namespace CaptivityEvents
                 else
                 {
                     CECustomHandler.ForceLogToFile("ReloadImagesAgain: Textures still valid, skipping reload");
+
                     return;
                 }
 
@@ -1130,51 +1117,53 @@ namespace CaptivityEvents
 
                 PropertyInfo propertyWidth = typeof(SpritePart).GetProperty("Width");
                 PropertyInfo propertyHeight = typeof(SpritePart).GetProperty("Height");
+
                 foreach (SpritePart spritePart in UIResourceManager.SpriteData.SpriteCategories["ui_fullbackgrounds"].SpriteParts)
                 {
                     switch (spritePart.Name)
                     {
                         case "wait_prisoner_female":
                             spritePart.SheetID = CEPersistence.CETexturesCount + 4;
-                            CEPersistence.sprite_index[3] = spritePart.SheetID - 1;
+                            CEPersistence.SpriteIndex[3] = spritePart.SheetID - 1;
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                            propertyWidth?.GetSetMethod(true).Invoke(spritePart, [445]);
+                            propertyHeight?.GetSetMethod(true).Invoke(spritePart, [805]);
                             spritePart.UpdateInitValues();
+
                             break;
 
                         case "wait_prisoner_male":
                             spritePart.SheetID = CEPersistence.CETexturesCount + 3;
-                            CEPersistence.sprite_index[2] = spritePart.SheetID - 1;
+                            CEPersistence.SpriteIndex[2] = spritePart.SheetID - 1;
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                            propertyWidth?.GetSetMethod(true).Invoke(spritePart, [445]);
+                            propertyHeight?.GetSetMethod(true).Invoke(spritePart, [805]);
                             spritePart.UpdateInitValues();
+
                             break;
 
                         case "wait_captive_female":
                             spritePart.SheetID = CEPersistence.CETexturesCount + 2;
-                            CEPersistence.sprite_index[1] = spritePart.SheetID - 1;
+                            CEPersistence.SpriteIndex[1] = spritePart.SheetID - 1;
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                            propertyWidth?.GetSetMethod(true).Invoke(spritePart, [445]);
+                            propertyHeight?.GetSetMethod(true).Invoke(spritePart, [805]);
                             spritePart.UpdateInitValues();
+
                             break;
 
                         case "wait_captive_male":
                             spritePart.SheetID = CEPersistence.CETexturesCount + 1;
-                            CEPersistence.sprite_index[0] = spritePart.SheetID - 1;
+                            CEPersistence.SpriteIndex[0] = spritePart.SheetID - 1;
                             spritePart.SheetX = 0;
                             spritePart.SheetY = 0;
-                            propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                            propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                            propertyWidth?.GetSetMethod(true).Invoke(spritePart, [445]);
+                            propertyHeight?.GetSetMethod(true).Invoke(spritePart, [805]);
                             spritePart.UpdateInitValues();
-                            break;
 
-                        default:
                             break;
                     }
                 }
@@ -1201,34 +1190,35 @@ namespace CaptivityEvents
                         {
                             case "wait_captive_at_sea_female":
                                 spritePart.SheetID = CEPersistence.CENavalTexturesCount + 1;
-                                CEPersistence.naval_sprite_index[0] = spritePart.SheetID - 1;
+                                CEPersistence.NavalSpriteIndex[0] = spritePart.SheetID - 1;
                                 spritePart.SheetX = 0;
                                 spritePart.SheetY = 0;
-                                propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                                propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                                propertyWidth?.GetSetMethod(true).Invoke(spritePart, [445]);
+                                propertyHeight?.GetSetMethod(true).Invoke(spritePart, [805]);
                                 spritePart.UpdateInitValues();
+
                                 break;
 
                             case "wait_captive_at_sea_male":
                                 spritePart.SheetID = CEPersistence.CENavalTexturesCount + 2;
-                                CEPersistence.naval_sprite_index[1] = spritePart.SheetID - 1;
+                                CEPersistence.NavalSpriteIndex[1] = spritePart.SheetID - 1;
                                 spritePart.SheetX = 0;
                                 spritePart.SheetY = 0;
-                                propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                                propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                                propertyWidth?.GetSetMethod(true).Invoke(spritePart, [445]);
+                                propertyHeight?.GetSetMethod(true).Invoke(spritePart, [805]);
                                 spritePart.UpdateInitValues();
+
                                 break;
 
                             case "raft_state":
                                 spritePart.SheetID = CEPersistence.CENavalTexturesCount + 3;
-                                CEPersistence.naval_sprite_index[2] = spritePart.SheetID - 1;
+                                CEPersistence.NavalSpriteIndex[2] = spritePart.SheetID - 1;
                                 spritePart.SheetX = 0;
                                 spritePart.SheetY = 0;
-                                propertyWidth.GetSetMethod(true).Invoke(spritePart, [445]);
-                                propertyHeight.GetSetMethod(true).Invoke(spritePart, [805]);
+                                propertyWidth?.GetSetMethod(true).Invoke(spritePart, [445]);
+                                propertyHeight?.GetSetMethod(true).Invoke(spritePart, [805]);
                                 spritePart.UpdateInitValues();
-                                break;
-                            default:
+
                                 break;
                         }
                     }
@@ -1253,10 +1243,11 @@ namespace CaptivityEvents
             if (game.GameType is not Campaign) return;
             CleanBugs();
             ResetHelper();
+
             if (!_isLoaded) return;
             InitializeAttributes(game);
             AddBehaviors((CampaignGameStarter)gameStarter);
-            CEPersistence.hotbutterAvailable = CEHelper.CheckHotButter();
+            CEPersistence.HotButterAvailable = CEHelper.CheckHotButter();
         }
 
         private void CleanBugs()
@@ -1271,24 +1262,24 @@ namespace CaptivityEvents
                 if (PlayerEncounter.Current == null) return;
                 if (PlayerEncounter.EncounteredMobileParty == null) return;
                 if (!PlayerEncounter.EncounteredMobileParty.StringId.StartsWith("CustomPartyCE_Hunt_")) return;
-                CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
+                CEPersistence.CurrentHuntState = CEPersistence.HuntState.AfterBattle;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return;
+                CECustomHandler.LogToFile("CheckEncounterIssue: " + e.Message);
             }
         }
 
         private void ResetHelper()
         {
-            CEHelper.spouseOne = null;
-            CEHelper.spouseTwo = null;
-            CEHelper.waitMenuCheck = -1;
+            CEHelper.SpouseOne = null;
+            CEHelper.SpouseTwo = null;
+            CEHelper.WaitMenuCheck = -1;
 
-            CEHelper.notificationCaptorExists = false;
-            CEHelper.notificationCaptorCheck = false;
-            CEHelper.notificationEventExists = false;
-            CEHelper.notificationEventCheck = false;
+            CEHelper.NotificationCaptorExists = false;
+            CEHelper.NotificationCaptorCheck = false;
+            CEHelper.NotificationEventExists = false;
+            CEHelper.NotificationEventCheck = false;
         }
 
         public override bool DoLoading(Game game)
@@ -1296,6 +1287,7 @@ namespace CaptivityEvents
             if (Campaign.Current == null) return true;
 
             CEConsole.ReloadEvents([]);
+
             if (!(CESettings.Instance?.PrisonerEscapeBehavior ?? true)) return base.DoLoading(game);
             IMbEvent<Hero> dailyTickHeroEvent = CampaignEvents.DailyTickHeroEvent;
 
@@ -1356,12 +1348,14 @@ namespace CaptivityEvents
                 CECustomHandler.LogToFile("Custom dialog lines added");
             }
 
-            if (_isLoadedInGame) CEConsole.ReloadEvents([]);
-            else AddCustomEvents(campaignStarter);
+            if (_isLoadedInGame)
+                CEConsole.ReloadEvents([]);
+            else
+                AddCustomEvents(campaignStarter);
 
             if (_isLoadedInGame) return;
             //TooltipRefresherCollection RefreshWorkshopTooltip
-            InformationManager.RegisterTooltip<CEBrothel, PropertyBasedTooltipVM>(new Action<PropertyBasedTooltipVM, object[]>(CEBrothelToolTip.BrothelTypeTooltipAction), "PropertyBasedTooltip");
+            InformationManager.RegisterTooltip<CEBrothel, PropertyBasedTooltipVM>(CEBrothelToolTip.BrothelTypeTooltipAction, "PropertyBasedTooltip");
             LoadBrothelSounds();
             _isLoadedInGame = true;
         }
@@ -1410,11 +1404,7 @@ namespace CaptivityEvents
                 foreach (MenuOption menuOption in customEvent.MenuOptions)
                 {
                     MenuCallBackDelegateRandom mcb = new(customEvent, menuOption, CEPersistence.CEEvents);
-                    gameStarter.AddGameMenuOption(
-                      menuOption.MenuID, menuOption.OptionID, menuOption.OptionText,
-                        mcb.RandomEventConditionMenuOption,
-                        mcb.RandomEventConsequenceMenuOption,
-                        false, variablesLoader.GetIntFromXML(menuOption.Order), false, "CEEVENTS");
+                    gameStarter.AddGameMenuOption(menuOption.MenuID, menuOption.OptionID, menuOption.OptionText, mcb.RandomEventConditionMenuOption, mcb.RandomEventConsequenceMenuOption, false, variablesLoader.GetIntFromXML(menuOption.Order), false, "CEEVENTS");
                 }
             }
         }
@@ -1437,41 +1427,41 @@ namespace CaptivityEvents
             foreach (CEEvent listedEvent in CEPersistence.CEEventList) AddEvent(gameStarter, listedEvent, CEPersistence.CEEvents);
         }
 
-        private void AddEvent(CampaignGameStarter gameStarter, CEEvent _listedEvent, List<CEEvent> eventList)
+        private void AddEvent(CampaignGameStarter gameStarter, CEEvent listedEvent, List<CEEvent> eventList)
         {
-            CECustomHandler.LogToFile("Loading Event: " + _listedEvent.Name);
+            CECustomHandler.LogToFile("Loading Event: " + listedEvent.Name);
 
             try
             {
-                if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                 {
-                    CEEventLoader.CELoadCaptorEvent(gameStarter, _listedEvent, eventList);
+                    CEEventLoader.CELoadCaptorEvent(gameStarter, listedEvent, eventList);
                 }
-                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                 {
-                    CEEventLoader.CELoadCaptiveEvent(gameStarter, _listedEvent, eventList);
+                    CEEventLoader.CELoadCaptiveEvent(gameStarter, listedEvent, eventList);
                 }
-                else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                 {
-                    CEEventLoader.CELoadRandomEvent(gameStarter, _listedEvent, eventList);
+                    CEEventLoader.CELoadRandomEvent(gameStarter, listedEvent, eventList);
                 }
                 else
                 {
-                    CECustomHandler.ForceLogToFile("Failed to load " + _listedEvent.Name + " contains no category flag (Captor, Captive, Random)");
+                    CECustomHandler.ForceLogToFile("Failed to load " + listedEvent.Name + " contains no category flag (Captor, Captive, Random)");
                     TextObject textObject = new("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
-                    textObject.SetTextVariable("NAME", _listedEvent.Name);
+                    textObject.SetTextVariable("NAME", listedEvent.Name);
                     textObject.SetTextVariable("TEST", "TEST");
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
                 }
             }
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("Failed to load " + _listedEvent.Name + " exception: " + e.Message + " stacktrace: " + e.StackTrace);
+                CECustomHandler.ForceLogToFile("Failed to load " + listedEvent.Name + " exception: " + e.Message + " stacktrace: " + e.StackTrace);
 
                 if (!_isLoadedInGame)
                 {
                     TextObject textObject = new("{=CEEVENTS1004}Failed to load event {NAME} : {ERROR} refer to logs in Mount & Blade II Bannerlord\\Modules\\zCaptivityEvents\\ModuleLogs for more information");
-                    textObject.SetTextVariable("NAME", _listedEvent.Name);
+                    textObject.SetTextVariable("NAME", listedEvent.Name);
                     textObject.SetTextVariable("ERROR", e.Message);
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Red));
                 }
@@ -1480,19 +1470,19 @@ namespace CaptivityEvents
 
         private void LoadBrothelSounds()
         {
-            brothelSounds.Add("female_01_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/female/01/stun"));
-            brothelSounds.Add("female_02_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/female/02/stun"));
-            brothelSounds.Add("female_03_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/female/03/stun"));
-            brothelSounds.Add("female_04_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/female/04/stun"));
-            brothelSounds.Add("female_05_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/female/05/stun"));
+            BrothelSounds.Add("female_01_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/female/01/stun"));
+            BrothelSounds.Add("female_02_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/female/02/stun"));
+            BrothelSounds.Add("female_03_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/female/03/stun"));
+            BrothelSounds.Add("female_04_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/female/04/stun"));
+            BrothelSounds.Add("female_05_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/female/05/stun"));
 
-            brothelSounds.Add("male_01_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/01/stun"));
-            brothelSounds.Add("male_02_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/02/stun"));
-            brothelSounds.Add("male_03_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/03/stun"));
-            brothelSounds.Add("male_04_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/04/stun"));
-            brothelSounds.Add("male_05_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/05/stun"));
-            brothelSounds.Add("male_06_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/06/stun"));
-            brothelSounds.Add("male_07_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/07/stun"));
+            BrothelSounds.Add("male_01_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/01/stun"));
+            BrothelSounds.Add("male_02_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/02/stun"));
+            BrothelSounds.Add("male_03_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/03/stun"));
+            BrothelSounds.Add("male_04_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/04/stun"));
+            BrothelSounds.Add("male_05_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/05/stun"));
+            BrothelSounds.Add("male_06_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/06/stun"));
+            BrothelSounds.Add("male_07_stun", SoundEvent.GetEventIdFromString("event:/voice/combat/male/07/stun"));
         }
 
         protected override void OnApplicationTick(float dt)
@@ -1523,18 +1513,18 @@ namespace CaptivityEvents
 
         private void SoundStateCheck()
         {
-            if (CEPersistence.soundLoop && CEPersistence.soundEvent != null && Game.Current.GameStateManager.ActiveState is MapState)
+            if (CEPersistence.SoundLoop && CEPersistence.SoundEvent != null && Game.Current.GameStateManager.ActiveState is MapState)
             {
                 try
                 {
-                    if (!CEPersistence.soundEvent.IsPlaying())
+                    if (!CEPersistence.SoundEvent.IsPlaying())
                     {
-                        CEPersistence.soundEvent.Play();
+                        CEPersistence.SoundEvent.Play();
                     }
                 }
                 catch (Exception)
                 {
-                    CEPersistence.soundEvent = null;
+                    CEPersistence.SoundEvent = null;
                 }
             }
         }
@@ -1542,56 +1532,59 @@ namespace CaptivityEvents
         // TODO MOVE TO PROPER LISTENERS AND AWAY FROM ONAPPLICATIONTICK
         private void AnimationStateCheck()
         {
-            if (CEPersistence.animationPlayEvent && Game.Current.GameStateManager.ActiveState is MapState)
+            if (CEPersistence.AnimationPlayEvent && Game.Current.GameStateManager.ActiveState is MapState)
             {
                 try
                 {
-                    if (Game.Current.ApplicationTime > lastCheck)
+                    if (Game.Current.ApplicationTime > _lastCheck)
                     {
-                        if (CEPersistence.animationIndex > CEPersistence.animationImageList.Count() - 1) CEPersistence.animationIndex = 0;
+                        if (CEPersistence.AnimationIndex > CEPersistence.AnimationImageList.Count() - 1) CEPersistence.AnimationIndex = 0;
 
-                        LoadTexture(CEPersistence.animationImageList[CEPersistence.animationIndex]);
-                        CEPersistence.animationIndex++;
+                        LoadTexture(CEPersistence.AnimationImageList[CEPersistence.AnimationIndex]);
+                        CEPersistence.AnimationIndex++;
 
-                        lastCheck = Game.Current.ApplicationTime + CEPersistence.animationSpeed;
+                        _lastCheck = Game.Current.ApplicationTime + CEPersistence.AnimationSpeed;
                     }
                 }
                 catch (Exception)
                 {
-                    CEPersistence.animationPlayEvent = false;
+                    CEPersistence.AnimationPlayEvent = false;
                 }
             }
         }
 
         private void RemoveCaptiveStateCheck()
         {
-            switch (CEPersistence.captiveInventoryStage)
+            switch (CEPersistence.CaptiveInventoryStage)
             {
                 case 0:
                     break;
 
                 case 1:
-                    if (Game.Current.GameStateManager.ActiveState is InventoryState inventoryState)
+                    if (Game.Current.GameStateManager.ActiveState is InventoryState)
                     {
-                        CEPersistence.captiveInventoryStage = 2;
+                        CEPersistence.CaptiveInventoryStage = 2;
                     }
+
                     break;
 
                 case 2:
-                    if (Game.Current.GameStateManager.ActiveState is MapState mapState)
+                    if (Game.Current.GameStateManager.ActiveState is MapState)
                     {
-                        if (CEPersistence.removeHero != null)
+                        if (CEPersistence.RemoveHero != null)
                         {
-                            while (MobileParty.MainParty.MemberRoster.Contains(CEPersistence.removeHero.CharacterObject))
+                            while (MobileParty.MainParty.MemberRoster.Contains(CEPersistence.RemoveHero.CharacterObject))
                             {
-                                MobileParty.MainParty.MemberRoster.RemoveTroop(CEPersistence.removeHero.CharacterObject, 1);
+                                MobileParty.MainParty.MemberRoster.RemoveTroop(CEPersistence.RemoveHero.CharacterObject);
                             }
 
-                            CEPersistence.removeHero = null;
+                            CEPersistence.RemoveHero = null;
                             PartyBase.MainParty.SetVisualAsDirty();
                         }
-                        CEPersistence.captiveInventoryStage = 0;
+
+                        CEPersistence.CaptiveInventoryStage = 0;
                     }
+
                     break;
             }
         }
@@ -1599,7 +1592,7 @@ namespace CaptivityEvents
         private void CaptiveStateCheck()
         {
             // CaptiveState
-            if (!CEPersistence.captivePlayEvent) return;
+            if (!CEPersistence.CaptivePlayEvent) return;
 
             // Dungeon
             DungeonStateCheck();
@@ -1610,46 +1603,43 @@ namespace CaptivityEvents
             // Map State -> Play Menu
             if (Game.Current.GameStateManager.ActiveState is MapState mapState)
             {
-                CEPersistence.captivePlayEvent = false;
+                CEPersistence.CaptivePlayEvent = false;
 
                 try
                 {
                     if (Hero.MainHero.IsFemale)
                     {
-                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale
-                            ? CEPersistence.CECaptorEvents.Find(item => item.Name == "CE_captor_female_sexual_menu")
-                            : CEPersistence.CECaptorEvents.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
-                        triggeredEvent.Captive = CEPersistence.captiveToPlay;
+                        CEEvent triggeredEvent = CEPersistence.CaptiveToPlay.IsFemale ? CEPersistence.CECaptorEvents.Find(item => item.Name == "CE_captor_female_sexual_menu") : CEPersistence.CECaptorEvents.Find(item => item.Name == "CE_captor_female_sexual_menu_m");
+                        triggeredEvent.Captive = CEPersistence.CaptiveToPlay;
 
                         if (mapState.AtMenu)
                         {
-                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
-                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                            CECampaignBehavior.ExtraProps.MenuToSwitchBackTo = mapState.GameMenuId;
+                            CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                         }
                         else
                         {
-                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
-                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
+                            CECampaignBehavior.ExtraProps.MenuToSwitchBackTo = null;
+                            CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo = null;
                         }
+
                         CEHelper.SafeActivateGameMenu(triggeredEvent.Name);
                         mapState.MenuContext?.SetBackgroundMeshName("wait_prisoner_female");
                     }
                     else
                     {
-                        CEEvent triggeredEvent = CEPersistence.captiveToPlay.IsFemale
-                            ? CEPersistence.CECaptorEvents.Find(item => item.Name == "CE_captor_male_sexual_menu")
-                            : CEPersistence.CECaptorEvents.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
-                        triggeredEvent.Captive = CEPersistence.captiveToPlay;
+                        CEEvent triggeredEvent = CEPersistence.CaptiveToPlay.IsFemale ? CEPersistence.CECaptorEvents.Find(item => item.Name == "CE_captor_male_sexual_menu") : CEPersistence.CECaptorEvents.Find(item => item.Name == "CE_captor_male_sexual_menu_m");
+                        triggeredEvent.Captive = CEPersistence.CaptiveToPlay;
 
                         if (mapState.AtMenu)
                         {
-                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
-                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                            CECampaignBehavior.ExtraProps.MenuToSwitchBackTo = mapState.GameMenuId;
+                            CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                         }
                         else
                         {
-                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
-                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
+                            CECampaignBehavior.ExtraProps.MenuToSwitchBackTo = null;
+                            CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo = null;
                         }
 
                         CEHelper.SafeActivateGameMenu(triggeredEvent.Name);
@@ -1658,24 +1648,21 @@ namespace CaptivityEvents
                 }
                 catch (Exception)
                 {
-                    CECustomHandler.ForceLogToFile(
-                        Hero.MainHero.IsFemale
-                        ? "Missing : CE_captor_female_sexual_menu/CE_captor_female_sexual_menu_m"
-                        : "Missing : CE_captor_male_sexual_menu/CE_captor_male_sexual_menu_m");
+                    CECustomHandler.ForceLogToFile(Hero.MainHero.IsFemale ? "Missing : CE_captor_female_sexual_menu/CE_captor_female_sexual_menu_m" : "Missing : CE_captor_male_sexual_menu/CE_captor_male_sexual_menu_m");
                 }
 
-                CEPersistence.captiveToPlay = null;
+                CEPersistence.CaptiveToPlay = null;
             }
         }
 
         private void DungeonStateCheck()
         {
-            if (CEPersistence.dungeonState == CEPersistence.DungeonState.Normal) return;
+            if (CEPersistence.CurrentDungeonState == CEPersistence.DungeonState.Normal) return;
 
             // Dungeon
             if (Game.Current.GameStateManager.ActiveState is MissionState missionStateDungeon && missionStateDungeon.CurrentMission.IsLoadingFinished)
             {
-                switch (CEPersistence.dungeonState)
+                switch (CEPersistence.CurrentDungeonState)
                 {
                     case CEPersistence.DungeonState.StartWalking:
                         if (CharacterObject.OneToOneConversationCharacter == null)
@@ -1686,39 +1673,40 @@ namespace CaptivityEvents
 
                                 Mission.Current.MainAgentServer.Controller = AgentControllerType.AI;
 
-                                WorldPosition worldPosition = new(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
+                                WorldPosition worldPosition = new(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.GameEntity.GlobalPosition, false);
 
-                                if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
+                                if (CEPersistence.AgentTalkingTo.CanBeAssignedForScriptedMovement())
                                 {
-                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
-                                    dungeonFadeOut = 2f;
+                                    CEPersistence.AgentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                    _dungeonFadeOut = 2f;
                                 }
                                 else
                                 {
-                                    CEPersistence.agentTalkingTo.DisableScriptedMovement();
-                                    CEPersistence.agentTalkingTo.HandleStopUsingAction();
-                                    CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
-                                    dungeonFadeOut = 2f;
+                                    CEPersistence.AgentTalkingTo.DisableScriptedMovement();
+                                    CEPersistence.AgentTalkingTo.HandleStopUsingAction();
+                                    CEPersistence.AgentTalkingTo.SetScriptedPosition(ref worldPosition, false, Agent.AIScriptedFrameFlags.DoNotRun);
+                                    _dungeonFadeOut = 2f;
                                 }
 
-                                behavior.BeginFadeOut(dungeonFadeOut);
+                                behavior.BeginFadeOut(_dungeonFadeOut);
                             }
                             catch (Exception)
                             {
                                 CECustomHandler.ForceLogToFile("Failed MissionCameraFadeView.");
                             }
-                            brothelTimerOne = missionStateDungeon.CurrentMission.CurrentTime + dungeonFadeOut;
-                            CEPersistence.dungeonState = CEPersistence.DungeonState.FadeIn;
+
+                            _brothelTimerOne = missionStateDungeon.CurrentMission.CurrentTime + _dungeonFadeOut;
+                            CEPersistence.CurrentDungeonState = CEPersistence.DungeonState.FadeIn;
                         }
 
                         break;
 
                     case CEPersistence.DungeonState.FadeIn:
-                        if (brothelTimerOne < missionStateDungeon.CurrentMission.CurrentTime)
+                        if (_brothelTimerOne < missionStateDungeon.CurrentMission.CurrentTime)
                         {
-                            CEPersistence.agentTalkingTo.ResetLookAgent();
-                            CEPersistence.agentTalkingTo.ResetAgentProperties();
-                            CEPersistence.dungeonState = CEPersistence.DungeonState.Normal;
+                            CEPersistence.AgentTalkingTo.ResetLookAgent();
+                            CEPersistence.AgentTalkingTo.ResetAgentProperties();
+                            CEPersistence.CurrentDungeonState = CEPersistence.DungeonState.Normal;
                             Mission.Current.EndMission();
                         }
 
@@ -1733,11 +1721,11 @@ namespace CaptivityEvents
 
         private void BrothelStateCheck()
         {
-            if (CEPersistence.brothelState == CEPersistence.BrothelState.Normal) return;
+            if (CEPersistence.CurrentBrothelState == CEPersistence.BrothelState.Normal) return;
 
             if (Game.Current.GameStateManager.ActiveState is MissionState missionStateBrothel && missionStateBrothel.CurrentMission.IsLoadingFinished)
             {
-                switch (CEPersistence.brothelState)
+                switch (CEPersistence.CurrentBrothelState)
                 {
                     case CEPersistence.BrothelState.Start:
                         if (CharacterObject.OneToOneConversationCharacter == null)
@@ -1748,88 +1736,79 @@ namespace CaptivityEvents
 
                                 Mission.Current.MainAgentServer.Controller = AgentControllerType.AI;
 
-                                if (CEPersistence.gameEntity != null)
+                                if (CEPersistence.GameEntity != null)
                                 {
-                                    WorldPosition worldPosition = new(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.gameEntity.GlobalPosition, false);
+                                    WorldPosition worldPosition = new(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.GameEntity.GlobalPosition, false);
 
-                                    if (CEPersistence.agentTalkingTo.CanBeAssignedForScriptedMovement())
+                                    if (CEPersistence.AgentTalkingTo.CanBeAssignedForScriptedMovement())
                                     {
-                                        CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
-                                        CEPersistence.brothelFadeIn = 3f;
+                                        CEPersistence.AgentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
+                                        CEPersistence.BrothelFadeIn = 3f;
                                     }
                                     else
                                     {
-                                        CEPersistence.agentTalkingTo.DisableScriptedMovement();
-                                        CEPersistence.agentTalkingTo.HandleStopUsingAction();
-                                        CEPersistence.agentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
-                                        CEPersistence.brothelFadeIn = 3f;
+                                        CEPersistence.AgentTalkingTo.DisableScriptedMovement();
+                                        CEPersistence.AgentTalkingTo.HandleStopUsingAction();
+                                        CEPersistence.AgentTalkingTo.SetScriptedPosition(ref worldPosition, true, Agent.AIScriptedFrameFlags.DoNotRun);
+                                        CEPersistence.BrothelFadeIn = 3f;
                                     }
                                 }
-                                if (CESettingsIntegrations.Instance.ActivateHotButter && CEPersistence.hotbutterAvailable)
+
+                                if (CESettingsIntegrations.Instance.ActivateHotButter && CEPersistence.HotButterAvailable)
                                 {
-                                    sfIn = .5f;          // base .5/1/.5 goes dark, then does a come-back
-                                    sfBlack = 1f;       // 1/1/.5 Goes dark AFTER
-                                    sfOut = .5f;         // .5/1/1 not too bad but goes dark after
-                                                         // .5/1/1.5 stays dark
-                                                         // 1.5/1/.95 stays dark
-                                                         // 1/1/1 stays dark
-                                                         // 1/1/.95 stays dark
+                                    SfIn = .5f; // base .5/1/.5 goes dark, then does a come-back
+                                    SfBlack = 1f; // 1/1/.5 Goes dark AFTER
+                                    SfOut = .5f; // .5/1/1 not too bad but goes dark after
+                                    // .5/1/1.5 stays dark
+                                    // 1.5/1/.95 stays dark
+                                    // 1/1/1 stays dark
+                                    // 1/1/.95 stays dark
                                 }
                                 else
                                 {
-                                    sfIn = CEPersistence.brothelFadeIn;
-                                    sfBlack = CEPersistence.brothelBlack;
-                                    sfOut = CEPersistence.brothelFadeOut;
+                                    SfIn = CEPersistence.BrothelFadeIn;
+                                    SfBlack = CEPersistence.BrothelBlack;
+                                    SfOut = CEPersistence.BrothelFadeOut;
                                 }
-                                behavior.BeginFadeOutAndIn(sfOut, sfBlack, sfIn);
+
+                                behavior.BeginFadeOutAndIn(SfOut, SfBlack, SfIn);
                             }
                             catch (Exception)
                             {
                                 CECustomHandler.ForceLogToFile("Failed MissionCameraFadeView.");
                             }
-                            brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelFadeIn;
-                            CEPersistence.brothelState = CEPersistence.BrothelState.FadeIn;
+
+                            _brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.BrothelFadeIn;
+                            CEPersistence.CurrentBrothelState = CEPersistence.BrothelState.FadeIn;
                         }
 
                         break;
 
                     case CEPersistence.BrothelState.FadeIn:
-                        if (brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
+                        if (_brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
                         {
-                            brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelBlack - 2f;
-                            brothelTimerTwo = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
-                            brothelTimerThree = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
+                            _brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.BrothelBlack - 2f;
+                            _brothelTimerTwo = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(BrothelSoundMin, BrothelSoundMax);
+                            _brothelTimerThree = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(BrothelSoundMin, BrothelSoundMax);
                             Hero.MainHero.HitPoints += 10;
 
-                            CEPersistence.agentTalkingTo.ResetLookAgent();
-                            CEPersistence.agentTalkingTo.ResetAgentProperties();
+                            CEPersistence.AgentTalkingTo.ResetLookAgent();
+                            CEPersistence.AgentTalkingTo.ResetAgentProperties();
 
-                            //if (CEPersistence.gameEntity != null)
-                            //{
-                            //    Mission.Current.MainAgent.TeleportToPosition(CEPersistence.gameEntity.GlobalPosition);
-                            //}
-                            CEPersistence.brothelState = CEPersistence.BrothelState.Black;
+                            CEPersistence.CurrentBrothelState = CEPersistence.BrothelState.Black;
 
-                            if (CESettingsIntegrations.Instance != null && CESettingsIntegrations.Instance.ActivateHotButter && CEPersistence.hotbutterAvailable)
+                            if (CESettingsIntegrations.Instance != null && CESettingsIntegrations.Instance.ActivateHotButter && CEPersistence.HotButterAvailable)
                             {
-                                brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelFadeOut;
+                                _brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.BrothelFadeOut;
                                 Mission.Current.MainAgentServer.Controller = AgentControllerType.Player;
-                                CEPersistence.brothelState = CEPersistence.BrothelState.FadeOut;
+                                CEPersistence.CurrentBrothelState = CEPersistence.BrothelState.FadeOut;
+
                                 try
                                 {
                                     string sceneToPlay = CEHelper.CustomSceneToPlay("scn_pompa_$location_culture_$location_$randomize", PartyBase.MainParty);
-                                    CharacterObject hotbutterChar = (CharacterObject)CEPersistence.agentTalkingTo.Character;
-                                    CESceneNotification data = new(
-                                    hotbutterChar.IsFemale ? Hero.MainHero.CharacterObject : hotbutterChar
-                                    , !hotbutterChar.IsFemale ? Hero.MainHero.CharacterObject : hotbutterChar
-                                        , sceneToPlay
-                                        // OLD:
-                                        // Hero.MainHero.IsFemale ? 
-                                        //    CharacterObject.Find(CEPersistence.agentTalkingTo.Character.StringId) : 
-                                        //    Hero.MainHero.CharacterObject, !Hero.MainHero.IsFemale ? 
-                                        //        CharacterObject.Find(CEPersistence.agentTalkingTo.Character.StringId) : 
-                                        //        Hero.MainHero.CharacterObject
-                                        );
+                                    CharacterObject hotbutterChar = (CharacterObject)CEPersistence.AgentTalkingTo.Character;
+
+                                    CESceneNotification data = new(hotbutterChar.IsFemale ? Hero.MainHero.CharacterObject : hotbutterChar, !hotbutterChar.IsFemale ? Hero.MainHero.CharacterObject : hotbutterChar, sceneToPlay);
                                     MBInformationManager.ShowSceneNotification(data);
                                 }
                                 catch (Exception e)
@@ -1842,42 +1821,48 @@ namespace CaptivityEvents
                         break;
 
                     case CEPersistence.BrothelState.Black:
-                        if (brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
+                        if (_brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
                         {
-                            brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.brothelFadeOut;
+                            _brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.BrothelFadeOut;
                             Mission.Current.MainAgentServer.Controller = AgentControllerType.Player;
-                            CEPersistence.brothelState = CEPersistence.BrothelState.FadeOut;
+                            CEPersistence.CurrentBrothelState = CEPersistence.BrothelState.FadeOut;
                         }
-                        else if (brothelTimerTwo < missionStateBrothel.CurrentMission.CurrentTime && (!CEPersistence.hotbutterAvailable || (CESettingsIntegrations.Instance == null || !CESettingsIntegrations.Instance.ActivateHotButter)))
+                        else if (_brothelTimerTwo < missionStateBrothel.CurrentMission.CurrentTime && (!CEPersistence.HotButterAvailable || (CESettingsIntegrations.Instance == null || !CESettingsIntegrations.Instance.ActivateHotButter)))
                         {
-                            brothelTimerTwo = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
+                            _brothelTimerTwo = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(BrothelSoundMin, BrothelSoundMax);
 
                             try
                             {
-                                int soundNumber = brothelSounds.Where(sound => { return sound.Key.StartsWith(Agent.Main.GetAgentVoiceDefinition()); }).GetRandomElementInefficiently().Value;
+                                int soundNumber = BrothelSounds.Where(sound => sound.Key.StartsWith(Agent.Main.GetAgentVoiceDefinition())).GetRandomElementInefficiently().Value;
                                 Mission.Current.MakeSound(soundNumber, Agent.Main.Frame.origin, true, false, -1, -1);
                             }
-                            catch (Exception) { }
+                            catch (Exception)
+                            {
+                                // ignored
+                            }
                         }
-                        else if (brothelTimerThree < missionStateBrothel.CurrentMission.CurrentTime && (!CEPersistence.hotbutterAvailable || (CESettingsIntegrations.Instance == null || !CESettingsIntegrations.Instance.ActivateHotButter)))
+                        else if (_brothelTimerThree < missionStateBrothel.CurrentMission.CurrentTime && (!CEPersistence.HotButterAvailable || (CESettingsIntegrations.Instance == null || !CESettingsIntegrations.Instance.ActivateHotButter)))
                         {
-                            brothelTimerThree = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(brothelSoundMin, brothelSoundMax);
+                            _brothelTimerThree = missionStateBrothel.CurrentMission.CurrentTime + MBRandom.RandomFloatRanged(BrothelSoundMin, BrothelSoundMax);
 
                             try
                             {
-                                int soundNumber = brothelSounds.Where(sound => { return sound.Key.StartsWith(CEPersistence.agentTalkingTo.GetAgentVoiceDefinition()); }).GetRandomElementInefficiently().Value;
+                                int soundNumber = BrothelSounds.Where(sound => sound.Key.StartsWith(CEPersistence.AgentTalkingTo.GetAgentVoiceDefinition())).GetRandomElementInefficiently().Value;
                                 Mission.Current.MakeSound(soundNumber, Agent.Main.Frame.origin, true, false, -1, -1);
                             }
-                            catch (Exception) { }
+                            catch (Exception)
+                            {
+                                // ignored
+                            }
                         }
 
                         break;
 
                     case CEPersistence.BrothelState.FadeOut:
-                        if (brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
+                        if (_brothelTimerOne < missionStateBrothel.CurrentMission.CurrentTime)
                         {
-                            CEPersistence.agentTalkingTo = null;
-                            CEPersistence.brothelState = CEPersistence.BrothelState.Normal;
+                            CEPersistence.AgentTalkingTo = null;
+                            CEPersistence.CurrentBrothelState = CEPersistence.BrothelState.Normal;
                         }
 
                         break;
@@ -1892,14 +1877,14 @@ namespace CaptivityEvents
         private void HuntStateCheck()
         {
             // Hunt Event To Play
-            if (CEPersistence.huntState == CEPersistence.HuntState.Normal) return;
+            if (CEPersistence.CurrentHuntState == CEPersistence.HuntState.Normal) return;
 
             // Hunt Event States
-            if ((CEPersistence.huntState == CEPersistence.HuntState.StartHunt || CEPersistence.huntState == CEPersistence.HuntState.HeadStart) && Game.Current.GameStateManager.ActiveState is MissionState missionState && missionState.CurrentMission.IsLoadingFinished)
+            if ((CEPersistence.CurrentHuntState == CEPersistence.HuntState.StartHunt || CEPersistence.CurrentHuntState == CEPersistence.HuntState.HeadStart) && Game.Current.GameStateManager.ActiveState is MissionState missionState && missionState.CurrentMission.IsLoadingFinished)
             {
                 try
                 {
-                    switch (CEPersistence.huntState)
+                    switch (CEPersistence.CurrentHuntState)
                     {
                         case CEPersistence.HuntState.StartHunt:
                             if (Mission.Current != null && Mission.Current.IsLoadingFinished && Mission.Current.CurrentTime > 2f && Mission.Current.Agents != null && !Mission.Current.Agents.Any((item) => item.IsPaused))
@@ -1917,14 +1902,14 @@ namespace CaptivityEvents
 
                                 CEHelper.AddQuickInformation(new TextObject("{=CEEVENTS1069}Let's allow them a brief lead before the pursuit begins."), 100, CharacterObject.PlayerCharacter);
 
-                                CEPersistence.huntState = CEPersistence.HuntState.HeadStart;
-                                huntingTimerOne = Mission.Current.CurrentTime + (CESettings.Instance?.HuntBegins ?? 7f);
+                                CEPersistence.CurrentHuntState = CEPersistence.HuntState.HeadStart;
+                                _huntingTimerOne = Mission.Current.CurrentTime + (CESettings.Instance?.HuntBegins ?? 7f);
                             }
 
                             break;
 
                         case CEPersistence.HuntState.HeadStart:
-                            if (Mission.Current != null && Mission.Current.Agents != null && Mission.Current.CurrentTime > huntingTimerOne)
+                            if (Mission.Current != null && Mission.Current.Agents != null && Mission.Current.CurrentTime > _huntingTimerOne)
                             {
                                 foreach (Agent agent2 in from agent in Mission.Current.Agents.ToList()
                                                          where agent.IsHuman && agent.IsEnemyOf(Agent.Main)
@@ -1934,10 +1919,9 @@ namespace CaptivityEvents
                                     component?.Panic();
                                     agent2.SetMaximumSpeedLimit(0.5f, false);
                                 }
-                                CEHelper.AddQuickInformation(new TextObject("{=CEEVENTS1068}Hunt them down!"), 100, CharacterObject.PlayerCharacter, CharacterObject.PlayerCharacter.IsFemale
-                                                                           ? "event:/voice/combat/female/01/victory"
-                                                                           : "event:/voice/combat/male/01/victory");
-                                CEPersistence.huntState = CEPersistence.HuntState.Hunting;
+
+                                CEHelper.AddQuickInformation(new TextObject("{=CEEVENTS1068}Hunt them down!"), 100, CharacterObject.PlayerCharacter, CharacterObject.PlayerCharacter.IsFemale ? "event:/voice/combat/female/01/victory" : "event:/voice/combat/male/01/victory");
+                                CEPersistence.CurrentHuntState = CEPersistence.HuntState.Hunting;
                             }
 
                             break;
@@ -1952,22 +1936,22 @@ namespace CaptivityEvents
                 catch (Exception e)
                 {
                     CECustomHandler.ForceLogToFile("Failed on hunting mission: " + e);
-                    CEPersistence.huntState = CEPersistence.HuntState.Hunting;
+                    CEPersistence.CurrentHuntState = CEPersistence.HuntState.Hunting;
                 }
             }
-            else if ((CEPersistence.huntState == CEPersistence.HuntState.HeadStart || CEPersistence.huntState == CEPersistence.HuntState.Hunting) && Game.Current.GameStateManager.ActiveState is MapState mapState && mapState.IsActive)
+            else if ((CEPersistence.CurrentHuntState == CEPersistence.HuntState.HeadStart || CEPersistence.CurrentHuntState == CEPersistence.HuntState.Hunting) && Game.Current.GameStateManager.ActiveState is MapState mapState && mapState.IsActive)
             {
-                CEPersistence.huntState = CEPersistence.HuntState.AfterBattle;
+                CEPersistence.CurrentHuntState = CEPersistence.HuntState.AfterBattle;
                 PlayerEncounter.SetPlayerVictorious();
                 if (CESettings.Instance?.HuntLetPrisonersEscape ?? false) PlayerEncounter.EnemySurrender = true;
                 PlayerEncounter.Update();
             }
-            else if (CEPersistence.huntState == CEPersistence.HuntState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapState2 && !mapState2.IsMenuState)
-            //TODO: move all of these to their proper listeners and out of the OnApplicationTick
+            else if (CEPersistence.CurrentHuntState == CEPersistence.HuntState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapState2 && !mapState2.IsMenuState)
+                //TODO: move all of these to their proper listeners and out of the OnApplicationTick
             {
                 if (PlayerEncounter.Current == null)
                 {
-                    CEPersistence.huntState = CEPersistence.HuntState.Normal;
+                    CEPersistence.CurrentHuntState = CEPersistence.HuntState.Normal;
                 }
                 else
                 {
@@ -1978,7 +1962,7 @@ namespace CaptivityEvents
 
         private void HandleFinishBattle(MapState mapState)
         {
-            CEPersistence.battleState = CEPersistence.BattleState.Normal;
+            CEPersistence.CurrentBattleState = CEPersistence.BattleState.Normal;
 
             // Validate and restore textures after battle if needed
             try
@@ -1990,46 +1974,42 @@ namespace CaptivityEvents
                 CECustomHandler.ForceLogToFile($"HandleFinishBattle: Failed to validate textures after battle: {e.Message}");
             }
 
-            PartyBase.MainParty.MemberRoster.RemoveIf(t => !t.Character.IsPlayerCharacter || CEPersistence.removePlayer);
+            PartyBase.MainParty.MemberRoster.RemoveIf(t => !t.Character.IsPlayerCharacter || CEPersistence.RemovePlayer);
 
-            foreach (TroopRosterElement troopRosterElement in CEPersistence.playerTroops)
+            foreach (TroopRosterElement troopRosterElement in CEPersistence.PlayerTroops)
             {
-                PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, 0, troopRosterElement.Xp, true, -1);
+                PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, 0, troopRosterElement.Xp);
             }
 
-            foreach (TroopRosterElement troopRosterElement in CEPersistence.temporaryTroops)
+            foreach (TroopRosterElement troopRosterElement in CEPersistence.TemporaryTroops)
             {
-                PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, 0, troopRosterElement.Xp, true, -1);
+                PartyBase.MainParty.MemberRoster.AddToCounts(troopRosterElement.Character, troopRosterElement.Number, false, 0, troopRosterElement.Xp);
             }
 
-            foreach (TroopRosterElement troopRosterElement in CEPersistence.temporaryTroops)
+            foreach (TroopRosterElement troopRosterElement in CEPersistence.TemporaryTroops)
             {
                 PartyBase.MainParty.MemberRoster.RemoveTroop(troopRosterElement.Character, troopRosterElement.Number);
             }
 
 
-            if (CEPersistence.playerWon)
+            if (CEPersistence.PlayerWon)
             {
-                if (CEPersistence.victoryEvent != null)
+                if (CEPersistence.VictoryEvent != null)
                 {
-                    CEHelper.SafeActivateGameMenu(CEPersistence.victoryEvent);
-                    mapState.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                               ? "wait_prisoner_female"
-                                                               : "wait_prisoner_male");
-                    CEPersistence.victoryEvent = null;
-                    CEPersistence.defeatEvent = null;
+                    CEHelper.SafeActivateGameMenu(CEPersistence.VictoryEvent);
+                    mapState.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
+                    CEPersistence.VictoryEvent = null;
+                    CEPersistence.DefeatEvent = null;
                 }
             }
             else
             {
-                if (CEPersistence.defeatEvent != null)
+                if (CEPersistence.DefeatEvent != null)
                 {
-                    CEHelper.SafeActivateGameMenu(CEPersistence.defeatEvent);
-                    mapState.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale
-                                                               ? "wait_prisoner_female"
-                                                               : "wait_prisoner_male");
-                    CEPersistence.victoryEvent = null;
-                    CEPersistence.defeatEvent = null;
+                    CEHelper.SafeActivateGameMenu(CEPersistence.DefeatEvent);
+                    mapState.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
+                    CEPersistence.VictoryEvent = null;
+                    CEPersistence.DefeatEvent = null;
                 }
             }
         }
@@ -2037,19 +2017,20 @@ namespace CaptivityEvents
 
         private void BattleStateCheck()
         {
-            if (CEPersistence.battleState == CEPersistence.BattleState.Normal) return;
+            if (CEPersistence.CurrentBattleState == CEPersistence.BattleState.Normal) return;
 
-            switch (CEPersistence.battleState)
+            switch (CEPersistence.CurrentBattleState)
             {
                 case CEPersistence.BattleState.StartBattle:
                     if (Game.Current.GameStateManager.ActiveState is MissionState missionState && missionState.CurrentMission.IsLoadingFinished)
                     {
-                        CEPersistence.battleState = CEPersistence.BattleState.AfterBattle;
+                        CEPersistence.CurrentBattleState = CEPersistence.BattleState.AfterBattle;
                     }
+
                     break;
                 case CEPersistence.BattleState.AfterBattle:
-                    if (CEPersistence.battleState == CEPersistence.BattleState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapState2 && !mapState2.IsMenuState)
-                    //TODO: move all of these to their proper listeners and out of the OnApplicationTick
+                    if (CEPersistence.CurrentBattleState == CEPersistence.BattleState.AfterBattle && Game.Current.GameStateManager.ActiveState is MapState mapState2 && !mapState2.IsMenuState)
+                        //TODO: move all of these to their proper listeners and out of the OnApplicationTick
                     {
                         if (PlayerEncounter.Current == null)
                         {
@@ -2061,7 +2042,7 @@ namespace CaptivityEvents
                             {
                                 CECustomHandler.ForceLogToFile("BattleStateCheck: PlayerEncounter.Current == null : " + e);
                                 LoadingWindow.DisableGlobalLoadingWindow();
-                                CEPersistence.battleState = CEPersistence.BattleState.Normal;
+                                CEPersistence.CurrentBattleState = CEPersistence.BattleState.Normal;
                             }
                         }
                         else
@@ -2071,25 +2052,26 @@ namespace CaptivityEvents
                                 if (PlayerEncounter.Battle == null)
                                 {
                                     TroopRoster troopRoster = PartyBase.MainParty.MemberRoster;
-                                    troopRoster.AddToCounts(CharacterObject.PlayerCharacter, -1, true, 0, 0, true, -1);
-                                    CEPersistence.playerWon = !((troopRoster.TotalManCount == 0 && CEPersistence.playerDied) || CEPersistence.playerSurrendered);
+                                    troopRoster.AddToCounts(CharacterObject.PlayerCharacter, -1, true);
+                                    CEPersistence.PlayerWon = !((troopRoster.TotalManCount == 0 && CEPersistence.PlayerDied) || CEPersistence.PlayerSurrendered);
 
-                                    CEPersistence.playerSurrendered = false;
-                                    CEPersistence.playerDied = false;
+                                    CEPersistence.PlayerSurrendered = false;
+                                    CEPersistence.PlayerDied = false;
 
-                                    troopRoster.AddToCounts(CharacterObject.PlayerCharacter, 1, true, 0, 0, true, -1);
+                                    troopRoster.AddToCounts(CharacterObject.PlayerCharacter, 1, true);
 
                                     HandleFinishBattle(mapState2);
+
                                     return;
                                 }
 
-                                CEPersistence.playerWon = PlayerEncounter.Battle.WinningSide == PlayerEncounter.Battle.PlayerSide;
+                                CEPersistence.PlayerWon = PlayerEncounter.Battle.WinningSide == PlayerEncounter.Battle.PlayerSide;
 
-                                if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.surrenderParty)
+                                if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.SurrenderParty)
                                 {
                                     try
                                     {
-                                        if (CEPersistence.playerWon)
+                                        if (CEPersistence.PlayerWon)
                                         {
                                             PlayerEncounter.EnemySurrender = true;
                                         }
@@ -2097,17 +2079,19 @@ namespace CaptivityEvents
                                         {
                                             PlayerEncounter.PlayerSurrender = true;
                                         }
+
                                         PlayerEncounter.Update();
-                                        CEPersistence.battleState = CEPersistence.BattleState.UpdateBattle;
+                                        CEPersistence.CurrentBattleState = CEPersistence.BattleState.UpdateBattle;
                                     }
                                     catch (Exception)
                                     {
-                                        PlayerEncounter.Finish(true);
+                                        PlayerEncounter.Finish();
                                     }
                                 }
-                                else if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.destroyParty)
+                                else if (PlayerEncounter.EncounteredMobileParty != null && CEPersistence.DestroyParty)
                                 {
                                     PlayerEncounter.Current.FinalizeBattle();
+
                                     try
                                     {
                                         DestroyPartyAction.Apply(PartyBase.MainParty, PlayerEncounter.EncounteredMobileParty);
@@ -2118,6 +2102,7 @@ namespace CaptivityEvents
                                     }
 
                                     PlayerEncounter.Finish(false);
+
                                     if (Settlement.CurrentSettlement != null)
                                     {
                                         EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
@@ -2128,6 +2113,7 @@ namespace CaptivityEvents
                                 {
                                     PlayerEncounter.Current.FinalizeBattle();
                                     PlayerEncounter.Finish(false);
+
                                     if (Settlement.CurrentSettlement != null)
                                     {
                                         EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
@@ -2139,14 +2125,15 @@ namespace CaptivityEvents
                             {
                                 CECustomHandler.ForceLogToFile("BattleStateCheck: " + e);
                                 LoadingWindow.DisableGlobalLoadingWindow();
-                                CEPersistence.battleState = CEPersistence.BattleState.Normal;
+                                CEPersistence.CurrentBattleState = CEPersistence.BattleState.Normal;
                             }
                         }
                     }
+
                     break;
                 case CEPersistence.BattleState.UpdateBattle:
-                    if (CEPersistence.battleState == CEPersistence.BattleState.UpdateBattle && Game.Current.GameStateManager.ActiveState is MapState mapState3 && !mapState3.IsMenuState)
-                    //TODO: move all of these to their proper listeners and out of the OnApplicationTick
+                    if (CEPersistence.CurrentBattleState == CEPersistence.BattleState.UpdateBattle && Game.Current.GameStateManager.ActiveState is MapState mapState3 && !mapState3.IsMenuState)
+                        //TODO: move all of these to their proper listeners and out of the OnApplicationTick
                     {
                         try
                         {
@@ -2161,15 +2148,12 @@ namespace CaptivityEvents
                         }
                         catch (Exception)
                         {
-                            CEPersistence.battleState = CEPersistence.BattleState.Normal;
+                            CEPersistence.CurrentBattleState = CEPersistence.BattleState.Normal;
                         }
                     }
-                    break;
-                default:
+
                     break;
             }
-
-
         }
 
         private void ForceAgentDropEquipment(Agent agent)
@@ -2184,7 +2168,10 @@ namespace CaptivityEvents
 
                 if (agent.HasMount) agent.MountAgent.Die(new Blow(), Agent.KillInfo.Musket);
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
     }
 }

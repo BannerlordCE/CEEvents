@@ -5,7 +5,7 @@ namespace CaptivityEvents.Brothel
 {
     internal static class CEBrothelToolTip
     {
-        public static void BrothelTypeTooltipAction(this PropertyBasedTooltipVM tooltipVM, object[] args) => UpdateTooltip(tooltipVM, args[0] as CEBrothel);
+        public static void BrothelTypeTooltipAction(this PropertyBasedTooltipVM tooltipVM, object[] args) => tooltipVM.UpdateTooltip(args[0] as CEBrothel);
 
         public static void UpdateTooltip(this PropertyBasedTooltipVM tooltipVM, CEBrothel brothel)
         {

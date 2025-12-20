@@ -15,9 +15,7 @@ using System.Text;
 using System.Threading;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.GameState;
-using TaleWorlds.CampaignSystem.Naval;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Settlements.Locations;
@@ -45,6 +43,7 @@ namespace CaptivityEvents.Helper
                 HardcodedCustomSettings _provider = new();
 
                 CECustomSettings customSettings = CECustomHandler.LoadCustomSettings();
+
                 if (customSettings != null)
                 {
                     _provider.EventCaptiveOn = customSettings.EventCaptiveOn;
@@ -156,17 +155,17 @@ namespace CaptivityEvents.Helper
                 if (!flag) return "Wrong input.\nFormat is \"captivity.force_fire_event [EventName] [CaptiveName]\".";
 
                 string result;
-                CEEvent ceEvent;
+
 
                 // Local function to handle the successful forced event launch
                 void ForceLaunchEvent(MapState mapState)
                 {
                     Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
-                    if (!mapState.AtMenu)
-                        CEHelper.SafeActivateGameMenu("prisoner_wait");
+                    if (!mapState.AtMenu) CEHelper.SafeActivateGameMenu("prisoner_wait");
 
                     CEHelper.SafeSwitchToMenu(result);
                 }
+
 
                 // ─── PLAYER CAPTIVE PATH ─────────────────────────────
                 if (PlayerCaptivity.IsCaptive)
@@ -175,9 +174,12 @@ namespace CaptivityEvents.Helper
 
                     switch (result)
                     {
-                        case "$FAILEDTOFIND": return "Failed to load event list.";
-                        case "$EVENTNOTFOUND": return "Event not found.";
-                        case "$EVENTCONDITIONSNOTMET": return "Event conditions are not met.";
+                        case "$FAILEDTOFIND":
+                            return "Failed to load event list.";
+                        case "$EVENTNOTFOUND":
+                            return "Event not found.";
+                        case "$EVENTCONDITIONSNOTMET":
+                            return "Event conditions are not met.";
                     }
 
                     if (result.StartsWith("$")) return result.Substring(1);
@@ -185,16 +187,17 @@ namespace CaptivityEvents.Helper
                     if (Game.Current.GameStateManager.ActiveState is MapState mapStateCaptive)
                     {
                         ForceLaunchEvent(mapStateCaptive);
+
                         return "Successfully force launched event.";
                     }
+
                     return "Failed to launch event, incorrect game state.";
                 }
 
                 // ─── RANDOM EVENT PATH ─────────────────────────────
-                result = CEEventManager.FireSpecificEventRandom(eventName, out ceEvent, true);
+                result = CEEventManager.FireSpecificEventRandom(eventName, out CEEvent ceEvent, true);
 
-                if (result == "$FAILEDTOFIND")
-                    return "Failed to load event list.";
+                if (result == "$FAILEDTOFIND") return "Failed to load event list.";
 
                 if (result == "$EVENTNOTFOUND" || result == "$EVENTCONDITIONSNOTMET")
                 {
@@ -205,10 +208,14 @@ namespace CaptivityEvents.Helper
 
                         switch (result)
                         {
-                            case "$FAILEDTOFIND": return "Failed to load event list.";
-                            case "$FAILTOFINDHERO": return "Failed to find specified captive in party: " + heroName;
-                            case "$EVENTNOTFOUND": return "Event not found.";
-                            case "$EVENTCONDITIONSNOTMET": return "No captives meet the event conditions.";
+                            case "$FAILEDTOFIND":
+                                return "Failed to load event list.";
+                            case "$FAILTOFINDHERO":
+                                return "Failed to find specified captive in party: " + heroName;
+                            case "$EVENTNOTFOUND":
+                                return "Event not found.";
+                            case "$EVENTCONDITIONSNOTMET":
+                                return "No captives meet the event conditions.";
                         }
 
                         if (result.StartsWith("$")) return result.Substring(1);
@@ -216,8 +223,10 @@ namespace CaptivityEvents.Helper
                         if (Game.Current.GameStateManager.ActiveState is MapState mapStateCaptor)
                         {
                             ForceLaunchEvent(mapStateCaptor);
+
                             return "Successfully force launched event.";
                         }
+
                         return "Failed to launch event, incorrect game state.";
                     }
                     else
@@ -229,14 +238,10 @@ namespace CaptivityEvents.Helper
                 // ─── SUCCESS PATH ─────────────────────────────
                 if (result.StartsWith("$")) return result.Substring(1);
 
-                if (Game.Current.GameStateManager.ActiveState is MapState mapStateRandom)
-                {
-                    ForceLaunchEvent(mapStateRandom);
-                    return "Successfully force launched event.";
-                }
+                if (Game.Current.GameStateManager.ActiveState is not MapState mapStateRandom) return "Failed to launch event, incorrect game state.";
+                ForceLaunchEvent(mapStateRandom);
 
-                return "Failed to launch event, incorrect game state.";
-
+                return "Successfully force launched event." + ceEvent.Name;
             }
             catch (Exception e)
             {
@@ -246,16 +251,19 @@ namespace CaptivityEvents.Helper
 
         private static void LaunchCaptorEvent(CEEvent returnedEvent)
         {
-            if (CEHelper.notificationCaptorExists) return;
+            if (CEHelper.NotificationCaptorExists) return;
 
             if (returnedEvent == null) return;
-            CEHelper.notificationCaptorExists = true;
+            CEHelper.NotificationCaptorExists = true;
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName)) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName);
-                else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_sexual_notification");
-                else new CESubModule().LoadCampaignNotificationTexture("CE_castle_notification");
+                if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName))
+                    new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName);
+                else if (returnedEvent.SexualContent)
+                    new CESubModule().LoadCampaignNotificationTexture("CE_sexual_notification");
+                else
+                    new CESubModule().LoadCampaignNotificationTexture("CE_castle_notification");
             }
             catch (Exception e)
             {
@@ -270,16 +278,19 @@ namespace CaptivityEvents.Helper
 
         private static void LaunchRandomEvent(CEEvent returnedEvent)
         {
-            if (CEHelper.notificationEventExists) return;
+            if (CEHelper.NotificationEventExists) return;
 
             if (returnedEvent == null) return;
-            CEHelper.notificationEventExists = true;
+            CEHelper.NotificationEventExists = true;
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName)) new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
-                else if (returnedEvent.SexualContent) new CESubModule().LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
-                else new CESubModule().LoadCampaignNotificationTexture("CE_random_notification", 1);
+                if (!string.IsNullOrWhiteSpace(returnedEvent.NotificationName))
+                    new CESubModule().LoadCampaignNotificationTexture(returnedEvent.NotificationName, 1);
+                else if (returnedEvent.SexualContent)
+                    new CESubModule().LoadCampaignNotificationTexture("CE_random_sexual_notification", 1);
+                else
+                    new CESubModule().LoadCampaignNotificationTexture("CE_random_notification", 1);
             }
             catch (Exception e)
             {
@@ -309,6 +320,7 @@ namespace CaptivityEvents.Helper
                 if (CampaignCheats.CheckParameters(strings, 1))
                 {
                     eventName = strings[0];
+
                     if (string.IsNullOrEmpty(eventName)) return "Wrong input.\nFormat is \"captivity.fire_event [EventName] [CaptiveName]\".";
 
                     flag = true;
@@ -326,6 +338,7 @@ namespace CaptivityEvents.Helper
                 if (!flag) return "Wrong input.\nFormat is \"captivity.fire_event [EventName] [CaptiveName]\".";
                 string result;
                 CEEvent returnedEvent;
+
 
                 // Helper to handle launching events
                 void HandleEventLaunch(CEEvent ceEventToLaunch, MapState mapState)
@@ -349,13 +362,14 @@ namespace CaptivityEvents.Helper
                             CEHelper.SafeActivateGameMenu("prisoner_wait");
                         else
                         {
-                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
-                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                            CECampaignBehavior.ExtraProps.MenuToSwitchBackTo = mapState.GameMenuId;
+                            CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                         }
 
                         CEHelper.SafeSwitchToMenu(result);
                     }
                 }
+
 
                 // ─── PLAYER CAPTIVE PATH ─────────────────────────────
                 if (PlayerCaptivity.IsCaptive)
@@ -364,9 +378,12 @@ namespace CaptivityEvents.Helper
 
                     switch (result)
                     {
-                        case "$FAILEDTOFIND": return "Failed to load event list.";
-                        case "$EVENTNOTFOUND": return "Event not found.";
-                        case "$EVENTCONDITIONSNOTMET": return "Event conditions are not met.";
+                        case "$FAILEDTOFIND":
+                            return "Failed to load event list.";
+                        case "$EVENTNOTFOUND":
+                            return "Event not found.";
+                        case "$EVENTCONDITIONSNOTMET":
+                            return "Event conditions are not met.";
                     }
 
                     if (result.StartsWith("$")) return result.Substring(1);
@@ -379,14 +396,15 @@ namespace CaptivityEvents.Helper
                             CEHelper.SafeActivateGameMenu("prisoner_wait");
                         else
                         {
-                            CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapStateCaptive.GameMenuId;
-                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapStateCaptive.MenuContext.CurrentBackgroundMeshName;
+                            CECampaignBehavior.ExtraProps.MenuToSwitchBackTo = mapStateCaptive.GameMenuId;
+                            CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo = mapStateCaptive.MenuContext.CurrentBackgroundMeshName;
                         }
 
                         CEHelper.SafeSwitchToMenu(result);
 
                         return "Successfully launched event.";
                     }
+
                     return "Failed to launch event, incorrect game state.";
                 }
 
@@ -403,10 +421,14 @@ namespace CaptivityEvents.Helper
 
                         switch (result)
                         {
-                            case "$FAILEDTOFIND": return "Failed to load event list.";
-                            case "$FAILTOFINDHERO": return "Failed to find specified captive in party: " + heroName;
-                            case "$EVENTNOTFOUND": return "Event not found.";
-                            case "$EVENTCONDITIONSNOTMET": return "No captives meet the event conditions.";
+                            case "$FAILEDTOFIND":
+                                return "Failed to load event list.";
+                            case "$FAILTOFINDHERO":
+                                return "Failed to find specified captive in party: " + heroName;
+                            case "$EVENTNOTFOUND":
+                                return "Event not found.";
+                            case "$EVENTCONDITIONSNOTMET":
+                                return "No captives meet the event conditions.";
                         }
 
                         if (result.StartsWith("$")) return result.Substring(1);
@@ -414,6 +436,7 @@ namespace CaptivityEvents.Helper
                         if (Game.Current.GameStateManager.ActiveState is MapState mapStateCaptor)
                         {
                             HandleEventLaunch(returnedEvent, mapStateCaptor);
+
                             return "Successfully launched event.";
                         }
 
@@ -428,14 +451,14 @@ namespace CaptivityEvents.Helper
                 // ─── SUCCESS PATH ─────────────────────────────
                 if (result.StartsWith("$")) return result.Substring(1);
 
-                if (Game.Current.GameStateManager.ActiveState is MapState mapStateRandom)
+                if (Game.Current.GameStateManager.ActiveState is MapState)
                 {
                     HandleEventLaunch(returnedEvent, null);
+
                     return "Successfully launched event.";
                 }
 
                 return "Failed to launch event, incorrect game state.";
-
             }
             catch (Exception e)
             {
@@ -460,6 +483,7 @@ namespace CaptivityEvents.Helper
                 if (CampaignCheats.CheckParameters(strings, 1))
                 {
                     eventName = strings[0];
+
                     if (string.IsNullOrEmpty(eventName)) return "Wrong input.\nFormat is \"captivity.can_i_run_this_event [EventName] [CaptiveName]\".";
 
                     flag = true;
@@ -485,15 +509,17 @@ namespace CaptivityEvents.Helper
 
                     switch (result)
                     {
-                        case "$FAILEDTOFIND": return "Failed to load event list.";
-                        case "$EVENTNOTFOUND": return "Event not found.";
-                        case "$EVENTCONDITIONSNOTMET": return "Event conditions are not met.";
+                        case "$FAILEDTOFIND":
+                            return "Failed to load event list.";
+                        case "$EVENTNOTFOUND":
+                            return "Event not found.";
+                        case "$EVENTCONDITIONSNOTMET":
+                            return "Event conditions are not met.";
                     }
 
                     if (result.StartsWith("$")) return result.Substring(1);
 
-                    if (Game.Current.GameStateManager.ActiveState is MapState)
-                        return "Event can be ran.";
+                    if (Game.Current.GameStateManager.ActiveState is MapState) return "Event can be ran.";
 
                     return "Failed to launch event, incorrect game state.";
                 }
@@ -501,8 +527,7 @@ namespace CaptivityEvents.Helper
                 // ─── RANDOM EVENT PATH ─────────────────────────────
                 result = CEEventManager.FireSpecificEventRandom(eventName, out returnedEvent);
 
-                if (result == "$FAILEDTOFIND")
-                    return "Failed to load event list.";
+                if (result == "$FAILEDTOFIND") return "Failed to load event list.";
 
                 if (result == "$EVENTNOTFOUND" || result == "$EVENTCONDITIONSNOTMET")
                 {
@@ -513,16 +538,19 @@ namespace CaptivityEvents.Helper
 
                         switch (result)
                         {
-                            case "$FAILEDTOFIND": return "Failed to load event list.";
-                            case "$FAILTOFINDHERO": return "Failed to find specified captive in party: " + heroName;
-                            case "$EVENTNOTFOUND": return "Event not found.";
-                            case "$EVENTCONDITIONSNOTMET": return "No captives meet the event conditions.";
+                            case "$FAILEDTOFIND":
+                                return "Failed to load event list.";
+                            case "$FAILTOFINDHERO":
+                                return "Failed to find specified captive in party: " + heroName;
+                            case "$EVENTNOTFOUND":
+                                return "Event not found.";
+                            case "$EVENTCONDITIONSNOTMET":
+                                return "No captives meet the event conditions.";
                         }
 
                         if (result.StartsWith("$")) return result.Substring(1);
 
-                        if (Game.Current.GameStateManager.ActiveState is MapState)
-                            return "Event can be ran.";
+                        if (Game.Current.GameStateManager.ActiveState is MapState) return "Event can be ran.";
 
                         return "Failed to launch event, incorrect game state.";
                     }
@@ -535,8 +563,7 @@ namespace CaptivityEvents.Helper
                 // ─── SUCCESS PATH ─────────────────────────────
                 if (result.StartsWith("$")) return result.Substring(1);
 
-                if (Game.Current.GameStateManager.ActiveState is MapState)
-                    return "Event can be ran.";
+                if (Game.Current.GameStateManager.ActiveState is MapState) return "Event can be ran. " + returnedEvent?.Name;
 
                 return "Failed to launch event, incorrect game state.";
             }
@@ -606,7 +633,6 @@ namespace CaptivityEvents.Helper
 
                 foreach (CEEvent ceEvent in CEPersistence.CECallableEvents)
                 {
-
                     string eventName = ceEvent.Name;
                     string result;
                     CEEvent returnedEvent = null;
@@ -616,11 +642,9 @@ namespace CaptivityEvents.Helper
                     {
                         result = CEEventManager.FireSpecificEvent(eventName);
 
-                        if (result.StartsWith("$"))
-                            continue;
+                        if (result.StartsWith("$")) continue;
 
-                        if (Game.Current.GameStateManager.ActiveState is not MapState)
-                            continue;
+                        if (Game.Current.GameStateManager.ActiveState is not MapState) continue;
 
                         goto EVENT_SUCCEEDED;
                     }
@@ -630,29 +654,25 @@ namespace CaptivityEvents.Helper
 
                     if (!result.StartsWith("$"))
                     {
-                        if (Game.Current.GameStateManager.ActiveState is not MapState)
-                            continue;
+                        if (Game.Current.GameStateManager.ActiveState is not MapState) continue;
 
                         goto EVENT_SUCCEEDED;
                     }
 
                     // ─── CAPTOR FALLBACK ─────────────────────────────────
-                    if (PartyBase.MainParty.NumberOfPrisoners <= 0)
-                        continue;
+                    if (PartyBase.MainParty.NumberOfPrisoners <= 0) continue;
 
-                    result = CEEventManager.FireSpecificEventPartyLeader(eventName, out returnedEvent, false, null);
+                    result = CEEventManager.FireSpecificEventPartyLeader(eventName, out returnedEvent);
 
-                    if (result.StartsWith("$"))
-                        continue;
+                    if (result.StartsWith("$")) continue;
 
-                    if (Game.Current.GameStateManager.ActiveState is not MapState)
-                        continue;
+                    if (Game.Current.GameStateManager.ActiveState is not MapState) continue;
 
                     EVENT_SUCCEEDED:
+
                     if (searchActive)
                     {
-                        if (ceEvent.Name.ToLower().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) != -1)
-                            text += ceEvent.Name + "\n";
+                        if (ceEvent.Name.ToLower().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) != -1) text += ceEvent.Name + "\n";
                     }
                     else
                     {
@@ -678,14 +698,12 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.impregnate [HERO]\".";
 
-                CEImpregnationSystem _impregnation = new();
+                CEImpregnationSystem impregnation = new();
                 string searchTerm = null;
 
                 if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
-                Hero hero = string.IsNullOrWhiteSpace(searchTerm)
-                    ? Hero.MainHero
-                    : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
+                Hero hero = string.IsNullOrWhiteSpace(searchTerm) ? Hero.MainHero : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
 
                 if (hero == null)
                 {
@@ -693,7 +711,8 @@ namespace CaptivityEvents.Helper
                 }
                 else
                 {
-                    _impregnation.ImpregnationChance(hero, 0, true, null);
+                    impregnation.ImpregnationChance(hero, 0, true);
+
                     return "Done.";
                 }
             }
@@ -737,7 +756,7 @@ namespace CaptivityEvents.Helper
                 if (!flagValid) return "Wrong input.\nFormat is \"captivity.ImpregnateBy [HERO] [HERO]\".";
                 //End of Validation
 
-                CEImpregnationSystem _impregnation = new();
+                CEImpregnationSystem impregnation = new();
 
                 Hero targetHero = Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == targetName);
                 Hero fromHero = Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == fromName);
@@ -748,7 +767,8 @@ namespace CaptivityEvents.Helper
                 }
                 else
                 {
-                    _impregnation.ImpregnationChance(targetHero, 0, false, fromHero);
+                    impregnation.ImpregnationChance(targetHero, 0, false, fromHero);
+
                     return ("Done. If allowed, " + targetName + " is now carrying the child of " + fromName);
                 }
             }
@@ -780,13 +800,9 @@ namespace CaptivityEvents.Helper
 
                 if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
-                Hero hero = string.IsNullOrWhiteSpace(searchTerm)
-                    ? Hero.MainHero
-                    : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
+                Hero hero = string.IsNullOrWhiteSpace(searchTerm) ? Hero.MainHero : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
 
-                return hero == null
-                    ? "Hero not found."
-                    : "Location : " + CEEventChecker.LocationString(hero.IsPrisoner ? hero.PartyBelongedToAsPrisoner : hero.PartyBelongedTo.Party);
+                return hero == null ? "Hero not found." : "Location : " + CEEventChecker.LocationString(hero.IsPrisoner ? hero.PartyBelongedToAsPrisoner : hero.PartyBelongedTo.Party);
             }
             catch (Exception e)
             {
@@ -816,13 +832,9 @@ namespace CaptivityEvents.Helper
 
                 if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
-                Hero hero = string.IsNullOrWhiteSpace(searchTerm)
-                    ? Hero.MainHero
-                    : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
+                Hero hero = string.IsNullOrWhiteSpace(searchTerm) ? Hero.MainHero : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
 
-                return hero == null
-                    ? "Hero not found."
-                    : CEEventChecker.CheckFlags(hero.CharacterObject, hero.IsPrisoner ? hero.PartyBelongedToAsPrisoner : hero.PartyBelongedTo.Party);
+                return hero == null ? "Hero not found." : CEEventChecker.CheckFlags(hero.CharacterObject, hero.IsPrisoner ? hero.PartyBelongedToAsPrisoner : hero.PartyBelongedTo.Party);
             }
             catch (Exception e)
             {
@@ -857,26 +869,26 @@ namespace CaptivityEvents.Helper
                 }
 
 
-                debug += "\nNotification Status:\nCaptor Exists: " + CEHelper.notificationCaptorExists + "\nRandom Exists: " + CEHelper.notificationEventExists;
+                debug += "\nNotification Status:\nCaptor Exists: " + CEHelper.NotificationCaptorExists + "\nRandom Exists: " + CEHelper.NotificationEventExists;
 
                 debug += "\nPregnancy Status:\n";
 
                 int index = 0;
 
                 CECampaignBehavior.HeroPregnancies.ForEach(pregnancy =>
-                {
-                    debug += "Index[" + index + "] - DueDate: " + pregnancy.DueDate + ", Father: " + pregnancy?.Father?.Name + ", Mother: " + pregnancy?.Mother?.Name + ", AlreadyOccurred: " + (pregnancy.AlreadyOccurred ? "Yes" : "No") + "\n";
-                    index++;
-                });
+                                                           {
+                                                               debug += "Index[" + index + "] - DueDate: " + pregnancy.DueDate + ", Father: " + pregnancy.Father?.Name + ", Mother: " + pregnancy.Mother?.Name + ", AlreadyOccurred: " + (pregnancy.AlreadyOccurred ? "Yes" : "No") + "\n";
+                                                               index++;
+                                                           });
 
                 debug += "\nReturn Equipment Status:\n";
                 index = 0;
 
                 CECampaignBehavior.HeroReturnEquipment.ForEach(returnEquipment =>
-                {
-                    debug += "Index[" + index + "] - Name: " + returnEquipment?.Captive?.Name + ", AlreadyOccurred: " + (returnEquipment.AlreadyOccurred ? "Yes" : "No") + "\n";
-                    index++;
-                });
+                                                               {
+                                                                   debug += "Index[" + index + "] - Name: " + returnEquipment?.Captive?.Name + ", AlreadyOccurred: " + (returnEquipment is { AlreadyOccurred: true } ? "Yes" : "No") + "\n";
+                                                                   index++;
+                                                               });
 
                 return debug;
             }
@@ -899,9 +911,8 @@ namespace CaptivityEvents.Helper
 
                 if (!CampaignCheats.CheckParameters(strings, 0)) searchTerm = string.Join(" ", strings);
 
-                Hero hero = string.IsNullOrWhiteSpace(searchTerm)
-                ? Hero.MainHero
-                : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
+                Hero hero = string.IsNullOrWhiteSpace(searchTerm) ? Hero.MainHero : Campaign.Current.AliveHeroes.FirstOrDefault(heroToFind => heroToFind.Name.ToString() == searchTerm);
+
                 if (hero == null) return "Hero not found.";
 
                 try
@@ -943,9 +954,7 @@ namespace CaptivityEvents.Helper
                 {
                     bool successful = CECampaignBehavior.ClearPregnancyList();
 
-                    return successful
-                        ? "Successfully cleared pregnancies of Captivity Events"
-                        : "Failed to Clear";
+                    return successful ? "Successfully cleared pregnancies of Captivity Events" : "Failed to Clear";
                 }
                 catch (Exception e)
                 {
@@ -974,9 +983,7 @@ namespace CaptivityEvents.Helper
                     CEBrothelBehavior.CleanList();
                     ResetStatus([]);
 
-                    return successful
-                        ? "Successfully cleaned save of captivity events data. Save & Exit the game now."
-                        : "Failed to Clean";
+                    return successful ? "Successfully cleaned save of captivity events data. Save & Exit the game now." : "Failed to Clean";
                 }
                 catch (Exception e)
                 {
@@ -1004,17 +1011,18 @@ namespace CaptivityEvents.Helper
                 if (CampaignCheats.CheckParameters(strings, 1)) specificTest = strings[0];
 
                 string test = "--- CE Test ---";
+
                 try
                 {
                     if (specificTest != null)
                     {
                         test += specificTest switch
-                        {
-                            "1" => "\n" + CETests.RunTestOne(),
-                            "2" => "\n" + CETests.RunTestTwo(),
-                            "3" => "\n" + CETests.RunTestThree(),
-                            _ => "\nNot Found",
-                        };
+                                {
+                                    "1" => "\n" + CETests.RunTestOne(),
+                                    "2" => "\n" + CETests.RunTestTwo(),
+                                    "3" => "\n" + CETests.RunTestThree(),
+                                    _ => "\nNot Found",
+                                };
                     }
                     else
                     {
@@ -1055,21 +1063,23 @@ namespace CaptivityEvents.Helper
                     RaftStateChangeAction.DeactivateRaftStateForParty(MobileParty.MainParty);
 
                     Hero.MainHero.Children.ForEach(child =>
-                    {
-                        child.Clan = Hero.MainHero.Clan;
-                        if (child.CharacterObject.Occupation != Occupation.Lord)
-                        {
-                            PropertyInfo fi = child.CharacterObject.GetType().GetProperty("Occupation", BindingFlags.Instance | BindingFlags.Public);
-                            fi?.SetValue(child.CharacterObject, Occupation.Lord);
-                        }
-                    });
+                                                   {
+                                                       child.Clan = Hero.MainHero.Clan;
+
+                                                       if (child.CharacterObject.Occupation != Occupation.Lord)
+                                                       {
+                                                           PropertyInfo fi = child.CharacterObject.GetType().GetProperty("Occupation", BindingFlags.Instance | BindingFlags.Public);
+                                                           fi?.SetValue(child.CharacterObject, Occupation.Lord);
+                                                       }
+                                                   });
 
                     string test = "";
 
-                    CEBrothelBehavior._brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanAlways", "CanAlways", "CanNever", "CanNever", ["empire_house_c_tavern_a", "", "", ""], null);
-                    CEBrothelBehavior._isBrothelInitialized = true;
+                    CEBrothelBehavior.Brothel = new Location("brothel", new TextObject("{=CEEVENTS1099}Brothel"), new TextObject("{=CEEVENTS1099}Brothel"), 30, true, false, "CanAlways", "CanAlways", "CanNever", "CanNever", ["empire_house_c_tavern_a", "", "", ""], null);
+                    CEBrothelBehavior.IsBrothelInitialized = true;
 
                     List<CEBrothel> list = CEBrothelBehavior.GetPlayerBrothels();
+
                     foreach (CEBrothel brothel in list)
                     {
                         test += "\n" + brothel.Name;
@@ -1107,6 +1117,7 @@ namespace CaptivityEvents.Helper
                     else
                     {
                         CECustomHandler.ForceLogToFile("CESubModule.Instance is null, cannot reload images");
+
                         return "Error: CESubModule.Instance is null";
                     }
 
@@ -1114,7 +1125,7 @@ namespace CaptivityEvents.Helper
 
                     CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
 
-                    List<string> modulePaths = CEHelper.GetModulePaths(modulesFound, out List<ModuleInfo> modules);
+                    List<string> modulePaths = CEHelper.GetModulePaths(modulesFound, out List<ModuleInfo> _);
 
                     // Load Images
                     string fullPath = BasePath.Name + "Modules/zCaptivityEvents/ModuleLoader/";
@@ -1156,7 +1167,10 @@ namespace CaptivityEvents.Helper
                                     }
                                 }
                             }
-                            catch (Exception) { }
+                            catch (Exception)
+                            {
+                                // ignored
+                            }
                         }
                     }
 
@@ -1231,19 +1245,17 @@ namespace CaptivityEvents.Helper
             {
                 Thread.Sleep(500);
 
-                if (CampaignCheats.CheckHelp(strings))
-                    return "Format is \"captivity.reload_events \".";
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.reload_events \".";
 
-                CEHelper.notificationCaptorExists = false;
-                CEHelper.notificationEventExists = false;
+                CEHelper.NotificationCaptorExists = false;
+                CEHelper.NotificationEventExists = false;
 
                 // Load modules
                 string[] modulesFound = Utilities.GetModulesNames();
                 CECustomHandler.ForceLogToFile("\n -- Loaded Modules -- \n" + string.Join("\n", modulesFound));
                 List<string> modulePaths = CEHelper.GetModulePaths(modulesFound, out List<ModuleInfo> modules);
 
-                if (Campaign.Current?.GameManager == null)
-                    return "Cannot reload in the current campaign.";
+                if (Campaign.Current?.GameManager == null) return "Cannot reload in the current campaign.";
 
                 // Remove old game menus
                 Campaign.Current.GameMenuManager.RemoveRelatedGameMenus("CEEVENTS");
@@ -1283,87 +1295,74 @@ namespace CaptivityEvents.Helper
                     }
                 }
 
-                CEHelper.brothelFlagFemale = false;
-                CEHelper.brothelFlagMale = false;
+                CEHelper.BrothelFlagFemale = false;
+                CEHelper.BrothelFlagMale = false;
 
                 var campaignGameStarter = new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager);
                 var variablesLoader = new CEVariablesLoader();
 
                 // Process events
-                foreach (var _listedEvent in CEPersistence.CEEvents.Where(e => !string.IsNullOrWhiteSpace(e.Name)))
+                foreach (var listedEvent in CEPersistence.CEEvents.Where(e => !string.IsNullOrWhiteSpace(e.Name)))
                 {
-                    if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwritable)
-                        && (CEPersistence.CEEventList.Any(x => x.Name == _listedEvent.Name) || CEPersistence.CEWaitingList.Any(x => x.Name == _listedEvent.Name)))
-                        continue;
+                    if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwritable) && (CEPersistence.CEEventList.Any(x => x.Name == listedEvent.Name) || CEPersistence.CEWaitingList.Any(x => x.Name == listedEvent.Name))) continue;
 
                     // Set brothel flags
-                    if (!CEHelper.brothelFlagFemale && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) &&
-                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) &&
-                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) &&
-                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) &&
-                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale))
+                    if (!CEHelper.BrothelFlagFemale && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsFemale))
                     {
-                        CEHelper.brothelFlagFemale = true;
+                        CEHelper.BrothelFlagFemale = true;
                     }
 
-                    if (!CEHelper.brothelFlagMale && _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) &&
-                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) &&
-                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) &&
-                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) &&
-                        _listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale))
+                    if (!CEHelper.BrothelFlagMale && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroIsProstitute) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Prostitution) && listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.HeroGenderIsMale))
                     {
-                        CEHelper.brothelFlagMale = true;
+                        CEHelper.BrothelFlagMale = true;
                     }
 
-                    if (_listedEvent.MenuOptions?.Length > 0)
-                        CEPersistence.CEMenuOptionEvents.Add(_listedEvent);
+                    if (listedEvent.MenuOptions?.Length > 0) CEPersistence.CEMenuOptionEvents.Add(listedEvent);
 
-                    if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredSettlement))
-                        CEPersistence.CEPartyEnteredSettlementEvents.Add(_listedEvent);
+                    if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.PartyEnteredSettlement)) CEPersistence.CEPartyEnteredSettlementEvents.Add(listedEvent);
 
-                    if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BirthAlternative))
-                        CEPersistence.CEAlternativePregnancyEvents.Add(_listedEvent);
-                    else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DeathAlternative))
-                        CEPersistence.CEAlternativeDeathEvents.Add(_listedEvent);
-                    else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.MarriageAlternative))
-                        CEPersistence.CEAlternativeMarriageEvents.Add(_listedEvent);
-                    else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DesertionAlternative))
-                        CEPersistence.CEAlternativeDesertionEvents.Add(_listedEvent);
-                    else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
-                        CEPersistence.CEWaitingList.Add(_listedEvent);
+                    if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.BirthAlternative))
+                        CEPersistence.CEAlternativePregnancyEvents.Add(listedEvent);
+                    else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DeathAlternative))
+                        CEPersistence.CEAlternativeDeathEvents.Add(listedEvent);
+                    else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.MarriageAlternative))
+                        CEPersistence.CEAlternativeMarriageEvents.Add(listedEvent);
+                    else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.DesertionAlternative))
+                        CEPersistence.CEAlternativeDesertionEvents.Add(listedEvent);
+                    else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.WaitingMenu))
+                        CEPersistence.CEWaitingList.Add(listedEvent);
                     else
                     {
-                        if (!_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
+                        if (!listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
                         {
                             int weightedChance = 1;
+
                             try
                             {
-                                if (_listedEvent.WeightedChanceOfOccurring != null)
-                                    weightedChance = variablesLoader.GetIntFromXML(_listedEvent.WeightedChanceOfOccurring);
+                                if (listedEvent.WeightedChanceOfOccurring != null) weightedChance = variablesLoader.GetIntFromXML(listedEvent.WeightedChanceOfOccurring);
                             }
                             catch
                             {
-                                CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring on " + _listedEvent.Name);
+                                CECustomHandler.LogToFile("Missing WeightedChanceOfOccurring on " + listedEvent.Name);
                             }
 
-                            if (weightedChance > 0)
-                                CEPersistence.CECallableEvents.Add(_listedEvent);
+                            if (weightedChance > 0) CEPersistence.CECallableEvents.Add(listedEvent);
                         }
 
-                        if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
+                        if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive))
                         {
-                            CEPersistence.CECaptiveEvents.Add(_listedEvent);
+                            CEPersistence.CECaptiveEvents.Add(listedEvent);
                         }
-                        else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
+                        else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random))
                         {
-                            CEPersistence.CERandomEvents.Add(_listedEvent);
+                            CEPersistence.CERandomEvents.Add(listedEvent);
                         }
-                        else if (_listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
+                        else if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor))
                         {
-                            CEPersistence.CECaptorEvents.Add(_listedEvent);
+                            CEPersistence.CECaptorEvents.Add(listedEvent);
                         }
 
-                        CEPersistence.CEEventList.Add(_listedEvent);
+                        CEPersistence.CEEventList.Add(listedEvent);
                     }
                 }
 
@@ -1393,9 +1392,11 @@ namespace CaptivityEvents.Helper
         {
             CEPersistence.CEEventImageList.Clear();
 
+
             void AddImage(string file)
             {
                 string key = Path.GetFileNameWithoutExtension(file);
+
                 if (!CEPersistence.CEEventImageList.ContainsKey(key))
                 {
                     try { CEPersistence.CEEventImageList.Add(key, file); }
@@ -1407,34 +1408,31 @@ namespace CaptivityEvents.Helper
                 }
             }
 
+
             // Module images
-            foreach (var path in modulePaths)
+            foreach (string path in modulePaths)
             {
                 try
                 {
-                    foreach (var file in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories)
-                                 .Where(f => f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)))
+                    foreach (string file in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories).Where(f => f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)))
                     {
                         AddImage(file);
                     }
                 }
-                catch { }
+                catch
+                {
+                    // ignored
+                }
             }
 
             // Captivity location images
-            string[] requiredImages = Directory.EnumerateFiles(requiredPath, "*.*", SearchOption.AllDirectories)
-                .Where(f => f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
-                .ToArray();
+            string[] requiredImages = Directory.EnumerateFiles(requiredPath, "*.*", SearchOption.AllDirectories).Where(f => f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)).ToArray();
 
-            string[] allFiles = Directory.EnumerateFiles(basePath, "*.*", SearchOption.AllDirectories)
-                .Where(f => f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
-                .ToArray();
+            string[] allFiles = Directory.EnumerateFiles(basePath, "*.*", SearchOption.AllDirectories).Where(f => f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".gif", StringComparison.OrdinalIgnoreCase)).ToArray();
 
-            foreach (var file in allFiles.Except(requiredImages))
-                AddImage(file);
+            foreach (string file in allFiles.Except(requiredImages)) AddImage(file);
 
-            foreach (var file in requiredImages)
-                AddImage(file);
+            foreach (string file in requiredImages) AddImage(file);
 
             new CESubModule().LoadTexture("default", false, true);
         }
@@ -1448,12 +1446,7 @@ namespace CaptivityEvents.Helper
 
                 if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.clear_parties [PARTY_ID]\".";
 
-                List<MobileParty> mobileParties = MobileParty.All
-                    .Where((mobileParty) =>
-                    {
-                        return mobileParty.StringId.StartsWith("CustomPartyCE_");
-                    }
-                    ).ToList();
+                List<MobileParty> mobileParties = MobileParty.All.Where((mobileParty) => mobileParty.StringId.StartsWith("CustomPartyCE_")).ToList();
 
                 foreach (MobileParty mobile in mobileParties)
                 {
@@ -1475,10 +1468,10 @@ namespace CaptivityEvents.Helper
             {
                 Thread.Sleep(500);
 
-                if (CEPersistence.soundEvent != null)
+                if (CEPersistence.SoundEvent != null)
                 {
-                    CEPersistence.soundEvent.Stop();
-                    CEPersistence.soundEvent = null;
+                    CEPersistence.SoundEvent.Stop();
+                    CEPersistence.SoundEvent = null;
                 }
 
                 if (CampaignCheats.CheckHelp(strings) && CampaignCheats.CheckParameters(strings, 1)) return "Format is \"captivity.play_sound [SOUND_ID]\".";
@@ -1506,24 +1499,27 @@ namespace CaptivityEvents.Helper
                         string text = "";
                         List<GameEntity> entities = [];
                         Mission.Current.Scene.GetEntities(ref entities);
+
                         foreach (GameEntity test in entities)
                         {
-                            text += test.Name + " : " + test.ToString() + "\n";
+                            text += test.Name + " : " + test + "\n";
                         }
+
                         CECustomHandler.ForceLogToFile(text);
 
                         return string.Empty;
                     }
 
                     Campaign campaign = Campaign.Current;
-                    Scene _mapScene = null;
+                    Scene mapScene = null;
+
                     if ((campaign?.MapSceneWrapper) != null)
                     {
-                        _mapScene = ((MapScene)Campaign.Current.MapSceneWrapper).Scene;
+                        mapScene = ((MapScene)Campaign.Current.MapSceneWrapper).Scene;
                     }
 
-                    CEPersistence.soundEvent = SoundEvent.CreateEvent(id, _mapScene);
-                    CEPersistence.soundEvent.Play();
+                    CEPersistence.SoundEvent = SoundEvent.CreateEvent(id, mapScene);
+                    CEPersistence.SoundEvent.Play();
 
                     return string.Empty;
                 }
@@ -1553,12 +1549,12 @@ namespace CaptivityEvents.Helper
                     CultureObject culture = CharacterObject.PlayerCharacter.Culture;
                     bool isFemale = true;
                     bool isHero = true;
-                    
+
                     // Parse parameters
                     if (CampaignCheats.CheckParameters(strings, 1))
                     {
                         string param = strings[0].ToLower();
-                        
+
                         // Check if it's a gender parameter
                         if (param == "male" || param == "female" || param == "m" || param == "f")
                         {
@@ -1567,30 +1563,28 @@ namespace CaptivityEvents.Helper
                         else
                         {
                             // Try to parse as culture
-                            CultureObject foundCulture = Campaign.Current.ObjectManager.GetObjectTypeList<CultureObject>()
-                                .FirstOrDefault(c => c.Name.ToString().ToLower().Contains(param) || c.StringId.ToLower().Contains(param));
-                            
+                            CultureObject foundCulture = Campaign.Current.ObjectManager.GetObjectTypeList<CultureObject>().FirstOrDefault(c => c.Name.ToString().ToLower().Contains(param) || c.StringId.ToLower().Contains(param));
+
                             if (foundCulture != null)
                             {
                                 culture = foundCulture;
                             }
                         }
                     }
-                    
+
                     if (CampaignCheats.CheckParameters(strings, 2))
                     {
                         string cultureName = strings[0].ToLower();
                         string genderParam = strings[1].ToLower();
-                        
+
                         // Parse culture
-                        CultureObject foundCulture = Campaign.Current.ObjectManager.GetObjectTypeList<CultureObject>()
-                            .FirstOrDefault(c => c.Name.ToString().ToLower().Contains(cultureName) || c.StringId.ToLower().Contains(cultureName));
-                        
+                        CultureObject foundCulture = Campaign.Current.ObjectManager.GetObjectTypeList<CultureObject>().FirstOrDefault(c => c.Name.ToString().ToLower().Contains(cultureName) || c.StringId.ToLower().Contains(cultureName));
+
                         if (foundCulture != null)
                         {
                             culture = foundCulture;
                         }
-                        
+
                         // Parse gender
                         if (genderParam == "male" || genderParam == "m")
                         {
@@ -1606,25 +1600,24 @@ namespace CaptivityEvents.Helper
                             isHero = genderParam == "true";
                         }
                     }
-                    
+
                     if (CampaignCheats.CheckParameters(strings, 3))
                     {
                         string cultureName = strings[0].ToLower();
                         string genderParam = strings[1].ToLower();
                         string heroParam = strings[2].ToLower();
-                        
+
                         // Parse culture
-                        CultureObject foundCulture = Campaign.Current.ObjectManager.GetObjectTypeList<CultureObject>()
-                            .FirstOrDefault(c => c.Name.ToString().ToLower().Contains(cultureName) || c.StringId.ToLower().Contains(cultureName));
-                        
+                        CultureObject foundCulture = Campaign.Current.ObjectManager.GetObjectTypeList<CultureObject>().FirstOrDefault(c => c.Name.ToString().ToLower().Contains(cultureName) || c.StringId.ToLower().Contains(cultureName));
+
                         if (foundCulture != null)
                         {
                             culture = foundCulture;
                         }
-                        
+
                         // Parse gender
                         isFemale = genderParam == "female" || genderParam == "f";
-                        
+
                         // Parse hero flag
                         isHero = heroParam == "true" || heroParam == "yes" || heroParam == "1";
                     }
@@ -1632,10 +1625,7 @@ namespace CaptivityEvents.Helper
                     if (isHero)
                     {
                         // Create a hero prisoner
-                        CharacterObject template = Campaign.Current.Characters.GetRandomElementWithPredicate(
-                            characterObject => characterObject.Culture == culture 
-                                && characterObject.IsFemale == isFemale 
-                                && characterObject.Occupation == Occupation.Wanderer);
+                        CharacterObject template = Campaign.Current.Characters.GetRandomElementWithPredicate(characterObject => characterObject.Culture == culture && characterObject.IsFemale == isFemale && characterObject.Occupation == Occupation.Wanderer);
 
                         if (template == null)
                         {
@@ -1644,6 +1634,7 @@ namespace CaptivityEvents.Helper
 
                         // Find a settlement for the hero's origin
                         Settlement settlement = SettlementHelper.FindRandomSettlement(x => x.IsTown && x.Culture == culture);
+
                         if (settlement == null)
                         {
                             settlement = Settlement.All.FirstOrDefault(s => s.IsTown);
@@ -1664,19 +1655,12 @@ namespace CaptivityEvents.Helper
                     else
                     {
                         // Create a regular troop prisoner
-                        CharacterObject troopTemplate = Campaign.Current.Characters.FirstOrDefault(
-                            characterObject => characterObject.Culture == culture 
-                                && characterObject.IsFemale == isFemale 
-                                && characterObject.Occupation == Occupation.Soldier
-                                && !characterObject.IsHero);
+                        CharacterObject troopTemplate = Campaign.Current.Characters.FirstOrDefault(characterObject => characterObject.Culture == culture && characterObject.IsFemale == isFemale && characterObject.Occupation == Occupation.Soldier && !characterObject.IsHero);
 
                         if (troopTemplate == null)
                         {
                             // Fallback to any regular troop
-                            troopTemplate = Campaign.Current.Characters.FirstOrDefault(
-                                characterObject => characterObject.Culture == culture 
-                                    && characterObject.IsFemale == isFemale 
-                                    && !characterObject.IsHero);
+                            troopTemplate = Campaign.Current.Characters.FirstOrDefault(characterObject => characterObject.Culture == culture && characterObject.IsFemale == isFemale && !characterObject.IsHero);
                         }
 
                         if (troopTemplate == null)

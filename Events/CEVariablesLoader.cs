@@ -16,6 +16,7 @@ namespace CaptivityEvents.Events
                 {
                     stringArray[i] = stringArray[i].Trim();
                 }
+
                 return stringArray;
             }
             catch (Exception)
@@ -26,17 +27,17 @@ namespace CaptivityEvents.Events
             }
         }
 
-        public int GetIntFromXML(string numpassed)
+        public int GetIntFromXML(string numPassed)
         {
             try
             {
                 int number = 0;
 
-                if (numpassed == null) return number;
+                if (numPassed == null) return number;
 
-                if (numpassed.StartsWith("R"))
+                if (numPassed.StartsWith("R"))
                 {
-                    string[] splitPass = numpassed.Split(' ');
+                    string[] splitPass = numPassed.Split(' ');
 
                     switch (splitPass.Length)
                     {
@@ -44,46 +45,47 @@ namespace CaptivityEvents.Events
                             int numberOne = int.Parse(splitPass[1]);
                             int numberTwo = int.Parse(splitPass[2]);
 
-                            number = numberOne < numberTwo
-                                ? MBRandom.RandomInt(numberOne, numberTwo)
-                                : MBRandom.RandomInt(numberTwo, numberOne);
+                            number = numberOne < numberTwo ? MBRandom.RandomInt(numberOne, numberTwo) : MBRandom.RandomInt(numberTwo, numberOne);
+
                             break;
 
                         case 2:
                             number = MBRandom.RandomInt(int.Parse(splitPass[1]));
+
                             break;
 
                         default:
                             number = MBRandom.RandomInt();
+
                             break;
                     }
                 }
                 else
                 {
-                    number = int.Parse(numpassed);
+                    number = int.Parse(numPassed);
                 }
 
                 return number;
             }
             catch (Exception)
             {
-                CECustomHandler.ForceLogToFile("Failed to parse int " + numpassed);
+                CECustomHandler.ForceLogToFile("Failed to parse int " + numPassed);
 
                 return 0;
             }
         }
 
-        public float GetFloatFromXML(string numpassed)
+        public float GetFloatFromXML(string numPassed)
         {
             try
             {
                 float number = 0f;
 
-                if (numpassed == null) return number;
+                if (numPassed == null) return number;
 
-                if (numpassed.StartsWith("R"))
+                if (numPassed.StartsWith("R"))
                 {
-                    string[] splitPass = numpassed.Split(' ');
+                    string[] splitPass = numPassed.Split(' ');
 
                     switch (splitPass.Length)
                     {
@@ -91,9 +93,7 @@ namespace CaptivityEvents.Events
                             float numberOne = float.Parse(splitPass[1]);
                             float numberTwo = float.Parse(splitPass[2]);
 
-                            number = numberOne < numberTwo
-                                ? MBRandom.RandomFloatRanged(numberOne, numberTwo)
-                                : MBRandom.RandomFloatRanged(numberTwo, numberOne);
+                            number = numberOne < numberTwo ? MBRandom.RandomFloatRanged(numberOne, numberTwo) : MBRandom.RandomFloatRanged(numberTwo, numberOne);
 
                             break;
 
@@ -110,14 +110,14 @@ namespace CaptivityEvents.Events
                 }
                 else
                 {
-                    number = float.Parse(numpassed);
+                    number = float.Parse(numPassed);
                 }
 
                 return number;
             }
             catch (Exception)
             {
-                CECustomHandler.LogToFile("Failed to parse float " + numpassed);
+                CECustomHandler.LogToFile("Failed to parse float " + numPassed);
 
                 return 0f;
             }

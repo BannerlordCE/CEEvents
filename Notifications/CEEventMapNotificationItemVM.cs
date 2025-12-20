@@ -6,7 +6,6 @@ using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.GameState;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Map.MapNotificationTypes;
 using TaleWorlds.Core;
@@ -22,9 +21,7 @@ namespace CaptivityEvents.Notifications
 
         public CEEventMapNotificationItemVM(InformationData data) : base(data)
         {
-            NotificationIdentifier = (CESettings.Instance?.EventCaptorCustomTextureNotifications ?? true)
-                ? "ceevent"
-                : "vote";
+            NotificationIdentifier = (CESettings.Instance?.EventCaptorCustomTextureNotifications ?? true) ? "ceevent" : "vote";
             _randomEvent = ((CEEventMapNotification)data).RandomEvent;
             _onInspect = OnRandomNotificationInspect;
         }
@@ -33,29 +30,29 @@ namespace CaptivityEvents.Notifications
         {
             base.ManualRefreshRelevantStatus();
 
-            if (PlayerCaptivity.IsCaptive || !CEHelper.notificationEventExists || !(CESettings.Instance?.EventCaptorNotifications ?? true))
+            if (PlayerCaptivity.IsCaptive || !CEHelper.NotificationEventExists || !(CESettings.Instance?.EventCaptorNotifications ?? true))
             {
-                CEHelper.notificationEventExists = false;
+                CEHelper.NotificationEventExists = false;
                 ExecuteRemove();
             }
-            else if (CECampaignBehavior.ExtraProps != null && CEHelper.notificationEventCheck)
+            else if (CECampaignBehavior.ExtraProps != null && CEHelper.NotificationEventCheck)
             {
                 if (new CEEventChecker(_randomEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter) != null)
                 {
-                    CEHelper.notificationEventCheck = false;
-                    CEHelper.notificationEventExists = false;
+                    CEHelper.NotificationEventCheck = false;
+                    CEHelper.NotificationEventExists = false;
                     ExecuteRemove();
                 }
                 else
                 {
-                    CEHelper.notificationEventCheck = false;
+                    CEHelper.NotificationEventCheck = false;
                 }
             }
         }
 
         private void OnRandomNotificationInspect()
         {
-            CEHelper.notificationEventExists = false;
+            CEHelper.NotificationEventExists = false;
             ExecuteRemove();
             string result = new CEEventChecker(_randomEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
 
@@ -65,6 +62,7 @@ namespace CaptivityEvents.Notifications
                 {
                     TextObject textObject = new("{=CEEVENTS1058}Event conditions are no longer met.");
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Gray));
+
                     return;
                 }
 
@@ -74,18 +72,20 @@ namespace CaptivityEvents.Notifications
                 {
                     if (CECampaignBehavior.ExtraProps != null)
                     {
-                        CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
-                        CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
+                        CECampaignBehavior.ExtraProps.MenuToSwitchBackTo = null;
+                        CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo = null;
                     }
+
                     CEHelper.SafeActivateGameMenu(_randomEvent.Name);
                 }
                 else
                 {
                     if (CECampaignBehavior.ExtraProps != null)
                     {
-                        CECampaignBehavior.ExtraProps.menuToSwitchBackTo = mapState.GameMenuId;
-                        CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
+                        CECampaignBehavior.ExtraProps.MenuToSwitchBackTo = mapState.GameMenuId;
+                        CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo = mapState.MenuContext.CurrentBackgroundMeshName;
                     }
+
                     CEHelper.SafeSwitchToMenu(_randomEvent.Name);
                 }
             }

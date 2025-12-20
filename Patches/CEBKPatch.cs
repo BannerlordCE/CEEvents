@@ -8,7 +8,6 @@ using TaleWorlds.Library;
 
 namespace CaptivityEvents.Patches
 {
-
     // Compatibility to Banner Kings
     internal class CEBKPatch
     {
@@ -35,8 +34,8 @@ namespace CaptivityEvents.Patches
             {
                 if (__result == null)
                 {
-                    FieldInfo _characterCreation = __instance.GetType().GetField("_characterCreation", BindingFlags.Instance | BindingFlags.NonPublic);
-                    FieldInfo _currentIndex = __instance.GetType().GetField("_currentIndex", BindingFlags.Instance | BindingFlags.NonPublic);
+                    FieldInfo characterCreation = __instance.GetType().GetField("_characterCreation", BindingFlags.Instance | BindingFlags.NonPublic);
+                    FieldInfo currentIndex = __instance.GetType().GetField("_currentIndex", BindingFlags.Instance | BindingFlags.NonPublic);
                     __instance.GainGroups.Add(new CharacterCreationGainGroupItemVM(attribute));
                     CharacterCreationGainGroupItemVM characterCreationGainGroupItemVM = __instance.GainGroups.SingleOrDefault((CharacterCreationGainGroupItemVM g) => g.AttributeObj == attribute);
                     __result = characterCreationGainGroupItemVM.Attribute;

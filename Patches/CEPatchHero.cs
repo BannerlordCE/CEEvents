@@ -12,14 +12,14 @@ namespace CaptivityEvents.Patches
     {
         public static void Postfix(Hero __instance, ref Hero __result)
         {
-            if (CEHelper.spouseOne != null && __instance == CEHelper.spouseOne)
+            if (CEHelper.SpouseOne != null && __instance == CEHelper.SpouseOne)
             {
-                __result = CEHelper.spouseTwo;
+                __result = CEHelper.SpouseTwo;
             }
             else
             {
-                bool flag2 = CEHelper.spouseTwo != null && __instance == CEHelper.spouseTwo;
-                if (flag2) __result = CEHelper.spouseOne;
+                bool flag2 = CEHelper.SpouseTwo != null && __instance == CEHelper.SpouseTwo;
+                if (flag2) __result = CEHelper.SpouseOne;
             }
         }
     }

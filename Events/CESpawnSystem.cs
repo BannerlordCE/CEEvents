@@ -31,6 +31,7 @@ namespace CaptivityEvents.Events
                             if (characterObject2.Occupation == Occupation.Soldier && string.Equals(characterObject2.Name.ToString(), troop.Id, StringComparison.OrdinalIgnoreCase))
                             {
                                 characterObject = characterObject2;
+
                                 break;
                             }
                         }
@@ -42,11 +43,11 @@ namespace CaptivityEvents.Events
                         {
                             if (troop.Ref != null && troop.Ref.ToLower() == "troop")
                             {
-                                party.MemberRoster.AddToCounts(characterObject, num, false, numWounded, 0, true, -1);
+                                party.MemberRoster.AddToCounts(characterObject, num, false, numWounded);
                             }
                             else
                             {
-                                party.PrisonRoster.AddToCounts(characterObject, num, false, numWounded, 0, true, -1);
+                                party.PrisonRoster.AddToCounts(characterObject, num, false, numWounded);
                             }
                         }
                     }
@@ -66,63 +67,70 @@ namespace CaptivityEvents.Events
                 {
                     bool isFemale = heroVariables.Gender != null && heroVariables.Gender.ToLower() == "female";
 
-                    string culture = null;
+                    string culture;
+
                     if (heroVariables.Culture != null)
                     {
                         culture = heroVariables.Culture.ToLower() switch
-                        {
-                            "player" => Hero.MainHero.Culture.StringId,
-                            "captor" => party.Culture.StringId,
-                            _ => heroVariables.Culture,
-                        };
+                                  {
+                                      "player" => Hero.MainHero.Culture.StringId,
+                                      "captor" => party.Culture.StringId,
+                                      _ => heroVariables.Culture,
+                                  };
                     }
                     else
                     {
                         culture = heroVariables.Culture;
                     }
 
-                    CultureObject cultureObject = MBObjectManager.Instance.GetObjectTypeList<CultureObject>().Where(x => (culture == null && x.IsMainCulture || x.StringId == culture.ToLower())).FirstOrDefault();
+                    CultureObject cultureObject = MBObjectManager.Instance.GetObjectTypeList<CultureObject>().Where(x => culture != null && (culture == null && x.IsMainCulture || x.StringId == culture.ToLower())).FirstOrDefault();
                     cultureObject ??= Hero.MainHero.Culture;
-                    CharacterObject wanderer = Campaign.Current.Characters.GetRandomElementWithPredicate((CharacterObject x) => (x.Occupation == Occupation.Wanderer) && (x.Culture == cultureObject) && (heroVariables.Gender == null || x.IsFemale == isFemale));
-                    Settlement randomElement = Settlement.All.GetRandomElementWithPredicate((Settlement settlement) => settlement.Culture == wanderer.Culture && settlement.IsTown);
+                    CharacterObject wanderer = Campaign.Current.Characters.GetRandomElementWithPredicate((x) => (x.Occupation == Occupation.Wanderer) && (x.Culture == cultureObject) && (heroVariables.Gender == null || x.IsFemale == isFemale));
+                    Settlement randomElement = Settlement.All.GetRandomElementWithPredicate((settlement) => settlement.Culture == wanderer.Culture && settlement.IsTown);
 
                     Clan ceClan = Clan.BanditFactions.GetRandomElementInefficiently();
+
                     if (heroVariables.Clan != null)
                     {
                         switch (heroVariables.Clan.ToLower())
                         {
                             case "captor":
                                 ceClan = party.Owner.Clan;
+
                                 break;
 
                             case "player":
                                 ceClan = Clan.PlayerClan;
+
                                 break;
 
                             default:
                                 Clan tClan = Clan.BanditFactions.Where(x => x.StringId.ToLower() == heroVariables.Clan.ToLower()).FirstOrDefault();
+
                                 if (tClan.StringId != null) { ceClan = tClan; }
+
                                 break;
                         }
                     }
-                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, ceClan, null, -1);
+
+                    Hero hero = HeroCreator.CreateSpecialHero(wanderer, randomElement, ceClan);
 
                     GiveGoldAction.ApplyBetweenCharacters(null, hero, 20000, true);
                     hero.SetHasMet();
                     hero.ChangeState(Hero.CharacterStates.Active);
+
                     if (heroVariables.Clan != null)
                     {
                         switch (heroVariables.Clan.ToLower())
                         {
                             case "captor":
                                 AddCompanionAction.Apply(party.Owner.Clan, hero);
+
                                 break;
 
                             case "player":
                                 AddCompanionAction.Apply(Clan.PlayerClan, hero);
-                                break;
 
-                            default:
                                 break;
                         }
                     }
@@ -136,7 +144,8 @@ namespace CaptivityEvents.Events
                                 int level = 0;
                                 int xp = 0;
 
-                                if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel)) level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
+                                if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel))
+                                    level = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByLevel);
                                 else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(skillToLevel.ByXP);
 
                                 new Dynamics().SkillModifier(hero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
@@ -154,8 +163,7 @@ namespace CaptivityEvents.Events
                     }
                     else
                     {
-                        if (!party.IsMobile) AddHeroToPartyAction.Apply(hero, party.Settlement.Party.MobileParty, true);
-                        else AddHeroToPartyAction.Apply(hero, party.MobileParty, true);
+                        AddHeroToPartyAction.Apply(hero, !party.IsMobile ? party.Settlement.Party.MobileParty : party.MobileParty);
                     }
                 }
                 catch (Exception e)

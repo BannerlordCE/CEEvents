@@ -2,6 +2,8 @@ using MCM.Abstractions.Base.Global;
 using MCM.Abstractions.FluentBuilder;
 using MCM.Common;
 using System.Collections.Generic;
+using System.Linq;
+using CaptivityEvents.Custom;
 
 namespace CaptivityEvents.Config
 {
@@ -9,13 +11,14 @@ namespace CaptivityEvents.Config
     {
         private FluentGlobalSettings _settings;
 
-        private static CESettingsFlags _instance = null;
+        private static CESettingsFlags _instance;
 
         public static CESettingsFlags Instance
         {
             get
             {
                 _instance ??= new CESettingsFlags();
+
                 return _instance;
             }
         }
@@ -34,21 +37,20 @@ namespace CaptivityEvents.Config
                 foreach (CECustom module in moduleCustoms)
                 {
                     builder.CreateGroup("{=CESETTINGS0090}Custom Flags of " + module.CEModuleName, groupBuilder =>
-                    {
-                        foreach (CEFlagNode flag in module.CEFlags)
-                        {
-                            if (!CustomFlags.ContainsKey(flag.Id))
-                            {
-                                CustomFlags.Add(flag.Id, flag.DefaultValue);
-                                groupBuilder.AddBool(flag.Id, flag.Name, new ProxyRef<bool>(() => CustomFlags[flag.Id], o => CustomFlags[flag.Id] = o), boolBuilder => boolBuilder.SetHintText(flag.HintText).SetRequireRestart(false));
-                            }
-                        }
-                        foreach (CESkillNode skillNode in module.CESkills)
-                        {
-                            CESkills.AddCustomSkill(skillNode);
-                        }
-                    });
+                                                                                                   {
+                                                                                                       foreach (CEFlagNode flag in module.CEFlags.Where(flag => !CustomFlags.ContainsKey(flag.Id)))
+                                                                                                       {
+                                                                                                           CustomFlags.Add(flag.Id, flag.DefaultValue);
+                                                                                                           groupBuilder.AddBool(flag.Id, flag.Name, new ProxyRef<bool>(() => CustomFlags[flag.Id], o => CustomFlags[flag.Id] = o), boolBuilder => boolBuilder.SetHintText(flag.HintText).SetRequireRestart(false));
+                                                                                                       }
+
+                                                                                                       foreach (CESkillNode skillNode in module.CESkills)
+                                                                                                       {
+                                                                                                           CESkills.AddCustomSkill(skillNode);
+                                                                                                       }
+                                                                                                   });
                 }
+
                 _settings = builder.BuildAsGlobal();
                 _settings.Register();
             }
@@ -63,6 +65,7 @@ namespace CaptivityEvents.Config
                             CustomFlags.Add(flag.Id, flag.DefaultValue);
                         }
                     }
+
                     foreach (CESkillNode skillNode in module.CESkills)
                     {
                         CESkills.AddCustomSkill(skillNode);

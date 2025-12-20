@@ -3,46 +3,25 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Xml.Serialization;
 
-namespace CaptivityEvents
+namespace CaptivityEvents.Custom
 {
     [DebuggerStepThrough]
     [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = null, IsNullable = true)]
     [Serializable]
-    public class CESkillNode
+    public class CESkillNode(string id, string name, string minLevel = "0", string maxLevel = null, bool setZeroOnEscape = false)
     {
-        public CESkillNode()
-        {
-            MinLevel = null;
-            MaxLevel = null;
-            Name = null;
-            Id = null;
-            SetZeroOnEscape = false;
-        }
+        public CESkillNode() : this(null, null, null) { }
 
-        public CESkillNode(string Id, string Name, string MinLevel = "0", string MaxLevel = null, bool SetZeroOnEscape = false)
-        {
-            this.MinLevel = MinLevel;
-            this.MaxLevel = MaxLevel;
-            this.Name = Name;
-            this.Id = Id;
-            this.SetZeroOnEscape = SetZeroOnEscape;
-        }
+        [XmlAttribute()] public string MinLevel { get; set; } = minLevel;
 
-        [XmlAttribute()]
-        public string MinLevel { get; set; }
+        [XmlAttribute()] public string MaxLevel { get; set; } = maxLevel;
 
-        [XmlAttribute()]
-        public string MaxLevel { get; set; }
+        [XmlAttribute()] public string Name { get; set; } = name;
 
-        [XmlAttribute()]
-        public string Name { get; set; }
+        [XmlAttribute()] public string Id { get; set; } = id;
 
-        [XmlAttribute()]
-        public string Id { get; set; }
-
-        [XmlAttribute()]
-        public bool SetZeroOnEscape { get; set; }
+        [XmlAttribute()] public bool SetZeroOnEscape { get; set; } = setZeroOnEscape;
     }
 
     [DebuggerStepThrough]
@@ -51,17 +30,13 @@ namespace CaptivityEvents
     [Serializable]
     public class CEFlagNode
     {
-        [XmlAttribute()]
-        public string HintText { get; set; }
+        [XmlAttribute()] public string HintText { get; set; }
 
-        [XmlAttribute()]
-        public string Name { get; set; }
+        [XmlAttribute()] public string Name { get; set; }
 
-        [XmlAttribute()]
-        public string Id { get; set; }
+        [XmlAttribute()] public string Id { get; set; }
 
-        [XmlAttribute()]
-        public bool DefaultValue { get; set; }
+        [XmlAttribute()] public bool DefaultValue { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -70,13 +45,10 @@ namespace CaptivityEvents
     [Serializable]
     public class CECustom
     {
-        [XmlElement("CEModuleName")]
-        public string CEModuleName { get; set; }
+        [XmlElement("CEModuleName")] public string CEModuleName { get; set; }
 
-        [XmlArrayItem("CEFlag")]
-        public List<CEFlagNode> CEFlags { get; set; }
+        [XmlArrayItem("CEFlag")] public List<CEFlagNode> CEFlags { get; set; }
 
-        [XmlArrayItem("CESkill")]
-        public List<CESkillNode> CESkills { get; set; }
+        [XmlArrayItem("CESkill")] public List<CESkillNode> CESkills { get; set; }
     }
 }

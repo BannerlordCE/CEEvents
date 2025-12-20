@@ -32,9 +32,7 @@ namespace CaptivityEvents.Config
         bool GetShouldUpdateContinuously();
     }
 
-    public interface ICEBooleanOptionData : ICEOptionData
-    {
-    }
+    public interface ICEBooleanOptionData : ICEOptionData { }
 
     public interface ICESelectionOptionData : ICEOptionData
     {
@@ -43,86 +41,62 @@ namespace CaptivityEvents.Config
         IEnumerable<SelectionData> GetSelectableOptionNames();
     }
 
-    public abstract class CEManagedOptionData : ICEOptionData
+    public abstract class CEManagedOptionData(string id, string name, float defaultValue = 0.0f, string description = "", Func<float, float> onChange = null) : ICEOptionData
     {
-        protected CEManagedOptionData(string id, string name, float defaultValue = 0.0f, string description = "", Func<float, float> onChange = null)
-        {
-            _id = id;
-            _name = name;
-            _description = description;
-            _value = defaultValue;
-            _defaultValue = defaultValue;
-            _onChange = onChange;
-        }
-
         public virtual float GetDefaultValue() => _defaultValue;
 
-        public void Commit()
-        {
-        }
+        public void Commit() { }
 
         public float GetValue(bool forceRefresh)
         {
-            if (forceRefresh)
-            {
-            }
+            if (forceRefresh) { }
+
             return _value;
         }
 
         public bool SetValue(float value)
         {
             float oldValue = _value;
-            _value = _onChange(value);
-            return oldValue != _value;
+            _value = onChange(value);
+
+            return Math.Abs(oldValue - _value) > 0.001f;
         }
 
-        public string GetName() => _name;
+        public string GetName() => Name;
 
-        public string GetDescription() => _description;
+        public string GetDescription() => description;
 
-        public string GetId() => _name;
+        public string GetId() => Name;
 
-        private readonly string _id;
-        internal string _name;
-        private readonly string _description;
-        private float _value;
-        private readonly float _defaultValue;
-
-        private readonly Func<float, float> _onChange;
+        private readonly string _id = id;
+        internal string Name = name;
+        private float _value = defaultValue;
+        private readonly float _defaultValue = defaultValue;
     }
 
-    public class CEActionOptionData : ICEOptionData
+    public class CEActionOptionData(string id, string name, Action onAction) : ICEOptionData
     {
-        public Action OnAction { get; private set; }
+        public Action OnAction { get; private set; } = onAction;
 
-        public CEActionOptionData(string id, string name, Action onAction)
-        {
-            _id = id;
-            _name = name;
-            OnAction = onAction;
-        }
-
-        public void Commit()
-        {
-        }
+        public void Commit() { }
 
         public float GetDefaultValue() => 0f;
 
         public float GetValue(bool forceRefresh) => 0f;
 
-        public string GetName() => _name;
+        public string GetName() => Name;
 
-        public string GetId() => _name;
+        public string GetId() => Name;
 
         public string GetDescription() => "";
 
         public bool SetValue(float value) => true;
 
-        private readonly string _id;
-        internal string _name;
+        private readonly string _id = id;
+        internal string Name = name;
     }
 
-    public class CEManagedNumericOptionData : CEManagedOptionData, ICENumericOptionData, ICEOptionData
+    public class CEManagedNumericOptionData : CEManagedOptionData, ICENumericOptionData
     {
         public CEManagedNumericOptionData(string id, string name, string description, float defaultValue, Func<float, float> onChange, float min, float max, bool discrete = true, bool updateContinuously = false) : base(id, name, defaultValue, description, onChange)
         {
@@ -146,27 +120,12 @@ namespace CaptivityEvents.Config
         private readonly bool _updateContinuously;
     }
 
-    public class CEManagedBooleanOptionData : CEManagedOptionData, ICEBooleanOptionData, ICEOptionData
+    public class CEManagedBooleanOptionData(string id, string name, string description, float defaultValue, Func<float, float> onChange) : CEManagedOptionData(id, name, defaultValue, description, onChange), ICEBooleanOptionData;
+
+    public class CEManagedSelectionOptionData(string id, string name, string description, float defaultValue, Func<float, float> onChange, int limit, IEnumerable<SelectionData> names) : CEManagedOptionData(id, name, defaultValue, description, onChange), ICESelectionOptionData
     {
-        public CEManagedBooleanOptionData(string id, string name, string description, float defaultValue, Func<float, float> onChange) : base(id, name, defaultValue, description, onChange)
-        {
-        }
-    }
+        public int GetSelectableOptionsLimit() => limit;
 
-    public class CEManagedSelectionOptionData : CEManagedOptionData, ICESelectionOptionData, ICEOptionData
-    {
-        public CEManagedSelectionOptionData(string id, string name, string description, float defaultValue, Func<float, float> onChange, int limit, IEnumerable<SelectionData> names) : base(id, name, defaultValue, description, onChange)
-        {
-            _selectableOptionsLimit = limit;
-            _selectableOptionNames = names;
-        }
-
-        public int GetSelectableOptionsLimit() => _selectableOptionsLimit;
-
-        public IEnumerable<SelectionData> GetSelectableOptionNames() => _selectableOptionNames;
-
-        private readonly int _selectableOptionsLimit;
-
-        private readonly IEnumerable<SelectionData> _selectableOptionNames;
+        public IEnumerable<SelectionData> GetSelectableOptionNames() => names;
     }
 }

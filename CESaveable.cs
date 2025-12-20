@@ -9,25 +9,23 @@ namespace CaptivityEvents
 {
     public class CESaveable : SaveableTypeDefiner
     {
-        public CESaveable() : base(82185785)
-        {
-        }
+        public CESaveable() : base(82185785) { }
 
         protected override void DefineClassTypes()
         {
-            AddClassDefinition(typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), 1, null);
-            AddClassDefinition(typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssueQuest), 2, null);
-            AddClassDefinition(typeof(CECampaignBehavior.Pregnancy), 3, null);
-            AddClassDefinition(typeof(CESkills), 4, null);
-            AddClassDefinition(typeof(CECaptorMapNotification), 5, null);
+            AddClassDefinition(typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssue), 1);
+            AddClassDefinition(typeof(CEWhereAreMyThingsIssueBehavior.CEWhereAreMyThingsIssueQuest), 2);
+            AddClassDefinition(typeof(CECampaignBehavior.Pregnancy), 3);
+            AddClassDefinition(typeof(CESkills), 4);
+            AddClassDefinition(typeof(CECaptorMapNotification), 5);
             // VM ONCE SAVEDATA CRASHES REFER TO TALEWORLD'S SAVE DEFINER ISSUE
-            AddClassDefinition(typeof(CECaptorMapNotificationItemVM), 6, null);
-            AddClassDefinition(typeof(CECampaignBehavior.ReturnEquipment), 7, null);
-            AddClassDefinition(typeof(CEEventMapNotification), 8, null);
+            AddClassDefinition(typeof(CECaptorMapNotificationItemVM), 6);
+            AddClassDefinition(typeof(CECampaignBehavior.ReturnEquipment), 7);
+            AddClassDefinition(typeof(CEEventMapNotification), 8);
             // VM ONCE SAVEDATA CRASHES REFER TO TALEWORLD'S SAVE DEFINER ISSUE
-            AddClassDefinition(typeof(CEEventMapNotificationItemVM), 9, null);
-            AddClassDefinition(typeof(CECampaignBehavior.ExtraVariables), 10, null);
-            AddClassDefinition(typeof(CEBrothel), 11, null);
+            AddClassDefinition(typeof(CEEventMapNotificationItemVM), 9);
+            AddClassDefinition(typeof(CECampaignBehavior.ExtraVariables), 10);
+            AddClassDefinition(typeof(CEBrothel), 11);
         }
 
         protected override void DefineContainerDefinitions()

@@ -22,9 +22,7 @@ namespace CaptivityEvents.Config
             RefreshValues();
         }
 
-        public virtual void UpdateData(bool initUpdate)
-        {
-        }
+        public virtual void UpdateData(bool initUpdate) { }
 
         public override void RefreshValues()
         {
@@ -104,8 +102,7 @@ namespace CaptivityEvents.Config
         protected bool _isEnabled = true;
 
         // Some native templates may bind IsOptionEnabled instead of IsEnabled.
-        [DataSourceProperty]
-        public bool IsOptionEnabled => IsEnabled;
+        [DataSourceProperty] public bool IsOptionEnabled => IsEnabled;
 
         public abstract void UpdateValue();
 
@@ -161,6 +158,7 @@ namespace CaptivityEvents.Config
         public override void UpdateValue()
         {
             int newVal = OptionValueAsBoolean ? 1 : 0;
+
             if ((int)Option.GetValue(false) != newVal)
             {
                 Option.SetValue(newVal);
@@ -195,12 +193,14 @@ namespace CaptivityEvents.Config
             _numericOptionData = option;
             _min = _numericOptionData.GetMinValue();
             _max = _numericOptionData.GetMaxValue();
+
             // Ensure sane defaults if data source returns invalid values
             if (_min >= _max || _min < -1e10f || _max > 1e10f)
             {
                 _min = 0f;
                 _max = 100f;
             }
+
             _initialValue = _numericOptionData.GetValue(false);
             // Clamp initial value to range
             if (_initialValue < _min) _initialValue = _min;
@@ -212,11 +212,9 @@ namespace CaptivityEvents.Config
         }
 
         // Some bundled widget templates may expect OptionMin/OptionMax rather than Min/Max.
-        [DataSourceProperty]
-        public float OptionMin => Min;
+        [DataSourceProperty] public float OptionMin => Min;
 
-        [DataSourceProperty]
-        public float OptionMax => Max;
+        [DataSourceProperty] public float OptionMax => Max;
 
         [DataSourceProperty]
         public float Min
@@ -255,6 +253,7 @@ namespace CaptivityEvents.Config
                 float clamped = value;
                 if (clamped < Min) clamped = Min;
                 if (clamped > Max) clamped = Max;
+
                 if (clamped != _optionValue)
                 {
                     _optionValue = clamped;
@@ -304,13 +303,13 @@ namespace CaptivityEvents.Config
                 {
                     return _optionValue.ToString("F");
                 }
+
                 return ((int)_optionValue).ToString();
             }
         }
 
         // Alias often used in UI text bindings.
-        [DataSourceProperty]
-        public string ValueText => OptionValueAsString;
+        [DataSourceProperty] public string ValueText => OptionValueAsString;
 
         // Step suggestion for discrete sliders.
         [DataSourceProperty]
@@ -322,8 +321,10 @@ namespace CaptivityEvents.Config
                 {
                     return 1f;
                 }
+
                 // Provide a reasonable granularity.
                 float span = Max - Min;
+
                 return span <= 0 ? 0.1f : span / 100f;
             }
         }
@@ -333,6 +334,7 @@ namespace CaptivityEvents.Config
             float newVal = IsDiscrete ? (float)Math.Round(OptionValue) : OptionValue;
             if (newVal < Min) newVal = Min;
             if (newVal > Max) newVal = Max;
+
             if (Option.SetValue(newVal))
             {
                 Option.Commit();
@@ -347,21 +349,17 @@ namespace CaptivityEvents.Config
         }
 
         public override void SetValue(float value) => OptionValue = value;
-        
+
         public override void ResetData() => OptionValue = Option.GetDefaultValue();
 
         // Additional alias properties for various slider templates.
-        [DataSourceProperty]
-        public float MinValue => Min;
+        [DataSourceProperty] public float MinValue => Min;
 
-        [DataSourceProperty]
-        public float MaxValue => Max;
+        [DataSourceProperty] public float MaxValue => Max;
 
-        [DataSourceProperty]
-        public float RangeMin => Min;
+        [DataSourceProperty] public float RangeMin => Min;
 
-        [DataSourceProperty]
-        public float RangeMax => Max;
+        [DataSourceProperty] public float RangeMax => Max;
 
         [DataSourceProperty]
         public float Value
@@ -385,20 +383,15 @@ namespace CaptivityEvents.Config
             set => OptionValue = value;
         }
 
-        [DataSourceProperty]
-        public float Current => OptionValue;
+        [DataSourceProperty] public float Current => OptionValue;
 
-        [DataSourceProperty]
-        public float OptionMinValue => Min;
+        [DataSourceProperty] public float OptionMinValue => Min;
 
-        [DataSourceProperty]
-        public float OptionMaxValue => Max;
+        [DataSourceProperty] public float OptionMaxValue => Max;
 
-        [DataSourceProperty]
-        public float LowerBound => Min;
+        [DataSourceProperty] public float LowerBound => Min;
 
-        [DataSourceProperty]
-        public float UpperBound => Max;
+        [DataSourceProperty] public float UpperBound => Max;
 
         [DataSourceProperty]
         public float NormalizedValue
@@ -406,15 +399,21 @@ namespace CaptivityEvents.Config
             get
             {
                 float span = Max - Min;
+
                 if (span <= 0.00001f) return 0f;
+
                 return (OptionValue - Min) / span;
             }
             set
             {
                 float span = Max - Min;
+
                 if (span <= 0.00001f) return;
                 float v = value;
-                if (v < 0f) v = 0f; else if (v > 1f) v = 1f;
+
+                if (v < 0f)
+                    v = 0f;
+                else if (v > 1f) v = 1f;
                 OptionValue = Min + (v * span);
             }
         }
@@ -454,25 +453,32 @@ namespace CaptivityEvents.Config
             Selector.SetOnChangeAction(null);
             bool flag = (int)Option.GetValue(true) != Selector.SelectedIndex;
             Action<SelectorVM<SelectorItemVM>> onChange = null;
+
             if (flag)
             {
                 onChange = new Action<SelectorVM<SelectorItemVM>>(UpdateValue);
             }
+
             if (selectableOptionNames.Any())
             {
                 if (selectableOptionNames.All((SelectionData n) => n.IsLocalizationId))
                 {
                     List<TextObject> list = [];
+
                     foreach (SelectionData selectionData in selectableOptionNames)
                     {
                         TextObject item = Module.CurrentModule.GlobalTextManager.FindText(selectionData.Data, null);
                         list.Add(item);
                     }
+
                     Selector.Refresh(list, (int)Option.GetValue(!initalUpdate), onChange);
+
                     goto IL_183;
                 }
             }
+
             List<string> list2 = [];
+
             foreach (SelectionData selectionData2 in selectableOptionNames)
             {
                 if (selectionData2.IsLocalizationId)
@@ -485,8 +491,10 @@ namespace CaptivityEvents.Config
                     list2.Add(selectionData2.Data);
                 }
             }
+
             Selector.Refresh(list2, (int)Option.GetValue(!initalUpdate), onChange);
-        IL_183:
+            IL_183:
+
             if (!flag)
             {
                 Selector.SetOnChangeAction(new Action<SelectorVM<SelectorItemVM>>(UpdateValue));
@@ -497,10 +505,12 @@ namespace CaptivityEvents.Config
         {
             base.RefreshValues();
             SelectorVM<SelectorItemVM> selector = Selector;
+
             if (selector == null)
             {
                 return;
             }
+
             selector.RefreshValues();
         }
 
@@ -544,6 +554,7 @@ namespace CaptivityEvents.Config
             get
             {
                 SelectorVM<SelectorItemVM> selector = _selector;
+
                 return selector;
             }
             set
@@ -575,6 +586,7 @@ namespace CaptivityEvents.Config
         public override void RefreshValues()
         {
             base.RefreshValues();
+
             if (_optionActionName != null)
             {
                 ActionName = _optionActionName.ToString();
@@ -584,30 +596,24 @@ namespace CaptivityEvents.Config
         private void ExecuteAction()
         {
             Action onAction = _onAction;
+
             if (onAction == null)
             {
                 return;
             }
+
             onAction.DynamicInvokeWithLog(Array.Empty<object>());
         }
 
-        public override void Cancel()
-        {
-        }
+        public override void Cancel() { }
 
         public override bool IsChanged() => false;
 
-        public override void ResetData()
-        {
-        }
+        public override void ResetData() { }
 
-        public override void SetValue(float value)
-        {
-        }
+        public override void SetValue(float value) { }
 
-        public override void UpdateValue()
-        {
-        }
+        public override void UpdateValue() { }
 
         [DataSourceProperty]
         public string ActionName

@@ -55,15 +55,17 @@ namespace CaptivityEvents.Events
 
             if ((hero.Clan?.Leader) == hero)
             {
-                if (hero != Hero.MainHero && hero.Clan.Heroes.Any((Hero x) => !x.IsChild && x != hero && x.IsAlive && x.IsLord))
+                if (hero != Hero.MainHero && hero.Clan.Heroes.Any((x) => !x.IsChild && x != hero && x.IsAlive && x.IsLord))
                 {
                     ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(hero.Clan);
                 }
+
                 if (hero.Clan.Kingdom != null && hero.Clan.Kingdom.RulingClan == hero.Clan)
                 {
                     List<Clan> list = (from t in hero.Clan.Kingdom.Clans
                                        where !t.IsEliminated && t.Leader != hero && !t.IsUnderMercenaryService
                                        select t).ToList();
+
                     if (list.IsEmpty())
                     {
                         if (!hero.Clan.Kingdom.IsEliminated)
@@ -92,7 +94,8 @@ namespace CaptivityEvents.Events
                 if (hero == null) return;
                 Hero heroSpouse = hero.Spouse;
 
-                if (!hero.IsHumanPlayerCharacter && hero.IsFactionLeader) RemoveFactionLeader(hero);
+                if (!hero.IsHumanPlayerCharacter && hero.IsFactionLeader)
+                    RemoveFactionLeader(hero);
                 else if (spouseHero != null && !spouseHero.IsHumanPlayerCharacter && spouseHero.IsFactionLeader) RemoveFactionLeader(spouseHero);
 
                 if (heroSpouse != null)
@@ -102,14 +105,15 @@ namespace CaptivityEvents.Events
                     textObject.SetTextVariable("SPOUSE", heroSpouse.Name);
                     InformationManager.DisplayMessage(new InformationMessage(textObject.ToString(), Colors.Magenta));
 
-                    if (heroSpouse.Father != null) heroSpouse.Clan = heroSpouse.Father.Clan;
+                    if (heroSpouse.Father != null)
+                        heroSpouse.Clan = heroSpouse.Father.Clan;
                     else if (heroSpouse.Mother != null) heroSpouse.Clan = heroSpouse.Mother.Clan;
                     hero.Spouse = null;
                 }
 
                 if (spouseHero == null) return;
 
-                if (hero?.Clan == spouseHero?.Clan) return;
+                if (hero.Clan == spouseHero.Clan) return;
 
                 Hero spouseHeroSpouse = spouseHero.Spouse;
 
@@ -120,7 +124,8 @@ namespace CaptivityEvents.Events
                     textObject3.SetTextVariable("SPOUSE", spouseHeroSpouse.Name);
                     InformationManager.DisplayMessage(new InformationMessage(textObject3.ToString(), Colors.Magenta));
 
-                    if (spouseHeroSpouse.Father != null) spouseHeroSpouse.Clan = spouseHeroSpouse.Father.Clan;
+                    if (spouseHeroSpouse.Father != null)
+                        spouseHeroSpouse.Clan = spouseHeroSpouse.Father.Clan;
                     else if (spouseHeroSpouse.Mother != null) spouseHeroSpouse.Clan = spouseHeroSpouse.Mother.Clan;
                     spouseHero.Spouse = null;
                 }
@@ -138,6 +143,7 @@ namespace CaptivityEvents.Events
             if (hero == null)
             {
                 CECustomHandler.ForceLogToFile("Failed TraitObjectModifier Missing Hero");
+
                 return;
             }
 
@@ -161,6 +167,7 @@ namespace CaptivityEvents.Events
                 try
                 {
                     int traitLevel = Hero.MainHero.GetTraitLevel(traitObject);
+
                     if (traitLevel != Hero.MainHero.GetTraitLevel(traitObject))
                     {
                         CampaignEventDispatcher.Instance.OnPlayerTraitChanged(traitObject, traitLevel);
@@ -180,6 +187,7 @@ namespace CaptivityEvents.Events
             if (hero == null)
             {
                 CECustomHandler.ForceLogToFile("Failed TraitModifier Missing Hero");
+
                 return;
             }
 
@@ -197,13 +205,14 @@ namespace CaptivityEvents.Events
             if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + trait);
         }
 
-        private void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp, bool display = true, bool resetSkill = false)
+        private static void SkillObjectModifier(SkillObject skillObject, Color color, Hero hero, string skill, int amount, int xp, bool display = true, bool resetSkill = false)
         {
             try
             {
                 if (hero == null)
                 {
                     CECustomHandler.ForceLogToFile("Failed SkillObjectModifier Missing Hero");
+
                     return;
                 }
 
@@ -215,6 +224,7 @@ namespace CaptivityEvents.Events
                     bool wasPositive = false;
 
                     CESkillNode skillNode = CESkills.FindSkillNode(skill);
+
                     if (skillNode != null)
                     {
                         int maxLevel = new CEVariablesLoader().GetIntFromXML(skillNode.MaxLevel);
@@ -275,13 +285,9 @@ namespace CaptivityEvents.Events
                         textObject = GameTexts.FindText("str_CE_level_skill");
                         textObject.SetTextVariable("HERO", hero.Name);
 
-                        if (xp == 0)
-                            textObject.SetTextVariable("NEGATIVE", wasPositive ? 0 : 1);
-                        else
-                            textObject.SetTextVariable("NEGATIVE", xp >= 0 ? 0 : 1);
-
+                        textObject.SetTextVariable("NEGATIVE", wasPositive ? 0 : 1);
                         textObject.SetTextVariable("SKILL_AMOUNT", Math.Abs(amount));
-                        textObject.SetTextVariable("PLURAL", amount > 1 || amount < 1 ? 1 : 0);
+                        textObject.SetTextVariable("PLURAL", amount is > 1 or < 1 ? 1 : 0);
                         textObject.SetTextVariable("SKILL", skillObject.Name.ToString().ToLower());
                         textObject.SetTextVariable("TOTAL_AMOUNT", newNumber);
                     }
@@ -302,16 +308,16 @@ namespace CaptivityEvents.Events
         internal Color PickColor(string color)
         {
             return color switch
-            {
-                "Black" or "black" => Colors.Black,
-                "White" or "white" => Colors.White,
-                "Yellow" or "yellow" => Colors.Yellow,
-                "Red" or "red" => Colors.Red,
-                "Magenta" or "magenta" => Colors.Magenta,
-                "Green" or "green" => Colors.Green,
-                "Cyan" or "cyan" => Colors.Cyan,
-                _ => Colors.Gray,
-            };
+                   {
+                       "Black" or "black" => Colors.Black,
+                       "White" or "white" => Colors.White,
+                       "Yellow" or "yellow" => Colors.Yellow,
+                       "Red" or "red" => Colors.Red,
+                       "Magenta" or "magenta" => Colors.Magenta,
+                       "Green" or "green" => Colors.Green,
+                       "Cyan" or "cyan" => Colors.Cyan,
+                       _ => Colors.Gray,
+                   };
         }
 
         internal void ResetCustomSkill(Hero hero, string skill, bool display = true, string color = "gray")
@@ -321,29 +327,26 @@ namespace CaptivityEvents.Events
             if (hero == null)
             {
                 CECustomHandler.ForceLogToFile("Failed ResetCustomSkill Missing Hero");
+
                 return;
             }
 
-            foreach (SkillObject skillObjectCustom in CESkills.CustomSkills)
+            foreach (SkillObject skillObjectCustom in CESkills.CustomSkills.Where(skillObjectCustom => skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill))
             {
-                if (skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill)
-                {
-                    found = true;
-                    SkillObjectModifier(skillObjectCustom, PickColor(color), hero, skill, 0, 0, display, true);
-                    break;
-                }
+                found = true;
+                SkillObjectModifier(skillObjectCustom, PickColor(color), hero, skill, 0, 0, display, true);
+
+                break;
             }
 
             if (found) return;
 
-            foreach (SkillObject skillObject in Skills.All)
+            foreach (SkillObject skillObject in Skills.All.Where(skillObject => skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill))
             {
-                if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
-                {
-                    found = true;
-                    SkillObjectModifier(skillObject, PickColor(color), hero, skill, 0, 0, display, true);
-                    break;
-                }
+                found = true;
+                SkillObjectModifier(skillObject, PickColor(color), hero, skill, 0, 0, display, true);
+
+                break;
             }
 
             if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + skill);
@@ -361,26 +364,22 @@ namespace CaptivityEvents.Events
         {
             bool found = false;
 
-            foreach (SkillObject skillObjectCustom in CESkills.CustomSkills)
+            foreach (SkillObject skillObjectCustom in CESkills.CustomSkills.Where(skillObjectCustom => skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill))
             {
-                if (skillObjectCustom.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObjectCustom.StringId == skill)
-                {
-                    found = true;
-                    SkillObjectModifier(skillObjectCustom, PickColor(color), hero, skill, amount, xp, display);
-                    break;
-                }
+                found = true;
+                SkillObjectModifier(skillObjectCustom, PickColor(color), hero, skill, amount, xp, display);
+
+                break;
             }
 
             if (found) return;
 
-            foreach (SkillObject skillObject in Skills.All)
+            foreach (SkillObject skillObject in Skills.All.Where(skillObject => skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill))
             {
-                if (skillObject.Name.ToString().Equals(skill, StringComparison.InvariantCultureIgnoreCase) || skillObject.StringId == skill)
-                {
-                    found = true;
-                    SkillObjectModifier(skillObject, PickColor(color), hero, skill, amount, xp, display);
-                    break;
-                }
+                found = true;
+                SkillObjectModifier(skillObject, PickColor(color), hero, skill, amount, xp, display);
+
+                break;
             }
 
             if (!found) CECustomHandler.ForceLogToFile("Unable to find : " + skill);
@@ -391,6 +390,7 @@ namespace CaptivityEvents.Events
             if (hero == null)
             {
                 CECustomHandler.ForceLogToFile("Failed SetModifier Missing Hero");
+
                 return;
             }
 
@@ -408,6 +408,7 @@ namespace CaptivityEvents.Events
                         if (quickInformation) CEHelper.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
                     }
                 }
+
                 CEHelper.SetSkillValue(hero, skill, 0);
             }
             else
@@ -469,6 +470,7 @@ namespace CaptivityEvents.Events
                         if (quickInformation) CEHelper.AddQuickInformation(textObject, 0, hero.CharacterObject, "event:/ui/notification/relation");
                     }
                 }
+
                 CEHelper.SetSkillValue(hero, slaveryFlag, amount);
             }
             else
@@ -526,8 +528,10 @@ namespace CaptivityEvents.Events
 
             try
             {
-                if (killer != null) KillCharacterAction.ApplyByMurder(Hero.MainHero, killer);
-                else KillCharacterAction.ApplyByMurder(Hero.MainHero);
+                if (killer != null)
+                    KillCharacterAction.ApplyByMurder(Hero.MainHero, killer);
+                else
+                    KillCharacterAction.ApplyByMurder(Hero.MainHero);
             }
             catch (Exception e)
             {
@@ -541,6 +545,7 @@ namespace CaptivityEvents.Events
             if (firstHero == null)
             {
                 CECustomHandler.ForceLogToFile("Failed ClanOption Missing Hero");
+
                 return;
             }
 
@@ -548,6 +553,7 @@ namespace CaptivityEvents.Events
             {
                 Clan clan = firstHero.Clan;
                 PropertyInfo pi = Campaign.Current.GetType().GetProperty("PlayerDefaultFaction", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
                 try
                 {
                     RemoveFactionLeader(firstHero);
@@ -567,6 +573,7 @@ namespace CaptivityEvents.Events
                                     firstHero.PartyBelongedTo.Army = null;
                                 }
                             }
+
                             IFaction kingdom = newClan.Kingdom;
                             FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(firstHero, kingdom ?? newClan);
                         }
@@ -579,6 +586,7 @@ namespace CaptivityEvents.Events
                         if (firstHero.PartyBelongedTo != null)
                         {
                             MobileParty partyBelongedTo = firstHero.PartyBelongedTo;
+
                             if (partyBelongedTo.Party.IsActive && partyBelongedTo.Party.Owner == firstHero)
                             {
                                 DisbandPartyAction.StartDisband(partyBelongedTo);
@@ -587,12 +595,13 @@ namespace CaptivityEvents.Events
 
                             firstHero.ChangeState(Hero.CharacterStates.Fugitive);
                             MobileParty partyBelongedTo2 = firstHero.PartyBelongedTo;
-                            partyBelongedTo2?.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default, 0);
+                            partyBelongedTo2?.MemberRoster.RemoveTroop(firstHero.CharacterObject);
                         }
                     }
 
                     firstHero.Clan = newClan;
                     if (pi != null && firstHero.IsHumanPlayerCharacter) pi.SetValue(Campaign.Current, newClan);
+
                     if (clan != null)
                     {
                         foreach (Hero hero3 in clan.Heroes)
@@ -600,10 +609,12 @@ namespace CaptivityEvents.Events
                             hero3.UpdateHomeSettlement();
                         }
                     }
+
                     foreach (Hero hero4 in newClan.Heroes)
                     {
                         hero4.UpdateHomeSettlement();
                     }
+
                     if (adopt)
                     {
                         if (newClan.Leader.IsFemale)
@@ -617,6 +628,7 @@ namespace CaptivityEvents.Events
                             firstHero.Mother = newClan.Leader.Spouse;
                         }
                     }
+
                     if (setLeader)
                     {
                         if (firstHero.IsHumanPlayerCharacter)
@@ -637,10 +649,9 @@ namespace CaptivityEvents.Events
             }
         }
 
-        private Clan ChangeClanName(Clan clan, TextObject clanName, TextObject informalName)
+        private static void ChangeClanName(Clan clan, TextObject clanName, TextObject informalName)
         {
             clan.ChangeClanName(clanName, informalName);
-            return clan;
         }
 
         internal void ClanChange(ClanOption[] clanOptions, Hero hero = null, Hero captor = null)
@@ -662,34 +673,41 @@ namespace CaptivityEvents.Events
                                 clanName = clanOption.Ref.ToLower() == "captor" ? captor.Culture.ClanNameList.GetRandomElement() : hero.Culture.ClanNameList.GetRandomElement();
                                 banner = Banner.CreateRandomClanBanner();
                                 leader = clanOption.Ref.ToLower() == "captor" ? captor : hero;
+
                                 break;
 
                             case "random":
                                 clan = Clan.All.GetRandomElement();
+
                                 break;
 
                             case "hero":
                                 clan = hero?.Clan;
+
                                 if (clan == null)
                                 {
                                     clanName = new TextObject(hero.Name + "'s Slaves");
                                     banner = Banner.CreateRandomClanBanner();
                                     leader = hero;
                                 }
+
                                 break;
 
                             case "captor":
                                 clan = captor?.Clan;
+
                                 if (clan == null)
                                 {
                                     clanName = new TextObject(captor.Name + "'s Slaves");
                                     banner = Banner.CreateRandomClanBanner();
                                     leader = captor;
                                 }
+
                                 break;
 
                             case "settlement":
                                 clan = clanOption.Ref.ToLower() == "captor" ? captor.CurrentSettlement.OwnerClan : hero.CurrentSettlement.OwnerClan;
+
                                 break;
                         }
                     }
@@ -720,6 +738,7 @@ namespace CaptivityEvents.Events
                         InformationManager.DisplayMessage(new InformationMessage(text.ToString(), Colors.Magenta));
 
                         CECustomHandler.ForceLogToFile("Failed ClanChange : clan is null ");
+
                         return;
                     }
 
@@ -735,18 +754,22 @@ namespace CaptivityEvents.Events
                     {
                         case "join":
                             ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan);
+
                             break;
 
                         case "joinasleader":
                             ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, true);
+
                             break;
 
                         case "adopted":
                             ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, false, true);
+
                             break;
 
                         case "adoptedasleader":
                             ClanOption(clanOption.Ref.ToLower() == "captor" ? captor : hero, clan, false, true);
+
                             break;
                     }
                 }
@@ -771,18 +794,22 @@ namespace CaptivityEvents.Events
                         {
                             case "random":
                                 kingdom = Kingdom.All.GetRandomElement();
+
                                 break;
 
                             case "hero":
                                 kingdom = hero.Clan.Kingdom;
+
                                 break;
 
                             case "captor":
                                 kingdom = captor.Clan.Kingdom;
+
                                 break;
 
                             case "settlement":
                                 kingdom = kingdomOption.Ref.ToLower() == "captor" ? captor.CurrentSettlement.OwnerClan.Kingdom : hero.CurrentSettlement.OwnerClan.Kingdom;
+
                                 break;
                         }
                     }
@@ -791,14 +818,17 @@ namespace CaptivityEvents.Events
                     {
                         case "leave":
                             ChangeKingdomAction.ApplyByLeaveKingdom(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, !kingdomOption.HideNotification);
+
                             break;
 
                         case "join":
                             ChangeKingdomAction.ApplyByJoinToKingdom(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, kingdom, default(CampaignTime), !kingdomOption.HideNotification);
+
                             break;
 
                         case "joinasmercenary":
                             ChangeKingdomAction.ApplyByJoinFactionAsMercenary(kingdomOption.Ref.ToLower() == "captor" ? captor.Clan : hero.Clan, kingdom, default(CampaignTime), 50, !kingdomOption.HideNotification);
+
                             break;
                     }
                 }
@@ -915,12 +945,13 @@ namespace CaptivityEvents.Events
                 if ((CESettings.Instance?.RenownChoice?.SelectedIndex ?? 1) == 0) return;
 
                 float renown = hero.Clan.Renown + amount;
+
                 float min = (CESettings.Instance?.RenownChoice?.SelectedIndex) switch
-                {
-                    0 => 0,
-                    2 => Campaign.Current.Models.ClanTierModel.GetRequiredRenownForTier(hero.Clan.Tier),
-                    _ => CESettings.Instance?.RenownMin ?? -150f,
-                };
+                            {
+                                0 => 0,
+                                2 => Campaign.Current.Models.ClanTierModel.GetRequiredRenownForTier(hero.Clan.Tier),
+                                _ => CESettings.Instance?.RenownMin ?? -150f,
+                            };
                 if (renown < min) renown = min;
 
 
@@ -956,11 +987,13 @@ namespace CaptivityEvents.Events
             hero2 ??= Hero.MainHero;
 
             Campaign.Current.Models.DiplomacyModel.GetHeroesForEffectiveRelation(hero1, hero2, out Hero hero3, out Hero hero4);
+
             if (hero3 == null || hero4 == null)
             {
                 hero3 = hero1;
                 hero4 = hero2;
             }
+
             int value = CharacterRelationManager.GetHeroRelation(hero3, hero4) + relationChange;
             value = MBMath.ClampInt(value, -100, 100);
             hero3.SetPersonalRelation(hero4, value);

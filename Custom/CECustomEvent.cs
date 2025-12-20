@@ -84,6 +84,7 @@ namespace CaptivityEvents.Custom
         GiveBirth,
         Abort,
         UnavailableIsInvisible,
+
         // Alternative Event Consequences
         ProceedWithDeath,
         CancelDeath,
@@ -292,11 +293,9 @@ namespace CaptivityEvents.Custom
     [Serializable]
     public class StripSettings
     {
-        [XmlAttribute()]
-        public bool Forced { get; set; }
+        [XmlAttribute()] public bool Forced { get; set; }
 
-        [XmlAttribute()]
-        public bool QuestEnabled { get; set; }
+        [XmlAttribute()] public bool QuestEnabled { get; set; }
 
         public string Clothing { get; set; }
 
@@ -337,17 +336,13 @@ namespace CaptivityEvents.Custom
     [Serializable]
     public class DamageParty
     {
-        [XmlAttribute()]
-        public string Number { get; set; }
+        [XmlAttribute()] public string Number { get; set; }
 
-        [XmlAttribute()]
-        public string WoundedNumber { get; set; }
+        [XmlAttribute()] public string WoundedNumber { get; set; }
 
-        [XmlAttribute()]
-        public string IncludeHeroes { get; set; }
+        [XmlAttribute()] public string IncludeHeroes { get; set; }
 
-        [XmlAttribute()]
-        public string Ref { get; set; }
+        [XmlAttribute()] public string Ref { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -356,17 +351,13 @@ namespace CaptivityEvents.Custom
     [Serializable]
     public class TeleportSettings
     {
-        [XmlAttribute()]
-        public string Location { get; set; }
+        [XmlAttribute()] public string Location { get; set; }
 
-        [XmlAttribute()]
-        public string LocationName { get; set; }
+        [XmlAttribute()] public string LocationName { get; set; }
 
-        [XmlAttribute()]
-        public string Distance { get; set; }
+        [XmlAttribute()] public string Distance { get; set; }
 
-        [XmlAttribute()]
-        public string Faction { get; set; }
+        [XmlAttribute()] public string Faction { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -375,11 +366,9 @@ namespace CaptivityEvents.Custom
     [Serializable]
     public class SceneSettings
     {
-        [XmlAttribute()]
-        public string TalkTo { get; set; }
+        [XmlAttribute()] public string TalkTo { get; set; }
 
-        [XmlAttribute()]
-        public string SceneName { get; set; }
+        [XmlAttribute()] public string SceneName { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -388,20 +377,15 @@ namespace CaptivityEvents.Custom
     [Serializable]
     public class BattleSettings
     {
-        [XmlAttribute()]
-        public string Ref { get; set; }
+        [XmlAttribute()] public string Ref { get; set; }
 
-        [XmlAttribute()]
-        public string Victory { get; set; }
+        [XmlAttribute()] public string Victory { get; set; }
 
-        [XmlAttribute()]
-        public string Defeat { get; set; }
+        [XmlAttribute()] public string Defeat { get; set; }
 
-        [XmlAttribute()]
-        public string PlayerTroops { get; set; }
+        [XmlAttribute()] public string PlayerTroops { get; set; }
 
-        [XmlAttribute()]
-        public string EnemyName { get; set; }
+        [XmlAttribute()] public string EnemyName { get; set; }
 
         [XmlArrayItem("SpawnTroop", IsNullable = true)]
         public SpawnTroop[] SpawnTroops { get; set; }
@@ -409,20 +393,15 @@ namespace CaptivityEvents.Custom
 
     public class Companion
     {
-        [XmlAttribute()]
-        public string Id { get; set; }
+        [XmlAttribute()] public string Id { get; set; }
 
-        [XmlAttribute()]
-        public string Ref { get; set; }
+        [XmlAttribute()] public string Ref { get; set; }
 
-        [XmlAttribute()]
-        public string Type { get; set; }
+        [XmlAttribute()] public string Type { get; set; }
 
-        [XmlAttribute()]
-        public string Location { get; set; }
+        [XmlAttribute()] public string Location { get; set; }
 
-        [XmlAttribute()]
-        public string UseOtherConditions { get; set; }
+        [XmlAttribute()] public string UseOtherConditions { get; set; }
 
         [XmlArrayItem("RestrictedListOfConsequences", IsNullable = false)]
         public RestrictedListOfConsequences[] MultipleRestrictedListOfConsequences { get; set; }
@@ -457,134 +436,98 @@ namespace CaptivityEvents.Custom
 
     public class TraitToLevel
     {
-        [XmlAttribute()]
-        public string Ref { get; set; }
+        [XmlAttribute()] public string Ref { get; set; }
 
-        [XmlAttribute()]
-        public string ByXP { get; set; }
+        [XmlAttribute()] public string ByXP { get; set; }
 
-        [XmlAttribute()]
-        public string ByLevel { get; set; }
+        [XmlAttribute()] public string ByLevel { get; set; }
 
-        [XmlAttribute()]
-        public string Id { get; set; }
+        [XmlAttribute()] public string Id { get; set; }
 
-        [XmlAttribute()]
-        public string Color { get; set; }
+        [XmlAttribute()] public string Color { get; set; }
 
-        [XmlAttribute()]
-        public bool HideNotification { get; set; }
+        [XmlAttribute()] public bool HideNotification { get; set; }
     }
 
     public class TraitRequired
     {
-        [XmlAttribute()]
-        public string Ref { get; set; }
+        [XmlAttribute()] public string Ref { get; set; }
 
-        [XmlAttribute()]
-        public string Max { get; set; }
+        [XmlAttribute()] public string Max { get; set; }
 
-        [XmlAttribute()]
-        public string Min { get; set; }
+        [XmlAttribute()] public string Min { get; set; }
 
-        [XmlAttribute()]
-        public string Id { get; set; }
+        [XmlAttribute()] public string Id { get; set; }
     }
 
     public class SkillToLevel
     {
-        [XmlAttribute()]
-        public string Ref { get; set; }
+        [XmlAttribute()] public string Ref { get; set; }
 
-        [XmlAttribute()]
-        public string ByXP { get; set; }
+        [XmlAttribute()] public string ByXP { get; set; }
 
-        [XmlAttribute()]
-        public string ByLevel { get; set; }
+        [XmlAttribute()] public string ByLevel { get; set; }
 
-        [XmlAttribute()]
-        public string Id { get; set; }
+        [XmlAttribute()] public string Id { get; set; }
 
-        [XmlAttribute()]
-        public string Color { get; set; }
+        [XmlAttribute()] public string Color { get; set; }
 
-        [XmlAttribute()]
-        public bool HideNotification { get; set; }
+        [XmlAttribute()] public bool HideNotification { get; set; }
     }
 
     public class SkillRequired
     {
-        [XmlAttribute()]
-        public string Ref { get; set; }
+        [XmlAttribute()] public string Ref { get; set; }
 
-        [XmlAttribute()]
-        public string Max { get; set; }
+        [XmlAttribute()] public string Max { get; set; }
 
-        [XmlAttribute()]
-        public string Min { get; set; }
+        [XmlAttribute()] public string Min { get; set; }
 
-        [XmlAttribute()]
-        public string Id { get; set; }
+        [XmlAttribute()] public string Id { get; set; }
     }
 
     public class ClanOption
     {
-        [XmlAttribute()]
-        public string Ref { get; set; }
+        [XmlAttribute()] public string Ref { get; set; }
 
-        [XmlAttribute()]
-        public string Action { get; set; }
+        [XmlAttribute()] public string Action { get; set; }
 
-        [XmlAttribute()]
-        public string Clan { get; set; }
+        [XmlAttribute()] public string Clan { get; set; }
 
-        [XmlAttribute()]
-        public bool HideNotification { get; set; }
+        [XmlAttribute()] public bool HideNotification { get; set; }
     }
 
     public class KingdomOption
     {
-        [XmlAttribute()]
-        public string Ref { get; set; }
+        [XmlAttribute()] public string Ref { get; set; }
 
-        [XmlAttribute()]
-        public string Action { get; set; }
+        [XmlAttribute()] public string Action { get; set; }
 
-        [XmlAttribute()]
-        public string Kingdom { get; set; }
+        [XmlAttribute()] public string Kingdom { get; set; }
 
-        [XmlAttribute()]
-        public bool HideNotification { get; set; }
+        [XmlAttribute()] public bool HideNotification { get; set; }
     }
 
     public class SpawnTroop
     {
-        [XmlAttribute()]
-        public string Ref { get; set; }
+        [XmlAttribute()] public string Ref { get; set; }
 
-        [XmlAttribute()]
-        public string Id { get; set; }
+        [XmlAttribute()] public string Id { get; set; }
 
-        [XmlAttribute()]
-        public string Number { get; set; }
+        [XmlAttribute()] public string Number { get; set; }
 
-        [XmlAttribute()]
-        public string WoundedNumber { get; set; }
+        [XmlAttribute()] public string WoundedNumber { get; set; }
     }
 
     public class SpawnHero
     {
-        [XmlAttribute()]
-        public string Ref { get; set; }
+        [XmlAttribute()] public string Ref { get; set; }
 
-        [XmlAttribute()]
-        public string Culture { get; set; }
+        [XmlAttribute()] public string Culture { get; set; }
 
-        [XmlAttribute()]
-        public string Gender { get; set; }
+        [XmlAttribute()] public string Gender { get; set; }
 
-        [XmlAttribute()]
-        public string Clan { get; set; }
+        [XmlAttribute()] public string Clan { get; set; }
 
         [XmlArrayItem("Skill", IsNullable = true)]
         public SkillToLevel[] SkillsToLevel { get; set; }
@@ -592,14 +535,11 @@ namespace CaptivityEvents.Custom
 
     public class Background
     {
-        [XmlAttribute()]
-        public string Name { get; set; }
+        [XmlAttribute()] public string Name { get; set; }
 
-        [XmlAttribute()]
-        public string Weight { get; set; }
+        [XmlAttribute()] public string Weight { get; set; }
 
-        [XmlAttribute()]
-        public string UseConditions { get; set; }
+        [XmlAttribute()] public string UseConditions { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -806,13 +746,11 @@ namespace CaptivityEvents.Custom
 
         public string SoundName { get; set; }
 
-        [XmlArrayItem("BackgroundName")]
-        public List<string> BackgroundAnimation { get; set; }
+        [XmlArrayItem("BackgroundName")] public List<string> BackgroundAnimation { get; set; }
 
         public string BackgroundAnimationSpeed { get; set; }
 
-        [XmlArrayItem("CustomFlag")]
-        public List<string> MultipleListOfCustomFlags { get; set; }
+        [XmlArrayItem("CustomFlag")] public List<string> MultipleListOfCustomFlags { get; set; }
 
         [XmlArrayItem("RestrictedListOfFlags", IsNullable = false)]
         public RestrictedListOfFlags[] MultipleRestrictedListOfFlags { get; set; }
@@ -956,20 +894,15 @@ namespace CaptivityEvents.Custom
         [XmlArrayItem("MenuOption", IsNullable = true)]
         public MenuOption[] MenuOptions { get; set; }
 
-        [XmlIgnore]
-        public CharacterObject Captive { get; set; }
+        [XmlIgnore] public CharacterObject Captive { get; set; }
 
-        [XmlIgnore]
-        public Dictionary<string, Hero> SavedCompanions { get; set; }
+        [XmlIgnore] public Dictionary<string, Hero> SavedCompanions { get; set; }
 
-        [XmlIgnore]
-        public string OldBackgroundName { get; set; }
+        [XmlIgnore] public string OldBackgroundName { get; set; }
 
-        [XmlIgnore]
-        public string OldWeightedChanceOfOccurring { get; set; }
+        [XmlIgnore] public string OldWeightedChanceOfOccurring { get; set; }
 
-        [XmlIgnore]
-        public Pregnancy Pregnancy { get; set; }
+        [XmlIgnore] public Pregnancy Pregnancy { get; set; }
     }
 
     [DebuggerStepThrough]
@@ -978,7 +911,6 @@ namespace CaptivityEvents.Custom
     [Serializable]
     public class CEEvents
     {
-        [XmlElement("CEEvent")]
-        public CEEvent[] CEEvent { get; set; }
+        [XmlElement("CEEvent")] public CEEvent[] CEEvent { get; set; }
     }
 }

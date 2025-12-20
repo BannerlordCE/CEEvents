@@ -44,22 +44,21 @@ namespace CaptivityEvents.Events
                     {
                         new CESubModule().LoadTexture("default");
 
-                        CEHelper.SafeSwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement
-                                                  ? "settlement_wait"
-                                                  : "prisoner_wait");
+                        CEHelper.SafeSwitchToMenu(PlayerCaptivity.CaptorParty.IsSettlement ? "settlement_wait" : "prisoner_wait");
                     }
                 }
                 else
                 {
-                    if (CECampaignBehavior.ExtraProps.menuToSwitchBackTo != null)
+                    if (CECampaignBehavior.ExtraProps.MenuToSwitchBackTo != null)
                     {
-                        if (CECampaignBehavior.ExtraProps.menuToSwitchBackTo != "prisoner_wait")
+                        if (CECampaignBehavior.ExtraProps.MenuToSwitchBackTo != "prisoner_wait")
                         {
-                            CEHelper.SafeSwitchToMenu(CECampaignBehavior.ExtraProps.menuToSwitchBackTo);
+                            CEHelper.SafeSwitchToMenu(CECampaignBehavior.ExtraProps.MenuToSwitchBackTo);
                         }
                         else
                         {
                             CECustomHandler.ForceLogToFile("General Error: CECaptorContinue : menuToSwitchBackTo : prisoner_wait");
+
                             if (Settlement.CurrentSettlement != null)
                             {
                                 EncounterManager.StartSettlementEncounter(MobileParty.MainParty, Settlement.CurrentSettlement);
@@ -68,16 +67,19 @@ namespace CaptivityEvents.Events
                             {
                                 GameMenu.ExitToLast();
                             }
+
                             Campaign.Current.TimeControlMode = Campaign.Current.LastTimeControlMode;
                             new CESubModule().LoadTexture("default");
+
                             return;
                         }
-                        CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
 
-                        if (CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo != null)
+                        CECampaignBehavior.ExtraProps.MenuToSwitchBackTo = null;
+
+                        if (CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo != null)
                         {
-                            args.MenuContext.SetBackgroundMeshName(CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo);
-                            CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
+                            args.MenuContext.SetBackgroundMeshName(CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo);
+                            CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo = null;
                         }
                     }
                     else
@@ -98,8 +100,8 @@ namespace CaptivityEvents.Events
             }
             catch (Exception e)
             {
-                CECampaignBehavior.ExtraProps.menuToSwitchBackTo = null;
-                CECampaignBehavior.ExtraProps.currentBackgroundMeshNameToSwitchBackTo = null;
+                CECampaignBehavior.ExtraProps.MenuToSwitchBackTo = null;
+                CECampaignBehavior.ExtraProps.CurrentBackgroundMeshNameToSwitchBackTo = null;
                 CECustomHandler.ForceLogToFile("Critical Error: CECaptorContinue : " + e);
             }
         }
@@ -111,12 +113,14 @@ namespace CaptivityEvents.Events
                 int prisonerCount = MobileParty.MainParty.PrisonRoster.Count;
                 if (prisonerCount < amount) amount = prisonerCount;
                 MobileParty.MainParty.PrisonRoster.WoundNumberOfNonHeroTroopsRandomly(amount);
+
                 if (releaseHeroes)
                 {
-                    foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster.GetTroopRoster())
+                    foreach (TroopRosterElement element in MobileParty.MainParty.PrisonRoster.GetTroopRoster().Where(element => element.Character.IsHero))
                     {
-                        if (element.Character.IsHero) element.Character.HeroObject.ChangeState(Hero.CharacterStates.Active);
+                        element.Character.HeroObject.ChangeState(Hero.CharacterStates.Active);
                     }
+
                     MobileParty.MainParty.PrisonRoster.Clear();
                 }
 
@@ -171,7 +175,7 @@ namespace CaptivityEvents.Events
 
         internal void CECaptorPrisonerRebel(MenuCallbackArgs args)
         {
-            CEPersistence.animationPlayEvent = false;
+            CEPersistence.AnimationPlayEvent = false;
 
             TroopRoster releasedPrisoners = TroopRoster.CreateDummyTroopRoster();
 
@@ -181,6 +185,7 @@ namespace CaptivityEvents.Events
                 {
                     if (element.Character.IsHero) element.Character.HeroObject.ChangeState(Hero.CharacterStates.Active);
                 }
+
                 releasedPrisoners.Add(MobileParty.MainParty.PrisonRoster);
                 MobileParty.MainParty.PrisonRoster.Clear();
             }
@@ -196,21 +201,21 @@ namespace CaptivityEvents.Events
                     //SpawnAPartyInFaction
                     TroopRosterElement leader = releasedPrisoners.GetTroopRoster().FirstOrDefault(hasHero => hasHero.Character.IsHero);
 
-                    Clan clan = null;
-                    Settlement nearest = null;
-                    MobileParty prisonerParty = null;
+                    Clan clan;
+                    Settlement nearest;
+                    MobileParty prisonerParty;
 
                     if (leader.Character != null)
                     {
                         clan = leader.Character.HeroObject.Clan;
-                        nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => true);
+                        nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => settlement.OwnerClan == clan) ?? SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), _ => true);
                         prisonerParty = LordPartyComponent.CreateLordParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), leader.Character.HeroObject, MobileParty.MainParty.Position, 0.5f, nearest, leader.Character.HeroObject);
                     }
                     else
                     {
                         clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                         clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
-                        nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => true);
+                        nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), _ => true);
                         prisonerParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false, null, CEHelper.GetSpawnPositionAroundSettlement(nearest));
                     }
 
@@ -225,9 +230,7 @@ namespace CaptivityEvents.Events
                     prisonerParty.MemberRoster.Add(releasedPrisoners);
                     prisonerParty.IsActive = true;
 
-                    prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown
-                                       ? nearest.GatePosition
-                                       : nearest.Position, prisonerParty.NavigationCapability);
+                    prisonerParty.SetMovePatrolAroundPoint(nearest.IsTown ? nearest.GatePosition : nearest.Position, prisonerParty.NavigationCapability);
 
                     if (leader.Character != null)
                     {
@@ -268,7 +271,7 @@ namespace CaptivityEvents.Events
 
             TroopRoster releasedPrisoners = TroopRoster.CreateDummyTroopRoster();
 
-            amount = CESettings.Instance?.AmountOfTroopsForHunt ?? 15;
+            amount = CESettings.Instance?.AmountOfTroopsForHunt ?? amount;
 
             try
             {
@@ -297,7 +300,7 @@ namespace CaptivityEvents.Events
                     Clan clan = Clan.BanditFactions.First(clanLooters => clanLooters.StringId == "looters");
                     clan.Banner.SetBannerVisual(Banner.CreateRandomBanner().BannerVisual);
 
-                    Settlement nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), settlement => { return true; });
+                    Settlement nearest = SettlementHelper.FindNearestSettlementToPoint(Hero.MainHero.GetCampaignPosition(), _ => true);
 
                     MobileParty prisonerParty = BanditPartyComponent.CreateLooterParty("CustomPartyCE_Hunt_" + MBRandom.RandomInt(int.MaxValue), clan, nearest, false, null, GetSpawnPositionAroundSettlement(nearest));
 
@@ -323,11 +326,11 @@ namespace CaptivityEvents.Events
 
                     CECustomHandler.LogToFile(prisonerParty.Name.ToString());
 
-                    PlayerEncounter.RestartPlayerEncounter(prisonerParty.Party, MobileParty.MainParty.Party, true);
+                    PlayerEncounter.RestartPlayerEncounter(prisonerParty.Party, MobileParty.MainParty.Party);
                     StartBattleAction.Apply(MobileParty.MainParty.Party, prisonerParty.Party);
                     PlayerEncounter.Update();
 
-                    CEPersistence.huntState = CEPersistence.HuntState.StartHunt;
+                    CEPersistence.CurrentHuntState = CEPersistence.HuntState.StartHunt;
 
                     //EncounterAttackConsequence
 
@@ -337,38 +340,30 @@ namespace CaptivityEvents.Events
                     CampaignVec2 campaignVec = CampaignVec2.Normalized(PlayerEncounter.Battle.AttackerSide.LeaderParty.Position - PlayerEncounter.Battle.DefenderSide.LeaderParty.Position);
 
                     MissionInitializerRecord rec = new(battleSceneForMapPatch)
-                    {
-                        TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
-                        DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
-                        DamageFromPlayerToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
-                        NeedsRandomTerrain = false,
-                        PlayingInCampaignMode = true,
-                        RandomTerrainSeed = MBRandom.RandomInt(10000),
-                        AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.Position),
-                        SceneHasMapPatch = true,
-                        DecalAtlasGroup = 2,
-                        PatchCoordinates = mapPatchAtPosition.normalizedCoordinates,
-                        PatchEncounterDir = campaignVec.ToVec2(),
-                    };
+                                                   {
+                                                       TerrainType = (int)Campaign.Current.MapSceneWrapper.GetFaceTerrainType(MobileParty.MainParty.CurrentNavigationFace),
+                                                       DamageToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
+                                                       DamageFromPlayerToFriendsMultiplier = Campaign.Current.Models.DifficultyModel.GetPlayerTroopsReceivedDamageMultiplier(),
+                                                       NeedsRandomTerrain = false,
+                                                       PlayingInCampaignMode = true,
+                                                       RandomTerrainSeed = MBRandom.RandomInt(10000),
+                                                       AtmosphereOnCampaign = Campaign.Current.Models.MapWeatherModel.GetAtmosphereModel(MobileParty.MainParty.Position),
+                                                       SceneHasMapPatch = true,
+                                                       DecalAtlasGroup = 2,
+                                                       PatchCoordinates = mapPatchAtPosition.normalizedCoordinates,
+                                                       PatchEncounterDir = campaignVec.ToVec2(),
+                                                   };
 
 
-                    bool flag2 = MapEvent.PlayerMapEvent.PartiesOnSide(BattleSideEnum.Defender).Any((MapEventParty involvedParty) => involvedParty.Party.IsMobile && (involvedParty.Party.MobileParty.IsCaravan || (involvedParty.Party.Owner != null && involvedParty.Party.Owner.IsMerchant)));
-                    bool flag3;
-                    if (MapEvent.PlayerMapEvent.MapEventSettlement == null)
-                    {
-                        flag3 = MapEvent.PlayerMapEvent.PartiesOnSide(BattleSideEnum.Defender).Any((MapEventParty involvedParty) => involvedParty.Party.IsMobile && involvedParty.Party.MobileParty.IsVillager);
-                    }
-                    else
-                    {
-                        flag3 = false;
-                    }
+                    bool flag2 = MapEvent.PlayerMapEvent.PartiesOnSide(BattleSideEnum.Defender).Any(involvedParty => involvedParty.Party.IsMobile && (involvedParty.Party.MobileParty.IsCaravan || involvedParty.Party.Owner is { IsMerchant: true }));
+
                     if (flag)
                     {
                         CampaignMission.OpenNavalBattleMission(rec);
                     }
                     else if (flag2)
                     {
-                        CampaignMission.OpenCaravanBattleMission(rec, flag2);
+                        CampaignMission.OpenCaravanBattleMission(rec, true);
                     }
                     else
                     {
@@ -389,6 +384,7 @@ namespace CaptivityEvents.Events
         internal void CECaptorMakeHeroCompanion(Hero captive)
         {
             if (captive == null) return;
+
             if (captive.IsFactionLeader)
             {
                 if (captive.Clan != null && captive.Clan.Kingdom != null)
@@ -397,18 +393,22 @@ namespace CaptivityEvents.Events
                     Clan result = null;
                     float num = 0f;
                     IEnumerable<Clan> clans = kingdom.Clans;
-                    foreach (Clan clan in clans.Where((Clan t) => t.Heroes.Any((Hero h) => h.IsAlive) && !t.IsMinorFaction && t != captive.Clan))
+
+                    foreach (Clan clan in clans.Where(t => t.Heroes.Any(h => h.IsAlive) && !t.IsMinorFaction && t != captive.Clan))
                     {
                         float clanStrength = Campaign.Current.Models.DiplomacyModel.GetClanStrength(clan);
+
                         if (num <= clanStrength)
                         {
                             num = clanStrength;
                             result = clan;
                         }
                     }
+
                     kingdom.RulingClan = result;
                 }
             }
+
             AddCompanionAction.Apply(Clan.PlayerClan, captive);
         }
 
@@ -443,7 +443,7 @@ namespace CaptivityEvents.Events
                     customHead = string.IsNullOrWhiteSpace(stripSettings.CustomHead) ? "" : stripSettings.CustomHead;
                 }
 
-                if (CESettingsIntegrations.Instance == null && clothingLevel == "slave" || !CESettingsIntegrations.Instance.ActivateKLBShackles && clothingLevel == "slave") return;
+                if (CESettingsIntegrations.Instance == null && clothingLevel == "slave" || !CESettingsIntegrations.Instance?.ActivateKLBShackles == true && clothingLevel == "slave") return;
 
                 Equipment randomElement = new();
 
@@ -451,123 +451,83 @@ namespace CaptivityEvents.Events
                 {
                     if (clothingLevel == "advanced")
                     {
-                        string bodyString = "";
-                        string legString = "";
-                        string headString = "";
-                        string capeString = "";
-                        string glovesString = "";
+                        string bodyString;
+                        string legString;
+                        string headString;
+                        string capeString;
+                        string glovesString;
 
                         switch (PlayerCaptivity.CaptorParty?.Culture != null ? PlayerCaptivity.CaptorParty?.Culture.Name.ToString().ToLower() : null)
                         {
                             case CampaignData.CultureSturgia:
                                 headString = "nordic_fur_cap";
-                                capeString = Hero.MainHero.IsFemale
-                                    ? "female_hood"
-                                    : "";
-                                bodyString = Hero.MainHero.IsFemale
-                                    ? "cut_dress"
-                                    : "heavy_nordic_tunic";
-                                legString = Hero.MainHero.IsFemale
-                                    ? "ladys_shoe"
-                                    : "rough_tied_boots";
+                                capeString = Hero.MainHero.IsFemale ? "female_hood" : "";
+                                bodyString = Hero.MainHero.IsFemale ? "cut_dress" : "heavy_nordic_tunic";
+                                legString = Hero.MainHero.IsFemale ? "ladys_shoe" : "rough_tied_boots";
                                 glovesString = "armwraps";
+
                                 break;
 
                             case CampaignData.CultureNord:
                                 headString = "nordic_fur_cap";
-                                capeString = Hero.MainHero.IsFemale
-                                    ? "female_hood"
-                                    : "";
-                                bodyString = Hero.MainHero.IsFemale
-                                    ? "cut_dress"
-                                    : "heavy_nordic_tunic";
-                                legString = Hero.MainHero.IsFemale
-                                    ? "ladys_shoe"
-                                    : "rough_tied_boots";
+                                capeString = Hero.MainHero.IsFemale ? "female_hood" : "";
+                                bodyString = Hero.MainHero.IsFemale ? "cut_dress" : "heavy_nordic_tunic";
+                                legString = Hero.MainHero.IsFemale ? "ladys_shoe" : "rough_tied_boots";
                                 glovesString = "armwraps";
+
                                 break;
 
                             case CampaignData.CultureAserai:
-                                headString = Hero.MainHero.IsFemale
-                                    ? ""
-                                    : "turban";
-                                bodyString = Hero.MainHero.IsFemale
-                                    ? "aserai_villager_female_dress"
-                                    : "aserai_tunic_waistcoat";
-
-                                legString = Hero.MainHero.IsFemale
-                                    ? "southern_moccasins"
-                                    : "wrapped_shoes";
+                                headString = Hero.MainHero.IsFemale ? "" : "turban";
+                                bodyString = Hero.MainHero.IsFemale ? "aserai_villager_female_dress" : "aserai_tunic_waistcoat";
+                                legString = Hero.MainHero.IsFemale ? "southern_moccasins" : "wrapped_shoes";
                                 capeString = "wrapped_scarf";
                                 glovesString = "armwraps";
+
                                 break;
 
                             case CampaignData.CultureKhuzait:
                                 headString = "fur_hat";
                                 capeString = "wrapped_scarf";
-                                bodyString = Hero.MainHero.IsFemale
-                                    ? "khuzait_dress"
-                                    : "steppe_armor";
-                                legString = Hero.MainHero.IsFemale
-                                    ? "ladys_shoe"
-                                    : "rough_tied_boots";
+                                bodyString = Hero.MainHero.IsFemale ? "khuzait_dress" : "steppe_armor";
+                                legString = Hero.MainHero.IsFemale ? "ladys_shoe" : "rough_tied_boots";
                                 glovesString = "armwraps";
+
                                 break;
 
                             case CampaignData.CultureEmpire:
-                                headString = Hero.MainHero.IsFemale
-                                    ? "female_head_wrap"
-                                    : "arming_cap";
-                                bodyString = Hero.MainHero.IsFemale
-                                    ? "vlandian_corset_dress"
-                                    : "padded_leather_shirt";
-                                legString = Hero.MainHero.IsFemale
-                                    ? "ladys_shoe"
-                                    : "rough_tied_boots";
+                                headString = Hero.MainHero.IsFemale ? "female_head_wrap" : "arming_cap";
+                                bodyString = Hero.MainHero.IsFemale ? "vlandian_corset_dress" : "padded_leather_shirt";
+                                legString = Hero.MainHero.IsFemale ? "ladys_shoe" : "rough_tied_boots";
                                 capeString = "wrapped_scarf";
                                 glovesString = "armwraps";
+
                                 break;
 
                             case CampaignData.CultureBattania:
-                                headString = Hero.MainHero.IsFemale
-                                    ? "female_head_wrap"
-                                    : "wrapped_headcloth";
-                                capeString = Hero.MainHero.IsFemale
-                                    ? "wrapped_scarf"
-                                    : "battania_shoulder_strap";
+                                headString = Hero.MainHero.IsFemale ? "female_head_wrap" : "wrapped_headcloth";
+                                capeString = Hero.MainHero.IsFemale ? "wrapped_scarf" : "battania_shoulder_strap";
                                 glovesString = "armwraps";
-                                bodyString = Hero.MainHero.IsFemale
-                                    ? "battania_dress_c"
-                                    : "burlap_waistcoat";
+                                bodyString = Hero.MainHero.IsFemale ? "battania_dress_c" : "burlap_waistcoat";
                                 legString = "ragged_boots";
+
                                 break;
 
                             case CampaignData.CultureVlandia:
-                                headString = Hero.MainHero.IsFemale
-                                    ? "female_head_wrap"
-                                    : "arming_cap";
-                                bodyString = Hero.MainHero.IsFemale
-                                    ? "vlandian_corset_dress"
-                                    : "padded_leather_shirt";
-                                legString = Hero.MainHero.IsFemale
-                                    ? "ladys_shoe"
-                                    : "ragged_boots";
+                                headString = Hero.MainHero.IsFemale ? "female_head_wrap" : "arming_cap";
+                                bodyString = Hero.MainHero.IsFemale ? "vlandian_corset_dress" : "padded_leather_shirt";
+                                legString = Hero.MainHero.IsFemale ? "ladys_shoe" : "ragged_boots";
                                 capeString = "wrapped_scarf";
                                 glovesString = "armwraps";
+
                                 break;
                             default:
-                                headString = Hero.MainHero.IsFemale
-                                    ? "female_head_wrap"
-                                    : "wrapped_headcloth";
-                                capeString = Hero.MainHero.IsFemale
-                                    ? "female_scarf"
-                                    : "battania_shoulder_strap";
-                                bodyString = Hero.MainHero.IsFemale
-                                    ? "plain_dress"
-                                    : "padded_leather_shirt";
-                                legString = Hero.MainHero.IsFemale
-                                    ? "ladys_shoe"
-                                    : "ragged_boots";
+                                headString = Hero.MainHero.IsFemale ? "female_head_wrap" : "wrapped_headcloth";
+                                capeString = Hero.MainHero.IsFemale ? "female_scarf" : "battania_shoulder_strap";
+                                bodyString = Hero.MainHero.IsFemale ? "plain_dress" : "padded_leather_shirt";
+                                legString = Hero.MainHero.IsFemale ? "ladys_shoe" : "ragged_boots";
+                                glovesString = "";
+
                                 break;
                         }
 
@@ -629,6 +589,7 @@ namespace CaptivityEvents.Events
                     else
                     {
                         MBEquipmentRoster tryRoster = MBObjectManager.Instance.GetObject<MBEquipmentRoster>(clothingLevel);
+
                         if (tryRoster != null)
                         {
                             Equipment tryEquipSet = tryRoster.AllEquipments.GetRandomElementWithPredicate(e => e.IsCivilian != true);
@@ -636,9 +597,7 @@ namespace CaptivityEvents.Events
                         }
                         else
                         {
-                            ItemObject itemObjectBody = Hero.MainHero.IsFemale
-                                ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress")
-                                : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
+                            ItemObject itemObjectBody = Hero.MainHero.IsFemale ? MBObjectManager.Instance.GetObject<ItemObject>("burlap_sack_dress") : MBObjectManager.Instance.GetObject<ItemObject>("tattered_rags");
                             randomElement.AddEquipmentToSlotWithoutAgent(EquipmentIndex.Body, new EquipmentElement(itemObjectBody));
                         }
                     }
@@ -651,24 +610,24 @@ namespace CaptivityEvents.Events
                     if (meleeLevel == "Advanced")
                     {
                         item = (PlayerCaptivity.CaptorParty?.Culture != null ? PlayerCaptivity.CaptorParty?.Culture.Name.ToString().ToLower() : null) switch
-                        {
-                            CampaignData.CultureSturgia => "sturgia_axe_3_t3",
-                            CampaignData.CultureAserai => "eastern_spear_1_t2",
-                            CampaignData.CultureEmpire => "northern_spear_1_t2",
-                            CampaignData.CultureBattania => "aserai_sword_1_t2",
-                            _ => "vlandia_sword_1_t2",
-                        };
+                               {
+                                   CampaignData.CultureSturgia => "sturgia_axe_3_t3",
+                                   CampaignData.CultureAserai => "eastern_spear_1_t2",
+                                   CampaignData.CultureEmpire => "northern_spear_1_t2",
+                                   CampaignData.CultureBattania => "aserai_sword_1_t2",
+                                   _ => "vlandia_sword_1_t2",
+                               };
                     }
                     else
                     {
                         item = (PlayerCaptivity.CaptorParty?.Culture != null ? PlayerCaptivity.CaptorParty?.Culture.Name.ToString().ToLower() : null) switch
-                        {
-                            CampaignData.CultureSturgia => "seax",
-                            CampaignData.CultureAserai => "celtic_dagger",
-                            CampaignData.CultureEmpire => "gladius_b",
-                            CampaignData.CultureBattania => "hooked_cleaver",
-                            _ => "seax",
-                        };
+                               {
+                                   CampaignData.CultureSturgia => "seax",
+                                   CampaignData.CultureAserai => "celtic_dagger",
+                                   CampaignData.CultureEmpire => "gladius_b",
+                                   CampaignData.CultureBattania => "hooked_cleaver",
+                                   _ => "seax",
+                               };
                     }
 
                     ItemObject itemObjectWeapon0 = MBObjectManager.Instance.GetObject<ItemObject>(item);
@@ -687,35 +646,42 @@ namespace CaptivityEvents.Events
                             case CampaignData.CultureSturgia:
                                 rangedItem = "nordic_shortbow";
                                 rangedAmmo = "default_arrows";
+
                                 break;
 
                             case CampaignData.CultureNord:
                                 rangedItem = "nordic_shortbow";
                                 rangedAmmo = "default_arrows";
+
                                 break;
 
                             case CampaignData.CultureVlandia:
                                 rangedItem = "crossbow_a";
                                 rangedAmmo = "tournament_bolts";
+
                                 break;
 
                             case CampaignData.CultureAserai:
                                 rangedItem = "tribal_bow";
                                 rangedAmmo = "default_arrows";
+
                                 break;
 
                             case CampaignData.CultureEmpire:
                                 rangedItem = "hunting_bow";
                                 rangedAmmo = "default_arrows";
+
                                 break;
 
                             case CampaignData.CultureBattania:
                                 rangedItem = "northern_javelin_2_t3";
+
                                 break;
 
                             default:
                                 rangedItem = "hunting_bow";
                                 rangedAmmo = "default_arrows";
+
                                 break;
                         }
 
@@ -756,13 +722,19 @@ namespace CaptivityEvents.Events
                     {
                         if (!captive.BattleEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(captive.BattleEquipment.GetEquipmentFromSlot(i).Item, 1);
                     }
-                    catch (Exception) { }
+                    catch (Exception e)
+                    {
+                        CECustomHandler.ForceLogToFile("BattleEquipment: " + e);
+                    }
 
                     try
                     {
                         if (!captive.CivilianEquipment.GetEquipmentFromSlot(i).IsEmpty) PartyBase.MainParty.ItemRoster.AddToCounts(captive.CivilianEquipment.GetEquipmentFromSlot(i).Item, 1);
                     }
-                    catch (Exception) { }
+                    catch (Exception e)
+                    {
+                        CECustomHandler.ForceLogToFile("CivilianEquipment: " + e);
+                    }
                 }
 
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(captive, randomElement);
@@ -770,7 +742,7 @@ namespace CaptivityEvents.Events
             }
             catch (Exception e)
             {
-                CECustomHandler.ForceLogToFile("CECaptorStripVictim: " + e.ToString());
+                CECustomHandler.ForceLogToFile("CECaptorStripVictim: " + e);
             }
         }
     }

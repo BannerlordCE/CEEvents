@@ -20,7 +20,6 @@ namespace CaptivityEvents.Patches
     [HarmonyPatch(typeof(PlayerCaptivityCampaignBehavior))]
     internal class CEPlayerCaptivityCampaignBehavior
     {
-
         private static bool CheckTimeElapsedMoreThanHours(CampaignTime eventBeginTime, float hoursToWait)
         {
             float elapsedHoursUntilNow = eventBeginTime.ElapsedHoursUntilNow;
@@ -35,13 +34,8 @@ namespace CaptivityEvents.Patches
             bool isInSettlement = PlayerCaptivity.CaptorParty.IsSettlement;
             bool isInLordParty = !isInSettlement && PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty.LeaderHero != null;
 
-            float eventOccurence = CESettings.Instance != null ?
-                isInSettlement ?
-                CESettings.Instance.EventOccurrenceSettlement :
-                isInLordParty ?
-                CESettings.Instance.EventOccurrenceLord :
-                CESettings.Instance.EventOccurrenceOther :
-                6f;
+            float eventOccurence = CESettings.Instance != null ? isInSettlement ? CESettings.Instance.EventOccurrenceSettlement : isInLordParty ? CESettings.Instance.EventOccurrenceLord : CESettings.Instance.EventOccurrenceOther : 6f;
+
             return CheckTimeElapsedMoreThanHours(PlayerCaptivity.LastCheckTime, eventOccurence);
         }
 
@@ -80,11 +74,11 @@ namespace CaptivityEvents.Patches
                 PlayerCaptivity.LastCheckTime = CampaignTime.Now;
                 if (Game.Current.GameStateManager.ActiveState is MapState) Campaign.Current.LastTimeControlMode = Campaign.Current.TimeControlMode;
                 PlayerCaptivity.CaptorParty = PlayerCaptivity.CaptorParty.MobileParty.CurrentSettlement.Party;
+
                 return "menu_captivity_transfer_to_town";
             }
 
             return null;
-
         }
 
         public static string CheckCaptivityChangeOld(float dt)
@@ -96,85 +90,100 @@ namespace CaptivityEvents.Patches
                 EndCaptivityAction.ApplyByReleasedByChoice(Hero.MainHero);
                 InformationManager.DisplayMessage(new InformationMessage(("Invalid Age: " + Hero.MainHero.Age), Colors.Gray));
                 CECustomHandler.ForceLogToFile("Underaged Player Detected. Age: " + Hero.MainHero.Age);
+
                 return "menu_captivity_end_by_party_removed";
             }
 
-            if (CEHelper.delayedEvents.Count > 0)
+            if (CEHelper.DelayedEvents.Count > 0)
             {
                 string eventToFire = null;
 
-                bool shouldFireEvent = CEHelper.delayedEvents.Any(item =>
-                {
+                bool shouldFireEvent = CEHelper.DelayedEvents.Any(item =>
+                                                                  {
+                                                                      if (item.eventName == "taken_prisoner")
+                                                                      {
+                                                                          eventToFire = "taken_prisoner";
+                                                                          item.hasBeenFired = true;
 
-                    if (item.eventName == "taken_prisoner")
-                    {
-                        eventToFire = "taken_prisoner";
-                        item.hasBeenFired = true;
-                        return true;
-                    }
+                                                                          return true;
+                                                                      }
 
-                    if (item.eventName == "defeated_and_taken_prisoner")
-                    {
-                        eventToFire = "defeated_and_taken_prisoner";
-                        item.hasBeenFired = true;
-                        return true;
-                    }
+                                                                      if (item.eventName == "defeated_and_taken_prisoner")
+                                                                      {
+                                                                          eventToFire = "defeated_and_taken_prisoner";
+                                                                          item.hasBeenFired = true;
 
-                    if (item.eventName != null && item.eventTime < CampaignTime.Now.ElapsedHoursUntilNow)
-                    {
-                        CECustomHandler.LogToFile("Firing " + item.eventName);
-                        if (item.conditions == true)
-                        {
-                            string result = CEEventManager.FireSpecificEvent(item.eventName);
-                            switch (result)
-                            {
-                                case "$FAILEDTOFIND":
-                                    CECustomHandler.LogToFile("Failed to load event list.");
-                                    break;
+                                                                          return true;
+                                                                      }
 
-                                case "$EVENTNOTFOUND":
-                                    CECustomHandler.LogToFile("Event not found.");
-                                    break;
+                                                                      if (item.eventName != null && item.eventTime < CampaignTime.Now.ElapsedHoursUntilNow)
+                                                                      {
+                                                                          CECustomHandler.LogToFile("Firing " + item.eventName);
 
-                                case "$EVENTCONDITIONSNOTMET":
-                                    CECustomHandler.LogToFile("Event conditions are not met.");
-                                    break;
+                                                                          if (item.conditions == true)
+                                                                          {
+                                                                              string result = CEEventManager.FireSpecificEvent(item.eventName);
 
-                                default:
-                                    if (result.StartsWith("$"))
-                                    {
-                                        CECustomHandler.LogToFile(result.Substring(1));
-                                    }
-                                    else
-                                    {
-                                        eventToFire = item.eventName;
-                                        item.hasBeenFired = true;
-                                        return true;
-                                    }
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            eventToFire = item.eventName.ToLower();
-                            CEEvent foundevent = CEPersistence.CECaptiveEvents.FirstOrDefault(ceevent => ceevent.Name.ToLower() == eventToFire);
-                            if (foundevent == null)
-                            {
-                                eventToFire = null;
-                                return false;
-                            }
-                            item.hasBeenFired = true;
-                            return true;
-                        }
-                    }
-                    return false;
-                });
+                                                                              switch (result)
+                                                                              {
+                                                                                  case "$FAILEDTOFIND":
+                                                                                      CECustomHandler.LogToFile("Failed to load event list.");
+
+                                                                                      break;
+
+                                                                                  case "$EVENTNOTFOUND":
+                                                                                      CECustomHandler.LogToFile("Event not found.");
+
+                                                                                      break;
+
+                                                                                  case "$EVENTCONDITIONSNOTMET":
+                                                                                      CECustomHandler.LogToFile("Event conditions are not met.");
+
+                                                                                      break;
+
+                                                                                  default:
+                                                                                      if (result.StartsWith("$"))
+                                                                                      {
+                                                                                          CECustomHandler.LogToFile(result.Substring(1));
+                                                                                      }
+                                                                                      else
+                                                                                      {
+                                                                                          eventToFire = item.eventName;
+                                                                                          item.hasBeenFired = true;
+
+                                                                                          return true;
+                                                                                      }
+
+                                                                                      break;
+                                                                              }
+                                                                          }
+                                                                          else
+                                                                          {
+                                                                              eventToFire = item.eventName.ToLower();
+                                                                              CEEvent foundevent = CEPersistence.CECaptiveEvents.FirstOrDefault(ceevent => ceevent.Name.ToLower() == eventToFire);
+
+                                                                              if (foundevent == null)
+                                                                              {
+                                                                                  eventToFire = null;
+
+                                                                                  return false;
+                                                                              }
+
+                                                                              item.hasBeenFired = true;
+
+                                                                              return true;
+                                                                          }
+                                                                      }
+
+                                                                      return false;
+                                                                  });
 
                 if (shouldFireEvent)
                 {
-                    CEHelper.delayedEvents.RemoveAll(item => item.hasBeenFired);
+                    CEHelper.DelayedEvents.RemoveAll(item => item.hasBeenFired);
                     PlayerCaptivity.LastCheckTime = CampaignTime.Now;
                     Hero.MainHero.HitPoints += MBRandom.RandomInt(10);
+
                     return eventToFire;
                 }
             }
@@ -187,7 +196,12 @@ namespace CaptivityEvents.Patches
                 CECustomHandler.LogToFile("About to choose a event!");
                 CEEvent captiveEvent = CEEventManager.ReturnWeightedChoiceOfEvents();
 
-                if (captiveEvent != null) { Hero.MainHero.HitPoints += MBRandom.RandomInt(10); return captiveEvent.Name; }
+                if (captiveEvent != null)
+                {
+                    Hero.MainHero.HitPoints += MBRandom.RandomInt(10);
+
+                    return captiveEvent.Name;
+                }
             }
             else
             {
@@ -197,7 +211,12 @@ namespace CaptivityEvents.Patches
                 CECustomHandler.LogToFile("About to choose a settlement event!");
                 CEEvent captiveEvent = CEEventManager.ReturnWeightedChoiceOfEvents();
 
-                if (captiveEvent != null) { Hero.MainHero.HitPoints += MBRandom.RandomInt(10); return captiveEvent.Name; }
+                if (captiveEvent != null)
+                {
+                    Hero.MainHero.HitPoints += MBRandom.RandomInt(10);
+
+                    return captiveEvent.Name;
+                }
             }
 
             return DefaultOverridenCheckCaptivityChange(dt);
@@ -211,6 +230,7 @@ namespace CaptivityEvents.Patches
             {
                 // Check for new menu to activate
                 string name = CheckCaptivityChangeOld(dt);
+
                 if (name != null)
                 {
                     try
@@ -237,6 +257,7 @@ namespace CaptivityEvents.Patches
             {
                 CECustomHandler.ForceLogToFile("CheckCaptivityChange Failure : " + e);
             }
+
             return false;
         }
     }

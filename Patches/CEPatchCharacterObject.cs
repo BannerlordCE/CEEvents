@@ -13,11 +13,9 @@ using TaleWorlds.ObjectSystem;
 
 namespace CaptivityEvents.Patches
 {
-
     [HarmonyPatch(typeof(CharacterObject))]
     internal static class CEPatchCharacterObject
     {
-
         static readonly List<MBGUID> ms = [];
 
         public static void RestartCharacter(CharacterObject character)
@@ -31,7 +29,7 @@ namespace CaptivityEvents.Patches
                 MBBodyProperties.ProduceNumericKeyWithParams(faceGenerationParams, false, false, ref bodyProperties);
                 character.UpdatePlayerCharacterBodyProperties(bodyProperties, characterObject.Race, characterObject.IsFemale);
 
-                if (character?.HeroObject != null) DisableHeroAction.Apply(character.HeroObject);
+                if (character.HeroObject != null) DisableHeroAction.Apply(character.HeroObject);
             }
             catch (Exception e) { CECustomHandler.LogToFile("Failed RestartCharacter " + e); }
         }
@@ -40,12 +38,10 @@ namespace CaptivityEvents.Patches
         {
             try
             {
-                List<MobileParty> mobileParties = MobileParty.All
-                .Where((mobileParty) =>
-                {
-                    return mobileParty.StringId.StartsWith("CustomPartyCE_");
-                }
-                ).ToList();
+                List<MobileParty> mobileParties = MobileParty.All.Where((mobileParty) =>
+                                                                        {
+                                                                            return mobileParty.StringId.StartsWith("CustomPartyCE_");
+                                                                        }).ToList();
 
                 if (mobileParties.Count != 0)
                 {
@@ -82,6 +78,7 @@ namespace CaptivityEvents.Patches
                     }
                 }
                 catch (Exception e) { CECustomHandler.LogToFile("Failed UpgradeTargets " + e); }
+
                 __result = [];
             }
         }
@@ -106,6 +103,7 @@ namespace CaptivityEvents.Patches
                     }
                 }
                 catch (Exception e) { CECustomHandler.LogToFile("Failed Culture " + e); }
+
                 __result = new CultureObject();
             }
         }
@@ -130,10 +128,9 @@ namespace CaptivityEvents.Patches
                     }
                 }
                 catch (Exception e) { CECustomHandler.LogToFile("Failed FirstBattleEquipment " + e); }
+
                 __result = new Equipment();
             }
         }
-
-
     }
 }

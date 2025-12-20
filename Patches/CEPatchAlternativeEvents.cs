@@ -37,7 +37,7 @@ namespace CaptivityEvents.Patches
         private static Hero _pendingDesertionHero;
         private static bool _desertionEventPending;
 
-        #region Death Alternative
+#region Death Alternative
 
         /// <summary>
         /// Prefix patch for KillCharacterAction.ApplyInternal to intercept deaths
@@ -75,6 +75,7 @@ namespace CaptivityEvents.Patches
             {
                 CECustomHandler.ForceLogToFile("DeathAlternative Failure: " + e.Message);
                 _deathEventPending = false;
+
                 return true; // On error, proceed with normal death
             }
 
@@ -122,9 +123,9 @@ namespace CaptivityEvents.Patches
         public static Hero GetPendingDeathKiller() => _pendingDeathKiller;
         public static bool IsDeathPending() => _deathEventPending;
 
-        #endregion
+#endregion
 
-        #region Marriage Alternative
+#region Marriage Alternative
 
         /// <summary>
         /// Prefix patch for MarriageAction.Apply to intercept marriages
@@ -165,6 +166,7 @@ namespace CaptivityEvents.Patches
             {
                 CECustomHandler.ForceLogToFile("MarriageAlternative Failure: " + e.Message);
                 _marriageEventPending = false;
+
                 return true; // On error, proceed with normal marriage
             }
 
@@ -212,9 +214,9 @@ namespace CaptivityEvents.Patches
         public static Hero GetPendingMarriageHero2() => _pendingMarriageHero2;
         public static bool IsMarriagePending() => _marriageEventPending;
 
-        #endregion
+#endregion
 
-        #region Desertion Alternative
+#region Desertion Alternative
 
         /// <summary>
         /// Prefix patch for RemoveCompanionAction.ApplyInternal to intercept companion leaving
@@ -256,6 +258,7 @@ namespace CaptivityEvents.Patches
             {
                 CECustomHandler.ForceLogToFile("DesertionAlternative Failure: " + e.Message);
                 _desertionEventPending = false;
+
                 return true; // On error, proceed with normal desertion
             }
 
@@ -299,26 +302,26 @@ namespace CaptivityEvents.Patches
         public static Hero GetPendingDesertionHero() => _pendingDesertionHero;
         public static bool IsDesertionPending() => _desertionEventPending;
 
-        #endregion
+#endregion
 
-        #region Helper Methods
+#region Helper Methods
 
         /// <summary>
         /// Returns a weighted random choice of alternative events matching the specified flag
         /// </summary>
-        private static CEEvent  ReturnWeightedChoiceOfEventsAlternative(RestrictedListOfFlags alternativeFlag, Hero targetHero, Hero secondaryHero)
+        private static CEEvent ReturnWeightedChoiceOfEventsAlternative(RestrictedListOfFlags alternativeFlag, Hero targetHero, Hero secondaryHero)
         {
             List<CEEvent> events = [];
             int CurrentOrder = 0;
 
             // Get the appropriate event list based on the alternative flag
             List<CEEvent> sourceEvents = alternativeFlag switch
-            {
-                RestrictedListOfFlags.DeathAlternative => CEPersistence.CEAlternativeDeathEvents,
-                RestrictedListOfFlags.MarriageAlternative => CEPersistence.CEAlternativeMarriageEvents,
-                RestrictedListOfFlags.DesertionAlternative => CEPersistence.CEAlternativeDesertionEvents,
-                _ => []
-            };
+                                         {
+                                             RestrictedListOfFlags.DeathAlternative => CEPersistence.CEAlternativeDeathEvents,
+                                             RestrictedListOfFlags.MarriageAlternative => CEPersistence.CEAlternativeMarriageEvents,
+                                             RestrictedListOfFlags.DesertionAlternative => CEPersistence.CEAlternativeDesertionEvents,
+                                             _ => []
+                                         };
 
             if (sourceEvents == null || sourceEvents.Count <= 0) return null;
 
@@ -337,10 +340,12 @@ namespace CaptivityEvents.Patches
                     {
                         CECustomHandler.LogToFile("IgnoreAllOther detected - auto fire " + listEvent.Name);
                         listEvent.Captive = targetHero?.CharacterObject;
+
                         return listEvent;
                     }
 
                     int OrderToCall = 0;
+
                     if (!string.IsNullOrEmpty(listEvent.OrderToCall))
                     {
                         OrderToCall = new CEVariablesLoader().GetIntFromXML(listEvent.OrderToCall);
@@ -349,6 +354,7 @@ namespace CaptivityEvents.Patches
                     if (OrderToCall < CurrentOrder)
                     {
                         CECustomHandler.LogToFile("OrderToCall - " + OrderToCall + " was less than CurrentOrder - " + CurrentOrder + " for " + listEvent.Name);
+
                         continue;
                     }
                     else if (OrderToCall > CurrentOrder)
@@ -378,6 +384,7 @@ namespace CaptivityEvents.Patches
                 {
                     CEEvent selectedEvent = events.GetRandomElement();
                     selectedEvent.Captive = targetHero?.CharacterObject;
+
                     return selectedEvent;
                 }
             }
@@ -396,7 +403,7 @@ namespace CaptivityEvents.Patches
         {
             if (ceEvent == null) return;
 
-            notificationEventExists = true;
+            NotificationEventExists = true;
 
             if (CESettings.Instance?.EventCaptorNotifications ?? true)
             {
@@ -415,8 +422,7 @@ namespace CaptivityEvents.Patches
                     CECustomHandler.ForceLogToFile("LoadCampaignNotificationTexture: " + e.Message);
                 }
 
-                Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(
-                    new CEEventMapNotification(ceEvent, new TextObject(notificationText)));
+                Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new CEEventMapNotification(ceEvent, new TextObject(notificationText)));
             }
             else
             {
@@ -435,6 +441,6 @@ namespace CaptivityEvents.Patches
             }
         }
 
-        #endregion
+#endregion
     }
 }
