@@ -815,7 +815,7 @@ namespace CaptivityEvents.Events
 
             foreach (SkillRequired skillRequired in _option.SkillsRequired)
             {
-                if (skillRequired.Ref == "Captor") continue;
+                if (skillRequired.Ref is "Captor" or "Captive") continue;
 
                 SkillObject foundSkill = CESkills.FindSkill(skillRequired.Id);
 
@@ -882,7 +882,7 @@ namespace CaptivityEvents.Events
 
             foreach (TraitRequired traitRequired in _option.TraitsRequired)
             {
-                if (traitRequired.Ref == "Captor") continue;
+                if (traitRequired.Ref is "Captor" or "Captive") continue;
 
                 TraitObject foundTrait;
 

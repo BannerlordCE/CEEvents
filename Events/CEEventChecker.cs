@@ -312,8 +312,8 @@ namespace CaptivityEvents.Events
             if (!ProstitutionCheck(captive)) return LatestMessage;
             if (!ProstitutionLevelCheck(captive)) return LatestMessage;
             if (!AgeCheck(captive)) return LatestMessage;
-            if (!TraitsCheck(captive)) return LatestMessage;
-            if (!SkillsCheck(captive)) return LatestMessage;
+            if (!TraitsCheck(captive, false, !nonRandomBehaviour)) return LatestMessage;
+            if (!SkillsCheck(captive, false, !nonRandomBehaviour)) return LatestMessage;
             if (!HealthCheck(captive)) return LatestMessage;
             if (!HeroCheck(captive, captorParty, nonRandomBehaviour)) return LatestMessage;
             if (!PlayerCheck()) return LatestMessage;
@@ -541,7 +541,7 @@ namespace CaptivityEvents.Events
             return null;
         }
 
-#region private
+        #region private
 
         private bool CompanionsCheck(CharacterObject hero, PartyBase party)
         {
@@ -1794,7 +1794,7 @@ namespace CaptivityEvents.Events
             return SkillsCheck(captorParty.LeaderHero?.CharacterObject, true);
         }
 
-        private bool SkillsCheck(CharacterObject character, bool captor = false)
+        private bool SkillsCheck(CharacterObject character, bool captor = false, bool isRandomEvent = false)
         {
             try
             {
@@ -1802,18 +1802,32 @@ namespace CaptivityEvents.Events
 
                 foreach (SkillRequired skillRequired in _listEvent.SkillsRequired)
                 {
-                    if (captor && skillRequired.Ref == "Hero") continue;
+                    switch (skillRequired.Ref)
+                    {
+                        case "Captive" or "Captor" when isRandomEvent:
+                        case "Captor" when !captor:
+                        case "Captive" when captor:
+                            continue;
+                    }
+
+                    CharacterObject characterToCheck = skillRequired.Ref is "Hero" ? CharacterObject.PlayerCharacter : character;
 
                     SkillObject foundSkill = CESkills.FindSkill(skillRequired.Id);
 
                     if (foundSkill == null) return LogError("Couldn't find " + skillRequired.Id);
-                    int skillLevel = character.GetSkillValue(foundSkill);
+                    int skillLevel = characterToCheck.GetSkillValue(foundSkill);
 
                     try
                     {
                         if (!string.IsNullOrWhiteSpace(skillRequired.Min))
                         {
-                            if (skillLevel < new CEVariablesLoader().GetIntFromXML(skillRequired.Min)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (captor ? "ReqCaptorSkillLevelAbove" : "ReqHeroSkillLevelAbove") + ".");
+                            if (skillLevel < new CEVariablesLoader().GetIntFromXML(skillRequired.Min))
+                                return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (skillRequired.Ref switch
+                                {
+                                    "Captor" => "ReqCaptorSkillLevelAbove",
+                                    "Captive" => "ReqCaptiveSkillLevelAbove",
+                                    _ => "ReqHeroSkillLevelAbove"
+                                }) + ".");
                         }
                     }
                     catch (Exception)
@@ -1825,7 +1839,13 @@ namespace CaptivityEvents.Events
                     {
                         if (!string.IsNullOrWhiteSpace(skillRequired.Max))
                         {
-                            if (skillLevel > new CEVariablesLoader().GetIntFromXML(skillRequired.Max)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (captor ? "ReqCaptorSkillLevelBelow" : "ReqHeroSkillLevelBelow") + ".");
+                            if (skillLevel > new CEVariablesLoader().GetIntFromXML(skillRequired.Max))
+                                return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (skillRequired.Ref switch
+                                {
+                                    "Captor" => "ReqCaptorSkillLevelBelow",
+                                    "Captive" => "ReqCaptiveSkillLevelBelow",
+                                    _ => "ReqHeroSkillLevelBelow"
+                                }) + ".");
                         }
                     }
                     catch (Exception)
@@ -1850,7 +1870,7 @@ namespace CaptivityEvents.Events
             return TraitsCheck(captorParty.LeaderHero?.CharacterObject, true);
         }
 
-        private bool TraitsCheck(CharacterObject character, bool captor = false)
+        private bool TraitsCheck(CharacterObject character, bool captor = false, bool isRandomEvent = false)
         {
             try
             {
@@ -1858,18 +1878,32 @@ namespace CaptivityEvents.Events
 
                 foreach (TraitRequired traitRequired in _listEvent.TraitsRequired)
                 {
-                    if (captor && traitRequired.Ref == "Hero") continue;
+                    switch (traitRequired.Ref)
+                    {
+                        case "Captive" or "Captor" when isRandomEvent:
+                        case "Captor" when !captor:
+                        case "Captive" when captor:
+                            continue;
+                    }
+
+                    CharacterObject characterToCheck = traitRequired.Ref is "Hero" ? CharacterObject.PlayerCharacter : character;
 
                     TraitObject foundTrait = TraitObject.All.SingleOrDefault(traitObject => traitObject.StringId == traitRequired.Id);
 
                     if (foundTrait == null) return LogError("Couldn't find " + traitRequired.Id);
-                    int traitLevel = character.GetTraitLevel(foundTrait);
+                    int traitLevel = characterToCheck.GetTraitLevel(foundTrait);
 
                     try
                     {
                         if (!string.IsNullOrWhiteSpace(traitRequired.Min))
                         {
-                            if (traitLevel < new CEVariablesLoader().GetIntFromXML(traitRequired.Min)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (captor ? "ReqCaptorTraitLevelAbove" : "ReqHeroTraitLevelAbove") + ".");
+                            if (traitLevel < new CEVariablesLoader().GetIntFromXML(traitRequired.Min))
+                                return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (traitRequired.Ref switch
+                                {
+                                    "Captor" => "ReqCaptorTraitLevelAbove",
+                                    "Captive" => "ReqCaptiveTraitLevelAbove",
+                                    _ => "ReqHeroTraitLevelAbove"
+                                }) + ".");
                         }
                     }
                     catch (Exception)
@@ -1881,7 +1915,13 @@ namespace CaptivityEvents.Events
                     {
                         if (!string.IsNullOrWhiteSpace(traitRequired.Max))
                         {
-                            if (traitLevel > new CEVariablesLoader().GetIntFromXML(traitRequired.Max)) return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (captor ? "ReqCaptorTraitLevelBelow" : "ReqHeroTraitLevelBelow") + ".");
+                            if (traitLevel > new CEVariablesLoader().GetIntFromXML(traitRequired.Max))
+                                return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (traitRequired.Ref switch
+                                {
+                                    "Captor" => "ReqCaptorTraitLevelBelow",
+                                    "Captive" => "ReqCaptiveTraitLevelBelow",
+                                    _ => "ReqHeroTraitLevelBelow"
+                                }) + ".");
                         }
                     }
                     catch (Exception)
@@ -2167,6 +2207,6 @@ namespace CaptivityEvents.Events
             return false;
         }
 
-#endregion private
+        #endregion private
     }
 }

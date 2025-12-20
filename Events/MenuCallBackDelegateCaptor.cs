@@ -174,9 +174,9 @@ namespace CaptivityEvents.Events
             ReqCaptives(ref args);
             ReqMaleCaptives(ref args);
             ReqFemaleCaptives(ref args);
-            ReqHeroSkills(ref args);
+            ReqCaptiveSkills(ref args);
             ReqCaptorSkills(ref args);
-            ReqHeroTraits(ref args);
+            ReqCaptiveTraits(ref args);
             ReqCaptorTraits(ref args);
             ReqGold(ref args);
 
@@ -199,11 +199,11 @@ namespace CaptivityEvents.Events
             catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
 
             _sharedCallBackHelper.ConsequencePlaySound();
+            _sharedCallBackHelper.ConsequenceChangeSkill();
+            _sharedCallBackHelper.ConsequenceChangeTrait();
             ConsequenceCaptorLeaveSpouse();
             ConsequenceCaptorGold(captiveHero);
             ConsequenceCaptorChangeGold();
-            ConsequenceCaptorSkill();
-            ConsequenceCaptorTrait();
             ConsequenceCaptorRenown();
             ConsequenceChangeMorale();
 
@@ -221,8 +221,6 @@ namespace CaptivityEvents.Events
                 ConsequenceRelations(captiveHero);
                 ConsequenceGold(captiveHero);
                 ConsequenceChangeGold(captiveHero);
-                ConsequenceTrait(captiveHero);
-                ConsequenceSkill(captiveHero);
                 ConsequenceRenown(captiveHero);
                 ConsequenceChangeHealth(captiveHero);
                 ConsequenceImpregnation(captiveHero);
@@ -765,86 +763,6 @@ namespace CaptivityEvents.Events
             }
         }
 
-        private void ConsequenceSkill(Hero captiveHero)
-        {
-            try
-            {
-                if (_option.SkillsToLevel != null && _option.SkillsToLevel.Count(skillToLevel => skillToLevel.Ref.ToLower() == "hero") != 0)
-                {
-                    foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
-                    {
-                        int level = 0;
-                        int xp = 0;
-
-                        if (skillToLevel.Ref.ToLower() != "hero") continue;
-
-                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel))
-                            level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
-
-                        _dynamics.SkillModifier(captiveHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
-                    }
-                }
-                else if (_listedEvent.SkillsToLevel != null && _listedEvent.SkillsToLevel.Count(skillToLevel => skillToLevel.Ref.ToLower() == "hero") != 0)
-                {
-                    foreach (SkillToLevel skillToLevel in _listedEvent.SkillsToLevel)
-                    {
-                        int level = 0;
-                        int xp = 0;
-
-                        if (skillToLevel.Ref.ToLower() != "hero") continue;
-
-                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel))
-                            level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
-
-                        _dynamics.SkillModifier(captiveHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
-                    }
-                }
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
-        }
-
-        internal void ConsequenceTrait(Hero captiveHero)
-        {
-            try
-            {
-                if (_option.TraitsToLevel != null && _option.TraitsToLevel.Count(traitToLevel => traitToLevel.Ref.ToLower() == "hero") != 0)
-                {
-                    foreach (TraitToLevel traitToLevel in _option.TraitsToLevel)
-                    {
-                        int level = 0;
-                        int xp = 0;
-
-                        if (traitToLevel.Ref.ToLower() != "hero") continue;
-
-                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel))
-                            level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
-
-                        _dynamics.TraitModifier(captiveHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
-                    }
-                }
-                else if (_listedEvent.TraitsToLevel != null && _listedEvent.TraitsToLevel.Count(traitToLevel => traitToLevel.Ref.ToLower() == "hero") != 0)
-                {
-                    foreach (TraitToLevel traitToLevel in _listedEvent.TraitsToLevel)
-                    {
-                        int level = 0;
-                        int xp = 0;
-
-                        if (traitToLevel.Ref.ToLower() != "hero") continue;
-
-                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel))
-                            level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
-
-                        _dynamics.TraitModifier(captiveHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
-                    }
-                }
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
-        }
-
         private void ConsequenceChangeGold(Hero captiveHero)
         {
             if (!_option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ChangeGold)) return;
@@ -1008,85 +926,6 @@ namespace CaptivityEvents.Events
             }
         }
 
-        private void ConsequenceCaptorTrait()
-        {
-            try
-            {
-                if (_option.TraitsToLevel != null && _option.TraitsToLevel.Count(traitToLevel => traitToLevel.Ref.ToLower() == "captor") != 0)
-                {
-                    foreach (TraitToLevel traitToLevel in _option.TraitsToLevel)
-                    {
-                        int level = 0;
-                        int xp = 0;
-
-                        if (traitToLevel.Ref.ToLower() != "captor") continue;
-
-                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel))
-                            level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
-
-                        _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
-                    }
-                }
-                else if (_listedEvent.TraitsToLevel != null && _listedEvent.TraitsToLevel.Count(traitToLevel => traitToLevel.Ref.ToLower() == "captor") != 0)
-                {
-                    foreach (TraitToLevel traitToLevel in _listedEvent.TraitsToLevel)
-                    {
-                        int level = 0;
-                        int xp = 0;
-
-                        if (traitToLevel.Ref.ToLower() != "captor") continue;
-
-                        if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel))
-                            level = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = new CEVariablesLoader().GetIntFromXML(traitToLevel.ByXP);
-
-                        _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
-                    }
-                }
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid Trait Flags"); }
-        }
-
-        private void ConsequenceCaptorSkill()
-        {
-            try
-            {
-                if (_option.SkillsToLevel != null && _option.SkillsToLevel.Count(skillToLevel => skillToLevel.Ref.ToLower() == "captor") != 0)
-                {
-                    foreach (SkillToLevel skillToLevel in _option.SkillsToLevel)
-                    {
-                        int level = 0;
-                        int xp = 0;
-
-                        if (skillToLevel.Ref.ToLower() != "captor") continue;
-
-                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel))
-                            level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
-
-                        _dynamics.SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
-                    }
-                }
-                else if (_listedEvent.SkillsToLevel != null && _listedEvent.SkillsToLevel.Count(skillToLevel => skillToLevel.Ref.ToLower() == "captor") != 0)
-                {
-                    foreach (SkillToLevel skillToLevel in _listedEvent.SkillsToLevel)
-                    {
-                        int level = 0;
-                        int xp = 0;
-
-                        if (skillToLevel.Ref.ToLower() != "captor") continue;
-
-                        if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel))
-                            level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
-                        else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
-
-                        _dynamics.SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
-                    }
-                }
-            }
-            catch (Exception) { CECustomHandler.LogToFile("Invalid Skill Flags"); }
-        }
 
         private void ConsequenceCaptorChangeGold()
         {
@@ -1173,7 +1012,7 @@ namespace CaptivityEvents.Events
 
             foreach (SkillRequired skillRequired in _option.SkillsRequired)
             {
-                if (skillRequired.Ref == "Hero") continue;
+                if (skillRequired.Ref is "Captive") continue;
 
                 SkillObject foundSkill = CESkills.FindSkill(skillRequired.Id);
 
@@ -1200,13 +1039,13 @@ namespace CaptivityEvents.Events
             }
         }
 
-        private void ReqHeroSkills(ref MenuCallbackArgs args)
+        private void ReqCaptiveSkills(ref MenuCallbackArgs args)
         {
             if (_option.SkillsRequired == null) return;
 
             foreach (SkillRequired skillRequired in _option.SkillsRequired)
             {
-                if (skillRequired.Ref == "Captor") continue;
+                if (skillRequired.Ref is "Captor" or "Hero") continue;
 
                 SkillObject foundSkill = CESkills.FindSkill(skillRequired.Id);
 
@@ -1273,7 +1112,7 @@ namespace CaptivityEvents.Events
 
             foreach (TraitRequired traitRequired in _option.TraitsRequired)
             {
-                if (traitRequired.Ref == "Hero") continue;
+                if (traitRequired.Ref == "Captive") continue;
 
                 TraitObject foundTrait;
 
@@ -1304,13 +1143,13 @@ namespace CaptivityEvents.Events
             }
         }
 
-        private void ReqHeroTraits(ref MenuCallbackArgs args)
+        private void ReqCaptiveTraits(ref MenuCallbackArgs args)
         {
             if (_option.TraitsRequired == null) return;
 
             foreach (TraitRequired traitRequired in _option.TraitsRequired)
             {
-                if (traitRequired.Ref == "Captor") continue;
+                if (traitRequired.Ref is "Captor" or "Hero") continue;
 
                 TraitObject foundTrait;
 

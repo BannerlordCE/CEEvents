@@ -226,9 +226,9 @@ namespace CaptivityEvents.Events
             ReqHeroHealthPercentage(ref args);
             ReqSlavery(ref args);
             ReqProstitute(ref args);
-            ReqHeroSkills(ref args);
+            ReqCaptiveSkills(ref args);
             ReqCaptorSkills(ref args);
-            ReqHeroTraits(ref args);
+            ReqCaptiveTraits(ref args);
             ReqCaptorTraits(ref args);
             ReqGold(ref args);
 
@@ -1050,7 +1050,7 @@ namespace CaptivityEvents.Events
 
             foreach (SkillRequired skillRequired in _option.SkillsRequired)
             {
-                if (skillRequired.Ref == "Hero") continue;
+                if (skillRequired.Ref is "Hero" or "Captive") continue;
 
                 if (PlayerCaptivity.CaptorParty.LeaderHero == null)
                 {
@@ -1084,88 +1084,7 @@ namespace CaptivityEvents.Events
             }
         }
 
-        private void ReqCaptorTraits(ref MenuCallbackArgs args)
-        {
-            if (_option.TraitsRequired == null) return;
-
-            foreach (TraitRequired traitRequired in _option.TraitsRequired)
-            {
-                if (traitRequired.Ref == "Hero") continue;
-
-                if (PlayerCaptivity.CaptorParty.LeaderHero == null)
-                {
-                    args.IsEnabled = false;
-
-                    return;
-                }
-
-                TraitObject foundTrait;
-
-                try
-                {
-                    foundTrait = TraitObject.All.Single((traitObject) => traitObject.StringId == traitRequired.Id);
-                }
-                catch (Exception)
-                {
-                    CECustomHandler.ForceLogToFile("Could not find trait " + traitRequired.Id);
-
-                    return;
-                }
-
-                int traitLevel = PlayerCaptivity.CaptorParty.LeaderHero.GetTraitLevel(foundTrait);
-
-                try
-                {
-                    if (ReqTraitsLevelAbove(ref args, foundTrait, traitLevel, traitRequired.Min, "str_CE_trait_captor_level")) break;
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid TraitRequiredAbove"); }
-
-                try
-                {
-                    if (ReqTraitsLevelBelow(ref args, foundTrait, traitLevel, traitRequired.Max, "str_CE_trait_captor_level")) break;
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid TraitRequiredBelow"); }
-            }
-        }
-
-        private void ReqHeroTraits(ref MenuCallbackArgs args)
-        {
-            if (_option.TraitsRequired == null) return;
-
-            foreach (TraitRequired traitRequired in _option.TraitsRequired)
-            {
-                if (traitRequired.Ref == "Captor") continue;
-
-                TraitObject foundTrait;
-
-                try
-                {
-                    foundTrait = TraitObject.All.Single((traitObject) => traitObject.StringId == traitRequired.Id);
-                }
-                catch (Exception)
-                {
-                    CECustomHandler.ForceLogToFile("Could not find trait " + traitRequired.Id);
-
-                    return;
-                }
-
-                int traitLevel = Hero.MainHero.GetTraitLevel(foundTrait);
-
-                try
-                {
-                    if (ReqTraitsLevelAbove(ref args, foundTrait, traitLevel, traitRequired.Min, "str_CE_trait_level")) break;
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid TraitRequiredAbove"); }
-
-                try
-                {
-                    if (ReqTraitsLevelBelow(ref args, foundTrait, traitLevel, traitRequired.Max, "str_CE_trait_level")) break;
-                }
-                catch (Exception) { CECustomHandler.LogToFile("Invalid TraitRequiredBelow"); }
-            }
-        }
-
-        private void ReqHeroSkills(ref MenuCallbackArgs args)
+        private void ReqCaptiveSkills(ref MenuCallbackArgs args)
         {
             if (_option.SkillsRequired == null) return;
 
@@ -1231,6 +1150,87 @@ namespace CaptivityEvents.Events
 #endregion ReqSkills
 
 #region ReqTraits
+
+        private void ReqCaptorTraits(ref MenuCallbackArgs args)
+        {
+            if (_option.TraitsRequired == null) return;
+
+            foreach (TraitRequired traitRequired in _option.TraitsRequired)
+            {
+                if (traitRequired.Ref is "Hero" or "Captive") continue;
+
+                if (PlayerCaptivity.CaptorParty.LeaderHero == null)
+                {
+                    args.IsEnabled = false;
+
+                    return;
+                }
+
+                TraitObject foundTrait;
+
+                try
+                {
+                    foundTrait = TraitObject.All.Single((traitObject) => traitObject.StringId == traitRequired.Id);
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.ForceLogToFile("Could not find trait " + traitRequired.Id);
+
+                    return;
+                }
+
+                int traitLevel = PlayerCaptivity.CaptorParty.LeaderHero.GetTraitLevel(foundTrait);
+
+                try
+                {
+                    if (ReqTraitsLevelAbove(ref args, foundTrait, traitLevel, traitRequired.Min, "str_CE_trait_captor_level")) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid TraitRequiredAbove"); }
+
+                try
+                {
+                    if (ReqTraitsLevelBelow(ref args, foundTrait, traitLevel, traitRequired.Max, "str_CE_trait_captor_level")) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid TraitRequiredBelow"); }
+            }
+        }
+
+        private void ReqCaptiveTraits(ref MenuCallbackArgs args)
+        {
+            if (_option.TraitsRequired == null) return;
+
+            foreach (TraitRequired traitRequired in _option.TraitsRequired)
+            {
+                if (traitRequired.Ref is "Captor" or "Hero") continue;
+
+                TraitObject foundTrait;
+
+                try
+                {
+                    foundTrait = TraitObject.All.Single((traitObject) => traitObject.StringId == traitRequired.Id);
+                }
+                catch (Exception)
+                {
+                    CECustomHandler.ForceLogToFile("Could not find trait " + traitRequired.Id);
+
+                    return;
+                }
+
+                int traitLevel = Hero.MainHero.GetTraitLevel(foundTrait);
+
+                try
+                {
+                    if (ReqTraitsLevelAbove(ref args, foundTrait, traitLevel, traitRequired.Min, "str_CE_trait_level")) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid TraitRequiredAbove"); }
+
+                try
+                {
+                    if (ReqTraitsLevelBelow(ref args, foundTrait, traitLevel, traitRequired.Max, "str_CE_trait_level")) break;
+                }
+                catch (Exception) { CECustomHandler.LogToFile("Invalid TraitRequiredBelow"); }
+            }
+        }
 
         private bool ReqTraitsLevelBelow(ref MenuCallbackArgs args, TraitObject traitRequired, int traitLevel, string max, string type)
         {

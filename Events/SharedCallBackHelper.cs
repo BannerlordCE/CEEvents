@@ -180,36 +180,78 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                if (option.TraitsToLevel != null && option.TraitsToLevel.Count(traitToLevel => traitToLevel.Ref.ToLower() == "hero") != 0)
+                bool isRandom = listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random);
+                bool isCaptor = listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor);
+
+                Hero captiveHero = isCaptor ? listedEvent.Captive?.HeroObject : Hero.MainHero;
+                Hero captorHero = isCaptor ? Hero.MainHero : PlayerCaptivity.CaptorParty?.LeaderHero;
+
+                if (option.TraitsToLevel != null)
                 {
                     foreach (TraitToLevel traitToLevel in option.TraitsToLevel)
                     {
                         int level = 0;
                         int xp = 0;
+                        string refName = traitToLevel.Ref?.ToLower() ?? "hero";
+                        Hero targetHero = null;
 
-                        if (traitToLevel.Ref.ToLower() != "hero") continue;
+                        switch (refName)
+                        {
+                            case "hero":
+                                targetHero = captiveHero;
+
+                                break;
+                            case "captor":
+                                targetHero = captorHero;
+
+                                break;
+                            case "captive":
+                                if (!isRandom) targetHero = captiveHero;
+
+                                break;
+                        }
+
+                        if (targetHero == null) continue;
 
                         if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel))
                             level = _variableLoader.GetIntFromXML(traitToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(traitToLevel.ByXP);
 
-                        _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
+                        _dynamics.TraitModifier(targetHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                     }
                 }
-                else if (listedEvent.TraitsToLevel != null && listedEvent.TraitsToLevel.Count(traitToLevel => traitToLevel.Ref.ToLower() == "hero") != 0)
+                else if (listedEvent.TraitsToLevel != null)
                 {
                     foreach (TraitToLevel traitToLevel in listedEvent.TraitsToLevel)
                     {
                         int level = 0;
                         int xp = 0;
+                        string refName = traitToLevel.Ref?.ToLower() ?? "hero";
+                        Hero targetHero = null;
 
-                        if (traitToLevel.Ref.ToLower() != "hero") continue;
+                        switch (refName)
+                        {
+                            case "hero":
+                                targetHero = captiveHero;
+
+                                break;
+                            case "captor":
+                                targetHero = captorHero;
+
+                                break;
+                            case "captive":
+                                if (!isRandom) targetHero = captiveHero;
+
+                                break;
+                        }
+
+                        if (targetHero == null) continue;
 
                         if (!string.IsNullOrWhiteSpace(traitToLevel.ByLevel))
                             level = _variableLoader.GetIntFromXML(traitToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(traitToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(traitToLevel.ByXP);
 
-                        _dynamics.TraitModifier(Hero.MainHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
+                        _dynamics.TraitModifier(targetHero, traitToLevel.Id, level, xp, !traitToLevel.HideNotification, traitToLevel.Color);
                     }
                 }
             }
@@ -220,36 +262,78 @@ namespace CaptivityEvents.Events
         {
             try
             {
-                if (option.SkillsToLevel != null && option.SkillsToLevel.Count(skillToLevel => skillToLevel.Ref.ToLower() == "hero") != 0)
+                bool isRandom = listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random);
+                bool isCaptor = listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor);
+
+                Hero captiveHero = isCaptor ? listedEvent.Captive?.HeroObject : Hero.MainHero;
+                Hero captorHero = isCaptor ? Hero.MainHero : PlayerCaptivity.CaptorParty?.LeaderHero;
+
+                if (option.SkillsToLevel != null)
                 {
                     foreach (SkillToLevel skillToLevel in option.SkillsToLevel)
                     {
                         int level = 0;
                         int xp = 0;
+                        string refName = skillToLevel.Ref?.ToLower() ?? "hero";
+                        Hero targetHero = null;
 
-                        if (skillToLevel.Ref.ToLower() != "hero") continue;
+                        switch (refName)
+                        {
+                            case "hero":
+                                targetHero = captiveHero;
+
+                                break;
+                            case "captor":
+                                targetHero = captorHero;
+
+                                break;
+                            case "captive":
+                                if (!isRandom) targetHero = captiveHero;
+
+                                break;
+                        }
+
+                        if (targetHero == null) continue;
 
                         if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel))
                             level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
 
-                        new Dynamics().SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
+                        new Dynamics().SkillModifier(targetHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }
                 }
-                else if (listedEvent.SkillsToLevel != null && listedEvent.SkillsToLevel.Count(skillToLevel => skillToLevel.Ref.ToLower() == "hero") != 0)
+                else if (listedEvent.SkillsToLevel != null)
                 {
                     foreach (SkillToLevel skillToLevel in listedEvent.SkillsToLevel)
                     {
                         int level = 0;
                         int xp = 0;
+                        string refName = skillToLevel.Ref?.ToLower() ?? "hero";
+                        Hero targetHero = null;
 
-                        if (skillToLevel.Ref.ToLower() != "hero") continue;
+                        switch (refName)
+                        {
+                            case "hero":
+                                targetHero = captiveHero;
+
+                                break;
+                            case "captor":
+                                targetHero = captorHero;
+
+                                break;
+                            case "captive":
+                                if (!isRandom) targetHero = captiveHero;
+
+                                break;
+                        }
+
+                        if (targetHero == null) continue;
 
                         if (!string.IsNullOrWhiteSpace(skillToLevel.ByLevel))
                             level = _variableLoader.GetIntFromXML(skillToLevel.ByLevel);
                         else if (!string.IsNullOrWhiteSpace(skillToLevel.ByXP)) xp = _variableLoader.GetIntFromXML(skillToLevel.ByXP);
 
-                        new Dynamics().SkillModifier(Hero.MainHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
+                        new Dynamics().SkillModifier(targetHero, skillToLevel.Id, level, xp, !skillToLevel.HideNotification, skillToLevel.Color);
                     }
                 }
             }
