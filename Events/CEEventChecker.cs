@@ -48,7 +48,7 @@ namespace CaptivityEvents.Events
                     returnString += "(hasDungeonFlag || hasCityFlag || hasTavernFlag)";
                 }
 
-                if (captorParty.Settlement.IsVillage) returnString += "(hasVillageFlag)";
+                if (captorParty.Settlement.IsVillage) returnString += "(hasVillageFlag || hasTavernFlag)";
 
                 if (captorParty.Settlement.IsHideout) returnString += "(hasHideoutFlag)";
 
@@ -121,12 +121,12 @@ namespace CaptivityEvents.Events
 
                 if (captorParty.MobileParty.CurrentSettlement.IsVillage)
                 {
-                    returnString += "(hasVillageFlag)";
+                    returnString += "(hasPartyInVillageFlag)(hasVillageFlag || hasTavernFlag)";
                 }
 
                 if (captorParty.MobileParty.CurrentSettlement.IsCastle)
                 {
-                    returnString += "(hasCastleFlag || hasDungeonFlag)";
+                    returnString += "(hasPartyInCastleFlag)(hasCastleFlag || hasDungeonFlag)";
                 }
 
                 try
