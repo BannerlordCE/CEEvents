@@ -1699,7 +1699,7 @@ namespace CaptivityEvents.Events
 
         private void SetReqHeroCaptivesBelow(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroCaptivesBelow)) return;
+            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => troopRosterElement.Character.IsHero ? troopRosterElement.Number : 0) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroCaptivesBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "high");
             args.IsEnabled = false;
@@ -1707,7 +1707,7 @@ namespace CaptivityEvents.Events
 
         private void SetReqCaptivesAbove(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return troopRosterElement.Number; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqCaptivesAbove)) return;
+            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => troopRosterElement.Number) >= new CEVariablesLoader().GetIntFromXML(_option.ReqCaptivesAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
             args.IsEnabled = false;
@@ -1715,7 +1715,7 @@ namespace CaptivityEvents.Events
 
         private void SetReqHeroCaptivesAbove(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroCaptivesAbove)) return;
+            if (PlayerCaptivity.CaptorParty.PrisonRoster.Sum(troopRosterElement => troopRosterElement.Character.IsHero ? troopRosterElement.Number : 0) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroCaptivesAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_captives_level", "low");
             args.IsEnabled = false;
@@ -1727,7 +1727,7 @@ namespace CaptivityEvents.Events
 
         private void SetReqFemaleTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleTroopsBelow)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => troopRosterElement.Character.IsFemale ? troopRosterElement.Number : 0) <= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleTroopsBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
             args.IsEnabled = false;
@@ -1735,7 +1735,7 @@ namespace CaptivityEvents.Events
 
         private void SetReqHeroFemaleTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroFemaleTroopsBelow)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero ? troopRosterElement.Number : 0) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroFemaleTroopsBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
             args.IsEnabled = false;
@@ -1743,7 +1743,7 @@ namespace CaptivityEvents.Events
 
         private void SetReqFemaleTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleTroopsAbove)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => troopRosterElement.Character.IsFemale ? troopRosterElement.Number : 0) >= new CEVariablesLoader().GetIntFromXML(_option.ReqFemaleTroopsAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
@@ -1751,7 +1751,7 @@ namespace CaptivityEvents.Events
 
         private void SetReqHeroFemaleTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroFemaleTroopsAbove)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero ? troopRosterElement.Number : 0) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroFemaleTroopsAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
@@ -1763,21 +1763,21 @@ namespace CaptivityEvents.Events
 
         private void SetReqMaleTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleTroopsBelow)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => troopRosterElement.Character.IsFemale ? troopRosterElement.Number : 0) <= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleTroopsBelow)) return;
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
             args.IsEnabled = false;
         }
 
         private void SetReqHeroMaleTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroMaleTroopsBelow)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => !troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero ? troopRosterElement.Number : 0) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroMaleTroopsBelow)) return;
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
             args.IsEnabled = false;
         }
 
         private void SetReqMaleTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleTroopsAbove)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => troopRosterElement.Character.IsFemale ? troopRosterElement.Number : 0) >= new CEVariablesLoader().GetIntFromXML(_option.ReqMaleTroopsAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
@@ -1785,7 +1785,7 @@ namespace CaptivityEvents.Events
 
         private void SetReqHeroMaleTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroMaleTroopsAbove)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => troopRosterElement.Character.IsFemale && troopRosterElement.Character.IsHero ? troopRosterElement.Number : 0) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroMaleTroopsAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
@@ -1797,7 +1797,7 @@ namespace CaptivityEvents.Events
 
         private void SetReqTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return troopRosterElement.Number; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqTroopsBelow)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => troopRosterElement.Number) <= new CEVariablesLoader().GetIntFromXML(_option.ReqTroopsBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
             args.IsEnabled = false;
@@ -1805,7 +1805,7 @@ namespace CaptivityEvents.Events
 
         private void SetReqHeroTroopsBelow(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroTroopsBelow)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => troopRosterElement.Character.IsHero ? troopRosterElement.Number : 0) <= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroTroopsBelow)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "high");
             args.IsEnabled = false;
@@ -1813,7 +1813,7 @@ namespace CaptivityEvents.Events
 
         private void SetReqTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return troopRosterElement.Number; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqTroopsAbove)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => troopRosterElement.Number) >= new CEVariablesLoader().GetIntFromXML(_option.ReqTroopsAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;
@@ -1821,7 +1821,7 @@ namespace CaptivityEvents.Events
 
         private void SetReqHeroTroopsAbove(ref MenuCallbackArgs args)
         {
-            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsHero) ? troopRosterElement.Number : 0; }) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroTroopsAbove)) return;
+            if (PlayerCaptivity.CaptorParty.MemberRoster.Sum(troopRosterElement => troopRosterElement.Character.IsHero ? troopRosterElement.Number : 0) >= new CEVariablesLoader().GetIntFromXML(_option.ReqHeroTroopsAbove)) return;
 
             args.Tooltip = GameTexts.FindText("str_CE_member_level", "low");
             args.IsEnabled = false;

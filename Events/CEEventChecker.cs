@@ -41,7 +41,7 @@ namespace CaptivityEvents.Events
         {
             string returnString = "";
 
-            if (captorParty != null && captorParty.IsSettlement)
+            if (captorParty is { IsSettlement: true })
             {
                 if (captorParty.Settlement.IsTown)
                 {
@@ -59,7 +59,7 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    bool hasCaravan = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan && !mobileParty.IsCurrentlyAtSea; }) != null;
+                    bool hasCaravan = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan && !mobileParty.IsCurrentlyAtSea) != null;
                     if (hasCaravan) returnString += "(visitedByCaravanFlag)";
                 }
                 catch (Exception)
@@ -69,7 +69,7 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    bool hasTradeShip = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan && mobileParty.IsCurrentlyAtSea; }) != null;
+                    bool hasTradeShip = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan && mobileParty.IsCurrentlyAtSea) != null;
                     if (hasTradeShip) returnString += "(visitedByTradeShipFlag)";
                 }
                 catch (Exception)
@@ -79,7 +79,7 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    bool hasLord = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty && !mobileParty.IsMainParty; }) != null;
+                    bool hasLord = captorParty.Settlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty) != null;
                     if (hasLord) returnString += "(VisitedByLordFlag)";
                 }
                 catch (Exception)
@@ -112,7 +112,7 @@ namespace CaptivityEvents.Events
 
                 returnString += "(hasPartyOnLandFlag)";
             }
-            else if (captorParty != null && captorParty.IsMobile && captorParty.MobileParty.CurrentSettlement != null)
+            else if (captorParty is { IsMobile: true } && captorParty.MobileParty.CurrentSettlement != null)
             {
                 if (captorParty.MobileParty.CurrentSettlement.IsTown)
                 {
@@ -131,7 +131,7 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    bool hasCaravan = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan && !mobileParty.IsCurrentlyAtSea; }) != null;
+                    bool hasCaravan = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan && !mobileParty.IsCurrentlyAtSea) != null;
                     if (hasCaravan) returnString += "(visitedByCaravanFlag)";
                 }
                 catch (Exception)
@@ -141,7 +141,7 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    bool hasTradeShip = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsCaravan && mobileParty.IsCurrentlyAtSea; }) != null;
+                    bool hasTradeShip = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsCaravan && mobileParty.IsCurrentlyAtSea) != null;
                     if (hasTradeShip) returnString += "(visitedByTradeShipFlag)";
                 }
                 catch (Exception)
@@ -151,7 +151,7 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    bool hasLord = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => { return mobileParty.IsLordParty && !mobileParty.IsMainParty; }) != null;
+                    bool hasLord = captorParty.MobileParty.CurrentSettlement.Parties.FirstOrDefault(mobileParty => mobileParty.IsLordParty && !mobileParty.IsMainParty) != null;
                     if (hasLord) returnString += "(VisitedByLordFlag)";
                 }
                 catch (Exception)
@@ -191,7 +191,7 @@ namespace CaptivityEvents.Events
                 returnString += "(hasTravellingFlag)";
                 if (captorParty.MobileParty.BesiegerCamp != null) returnString += "(duringSiegeFlag)";
 
-                if (captorParty.MapEvent != null && captorParty.MapEvent.IsRaid && captorParty.MapFaction.IsAtWarWith(captorParty.MapEvent.MapEventSettlement.MapFaction) && captorParty.MapEvent.DefenderSide.TroopCount == 0) returnString += "(duringRaidFlag)";
+                if (captorParty.MapEvent is { IsRaid: true } && captorParty.MapFaction.IsAtWarWith(captorParty.MapEvent.MapEventSettlement.MapFaction) && captorParty.MapEvent.DefenderSide.TroopCount == 0) returnString += "(duringRaidFlag)";
 
                 returnString += (captorParty.MobileParty.IsCurrentlyAtSea) ? "(hasPartyAtSeaFlag)" : "(hasPartyOnLandFlag)";
             }
@@ -238,9 +238,7 @@ namespace CaptivityEvents.Events
 
             returnString += "\n\n\n------- Party Status -------";
 
-            if (captorParty is { IsMobile: true })
-                if (captorParty.MobileParty != null)
-                    returnString += "\nMoral Total : " + captorParty.MobileParty.Morale;
+            if (captorParty is { IsMobile: true, MobileParty: not null }) returnString += "\nMoral Total : " + captorParty.MobileParty.Morale;
 
             if (captorParty != PartyBase.MainParty)
             {
@@ -266,14 +264,14 @@ namespace CaptivityEvents.Events
 
             if (captorParty != null)
             {
-                returnString += "\nTotal Females : " + captorParty.MemberRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
-                returnString += "\nTotal Males : " + captorParty.MemberRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
+                returnString += "\nTotal Females : " + captorParty.MemberRoster.Sum(troopRosterElement => troopRosterElement.Character.IsFemale ? troopRosterElement.Number : 0);
+                returnString += "\nTotal Males : " + captorParty.MemberRoster.Sum(troopRosterElement => !troopRosterElement.Character.IsFemale ? troopRosterElement.Number : 0);
                 returnString += "\nTotal : " + captorParty.MemberRoster.Count;
 
                 returnString += "\n\n--- Captive Members ---";
 
-                returnString += "\nTotal Females : " + captorParty.PrisonRoster.Sum(troopRosterElement => { return (troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
-                returnString += "\nTotal Males : " + captorParty.PrisonRoster.Sum(troopRosterElement => { return (!troopRosterElement.Character.IsFemale) ? troopRosterElement.Number : 0; });
+                returnString += "\nTotal Females : " + captorParty.PrisonRoster.Sum(troopRosterElement => troopRosterElement.Character.IsFemale ? troopRosterElement.Number : 0);
+                returnString += "\nTotal Males : " + captorParty.PrisonRoster.Sum(troopRosterElement => !troopRosterElement.Character.IsFemale ? troopRosterElement.Number : 0);
                 returnString += "\nTotal : " + captorParty.PrisonRoster.Count;
             }
 
@@ -541,7 +539,7 @@ namespace CaptivityEvents.Events
             return null;
         }
 
-        #region private
+#region private
 
         private bool CompanionsCheck(CharacterObject hero, PartyBase party)
         {
@@ -1823,11 +1821,11 @@ namespace CaptivityEvents.Events
                         {
                             if (skillLevel < new CEVariablesLoader().GetIntFromXML(skillRequired.Min))
                                 return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (skillRequired.Ref switch
-                                {
-                                    "Captor" => "ReqCaptorSkillLevelAbove",
-                                    "Captive" => "ReqCaptiveSkillLevelAbove",
-                                    _ => "ReqHeroSkillLevelAbove"
-                                }) + ".");
+                                                                                                                            {
+                                                                                                                                "Captor" => "ReqCaptorSkillLevelAbove",
+                                                                                                                                "Captive" => "ReqCaptiveSkillLevelAbove",
+                                                                                                                                _ => "ReqHeroSkillLevelAbove"
+                                                                                                                            }) + ".");
                         }
                     }
                     catch (Exception)
@@ -1841,11 +1839,11 @@ namespace CaptivityEvents.Events
                         {
                             if (skillLevel > new CEVariablesLoader().GetIntFromXML(skillRequired.Max))
                                 return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (skillRequired.Ref switch
-                                {
-                                    "Captor" => "ReqCaptorSkillLevelBelow",
-                                    "Captive" => "ReqCaptiveSkillLevelBelow",
-                                    _ => "ReqHeroSkillLevelBelow"
-                                }) + ".");
+                                                                                                                            {
+                                                                                                                                "Captor" => "ReqCaptorSkillLevelBelow",
+                                                                                                                                "Captive" => "ReqCaptiveSkillLevelBelow",
+                                                                                                                                _ => "ReqHeroSkillLevelBelow"
+                                                                                                                            }) + ".");
                         }
                     }
                     catch (Exception)
@@ -1899,11 +1897,11 @@ namespace CaptivityEvents.Events
                         {
                             if (traitLevel < new CEVariablesLoader().GetIntFromXML(traitRequired.Min))
                                 return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (traitRequired.Ref switch
-                                {
-                                    "Captor" => "ReqCaptorTraitLevelAbove",
-                                    "Captive" => "ReqCaptiveTraitLevelAbove",
-                                    _ => "ReqHeroTraitLevelAbove"
-                                }) + ".");
+                                                                                                                            {
+                                                                                                                                "Captor" => "ReqCaptorTraitLevelAbove",
+                                                                                                                                "Captive" => "ReqCaptiveTraitLevelAbove",
+                                                                                                                                _ => "ReqHeroTraitLevelAbove"
+                                                                                                                            }) + ".");
                         }
                     }
                     catch (Exception)
@@ -1917,11 +1915,11 @@ namespace CaptivityEvents.Events
                         {
                             if (traitLevel > new CEVariablesLoader().GetIntFromXML(traitRequired.Max))
                                 return Error("Skipping event " + _listEvent.Name + " it does not match the conditions. " + (traitRequired.Ref switch
-                                {
-                                    "Captor" => "ReqCaptorTraitLevelBelow",
-                                    "Captive" => "ReqCaptiveTraitLevelBelow",
-                                    _ => "ReqHeroTraitLevelBelow"
-                                }) + ".");
+                                                                                                                            {
+                                                                                                                                "Captor" => "ReqCaptorTraitLevelBelow",
+                                                                                                                                "Captive" => "ReqCaptiveTraitLevelBelow",
+                                                                                                                                _ => "ReqHeroTraitLevelBelow"
+                                                                                                                            }) + ".");
                         }
                     }
                     catch (Exception)
@@ -2115,14 +2113,14 @@ namespace CaptivityEvents.Events
                 {
                     if (CESettingsEvents.Instance != null)
                     {
-                        KeyValuePair<string, bool> eventFound = CESettingsEvents.Instance.EventToggle.FirstOrDefault((eventToggle) => { return eventToggle.Key == _listEvent.Name; });
+                        KeyValuePair<string, bool> eventFound = CESettingsEvents.Instance.EventToggle.FirstOrDefault((eventToggle) => eventToggle.Key == _listEvent.Name);
 
-                        if (eventFound.Key != null && !eventFound.Value)
+                        if (eventFound is { Key: not null, Value: false })
                         {
                             return Error("Skipping event " + _listEvent.Name + " Toggle is Off");
                         }
 
-                        KeyValuePair<string, CESettingsEvent> eventSettingFound = CESettingsEvents.Instance.EventSettings.FirstOrDefault((eventSettings) => { return eventSettings.Key == _listEvent.Name; });
+                        KeyValuePair<string, CESettingsEvent> eventSettingFound = CESettingsEvents.Instance.EventSettings.FirstOrDefault((eventSettings) => eventSettings.Key == _listEvent.Name);
 
                         if (eventSettingFound.Key != null)
                         {
@@ -2167,7 +2165,7 @@ namespace CaptivityEvents.Events
 
                     for (int i = 0; i < size; i++)
                     {
-                        KeyValuePair<string, bool> flagFound = CESettingsFlags.Instance.CustomFlags.First((flag) => { return flag.Key == _listEvent.MultipleListOfCustomFlags[i]; });
+                        KeyValuePair<string, bool> flagFound = CESettingsFlags.Instance.CustomFlags.First((flag) => flag.Key == _listEvent.MultipleListOfCustomFlags[i]);
 
                         if (!flagFound.Value)
                         {
@@ -2207,6 +2205,6 @@ namespace CaptivityEvents.Events
             return false;
         }
 
-        #endregion private
+#endregion private
     }
 }
