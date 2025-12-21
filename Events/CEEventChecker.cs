@@ -45,7 +45,7 @@ namespace CaptivityEvents.Events
             {
                 if (captorParty.Settlement.IsTown)
                 {
-                    returnString += "(hasDungeonFlag || hasCityFlag)";
+                    returnString += "(hasDungeonFlag || hasCityFlag || hasTavernFlag)";
                 }
 
                 if (captorParty.Settlement.IsVillage) returnString += "(hasVillageFlag)";
@@ -116,7 +116,7 @@ namespace CaptivityEvents.Events
             {
                 if (captorParty.MobileParty.CurrentSettlement.IsTown)
                 {
-                    returnString += "(hasPartyInTownFlag)";
+                    returnString += "(hasPartyInTownFlag)(hasCityFlag || hasTavernFlag)";
                 }
 
                 if (captorParty.MobileParty.CurrentSettlement.IsVillage)
@@ -880,6 +880,7 @@ namespace CaptivityEvents.Events
             }
 
             bool hasCityFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationCity);
+            bool hasTavernFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationTavern);
             bool hasDungeonFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationDungeon);
             bool hasVillageFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationVillage);
             bool hasHideoutFlag = _listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.LocationHideout);
@@ -906,7 +907,7 @@ namespace CaptivityEvents.Events
             eventMatchingCondition = true;
 
 
-            bool inclusiveConditions = (hasCityFlag || hasDungeonFlag || hasVillageFlag || hasHideoutFlag || hasPartyInPortFlag || hasTravellingFlag || hasCastleFlag || hasPartyInTownFlag || hasPartyInVillageFlag || hasPartyInCastleFlag);
+            bool inclusiveConditions = (hasCityFlag || hasDungeonFlag || hasVillageFlag || hasHideoutFlag || hasPartyInPortFlag || hasTavernFlag || hasTravellingFlag || hasCastleFlag || hasPartyInTownFlag || hasPartyInVillageFlag || hasPartyInCastleFlag);
 
             bool exclusiveConditionsLand = (hasPartyOnLandFlag || hasPartyAtSeaFlag) && !(hasPartyOnLandFlag && hasPartyAtSeaFlag);
 
@@ -958,7 +959,7 @@ namespace CaptivityEvents.Events
 
                 if (!inclusiveConditions) return eventMatchingCondition || Error("Skipping event " + _listEvent.Name + " it does not match the location conditions.");
 
-                eventMatchingCondition = hasTravellingFlag && locationString.Contains("hasTravellingFlag") || hasCityFlag && locationString.Contains("hasCityFlag") || hasDungeonFlag && locationString.Contains("hasDungeonFlag") || hasVillageFlag && locationString.Contains("hasVillageFlag") || hasHideoutFlag && locationString.Contains("hasHideoutFlag") || hasPartyInPortFlag && locationString.Contains("hasPartyInPortFlag") || hasCastleFlag && locationString.Contains("hasCastleFlag") || hasPartyInTownFlag && locationString.Contains("hasPartyInTownFlag") || hasPartyInVillageFlag && locationString.Contains("hasPartyInVillageFlag") || hasPartyInCastleFlag && locationString.Contains("hasPartyInCastleFlag");
+                eventMatchingCondition = hasTravellingFlag && locationString.Contains("hasTravellingFlag") || hasCityFlag && locationString.Contains("hasCityFlag") || hasTavernFlag && locationString.Contains("hasTavernFlag") || hasDungeonFlag && locationString.Contains("hasDungeonFlag") || hasVillageFlag && locationString.Contains("hasVillageFlag") || hasHideoutFlag && locationString.Contains("hasHideoutFlag") || hasPartyInPortFlag && locationString.Contains("hasPartyInPortFlag") || hasCastleFlag && locationString.Contains("hasCastleFlag") || hasPartyInTownFlag && locationString.Contains("hasPartyInTownFlag") || hasPartyInVillageFlag && locationString.Contains("hasPartyInVillageFlag") || hasPartyInCastleFlag && locationString.Contains("hasPartyInCastleFlag");
             }
 
             return eventMatchingCondition || Error("Skipping event " + _listEvent.Name + " it does not match the location conditions.");

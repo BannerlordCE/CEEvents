@@ -46,7 +46,7 @@ namespace CaptivityEvents.Brothel
             // Option Added To Town
             campaignGameStarter.AddGameMenuOption("town", "town_brothel", "{=CEEVENTS1100}Go to the brothel district", CanGoToBrothelDistrictOnCondition, delegate
                                                                                                                                                           {
-                                                                                                                                                              if (CEHelper.SafeSwitchToMenu("town_brothel")) CEHelper.SafeSwitchToMenu("town");
+                                                                                                                                                              if (!CEHelper.SafeSwitchToMenu("town_brothel")) CEHelper.SafeSwitchToMenu("town");
                                                                                                                                                           }, false, 2);
 
             campaignGameStarter.AddGameMenu("town_brothel", "{=CEEVENTS1098}You are in the brothel district", BrothelDistrictOnInit, GameMenu.MenuOverlayType.SettlementWithBoth);
