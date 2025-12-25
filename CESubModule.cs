@@ -4,6 +4,7 @@ using CaptivityEvents.Config;
 using CaptivityEvents.Custom;
 using CaptivityEvents.Events;
 using CaptivityEvents.Helper;
+using CaptivityEvents.Incidents;
 using CaptivityEvents.Notifications;
 using HarmonyLib;
 using System;
@@ -189,6 +190,9 @@ namespace CaptivityEvents
         private Harmony _harmony;
 
         public const string HarmonyId = "com.CE.captivityEvents";
+
+        // Track if we've already played the custom intro movie
+        private static bool _customIntroPlayed;
 
         // Last Check on Animation Loop
         private static float _lastCheck;
@@ -812,6 +816,34 @@ namespace CaptivityEvents
 
                 CECustomHandler.ForceLogToFile(CESettings.Instance?.EventCaptorNotifications ?? true ? "Patching Map Notifications: No Conflicts Detected : Enabled." : "EventCaptorNotifications: Disabled.");
 
+                // Patch Module.OnApplicationTick to intercept before SetInitialModuleScreenAsRootScreen is called
+                // try
+                // {
+                //     _harmony.Patch(
+                //         AccessTools.Method(typeof(TaleWorlds.MountAndBlade.Module), "OnApplicationTick", new Type[] { typeof(float) }),
+                //         prefix: new HarmonyMethod(typeof(CESubModule), nameof(OnApplicationTickPrefix))
+                //     );
+                //     CECustomHandler.ForceLogToFile("Module.OnApplicationTick patched successfully for intro movie");
+                // }
+                // catch (Exception e)
+                // {
+                //     CECustomHandler.ForceLogToFile("Failed to patch Module.OnApplicationTick: " + e.Message);
+                // }
+
+                // Patch Module.OnInitialModuleScreenActivated to play our intro after native splash screen
+                try
+                {
+                    _harmony.Patch(
+                        AccessTools.Method(typeof(TaleWorlds.MountAndBlade.Module), "OnInitialModuleScreenActivated", new Type[] { typeof(bool) }),
+                        prefix: new HarmonyMethod(typeof(CESubModule), nameof(OnInitialModuleScreenActivatedPrefix))
+                    );
+                    CECustomHandler.ForceLogToFile("Module.OnInitialModuleScreenActivated patched successfully for intro movie");
+                }
+                catch (Exception e)
+                {
+                    CECustomHandler.ForceLogToFile("Failed to patch Module.OnInitialModuleScreenActivated: " + e.Message);
+                }
+
                 _harmony.PatchAll();
             }
             catch (Exception ex)
@@ -902,7 +934,7 @@ namespace CaptivityEvents
                 }
                 else
                 {
-                    if (!listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
+                    if (!listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent) && listedEvent.EventType?.ToLower() != "incident")
                     {
                         int weightedChance = 1;
 
@@ -1331,6 +1363,13 @@ namespace CaptivityEvents
             {
                 campaignStarter.AddBehavior(new PlayerCaptivityCampaignBehavior());
             }
+
+            // Add CE Incident Handler for converting CE events to Bannerlord incidents
+            CEIncidentHandler ceIncidentHandler = new CEIncidentHandler();
+            campaignStarter.AddBehavior(ceIncidentHandler);
+
+            // Initialize incidents after behaviors are added
+            ceIncidentHandler.InitializeIncidents();
 
             CEPrisonerDialogue prisonerDialogue = new();
 
@@ -1996,8 +2035,16 @@ namespace CaptivityEvents
             {
                 if (CEPersistence.VictoryEvent != null)
                 {
-                    CEHelper.SafeActivateGameMenu(CEPersistence.VictoryEvent);
-                    mapState.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
+                    // Check if victory event should be launched as an incident
+                    if (CEIncidentHelper.ShouldLaunchAsIncident(CEPersistence.VictoryEvent))
+                    {
+                        CEIncidentHelper.LaunchBattleResultIncident(CEPersistence.VictoryEvent);
+                    }
+                    else
+                    {
+                        CEHelper.SafeActivateGameMenu(CEPersistence.VictoryEvent);
+                        mapState.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
+                    }
                     CEPersistence.VictoryEvent = null;
                     CEPersistence.DefeatEvent = null;
                 }
@@ -2006,8 +2053,16 @@ namespace CaptivityEvents
             {
                 if (CEPersistence.DefeatEvent != null)
                 {
-                    CEHelper.SafeActivateGameMenu(CEPersistence.DefeatEvent);
-                    mapState.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
+                    // Check if defeat event should be launched as an incident
+                    if (CEIncidentHelper.ShouldLaunchAsIncident(CEPersistence.DefeatEvent))
+                    {
+                        CEIncidentHelper.LaunchBattleResultIncident(CEPersistence.DefeatEvent);
+                    }
+                    else
+                    {
+                        CEHelper.SafeActivateGameMenu(CEPersistence.DefeatEvent);
+                        mapState.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
+                    }
                     CEPersistence.VictoryEvent = null;
                     CEPersistence.DefeatEvent = null;
                 }
@@ -2171,6 +2226,75 @@ namespace CaptivityEvents
             catch (Exception)
             {
                 // ignored
+            }
+        }
+
+        // Harmony prefix for Module.OnInitialModuleScreenActivated
+        private static bool OnInitialModuleScreenActivatedPrefix(TaleWorlds.MountAndBlade.Module __instance, bool isFromSplashScreenVideo)
+        {
+            try
+            {
+                CECustomHandler.ForceLogToFile("OnInitialModuleScreenActivatedPrefix called with isFromSplashScreenVideo: " + isFromSplashScreenVideo);
+
+                // Only play our intro after the native splash screen has finished (isFromSplashScreenVideo should be true)
+                if (isFromSplashScreenVideo && !_customIntroPlayed)
+                {
+                    CECustomHandler.ForceLogToFile("Native splash screen finished, checking for custom intro movie");
+
+                    // Check if we have a custom intro movie to play
+                    string customVideoPath = ModuleHelper.GetModuleFullPath("zCaptivityEvents") + "Videos/intro_custom.ivf";
+
+                    if (File.Exists(customVideoPath))
+                    {
+                        CECustomHandler.ForceLogToFile("Found custom intro movie, playing: " + customVideoPath);
+
+                        // Create VideoPlaybackState and play the custom intro movie
+                        VideoPlaybackState videoPlaybackState = __instance.GlobalGameStateManager.CreateState<VideoPlaybackState>();
+                        string customAudioPath = ModuleHelper.GetModuleFullPath("zCaptivityEvents") + "Videos/intro_custom.ogg";
+
+                        videoPlaybackState.SetStartingParameters(customVideoPath, customAudioPath, string.Empty, 24f, true);
+
+                        // Set delegate to continue to main menu after video
+                        videoPlaybackState.SetOnVideoFinisedDelegate(new Action(() =>
+                        {
+                            CECustomHandler.ForceLogToFile("Custom intro movie finished, returning to main menu");
+                            CESubModule._customIntroPlayed = true;
+
+                            // Pop the video state to return to the main menu (InitialState)
+                            if (__instance.GlobalGameStateManager.ActiveState is VideoPlaybackState)
+                            {
+                                __instance.GlobalGameStateManager.PopState(0);
+                                CECustomHandler.ForceLogToFile("Popped video state, should now be back at main menu");
+                            }
+                        }));
+
+                        __instance.GlobalGameStateManager.CleanAndPushState(videoPlaybackState, 0);
+
+                        CECustomHandler.ForceLogToFile("Custom intro movie started after native splash screen");
+
+                        // Return false to prevent the original method from running
+                        return false;
+                    }
+                    else
+                    {
+                        CECustomHandler.ForceLogToFile("Custom intro movie not found: " + customVideoPath);
+                        CESubModule._customIntroPlayed = true; // Don't try again
+                        // Continue with original method
+                        return true;
+                    }
+                }
+                else
+                {
+                    // Either isFromSplashScreenVideo is false (not after splash) or we've already played our intro
+                    CECustomHandler.ForceLogToFile("Skipping custom intro - isFromSplashScreenVideo: " + isFromSplashScreenVideo + ", already played: " + _customIntroPlayed);
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed to check for custom intro movie: " + e.Message);
+                CESubModule._customIntroPlayed = true; // Don't retry on error
+                return true; // Continue with original method on error
             }
         }
     }

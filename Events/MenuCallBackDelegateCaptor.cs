@@ -1748,7 +1748,7 @@ namespace CaptivityEvents.Events
             MBTextManager.SetTextVariable("MONEY_AMOUNT", content);
         }
 
-        private void InitSetNames(ref MenuCallbackArgs args)
+        internal void InitCaptorTextVariables()
         {
             try
             {
@@ -1762,11 +1762,10 @@ namespace CaptivityEvents.Events
             }
             catch (Exception) { CECustomHandler.LogToFile("Hero doesn't exist"); }
 
-            TextObject text = args.MenuContext.GameMenu.GetText();
-            if (MobileParty.MainParty.CurrentSettlement != null) text.SetTextVariable("SETTLEMENT_NAME", MobileParty.MainParty.CurrentSettlement.Name);
-            text.SetTextVariable("PARTY_NAME", MobileParty.MainParty.Name);
-            text.SetTextVariable("CAPTOR_NAME", Hero.MainHero.Name);
-            text.SetTextVariable("ISONSEA", MobileParty.MainParty.IsCurrentlyAtSea ? 1 : 0);
+            if (MobileParty.MainParty.CurrentSettlement != null) MBTextManager.SetTextVariable("SETTLEMENT_NAME", MobileParty.MainParty.CurrentSettlement.Name);
+            MBTextManager.SetTextVariable("PARTY_NAME", MobileParty.MainParty.Name);
+            MBTextManager.SetTextVariable("CAPTOR_NAME", Hero.MainHero.Name);
+            MBTextManager.SetTextVariable("ISONSEA", MobileParty.MainParty.IsCurrentlyAtSea ? 1 : 0);
 
             try
             {
@@ -1774,8 +1773,8 @@ namespace CaptivityEvents.Events
                 {
                     foreach (KeyValuePair<string, Hero> item in _listedEvent.SavedCompanions)
                     {
-                        text.SetTextVariable("COMPANION_NAME_" + item.Key, item.Value?.Name);
-                        text.SetTextVariable("COMPANIONISFEMALE_" + item.Key, item.Value is { IsFemale: true } ? 1 : 0);
+                        MBTextManager.SetTextVariable("COMPANION_NAME_" + item.Key, item.Value?.Name);
+                        MBTextManager.SetTextVariable("COMPANIONISFEMALE_" + item.Key, item.Value is { IsFemale: true } ? 1 : 0);
                     }
                 }
             }
@@ -1783,7 +1782,10 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.ForceLogToFile("Failed to SetNames for " + _listedEvent.Name);
             }
-
+        }
+        
+        private void InitSetNames(ref MenuCallbackArgs args)
+        {
             args.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
         }
 

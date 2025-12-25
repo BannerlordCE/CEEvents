@@ -95,6 +95,21 @@ namespace CaptivityEvents.Custom
     }
 
     [XmlType(AnonymousType = true)]
+    [XmlRoot(Namespace = "", IsNullable = true)]
+    [Serializable]
+    public enum RestrictedListOfIncidentTriggers
+    {
+        PartyEnteredSettlementIsVillage,
+        PartyLeavingSettlementIsVillage,
+        PartyEnteredSettlementIsTown,
+        PartyLeavingSettlementIsTown,
+        PartyEnteredSettlementIsCastle,
+        PartyLeavingSettlementIsCastle,
+        PartyIsWaitingInSettlement,
+        LeavingBattle
+    }
+
+    [XmlType(AnonymousType = true)]
     [XmlRoot(Namespace = "", IsNullable = false)]
     [Serializable]
     public enum RestrictedListOfFlags
@@ -737,6 +752,12 @@ namespace CaptivityEvents.Custom
 
         public string Text { get; set; }
 
+        public string EventType { get; set; }
+
+        public string IncidentType { get; set; }
+
+        public string IncidentCooldown { get; set; }
+
         public string BackgroundName { get; set; }
 
         [XmlArrayItem("Background", IsNullable = true)]
@@ -754,6 +775,9 @@ namespace CaptivityEvents.Custom
 
         [XmlArrayItem("RestrictedListOfFlags", IsNullable = false)]
         public RestrictedListOfFlags[] MultipleRestrictedListOfFlags { get; set; }
+
+        [XmlArrayItem("RestrictedListOfIncidentTriggers")]
+        public RestrictedListOfIncidentTriggers[] MultipleRestrictedListOfIncidentTriggers { get; set; }
 
         [XmlArrayItem("Option", IsNullable = true)]
         public Option[] Options { get; set; }

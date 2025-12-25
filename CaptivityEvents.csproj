@@ -104,6 +104,11 @@
     <Compile Include="Events\WaitingList.cs" />
     <Compile Include="Helper\CETests.cs" />
     <Compile Include="Helper\CEDelayedEvent.cs" />
+    <Compile Include="Incidents\CEIncidentHandler.cs" />
+    <Compile Include="Incidents\CEIncidentHelper.cs" />
+    <Compile Include="Incidents\IncidentHandlerDelegateCaptive.cs" />
+    <Compile Include="Incidents\IncidentHandlerDelegateRandom.cs" />
+    <Compile Include="Incidents\IncidentHandlerDelegateCaptor.cs" />
     <Compile Include="Notifications\CECaptorMapNotification.cs" />
     <Compile Include="Notifications\CECaptorMapNotificationItemVM.cs" />
     <Compile Include="Helper\CEConsole.cs" />

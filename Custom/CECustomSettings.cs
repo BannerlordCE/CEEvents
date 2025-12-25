@@ -75,6 +75,7 @@ namespace CaptivityEvents
         public bool PregnancyMessages { get; set; } = true;
         public int RenownChoice { get; set; } = 1;
         public float RenownMin { get; set; } = -150f;
+        public bool IncidentsEnabled { get; set; } = true;
         public bool LogToggle { get; set; } = true;
     }
 }

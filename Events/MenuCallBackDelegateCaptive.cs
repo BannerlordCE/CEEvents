@@ -1930,13 +1930,9 @@ namespace CaptivityEvents.Events
             else { text.SetTextVariable("DAYS", 0); }
         }
 
-        private void InitCaptiveTextVariables(ref MenuCallbackArgs args)
+        internal void InitCaptiveTextVariables(ref TextObject text)
         {
-            if (!PlayerCaptivity.IsCaptive) return;
-
             int captiveTimeInDays = PlayerCaptivity.CaptiveTimeInDays;
-            TextObject text = args.MenuContext.GameMenu.GetText();
-
             text.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale ? 1 : 0);
 
             if (PlayerCaptivity.CaptorParty.LeaderHero != null)
@@ -1988,6 +1984,15 @@ namespace CaptivityEvents.Events
             }
 
             InitCaptiveTimeInDays(captiveTimeInDays, ref text);
+        }
+
+        private void InitCaptiveTextVariables(ref MenuCallbackArgs args)
+        {
+            if (!PlayerCaptivity.IsCaptive) return;
+
+            TextObject text = args.MenuContext.GameMenu.GetText();
+
+            InitCaptiveTextVariables(ref text);
         }
 
 #endregion Init Options

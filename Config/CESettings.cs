@@ -77,6 +77,7 @@ namespace CaptivityEvents.Config
         bool PregnancyMessages { get; set; }
         Dropdown<string> RenownChoice { get; set; }
         float RenownMin { get; set; }
+        bool IncidentsEnabled { get; set; }
         bool LogToggle { get; set; }
     }
 
@@ -155,6 +156,7 @@ namespace CaptivityEvents.Config
         public Dropdown<string> RenownChoice { get; set; } = new Dropdown<string>(new string[] { "{=CESETTINGS1115}Off", "{=CESETTINGS1022}Decrease/Increase Clan Level", "{=CESETTINGS1023}Keep/Increase Clan Level" }, 1);
 
         public float RenownMin { get; set; } = -150f;
+        public bool IncidentsEnabled { get; set; } = true;
         public bool LogToggle { get; set; } = false;
     }
 
@@ -355,6 +357,10 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0088}Random")]
         public float EventOccurrenceRandom { get; set; } = 12f;
 
+        [SettingPropertyBool("{=CESETTINGS1144}Incidents Enabled", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1145}Enable or disable all incidents, including default game incidents.", IsToggle = true)]
+        [SettingPropertyGroup("{=CESETTINGS0088}Random")]
+        public bool IncidentsEnabled { get; set; } = true;
+
 #endregion Random
 
 #region Escape
@@ -535,7 +541,7 @@ namespace CaptivityEvents.Config
         [SettingPropertyGroup("{=CESETTINGS0095}Other")]
         public float RenownMin { get; set; } = -150f;
 
-        [SettingPropertyBool("{=CESETTINGS1088}Logging Toggle (Slows Down The Game)", Order = 3, RequireRestart = false, HintText = "{=CESETTINGS1089}Log the events (Debug Mode)")]
+        [SettingPropertyBool("{=CESETTINGS1088}Logging Toggle (Slows Down The Game)", Order = 4, RequireRestart = false, HintText = "{=CESETTINGS1089}Log the events (Debug Mode)")]
         [SettingPropertyGroup("{=CESETTINGS0095}Other")]
         public bool LogToggle { get; set; } = false;
 
@@ -631,6 +637,7 @@ namespace CaptivityEvents.Config
                         _provider.PregnancyMessages = customSettings.PregnancyMessages;
                         _provider.RenownMin = customSettings.RenownMin;
                         _provider.RenownChoice.SelectedIndex = customSettings.RenownChoice;
+                        _provider.IncidentsEnabled = customSettings.IncidentsEnabled;
                         _provider.LogToggle = customSettings.LogToggle;
                     }
 

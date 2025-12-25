@@ -13,9 +13,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using CaptivityEvents.Incidents;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.GameState;
+using TaleWorlds.CampaignSystem.Incidents;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Settlements.Locations;
@@ -25,6 +27,7 @@ using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.ModuleManager;
 using TaleWorlds.MountAndBlade;
+using TaleWorlds.ObjectSystem;
 using Path = System.IO.Path;
 
 namespace CaptivityEvents.Helper
@@ -1238,6 +1241,38 @@ namespace CaptivityEvents.Helper
             }
         }
 
+        [CommandLineFunctionality.CommandLineArgumentFunction("reload_incidents", "captivity")]
+        public static string ReloadIncidents(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.reload_incidents \".";
+
+                if (Campaign.Current?.GameManager == null) return "Cannot reload in the current campaign.";
+
+                // Get the CEIncidentHandler instance
+                CEIncidentHandler incidentHandler = Campaign.Current.CampaignBehaviorManager.GetBehavior<CEIncidentHandler>();
+
+                if (incidentHandler == null)
+                {
+                    return "CEIncidentHandler not found in campaign behaviors.";
+                }
+
+                // Call InitializeIncidents to reload all incidents
+                incidentHandler.InitializeIncidents();
+
+                int incidentCount = MBObjectManager.Instance.GetObjectTypeList<Incident>().Count;
+
+                return $"Successfully reloaded incidents. Total incidents: {incidentCount}";
+            }
+            catch (Exception e)
+            {
+                return "Failed to reload incidents: " + e.Message;
+            }
+        }
+
         [CommandLineFunctionality.CommandLineArgumentFunction("reload_events", "captivity")]
         public static string ReloadEvents(List<string> strings)
         {
@@ -1283,7 +1318,7 @@ namespace CaptivityEvents.Helper
                 CEPersistence.CECustomModules = CECustomHandler.GetModules();
 
                 // Map module names
-                foreach (var item in CEPersistence.CECustomModules)
+                foreach (CECustomModule item in CEPersistence.CECustomModules)
                 {
                     try
                     {
@@ -1298,11 +1333,11 @@ namespace CaptivityEvents.Helper
                 CEHelper.BrothelFlagFemale = false;
                 CEHelper.BrothelFlagMale = false;
 
-                var campaignGameStarter = new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager);
-                var variablesLoader = new CEVariablesLoader();
+                CampaignGameStarter campaignGameStarter = new CampaignGameStarter(Campaign.Current.GameMenuManager, Campaign.Current.ConversationManager);
+                CEVariablesLoader variablesLoader = new CEVariablesLoader();
 
                 // Process events
-                foreach (var listedEvent in CEPersistence.CEEvents.Where(e => !string.IsNullOrWhiteSpace(e.Name)))
+                foreach (CEEvent listedEvent in CEPersistence.CEEvents.Where(e => !string.IsNullOrWhiteSpace(e.Name)))
                 {
                     if (listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Overwritable) && (CEPersistence.CEEventList.Any(x => x.Name == listedEvent.Name) || CEPersistence.CEWaitingList.Any(x => x.Name == listedEvent.Name))) continue;
 
@@ -1333,7 +1368,7 @@ namespace CaptivityEvents.Helper
                         CEPersistence.CEWaitingList.Add(listedEvent);
                     else
                     {
-                        if (!listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent))
+                        if (!listedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.CanOnlyBeTriggeredByOtherEvent) && listedEvent.EventType?.ToLower() != "incident")
                         {
                             int weightedChance = 1;
 
@@ -1379,7 +1414,10 @@ namespace CaptivityEvents.Helper
                 string requiredPath = Path.Combine(basePath, "CaptivityRequired");
                 LoadImages(modulePaths, basePath, requiredPath);
 
-                return $"Loaded {CEPersistence.CEEventImageList.Count} images and {CEPersistence.CEEvents.Count} events.";
+                // Also reload incidents since events were reloaded
+                string incidentResult = ReloadIncidents([]);
+
+                return $"Loaded {CEPersistence.CEEventImageList.Count} images and {CEPersistence.CEEvents.Count} events.\n{incidentResult}";
             }
             catch (Exception e)
             {
@@ -1685,6 +1723,205 @@ namespace CaptivityEvents.Helper
             }
         }
 
+        [CommandLineFunctionality.CommandLineArgumentFunction("play_intro", "captivity")]
+        public static string PlayIntro(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.play_intro\". Plays the Captivity Events intro movie.";
+
+                try
+                {
+                    // Stop background music before starting video
+                    try
+                    {
+                        if (MBMusicManager.Current != null)
+                        {
+                            MBMusicManager.Current.ForceStopThemeWithFadeOut();
+                            CECustomHandler.ForceLogToFile("Stopped background music before video playback");
+                        }
+                    }
+                    catch (Exception musicEx)
+                    {
+                        CECustomHandler.ForceLogToFile("Could not stop music: " + musicEx.Message);
+                    }
+
+                    // Check if we have a custom intro movie to play
+                    string customVideoPath = ModuleHelper.GetModuleFullPath("zCaptivityEvents") + "Videos/intro_custom.ivf";
+
+                    if (File.Exists(customVideoPath))
+                    {
+                        CECustomHandler.ForceLogToFile("Console command: Playing intro movie: " + customVideoPath);
+
+                        // Create VideoPlaybackState and play the custom intro movie
+                        VideoPlaybackState videoPlaybackState = Game.Current.GameStateManager.CreateState<VideoPlaybackState>();
+                        string customAudioPath = ModuleHelper.GetModuleFullPath("zCaptivityEvents") + "Videos/intro_custom.ogg";
+
+                        videoPlaybackState.SetStartingParameters(customVideoPath, customAudioPath, string.Empty, 24f, true);
+
+                        // Set delegate to continue to main menu after video
+                        videoPlaybackState.SetOnVideoFinisedDelegate(new Action(() =>
+                        {
+                            CECustomHandler.ForceLogToFile("Console intro movie finished, returning to current state");
+
+                            // Pop the video state to return to the previous state
+                            if (Game.Current.GameStateManager.ActiveState is VideoPlaybackState)
+                            {
+                                Game.Current.GameStateManager.PopState(0);
+                                CECustomHandler.ForceLogToFile("Popped video state from console command");
+                            }
+                        }));
+
+                        Game.Current.GameStateManager.PushState(videoPlaybackState, 0);
+
+                        CECustomHandler.ForceLogToFile("Console intro movie started");
+
+                        return "Intro movie started successfully.";
+                    }
+                    else
+                    {
+                        return "Intro movie file not found: " + customVideoPath;
+                    }
+                }
+                catch (Exception e)
+                {
+                    return "Failed to play intro movie: " + e.Message;
+                }
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("trigger_incident", "captivity")]
+        public static string TriggerIncident(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.trigger_incident [INCIDENT_NAME]\".\nTriggers a specific incident by name, or triggers a random incident if no name is provided (if conditions match).";
+
+                string incidentName = null;
+
+                if (CampaignCheats.CheckParameters(strings, 1))
+                {
+                    incidentName = strings[0];
+                }
+
+                if (!string.IsNullOrEmpty(incidentName))
+                {
+                    // Try to trigger specific incident
+                    Incident incident = MBObjectManager.Instance.GetObjectTypeList<Incident>()
+                                                       .FirstOrDefault(i => i.StringId.Equals(incidentName, StringComparison.OrdinalIgnoreCase) ||
+                                                                            i.Title.ToString().Equals(incidentName, StringComparison.OrdinalIgnoreCase));
+
+                    if (incident == null)
+                    {
+                        return $"Incident '{incidentName}' not found.";
+                    }
+
+                    // Check if incident can be invoked
+                    if (!incident.CanIncidentBeInvoked())
+                    {
+                        return $"Incident '{incidentName}' conditions are not met or is on cooldown.";
+                    }
+
+                    // Invoke the specific incident
+                    MapState mapState = GameStateManager.Current.LastOrDefault<MapState>();
+                    mapState?.NextIncident = incident;
+
+                    return $"Triggered incident: {incident.Title}";
+                }
+                else
+                {
+                    // Trigger random incident - get the CEIncidentHandler instance from campaign behaviors
+                    CEIncidentHandler incidentHandler = Campaign.Current.CampaignBehaviorManager.GetBehavior<CEIncidentHandler>();
+
+                    if (incidentHandler == null)
+                    {
+                        return "CEIncidentHandler not found.";
+                    }
+
+                    // Get available incidents that are not on cooldown and can be invoked
+                    List<Incident> availableIncidents = MBObjectManager.Instance.GetObjectTypeList<Incident>()
+                                                                       .Where(incident => !incidentHandler._incidentsOnCooldown.ContainsKey(incident) &&
+                                                                                          incident.CanIncidentBeInvoked())
+                                                                       .ToList();
+
+                    if (availableIncidents.Count == 0)
+                    {
+                        return "No incidents available to trigger (conditions not met or all on cooldown).";
+                    }
+
+                    Incident randomIncident = availableIncidents.GetRandomElement();
+
+                    MapState mapState = GameStateManager.Current.LastOrDefault<MapState>();
+                    mapState?.NextIncident = randomIncident;
+
+                    return $"Triggered random incident: {randomIncident.Title}";
+                }
+            }
+            catch (Exception e)
+            {
+                return "Failed to trigger incident: " + e.Message;
+            }
+        }
+
+        [CommandLineFunctionality.CommandLineArgumentFunction("list_incidents", "captivity")]
+        public static string ListIncidents(List<string> strings)
+        {
+            try
+            {
+                Thread.Sleep(500);
+
+                if (CampaignCheats.CheckHelp(strings)) return "Format is \"captivity.list_incidents [SEARCH_TERM]\".";
+
+                string searchTerm = null;
+                if (CampaignCheats.CheckParameters(strings, 1)) searchTerm = strings[0].ToLower();
+
+                MBReadOnlyList<Incident> incidents = MBObjectManager.Instance.GetObjectTypeList<Incident>();
+
+                if (incidents.Count == 0)
+                {
+                    return "No incidents loaded.";
+                }
+
+                StringBuilder sb = new StringBuilder();
+                int totalCount = incidents.Count;
+                int displayCount = 0;
+
+                foreach (Incident incident in incidents.OrderBy(x => x.StringId))
+                {
+                    string displayName = $"{incident.StringId} - {incident.Title}";
+                    if (searchTerm == null || incident.StringId.ToLower().Contains(searchTerm) ||
+                        incident.Title.ToString().ToLower().Contains(searchTerm))
+                    {
+                        sb.AppendLine(displayName);
+                        displayCount++;
+                    }
+                }
+
+                if (searchTerm != null)
+                {
+                    sb.Insert(0, $"Loaded incidents matching '{searchTerm}': {displayCount} of {totalCount}\n\n");
+                }
+                else
+                {
+                    sb.Insert(0, $"Loaded incidents: {totalCount}\n\n");
+                }
+
+                return sb.ToString();
+            }
+            catch (Exception e)
+            {
+                return "Sosig\n" + e;
+            }
+        }
+
         [CommandLineFunctionality.CommandLineArgumentFunction("list_images", "captivity")]
         public static string ListImages(List<string> strings)
         {
@@ -1706,7 +1943,7 @@ namespace CaptivityEvents.Helper
                 int totalCount = CEPersistence.CEEventImageList.Count;
                 int displayCount = 0;
 
-                foreach (var kvp in CEPersistence.CEEventImageList.OrderBy(x => x.Key))
+                foreach (KeyValuePair<string, string> kvp in CEPersistence.CEEventImageList.OrderBy(x => x.Key))
                 {
                     if (searchTerm == null || kvp.Key.ToLower().Contains(searchTerm))
                     {
@@ -1716,14 +1953,7 @@ namespace CaptivityEvents.Helper
                     }
                 }
 
-                if (searchTerm != null)
-                {
-                    sb.Insert(0, $"Loaded images matching '{searchTerm}': {displayCount} of {totalCount}\n\n");
-                }
-                else
-                {
-                    sb.Insert(0, $"Loaded images: {totalCount}\n\n");
-                }
+                sb.Insert(0, searchTerm != null ? $"Loaded images matching '{searchTerm}': {displayCount} of {totalCount}\n\n" : $"Loaded images: {totalCount}\n\n");
 
                 return sb.ToString();
             }

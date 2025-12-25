@@ -135,13 +135,8 @@ namespace CaptivityEvents.Events
 
 #region Regular Event
 
-        internal void RandomEventGameMenu(MenuCallbackArgs args)
+        internal void InitRandomTextVariables()
         {
-            args.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
-
-            _sharedCallBackHelper.LoadBackgroundImage("default_random");
-            _sharedCallBackHelper.ConsequencePlaySound(true);
-
             MBTextManager.SetTextVariable("ISFEMALE", Hero.MainHero.IsFemale ? 1 : 0);
             MBTextManager.SetTextVariable("ISONSEA", MobileParty.MainParty.IsCurrentlyAtSea ? 1 : 0);
 
@@ -165,6 +160,16 @@ namespace CaptivityEvents.Events
             {
                 CECustomHandler.ForceLogToFile("Failed to RandomEventGameMenu for " + _listedEvent.Name);
             }
+        }
+
+        internal void RandomEventGameMenu(MenuCallbackArgs args)
+        {
+            args.MenuContext?.SetBackgroundMeshName(Hero.MainHero.IsFemale ? "wait_prisoner_female" : "wait_prisoner_male");
+
+            _sharedCallBackHelper.LoadBackgroundImage("default_random");
+            _sharedCallBackHelper.ConsequencePlaySound(true);
+
+            InitRandomTextVariables();
         }
 
         internal bool RandomEventConditionMenuOption(MenuCallbackArgs args)
