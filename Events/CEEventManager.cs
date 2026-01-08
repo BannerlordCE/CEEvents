@@ -426,7 +426,67 @@ namespace CaptivityEvents.Events
 
                 foreach (CEEvent listEvent in CEPersistence.CEPartyEnteredSettlementEvents)
                 {
-                    string result = new CEEventChecker(listEvent).FlagsDoMatchEventConditionsPartyEnter(party, settlement);
+                    string result = null;
+
+                    // Determine event type and route to appropriate validation method
+                    bool hasCaptiveFlag = listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive);
+                    bool hasRandomFlag = listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random);
+                    bool hasCaptorFlag = listEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor);
+
+                    // Validate using FlagsDoMatchEventConditionsPartyEnter first (common checks)
+                    result = new CEEventChecker(listEvent).FlagsDoMatchEventConditionsPartyEnter(party, settlement);
+
+                    // If basic party enter checks pass, do additional type-specific checks
+                    if (result == null)
+                    {
+                        if (hasCaptiveFlag && PlayerCaptivity.IsCaptive)
+                        {
+                            // Captive event - validate with player as captive
+                            result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                        }
+                        else if (hasRandomFlag && !PlayerCaptivity.IsCaptive)
+                        {
+                            // Random event - validate with player character
+                            result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                        }
+                        else if (hasCaptorFlag && !PlayerCaptivity.IsCaptive)
+                        {
+                            // Captor event - need to find a suitable captive
+                            if (party.PrisonRoster != null && party.PrisonRoster.TotalManCount > 0)
+                            {
+                                // Try to find the first captive that meets conditions
+                                bool foundValidCaptive = false;
+
+                                foreach (TroopRosterElement troopRosterElement in party.PrisonRoster.GetTroopRoster())
+                                {
+                                    if (troopRosterElement.Character == null) continue;
+
+                                    result = new CEEventChecker(listEvent).FlagsDoMatchEventConditions(troopRosterElement.Character, party.Party);
+
+                                    if (result == null)
+                                    {
+                                        // Found a valid captive
+                                        listEvent.Captive = troopRosterElement.Character;
+                                        foundValidCaptive = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!foundValidCaptive)
+                                {
+                                    // No captive met the conditions
+                                    CECustomHandler.LogToFile("PartyEnter: Captor event " + listEvent.Name + " - no captives met conditions");
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                // No prisoners
+                                CECustomHandler.LogToFile("PartyEnter: Captor event " + listEvent.Name + " - no prisoners in party");
+                                continue;
+                            }
+                        }
+                    }
 
                     if (result == null)
                     {
@@ -479,11 +539,48 @@ namespace CaptivityEvents.Events
 
                 try
                 {
-                    if (events.Count > 0) return events.GetRandomElement();
+                    if (events.Count > 0)
+                    {
+                        CEEvent selectedEvent = events.GetRandomElement();
+
+                        // Double-check the selected event one more time before returning
+                        string doubleCheckResult = null;
+
+                        bool hasCaptiveFlag = selectedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captive);
+                        bool hasRandomFlag = selectedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Random);
+                        bool hasCaptorFlag = selectedEvent.MultipleRestrictedListOfFlags.Contains(RestrictedListOfFlags.Captor);
+
+                        // Re-validate the selected event
+                        doubleCheckResult = new CEEventChecker(selectedEvent).FlagsDoMatchEventConditionsPartyEnter(party, settlement);
+
+                        if (doubleCheckResult == null)
+                        {
+                            if (hasCaptiveFlag && PlayerCaptivity.IsCaptive)
+                            {
+                                doubleCheckResult = new CEEventChecker(selectedEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter, PlayerCaptivity.CaptorParty);
+                            }
+                            else if (hasRandomFlag && !PlayerCaptivity.IsCaptive)
+                            {
+                                doubleCheckResult = new CEEventChecker(selectedEvent).FlagsDoMatchEventConditions(CharacterObject.PlayerCharacter);
+                            }
+                            else if (hasCaptorFlag && !PlayerCaptivity.IsCaptive && selectedEvent.Captive != null)
+                            {
+                                doubleCheckResult = new CEEventChecker(selectedEvent).FlagsDoMatchEventConditions(selectedEvent.Captive, party.Party);
+                            }
+                        }
+
+                        if (doubleCheckResult != null)
+                        {
+                            CECustomHandler.LogToFile("PartyEnter: Double-check failed for selected event " + selectedEvent.Name + ": " + doubleCheckResult);
+                            return null;
+                        }
+
+                        return selectedEvent;
+                    }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    CECustomHandler.LogToFile("PartyEnter: Something is broken?");
+                    CECustomHandler.LogToFile("PartyEnter: Something is broken? " + e);
                     PrintDebugInGameTextMessage("PartyEnter Something Broken...?");
                 }
             }

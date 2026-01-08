@@ -17,7 +17,7 @@ namespace CaptivityEvents.Patches
         private static bool ShouldPatch() => CESettings.Instance?.ProstitutionControl ?? true;
 
         [HarmonyPostfix]
-        private static void CalculateClanIncomeInternal(Clan clan, ref ExplainedNumber goldChange, bool applyWithdrawals = false)
+        private static void CalculateClanIncomeInternal(Clan clan, ref ExplainedNumber goldChange, bool applyWithdrawals = false, bool includeDetails = false)
         {
             if (clan.IsEliminated) return;
             if (Clan.PlayerClan != clan) return;

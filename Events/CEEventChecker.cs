@@ -372,6 +372,30 @@ namespace CaptivityEvents.Events
                 return LatestMessage;
             }
 
+
+            if (!PlayerCaptivity.IsCaptive)
+            {
+                if ((party != MobileParty.MainParty && MobileParty.MainParty.CurrentSettlement != settlement))
+                {
+                    LogError("Skipping event " + _listEvent.Name + " party is not the main party entering the settlement.");
+
+                    return LatestMessage;
+                }
+            } 
+            else
+            {
+                if (PlayerCaptivity.CaptorParty.IsMobile && party != PlayerCaptivity.CaptorParty.MobileParty && MobileParty.MainParty.CurrentSettlement != settlement)
+                {
+                    LogError("Skipping event " + _listEvent.Name + " party is not the captor party entering the settlement.");
+                    return LatestMessage;
+                }
+                else if (!PlayerCaptivity.CaptorParty.IsMobile && PlayerCaptivity.CaptorParty != settlement.Party)
+                {
+                    LogError("Skipping event " + _listEvent.Name + " party is not the captor party entering the settlement.");
+                    return LatestMessage;
+                }
+            }
+
             if (!ValidateEvent()) return LatestMessage;
             if (!SettingsCheck()) return LatestMessage;
             if (!CustomFlagCheck()) return LatestMessage;

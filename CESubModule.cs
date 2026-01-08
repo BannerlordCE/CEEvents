@@ -194,6 +194,9 @@ namespace CaptivityEvents
         // Track if we've already played the custom intro movie
         private static bool _customIntroPlayed;
 
+        // Dramalord integration
+        public static bool IsDramalordLoaded { get; private set; }
+
         // Last Check on Animation Loop
         private static float _lastCheck;
 
@@ -636,7 +639,7 @@ namespace CaptivityEvents
                 ApplicationVersion modversion = ceModule.Version;
                 ApplicationVersion gameversion = nativeModule.Version;
 
-                if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor || modversion.Revision != gameversion.Revision)
+                if (gameversion.Major != modversion.Major || gameversion.Minor != modversion.Minor)
                 {
                     CECustomHandler.ForceLogToFile("Captivity Events " + modversion + " has the detected the wrong version " + gameversion);
                     MessageBox.Show("Warning:\n Captivity Events " + modversion + " has the detected the wrong game version. Please download the correct version for " + gameversion + ". Or continue at your own risk.", "Captivity Events has the detected the wrong version");
@@ -804,31 +807,24 @@ namespace CaptivityEvents
 
             try
             {
-                Dictionary<string, Version> dict = Harmony.VersionInfo(out Version myVersion);
-                CECustomHandler.ForceLogToFile("My version: " + myVersion);
-
-                foreach (KeyValuePair<string, Version> entry in dict)
+                try
                 {
-                    string id = entry.Key;
-                    Version version = entry.Value;
-                    CECustomHandler.ForceLogToFile("Mod " + id + " uses Harmony version " + version);
+                    Dictionary<string, Version> dict = Harmony.VersionInfo(out Version myVersion);
+                    CECustomHandler.ForceLogToFile("My version: " + myVersion);
+
+                    foreach (KeyValuePair<string, Version> entry in dict)
+                    {
+                        string id = entry.Key;
+                        Version version = entry.Value;
+                        CECustomHandler.ForceLogToFile("Mod " + id + " uses Harmony version " + version);
+                    }
+                }
+                catch (Exception e)
+                {
+                    CECustomHandler.ForceLogToFile("Harmony Check Failed: " + e.Message);
                 }
 
                 CECustomHandler.ForceLogToFile(CESettings.Instance?.EventCaptorNotifications ?? true ? "Patching Map Notifications: No Conflicts Detected : Enabled." : "EventCaptorNotifications: Disabled.");
-
-                // Patch Module.OnApplicationTick to intercept before SetInitialModuleScreenAsRootScreen is called
-                // try
-                // {
-                //     _harmony.Patch(
-                //         AccessTools.Method(typeof(TaleWorlds.MountAndBlade.Module), "OnApplicationTick", new Type[] { typeof(float) }),
-                //         prefix: new HarmonyMethod(typeof(CESubModule), nameof(OnApplicationTickPrefix))
-                //     );
-                //     CECustomHandler.ForceLogToFile("Module.OnApplicationTick patched successfully for intro movie");
-                // }
-                // catch (Exception e)
-                // {
-                //     CECustomHandler.ForceLogToFile("Failed to patch Module.OnApplicationTick: " + e.Message);
-                // }
 
                 // Patch Module.OnInitialModuleScreenActivated to play our intro after native splash screen
                 try
@@ -850,6 +846,17 @@ namespace CaptivityEvents
             {
                 CECustomHandler.ForceLogToFile("Failed to load: " + ex);
                 MessageBox.Show($"Error Initializing Captivity Events:\n\n{ex}");
+            }
+
+            // Check for Dramalord mod
+            try
+            {
+                IsDramalordLoaded = AppDomain.CurrentDomain.GetAssemblies().Any(a => a.GetName().Name == "Dramalord");
+                CECustomHandler.ForceLogToFile(IsDramalordLoaded ? "Dramalord mod detected, integration enabled." : "Dramalord mod not detected.");
+            }
+            catch (Exception e)
+            {
+                CECustomHandler.ForceLogToFile("Failed to check for Dramalord: " + e.Message);
             }
 
             if (_isLoaded) return;

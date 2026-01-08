@@ -25,6 +25,7 @@ namespace CaptivityEvents.Config
         public bool ActivateKLBShackles;
         public bool ActivatePrimaeNoctisBLord;
         public bool ActivateHotButter;
+        public bool ActivateDramalord;
 
         public void InitializeSettings()
         {
@@ -34,8 +35,9 @@ namespace CaptivityEvents.Config
             ModuleInfo hotButter = ModuleHelper.GetModules().FirstOrDefault(searchInfo => searchInfo.Id.ToLower().StartsWith("hotbutter"));
             ModuleInfo klbShackles = ModuleHelper.GetModules().FirstOrDefault(searchInfo => searchInfo.Id == "KLBShackles");
             ModuleInfo primaeNoctisBLord = ModuleHelper.GetModules().FirstOrDefault(searchInfo => searchInfo.Id.ToLower().StartsWith("primaenoctisblord"));
+            ModuleInfo dramalord = ModuleHelper.GetModules().FirstOrDefault(searchInfo => searchInfo.Id.ToLower() == "dramalord");
 
-            if (klbShackles != null || hotButter != null || primaeNoctisBLord != null) shouldRegister = true;
+            if (klbShackles != null || hotButter != null || primaeNoctisBLord != null || dramalord != null) shouldRegister = true;
 
             if (!shouldRegister) return;
 
@@ -60,6 +62,11 @@ namespace CaptivityEvents.Config
                                                         if (hotButter != null)
                                                         {
                                                             groupBuilder.AddBool("HotButter", "Hot Butter (Animated Scenes)", new ProxyRef<bool>(() => ActivateHotButter, o => ActivateHotButter = o), boolBuilder => boolBuilder.SetHintText("Enables Custom Sex Scenes in Brothel/Other.  (Make sure to double check if the extension is turned on in the launcher)").SetRequireRestart(false));
+                                                        }
+
+                                                        if (dramalord != null)
+                                                        {
+                                                            groupBuilder.AddBool("Dramalord", "Dramalord (Relationship Integration)", new ProxyRef<bool>(() => ActivateDramalord, o => ActivateDramalord = o), boolBuilder => boolBuilder.SetHintText("Enables integration with Dramalord's relationship system. Events will affect love and friendship values. (Make sure to double check if the extension is turned on in the launcher)").SetRequireRestart(false));
                                                         }
                                                     });
 
