@@ -1282,11 +1282,18 @@ namespace CaptivityEvents
             if (game.GameType is not Campaign) return;
             CleanBugs();
             ResetHelper();
-
+            PatchDefaultClanFinanceModel();
             if (!_isLoaded) return;
             InitializeAttributes(game);
             AddBehaviors((CampaignGameStarter)gameStarter);
             CEPersistence.HotButterAvailable = CEHelper.CheckHotButter();
+        }
+
+        private void PatchDefaultClanFinanceModel()
+        {
+            if (!(CESettings.Instance?.ProstitutionControl ?? true)) return;
+            var original = AccessTools.Method(typeof(TaleWorlds.CampaignSystem.GameComponents.DefaultClanFinanceModel), "CalculateClanIncomeInternal");
+            _harmony.Patch(original, postfix: new HarmonyMethod(AccessTools.Method(typeof(Patches.CEPatchDefaultClanFinanceModel), "CalculateClanIncomeInternal")));
         }
 
         private void CleanBugs()
