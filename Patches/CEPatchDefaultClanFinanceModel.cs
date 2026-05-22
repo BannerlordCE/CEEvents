@@ -10,13 +10,8 @@ using TaleWorlds.Localization;
 
 namespace CaptivityEvents.Patches
 {
-    [HarmonyPatch(typeof(DefaultClanFinanceModel), "CalculateClanIncomeInternal")]
     internal class CEPatchDefaultClanFinanceModel
     {
-        [HarmonyPrepare]
-        private static bool ShouldPatch() => CESettings.Instance?.ProstitutionControl ?? true;
-
-        [HarmonyPostfix]
         private static void CalculateClanIncomeInternal(Clan clan, ref ExplainedNumber goldChange, bool applyWithdrawals = false, bool includeDetails = false)
         {
             if (clan.IsEliminated) return;
