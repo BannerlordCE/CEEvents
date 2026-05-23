@@ -159,7 +159,6 @@ namespace CaptivityEvents.Helper
 
                 string result;
 
-
                 // Local function to handle the successful forced event launch
                 void ForceLaunchEvent(MapState mapState)
                 {
@@ -168,7 +167,6 @@ namespace CaptivityEvents.Helper
 
                     CEHelper.SafeSwitchToMenu(result);
                 }
-
 
                 // ─── PLAYER CAPTIVE PATH ─────────────────────────────
                 if (PlayerCaptivity.IsCaptive)
@@ -179,8 +177,10 @@ namespace CaptivityEvents.Helper
                     {
                         case "$FAILEDTOFIND":
                             return "Failed to load event list.";
+
                         case "$EVENTNOTFOUND":
                             return "Event not found.";
+
                         case "$EVENTCONDITIONSNOTMET":
                             return "Event conditions are not met.";
                     }
@@ -213,10 +213,13 @@ namespace CaptivityEvents.Helper
                         {
                             case "$FAILEDTOFIND":
                                 return "Failed to load event list.";
+
                             case "$FAILTOFINDHERO":
                                 return "Failed to find specified captive in party: " + heroName;
+
                             case "$EVENTNOTFOUND":
                                 return "Event not found.";
+
                             case "$EVENTCONDITIONSNOTMET":
                                 return "No captives meet the event conditions.";
                         }
@@ -342,7 +345,6 @@ namespace CaptivityEvents.Helper
                 string result;
                 CEEvent returnedEvent;
 
-
                 // Helper to handle launching events
                 void HandleEventLaunch(CEEvent ceEventToLaunch, MapState mapState)
                 {
@@ -373,7 +375,6 @@ namespace CaptivityEvents.Helper
                     }
                 }
 
-
                 // ─── PLAYER CAPTIVE PATH ─────────────────────────────
                 if (PlayerCaptivity.IsCaptive)
                 {
@@ -383,8 +384,10 @@ namespace CaptivityEvents.Helper
                     {
                         case "$FAILEDTOFIND":
                             return "Failed to load event list.";
+
                         case "$EVENTNOTFOUND":
                             return "Event not found.";
+
                         case "$EVENTCONDITIONSNOTMET":
                             return "Event conditions are not met.";
                     }
@@ -426,10 +429,13 @@ namespace CaptivityEvents.Helper
                         {
                             case "$FAILEDTOFIND":
                                 return "Failed to load event list.";
+
                             case "$FAILTOFINDHERO":
                                 return "Failed to find specified captive in party: " + heroName;
+
                             case "$EVENTNOTFOUND":
                                 return "Event not found.";
+
                             case "$EVENTCONDITIONSNOTMET":
                                 return "No captives meet the event conditions.";
                         }
@@ -514,8 +520,10 @@ namespace CaptivityEvents.Helper
                     {
                         case "$FAILEDTOFIND":
                             return "Failed to load event list.";
+
                         case "$EVENTNOTFOUND":
                             return "Event not found.";
+
                         case "$EVENTCONDITIONSNOTMET":
                             return "Event conditions are not met.";
                     }
@@ -543,10 +551,13 @@ namespace CaptivityEvents.Helper
                         {
                             case "$FAILEDTOFIND":
                                 return "Failed to load event list.";
+
                             case "$FAILTOFINDHERO":
                                 return "Failed to find specified captive in party: " + heroName;
+
                             case "$EVENTNOTFOUND":
                                 return "Event not found.";
+
                             case "$EVENTCONDITIONSNOTMET":
                                 return "No captives meet the event conditions.";
                         }
@@ -682,7 +693,6 @@ namespace CaptivityEvents.Helper
                         text += ceEvent.Name + "\n";
                     }
                 }
-
 
                 return text;
             }
@@ -871,7 +881,6 @@ namespace CaptivityEvents.Helper
                     debug += e;
                 }
 
-
                 debug += "\nNotification Status:\nCaptor Exists: " + CEHelper.NotificationCaptorExists + "\nRandom Exists: " + CEHelper.NotificationEventExists;
 
                 debug += "\nPregnancy Status:\n";
@@ -1020,12 +1029,12 @@ namespace CaptivityEvents.Helper
                     if (specificTest != null)
                     {
                         test += specificTest switch
-                                {
-                                    "1" => "\n" + CETests.RunTestOne(),
-                                    "2" => "\n" + CETests.RunTestTwo(),
-                                    "3" => "\n" + CETests.RunTestThree(),
-                                    _ => "\nNot Found",
-                                };
+                        {
+                            "1" => "\n" + CETests.RunTestOne(),
+                            "2" => "\n" + CETests.RunTestTwo(),
+                            "3" => "\n" + CETests.RunTestThree(),
+                            _ => "\nNot Found",
+                        };
                     }
                     else
                     {
@@ -1430,7 +1439,6 @@ namespace CaptivityEvents.Helper
         {
             CEPersistence.CEEventImageList.Clear();
 
-
             void AddImage(string file)
             {
                 string key = Path.GetFileNameWithoutExtension(file);
@@ -1445,7 +1453,6 @@ namespace CaptivityEvents.Helper
                     CECustomHandler.ForceLogToFile("Failure to load " + file + " - duplicate found.");
                 }
             }
-
 
             // Module images
             foreach (string path in modulePaths)

@@ -64,7 +64,7 @@ namespace CaptivityEvents.Issues
             protected override void CompleteIssueWithTimedOutConsequences()
             { }
 
-            protected override bool CanPlayerTakeQuestConditions(Hero issueGiver, out PreconditionFlags flag, out Hero relationHero, out SkillObject skill)
+            protected override bool CanPlayerTakeQuestConditions(Hero issueGiver, out PreconditionFlags flag, out Hero relationHero, out SkillObject skill, out int requiredGold)
             {
                 bool flag2 = issueGiver.GetRelationWithPlayer() >= -10f;
 
@@ -73,6 +73,7 @@ namespace CaptivityEvents.Issues
                     : PreconditionFlags.Relation;
                 relationHero = issueGiver;
                 skill = null;
+                requiredGold = 0;
 
                 return flag2;
             }
