@@ -1528,7 +1528,7 @@ namespace CaptivityEvents.Brothel
                 // Escape
                 for (int i = 0; i < _brothelList.Count; i++)
                 {
-                    for (int y = 0; y < _brothelList[i].CaptiveProstitutes.Count; y++)
+                    for (int y = _brothelList[i].CaptiveProstitutes.Count; y > -1; y--)
                     {
                         if (_brothelList[i].CaptiveProstitutes[y].IsHero)
                         {
@@ -1575,7 +1575,7 @@ namespace CaptivityEvents.Brothel
                 // Renown Modifier
                 for (int i = 0; i < _brothelList.Count; i++)
                 {
-                    for (int y = 0; y < _brothelList[i].CaptiveProstitutes.Count; y++)
+                    for (int y = _brothelList[i].CaptiveProstitutes.Count; y > -1; y--)
                     {
                         if (_brothelList[i].CaptiveProstitutes[y].IsHero)
                         {
@@ -1600,7 +1600,7 @@ namespace CaptivityEvents.Brothel
                 {
                     for (int i = 0; i < _brothelList.Count; i++)
                     {
-                        for (int y = 0; y < _brothelList[i].CaptiveProstitutes.Count; y++)
+                        for (int y = _brothelList[i].CaptiveProstitutes.Count; y > -1; y--)
                         {
                             if (_brothelList[i].CaptiveProstitutes[y].IsHero)
                             {
