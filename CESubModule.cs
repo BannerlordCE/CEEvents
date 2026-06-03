@@ -1722,8 +1722,6 @@ namespace CaptivityEvents
                         {
                             try
                             {
-                                MissionCameraFadeView behavior = Mission.Current.GetMissionBehavior<MissionCameraFadeView>();
-
                                 Mission.Current.MainAgentServer.Controller = AgentControllerType.AI;
 
                                 WorldPosition worldPosition = new(Mission.Current.Scene, UIntPtr.Zero, CEPersistence.GameEntity.GlobalPosition, false);
@@ -1741,7 +1739,8 @@ namespace CaptivityEvents
                                     _dungeonFadeOut = 2f;
                                 }
 
-                                behavior.BeginFadeOut(_dungeonFadeOut);
+                                ScreenFadeController.BeginFadeOut(_dungeonFadeOut);
+
                             }
                             catch (Exception)
                             {
@@ -1785,7 +1784,6 @@ namespace CaptivityEvents
                         {
                             try
                             {
-                                MissionCameraFadeView behavior = Mission.Current.GetMissionBehavior<MissionCameraFadeView>();
 
                                 Mission.Current.MainAgentServer.Controller = AgentControllerType.AI;
 
@@ -1824,11 +1822,11 @@ namespace CaptivityEvents
                                     SfOut = CEPersistence.BrothelFadeOut;
                                 }
 
-                                behavior.BeginFadeOutAndIn(SfOut, SfBlack, SfIn);
+                                ScreenFadeController.BeginFadeOutAndIn(SfOut, SfBlack, SfIn);
                             }
                             catch (Exception)
                             {
-                                CECustomHandler.ForceLogToFile("Failed MissionCameraFadeView.");
+                                CECustomHandler.ForceLogToFile("Failed ScreenFadeController.");
                             }
 
                             _brothelTimerOne = missionStateBrothel.CurrentMission.CurrentTime + CEPersistence.BrothelFadeIn;

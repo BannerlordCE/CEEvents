@@ -41,6 +41,9 @@
 		},
 		{
 			"path": "."
+		},
+		{
+			"path": "../../zCECommon"
 		}
 	],
 	"settings": {
