@@ -83,7 +83,46 @@ namespace CaptivityEvents.Events
                 ? PlayerCaptivity.CaptorParty //captive
                 : PartyBase.MainParty; //random, captor
 
-            CharacterObject character1 = (isCaptive || isRandom) ? Hero.MainHero.IsFemale ? Hero.MainHero.CharacterObject : null : listedEvent.Captive?.IsFemale ?? false ? listedEvent.Captive : null;
+            Hero heroCompanion = null;
+            if (option.Companions != null)
+            {
+                try
+                {
+                    foreach (Companion companion in option.Companions)
+                    {
+                        if (companion.Id != null)
+                        {
+                            heroCompanion = listedEvent.SavedCompanions.FirstOrDefault((item) => item.Key == companion.Id).Value;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    CECustomHandler.ForceLogToFile("Incorrect ConsequenceCompanions: " + e + listedEvent.Name);
+                }
+                
+            }
+            
+            CharacterObject character1 = null;
+
+            if (isCaptive || isRandom)
+            {
+                if (Hero.MainHero.IsFemale)
+                {
+                    character1 = Hero.MainHero.CharacterObject;
+                }
+                else if (isRandom && heroCompanion != null)
+                {
+                    character1 = heroCompanion.CharacterObject;
+                }
+            }
+            else
+            {
+                if (listedEvent.Captive != null && listedEvent.Captive.IsFemale)
+                {
+                    character1 = listedEvent.Captive;
+                }
+            }
             CharacterObject character2 = (isCaptive || isRandom) ? !Hero.MainHero.IsFemale ? Hero.MainHero.CharacterObject : null : !listedEvent.Captive?.IsFemale ?? false ? listedEvent.Captive : null;
 
             if (option.MultipleRestrictedListOfConsequences.Contains(RestrictedListOfConsequences.ImpregnationByPlayer))
